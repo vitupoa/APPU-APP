@@ -3,7 +3,7 @@ import { redis } from '../../config/redis';
 
 export const getCacheValue = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { key } = req.params;
+    const key = req.params.key as string;
     if (!key) {
       res.status(400).json({ error: 'Cache key is required' });
       return;
@@ -54,7 +54,7 @@ export const setCacheValue = async (req: Request, res: Response): Promise<void> 
 
 export const deleteCacheValue = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { key } = req.params;
+    const key = req.params.key as string;
     if (!key) {
       res.status(400).json({ error: 'Cache key is required' });
       return;
