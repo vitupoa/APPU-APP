@@ -1,0 +1,531 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USERS ────────────────────────────────────────────────
+
+enum AccountType {
+  CREATOR
+  BUSINESS
+}
+
+model User {
+  id              String      @id @default(uuid())
+  email           String      @unique
+  phone           String?     @unique
+  username        String      @unique
+  firstName       String      @map("first_name")
+  lastName        String      @map("last_name")
+  displayName     String      @map("display_name")
+  avatarUrl       String?     @map("avatar_url")
+  coverPhotoUrl   String?     @map("cover_photo_url")
+  bio             String?
+  country         String      @db.VarChar(2) // ISO country code
+  currency        String      @db.VarChar(3) // ISO currency code
+  googleId        String?     @unique @map("google_id")
+  appleId         String?     @unique @map("apple_id")
+  accountType     AccountType @default(CREATOR) @map("account_type")
+  isAdmin         Boolean     @default(false) @map("is_admin") 
+  isVerified      Boolean     @default(false) @map("is_verified")
+  isWalletUnlocked Boolean    @default(false) @map("is_wallet_unlocked")
+  passwordHash    String?     @map("password_hash")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  wallet              Wallet?
+  refreshTokens       RefreshToken[]
+  bioLinks            BioLink[]
+  admirers            Admire[]          @relation("AdmiredBy")
+  admiring            Admire[]          @relation("Admirer")
+  subscriptionTiers   SubscriptionTier[]
+  subscribedTo        Subscription[]    @relation("Subscriber")
+  subscribers         Subscription[]    @relation("Creator")
+  milestoneCompletions MilestoneCompletion[]
+  shorts              Short[]
+  shortLikes          ShortLike[]
+  shortComments       ShortComment[]
+  shortCollections    ShortCollection[]
+  posts               Post[]
+  postLikes           PostLike[]
+  postComments        PostComment[]
+  contestsCreated     Contest[]
+  contestParticipations ContestParticipant[]
+  contestSubmissions  ContestSubmission[]
+  contestWins         ContestWinner[]
+  transactions        Transaction[]
+  escrows             Escrow[]
+  products            Product[]
+  dailyStats          DailyStat[]
+
+  @@map("users")
+}
+
+// ─── AUTH ──────────────────────────────────────────────────
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  tokenHash String   @map("token_hash")
+  deviceId  String   @map("device_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// ─── WALLET ───────────────────────────────────────────────
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  krBalance Decimal  @default(0) @map("kr_balance") @db.Decimal(18, 4)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  type           String   // topup, withdraw, tip_sent, tip_received, contest_escrow, contest_prize, subscription_earned, subscription_paid, shop_sale, ad_revenue, platform_fee
+  amountKr       Decimal  @map("amount_kr") @db.Decimal(18, 4)
+  amountFiat     Decimal? @map("amount_fiat") @db.Decimal(18, 4)
+  currency       String?  @db.VarChar(3)
+  provider       String?  // paypal, paystack, mpesa, payoneer, platform
+  status         String   @default("pending") // pending, completed, failed, cancelled
+  reference      String?
+  counterpartyId String?  @map("counterparty_id")
+  metadata       Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("transactions")
+}
+
+model Escrow {
+  id            String   @id @default(uuid())
+  contestId     String   @map("contest_id")
+  userId        String   @map("user_id")
+  prizeAmountKr Decimal  @map("prize_amount_kr") @db.Decimal(18, 4)
+  feeAmountKr   Decimal  @map("fee_amount_kr") @db.Decimal(18, 4)
+  status        String   @default("held") // held, released, refunded
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  contest Contest @relation(fields: [contestId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("escrows")
+}
+
+// ─── SOCIAL ───────────────────────────────────────────────
+
+model Admire {
+  id        String   @id @default(uuid())
+  admirerId String   @map("admirer_id")
+  admiredId String   @map("admired_id")
+  isLovers  Boolean  @default(false) @map("is_lovers")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  admirer User @relation("Admirer", fields: [admirerId], references: [id], onDelete: Cascade)
+  admired User @relation("AdmiredBy", fields: [admiredId], references: [id], onDelete: Cascade)
+
+  @@unique([admirerId, admiredId])
+  @@map("admires")
+}
+
+model BioLink {
+  id        String @id @default(uuid())
+  userId    String @map("user_id")
+  label     String
+  url       String
+  icon      String?
+  sortOrder Int    @default(0) @map("sort_order")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("bio_links")
+}
+
+// ─── SUBSCRIPTIONS ────────────────────────────────────────
+
+enum SubscriptionTierType {
+  TOP_FUN
+  REAL_FAN
+  TRUE_FAN
+  SUPER_FAN
+}
+
+model SubscriptionTier {
+  id        String               @id @default(uuid())
+  creatorId String               @map("creator_id")
+  tier      SubscriptionTierType
+  krAmount  Decimal              @map("kr_amount") @db.Decimal(18, 4)
+  benefits  String
+  isEnabled Boolean              @default(true) @map("is_enabled")
+  createdAt DateTime             @default(now()) @map("created_at")
+
+  creator       User           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
+
+  @@unique([creatorId, tier])
+  @@map("subscription_tiers")
+}
+
+model Subscription {
+  id            String               @id @default(uuid())
+  subscriberId  String               @map("subscriber_id")
+  creatorId     String               @map("creator_id")
+  tierId        String               @map("tier_id")
+  tier          SubscriptionTierType
+  krAmount      Decimal              @map("kr_amount") @db.Decimal(18, 4)
+  status        String               @default("active") // active, cancelled, expired
+  startedAt     DateTime             @default(now()) @map("started_at")
+  nextBillingAt DateTime?            @map("next_billing_at")
+  cancelledAt   DateTime?            @map("cancelled_at")
+
+  subscriber     User             @relation("Subscriber", fields: [subscriberId], references: [id], onDelete: Cascade)
+  creator        User             @relation("Creator", fields: [creatorId], references: [id], onDelete: Cascade)
+  subscriptionTier SubscriptionTier @relation(fields: [tierId], references: [id])
+
+  @@unique([subscriberId, creatorId])
+  @@map("subscriptions")
+}
+
+// ─── MILESTONES ───────────────────────────────────────────
+
+model Milestone {
+  id               String   @id @default(uuid())
+  title            String
+  description      String
+  requirementType  String   @map("requirement_type")
+  requirementValue Int      @map("requirement_value")
+  rewardKr         Decimal  @map("reward_kr") @db.Decimal(18, 4)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  completions MilestoneCompletion[]
+
+  @@map("milestones")
+}
+
+model MilestoneCompletion {
+  id          String   @id @default(uuid())
+  milestoneId String   @map("milestone_id")
+  userId      String   @map("user_id")
+  completedAt DateTime @default(now()) @map("completed_at")
+
+  milestone Milestone @relation(fields: [milestoneId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([milestoneId]) // Only first user can complete
+  @@map("milestone_completions")
+}
+
+// ─── SHORTS ───────────────────────────────────────────────
+
+model Short {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  videoUrl        String   @map("video_url")
+  thumbnailUrl    String?  @map("thumbnail_url")
+  caption         String?
+  musicTitle      String?  @map("music_title")
+  musicArtist     String?  @map("music_artist")
+  isLocked        Boolean  @default(false) @map("is_locked")
+  requiredTier    SubscriptionTierType? @map("required_tier")
+  contestId       String?  @map("contest_id")
+  collectionId    String?  @map("collection_id")
+  linkedProductId String?  @map("linked_product_id") // Shop product shown briefly during playback
+  views           Int      @default(0)
+  likesCount      Int      @default(0) @map("likes_count")
+  commentsCount   Int      @default(0) @map("comments_count")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contest       Contest?         @relation(fields: [contestId], references: [id])
+  collection    ShortCollection? @relation(fields: [collectionId], references: [id])
+  linkedProduct Product?         @relation(fields: [linkedProductId], references: [id])
+  likes         ShortLike[]
+  comments      ShortComment[]
+
+  @@index([userId, createdAt])
+  @@map("shorts")
+}
+
+model ShortCollection {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  coverUrl  String?  @map("cover_url")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shorts Short[]
+
+  @@map("short_collections")
+}
+
+model ShortLike {
+  id        String   @id @default(uuid())
+  shortId   String   @map("short_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  short Short @relation(fields: [shortId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([shortId, userId])
+  @@map("short_likes")
+}
+
+model ShortComment {
+  id        String   @id @default(uuid())
+  shortId   String   @map("short_id")
+  userId    String   @map("user_id")
+  text      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  short Short @relation(fields: [shortId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("short_comments")
+}
+
+// ─── FEED POSTS ───────────────────────────────────────────
+
+model Post {
+  id            String               @id @default(uuid())
+  userId        String               @map("user_id")
+  caption       String?
+  imageUrls     String[]             @map("image_urls")
+  isLocked      Boolean              @default(false) @map("is_locked")
+  requiredTier  SubscriptionTierType? @map("required_tier")
+  likesCount    Int                  @default(0) @map("likes_count")
+  commentsCount Int                  @default(0) @map("comments_count")
+  createdAt     DateTime             @default(now()) @map("created_at")
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes    PostLike[]
+  comments PostComment[]
+
+  @@index([userId, createdAt])
+  @@map("posts")
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("post_likes")
+}
+
+model PostComment {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  text      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("post_comments")
+}
+
+// ─── CONTESTS (CORE) ──────────────────────────────────────
+
+enum ContestMediaType {
+  PHOTO
+  VIDEO
+  PHOTO_AND_VIDEO
+}
+
+enum ContestStatus {
+  DRAFT
+  ACTIVE
+  JUDGING
+  COMPLETED
+  CANCELLED
+}
+
+enum JudgingCriteria {
+  CREATOR_PICKS
+  COMMUNITY_VOTE
+  MOST_ENGAGEMENT
+}
+
+model Contest {
+  id                String          @id @default(uuid())
+  creatorId         String          @map("creator_id")
+  title             String
+  description       String?
+  mediaType         ContestMediaType @map("media_type")
+  category          String
+  coverMediaUrl     String?         @map("cover_media_url")
+  prizeTotalKr      Decimal         @map("prize_total_kr") @db.Decimal(18, 4)
+  platformFeeKr     Decimal         @map("platform_fee_kr") @db.Decimal(18, 4)
+  maxWinners        Int             @map("max_winners") @db.SmallInt
+  judgingCriteria    JudgingCriteria @map("judging_criteria")
+  sponsorName       String?         @map("sponsor_name") // "Sponsored by [NAME]" clickable text
+  sponsorUrl        String?         @map("sponsor_url")  // Link opened when sponsor name is tapped
+  deadline          DateTime
+  status            ContestStatus   @default(ACTIVE)
+  totalParticipants Int             @default(0) @map("total_participants")
+  totalSubmissions  Int             @default(0) @map("total_submissions")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  creator        User                     @relation(fields: [creatorId], references: [id])
+  actions        ContestAction[]
+  distributions  ContestPrizeDistribution[]
+  participants   ContestParticipant[]
+  submissions    ContestSubmission[]
+  winners        ContestWinner[]
+  escrows        Escrow[]
+  shorts         Short[]
+
+  @@index([status, deadline])
+  @@map("contests")
+}
+
+model ContestAction {
+  id           String  @id @default(uuid())
+  contestId    String  @map("contest_id")
+  actionType   String  @map("action_type")
+  targetUrl    String  @map("target_url")
+  label        String
+  isVerifiable Boolean @default(false) @map("is_verifiable")
+  sortOrder    Int     @default(0) @map("sort_order")
+
+  contest     Contest                   @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  completions ContestActionCompletion[]
+
+  @@map("contest_actions")
+}
+
+model ContestPrizeDistribution {
+  id         String  @id @default(uuid())
+  contestId  String  @map("contest_id")
+  rank       Int
+  percentage Decimal @db.Decimal(5, 2)
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+
+  @@map("contest_prize_distributions")
+}
+
+model ContestParticipant {
+  id        String   @id @default(uuid())
+  contestId String   @map("contest_id")
+  userId    String   @map("user_id")
+  joinedAt  DateTime @default(now()) @map("joined_at")
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([contestId, userId])
+  @@map("contest_participants")
+}
+
+model ContestSubmission {
+  id          String   @id @default(uuid())
+  contestId   String   @map("contest_id") // ALWAYS linked to parent contest
+  userId      String   @map("user_id")
+  mediaUrl    String   @map("media_url")
+  mediaType   String   @map("media_type") // photo or video
+  proofUrls   String[] @map("proof_urls")
+  votesCount  Int      @default(0) @map("votes_count")
+  rank        Int?
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  contest           Contest                   @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user              User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actionCompletions ContestActionCompletion[]
+
+  @@unique([contestId, userId]) // One submission per user per contest
+  @@map("contest_submissions")
+}
+
+model ContestActionCompletion {
+  id           String  @id @default(uuid())
+  submissionId String  @map("submission_id")
+  actionId     String  @map("action_id")
+  isCompleted  Boolean @default(false) @map("is_completed")
+  proofUrl     String? @map("proof_url")
+
+  submission ContestSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  action     ContestAction     @relation(fields: [actionId], references: [id], onDelete: Cascade)
+
+  @@map("contest_action_completions")
+}
+
+model ContestWinner {
+  id        String   @id @default(uuid())
+  contestId String   @map("contest_id")
+  userId    String   @map("user_id")
+  rank      Int
+  prizeKr   Decimal  @map("prize_kr") @db.Decimal(18, 4)
+  awardedAt DateTime @default(now()) @map("awarded_at")
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("contest_winners")
+}
+
+// ─── SHOP ─────────────────────────────────────────────────
+
+model Product {
+  id              String   @id @default(uuid())
+  sellerId        String   @map("seller_id")
+  title           String
+  description     String?
+  imageUrls       String[] @map("image_urls")
+  priceKr         Decimal  @map("price_kr") @db.Decimal(18, 4)
+  category        String?
+  whatsappNumber  String   @map("whatsapp_number")
+  status          String   @default("active") // active, sold, removed
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  seller       User    @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  linkedShorts Short[] // Shorts that link to this product
+
+  @@index([status, createdAt])
+  @@map("products")
+}
+
+// ─── ANALYTICS ────────────────────────────────────────────
+
+model DailyStat {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  date        DateTime @db.Date
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  newAdmirers Int      @default(0) @map("new_admirers")
+  krEarned    Decimal  @default(0) @map("kr_earned") @db.Decimal(18, 4)
+  krSpent     Decimal  @default(0) @map("kr_spent") @db.Decimal(18, 4)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("daily_stats")
+}

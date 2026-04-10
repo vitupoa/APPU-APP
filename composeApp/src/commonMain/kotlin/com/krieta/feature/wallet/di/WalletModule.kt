@@ -1,0 +1,18 @@
+package com.krieta.feature.wallet.di
+
+import com.krieta.feature.wallet.data.remote.WalletApi
+import com.krieta.feature.wallet.data.repository.WalletRepositoryImpl
+import com.krieta.feature.wallet.domain.repository.WalletRepository
+import com.krieta.feature.wallet.presentation.viewmodel.TopupViewModel
+import com.krieta.feature.wallet.presentation.viewmodel.WalletViewModel
+import com.krieta.feature.wallet.presentation.viewmodel.WithdrawViewModel
+import org.koin.dsl.module
+
+val walletModule = module {
+    single { WalletApi(get()) }
+    single<WalletRepository> { WalletRepositoryImpl(get()) }
+
+    factory { WalletViewModel(get()) }
+    factory { TopupViewModel(get(), "USD") } // TODO: inject from user session currency
+    factory { WithdrawViewModel(get(), "USD") } // TODO: inject from user session currency
+}
