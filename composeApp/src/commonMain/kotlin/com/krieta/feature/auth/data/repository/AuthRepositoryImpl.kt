@@ -26,11 +26,21 @@ class AuthRepositoryImpl(
     private fun mapUser(dto: com.krieta.feature.auth.data.remote.dto.UserDto): User {
         return User(
             id = dto.id,
-            username = dto.username,
             email = dto.email,
+            phone = dto.phone,
+            username = dto.username,
+            firstName = dto.firstName,
+            lastName = dto.lastName,
             displayName = dto.displayName,
+            avatarUrl = dto.avatarUrl,
+            coverPhotoUrl = dto.coverPhotoUrl,
+            bio = dto.bio,
+            country = dto.country,
+            currency = dto.currency,
             accountType = dto.accountType,
-            isWalletUnlocked = dto.isWalletUnlocked
+            isVerified = dto.isVerified,
+            isWalletUnlocked = dto.isWalletUnlocked,
+            createdAt = dto.createdAt
         )
     }
 

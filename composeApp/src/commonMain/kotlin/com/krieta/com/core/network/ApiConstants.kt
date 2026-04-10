@@ -1,8 +1,10 @@
 package com.krieta.com.core.network
 
+import com.krieta.com.BuildConfig
+
 object ApiConstants {
-    // Railway backend base URL — update with actual Railway deployment URL
-    const val BASE_URL = "https://krieta-api.up.railway.app"
+    // Railway backend base URL securely passed via local.properties
+    const val BASE_URL = "https://${BuildConfig.RAILWAY_URL}"
     const val API_VERSION = "/api/v1"
 
     // Auth

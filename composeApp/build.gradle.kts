@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.buildconfig)
 }
 
 kotlin {
@@ -126,6 +127,20 @@ sqldelight {
             packageName.set("com.krieta.com.db")
         }
     }
+}
+
+buildConfig {
+    packageName("com.krieta.com")
+    
+    val localProps = Properties()
+    val localPropsFile = project.rootProject.file("local.properties")
+    if (localPropsFile.exists()) {
+        localProps.load(localPropsFile.inputStream())
+    }
+
+    buildConfigField("String", "RAILWAY_URL", "\"${localProps.getProperty("RAILWAY_URL", "")}\"")
+    buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${localProps.getProperty("GOOGLE_CLIENT_ID", "")}\"")
+    buildConfigField("String", "APPLE_CLIENT_ID", "\"${localProps.getProperty("APPLE_CLIENT_ID", "")}\"")
 }
 
 android {

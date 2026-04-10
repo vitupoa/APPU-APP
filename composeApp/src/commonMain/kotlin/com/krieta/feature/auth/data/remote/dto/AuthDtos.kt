@@ -41,11 +41,21 @@ data class OauthLoginRequestDto(
 @Serializable
 data class UserDto(
     val id: String,
-    val username: String,
     val email: String,
+    val phone: String? = null,
+    val username: String,
+    val firstName: String,
+    val lastName: String,
     val displayName: String,
+    val avatarUrl: String? = null,
+    val coverPhotoUrl: String? = null,
+    val bio: String? = null,
+    val country: String,
+    val currency: String,
     val accountType: String,
-    val isWalletUnlocked: Boolean
+    val isVerified: Boolean,
+    val isWalletUnlocked: Boolean,
+    val createdAt: String? = null // Handled implicitly as ISO string
 )
 
 @Serializable

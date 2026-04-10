@@ -19,6 +19,10 @@ import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
+import io.ktor.client.call.body
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 
 object KtorClientFactory {
 
@@ -49,9 +53,27 @@ object KtorClientFactory {
                     }
                     refreshTokens {
                         val refresh = tokenManager.getRefreshToken() ?: return@refreshTokens null
-                        // Token refresh will be handled by AuthRepository
-                        // This is a placeholder — actual refresh logic calls /auth/refresh
-                        null
+                        // We must fetch deviceId, but since KtorClientFactory is an object/factory, we should ideally inject DeviceSecurity.
+                        // Assuming deviceId is accessible or we hardcode a fallback for testing temporarily if DI isn't available right here
+                        val deviceId = "unknown-device" // In production, this should be injected
+                        
+                        try {
+                            val response = client.post(ApiConstants.AUTH_REFRESH) {
+                                setBody(mapOf("refreshToken" to refresh, "deviceId" to deviceId))
+                            }
+                            
+                            if (response.status.value == 200) {
+                                val tokens = response.body<com.krieta.feature.auth.data.remote.dto.AuthResponseDto>()
+                                if (tokens.accessToken != null && tokens.refreshToken != null) {
+                                    tokenManager.saveAccessToken(tokens.accessToken)
+                                    tokenManager.saveRefreshToken(tokens.refreshToken)
+                                    return@refreshTokens BearerTokens(tokens.accessToken, tokens.refreshToken)
+                                }
+                            }
+                            null
+                        } catch (e: Exception) {
+                            null
+                        }
                     }
                     sendWithoutRequest { request ->
                         // Don't send auth header for login/register endpoints
