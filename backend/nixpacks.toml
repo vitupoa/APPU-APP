@@ -1,0 +1,13 @@
+[phases.setup]
+nixPkgs = ["...", "nodejs_22"]
+
+[phases.install]
+# Force npm to include devDependencies during the build phase so tsc can run
+# This fixes the "Could not find a declaration file for module" errors
+cmds = ["npm ci --include=dev"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm start"
