@@ -16,6 +16,7 @@ import userRoutes from './modules/user/user.routes';
 import shopRoutes from './modules/shop/shop.routes';
 import analyticsRoutes from './modules/analytics/analytics.routes';
 import adsRoutes from './modules/ads/ads.routes';
+import cacheRoutes from './modules/cache/cache.routes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -51,6 +52,7 @@ app.use('/api/v1/contests', contestsRoutes);
 app.use('/api/v1/shop', shopRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/ads', adsRoutes);
+app.use('/api/v1/cache', cacheRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
