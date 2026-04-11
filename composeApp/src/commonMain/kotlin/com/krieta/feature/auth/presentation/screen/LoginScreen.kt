@@ -34,8 +34,8 @@ class LoginScreen : Screen {
         // Listen for successes
         LaunchedEffect(authState) {
             if (authState is AuthState.Success) {
-                // Navigate to main feed/wallet
-                // navigator.replaceAll(MainTabsScreen()) 
+                // Navigate to main feed/wallet seamlessly
+                navigator.replaceAll(com.krieta.com.core.navigation.MainScreen()) 
             }
         }
 
@@ -104,7 +104,7 @@ class LoginScreen : Screen {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                TextButton(onClick = { /* navigator.push(RegisterScreen()) */ }) {
+                TextButton(onClick = { navigator.push(RegisterScreen()) }) {
                     Text("Don't have an account? Sign Up")
                 }
             }
