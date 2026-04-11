@@ -5,6 +5,13 @@ const envSchema = z.object({
   PORT: z.string().default('3000').transform(Number),
   CORS_ORIGIN: z.string().default('*'),
 
+  // Rate Limiting
+  RATE_LIMIT_MAX: z.string().default('100').transform(Number),
+  RATE_LIMIT_WINDOW_MS: z.string().default('900000').transform(Number),
+
+  // Security
+  REQUEST_SIGNING_KEY: z.string().min(16, 'REQUEST_SIGNING_KEY must be at least 16 characters'),
+
   // Database
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
 

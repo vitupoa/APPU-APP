@@ -58,6 +58,8 @@ model User {
   contestParticipations ContestParticipant[]
   contestSubmissions  ContestSubmission[]
   contestWins         ContestWinner[]
+  contestJudges       ContestJudge[]
+  contestVotes        ContestVote[]
   transactions        Transaction[]
   escrows             Escrow[]
   products            Product[]
@@ -213,9 +215,11 @@ model Milestone {
   requirementType  String   @map("requirement_type")
   requirementValue Int      @map("requirement_value")
   rewardKr         Decimal  @map("reward_kr") @db.Decimal(18, 4)
+  contestId        String?  @map("contest_id") // Optional link bridging Contest Airdrop FOMO natively
   createdAt        DateTime @default(now()) @map("created_at")
 
   completions MilestoneCompletion[]
+  contest     Contest?              @relation(fields: [contestId], references: [id], onDelete: Cascade)
 
   @@map("milestones")
 }
@@ -363,6 +367,7 @@ enum ContestStatus {
   DRAFT
   ACTIVE
   JUDGING
+  PENDING_PAYOUT  // Results declared algorithmically. Enters 72h Escrow freeze pending manual Verification!
   COMPLETED
   CANCELLED
 }
@@ -371,6 +376,18 @@ enum JudgingCriteria {
   CREATOR_PICKS
   COMMUNITY_VOTE
   MOST_ENGAGEMENT
+  COMBINATION     // Blends Leaderboard Votes and Judge decisions natively
+}
+
+enum RequirementType {
+  FOLLOW_KRIETA
+  YOUTUBE_SUB
+  SPOTIFY_FOLLOW
+  INSTAGRAM_FOLLOW
+  TIKTOK_FOLLOW
+  WATCH_VIDEO
+  VISIT_SHOP
+  CUSTOM
 }
 
 model Contest {
@@ -383,8 +400,19 @@ model Contest {
   coverMediaUrl     String?         @map("cover_media_url")
   prizeTotalKr      Decimal         @map("prize_total_kr") @db.Decimal(18, 4)
   platformFeeKr     Decimal         @map("platform_fee_kr") @db.Decimal(18, 4)
+  
+  // Custom Execution Mechanics
+  entryFeeKr        Decimal?        @map("entry_fee_kr") @db.Decimal(18, 4)
+  publicVoteWeight  Int?            @map("public_vote_weight") // Scale 0-100 indicating percentage weight vs Judge
+  targetAges        Int[]           @map("target_ages") // Optional range: [18, 35]
+  targetGeos        String[]        @map("target_geos") // Optional array ["US", "KE", "UK"] Array mapping ISOs
+  airdropKr         Decimal?        @map("airdrop_kr") @db.Decimal(18, 4)
+  airdropLimit      Int?            @map("airdrop_limit") // Defines maximum initial users receiving FOMO drops dynamically
+  allowDailyPrizes  Boolean         @default(false) @map("allow_daily_prizes")
+  dailyPrizeKr      Decimal?        @map("daily_prize_kr") @db.Decimal(18, 4) // Amount pushed securely by Node-Cron
+  
   maxWinners        Int             @map("max_winners") @db.SmallInt
-  judgingCriteria    JudgingCriteria @map("judging_criteria")
+  judgingCriteria   JudgingCriteria @map("judging_criteria")
   sponsorName       String?         @map("sponsor_name") // "Sponsored by [NAME]" clickable text
   sponsorUrl        String?         @map("sponsor_url")  // Link opened when sponsor name is tapped
   deadline          DateTime
@@ -401,19 +429,22 @@ model Contest {
   winners        ContestWinner[]
   escrows        Escrow[]
   shorts         Short[]
+  judges         ContestJudge[]
+  milestones     Milestone[]   // Explicit Native Link powering FOMO Airdrops!
 
   @@index([status, deadline])
   @@map("contests")
 }
 
 model ContestAction {
-  id           String  @id @default(uuid())
-  contestId    String  @map("contest_id")
-  actionType   String  @map("action_type")
-  targetUrl    String  @map("target_url")
-  label        String
-  isVerifiable Boolean @default(false) @map("is_verifiable")
-  sortOrder    Int     @default(0) @map("sort_order")
+  id               String          @id @default(uuid())
+  contestId        String          @map("contest_id")
+  actionType       RequirementType @map("action_type") // Tied correctly to the robust 8 Requirement Templates natively
+  targetUrl        String?         @map("target_url")
+  label            String
+  isVerifiable     Boolean         @default(false) @map("is_verifiable")
+  requiresUpload   Boolean         @default(false) @map("requires_upload") // True for Instagram/TikTok proof screenshots!
+  sortOrder        Int             @default(0) @map("sort_order")
 
   contest     Contest                   @relation(fields: [contestId], references: [id], onDelete: Cascade)
   completions ContestActionCompletion[]
@@ -453,12 +484,15 @@ model ContestSubmission {
   mediaType   String   @map("media_type") // photo or video
   proofUrls   String[] @map("proof_urls")
   votesCount  Int      @default(0) @map("votes_count")
+  judgeScore  Decimal? @default(0) @map("judge_score") @db.Decimal(5, 2) // Explicit score storing algorithm logic combining Combos
+  finalScore  Decimal? @map("final_score") @db.Decimal(7, 2)
   rank        Int?
   submittedAt DateTime @default(now()) @map("submitted_at")
 
   contest           Contest                   @relation(fields: [contestId], references: [id], onDelete: Cascade)
   user              User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
   actionCompletions ContestActionCompletion[]
+  votes             ContestVote[]
 
   @@unique([contestId, userId]) // One submission per user per contest
   @@map("contest_submissions")
@@ -489,6 +523,35 @@ model ContestWinner {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("contest_winners")
+}
+
+model ContestJudge {
+  id        String   @id @default(uuid())
+  contestId String   @map("contest_id")
+  userId    String   @map("user_id")
+  status    String   @default("pending") // pending, accepted, rejected mapping invite hooks
+  addedAt   DateTime @default(now()) @map("added_at")
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([contestId, userId])
+  @@map("contest_judges")
+}
+
+model ContestVote {
+  id           String   @id @default(uuid())
+  submissionId String   @map("submission_id")
+  voterId      String   @map("voter_id")
+  ipAddress    String?  @map("ip_address") // Protection mapping explicitly against Clickbots!
+  fingerprint  String?  @map("fingerprint") // Cross-ref device footprint logic locking abuse loops
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  submission ContestSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  voter      User              @relation(fields: [voterId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, voterId])
+  @@map("contest_votes")
 }
 
 // ─── SHOP ─────────────────────────────────────────────────

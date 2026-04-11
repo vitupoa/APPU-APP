@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { createServer } from 'http';
-import { Server as SocketServer } from 'socket.io';
 import { env } from './config/env';
+import { initializeGateway } from './shared/gateway/socket';
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
 import authRoutes from './modules/auth/auth.routes';
@@ -21,13 +21,8 @@ import cacheRoutes from './modules/cache/cache.routes';
 const app = express();
 const httpServer = createServer(app);
 
-// Socket.io for real-time features (milestones, contests, notifications)
-const io = new SocketServer(httpServer, {
-  cors: {
-    origin: env.CORS_ORIGIN,
-    methods: ['GET', 'POST'],
-  },
-});
+// Socket.io Redis Clustered Gateway for real-time features (milestones, contests, notifications)
+const io = initializeGateway(httpServer);
 
 // Global middleware
 app.use(helmet());
@@ -57,14 +52,7 @@ app.use('/api/v1/cache', cacheRoutes);
 // Error handler (must be last)
 app.use(errorHandler);
 
-// Socket.io connection handling
-io.on('connection', (socket) => {
-  console.log(`Client connected: ${socket.id}`);
-
-  socket.on('disconnect', () => {
-    console.log(`Client disconnected: ${socket.id}`);
-  });
-});
+// Endpoints connected, Socket.io manages connections internally.
 
 // Graceful shutdown
 const gracefulShutdown = () => {

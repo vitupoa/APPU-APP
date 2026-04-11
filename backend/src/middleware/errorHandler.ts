@@ -1,6 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 
+const EMAIL_REGEX = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
+const PHONE_REGEX = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
+const SECRET_REGEX = /(password|secret|token|hash|key)[\s]*[:=][\s]*['"]?([^\s'",}]+)/gi;
+
+function redactPII(text: string): string {
+  if (!text) return text;
+  return text
+    .replace(EMAIL_REGEX, '***@***.***')
+    .replace(PHONE_REGEX, '[REDACTED_PHONE]')
+    .replace(SECRET_REGEX, '$1: [REDACTED_SECRET]');
+}
+
 interface ApiError {
   status: number;
   message: string;
@@ -26,7 +38,8 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
-  console.error(`[ERROR] ${err.name}: ${err.message}`);
+  const secureMessage = redactPII(err.message);
+  console.error(`[ERROR] ${err.name}: ${secureMessage}`);
 
   // Zod validation errors
   if (err instanceof ZodError) {

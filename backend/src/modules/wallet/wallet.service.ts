@@ -32,21 +32,29 @@ export class WalletService {
   }
 
   /**
-   * Transfers a Tip from one user to another atomically.
+   * Transfers a Tip from one user to another atomically parsing explicit Tokenomics (15% platform cut).
    */
-  static async sendTip(senderId: string, recipientId: string, fiatAmount: number, senderCurrency: string) {
+  static async sendTip(senderId: string, recipientId: string, senderKrAmount: number, senderCurrency: string) {
     if (senderId === recipientId) {
       throw new Error("You cannot tip yourself");
     }
 
-    // Rate: How much Kr does this Fiat buy?
-    // Using buy margin because they are purchasing Kr functionally to tip
-    const rate = await ExchangeService.getTransactionRate(senderCurrency, 'buy');
-    const krAmount = new Prisma.Decimal(fiatAmount / rate);
-
-    if (krAmount.lessThan(0.1)) {
-      throw new Error("Tip amount is too small");
+    if (!Number.isInteger(senderKrAmount) || senderKrAmount < 1) {
+      throw new Error("Tip amount must be a whole Kr integer strictly above 0.");
     }
+
+    // 1 Kr = $0.01. Calculate specific fiat tracking values!
+    const baseUsd = ExchangeService.getUSDFromKr(senderKrAmount);
+    const localRate = await ExchangeService.getTransactionRate(senderCurrency, 'sell');
+    const fiatAmount = baseUsd * localRate;
+
+    const krDecimal = new Prisma.Decimal(senderKrAmount);
+    
+    // TIPPING TAX LOGIC
+    const PLATFORM_FEE_RATE = 0.15; // 15% Explicit Cut mapped
+    const platformCut = senderKrAmount * PLATFORM_FEE_RATE;
+    const recipientReceiveAmount = new Prisma.Decimal(senderKrAmount - platformCut);
+    const platformCutDecimal = new Prisma.Decimal(platformCut);
 
     // Execute atomic transaction for balance safety
     return prisma.$transaction(async (tx) => {
@@ -55,27 +63,27 @@ export class WalletService {
         throw new Error("Insufficient Kr balance to tip");
       }
 
-      // Deduct Sender
+      // Deduct Full Amount Sender (-100%)
       await tx.wallet.update({
         where: { userId: senderId },
-        data: { krBalance: { decrement: krAmount } }
+        data: { krBalance: { decrement: krDecimal } }
       });
 
-      // Credit Recipient
+      // Credit Recipient (-15% Platform cut applied -> 85%)
       const recipientWallet = await tx.wallet.upsert({
         where: { userId: recipientId },
-        create: { userId: recipientId, krBalance: krAmount },
-        update: { krBalance: { increment: krAmount } }
+        create: { userId: recipientId, krBalance: recipientReceiveAmount },
+        update: { krBalance: { increment: recipientReceiveAmount } }
       });
 
-      // Record Transactions
+      // Record Transactions accurately outlining Revenue Velocity
       await tx.transaction.createMany({
         data: [
           {
             userId: senderId,
             counterpartyId: recipientId,
             type: 'tip_sent',
-            amountKr: krAmount,
+            amountKr: krDecimal,
             amountFiat: fiatAmount,
             currency: senderCurrency,
             status: 'completed',
@@ -85,9 +93,17 @@ export class WalletService {
             userId: recipientId,
             counterpartyId: senderId,
             type: 'tip_received',
-            amountKr: krAmount,
+            amountKr: recipientReceiveAmount,
             status: 'completed',
             provider: 'platform'
+          },
+          {
+            userId: senderId, // Associated essentially with the action
+            counterpartyId: 'PLATFORM_REVENUE',
+            type: 'platform_fee',
+            amountKr: platformCutDecimal,
+            status: 'completed',
+            provider: 'platform_engine'
           }
         ]
       });
@@ -103,7 +119,9 @@ export class WalletService {
 
       return {
         success: true,
-        krTipped: krAmount
+        krTipped: senderKrAmount,
+        krReceived: recipientReceiveAmount.toNumber(),
+        platformFee: platformCut
       };
     });
   }

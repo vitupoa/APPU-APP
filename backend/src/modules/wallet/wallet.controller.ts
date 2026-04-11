@@ -21,7 +21,7 @@ export class WalletController {
       const result = await WalletService.sendTip(
         req.userId!, 
         data.recipientId, 
-        data.fiatAmount, 
+        data.krAmount, 
         data.currency
       );
       

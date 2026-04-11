@@ -14,6 +14,6 @@ val profileModule = module {
     factory { (userId: String?) -> ProfileViewModel(userId, get()) }
     factory { EditProfileViewModel(get()) }
     factory { (userId: String, listType: SocialListType) -> SocialListViewModel(userId, listType, get()) }
-    factory { MilestonesViewModel(get()) }
+    factory { MilestonesViewModel(get(), get()) }
     factory { SubscriptionTierSetupViewModel(get()) }
 }

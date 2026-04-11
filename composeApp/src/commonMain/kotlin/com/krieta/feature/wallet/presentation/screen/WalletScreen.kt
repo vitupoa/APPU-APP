@@ -4,6 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 
 
+import androidx.compose.runtime.collectAsState
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +20,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +29,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.krieta.com.core.theme.GlassmorphicContainer
+import com.krieta.com.core.theme.bounceClick
+import com.krieta.com.core.theme.KrietaColors
 import com.krieta.com.core.util.KrCurrencyFormatter
 import com.krieta.feature.wallet.domain.model.Transaction
 import com.krieta.feature.wallet.domain.model.TransactionType
@@ -68,47 +75,70 @@ class WalletScreen : Screen {
                     }
                     is WalletState.Success -> {
                         Column(modifier = Modifier.fillMaxSize()) {
-                            // Balance Card
-                            Card(
+                            // Luxurious Glassmorphic Balance Wrapper
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                                )
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(24.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text("Total Balance", style = MaterialTheme.typography.titleMedium)
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        text = KrCurrencyFormatter.formatKr(currentState.balance.krBalance),
-                                        fontSize = 32.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "~" + KrCurrencyFormatter.formatFiat(
-                                            currentState.balance.fiatEquivalent,
-                                            currentState.balance.currency
+                                    .padding(16.dp)
+                                    .background(
+                                        brush = Brush.linearGradient(
+                                            colors = listOf(KrietaColors.PrimaryDark, KrietaColors.Background)
                                         ),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                                        shape = RoundedCornerShape(32.dp)
                                     )
-
-                                    Spacer(modifier = Modifier.height(24.dp))
-                                    
-                                    // Action Buttons
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                GlassmorphicContainer(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(32.dp),
+                                    alpha = 0.2f
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(32.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        WalletActionButton(icon = Icons.Default.Add, label = "Top Up", onClick = { navigator.push(TopupScreen()) })
-                                        WalletActionButton(icon = Icons.Default.ArrowDownward, label = "Withdraw", onClick = { navigator.push(WithdrawScreen()) })
+                                        Text(
+                                            "Total Balance", 
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = Color.White.copy(alpha = 0.8f)
+                                        )
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        
+                                        // Golden Kr Amount mapped elegantly
+                                        Text(
+                                            text = KrCurrencyFormatter.formatKr(currentState.balance.krBalance),
+                                            style = MaterialTheme.typography.displayMedium,
+                                            color = KrietaColors.KrGold
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        
+                                        // Subtle Fiat mapping seamlessly aligned
+                                        Text(
+                                            text = "~" + KrCurrencyFormatter.formatFiat(
+                                                currentState.balance.fiatEquivalent,
+                                                currentState.balance.currency
+                                            ),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = Color.White.copy(alpha = 0.6f)
+                                        )
+
+                                        Spacer(modifier = Modifier.height(32.dp))
+                                        
+                                        // Action Buttons - Organic Bounce Click enabled!
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceEvenly
+                                        ) {
+                                            WalletActionButton(
+                                                icon = Icons.Default.Add, 
+                                                label = "Top Up", 
+                                                onClick = { navigator.push(TopupScreen()) }
+                                            )
+                                            WalletActionButton(
+                                                icon = Icons.Default.ArrowDownward, 
+                                                label = "Withdraw", 
+                                                onClick = { navigator.push(WithdrawScreen()) }
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -151,11 +181,20 @@ class WalletScreen : Screen {
         onClick: () -> Unit
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            FilledIconButton(onClick = onClick, modifier = Modifier.size(56.dp)) {
-                Icon(imageVector = icon, contentDescription = label)
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .bounceClick { onClick() }
+                    .background(
+                        color = Color.White.copy(alpha = 0.1f), 
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                 Icon(imageVector = icon, contentDescription = label, tint = Color.White)
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(label, style = MaterialTheme.typography.labelSmall)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(label, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.8f))
         }
     }
 

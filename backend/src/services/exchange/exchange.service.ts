@@ -50,18 +50,34 @@ export class ExchangeService {
   }
 
   /**
-   * Returns rate with Krieta's 4.5% platform margin applied.
-   * If user is BUYING Kr (topup), they pay 4.5% more fiat.
-   * If user is SELLING Kr (withdraw), they get 4.5% less fiat.
+   * Fiat -> KR Conversion engine properly isolating the Tokenomic Pegs
+   * 100 Kr = $1.00 USD (Base Peg is Absolute)
+   */
+  static getKrFromUSD(usdAmount: number): number {
+      return usdAmount * 100;
+  }
+
+  static getUSDFromKr(krAmount: number): number {
+      return krAmount / 100;
+  }
+
+  /**
+   * Returns rate with Krieta's 4.5% platform margin applied ONLY on BUYS (Topups).
+   * Withdrawals operate entirely free (Margin 0).
+   * 
+   * @param localCurrency User's local ISO currency (e.g. KES)
+   * @param type transaction format (buy or sell)
+   * @returns Exchange Rate relative to Fiat
    */
   static async getTransactionRate(localCurrency: string, type: 'buy' | 'sell'): Promise<number> {
     const baseRate = await this.getRate(localCurrency);
-    const MARGIN = 0.045; // 4.5%
-
+    
     if (type === 'buy') {
-      return baseRate * (1 + MARGIN);
+      const TOPUP_MARGIN = 0.045; // 4.5% Spread explicitly isolated preventing arbitrage 
+      return baseRate * (1 + TOPUP_MARGIN);
     } else {
-      return baseRate * (1 - MARGIN);
+      // 0% Withdrawal Fees
+      return baseRate;
     }
   }
 }

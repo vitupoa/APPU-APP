@@ -23,7 +23,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.plugins.auth.providers.BearerAuthProvider
-
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 object KtorClientFactory {
 
     val json = Json {
@@ -40,6 +41,11 @@ object KtorClientFactory {
         return HttpClient {
             install(ContentNegotiation) {
                 json(json)
+            }
+
+            install(WebSockets) {
+                contentConverter = KotlinxWebsocketSerializationConverter(json)
+                pingInterval = 20_000
             }
 
             install(Auth) {

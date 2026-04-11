@@ -15,7 +15,7 @@ export const withdrawInitiateSchema = z.object({
 
 export const tipSchema = z.object({
   recipientId: z.string().uuid('Invalid recipient ID'),
-  fiatAmount: z.number().positive('Tip must be positive'),
+  krAmount: z.number().int().positive('Tip must be a positive integer'),
   currency: z.string().length(3),
 });
 

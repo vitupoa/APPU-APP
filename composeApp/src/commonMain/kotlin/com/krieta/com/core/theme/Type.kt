@@ -8,10 +8,11 @@ import androidx.compose.ui.unit.sp
 
 val KrietaTypography = Typography(
     displayLarge = TextStyle(
+        fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Bold,
         fontSize = 57.sp,
         lineHeight = 64.sp,
-        letterSpacing = (-0.25).sp
+        letterSpacing = (-0.5).sp // Tighter spacing for modern geometric headers natively!
     ),
     displayMedium = TextStyle(
         fontWeight = FontWeight.Bold,
@@ -26,10 +27,11 @@ val KrietaTypography = Typography(
         letterSpacing = 0.sp
     ),
     headlineLarge = TextStyle(
-        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.ExtraBold, // Elevate emphasis organically mapping hierarchy natively
         fontSize = 32.sp,
         lineHeight = 40.sp,
-        letterSpacing = 0.sp
+        letterSpacing = (-0.5).sp
     ),
     headlineMedium = TextStyle(
         fontWeight = FontWeight.SemiBold,

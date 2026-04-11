@@ -12,7 +12,7 @@ val walletModule = module {
     single { WalletApi(get()) }
     single<WalletRepository> { WalletRepositoryImpl(get()) }
 
-    factory { WalletViewModel(get()) }
+    factory { WalletViewModel(get(), get()) }
     factory { TopupViewModel(get(), "USD") } // TODO: inject from user session currency
     factory { WithdrawViewModel(get(), "USD") } // TODO: inject from user session currency
 }
