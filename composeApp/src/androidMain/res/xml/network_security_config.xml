@@ -7,13 +7,9 @@
     </base-config>
 
     <!-- Railway backend domain pinning -->
-    <domain-config cleartextTrafficPermitted="false">
+    <!-- Railway backend domain routing -> Pinning temporarily disabled for local compilation -->
+    <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">krieta-api.up.railway.app</domain>
-        <pin-set>
-            <!-- Pin will be updated with actual Railway SSL certificate pins -->
-            <!-- Use backup pins to handle certificate rotation -->
-            <pin digest="SHA-256">PLACEHOLDER_PIN_1=</pin>
-            <pin digest="SHA-256">PLACEHOLDER_PIN_2=</pin>
-        </pin-set>
+        <domain includeSubdomains="true">10.0.2.2</domain> <!-- For local Android emulator testing -->
     </domain-config>
 </network-security-config>
