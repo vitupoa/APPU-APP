@@ -93,7 +93,7 @@ class ContestJudgeDashboardScreen : Screen {
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text("Total Entries: ${contest.totalSubmissions}", style = MaterialTheme.typography.bodySmall)
+                    Text("Total Entries: ${contest.submissionsCount}", style = MaterialTheme.typography.bodySmall)
                     
                     if (contest.status == ContestStatus.PENDING_PAYOUT) {
                         Text("🕒 Time Remaining: 48h 12m", color = Color.Red, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)

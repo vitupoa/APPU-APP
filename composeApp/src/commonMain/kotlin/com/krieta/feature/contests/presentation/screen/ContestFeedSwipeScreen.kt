@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -158,7 +159,7 @@ class ContestFeedSwipeScreen : Screen {
                          // Upvote Icon representation ONLY showing Upvotes organically!
                          Surface(shape = RoundedCornerShape(20.dp), color = Color.White.copy(alpha = 0.2f), modifier = Modifier.size(56.dp)) {}
                          Spacer(modifier = Modifier.height(6.dp))
-                         Text("${contest.totalSubmissions * 12} Upvotes", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
+                         Text("${contest.submissionsCount * 12} Upvotes", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
                      }
                      
                       Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.bounceClick{}) {

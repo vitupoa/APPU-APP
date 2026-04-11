@@ -83,8 +83,8 @@ class ContestModerationScreen(private val contestId: String) : Screen {
             Column(modifier = Modifier.padding(16.dp)) {
                 // Header User Context
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                     Text("User ID: ${entry.userId.take(8)}...", fontWeight = FontWeight.Bold)
-                     Text("Community Votes: ${entry.votesCount}", color = MaterialTheme.colorScheme.primary)
+                     Text("User ID: ${entry.user.id.take(8)}...", fontWeight = FontWeight.Bold)
+                     Text("Community Votes: ${entry.votes}", color = MaterialTheme.colorScheme.primary)
                 }
                 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -106,8 +106,8 @@ class ContestModerationScreen(private val contestId: String) : Screen {
 
                 Spacer(modifier = Modifier.height(12.dp))
                 
-                if (entry.proofUrls.isNotEmpty()) {
-                     Text("Attached Proof Documents: ${entry.proofUrls.size}", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                if (entry.proofScreenshots.isNotEmpty()) {
+                     Text("Attached Proof Documents: ${entry.proofScreenshots.size}", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                      // Here we layout a LazyRow showing the Cloudinary Screenshot proofs explicitly for the judge!
                 }
 

@@ -18,7 +18,7 @@ data class RequiredAction(
 enum class ContestMediaType { PHOTO, VIDEO, PHOTO_AND_VIDEO }
 enum class ContestCategory { DANCE, CHALLENGE, PROMOTION, CREATIVE, ART, MUSIC }
 enum class JudgingCriteria { CREATOR_PICKS, COMMUNITY_VOTE, MOST_ENGAGEMENT }
-enum class ContestStatus { DRAFT, ACTIVE, JUDGING, COMPLETED, CANCELLED }
+enum class ContestStatus { DRAFT, ACTIVE, JUDGING, PENDING_PAYOUT, COMPLETED, CANCELLED }
 
 data class Contest(
     val id: String,

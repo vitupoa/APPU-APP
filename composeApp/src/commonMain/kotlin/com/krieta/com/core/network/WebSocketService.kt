@@ -96,7 +96,7 @@ class WebSocketService(
         if (payload.startsWith("42")) {
             try {
                 val jsonPayload = payload.substring(2) // Strip "42" prefixes implicitly
-                val array = Json.parseToJsonElement(jsonPayload).kotlinx.serialization.json.jsonArray
+                val array = Json.parseToJsonElement(jsonPayload).jsonArray
                 val eventName = array[0].jsonPrimitive.content
                 val dataContent = array[1].toString()
 

@@ -45,7 +45,7 @@ object KtorClientFactory {
 
             install(WebSockets) {
                 contentConverter = KotlinxWebsocketSerializationConverter(json)
-                pingInterval = 20_000
+                pingIntervalMillis = 20_000L
             }
 
             install(Auth) {
