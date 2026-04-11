@@ -3,9 +3,9 @@ import { z } from 'zod';
 export const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  firstName: z.string().min(2, 'First name must be at least 2 characters').regex(/^[A-Za-z\-']+$/, 'First name can only contain letters, hyphens, and apostrophes'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters').regex(/^[A-Za-z\-']+$/, 'Last name can only contain letters, hyphens, and apostrophes'),
-  username: z.string().min(3, 'Username must be at least 3 characters').regex(/^[a-z0-9_]+$/, 'Username can only contain lowercase letters, numbers, and underscores'),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  username: z.string().min(3, 'Username must be at least 3 characters').regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
   phone: z.string().optional(),
   accountType: z.enum(['CREATOR', 'BUSINESS']).default('CREATOR'),
   country: z.string().length(2, 'Country must be a 2-letter ISO code'),

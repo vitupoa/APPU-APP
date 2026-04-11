@@ -17,6 +17,8 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import cafe.adriel.voyager.navigator.currentOrThrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +45,7 @@ object HomeTab : Tab {
     @Composable
     override fun Content() {
         var selectedTabIndex by remember { mutableStateOf(0) }
-        val tabs = listOf("Following", "For You")
+        val tabs = listOf("Admiring", "Discover", "Contests")
 
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -80,10 +82,10 @@ object HomeTab : Tab {
 
                 // Feed Content ViewPager
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    if (selectedTabIndex == 0) {
-                        PlaceholderTab("Following Feed (Empty)")
-                    } else {
-                        PlaceholderTab("For You Feed (Algorithmic)")
+                    when (selectedTabIndex) {
+                        0 -> PlaceholderTab("Admiring Feed (Following)")
+                        1 -> PlaceholderTab("Discover Feed (For You)")
+                        2 -> PlaceholderTab("Submit Contests Feed")
                     }
                 }
             }
@@ -114,8 +116,37 @@ object ContestsTab : Tab {
 
     @Composable
     override fun Content() {
-        // Will be replaced with ContestFeedScreen
-        PlaceholderTab("Contests")
+        val navigator = cafe.adriel.voyager.navigator.LocalNavigator.currentOrThrow
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+            ) {
+                Text(
+                    text = "Discover Active Parent Contests & Ended Parent Contests",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(16.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+                
+                androidx.compose.material3.Button(
+                    onClick = {
+                        navigator.push(com.krieta.feature.contests.presentation.screen.CreateContestScreen())
+                    },
+                    modifier = Modifier.padding(top = 16.dp),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = KrietaColors.Primary
+                    )
+                ) {
+                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                    Text("Create Contest")
+                }
+            }
+        }
     }
 }
 

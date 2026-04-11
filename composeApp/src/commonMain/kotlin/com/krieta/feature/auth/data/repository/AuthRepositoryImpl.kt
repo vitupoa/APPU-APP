@@ -48,11 +48,15 @@ class AuthRepositoryImpl(
         return safeApiCall {
             val response = api.register(request)
             
+            if (response.error != null) {
+                throw IllegalStateException(response.error)
+            }
+
             response.accessToken?.let { tokenManager.saveAccessToken(it) }
             response.refreshToken?.let { tokenManager.saveRefreshToken(it) }
             
             val user = response.user?.let { mapUser(it) }
-                ?: throw IllegalStateException("Backend returned success without User object")
+                ?: throw IllegalStateException("Login failed: Invalid server response")
             
             _currentUser.value = user
             user
@@ -63,11 +67,15 @@ class AuthRepositoryImpl(
         return safeApiCall {
             val response = api.login(request)
             
+            if (response.error != null) {
+                throw IllegalStateException(response.error)
+            }
+
             response.accessToken?.let { tokenManager.saveAccessToken(it) }
             response.refreshToken?.let { tokenManager.saveRefreshToken(it) }
             
             val user = response.user?.let { mapUser(it) }
-                ?: throw IllegalStateException("Backend returned success without User object")
+                ?: throw IllegalStateException("Login failed: Invalid server response")
             
             _currentUser.value = user
             user
