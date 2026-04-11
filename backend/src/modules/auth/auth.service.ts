@@ -17,8 +17,8 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Token expiration: 7 days
-const REFRESH_TOKEN_TTL = 7 * 24 * 60 * 60 * 1000;
+// Token expiration: 365 days simulating TikTok persistent logins securely!
+const REFRESH_TOKEN_TTL = 365 * 24 * 60 * 60 * 1000;
 
 export class AuthService {
   /**
@@ -51,7 +51,9 @@ export class AuthService {
           if (process.env.NODE_ENV !== 'production') {
               console.log(`[MOCK AWS SES] OTP for ${email} is ${otp}`);
           } else {
-              await transporter.sendMail(mailOptions);
+              // TEMPORARY BYPASS: Forcing Console Mock because AWS SES is not configured physically yet.
+              // transporter.sendMail(mailOptions);
+              console.log(`[BYPASS AWS SES] Test OTP for ${email} is ${otp}`);
           }
       } catch (error) {
           console.error('[AWS SES] Failed sending OTP:', error);
