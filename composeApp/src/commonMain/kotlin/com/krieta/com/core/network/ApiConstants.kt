@@ -4,7 +4,11 @@ import com.krieta.com.BuildConfig
 
 object ApiConstants {
     // Railway backend base URL securely passed via local.properties
-    const val BASE_URL = "https://${BuildConfig.RAILWAY_URL}"
+    val BASE_URL = if (BuildConfig.RAILWAY_URL.contains("10.0.2.2") || BuildConfig.RAILWAY_URL.contains("localhost")) {
+        "http://${BuildConfig.RAILWAY_URL}"
+    } else {
+        "https://${BuildConfig.RAILWAY_URL}"
+    }
     const val API_VERSION = "/api/v1"
 
     // Auth

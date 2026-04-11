@@ -139,7 +139,7 @@ buildConfig {
         localProps.load(localPropsFile.inputStream())
     }
 
-    buildConfigField("String", "RAILWAY_URL", "\"${localProps.getProperty("RAILWAY_URL", "")}\"")
+    buildConfigField("String", "RAILWAY_URL", "\"${localProps.getProperty("RAILWAY_BASE_URL", "10.0.2.2:3000")}\"")
     buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${localProps.getProperty("GOOGLE_CLIENT_ID", "")}\"")
     buildConfigField("String", "APPLE_CLIENT_ID", "\"${localProps.getProperty("APPLE_CLIENT_ID", "")}\"")
 }
