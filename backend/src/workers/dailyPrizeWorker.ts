@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { prisma } from '../index'; // Assumes exported prisma instance 
+import { prisma } from '../config/database'; // Assumes exported prisma instance 
 import { pubClient, RedisChannels } from '../shared/gateway/redis';
 
 export function startDailyPrizeWorker() {
@@ -44,7 +44,7 @@ export function startDailyPrizeWorker() {
                 const winner = eligibleSubmissions[randomIndex];
 
                 // Deposit the Kr securely using Prisma Transactions
-                await prisma.$transaction(async (tx) => {
+                await prisma.$transaction(async (tx: any) => {
                     // Update user's actual KR balance cleanly
                     await tx.wallet.update({
                         where: { userId: winner.userId },

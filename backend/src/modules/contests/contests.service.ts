@@ -98,7 +98,7 @@ export class ContestService {
           } : undefined,
           actions: {
             create: data.requiredActions.map((a, i) => ({
-              actionType: a.type,
+              actionType: a.type as any,
               targetUrl: a.targetUrl ?? '',
               label: a.label,
               sortOrder: i

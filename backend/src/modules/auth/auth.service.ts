@@ -28,7 +28,7 @@ export class AuthService {
       const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Strict 6 digits
 
       // Save OTP into Redis organically defining the 600s limit!
-      await pubClient.setEx(`otp:${email}`, 600, otp);
+      await pubClient.setex(`otp:${email}`, 600, otp);
 
       // Construct AWS SES template securely
       const mailOptions = {

@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { prisma } from '../../index'; // Assuming PrismaClient is exported from a central DB config natively
+import { prisma } from '../../config/database';
 import { rateLimit } from 'express-rate-limit';
 import { z } from 'zod';
-import { validateRequest } from '../../middleware/validateRequest';
+import { validateRequest } from '../../middleware/validate';
 // import { authenticate } from '../../middleware/auth'; // Ensure you have authentication logic securely checking token headers
 
 const router = Router();
@@ -57,7 +57,7 @@ router.post('/vote', voteThrottler, validateRequest(VoteSchema), async (req: Req
         }
 
         // 2. Transact safely natively mapping constraints implicitly without inflating cash
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: any) => {
             // Log vote safely preventing clickbots natively
             await tx.contestVote.create({
                 data: {

@@ -59,7 +59,7 @@ export class WalletService {
     // Execute atomic transaction for balance safety
     return prisma.$transaction(async (tx) => {
       const senderWallet = await tx.wallet.findUnique({ where: { userId: senderId } });
-      if (!senderWallet || senderWallet.krBalance.lessThan(krAmount)) {
+      if (!senderWallet || senderWallet.krBalance.lessThan(krDecimal)) {
         throw new Error("Insufficient Kr balance to tip");
       }
 
