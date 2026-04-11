@@ -1,5 +1,6 @@
 package com.krieta.feature.profile.presentation.screen
 
+import cafe.adriel.voyager.core.screen.Screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -16,11 +17,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krieta.com.core.theme.KrietaColors
 
-@Composable
-fun ProfileScreen() {
-    Column(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
-    ) {
+class ProfileScreen(val userId: String? = null) : Screen {
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    override fun Content() {
+        Column(
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+        ) {
         // App Bar
         CenterAlignedTopAppBar(
             title = { Text("@username", fontWeight = FontWeight.Bold) },
@@ -96,6 +99,7 @@ fun ProfileScreen() {
             }
         }
     }
+}
 }
 
 @Composable
