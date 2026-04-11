@@ -67,6 +67,7 @@ data class AuthResponseDto(
     // For oauth specific responses
     val isNewUser: Boolean? = null,
     val error: String? = null,
+    val details: kotlinx.serialization.json.JsonElement? = null,
     val code: String? = null,
     val suggestions: List<String>? = null
 )
