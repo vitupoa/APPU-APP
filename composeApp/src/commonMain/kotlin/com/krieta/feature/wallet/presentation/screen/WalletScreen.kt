@@ -16,6 +16,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -45,6 +47,8 @@ class WalletScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = getScreenModel<WalletViewModel>()
         val state by viewModel.state.collectAsState()
+        
+        var isBalanceHidden by remember { mutableStateOf(false) }
 
         Scaffold(
             topBar = {
@@ -96,16 +100,30 @@ class WalletScreen : Screen {
                                         modifier = Modifier.padding(32.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        Text(
-                                            "Total Balance", 
-                                            style = MaterialTheme.typography.titleMedium,
-                                            color = Color.White.copy(alpha = 0.8f)
-                                        )
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                "Total Balance", 
+                                                style = MaterialTheme.typography.titleMedium,
+                                                color = Color.White.copy(alpha = 0.8f)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            IconButton(
+                                                onClick = { isBalanceHidden = !isBalanceHidden },
+                                                modifier = Modifier.size(24.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = if (isBalanceHidden) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                                    contentDescription = "Toggle Balance",
+                                                    tint = Color.White.copy(alpha = 0.6f)
+                                                )
+                                            }
+                                        }
+                                        
                                         Spacer(modifier = Modifier.height(12.dp))
                                         
                                         // Golden Kr Amount mapped elegantly
                                         Text(
-                                            text = KrCurrencyFormatter.formatKr(currentState.balance.krBalance),
+                                            text = if (isBalanceHidden) "Kr ****" else KrCurrencyFormatter.formatKr(currentState.balance.krBalance),
                                             style = MaterialTheme.typography.displayMedium,
                                             color = KrietaColors.KrGold
                                         )
@@ -113,7 +131,7 @@ class WalletScreen : Screen {
                                         
                                         // Subtle Fiat mapping seamlessly aligned
                                         Text(
-                                            text = "~" + KrCurrencyFormatter.formatFiat(
+                                            text = if (isBalanceHidden) "~ $**.**" else "~ " + KrCurrencyFormatter.formatFiat(
                                                 currentState.balance.fiatEquivalent,
                                                 currentState.balance.currency
                                             ),

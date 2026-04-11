@@ -17,7 +17,6 @@ enum AccountType {
 model User {
   id              String      @id @default(uuid())
   email           String      @unique
-  phone           String?     @unique
   username        String      @unique
   firstName       String      @map("first_name")
   lastName        String      @map("last_name")
@@ -32,7 +31,11 @@ model User {
   accountType     AccountType @default(CREATOR) @map("account_type")
   isAdmin         Boolean     @default(false) @map("is_admin") 
   isVerified      Boolean     @default(false) @map("is_verified")
+  
+  // Wallet Security 
   isWalletUnlocked Boolean    @default(false) @map("is_wallet_unlocked")
+  walletPinHash   String?     @map("wallet_pin_hash")
+  
   passwordHash    String?     @map("password_hash")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")

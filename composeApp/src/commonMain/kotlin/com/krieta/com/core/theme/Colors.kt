@@ -3,47 +3,49 @@ package com.krieta.com.core.theme
 import androidx.compose.ui.graphics.Color
 
 object KrietaColors {
-    // Primary — Deep Teal/Emerald
-    val Primary = Color(0xFF0D9373)
-    val PrimaryDark = Color(0xFF076B54)
-    val PrimaryLight = Color(0xFF14B890)
-    val PrimaryContainer = Color(0xFF0A2E25)
-    val OnPrimary = Color(0xFFFFFFFF)
-    val OnPrimaryContainer = Color(0xFFB8F5E5)
+    // Primary — High-Energy Yellow
+    val Primary = Color(0xFFFFCC00) // Electric Yellow
+    val PrimaryDark = Color(0xFFCC9900)
+    val PrimaryLight = Color(0xFFFFD633)
+    val PrimaryContainer = Color(0xFF332900)
+    val OnPrimary = Color(0xFF000000) // Black text on Yellow buttons looks insanely sharp
+    val OnPrimaryContainer = Color(0xFFFFE680)
 
-    // Accent — Warm Gold/Amber
-    val Accent = Color(0xFFE5A340)
-    val AccentDark = Color(0xFFC48A2D)
-    val AccentLight = Color(0xFFF0C068)
-    val AccentContainer = Color(0xFF3D2E10)
-    val OnAccent = Color(0xFF1A1200)
-    val OnAccentContainer = Color(0xFFFCE4B8)
+    // Accent — Aggressive Red (For important actions / notifications)
+    val Accent = Color(0xFFE60000) // Racing Red
+    val AccentDark = Color(0xFF990000)
+    val AccentLight = Color(0xFFFF3333)
+    val AccentContainer = Color(0xFF330000)
+    val OnAccent = Color(0xFFFFFFFF)
+    val OnAccentContainer = Color(0xFFFF9999)
 
-    // Surface / Background — Rich Dark Grays
-    val Background = Color(0xFF0A0E0D)
-    val BackgroundElevated = Color(0xFF121917)
-    val Surface = Color(0xFF161D1B)
-    val SurfaceVariant = Color(0xFF1E2826)
-    val SurfaceHigh = Color(0xFF253230)
-    val OnBackground = Color(0xFFE1E8E5)
-    val OnSurface = Color(0xFFD4DDD9)
-    val OnSurfaceVariant = Color(0xFF9EAAA6)
+    // Surface / Background — Pure Black & Charcoal
+    val Background = Color(0xFF050505) // Near Pure Black
+    val BackgroundElevated = Color(0xFF111111) // Very Dark Charcoal 
+    val Surface = Color(0xFF161616)
+    val SurfaceVariant = Color(0xFF1E1E1E)
+    val SurfaceHigh = Color(0xFF262626)
+    
+    // Text remain Grey-scales for supreme legibility against Black!
+    val OnBackground = Color(0xFFE1E1E1)
+    val OnSurface = Color(0xFFD4D4D4)
+    val OnSurfaceVariant = Color(0xFFA0A0A0)
 
-    // Status Colors
-    val Success = Color(0xFF3DD68C)
-    val SuccessContainer = Color(0xFF0F3324)
+    // Status Colors (Aligned slightly to match the intense new theme)
+    val Success = Color(0xFF34C759)
+    val SuccessContainer = Color(0xFF0A2912)
     val OnSuccess = Color(0xFF003920)
-    val Error = Color(0xFFEF6461)
-    val ErrorContainer = Color(0xFF3C1414)
+    val Error = Color(0xFFFF3B30) // Vibrant iOS Red
+    val ErrorContainer = Color(0xFF330C0A)
     val OnError = Color(0xFF410002)
-    val Warning = Color(0xFFFFB74D)
-    val WarningContainer = Color(0xFF3D2A08)
-    val Info = Color(0xFF64B5F6)
-    val InfoContainer = Color(0xFF0D2944)
+    val Warning = Color(0xFFFF9F0A)
+    val WarningContainer = Color(0xFF332002)
+    val Info = Color(0xFF0A84FF)
+    val InfoContainer = Color(0xFF021A33)
 
-    // Kr Currency — Distinctive color for Kr amounts
-    val KrGold = Color(0xFFD4A843)
-    val KrGoldDim = Color(0xFF8B7230)
+    // Kr Currency — Blends organically with the Yellow primary now
+    val KrGold = Color(0xFFFFD700) 
+    val KrGoldDim = Color(0xFFCCAA00)
 
     // Overlay
     val Scrim = Color(0x99000000)
