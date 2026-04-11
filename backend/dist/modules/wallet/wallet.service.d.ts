@@ -10,11 +10,13 @@ export declare class WalletService {
         isWalletUnlocked: boolean;
     }>;
     /**
-     * Transfers a Tip from one user to another atomically.
+     * Transfers a Tip from one user to another atomically parsing explicit Tokenomics (15% platform cut).
      */
-    static sendTip(senderId: string, recipientId: string, fiatAmount: number, senderCurrency: string): Promise<{
+    static sendTip(senderId: string, recipientId: string, senderKrAmount: number, senderCurrency: string): Promise<{
         success: boolean;
-        krTipped: Prisma.Decimal;
+        krTipped: number;
+        krReceived: number;
+        platformFee: number;
     }>;
     static getTransactions(userId: string, limit?: number, offset?: number): Promise<{
         status: string;

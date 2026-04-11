@@ -26,6 +26,15 @@ export declare class ContestService {
         sponsorUrl?: string;
         deadline: Date;
         coverMediaUrl?: string;
+        entryFeeKr?: number;
+        publicVoteWeight?: number;
+        allowDailyPrizes?: boolean;
+        dailyPrizeKr?: number;
+        targetAges?: number[];
+        targetGeos?: string[];
+        airdropKr?: number;
+        airdropLimit?: number;
+        judges?: string[];
     }): Promise<{
         prizeKr: Prisma.Decimal;
         platformFeeKr: Prisma.Decimal;
@@ -44,9 +53,10 @@ export declare class ContestService {
             label: string;
             sortOrder: number;
             contestId: string;
-            actionType: string;
-            targetUrl: string;
+            actionType: import(".prisma/client").$Enums.RequirementType;
+            targetUrl: string | null;
             isVerifiable: boolean;
+            requiresUpload: boolean;
         }[];
         distributions: {
             id: string;
@@ -55,14 +65,22 @@ export declare class ContestService {
             percentage: Prisma.Decimal;
         }[];
         status: import(".prisma/client").$Enums.ContestStatus;
+        description: string | null;
         id: string;
         creatorId: string;
         title: string;
-        description: string | null;
         mediaType: import(".prisma/client").$Enums.ContestMediaType;
         category: string;
         coverMediaUrl: string | null;
         prizeTotalKr: Prisma.Decimal;
+        entryFeeKr: Prisma.Decimal | null;
+        publicVoteWeight: number | null;
+        targetAges: number[];
+        targetGeos: string[];
+        airdropKr: Prisma.Decimal | null;
+        airdropLimit: number | null;
+        allowDailyPrizes: boolean;
+        dailyPrizeKr: Prisma.Decimal | null;
         maxWinners: number;
         judgingCriteria: import(".prisma/client").$Enums.JudgingCriteria;
         sponsorName: string | null;
@@ -123,8 +141,8 @@ export declare class ContestService {
         totalChargedKr: number;
         rules: string[];
         requiredActions: {
-            type: string;
-            targetUrl: string;
+            type: import(".prisma/client").$Enums.RequirementType;
+            targetUrl: string | null;
             label: string;
         }[];
         maxWinners: number;
@@ -168,6 +186,8 @@ export declare class ContestService {
         mediaUrl: string;
         proofUrls: string[];
         votesCount: number;
+        judgeScore: Prisma.Decimal | null;
+        finalScore: Prisma.Decimal | null;
         rank: number | null;
         submittedAt: Date;
     }>;

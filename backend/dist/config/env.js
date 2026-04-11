@@ -6,6 +6,11 @@ const envSchema = zod_1.z.object({
     NODE_ENV: zod_1.z.enum(['development', 'production', 'test']).default('development'),
     PORT: zod_1.z.string().default('3000').transform(Number),
     CORS_ORIGIN: zod_1.z.string().default('*'),
+    // Rate Limiting
+    RATE_LIMIT_MAX: zod_1.z.string().default('100').transform(Number),
+    RATE_LIMIT_WINDOW_MS: zod_1.z.string().default('900000').transform(Number),
+    // Security
+    REQUEST_SIGNING_KEY: zod_1.z.string().min(16, 'REQUEST_SIGNING_KEY must be at least 16 characters'),
     // Database
     DATABASE_URL: zod_1.z.string().min(1, 'DATABASE_URL is required'),
     // Redis

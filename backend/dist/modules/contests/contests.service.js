@@ -11,7 +11,13 @@ class ContestService {
      */
     static async createContest(data) {
         const platformFeeKr = data.prizeKr * PLATFORM_FEE_RATE;
-        const totalChargedKr = new client_1.Prisma.Decimal(data.prizeKr + platformFeeKr);
+        // Calculate total duration in days dynamically locking the daily prize pool Escrow natively
+        const durationMs = data.deadline.getTime() - new Date().getTime();
+        const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
+        const totalDailyPrizePool = data.allowDailyPrizes && data.dailyPrizeKr ? (data.dailyPrizeKr * durationDays) : 0;
+        const airdropTotalPool = (data.airdropKr && data.airdropLimit) ? (data.airdropKr * data.airdropLimit) : 0;
+        // Massive Escrow Calculation blocking fraudulent contest creations natively 
+        const totalChargedKr = new client_1.Prisma.Decimal(data.prizeKr + platformFeeKr + totalDailyPrizePool + airdropTotalPool);
         const prizeKr = new client_1.Prisma.Decimal(data.prizeKr);
         const feeKr = new client_1.Prisma.Decimal(platformFeeKr);
         return database_1.prisma.$transaction(async (tx) => {
@@ -42,6 +48,19 @@ class ContestService {
                     sponsorUrl: data.sponsorUrl ?? null,
                     deadline: data.deadline,
                     status: 'ACTIVE',
+                    // Inject Gamification
+                    entryFeeKr: data.entryFeeKr ? new client_1.Prisma.Decimal(data.entryFeeKr) : null,
+                    publicVoteWeight: data.publicVoteWeight,
+                    allowDailyPrizes: data.allowDailyPrizes ?? false,
+                    dailyPrizeKr: data.dailyPrizeKr ? new client_1.Prisma.Decimal(data.dailyPrizeKr) : null,
+                    targetAges: data.targetAges,
+                    targetGeos: data.targetGeos,
+                    airdropKr: data.airdropKr ? new client_1.Prisma.Decimal(data.airdropKr) : null,
+                    airdropLimit: data.airdropLimit,
+                    // Relational Maps
+                    judges: data.judges && data.judges.length > 0 ? {
+                        create: data.judges.map((j) => ({ userId: j }))
+                    } : undefined,
                     actions: {
                         create: data.requiredActions.map((a, i) => ({
                             actionType: a.type,

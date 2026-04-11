@@ -30,8 +30,8 @@ export declare const registerSchema: z.ZodObject<{
     currency: string;
     deviceId: string;
     password: string;
-    phone?: string | undefined;
     accountType?: "CREATOR" | "BUSINESS" | undefined;
+    phone?: string | undefined;
 }>;
 export declare const loginSchema: z.ZodEffects<z.ZodObject<{
     email: z.ZodOptional<z.ZodString>;
@@ -43,26 +43,26 @@ export declare const loginSchema: z.ZodEffects<z.ZodObject<{
     deviceId: string;
     password: string;
     email?: string | undefined;
-    phone?: string | undefined;
     username?: string | undefined;
+    phone?: string | undefined;
 }, {
     deviceId: string;
     password: string;
     email?: string | undefined;
-    phone?: string | undefined;
     username?: string | undefined;
+    phone?: string | undefined;
 }>, {
     deviceId: string;
     password: string;
     email?: string | undefined;
-    phone?: string | undefined;
     username?: string | undefined;
+    phone?: string | undefined;
 }, {
     deviceId: string;
     password: string;
     email?: string | undefined;
-    phone?: string | undefined;
     username?: string | undefined;
+    phone?: string | undefined;
 }>;
 export declare const oauthSchema: z.ZodObject<{
     provider: z.ZodEnum<["google", "apple"]>;

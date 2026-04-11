@@ -5,9 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.paymentRateLimiter = exports.authRateLimiter = exports.rateLimiter = void 0;
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
+const env_1 = require("../config/env");
 exports.rateLimiter = (0, express_rate_limit_1.default)({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // 100 requests per window
+    windowMs: env_1.env.RATE_LIMIT_WINDOW_MS,
+    max: env_1.env.RATE_LIMIT_MAX,
     standardHeaders: true,
     legacyHeaders: false,
     message: { error: 'Too many requests, please try again later' },

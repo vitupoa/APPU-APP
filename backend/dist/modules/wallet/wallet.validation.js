@@ -6,6 +6,7 @@ exports.topupInitiateSchema = zod_1.z.object({
     fiatAmount: zod_1.z.number().positive('Amount must be positive'),
     currency: zod_1.z.string().length(3),
     provider: zod_1.z.enum(['paypal', 'paystack', 'mpesa']),
+    phoneNumber: zod_1.z.string().optional(),
 });
 exports.withdrawInitiateSchema = zod_1.z.object({
     fiatAmount: zod_1.z.number().positive('Amount must be positive'),
@@ -15,7 +16,7 @@ exports.withdrawInitiateSchema = zod_1.z.object({
 });
 exports.tipSchema = zod_1.z.object({
     recipientId: zod_1.z.string().uuid('Invalid recipient ID'),
-    fiatAmount: zod_1.z.number().positive('Tip must be positive'),
+    krAmount: zod_1.z.number().int().positive('Tip must be a positive integer'),
     currency: zod_1.z.string().length(3),
 });
 exports.exchangeRateSchema = zod_1.z.object({

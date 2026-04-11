@@ -8,8 +8,8 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const http_1 = require("http");
-const socket_io_1 = require("socket.io");
 const env_1 = require("./config/env");
+const socket_1 = require("./shared/gateway/socket");
 const errorHandler_1 = require("./middleware/errorHandler");
 const rateLimiter_1 = require("./middleware/rateLimiter");
 const auth_routes_1 = __importDefault(require("./modules/auth/auth.routes"));
@@ -22,16 +22,12 @@ const user_routes_1 = __importDefault(require("./modules/user/user.routes"));
 const shop_routes_1 = __importDefault(require("./modules/shop/shop.routes"));
 const analytics_routes_1 = __importDefault(require("./modules/analytics/analytics.routes"));
 const ads_routes_1 = __importDefault(require("./modules/ads/ads.routes"));
+const cache_routes_1 = __importDefault(require("./modules/cache/cache.routes"));
 const app = (0, express_1.default)();
 exports.app = app;
 const httpServer = (0, http_1.createServer)(app);
-// Socket.io for real-time features (milestones, contests, notifications)
-const io = new socket_io_1.Server(httpServer, {
-    cors: {
-        origin: env_1.env.CORS_ORIGIN,
-        methods: ['GET', 'POST'],
-    },
-});
+// Socket.io Redis Clustered Gateway for real-time features (milestones, contests, notifications)
+const io = (0, socket_1.initializeGateway)(httpServer);
 exports.io = io;
 // Global middleware
 app.use((0, helmet_1.default)());
@@ -54,15 +50,10 @@ app.use('/api/v1/contests', contests_routes_1.default);
 app.use('/api/v1/shop', shop_routes_1.default);
 app.use('/api/v1/analytics', analytics_routes_1.default);
 app.use('/api/v1/ads', ads_routes_1.default);
+app.use('/api/v1/cache', cache_routes_1.default);
 // Error handler (must be last)
 app.use(errorHandler_1.errorHandler);
-// Socket.io connection handling
-io.on('connection', (socket) => {
-    console.log(`Client connected: ${socket.id}`);
-    socket.on('disconnect', () => {
-        console.log(`Client disconnected: ${socket.id}`);
-    });
-});
+// Endpoints connected, Socket.io manages connections internally.
 // Graceful shutdown
 const gracefulShutdown = () => {
     console.log('Shutting down gracefully...');

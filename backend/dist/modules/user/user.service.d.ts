@@ -48,7 +48,6 @@ export declare class UserService {
     }): Promise<{
         id: string;
         email: string;
-        phone: string | null;
         username: string;
         firstName: string;
         lastName: string;
@@ -64,6 +63,7 @@ export declare class UserService {
         isAdmin: boolean;
         isVerified: boolean;
         isWalletUnlocked: boolean;
+        walletPinHash: string | null;
         passwordHash: string | null;
         createdAt: Date;
         updatedAt: Date;
@@ -148,10 +148,11 @@ export declare class UserService {
             completedAt: Date;
         })[];
     } & {
+        description: string;
         id: string;
         createdAt: Date;
+        contestId: string | null;
         title: string;
-        description: string;
         requirementType: string;
         requirementValue: number;
         rewardKr: Prisma.Decimal;

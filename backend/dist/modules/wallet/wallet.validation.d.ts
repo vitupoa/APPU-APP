@@ -3,14 +3,17 @@ export declare const topupInitiateSchema: z.ZodObject<{
     fiatAmount: z.ZodNumber;
     currency: z.ZodString;
     provider: z.ZodEnum<["paypal", "paystack", "mpesa"]>;
+    phoneNumber: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     currency: string;
     provider: "paypal" | "paystack" | "mpesa";
     fiatAmount: number;
+    phoneNumber?: string | undefined;
 }, {
     currency: string;
     provider: "paypal" | "paystack" | "mpesa";
     fiatAmount: number;
+    phoneNumber?: string | undefined;
 }>;
 export declare const withdrawInitiateSchema: z.ZodObject<{
     fiatAmount: z.ZodNumber;
@@ -30,15 +33,15 @@ export declare const withdrawInitiateSchema: z.ZodObject<{
 }>;
 export declare const tipSchema: z.ZodObject<{
     recipientId: z.ZodString;
-    fiatAmount: z.ZodNumber;
+    krAmount: z.ZodNumber;
     currency: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     currency: string;
-    fiatAmount: number;
+    krAmount: number;
     recipientId: string;
 }, {
     currency: string;
-    fiatAmount: number;
+    krAmount: number;
     recipientId: string;
 }>;
 export declare const exchangeRateSchema: z.ZodObject<{

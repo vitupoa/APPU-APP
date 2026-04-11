@@ -1,0 +1,1 @@
+{"version":3,"file":"socket.d.ts","sourceRoot":"","sources":["../../../src/shared/gateway/socket.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,IAAI,YAAY,EAAE,MAAM,WAAW,CAAC;AAGnD,OAAO,EAAE,MAAM,IAAI,UAAU,EAAE,MAAM,MAAM,CAAC;AAG5C,eAAO,IAAI,EAAE,EAAE,YAAY,CAAC;AAE5B,wBAAgB,iBAAiB,CAAC,UAAU,EAAE,UAAU,uIA6BvD"}

@@ -17,7 +17,7 @@ class WalletController {
     static async sendTip(req, res) {
         try {
             const data = wallet_validation_1.tipSchema.parse(req.body);
-            const result = await wallet_service_1.WalletService.sendTip(req.userId, data.recipientId, data.fiatAmount, data.currency);
+            const result = await wallet_service_1.WalletService.sendTip(req.userId, data.recipientId, data.krAmount, data.currency);
             res.status(200).json(result);
         }
         catch (error) {

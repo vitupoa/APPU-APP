@@ -13,17 +13,23 @@ cloudinary_1.v2.config({
     secure: true,
 });
 exports.CLOUDINARY_FOLDERS = {
-    PROFILE_PHOTO: 'Krieta/profile/photo',
-    PROFILE_VIDEO: 'Krieta/profile/video',
-    SHORTS_VIDEO: 'Krieta/shorts/video',
-    SHORTS_PHOTO: 'Krieta/shorts/photo',
-    CONTESTS_PHOTO: 'Krieta/contests/photo',
-    CONTESTS_VIDEO: 'Krieta/contests/video',
-    FEED_PHOTO: 'Krieta/feed/photo',
-    SHOP_PHOTO: 'Krieta/shop/photo',
-    CHAT_PHOTO: 'Krieta/chat/photo',
-    CHAT_VIDEO: 'Krieta/chat/video',
-    CHAT_AUDIO: 'Krieta/chat/audio',
+    // Profiles
+    PROFILE_IMAGES: 'Krieta/profile/Images',
+    PROFILE_VIDEOS: 'Krieta/profile/Videos',
+    // Shorts
+    SHORTS_VIDEOS: 'Krieta/shorts/Videos',
+    SHORTS_IMAGES: 'Krieta/shorts/Images',
+    // Contests
+    CONTESTS_IMAGES: 'Krieta/contests/Images',
+    CONTESTS_VIDEOS: 'Krieta/contests/Videos',
+    // Feed
+    FEED_IMAGES: 'Krieta/feed/Images',
+    // Shop
+    SHOP_IMAGES: 'Krieta/shop/Images',
+    // Chat
+    CHAT_IMAGES: 'Krieta/chat/Images',
+    CHAT_VIDEOS: 'Krieta/chat/Videos',
+    CHAT_AUDIO: 'Krieta/chat/Audio',
 };
 /**
  * Generate signed upload params for client-side direct upload.
@@ -31,10 +37,16 @@ exports.CLOUDINARY_FOLDERS = {
  */
 function generateUploadSignature(folder) {
     const timestamp = Math.round(Date.now() / 1000);
+    // Eager optimizations offloading thumbnails to Cloudinary Infrastructure asynchronously
+    const eagerTransformations = folder.includes('Videos')
+        ? 'c_fill,h_400,w_400,f_auto,so_0'
+        : 'c_fill,w_400,h_400,f_auto';
     const params = {
         timestamp,
         folder,
         upload_preset: 'krieta_signed',
+        eager: eagerTransformations,
+        eager_async: true,
     };
     const signature = cloudinary_1.v2.utils.api_sign_request(params, env_1.env.CLOUDINARY_API_SECRET);
     return {

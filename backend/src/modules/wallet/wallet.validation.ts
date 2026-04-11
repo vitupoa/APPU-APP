@@ -4,6 +4,7 @@ export const topupInitiateSchema = z.object({
   fiatAmount: z.number().positive('Amount must be positive'),
   currency: z.string().length(3),
   provider: z.enum(['paypal', 'paystack', 'mpesa']),
+  phoneNumber: z.string().optional(),
 });
 
 export const withdrawInitiateSchema = z.object({

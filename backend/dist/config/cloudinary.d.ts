@@ -1,16 +1,16 @@
 import { v2 as cloudinary } from 'cloudinary';
 export declare const CLOUDINARY_FOLDERS: {
-    readonly PROFILE_PHOTO: "Krieta/profile/photo";
-    readonly PROFILE_VIDEO: "Krieta/profile/video";
-    readonly SHORTS_VIDEO: "Krieta/shorts/video";
-    readonly SHORTS_PHOTO: "Krieta/shorts/photo";
-    readonly CONTESTS_PHOTO: "Krieta/contests/photo";
-    readonly CONTESTS_VIDEO: "Krieta/contests/video";
-    readonly FEED_PHOTO: "Krieta/feed/photo";
-    readonly SHOP_PHOTO: "Krieta/shop/photo";
-    readonly CHAT_PHOTO: "Krieta/chat/photo";
-    readonly CHAT_VIDEO: "Krieta/chat/video";
-    readonly CHAT_AUDIO: "Krieta/chat/audio";
+    readonly PROFILE_IMAGES: "Krieta/profile/Images";
+    readonly PROFILE_VIDEOS: "Krieta/profile/Videos";
+    readonly SHORTS_VIDEOS: "Krieta/shorts/Videos";
+    readonly SHORTS_IMAGES: "Krieta/shorts/Images";
+    readonly CONTESTS_IMAGES: "Krieta/contests/Images";
+    readonly CONTESTS_VIDEOS: "Krieta/contests/Videos";
+    readonly FEED_IMAGES: "Krieta/feed/Images";
+    readonly SHOP_IMAGES: "Krieta/shop/Images";
+    readonly CHAT_IMAGES: "Krieta/chat/Images";
+    readonly CHAT_VIDEOS: "Krieta/chat/Videos";
+    readonly CHAT_AUDIO: "Krieta/chat/Audio";
 };
 export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINARY_FOLDERS];
 /**

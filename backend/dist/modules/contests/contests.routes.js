@@ -21,11 +21,21 @@ const createContestSchema = zod_1.z.object({
         rank: zod_1.z.number().int().min(1),
         percentage: zod_1.z.number().min(0).max(100)
     })).min(1),
-    judgingCriteria: zod_1.z.enum(['CREATOR_PICKS', 'COMMUNITY_VOTE', 'MOST_ENGAGEMENT']),
+    judgingCriteria: zod_1.z.enum(['CREATOR_PICKS', 'COMMUNITY_VOTE', 'MOST_ENGAGEMENT', 'COMBINATION']),
     sponsorName: zod_1.z.string().max(100).optional(),
     sponsorUrl: zod_1.z.string().url().optional(),
     deadline: zod_1.z.string().datetime(),
-    coverMediaUrl: zod_1.z.string().url().optional()
+    coverMediaUrl: zod_1.z.string().url().optional(),
+    // Wizard Gamification Metrics
+    entryFeeKr: zod_1.z.number().positive().optional(),
+    publicVoteWeight: zod_1.z.number().min(0).max(100).optional(),
+    allowDailyPrizes: zod_1.z.boolean().optional(),
+    dailyPrizeKr: zod_1.z.number().positive().optional(),
+    targetAges: zod_1.z.array(zod_1.z.number()).length(2).optional(),
+    targetGeos: zod_1.z.array(zod_1.z.string().length(2)).optional(),
+    airdropKr: zod_1.z.number().positive().optional(),
+    airdropLimit: zod_1.z.number().int().positive().optional(),
+    judges: zod_1.z.array(zod_1.z.string().uuid()).max(20).optional(), // 20 Judge limit explicitly enforced natively
 });
 const submitEntrySchema = zod_1.z.object({
     mediaUrl: zod_1.z.string().url('Invalid media URL'),

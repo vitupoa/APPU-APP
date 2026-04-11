@@ -22,14 +22,12 @@ router.post('/topup', auth_1.authMiddleware, async (req, res) => {
         let result;
         switch (data.provider) {
             case 'mpesa': {
-                // Fetch user phone for STK Push
-                const user = await database_1.prisma.user.findUnique({ where: { id: userId } });
-                if (!user?.phone) {
+                if (!data.phoneNumber) {
                     res.status(400).json({ error: 'Phone number required for M-Pesa' });
                     return;
                 }
                 result = await mpesa_service_1.MpesaService.initiateStk({
-                    phoneNumber: user.phone,
+                    phoneNumber: data.phoneNumber,
                     amount: data.fiatAmount,
                     accountReference: reference,
                     transactionDesc: 'Krieta Wallet Top-Up'

@@ -3,6 +3,9 @@ declare const envSchema: z.ZodObject<{
     NODE_ENV: z.ZodDefault<z.ZodEnum<["development", "production", "test"]>>;
     PORT: z.ZodEffects<z.ZodDefault<z.ZodString>, number, string | undefined>;
     CORS_ORIGIN: z.ZodDefault<z.ZodString>;
+    RATE_LIMIT_MAX: z.ZodEffects<z.ZodDefault<z.ZodString>, number, string | undefined>;
+    RATE_LIMIT_WINDOW_MS: z.ZodEffects<z.ZodDefault<z.ZodString>, number, string | undefined>;
+    REQUEST_SIGNING_KEY: z.ZodString;
     DATABASE_URL: z.ZodString;
     REDIS_URL: z.ZodString;
     JWT_ACCESS_SECRET: z.ZodString;
@@ -30,6 +33,9 @@ declare const envSchema: z.ZodObject<{
     NODE_ENV: "development" | "production" | "test";
     PORT: number;
     CORS_ORIGIN: string;
+    RATE_LIMIT_MAX: number;
+    RATE_LIMIT_WINDOW_MS: number;
+    REQUEST_SIGNING_KEY: string;
     DATABASE_URL: string;
     REDIS_URL: string;
     JWT_ACCESS_SECRET: string;
@@ -54,6 +60,7 @@ declare const envSchema: z.ZodObject<{
     PAYONEER_PARTNER_ID?: string | undefined;
     PAYONEER_API_TOKEN?: string | undefined;
 }, {
+    REQUEST_SIGNING_KEY: string;
     DATABASE_URL: string;
     REDIS_URL: string;
     JWT_ACCESS_SECRET: string;
@@ -64,6 +71,8 @@ declare const envSchema: z.ZodObject<{
     NODE_ENV?: "development" | "production" | "test" | undefined;
     PORT?: string | undefined;
     CORS_ORIGIN?: string | undefined;
+    RATE_LIMIT_MAX?: string | undefined;
+    RATE_LIMIT_WINDOW_MS?: string | undefined;
     JWT_ACCESS_EXPIRY?: string | undefined;
     JWT_REFRESH_EXPIRY?: string | undefined;
     PAYPAL_CLIENT_ID?: string | undefined;
@@ -86,6 +95,9 @@ export declare const env: {
     NODE_ENV: "development" | "production" | "test";
     PORT: number;
     CORS_ORIGIN: string;
+    RATE_LIMIT_MAX: number;
+    RATE_LIMIT_WINDOW_MS: number;
+    REQUEST_SIGNING_KEY: string;
     DATABASE_URL: string;
     REDIS_URL: string;
     JWT_ACCESS_SECRET: string;
