@@ -18,7 +18,6 @@ import io.ktor.http.contentType
 import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNamingStrategy
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -34,7 +33,6 @@ object KtorClientFactory {
         encodeDefaults = true
         coerceInputValues = true
         explicitNulls = false
-        namingStrategy = JsonNamingStrategy.SnakeCase
     }
 
     fun create(tokenManager: TokenManager): HttpClient {
