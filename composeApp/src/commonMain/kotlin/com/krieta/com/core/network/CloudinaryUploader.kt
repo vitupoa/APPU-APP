@@ -32,9 +32,15 @@ class CloudinaryUploader(private val httpClient: HttpClient) {
     suspend fun uploadMedia(folder: String, fileBytes: ByteArray, isVideo: Boolean = false): NetworkResult<String> {
         return safeApiCall {
             // 1. Get Signature from our backend
-            val signatureDto: CloudinarySignatureDto = httpClient.get("${ApiConstants.API_VERSION}/media/upload-signature") {
+            val response = httpClient.get("${ApiConstants.API_VERSION}/media/upload-signature") {
                 parameter("folder", folder)
-            }.body()
+            }
+            
+            if (!response.status.let { it.value in 200..299 }) {
+                throw Exception("Failed to fetch upload signature: HTTP ${response.status.value}. Ensure you are authenticated and backend is updated.")
+            }
+            
+            val signatureDto: CloudinarySignatureDto = response.body()
 
             // 2. Upload to Cloudinary directly
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${if (isVideo) "video" else "image"}/upload"

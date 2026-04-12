@@ -59,7 +59,7 @@ object KtorClientFactory {
                         val refresh = tokenManager.getRefreshToken() ?: return@refreshTokens null
                         // We must fetch deviceId, but since KtorClientFactory is an object/factory, we should ideally inject DeviceSecurity.
                         // Assuming deviceId is accessible or we hardcode a fallback for testing temporarily if DI isn't available right here
-                        val deviceId = "unknown-device" // In production, this should be injected
+                        val deviceId = "TEMP_DEVICE_ID" // In production, this should be injected
                         
                         try {
                             val response = client.post(ApiConstants.AUTH_REFRESH) {
