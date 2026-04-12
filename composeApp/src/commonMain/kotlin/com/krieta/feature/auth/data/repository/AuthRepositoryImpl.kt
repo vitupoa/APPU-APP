@@ -49,7 +49,8 @@ class AuthRepositoryImpl(
             val response = api.register(request)
             
             if (response.error != null) {
-                throw IllegalStateException(response.error)
+                val detailsStr = response.details?.toString() ?: ""
+                throw IllegalStateException("${response.error} $detailsStr".trim())
             }
 
             response.accessToken?.let { tokenManager.saveAccessToken(it) }
@@ -68,7 +69,8 @@ class AuthRepositoryImpl(
             val response = api.login(request)
             
             if (response.error != null) {
-                throw IllegalStateException(response.error)
+                val detailsStr = response.details?.toString() ?: ""
+                throw IllegalStateException("${response.error} $detailsStr".trim())
             }
 
             response.accessToken?.let { tokenManager.saveAccessToken(it) }
