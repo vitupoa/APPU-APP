@@ -44,9 +44,11 @@ class RegisterScreen : Screen {
 
         LaunchedEffect(registerState) {
             if (registerState is RegisterState.Success) {
-                // navigator.replaceAll(MainTabsScreen())
+                navigator.replaceAll(com.krieta.com.core.navigation.MainScreen())
             }
         }
+        
+        var passwordVisible by remember { mutableStateOf(false) }
 
         Scaffold(
             topBar = {
@@ -146,7 +148,13 @@ class RegisterScreen : Screen {
                     onValueChange = { viewModel.password.value = it },
                     label = { Text("Password") },
                     modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = if (passwordVisible) androidx.compose.ui.text.input.VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val icon = if (passwordVisible) "Hide" else "Show"
+                        TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Text(icon, color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                        }
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -166,6 +174,12 @@ class RegisterScreen : Screen {
                 if (registerState is RegisterState.Error) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Text((registerState as RegisterState.Error).message, color = MaterialTheme.colorScheme.error)
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                TextButton(onClick = { navigator.replaceAll(LoginScreen()) }) {
+                    Text("Already have an account? Sign In")
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))

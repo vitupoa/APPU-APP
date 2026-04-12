@@ -30,6 +30,8 @@ class LoginScreen : Screen {
         val authState by viewModel.authState.collectAsState()
         val email by viewModel.email.collectAsState()
         val password by viewModel.password.collectAsState()
+        
+        var passwordVisible by remember { mutableStateOf(false) }
 
         // Listen for successes
         LaunchedEffect(authState) {
@@ -71,7 +73,13 @@ class LoginScreen : Screen {
                     onValueChange = { viewModel.password.value = it },
                     label = { Text("Password") },
                     modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (passwordVisible) androidx.compose.ui.text.input.VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val icon = if (passwordVisible) "Hide" else "Show"
+                        TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Text(icon, color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                        }
+                    },
                     enabled = authState !is AuthState.Loading
                 )
 

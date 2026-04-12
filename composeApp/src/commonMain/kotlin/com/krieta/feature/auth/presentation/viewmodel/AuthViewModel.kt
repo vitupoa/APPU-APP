@@ -38,8 +38,10 @@ class AuthViewModel(
         screenModelScope.launch {
             _authState.value = AuthState.Loading
             
+            val isEmail = email.value.contains("@")
             val request = LoginRequestDto(
-                email = email.value,
+                email = if (isEmail) email.value.trim() else null,
+                username = if (!isEmail) email.value.trim() else null,
                 password = password.value,
                 deviceId = "TEMP_DEVICE_ID" // Ideally fetched from actual DeviceSecurity Expect/Actual
             )

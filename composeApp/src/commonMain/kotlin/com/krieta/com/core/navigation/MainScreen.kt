@@ -49,6 +49,7 @@ class MainScreen : Screen {
 
         TabNavigator(HomeTab) {
             Scaffold(
+                modifier = Modifier.fillMaxSize(),
                 containerColor = MaterialTheme.colorScheme.background,
                 bottomBar = { 
                     KrietaBottomBar(onCreateClick = { showCreateSheet = true }) 
