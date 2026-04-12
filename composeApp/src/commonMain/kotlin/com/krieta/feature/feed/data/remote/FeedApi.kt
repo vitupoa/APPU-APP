@@ -33,4 +33,12 @@ class FeedApi(private val httpClient: HttpClient) {
             setBody(CommentRequest(text))
         }.body()
     }
+
+    suspend fun createPost(caption: String, imageUrls: List<String>) {
+        @Serializable
+        data class CreatePostRequest(val caption: String, val imageUrls: List<String>)
+        httpClient.post(ApiConstants.FEED) {
+            setBody(CreatePostRequest(caption, imageUrls))
+        }
+    }
 }

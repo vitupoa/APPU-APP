@@ -14,4 +14,5 @@ val contestsModule = module {
     factory { ContestFeedViewModel(get()) }
     // ContestDetailViewModel needs contestId injected via parametersOf
     factory { (contestId: String) -> ContestDetailViewModel(contestId, get()) }
+    factory { com.krieta.feature.contests.presentation.viewmodel.CreateContestViewModel(get(), get()) }
 }

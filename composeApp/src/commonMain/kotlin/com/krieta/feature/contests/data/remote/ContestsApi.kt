@@ -10,6 +10,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 
 class ContestsApi(private val httpClient: HttpClient) {
 
@@ -38,5 +39,11 @@ class ContestsApi(private val httpClient: HttpClient) {
 
     suspend fun getLeaderboard(contestId: String): List<ContestSubmissionDto> {
         return httpClient.get("${ApiConstants.CONTESTS}/$contestId/leaderboard").body()
+    }
+
+    suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto) {
+        httpClient.post(ApiConstants.CONTESTS) {
+            setBody(request)
+        }
     }
 }

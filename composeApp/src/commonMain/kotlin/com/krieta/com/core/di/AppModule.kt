@@ -22,6 +22,7 @@ val coreModule = module {
     single<HttpClient> { KtorClientFactory.create(get<TokenManager>()) }
     single { WebSocketService(get(), get()) }
     single { LocationProvider() }
+    single { com.krieta.com.core.network.CloudinaryUploader(get()) }
 }
 
 val appModules: List<Module>

@@ -53,6 +53,10 @@ class ContestsRepositoryImpl(
         return safeApiCall { api.getLeaderboard(contestId).map { it.toDomain() } }
     }
 
+    override suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto): NetworkResult<Unit> {
+        return safeApiCall { api.createContest(request); Unit }
+    }
+
     private fun ContestDto.toDomain(): Contest = Contest(
         id = id,
         creator = ContestCreator(

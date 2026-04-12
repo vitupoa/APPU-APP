@@ -14,12 +14,39 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 
+import cafe.adriel.voyager.koin.getScreenModel
+import com.krieta.feature.feed.presentation.viewmodel.CreatePostViewModel
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.core.PickerMode
+import kotlinx.coroutines.launch
+
 class CreatePostScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        var postText by remember { mutableStateOf("") }
+        val viewModel = getScreenModel<CreatePostViewModel>()
+        val state by viewModel.state.collectAsState()
+
+        LaunchedEffect(state.success) {
+            if (state.success) navigator.pop()
+        }
+
+        val scope = rememberCoroutineScope()
+        
+        val launcher = rememberFilePickerLauncher(
+            type = PickerType.Image,
+            mode = PickerMode.Multiple()
+        ) { files ->
+            files?.forEach { file ->
+                // Coroutine to read bytes
+                scope.launch {
+                    val bytes = file.readBytes()
+                    viewModel.addImage(bytes)
+                }
+            }
+        }
 
         Scaffold(
             topBar = {
@@ -31,7 +58,7 @@ class CreatePostScreen : Screen {
                         }
                     },
                     actions = {
-                        TextButton(onClick = { /* Publish Logic */ navigator.pop() }) {
+                        TextButton(onClick = { viewModel.post() }, enabled = !state.isPosting) {
                             Text("Post", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         }
                     }
@@ -43,11 +70,32 @@ class CreatePostScreen : Screen {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 OutlinedTextField(
-                    value = postText,
-                    onValueChange = { postText = it },
+                    value = state.caption,
+                    onValueChange = { viewModel.updateCaption(it) },
                     placeholder = { Text("What's on your mind?") },
-                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    modifier = Modifier.fillMaxWidth().height(150.dp),
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(onClick = { launcher.launch() }, modifier = Modifier.fillMaxWidth()) {
+                    Text("Add Images")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Display selected images preview count or error
+                if (state.imageBytes.isNotEmpty()) {
+                    Text("${state.imageBytes.size} images selected", fontWeight = FontWeight.Bold)
+                }
+
+                if (state.isPosting) {
+                    CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+                }
+
+                state.error?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 16.dp))
+                }
             }
         }
     }

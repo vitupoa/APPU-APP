@@ -19,7 +19,8 @@ sealed class RegisterState {
 }
 
 class RegisterViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val locationProvider: com.krieta.com.core.location.LocationProvider
 ) : ScreenModel {
 
     private val _registerState = MutableStateFlow<RegisterState>(RegisterState.Idle)
@@ -50,9 +51,9 @@ class RegisterViewModel(
                 lastName = lastName.value.trim(),
                 username = username.value.trim(),
                 accountType = accountType.value,
-                country = "US", // Placeholder - real implementation uses LocationProvider
-                currency = "USD", // Placeholder - real implementation uses LocationProvider
-                deviceId = "TEMP_DEVICE_ID"
+                country = locationProvider.getCurrentCountry(),
+                currency = locationProvider.getCurrentCurrency(),
+                deviceId = "TEMP_DEVICE_ID" // Ideally bound locally
             )
             
             val result = authRepository.register(request)

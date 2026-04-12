@@ -10,4 +10,5 @@ val shortsModule = module {
     single { ShortsApi(get()) }
     single<ShortsRepository> { ShortsRepositoryImpl(get()) }
     factory { ShortsViewModel(get()) }
+    factory { com.krieta.feature.shorts.presentation.viewmodel.CreateShortViewModel(get(), get()) }
 }

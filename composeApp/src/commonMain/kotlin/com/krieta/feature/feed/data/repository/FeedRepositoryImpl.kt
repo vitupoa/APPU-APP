@@ -31,6 +31,10 @@ class FeedRepositoryImpl(
         return safeApiCall { api.addComment(postId, text); Unit }
     }
 
+    override suspend fun createPost(caption: String, imageUrls: List<String>): NetworkResult<Unit> {
+        return safeApiCall { api.createPost(caption, imageUrls); Unit }
+    }
+
     private fun PostDto.toDomain() = Post(
         id = id,
         creator = PostCreator(

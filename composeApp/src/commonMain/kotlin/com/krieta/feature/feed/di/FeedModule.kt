@@ -10,4 +10,5 @@ val feedModule = module {
     single { FeedApi(get()) }
     single<FeedRepository> { FeedRepositoryImpl(get()) }
     factory { FeedViewModel(get()) }
+    factory { com.krieta.feature.feed.presentation.viewmodel.CreatePostViewModel(get(), get()) }
 }

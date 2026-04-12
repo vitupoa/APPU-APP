@@ -55,7 +55,7 @@ class MainScreen : Screen {
                     KrietaBottomBar(onCreateClick = { showCreateSheet = true }) 
                 },
                 content = { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)) {
+                    Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                         CurrentTab()
                     }
                 }

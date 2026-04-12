@@ -75,6 +75,18 @@ class ShortsRepositoryImpl(
         try { api.incrementView(shortId) } catch (_: Exception) {}
     }
 
+    override suspend fun createShort(videoUrl: String, caption: String): NetworkResult<Unit> {
+        return safeApiCall { 
+            api.createShort(
+                com.krieta.feature.shorts.data.remote.dto.CreateShortRequestDto(
+                    videoUrl = videoUrl,
+                    caption = caption
+                )
+            )
+            Unit 
+        }
+    }
+
     private fun com.krieta.feature.shorts.data.remote.dto.ShortDto.toDomain(): Short {
         return Short(
             id = id,

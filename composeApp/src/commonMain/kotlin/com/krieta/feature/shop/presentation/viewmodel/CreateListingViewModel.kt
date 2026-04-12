@@ -23,7 +23,8 @@ data class CreateListingState(
 )
 
 class CreateListingViewModel(
-    private val repository: ShopRepository
+    private val repository: ShopRepository,
+    private val cloudinaryUploader: com.krieta.com.core.network.CloudinaryUploader
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(CreateListingState())
@@ -35,10 +36,24 @@ class CreateListingViewModel(
     fun onCategoryChange(v: String) { _state.value = _state.value.copy(category = v) }
     fun onWhatsappChange(v: String) { _state.value = _state.value.copy(whatsappNumber = v) }
 
-    fun addImageUrl(url: String) {
+    fun uploadImage(bytes: ByteArray) {
         val current = _state.value.imageUrls
         if (current.size < 10) {
-            _state.value = _state.value.copy(imageUrls = current + url)
+            screenModelScope.launch {
+                _state.value = _state.value.copy(isSaving = true, error = null)
+                when (val result = cloudinaryUploader.uploadMedia(com.krieta.com.core.network.ApiConstants.CloudinaryFolders.SHOP_PHOTO, bytes, isVideo = false)) {
+                    is NetworkResult.Success -> {
+                        _state.value = _state.value.copy(
+                            imageUrls = current + result.data,
+                            isSaving = false
+                        )
+                    }
+                    is NetworkResult.Error -> {
+                        _state.value = _state.value.copy(isSaving = false, error = "Failed to upload image: ${result.message}")
+                    }
+                    else -> {}
+                }
+            }
         }
     }
 

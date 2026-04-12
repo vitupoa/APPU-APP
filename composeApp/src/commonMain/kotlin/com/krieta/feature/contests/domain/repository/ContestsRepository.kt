@@ -13,4 +13,5 @@ interface ContestsRepository {
     suspend fun joinContest(contestId: String): NetworkResult<Unit>
     suspend fun getSubmissions(contestId: String, cursor: String?): NetworkResult<SubmissionsResult>
     suspend fun getLeaderboard(contestId: String): NetworkResult<List<ContestSubmission>>
+    suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto): NetworkResult<Unit>
 }

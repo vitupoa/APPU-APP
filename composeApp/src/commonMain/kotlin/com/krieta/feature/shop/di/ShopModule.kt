@@ -14,5 +14,5 @@ val shopModule = module {
 
     factory { ShopListViewModel(get()) }
     factory { (productId: String) -> ProductDetailViewModel(productId, get()) }
-    factory { CreateListingViewModel(get()) }
+    factory { CreateListingViewModel(get(), get()) }
 }

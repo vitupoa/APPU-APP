@@ -28,6 +28,10 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.krieta.feature.shop.presentation.viewmodel.CreateListingViewModel
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.core.PickerMode
+import kotlinx.coroutines.launch
 
 class CreateListingScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +43,20 @@ class CreateListingScreen : Screen {
 
         LaunchedEffect(state.saveSuccess) {
             if (state.saveSuccess) navigator.pop()
+        }
+
+        val scope = rememberCoroutineScope()
+        
+        val launcher = rememberFilePickerLauncher(
+            type = PickerType.Image,
+            mode = PickerMode.Multiple()
+        ) { files ->
+            files?.forEach { file ->
+                scope.launch {
+                    val bytes = file.readBytes()
+                    viewModel.uploadImage(bytes)
+                }
+            }
         }
 
         Scaffold(
@@ -84,44 +102,17 @@ class CreateListingScreen : Screen {
                         }
                     }
                     if (state.imageUrls.size < 10) {
-                        var imageUrlInput by remember { mutableStateOf("") }
                         OutlinedIconButton(
-                            onClick = {
-                                if (imageUrlInput.isNotBlank()) {
-                                    viewModel.addImageUrl(imageUrlInput)
-                                    imageUrlInput = ""
-                                }
-                            },
+                            onClick = { launcher.launch() },
                             modifier = Modifier.size(72.dp)
                         ) {
-                            Icon(Icons.Default.AddPhotoAlternate, "Add Image")
+                            if (state.isSaving && state.imageUrls.isEmpty()) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            } else {
+                                Icon(Icons.Default.AddPhotoAlternate, "Add Image")
+                            }
                         }
                     }
-                }
-
-                // Image URL input
-                var imageUrlInput by remember { mutableStateOf("") }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedTextField(
-                        value = imageUrlInput,
-                        onValueChange = { imageUrlInput = it },
-                        label = { Text("Image URL") },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    Button(
-                        onClick = {
-                            if (imageUrlInput.isNotBlank()) {
-                                viewModel.addImageUrl(imageUrlInput)
-                                imageUrlInput = ""
-                            }
-                        },
-                        shape = RoundedCornerShape(12.dp)
-                    ) { Text("Add") }
                 }
 
                 OutlinedTextField(

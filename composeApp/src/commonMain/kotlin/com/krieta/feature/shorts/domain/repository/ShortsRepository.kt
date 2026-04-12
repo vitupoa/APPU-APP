@@ -12,4 +12,5 @@ interface ShortsRepository {
     suspend fun getComments(shortId: String, cursor: String?): NetworkResult<List<ShortComment>>
     suspend fun addComment(shortId: String, text: String): NetworkResult<ShortComment>
     suspend fun incrementView(shortId: String)
+    suspend fun createShort(videoUrl: String, caption: String): NetworkResult<Unit>
 }

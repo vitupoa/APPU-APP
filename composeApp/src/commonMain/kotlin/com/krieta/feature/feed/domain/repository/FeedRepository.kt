@@ -9,4 +9,5 @@ interface FeedRepository {
     suspend fun getFeed(cursor: String?): NetworkResult<FeedResult>
     suspend fun toggleLike(postId: String): NetworkResult<Boolean>
     suspend fun addComment(postId: String, text: String): NetworkResult<Unit>
+    suspend fun createPost(caption: String, imageUrls: List<String>): NetworkResult<Unit>
 }

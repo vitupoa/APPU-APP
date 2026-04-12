@@ -13,5 +13,5 @@ val authModule = module {
     
     // ViewModels (in Koin Core for Voyager, we define as factory)
     factory { AuthViewModel(get()) }
-    factory { RegisterViewModel(get()) }
+    factory { RegisterViewModel(get(), get()) }
 }

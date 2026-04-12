@@ -76,15 +76,21 @@ data class SubmissionsResponseDto(
 )
 
 @Serializable
+data class PrizeDistributionDto(
+    val rank: Int,
+    val percentage: Double
+)
+
+@Serializable
 data class CreateContestRequestDto(
     val title: String,
     val description: String,
     val mediaType: String,
-    val contestCategory: String,
+    val category: String, // Matches backend 'category'
     val prizeKr: Double,
-    val rules: List<String>,
     val requiredActions: List<RequiredActionDto>,
     val maxWinners: Int,
+    val prizeDistribution: List<PrizeDistributionDto>, // Matches backend requirement
     val judgingCriteria: String,
     val sponsorName: String? = null,
     val sponsorUrl: String? = null,
