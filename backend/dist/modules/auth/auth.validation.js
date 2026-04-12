@@ -5,9 +5,9 @@ const zod_1 = require("zod");
 exports.registerSchema = zod_1.z.object({
     email: zod_1.z.string().email('Invalid email address'),
     password: zod_1.z.string().min(8, 'Password must be at least 8 characters'),
-    firstName: zod_1.z.string().min(2, 'First name must be at least 2 characters').regex(/^[A-Za-z\-']+$/, 'First name can only contain letters, hyphens, and apostrophes'),
-    lastName: zod_1.z.string().min(2, 'Last name must be at least 2 characters').regex(/^[A-Za-z\-']+$/, 'Last name can only contain letters, hyphens, and apostrophes'),
-    username: zod_1.z.string().min(3, 'Username must be at least 3 characters').regex(/^[a-z0-9_]+$/, 'Username can only contain lowercase letters, numbers, and underscores'),
+    firstName: zod_1.z.string().min(1, 'First name is required'),
+    lastName: zod_1.z.string().min(1, 'Last name is required'),
+    username: zod_1.z.string().min(3, 'Username must be at least 3 characters').regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
     phone: zod_1.z.string().optional(),
     accountType: zod_1.z.enum(['CREATOR', 'BUSINESS']).default('CREATOR'),
     country: zod_1.z.string().length(2, 'Country must be a 2-letter ISO code'),

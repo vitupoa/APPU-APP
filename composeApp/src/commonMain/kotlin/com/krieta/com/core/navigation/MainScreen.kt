@@ -6,6 +6,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -51,6 +54,7 @@ class MainScreen : Screen {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 containerColor = MaterialTheme.colorScheme.background,
+                contentWindowInsets = WindowInsets.systemBars,
                 bottomBar = { 
                     KrietaBottomBar(onCreateClick = { showCreateSheet = true }) 
                 },
@@ -73,6 +77,7 @@ private fun KrietaBottomBar(onCreateClick: () -> Unit) {
     NavigationBar(
         containerColor = KrietaColors.BackgroundElevated,
         contentColor = KrietaColors.OnSurface,
+        windowInsets = WindowInsets.navigationBars,
     ) {
         TabItem(HomeTab)
         TabItem(ContestsTab)

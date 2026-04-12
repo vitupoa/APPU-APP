@@ -23,6 +23,7 @@ const shop_routes_1 = __importDefault(require("./modules/shop/shop.routes"));
 const analytics_routes_1 = __importDefault(require("./modules/analytics/analytics.routes"));
 const ads_routes_1 = __importDefault(require("./modules/ads/ads.routes"));
 const cache_routes_1 = __importDefault(require("./modules/cache/cache.routes"));
+const media_routes_1 = __importDefault(require("./modules/media/media.routes"));
 const app = (0, express_1.default)();
 exports.app = app;
 const httpServer = (0, http_1.createServer)(app);
@@ -51,6 +52,7 @@ app.use('/api/v1/shop', shop_routes_1.default);
 app.use('/api/v1/analytics', analytics_routes_1.default);
 app.use('/api/v1/ads', ads_routes_1.default);
 app.use('/api/v1/cache', cache_routes_1.default);
+app.use('/api/v1/media', media_routes_1.default);
 // Error handler (must be last)
 app.use(errorHandler_1.errorHandler);
 // Endpoints connected, Socket.io manages connections internally.

@@ -108,7 +108,7 @@ kotlin {
             implementation(libs.datastore.preferences)
 
             // FileKit - Cross Platform File Picker
-            implementation("io.github.vinceglb:filekit-compose:0.8.1")
+            implementation("io.github.vinceglb:filekit-compose:0.8.8")
         }
 
         iosMain.dependencies {

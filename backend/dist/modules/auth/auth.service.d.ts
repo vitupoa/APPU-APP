@@ -1,17 +1,5 @@
 export declare class AuthService {
     /**
-     * Generates a 6-Digit OTP, maps to Redis with strict 10-minute expiry (600s), and dispatches via AWS SES natively
-     */
-    static requestEmailOTP(email: string): Promise<{
-        message: string;
-    }>;
-    /**
-     * Explodes the OTP upon validation mapping absolute protection organically
-     */
-    static verifyEmailOTP(email: string, otp: string): Promise<{
-        success: boolean;
-    }>;
-    /**
      * Helper to generate a unique refresh token, hash it, and store it
      */
     private static createRefreshToken;
@@ -25,9 +13,15 @@ export declare class AuthService {
             id: string;
             username: string;
             email: string;
+            firstName: string;
+            lastName: string;
             displayName: string;
+            country: string;
+            currency: string;
             accountType: import(".prisma/client").$Enums.AccountType;
+            isVerified: boolean;
             isWalletUnlocked: boolean;
+            createdAt: Date;
         };
         accessToken: string;
         refreshToken: string;
@@ -37,9 +31,15 @@ export declare class AuthService {
             id: string;
             username: string;
             email: string;
+            firstName: string;
+            lastName: string;
             displayName: string;
+            country: string;
+            currency: string;
             accountType: import(".prisma/client").$Enums.AccountType;
+            isVerified: boolean;
             isWalletUnlocked: boolean;
+            createdAt: Date;
         };
         accessToken: string;
         refreshToken: string;
