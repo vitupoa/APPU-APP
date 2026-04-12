@@ -109,9 +109,15 @@ export class AuthService {
         id: user.id,
         username: user.username,
         email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
         displayName: user.displayName,
+        country: user.country,
+        currency: user.currency,
         accountType: user.accountType,
-        isWalletUnlocked: user.isWalletUnlocked
+        isVerified: user.isVerified,
+        isWalletUnlocked: user.isWalletUnlocked,
+        createdAt: user.createdAt
       },
       accessToken,
       refreshToken
@@ -155,9 +161,15 @@ export class AuthService {
         id: user.id,
         username: user.username,
         email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
         displayName: user.displayName,
+        country: user.country,
+        currency: user.currency,
         accountType: user.accountType,
-        isWalletUnlocked: user.isWalletUnlocked
+        isVerified: user.isVerified,
+        isWalletUnlocked: user.isWalletUnlocked,
+        createdAt: user.createdAt
       },
       accessToken,
       refreshToken
