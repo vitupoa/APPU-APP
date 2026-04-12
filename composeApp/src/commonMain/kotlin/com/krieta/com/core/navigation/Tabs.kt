@@ -83,9 +83,9 @@ object HomeTab : Tab {
                 // Feed Content ViewPager
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     when (selectedTabIndex) {
-                        0 -> PlaceholderTab("Admiring Feed (Following)")
-                        1 -> PlaceholderTab("Discover Feed (For You)")
-                        2 -> PlaceholderTab("Submit Contests Feed")
+                        0 -> com.krieta.feature.feed.presentation.screen.FeedScreen().Content()
+                        1 -> com.krieta.feature.feed.presentation.screen.FeedScreen().Content()
+                        2 -> com.krieta.feature.contests.presentation.screen.ContestFeedSwipeScreen().Content()
                     }
                 }
             }
@@ -120,32 +120,8 @@ object ContestsTab : Tab {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-            ) {
-                Text(
-                    text = "Discover Active Parent Contests & Ended Parent Contests",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(16.dp),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-                
-                androidx.compose.material3.Button(
-                    onClick = {
-                        navigator.push(com.krieta.feature.contests.presentation.screen.CreateContestScreen())
-                    },
-                    modifier = Modifier.padding(top = 16.dp),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = KrietaColors.Primary
-                    )
-                ) {
-                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                    Text("Create Contest")
-                }
-            }
+            // Embedded Contest Feed Screen
+            com.krieta.feature.contests.presentation.screen.ContestFeedScreen().Content()
         }
     }
 }

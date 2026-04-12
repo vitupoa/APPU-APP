@@ -63,6 +63,7 @@ class LoginScreen : Screen {
                     onValueChange = { viewModel.email.value = it },
                     label = { Text("Email, Phone or Username") },
                     modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email),
                     enabled = authState !is AuthState.Loading
                 )
                 

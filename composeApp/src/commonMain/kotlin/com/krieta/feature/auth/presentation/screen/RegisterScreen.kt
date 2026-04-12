@@ -138,7 +138,8 @@ class RegisterScreen : Screen {
                     value = email,
                     onValueChange = { viewModel.email.value = it },
                     label = { Text("Email Address") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
