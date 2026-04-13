@@ -45,6 +45,11 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             }
             level = io.ktor.client.plugins.logging.LogLevel.INFO
         }
+        install(io.ktor.client.plugins.HttpTimeout) {
+            requestTimeoutMillis = 180_000L
+            connectTimeoutMillis = 180_000L
+            socketTimeoutMillis = 180_000L
+        }
     }
 
     suspend fun uploadMedia(folder: String, fileBytes: ByteArray, isVideo: Boolean = false): NetworkResult<String> {
@@ -67,16 +72,16 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                 setBody(
                     MultiPartFormDataContent(
                         formData {
+                            append("api_key", signatureDto.apiKey)
+                            append("timestamp", signatureDto.timestamp.toString())
+                            append("signature", signatureDto.signature)
+                            append("folder", signatureDto.folder)
                             append("file", fileBytes, Headers.build {
                                 append(
                                     HttpHeaders.ContentDisposition, 
                                     "form-data; name=\"file\"; filename=\"upload.${if (isVideo) "mp4" else "jpg"}\""
                                 )
                             })
-                            append("api_key", signatureDto.apiKey)
-                            append("timestamp", signatureDto.timestamp.toString())
-                            append("signature", signatureDto.signature)
-                            append("folder", signatureDto.folder)
                         }
                     )
                 )
@@ -84,6 +89,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
 
             if (uploadResponse.status.value !in 200..299) {
                 val errorBody = uploadResponse.bodyAsText()
+                println("Cloudinary RAW ERROR: $errorBody")
                 throw Exception("Cloudinary upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
             }
 
