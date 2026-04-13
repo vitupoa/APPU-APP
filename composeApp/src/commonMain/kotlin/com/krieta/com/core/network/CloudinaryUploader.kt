@@ -43,7 +43,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     println("CloudinaryHttp: $message")
                 }
             }
-            level = io.ktor.client.plugins.logging.LogLevel.ALL
+            level = io.ktor.client.plugins.logging.LogLevel.INFO
         }
     }
 
