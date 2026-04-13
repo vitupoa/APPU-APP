@@ -37,6 +37,14 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
         install(ContentNegotiation) {
             json(KtorClientFactory.json)
         }
+        install(io.ktor.client.plugins.logging.Logging) {
+            logger = object : io.ktor.client.plugins.logging.Logger {
+                override fun log(message: String) {
+                    println("CloudinaryHttp: $message")
+                }
+            }
+            level = io.ktor.client.plugins.logging.LogLevel.ALL
+        }
     }
 
     suspend fun uploadMedia(folder: String, fileBytes: ByteArray, isVideo: Boolean = false): NetworkResult<String> {
