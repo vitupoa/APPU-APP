@@ -68,7 +68,10 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     MultiPartFormDataContent(
                         formData {
                             append("file", fileBytes, Headers.build {
-                                append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+                                append(
+                                    HttpHeaders.ContentDisposition, 
+                                    "form-data; name=\"file\"; filename=\"upload.${if (isVideo) "mp4" else "jpg"}\""
+                                )
                             })
                             append("api_key", signatureDto.apiKey)
                             append("timestamp", signatureDto.timestamp.toString())
