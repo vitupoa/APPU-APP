@@ -45,7 +45,6 @@ export function generateUploadSignature(folder: CloudinaryFolder) {
   const params = {
     timestamp,
     folder,
-    upload_preset: 'krieta_signed',
     eager: eagerTransformations,
     eager_async: true,
   };
@@ -61,7 +60,6 @@ export function generateUploadSignature(folder: CloudinaryFolder) {
     folder,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
-    uploadPreset: 'krieta_signed',
     eager: eagerTransformations,
     eagerAsync: true,
   };
