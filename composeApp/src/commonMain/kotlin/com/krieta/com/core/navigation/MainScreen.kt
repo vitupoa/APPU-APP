@@ -54,7 +54,6 @@ class MainScreen : Screen {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 containerColor = MaterialTheme.colorScheme.background,
-                contentWindowInsets = WindowInsets.systemBars,
                 bottomBar = { 
                     KrietaBottomBar(onCreateClick = { showCreateSheet = true }) 
                 },
@@ -77,7 +76,6 @@ private fun KrietaBottomBar(onCreateClick: () -> Unit) {
     NavigationBar(
         containerColor = KrietaColors.BackgroundElevated,
         contentColor = KrietaColors.OnSurface,
-        windowInsets = WindowInsets.navigationBars,
     ) {
         TabItem(HomeTab)
         TabItem(ContestsTab)
@@ -86,7 +84,7 @@ private fun KrietaBottomBar(onCreateClick: () -> Unit) {
         Box(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight(),
+                .padding(vertical = 12.dp),
             contentAlignment = Alignment.Center
         ) {
             Box(
