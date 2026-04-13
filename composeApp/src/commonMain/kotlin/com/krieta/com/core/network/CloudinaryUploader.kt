@@ -8,6 +8,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import kotlinx.serialization.Serializable
@@ -18,7 +19,10 @@ data class CloudinarySignatureDto(
     val timestamp: Long,
     val folder: String,
     val apiKey: String,
-    val cloudName: String
+    val cloudName: String,
+    val uploadPreset: String = "",
+    val eager: String = "",
+    val eagerAsync: Boolean = false
 )
 
 @Serializable
@@ -45,7 +49,7 @@ class CloudinaryUploader(private val httpClient: HttpClient) {
             // 2. Upload to Cloudinary directly
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${if (isVideo) "video" else "image"}/upload"
             
-            val uploadResponse: CloudinaryUploadResponse = httpClient.post(uploadUrl) {
+            val uploadResponse = httpClient.post(uploadUrl) {
                 setBody(
                     MultiPartFormDataContent(
                         formData {
@@ -56,12 +60,26 @@ class CloudinaryUploader(private val httpClient: HttpClient) {
                             append("timestamp", signatureDto.timestamp.toString())
                             append("signature", signatureDto.signature)
                             append("folder", signatureDto.folder)
+                            if (signatureDto.uploadPreset.isNotEmpty()) {
+                                append("upload_preset", signatureDto.uploadPreset)
+                            }
+                            if (signatureDto.eager.isNotEmpty()) {
+                                append("eager", signatureDto.eager)
+                            }
+                            append("eager_async", signatureDto.eagerAsync.toString())
                         }
                     )
                 )
-            }.body()
+            }
 
-            uploadResponse.secure_url
+            if (uploadResponse.status.value !in 200..299) {
+                val errorBody = uploadResponse.bodyAsText()
+                throw Exception("Cloudinary upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
+            }
+
+            val result: CloudinaryUploadResponse = uploadResponse.body()
+            result.secure_url
         }
     }
 }
+
