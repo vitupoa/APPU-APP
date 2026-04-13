@@ -57,16 +57,16 @@ object ApiConstants {
 
     // Cloudinary folder paths
     object CloudinaryFolders {
-        const val PROFILE_PHOTO = "Krieta/profile/photo"
-        const val PROFILE_VIDEO = "Krieta/profile/video"
-        const val SHORTS_VIDEO = "Krieta/shorts/video"
-        const val SHORTS_PHOTO = "Krieta/shorts/photo"
-        const val CONTESTS_PHOTO = "Krieta/contests/photo"
-        const val CONTESTS_VIDEO = "Krieta/contests/video"
-        const val FEED_PHOTO = "Krieta/feed/photo"
-        const val SHOP_PHOTO = "Krieta/shop/photo"
-        const val CHAT_PHOTO = "Krieta/chat/photo"
-        const val CHAT_VIDEO = "Krieta/chat/video"
-        const val CHAT_AUDIO = "Krieta/chat/audio"
+        const val PROFILE_PHOTO = "Krieta/profile/Images"
+        const val PROFILE_VIDEO = "Krieta/profile/Videos"
+        const val SHORTS_VIDEO = "Krieta/shorts/Videos"
+        const val SHORTS_PHOTO = "Krieta/shorts/Images"
+        const val CONTESTS_PHOTO = "Krieta/contests/Images"
+        const val CONTESTS_VIDEO = "Krieta/contests/Videos"
+        const val FEED_PHOTO = "Krieta/feed/Images"
+        const val SHOP_PHOTO = "Krieta/shop/Images"
+        const val CHAT_PHOTO = "Krieta/chat/Images"
+        const val CHAT_VIDEO = "Krieta/chat/Videos"
+        const val CHAT_AUDIO = "Krieta/chat/Audio"
     }
 }
