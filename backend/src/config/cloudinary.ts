@@ -37,20 +37,8 @@ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINA
 export function generateUploadSignature(folder: CloudinaryFolder) {
   const timestamp = Math.round(Date.now() / 1000);
   
-  // Eager optimizations offloading thumbnails to Cloudinary Infrastructure asynchronously
-  const eagerTransformations = folder.includes('Videos') 
-    ? 'c_fill,h_400,w_400,f_auto,so_0' 
-    : 'c_fill,w_400,h_400,f_auto';
-
-  const params = {
-    timestamp,
-    folder,
-    eager: eagerTransformations,
-    eager_async: true,
-  };
-
   const signature = cloudinary.utils.api_sign_request(
-    params,
+    { timestamp, folder },
     env.CLOUDINARY_API_SECRET
   );
 
@@ -60,8 +48,6 @@ export function generateUploadSignature(folder: CloudinaryFolder) {
     folder,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
-    eager: eagerTransformations,
-    eagerAsync: true,
   };
 }
 

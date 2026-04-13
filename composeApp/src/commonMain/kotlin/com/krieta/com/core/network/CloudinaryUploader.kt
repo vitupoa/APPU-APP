@@ -21,9 +21,7 @@ data class CloudinarySignatureDto(
     val timestamp: Long,
     val folder: String,
     val apiKey: String,
-    val cloudName: String,
-    val eager: String = "",
-    val eagerAsync: Boolean = false
+    val cloudName: String
 )
 
 @Serializable
@@ -68,10 +66,6 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                             append("timestamp", signatureDto.timestamp.toString())
                             append("signature", signatureDto.signature)
                             append("folder", signatureDto.folder)
-                            if (signatureDto.eager.isNotEmpty()) {
-                                append("eager", signatureDto.eager)
-                            }
-                            append("eager_async", signatureDto.eagerAsync.toString())
                         }
                     )
                 )
