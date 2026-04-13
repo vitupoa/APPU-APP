@@ -23,6 +23,9 @@ export declare function generateUploadSignature(folder: CloudinaryFolder): {
     folder: CloudinaryFolder;
     apiKey: string;
     cloudName: string;
+    uploadPreset: string;
+    eager: string;
+    eagerAsync: boolean;
 };
 /**
  * Validate that an uploaded resource is in the expected folder.

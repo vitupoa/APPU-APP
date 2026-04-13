@@ -55,6 +55,9 @@ function generateUploadSignature(folder) {
         folder,
         apiKey: env_1.env.CLOUDINARY_API_KEY,
         cloudName: env_1.env.CLOUDINARY_CLOUD_NAME,
+        uploadPreset: 'krieta_signed',
+        eager: eagerTransformations,
+        eagerAsync: true,
     };
 }
 /**
