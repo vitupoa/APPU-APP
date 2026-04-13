@@ -80,11 +80,16 @@ object KtorClientFactory {
                         }
                     }
                     sendWithoutRequest { request ->
-                        // Don't send auth header for login/register endpoints
                         val path = request.url.encodedPath
-                        !path.contains("/auth/login") &&
-                        !path.contains("/auth/register") &&
-                        !path.contains("/auth/refresh")
+                        val host = request.url.host
+                        
+                        val isCloudinary = host.contains("cloudinary.com")
+                        val isAuthRoute = path.contains("/auth/login") || 
+                                          path.contains("/auth/register") || 
+                                          path.contains("/auth/refresh")
+                                          
+                        // Send auth eagerly ONLY if it's NOT a cloudinary request and NOT an auth route
+                        !isCloudinary && !isAuthRoute
                     }
                 }
             }

@@ -11,6 +11,8 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -31,12 +33,19 @@ data class CloudinaryUploadResponse(
     val public_id: String
 )
 
-class CloudinaryUploader(private val httpClient: HttpClient) {
+class CloudinaryUploader(private val authenticatedClient: HttpClient) {
+
+    // A dedicated plain HTTP client for Cloudinary that has NO Auth plugin or interceptors installed.
+    private val plainClient = HttpClient {
+        install(ContentNegotiation) {
+            json(KtorClientFactory.json)
+        }
+    }
 
     suspend fun uploadMedia(folder: String, fileBytes: ByteArray, isVideo: Boolean = false): NetworkResult<String> {
         return safeApiCall {
             // 1. Get Signature from our backend
-            val signatureResponse = httpClient.get("${ApiConstants.API_VERSION}/media/upload-signature") {
+            val signatureResponse = authenticatedClient.get("${ApiConstants.API_VERSION}/media/upload-signature") {
                 parameter("folder", folder)
             }
             
@@ -49,7 +58,7 @@ class CloudinaryUploader(private val httpClient: HttpClient) {
             // 2. Upload to Cloudinary directly
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${if (isVideo) "video" else "image"}/upload"
             
-            val uploadResponse = httpClient.post(uploadUrl) {
+            val uploadResponse = plainClient.post(uploadUrl) {
                 setBody(
                     MultiPartFormDataContent(
                         formData {
