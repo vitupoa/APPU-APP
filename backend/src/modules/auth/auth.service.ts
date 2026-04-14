@@ -127,8 +127,18 @@ export class AuthService {
   static async login(data: any) {
     let user = null;
     
-    if (data.email) user = await prisma.user.findUnique({ where: { email: data.email } });
-    else if (data.username) user = await prisma.user.findUnique({ where: { username: data.username } });
+    if (data.email) {
+      const emailLower = data.email.toLowerCase();
+      user = await prisma.user.findFirst({ where: { email: emailLower } });
+      if (!user) {
+        // Fallback for insensitive check if database allows it or for differently cased registrations
+        user = await prisma.user.findFirst({ where: { email: { equals: data.email, mode: 'insensitive' } } }) || 
+               await prisma.user.findFirst({ where: { email: data.email } });
+      }
+    } else if (data.username) {
+      user = await prisma.user.findFirst({ where: { username: { equals: data.username, mode: 'insensitive' } } }) ||
+             await prisma.user.findUnique({ where: { username: data.username } });
+    }
 
     if (!user || !user.passwordHash) {
       throw new Error('Invalid credentials');

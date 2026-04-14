@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.theme.GlassmorphicContainer
@@ -45,7 +45,7 @@ class WalletScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<WalletViewModel>()
+        val viewModel = koinScreenModel<WalletViewModel>()
         val state by viewModel.state.collectAsState()
         
         var isBalanceHidden by remember { mutableStateOf(false) }

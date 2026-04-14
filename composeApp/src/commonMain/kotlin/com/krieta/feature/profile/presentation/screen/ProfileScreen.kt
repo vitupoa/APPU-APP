@@ -308,7 +308,7 @@ private fun BioLinkBottomSheet(
     onAddLink: (String, String) -> Unit,
     onDeleteLink: (String) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState()
     var showAddLinkField by remember { mutableStateOf(false) }
     var newTitle by remember { mutableStateOf("") }
     var newUrl by remember { mutableStateOf("") }
@@ -317,7 +317,7 @@ private fun BioLinkBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = KrietaColors.BackgroundElevated,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = KrietaColors.OnSurfaceVariant.copy(alpha = 0.4f)) }
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Column(
             modifier = Modifier

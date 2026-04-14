@@ -78,7 +78,7 @@ private fun KrietaBottomBar(onCreateClick: () -> Unit) {
         contentColor = KrietaColors.OnSurface,
     ) {
         TabItem(HomeTab)
-        TabItem(ContestsTab)
+        TabItem(ExploreTab)
         
         // TikTok Style Custom Center Action Button
         Box(
@@ -104,7 +104,7 @@ private fun KrietaBottomBar(onCreateClick: () -> Unit) {
             }
         }
         
-        TabItem(ShopTab)
+        TabItem(ContestsTab)
         TabItem(ProfileTab)
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -93,24 +94,71 @@ object HomeTab : Tab {
     }
 }
 
-object DiscoverTab : Tab {
+object ExploreTab : Tab {
     override val options: TabOptions
         @Composable get() {
             val icon = rememberVectorPainter(Icons.Default.Search)
-            return remember { TabOptions(index = 1u, title = "Discover", icon = icon) }
+            return remember { TabOptions(index = 1u, title = "Explore", icon = icon) }
         }
 
     @Composable
     override fun Content() {
-        // Will be replaced with DiscoverScreen (For You feed + search)
-        PlaceholderTab("Discover")
+        val navigator = cafe.adriel.voyager.navigator.LocalNavigator.currentOrThrow
+
+        Box(
+            modifier = Modifier.fillMaxSize().background(KrietaColors.Background)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 24.dp),
+                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Explore",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = KrietaColors.OnBackground,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                // Drips Card
+                androidx.compose.material3.Card(
+                    modifier = Modifier.fillMaxWidth().height(120.dp).androidx.compose.foundation.clickable {
+                        // TODO: Map to DripsScreen when created
+                    },
+                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = KrietaColors.SurfaceVariant),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Drips", color = KrietaColors.Primary, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+                    }
+                }
+
+                // Shop Card
+                androidx.compose.material3.Card(
+                    modifier = Modifier.fillMaxWidth().height(120.dp).androidx.compose.foundation.clickable {
+                        // Navigator push using Placeholder for now as specified
+                        navigator.push(object : cafe.adriel.voyager.core.screen.Screen {
+                            @Composable
+                            override fun Content() {
+                                PlaceholderTab("Shop")
+                            }
+                        })
+                    },
+                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = KrietaColors.SurfaceVariant),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Shop", color = KrietaColors.Primary, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+                    }
+                }
+            }
+        }
     }
 }
 
 object ContestsTab : Tab {
     override val options: TabOptions
         @Composable get() {
-            val icon = rememberVectorPainter(Icons.Default.Star)
+            val icon = rememberVectorPainter(Icons.Default.EmojiEvents)
             return remember { TabOptions(index = 2u, title = "Contests", icon = icon) }
         }
 
@@ -123,20 +171,6 @@ object ContestsTab : Tab {
             // Embedded Contest Feed Screen
             com.krieta.feature.contests.presentation.screen.ContestFeedScreen().Content()
         }
-    }
-}
-
-object ShopTab : Tab {
-    override val options: TabOptions
-        @Composable get() {
-            val icon = rememberVectorPainter(Icons.Default.ShoppingCart)
-            return remember { TabOptions(index = 3u, title = "Shop", icon = icon) }
-        }
-
-    @Composable
-    override fun Content() {
-        // Will be replaced with ShopScreen
-        PlaceholderTab("Shop")
     }
 }
 
