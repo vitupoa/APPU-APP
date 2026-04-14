@@ -4,12 +4,16 @@ import cafe.adriel.voyager.core.screen.Screen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
@@ -24,19 +28,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.theme.KrietaColors
+import com.krieta.feature.wallet.presentation.screen.WalletScreen
 import kotlinx.coroutines.delay
+
+data class BioLink(val id: String, val title: String, val url: String)
 
 class ProfileScreen(val userId: String? = null) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         var menuExpanded by remember { mutableStateOf(false) }
         var isRefreshing by remember { mutableStateOf(false) }
+        var showBioLinkSheet by remember { mutableStateOf(false) }
         
         val isOwnProfile = userId == null
         var isAdmiring by remember { mutableStateOf(false) }
         val pullRefreshState = rememberPullToRefreshState()
+
+        // Mock Bio Links
+        var bioLinks by remember { 
+            mutableStateOf(listOf(
+                BioLink("1", "My Portfolio", "https://krieta.app/portfolio"),
+                BioLink("2", "Latest Sip", "https://krieta.app/sips/123")
+            )) 
+        }
 
         if (isRefreshing) {
             LaunchedEffect(true) {
@@ -173,7 +192,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 ) {
                     if (isOwnProfile) {
                         Button(
-                            onClick = {}, 
+                            onClick = { navigator.push(EditProfileScreen()) }, 
                             modifier = Modifier.weight(1f).height(44.dp),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.SurfaceVariant, contentColor = KrietaColors.OnSurface)
@@ -181,7 +200,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                             Text("Edit Profile", fontWeight = FontWeight.SemiBold)
                         }
                         Button(
-                            onClick = {}, 
+                            onClick = { navigator.push(WalletScreen()) }, 
                             modifier = Modifier.weight(1f).height(44.dp),
                             shape = RoundedCornerShape(8.dp),
                             border = BorderStroke(1.dp, KrietaColors.Outline),
@@ -218,8 +237,18 @@ class ProfileScreen(val userId: String? = null) : Screen {
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text("🎯 Milestones", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = KrietaColors.PrimaryLight)
-                    Text("🔗 Bio Link", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = KrietaColors.PrimaryLight)
+                    Row(
+                        modifier = Modifier.clickable { navigator.push(MilestonesScreen()) },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("🎯 Milestones", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = KrietaColors.PrimaryLight)
+                    }
+                    Row(
+                        modifier = Modifier.clickable { showBioLinkSheet = true },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("🔗 Bio Link", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = KrietaColors.PrimaryLight)
+                    }
                 }
 
                 // Tabs Configuration (No Grid requested)
@@ -250,8 +279,189 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 Spacer(modifier = Modifier.height(300.dp))
             }
         }
+
+        if (showBioLinkSheet) {
+            BioLinkBottomSheet(
+                isOwnProfile = isOwnProfile,
+                links = bioLinks,
+                onDismiss = { showBioLinkSheet = false },
+                onAddLink = { title, url -> 
+                    bioLinks = bioLinks + BioLink(
+                        id = (bioLinks.size + 1).toString(), 
+                        title = title, 
+                        url = url
+                    ) 
+                },
+                onDeleteLink = { id -> bioLinks = bioLinks.filter { it.id != id } }
+            )
+        }
     }
 }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BioLinkBottomSheet(
+    isOwnProfile: Boolean,
+    links: List<BioLink>,
+    onDismiss: () -> Unit,
+    onAddLink: (String, String) -> Unit,
+    onDeleteLink: (String) -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showAddLinkField by remember { mutableStateOf(false) }
+    var newTitle by remember { mutableStateOf("") }
+    var newUrl by remember { mutableStateOf("") }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = KrietaColors.BackgroundElevated,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = KrietaColors.OnSurfaceVariant.copy(alpha = 0.4f)) }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 48.dp)
+        ) {
+            Box(modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)) {
+                Text(
+                    text = if (isOwnProfile) "Manage Bio Links" else "Connect with Me",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = KrietaColors.OnSurface,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+                if (isOwnProfile && !showAddLinkField) {
+                    IconButton(
+                        onClick = { showAddLinkField = true },
+                        modifier = Modifier.align(Alignment.CenterEnd).background(KrietaColors.Primary.copy(alpha = 0.1f), CircleShape)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add", tint = KrietaColors.Primary)
+                    }
+                }
+            }
+
+            if (links.isEmpty() && !showAddLinkField) {
+                Text(
+                    "No links added yet.",
+                    color = KrietaColors.OnSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            links.forEach { link ->
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable { /* External Navigation logic */ },
+                    color = KrietaColors.SurfaceVariant,
+                    border = BorderStroke(1.dp, KrietaColors.Outline.copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = link.title, 
+                                fontWeight = FontWeight.Bold, 
+                                fontSize = 16.sp,
+                                color = KrietaColors.OnSurface
+                            )
+                            Text(
+                                text = link.url, 
+                                fontSize = 12.sp, 
+                                color = KrietaColors.Primary.copy(alpha = 0.8f),
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+                        }
+                        
+                        if (isOwnProfile) {
+                            IconButton(onClick = { onDeleteLink(link.id) }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red.copy(alpha = 0.6f))
+                            }
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.List, // Placeholder for external link icon
+                                contentDescription = "Visit",
+                                tint = KrietaColors.OnSurfaceVariant,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (isOwnProfile && showAddLinkField) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                        .background(KrietaColors.Surface, RoundedCornerShape(16.dp))
+                        .padding(16.dp)
+                ) {
+                    Text("Add New Link", fontWeight = FontWeight.Bold, color = KrietaColors.Primary)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    OutlinedTextField(
+                        value = newTitle,
+                        onValueChange = { newTitle = it },
+                        label = { Text("Title (e.g. My Website)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = KrietaColors.Primary,
+                            unfocusedBorderColor = KrietaColors.Outline
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = newUrl,
+                        onValueChange = { newUrl = it },
+                        label = { Text("URL (https://...)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = KrietaColors.Primary,
+                            unfocusedBorderColor = KrietaColors.Outline
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        TextButton(
+                            onClick = { showAddLinkField = false },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Cancel", color = KrietaColors.OnSurfaceVariant)
+                        }
+                        Button(
+                            onClick = {
+                                if (newTitle.isNotBlank() && newUrl.isNotBlank()) {
+                                    onAddLink(newTitle, newUrl)
+                                    newTitle = ""
+                                    newUrl = ""
+                                    showAddLinkField = false
+                                }
+                            },
+                            modifier = Modifier.weight(2f),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.Primary)
+                        ) {
+                            Text("Save Link", color = KrietaColors.Background, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -261,3 +471,4 @@ private fun AnalyticsStat(count: String, label: String) {
         Text(label, fontSize = 13.sp, color = KrietaColors.OnSurfaceVariant)
     }
 }
+
