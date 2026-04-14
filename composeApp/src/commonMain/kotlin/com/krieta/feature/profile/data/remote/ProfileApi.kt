@@ -19,6 +19,12 @@ class ProfileApi(private val httpClient: HttpClient) {
         return httpClient.get("${ApiConstants.USERS}/$userId").body()
     }
 
+    suspend fun searchUsers(query: String): List<SocialUserDto> {
+        return httpClient.get(ApiConstants.WALLET_SEARCH_USERS) {
+            parameter("query", query)
+        }.body()
+    }
+
     suspend fun updateProfile(request: UpdateProfileRequestDto): UserProfileDto {
         return httpClient.put(ApiConstants.USERS_ME) {
             contentType(ContentType.Application.Json)

@@ -16,4 +16,5 @@ val profileModule = module {
     factory { MilestonesViewModel(get(), get()) }
     factory { SubscriptionTierSetupViewModel(get()) }
     factory { BioLinksViewModel(get()) }
+    factory { SearchViewModel(get()) }
 }

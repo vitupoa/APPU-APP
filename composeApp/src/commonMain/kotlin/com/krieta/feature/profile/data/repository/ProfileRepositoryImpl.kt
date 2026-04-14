@@ -7,10 +7,16 @@ import com.krieta.feature.profile.data.remote.dto.*
 import com.krieta.feature.profile.domain.model.*
 import com.krieta.feature.profile.domain.repository.ProfileRepository
 import com.krieta.feature.profile.domain.repository.SocialListResult
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 class ProfileRepositoryImpl(
     private val api: ProfileApi
 ) : ProfileRepository {
+
+    private val _profileUpdates = MutableSharedFlow<UserProfile>(extraBufferCapacity = 1)
+    override val profileUpdates: SharedFlow<UserProfile> = _profileUpdates.asSharedFlow()
 
     override suspend fun getMyProfile(): NetworkResult<UserProfile> =
         safeApiCall { api.getMyProfile().toDomain() }
@@ -22,10 +28,18 @@ class ProfileRepositoryImpl(
         firstName: String?, lastName: String?, displayName: String?,
         username: String?, bio: String?, avatarUrl: String?, coverPhotoUrl: String?
     ): NetworkResult<UserProfile> = safeApiCall {
-        api.updateProfile(
+        val updated = api.updateProfile(
             UpdateProfileRequestDto(firstName, lastName, displayName, username, bio, avatarUrl, coverPhotoUrl)
         ).toDomain()
+        _profileUpdates.tryEmit(updated)
+        updated
     }
+
+    override suspend fun searchUsers(query: String): NetworkResult<List<SocialUser>> = safeApiCall {
+        api.searchUsers(query).map { it.toDomain() }
+    }
+
+    private fun SocialUserDto.toDomain() = SocialUser(id, username, displayName, avatarUrl, isVerified, isLovers)
 
     override suspend fun updateBioLinks(links: List<BioLink>): NetworkResult<List<BioLink>> =
         safeApiCall {

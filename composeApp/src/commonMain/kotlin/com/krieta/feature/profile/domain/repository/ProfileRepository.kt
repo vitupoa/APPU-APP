@@ -5,13 +5,17 @@ import com.krieta.feature.profile.domain.model.*
 
 data class SocialListResult(val items: List<SocialUser>, val nextCursor: String?)
 
+import kotlinx.coroutines.flow.SharedFlow
+
 interface ProfileRepository {
+    val profileUpdates: SharedFlow<UserProfile>
     suspend fun getMyProfile(): NetworkResult<UserProfile>
     suspend fun getProfile(userId: String): NetworkResult<UserProfile>
     suspend fun updateProfile(
         firstName: String?, lastName: String?, displayName: String?,
         username: String?, bio: String?, avatarUrl: String?, coverPhotoUrl: String?
     ): NetworkResult<UserProfile>
+    suspend fun searchUsers(query: String): NetworkResult<List<SocialUser>>
     suspend fun updateBioLinks(links: List<BioLink>): NetworkResult<List<BioLink>>
 
     suspend fun admire(userId: String): NetworkResult<Boolean> // returns isLovers

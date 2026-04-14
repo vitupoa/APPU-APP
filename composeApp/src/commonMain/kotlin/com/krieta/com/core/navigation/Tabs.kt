@@ -33,6 +33,10 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.krieta.com.core.theme.KrietaColors
 import com.krieta.feature.profile.presentation.screen.ProfileScreen
 import com.krieta.feature.shop.presentation.screen.ShopScreen
+import cafe.adriel.voyager.koin.koinScreenModel
+import com.krieta.feature.profile.presentation.viewmodel.SearchViewModel
+import com.krieta.feature.profile.domain.model.SocialUser
+import com.krieta.feature.profile.presentation.screen.ProfileScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -75,23 +79,12 @@ class ExploreScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        var query by remember { mutableStateOf("") }
-        var results by remember { mutableStateOf<List<SearchResult>>(emptyList()) }
-        var isSearching by remember { mutableStateOf(false) }
-        val scope = rememberCoroutineScope()
-
-        // Debounced search
-        LaunchedEffect(query) {
-            if (query.isBlank()) {
-                results = emptyList()
-                isSearching = false
-                return@LaunchedEffect
-            }
-            isSearching = true
-            delay(350) // debounce
-            results = performMockSearch(query)
-            isSearching = false
-        }
+        val searchViewModel = koinScreenModel<SearchViewModel>()
+        val searchState by searchViewModel.state.collectAsState()
+        
+        val query = searchState.query
+        val results = searchState.results
+        val isSearching = searchState.isLoading
 
         Column(
             modifier = Modifier
@@ -119,7 +112,7 @@ class ExploreScreen : Screen {
             // Search Bar
             OutlinedTextField(
                 value = query,
-                onValueChange = { query = it },
+                onValueChange = { searchViewModel.onQueryChange(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -130,7 +123,7 @@ class ExploreScreen : Screen {
                 },
                 trailingIcon = {
                     AnimatedVisibility(query.isNotEmpty(), enter = fadeIn(), exit = fadeOut()) {
-                        IconButton(onClick = { query = "" }) {
+                        IconButton(onClick = { searchViewModel.onQueryChange("") }) {
                             Icon(Icons.Default.Close, contentDescription = "Clear", tint = KrietaColors.OnSurfaceVariant)
                         }
                     }
@@ -239,7 +232,21 @@ private fun ExploreCard(
     }
 }
 
-// ─── SEARCH RESULT ROW ────────────────────────────────────────────
+// ─── SEARCH RESULT UTILS ──────────────────────────────────────────
+private val SearchResultType.emoji: String get() = when(this) {
+    SearchResultType.USER -> "👤"
+    SearchResultType.PRODUCT -> "🛍️"
+    SearchResultType.CONTEST -> "🏆"
+    SearchResultType.SHORT -> "🎬"
+}
+
+private val SearchResultType.color: androidx.compose.ui.graphics.Color get() = when(this) {
+    SearchResultType.USER -> KrietaColors.Primary
+    SearchResultType.PRODUCT -> KrietaColors.Accent
+    SearchResultType.CONTEST -> KrietaColors.Warning
+    SearchResultType.SHORT -> KrietaColors.Info
+}
+
 @Composable
 private fun SearchResultRow(result: SearchResult, onClick: () -> Unit) {
     Surface(
@@ -254,7 +261,6 @@ private fun SearchResultRow(result: SearchResult, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Type avatar / icon
             Box(
                 modifier = Modifier
                     .size(44.dp)
@@ -267,7 +273,7 @@ private fun SearchResultRow(result: SearchResult, onClick: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     result.title,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
                     color = KrietaColors.OnSurface,
                     maxLines = 1,
@@ -288,49 +294,6 @@ private fun SearchResultRow(result: SearchResult, onClick: () -> Unit) {
                 modifier = Modifier.size(18.dp)
             )
         }
-    }
-}
-
-// ─── SEARCH TYPES ─────────────────────────────────────────────────
-enum class SearchResultType(
-    val emoji: String,
-    val color: androidx.compose.ui.graphics.Color
-) {
-    USER("👤", KrietaColors.Primary),
-    PRODUCT("🛍️", KrietaColors.Accent),
-    CONTEST("🏆", KrietaColors.Warning),
-    SHORT("🎬", KrietaColors.Info)
-}
-
-data class SearchResult(
-    val id: String,
-    val type: SearchResultType,
-    val title: String,
-    val subtitle: String
-)
-
-// ─── MOCK SEARCH (replace with API calls) ─────────────────────────
-private fun performMockSearch(query: String): List<SearchResult> {
-    val q = query.lowercase()
-    val mockUsers = listOf(
-        SearchResult("u1", SearchResultType.USER, "@krieta_creator", "Krieta Creator • 1.3K admirers"),
-        SearchResult("u2", SearchResultType.USER, "@test_warrior", "Test Warrior • 432 admiring"),
-        SearchResult("u3", SearchResultType.USER, "@the_explorer", "The Explorer • 800 followers"),
-    )
-    val mockProducts = listOf(
-        SearchResult("p1", SearchResultType.PRODUCT, "Krieta T-Shirt", "Shop • 45 Kr"),
-        SearchResult("p2", SearchResultType.PRODUCT, "Creator Pack", "Shop • 120 Kr"),
-    )
-    val mockContests = listOf(
-        SearchResult("c1", SearchResultType.CONTEST, "Photography Challenge", "Contests • Ends in 3 days"),
-        SearchResult("c2", SearchResultType.CONTEST, "Best Short Film", "Contests • 50 entries"),
-    )
-    val mockShorts = listOf(
-        SearchResult("s1", SearchResultType.SHORT, "Epic Sunset Drip", "Drips • 4.2K views"),
-        SearchResult("s2", SearchResultType.SHORT, "Street Photography", "Drips • 1.8K views"),
-    )
-    return (mockUsers + mockProducts + mockContests + mockShorts).filter {
-        it.title.lowercase().contains(q) || it.subtitle.lowercase().contains(q)
     }
 }
 

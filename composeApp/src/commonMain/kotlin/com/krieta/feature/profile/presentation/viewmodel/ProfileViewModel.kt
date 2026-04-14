@@ -10,6 +10,7 @@ import com.krieta.feature.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 data class ProfileState(
@@ -30,7 +31,20 @@ class ProfileViewModel(
 
     val isOwnProfile: Boolean get() = userId == null
 
-    init { loadProfile() }
+    init { 
+        refreshProfile() 
+        observeProfileUpdates()
+    }
+
+    private fun observeProfileUpdates() {
+        screenModelScope.launch {
+            repository.profileUpdates.collectLatest { updatedProfile ->
+                if (isOwnProfile || updatedProfile.id == userId) {
+                    _state.value = _state.value.copy(profile = updatedProfile)
+                }
+            }
+        }
+    }
 
     fun toggleAdmire() {
         val profile = _state.value.profile ?: return
@@ -84,7 +98,7 @@ class ProfileViewModel(
         }
     }
 
-    private fun loadProfile() {
+    fun refreshProfile() {
         screenModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
 
