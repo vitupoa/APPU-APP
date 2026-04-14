@@ -15,7 +15,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.feature.auth.presentation.viewmodel.AuthState
@@ -25,7 +25,7 @@ class LoginScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<AuthViewModel>()
+        val viewModel = koinScreenModel<AuthViewModel>()
         
         val authState by viewModel.authState.collectAsState()
         val email by viewModel.email.collectAsState()

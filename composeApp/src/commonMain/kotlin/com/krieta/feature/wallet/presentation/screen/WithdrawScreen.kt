@@ -20,7 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.util.KrCurrencyFormatter
@@ -32,7 +32,7 @@ class WithdrawScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<WithdrawViewModel>()
+        val viewModel = koinScreenModel<WithdrawViewModel>()
         val state by viewModel.state.collectAsState()
 
         Scaffold(

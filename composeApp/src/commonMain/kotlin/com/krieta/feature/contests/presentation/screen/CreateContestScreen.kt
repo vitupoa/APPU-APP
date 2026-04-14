@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.krieta.feature.contests.presentation.viewmodel.CreateContestViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -23,7 +23,7 @@ class CreateContestScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = cafe.adriel.voyager.navigator.LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<CreateContestViewModel>()
+        val viewModel = koinScreenModel<CreateContestViewModel>()
         val state by viewModel.state.collectAsState()
         val scope = rememberCoroutineScope()
 

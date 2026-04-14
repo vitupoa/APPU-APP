@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.util.KrCurrencyFormatter
@@ -32,7 +32,7 @@ class ContestFeedScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<ContestFeedViewModel>()
+        val viewModel = koinScreenModel<ContestFeedViewModel>()
         val state by viewModel.state.collectAsState()
         val isLoadingMore by viewModel.isLoadingMore.collectAsState()
         val listState = rememberLazyListState()

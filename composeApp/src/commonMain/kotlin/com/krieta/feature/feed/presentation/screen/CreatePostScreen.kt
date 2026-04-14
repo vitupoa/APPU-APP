@@ -14,7 +14,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.krieta.feature.feed.presentation.viewmodel.CreatePostViewModel
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
@@ -26,7 +26,7 @@ class CreatePostScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<CreatePostViewModel>()
+        val viewModel = koinScreenModel<CreatePostViewModel>()
         val state by viewModel.state.collectAsState()
 
         LaunchedEffect(state.success) {

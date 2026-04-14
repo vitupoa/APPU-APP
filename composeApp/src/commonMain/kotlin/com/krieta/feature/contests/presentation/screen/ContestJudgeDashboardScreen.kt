@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.feature.contests.domain.model.Contest
@@ -23,7 +23,7 @@ class ContestJudgeDashboardScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<ContestJudgeViewModel>()
+        val viewModel = koinScreenModel<ContestJudgeViewModel>()
         val state by viewModel.state.collectAsState()
 
         Scaffold(

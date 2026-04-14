@@ -20,7 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
@@ -42,7 +42,7 @@ class SocialListScreen(
             "Lovers" -> SocialListType.LOVERS
             else -> SocialListType.ADMIRERS
         }
-        val viewModel = getScreenModel<SocialListViewModel>(parameters = { parametersOf(userId, listType) })
+        val viewModel = koinScreenModel<SocialListViewModel>(parameters = { parametersOf(userId, listType) })
         val state by viewModel.state.collectAsState()
 
         Scaffold(

@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import coil3.compose.AsyncImage
 import com.krieta.com.core.util.KrCurrencyFormatter
 import com.krieta.feature.shorts.domain.model.LinkedProduct
@@ -44,7 +44,7 @@ import kotlinx.coroutines.delay
 class ShortsScreen : Screen {
     @Composable
     override fun Content() {
-        val viewModel = getScreenModel<ShortsViewModel>()
+        val viewModel = koinScreenModel<ShortsViewModel>()
         val state by viewModel.state.collectAsState()
 
         val pagerState = rememberPagerState(pageCount = { state.items.size })

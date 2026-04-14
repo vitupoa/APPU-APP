@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.krieta.feature.shorts.presentation.viewmodel.CreateShortViewModel
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
@@ -27,7 +27,7 @@ class CreateShortScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<CreateShortViewModel>()
+        val viewModel = koinScreenModel<CreateShortViewModel>()
         val state by viewModel.state.collectAsState()
         val scope = rememberCoroutineScope()
 

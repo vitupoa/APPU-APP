@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import coil3.compose.AsyncImage
 import com.krieta.feature.feed.domain.model.Post
 import com.krieta.feature.feed.presentation.viewmodel.FeedViewModel
@@ -40,7 +40,7 @@ class FeedScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val viewModel = getScreenModel<FeedViewModel>()
+        val viewModel = koinScreenModel<FeedViewModel>()
         val state by viewModel.state.collectAsState()
         val listState = rememberLazyListState()
 

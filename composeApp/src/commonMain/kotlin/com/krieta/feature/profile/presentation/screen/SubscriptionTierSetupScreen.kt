@@ -20,7 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.feature.profile.presentation.viewmodel.SubscriptionTierSetupViewModel
@@ -31,7 +31,7 @@ class SubscriptionTierSetupScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<SubscriptionTierSetupViewModel>()
+        val viewModel = koinScreenModel<SubscriptionTierSetupViewModel>()
         val state by viewModel.state.collectAsState()
 
         LaunchedEffect(state.saveSuccess) {

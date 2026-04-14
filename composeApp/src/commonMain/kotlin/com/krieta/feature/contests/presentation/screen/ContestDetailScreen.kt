@@ -31,7 +31,7 @@ import com.krieta.feature.contests.domain.model.ContestStatus
 import com.krieta.feature.contests.domain.model.ContestSubmission
 import com.krieta.feature.contests.presentation.viewmodel.ContestDetailViewModel
 import org.koin.core.parameter.parametersOf
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 
 class ContestDetailScreen(private val contestId: String) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +39,7 @@ class ContestDetailScreen(private val contestId: String) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val uriHandler = LocalUriHandler.current
-        val viewModel = getScreenModel<ContestDetailViewModel>(parameters = { parametersOf(contestId) })
+        val viewModel = koinScreenModel<ContestDetailViewModel>(parameters = { parametersOf(contestId) })
         val state by viewModel.state.collectAsState()
 
         Scaffold(

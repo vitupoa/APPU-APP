@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.feature.contests.domain.model.ContestSubmission
@@ -24,7 +24,7 @@ class ContestModerationScreen(private val contestId: String) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<ContestJudgeViewModel>()
+        val viewModel = koinScreenModel<ContestJudgeViewModel>()
         
         // This Stateflow specifically polls `ContestSubmission` records tied to `contestId` mapping users natively
         val state by viewModel.submissionState.collectAsState()

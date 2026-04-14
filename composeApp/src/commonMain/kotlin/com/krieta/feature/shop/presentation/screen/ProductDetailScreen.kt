@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
@@ -41,7 +41,7 @@ class ProductDetailScreen(private val productId: String) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val uriHandler = LocalUriHandler.current
-        val viewModel = getScreenModel<ProductDetailViewModel>(parameters = { parametersOf(productId) })
+        val viewModel = koinScreenModel<ProductDetailViewModel>(parameters = { parametersOf(productId) })
         val state by viewModel.state.collectAsState()
 
         Scaffold(
