@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.background
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TabRow
@@ -34,6 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import com.krieta.com.core.theme.KrietaColors
 
 object HomeTab : Tab {
@@ -101,6 +108,7 @@ object ExploreTab : Tab {
             return remember { TabOptions(index = 1u, title = "Explore", icon = icon) }
         }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = cafe.adriel.voyager.navigator.LocalNavigator.currentOrThrow
@@ -110,7 +118,7 @@ object ExploreTab : Tab {
         ) {
             Column(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 24.dp),
-                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
                     text = "Explore",
@@ -120,12 +128,13 @@ object ExploreTab : Tab {
                 )
 
                 // Drips Card
-                androidx.compose.material3.Card(
-                    modifier = Modifier.fillMaxWidth().height(120.dp).androidx.compose.foundation.clickable {
-                        // TODO: Map to DripsScreen when created
+                Card(
+                    onClick = {
+                        // TODO: Navigate to DripsScreen when created
                     },
-                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = KrietaColors.SurfaceVariant),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    colors = CardDefaults.cardColors(containerColor = KrietaColors.SurfaceVariant),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("Drips", color = KrietaColors.Primary, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
@@ -133,9 +142,8 @@ object ExploreTab : Tab {
                 }
 
                 // Shop Card
-                androidx.compose.material3.Card(
-                    modifier = Modifier.fillMaxWidth().height(120.dp).androidx.compose.foundation.clickable {
-                        // Navigator push using Placeholder for now as specified
+                Card(
+                    onClick = {
                         navigator.push(object : cafe.adriel.voyager.core.screen.Screen {
                             @Composable
                             override fun Content() {
@@ -143,8 +151,9 @@ object ExploreTab : Tab {
                             }
                         })
                     },
-                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = KrietaColors.SurfaceVariant),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    colors = CardDefaults.cardColors(containerColor = KrietaColors.SurfaceVariant),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("Shop", color = KrietaColors.Primary, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
