@@ -13,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,28 +25,44 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.krieta.com.core.theme.KrietaColors
+import kotlinx.coroutines.delay
 
 class ProfileScreen(val userId: String? = null) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         var menuExpanded by remember { mutableStateOf(false) }
+        var isRefreshing by remember { mutableStateOf(false) }
         
         val isOwnProfile = userId == null
         var isAdmiring by remember { mutableStateOf(false) }
+        val pullRefreshState = rememberPullToRefreshState()
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(KrietaColors.Background)
+        if (isRefreshing) {
+            LaunchedEffect(true) {
+                delay(1500)
+                isRefreshing = false
+            }
+        }
+
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { isRefreshing = true },
+            state = pullRefreshState,
+            modifier = Modifier.fillMaxSize()
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .background(KrietaColors.Background)
             ) {
-                // Header Area with Cover Image
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Header Area with Cover Image
                 Box(
                     modifier = Modifier.fillMaxWidth().height(180.dp),
                     contentAlignment = Alignment.TopCenter
@@ -233,6 +251,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
             }
         }
     }
+}
 }
 
 @Composable

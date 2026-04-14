@@ -149,7 +149,7 @@ object ProfileTab : Tab {
 
     @Composable
     override fun Content() {
-        com.krieta.feature.profile.presentation.screen.ProfileScreen()
+        com.krieta.feature.profile.presentation.screen.ProfileScreen().Content()
     }
 }
 
