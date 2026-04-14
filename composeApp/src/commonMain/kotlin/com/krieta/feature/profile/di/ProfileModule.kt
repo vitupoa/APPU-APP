@@ -10,10 +10,10 @@ val profileModule = module {
     single { ProfileApi(get()) }
     single<ProfileRepository> { ProfileRepositoryImpl(get()) }
 
-    // ProfileViewModel needs optional userId via parametersOf
     factory { (userId: String?) -> ProfileViewModel(userId, get()) }
     factory { EditProfileViewModel(get()) }
     factory { (userId: String, listType: SocialListType) -> SocialListViewModel(userId, listType, get()) }
     factory { MilestonesViewModel(get(), get()) }
     factory { SubscriptionTierSetupViewModel(get()) }
+    factory { BioLinksViewModel(get()) }
 }

@@ -28,48 +28,45 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import com.krieta.com.core.theme.KrietaColors
-import com.krieta.feature.wallet.presentation.screen.WalletScreen
-import kotlinx.coroutines.delay
-
-data class BioLink(val id: String, val title: String, val url: String)
+import cafe.adriel.voyager.koin.koinScreenModel
+import org.koin.core.parameter.parametersOf
+import com.krieta.feature.profile.presentation.viewmodel.ProfileViewModel
+import com.krieta.feature.profile.presentation.viewmodel.BioLinksViewModel
+import com.krieta.feature.profile.domain.model.BioLink
+import com.krieta.feature.profile.presentation.screen.MilestonesScreen
+import com.krieta.feature.profile.presentation.screen.EditProfileScreen
 
 class ProfileScreen(val userId: String? = null) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val profileViewModel = koinScreenModel<ProfileViewModel> { parametersOf(userId) }
+        val bioLinksViewModel = koinScreenModel<BioLinksViewModel>()
+        
+        val profileState by profileViewModel.state.collectAsState()
+        val bioLinksState by bioLinksViewModel.state.collectAsState()
+
         var menuExpanded by remember { mutableStateOf(false) }
-        var isRefreshing by remember { mutableStateOf(false) }
         var showBioLinkSheet by remember { mutableStateOf(false) }
         
-        val isOwnProfile = userId == null
-        var isAdmiring by remember { mutableStateOf(false) }
-        val pullRefreshState = rememberPullToRefreshState()
-
-        // Mock Bio Links
-        var bioLinks by remember { 
-            mutableStateOf(listOf(
-                BioLink("1", "My Portfolio", "https://krieta.app/portfolio"),
-                BioLink("2", "Latest Sip", "https://krieta.app/sips/123")
-            )) 
-        }
-
-        if (isRefreshing) {
-            LaunchedEffect(true) {
-                delay(1500)
-                isRefreshing = false
+        val isOwnProfile = profileViewModel.isOwnProfile
+        
+        val profile = profileState.profile
+        val isLoading = profileState.isLoading
+        val error = profileState.error
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = KrietaColors.Primary)
             }
-        }
-
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = { isRefreshing = true },
-            state = pullRefreshState,
-            modifier = Modifier.fillMaxSize()
-        ) {
+        } else if (error != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Error: $error", color = Color.Red)
+                    Button(onClick = { /* TODO: Retry logic */ }) { Text("Retry") }
+                }
+            }
+        } else if (profile != null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -82,151 +79,161 @@ class ProfileScreen(val userId: String? = null) : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Header Area with Cover Image
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(180.dp),
-                    contentAlignment = Alignment.TopCenter
-                ) {
-                    // Cover Banner Placeholder (Dark background)
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(130.dp)
-                            .background(KrietaColors.BackgroundElevated)
-                    )
-                    
-                    // Top App Bar / Actions over Cover
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        horizontalArrangement = Arrangement.End
+                        modifier = Modifier.fillMaxWidth().height(180.dp),
+                        contentAlignment = Alignment.TopCenter
                     ) {
-                        Box {
-                            IconButton(onClick = { menuExpanded = true }) {
-                                Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = KrietaColors.OnBackground)
-                            }
-                            DropdownMenu(
-                                expanded = menuExpanded,
-                                onDismissRequest = { menuExpanded = false },
-                                modifier = Modifier.background(KrietaColors.SurfaceVariant)
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text("Profile Views", color = KrietaColors.OnSurface) },
-                                    onClick = { menuExpanded = false }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Analytics", color = KrietaColors.OnSurface) },
-                                    onClick = { menuExpanded = false }
-                                )
-                            }
-                        }
-                    }
-
-                    // Avatar overlapping Cover
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .offset(y = 10.dp)
-                    ) {
+                        // Cover Banner Placeholder (Dark background)
                         Box(
                             modifier = Modifier
-                                .size(90.dp)
-                                .clip(CircleShape)
-                                .background(KrietaColors.SurfaceVariant)
-                                .border(3.dp, KrietaColors.Primary, CircleShape),
-                            contentAlignment = Alignment.Center
+                                .fillMaxWidth()
+                                .height(130.dp)
+                                .background(KrietaColors.BackgroundElevated)
+                        )
+                        
+                        // Top App Bar / Actions over Cover
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            horizontalArrangement = Arrangement.End
                         ) {
-                            Text("U", fontSize = 36.sp, color = KrietaColors.Primary)
+                            Box {
+                                IconButton(onClick = { menuExpanded = true }) {
+                                    Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = KrietaColors.OnBackground)
+                                }
+                                DropdownMenu(
+                                    expanded = menuExpanded,
+                                    onDismissRequest = { menuExpanded = false },
+                                    modifier = Modifier.background(KrietaColors.SurfaceVariant)
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Profile Views", color = KrietaColors.OnSurface) },
+                                        onClick = { menuExpanded = false }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Analytics", color = KrietaColors.OnSurface) },
+                                        onClick = { menuExpanded = false }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Avatar overlapping Cover
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .offset(y = 10.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(90.dp)
+                                    .clip(CircleShape)
+                                    .background(KrietaColors.SurfaceVariant)
+                                    .border(3.dp, KrietaColors.Primary, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(profile.username.firstOrNull()?.uppercase() ?: "?", fontSize = 36.sp, color = KrietaColors.Primary)
+                            }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // User Info
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // User Info
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            profile.displayName, 
+                            fontWeight = FontWeight.Bold, 
+                            fontSize = 22.sp, 
+                            color = KrietaColors.OnBackground
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        // Creator Badge
+                        if (profile.accountType.name == "CREATOR") {
+                            Box(
+                                modifier = Modifier
+                                    .border(1.dp, KrietaColors.PrimaryDark, RoundedCornerShape(12.dp))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text("★ Creator", fontSize = 10.sp, color = KrietaColors.Primary)
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("@${profile.username}", fontSize = 14.sp, color = KrietaColors.OnSurfaceVariant)
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        "Test Account", 
-                        fontWeight = FontWeight.Bold, 
-                        fontSize = 22.sp, 
-                        color = KrietaColors.OnBackground
+                        profile.bio ?: "No bio yet", 
+                        fontSize = 14.sp, 
+                        color = KrietaColors.OnSurface,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 24.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    // Creator Badge
-                    Box(
-                        modifier = Modifier
-                            .border(1.dp, KrietaColors.PrimaryDark, RoundedCornerShape(12.dp))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+
+                    // Social Stats (Admirers, Admiring)
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("★ Creator", fontSize = 10.sp, color = KrietaColors.Primary)
+                        AnalyticsStat("${profile.stats.admirers}", "Admirers")
+                        Spacer(modifier = Modifier.width(32.dp))
+                        AnalyticsStat("${profile.stats.admiring}", "Admiring")
                     }
-                }
 
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("@test_warrior", fontSize = 14.sp, color = KrietaColors.OnSurfaceVariant)
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    "Just here for testing the awesome Krieta platform!", 
-                    fontSize = 14.sp, 
-                    color = KrietaColors.OnSurface,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                )
-
-                // Social Stats (Admirers, Admiring)
-                Spacer(modifier = Modifier.height(20.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AnalyticsStat("1.3K", "Admirers")
-                    Spacer(modifier = Modifier.width(32.dp))
-                    AnalyticsStat("432", "Admiring")
-                }
-
-                // Action buttons
-                Spacer(modifier = Modifier.height(20.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    if (isOwnProfile) {
-                        Button(
-                            onClick = { navigator.push(EditProfileScreen()) }, 
-                            modifier = Modifier.weight(1f).height(44.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.SurfaceVariant, contentColor = KrietaColors.OnSurface)
-                        ) {
-                            Text("Edit Profile", fontWeight = FontWeight.SemiBold)
-                        }
-                        Button(
-                            onClick = { navigator.push(WalletScreen()) }, 
-                            modifier = Modifier.weight(1f).height(44.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            border = BorderStroke(1.dp, KrietaColors.Outline),
-                            colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.Surface, contentColor = KrietaColors.Primary)
-                        ) {
-                            Text("Wallet", fontWeight = FontWeight.SemiBold, color = KrietaColors.Primary)
-                        }
-                    } else {
-                        Button(
-                            onClick = { isAdmiring = !isAdmiring }, 
-                            modifier = Modifier.weight(1f).height(44.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isAdmiring) KrietaColors.SurfaceVariant else KrietaColors.Accent, 
-                                contentColor = if (isAdmiring) KrietaColors.OnSurface else KrietaColors.OnAccent
-                            )
-                        ) {
-                            Text(if (isAdmiring) "Unadmire" else "Admire", fontWeight = FontWeight.SemiBold)
-                        }
-                        Button(
-                            onClick = {}, 
-                            modifier = Modifier.weight(1f).height(44.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.SurfaceVariant, contentColor = KrietaColors.OnSurface)
-                        ) {
-                            Text("Message", fontWeight = FontWeight.SemiBold)
+                    // Action buttons
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        if (isOwnProfile) {
+                            Button(
+                                onClick = { navigator.push(EditProfileScreen()) }, 
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.SurfaceVariant, contentColor = KrietaColors.OnSurface)
+                            ) {
+                                Text("Edit Profile", fontWeight = FontWeight.SemiBold)
+                            }
+                            Button(
+                                onClick = { navigator.push(WalletScreen()) }, 
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                border = BorderStroke(1.dp, KrietaColors.Outline),
+                                colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.Surface, contentColor = KrietaColors.Primary)
+                            ) {
+                                Text("Wallet", fontWeight = FontWeight.SemiBold, color = KrietaColors.Primary)
+                            }
+                        } else {
+                            val relationship = profile.relationshipStatus
+                            val isFollowing = relationship.name == "ADMIRING" || relationship.name == "LOVERS"
+                            
+                            Button(
+                                onClick = { profileViewModel.toggleAdmire() }, 
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isFollowing) KrietaColors.SurfaceVariant else KrietaColors.Accent, 
+                                    contentColor = if (isFollowing) KrietaColors.OnSurface else KrietaColors.OnAccent
+                                )
+                            ) {
+                                if (profileState.isRelationshipLoading) {
+                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = KrietaColors.OnBackground)
+                                } else {
+                                    Text(if (isFollowing) "Unadmire" else "Admire", fontWeight = FontWeight.SemiBold)
+                                }
+                            }
+                            Button(
+                                onClick = {}, 
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.SurfaceVariant, contentColor = KrietaColors.OnSurface)
+                            ) {
+                                Text("Message", fontWeight = FontWeight.SemiBold)
+                            }
                         }
                     }
                 }
@@ -276,23 +283,19 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 }
 
                 // Empty space since Grid is excluded
-                Spacer(modifier = Modifier.height(300.dp))
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+            }
             }
         }
 
         if (showBioLinkSheet) {
             BioLinkBottomSheet(
                 isOwnProfile = isOwnProfile,
-                links = bioLinks,
+                links = if (isOwnProfile) bioLinksState.links else profile?.bioLinks ?: emptyList(),
                 onDismiss = { showBioLinkSheet = false },
-                onAddLink = { title, url -> 
-                    bioLinks = bioLinks + BioLink(
-                        id = (bioLinks.size + 1).toString(), 
-                        title = title, 
-                        url = url
-                    ) 
-                },
-                onDeleteLink = { id -> bioLinks = bioLinks.filter { it.id != id } }
+                onAddLink = { label, url -> bioLinksViewModel.addLink(label, url) },
+                onDeleteLink = { id -> bioLinksViewModel.deleteLink(id) }
             )
         }
     }
@@ -370,7 +373,7 @@ private fun BioLinkBottomSheet(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = link.title, 
+                                text = link.label, 
                                 fontWeight = FontWeight.Bold, 
                                 fontSize = 16.sp,
                                 color = KrietaColors.OnSurface
@@ -414,24 +417,34 @@ private fun BioLinkBottomSheet(
                     OutlinedTextField(
                         value = newTitle,
                         onValueChange = { newTitle = it },
-                        label = { Text("Title (e.g. My Website)") },
+                        label = { Text("Title (e.g. My Website)", color = KrietaColors.OnSurfaceVariant) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = KrietaColors.Primary,
-                            unfocusedBorderColor = KrietaColors.Outline
+                            unfocusedBorderColor = KrietaColors.Outline,
+                            focusedTextColor = KrietaColors.OnBackground,
+                            unfocusedTextColor = KrietaColors.OnBackground,
+                            cursorColor = KrietaColors.Primary,
+                            focusedLabelColor = KrietaColors.Primary,
+                            unfocusedLabelColor = KrietaColors.OnSurfaceVariant
                         )
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     OutlinedTextField(
                         value = newUrl,
                         onValueChange = { newUrl = it },
-                        label = { Text("URL (https://...)") },
+                        label = { Text("URL (https://...)", color = KrietaColors.OnSurfaceVariant) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = KrietaColors.Primary,
-                            unfocusedBorderColor = KrietaColors.Outline
+                            unfocusedBorderColor = KrietaColors.Outline,
+                            focusedTextColor = KrietaColors.OnBackground,
+                            unfocusedTextColor = KrietaColors.OnBackground,
+                            cursorColor = KrietaColors.Primary,
+                            focusedLabelColor = KrietaColors.Primary,
+                            unfocusedLabelColor = KrietaColors.OnSurfaceVariant
                         )
                     )
                     Spacer(modifier = Modifier.height(20.dp))
