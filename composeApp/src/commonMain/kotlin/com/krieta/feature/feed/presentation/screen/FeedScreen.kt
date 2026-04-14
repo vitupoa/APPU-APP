@@ -19,7 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ModeComment
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -226,7 +226,7 @@ class FeedScreen : Screen {
                 // Tip only on unlocked posts
                 if (!post.isLocked) {
                     IconButton(onClick = { /* Open tip dialog */ }) {
-                        Icon(Icons.Default.Send, contentDescription = "Tip")
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Tip")
                     }
                 }
             }

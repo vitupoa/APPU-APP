@@ -19,7 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ModeComment
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -258,7 +258,7 @@ class ShortsScreen : Screen {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         IconButton(onClick = { /* Open tip dialog */ }) {
                             Icon(
-                                Icons.Default.Send,
+                                Icons.AutoMirrored.Filled.Send,
                                 contentDescription = "Tip",
                                 tint = Color.White,
                                 modifier = Modifier.size(30.dp)

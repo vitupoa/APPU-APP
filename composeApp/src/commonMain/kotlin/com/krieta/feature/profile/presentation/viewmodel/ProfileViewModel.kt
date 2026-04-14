@@ -99,6 +99,10 @@ class ProfileViewModel(
     }
 
     fun refreshProfile() {
+        loadProfile()
+    }
+
+    private fun loadProfile() {
         screenModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
 

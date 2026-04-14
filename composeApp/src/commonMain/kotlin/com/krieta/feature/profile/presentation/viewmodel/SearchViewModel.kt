@@ -35,7 +35,7 @@ class SearchViewModel(
     private val queryFlow = MutableStateFlow("")
 
     init {
-        @OptIn(FlowPreview::class)
+        @OptIn(FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
         queryFlow
             .debounce(300)
             .distinctUntilChanged()

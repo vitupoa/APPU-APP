@@ -1,6 +1,8 @@
 package com.krieta.feature.profile.presentation.screen
 
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -35,6 +38,8 @@ import com.krieta.feature.profile.presentation.viewmodel.BioLinksViewModel
 import com.krieta.feature.profile.domain.model.BioLink
 import com.krieta.feature.profile.presentation.screen.MilestonesScreen
 import com.krieta.feature.profile.presentation.screen.EditProfileScreen
+import com.krieta.feature.wallet.presentation.screen.WalletScreen
+import com.krieta.com.core.theme.KrietaColors
 
 class ProfileScreen(val userId: String? = null) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -261,7 +266,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 // Tabs Configuration (No Grid requested)
                 Spacer(modifier = Modifier.height(24.dp))
                 var selectedTab by remember { mutableStateOf(0) }
-                TabRow(
+                PrimaryTabRow(
                     selectedTabIndex = selectedTab,
                     containerColor = Color.Transparent,
                     contentColor = KrietaColors.Primary
@@ -285,8 +290,6 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 // Empty space since Grid is excluded
                 Spacer(modifier = Modifier.height(100.dp))
             }
-            }
-            }
         }
 
         if (showBioLinkSheet) {
@@ -299,7 +302,6 @@ class ProfileScreen(val userId: String? = null) : Screen {
             )
         }
     }
-}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -393,7 +395,7 @@ private fun BioLinkBottomSheet(
                             }
                         } else {
                             Icon(
-                                imageVector = Icons.Default.List, // Placeholder for external link icon
+                                imageVector = Icons.AutoMirrored.Filled.List, // Placeholder for external link icon
                                 contentDescription = "Visit",
                                 tint = KrietaColors.OnSurfaceVariant,
                                 modifier = Modifier.size(20.dp)

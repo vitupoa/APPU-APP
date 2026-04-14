@@ -17,6 +17,7 @@ kotlin {
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
+            freeCompilerArgs.add("-Xexpect-actual-classes")
         }
     }
 
@@ -28,6 +29,14 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
         }
+        iosTarget.compilerOptions {
+            freeCompilerArgs.add("-Xexpect-actual-classes")
+        }
+    }
+
+    // Enable expect/actual classes feature
+    sourceSets.all {
+        languageSettings.optIn("kotlin.ExperimentalMultiplatform")
     }
 
     sourceSets {

@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,8 +36,9 @@ import com.krieta.feature.profile.presentation.screen.ProfileScreen
 import com.krieta.feature.shop.presentation.screen.ShopScreen
 import cafe.adriel.voyager.koin.koinScreenModel
 import com.krieta.feature.profile.presentation.viewmodel.SearchViewModel
+import com.krieta.feature.profile.presentation.viewmodel.SearchResult
+import com.krieta.feature.profile.presentation.viewmodel.SearchResultType
 import com.krieta.feature.profile.domain.model.SocialUser
-import com.krieta.feature.profile.presentation.screen.ProfileScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -309,7 +311,7 @@ class DripsScreen : Screen {
                     title = { Text("Drips", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = KrietaColors.BackgroundElevated)

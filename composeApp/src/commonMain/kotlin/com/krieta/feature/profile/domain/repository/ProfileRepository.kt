@@ -2,10 +2,9 @@ package com.krieta.feature.profile.domain.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.profile.domain.model.*
+import kotlinx.coroutines.flow.SharedFlow
 
 data class SocialListResult(val items: List<SocialUser>, val nextCursor: String?)
-
-import kotlinx.coroutines.flow.SharedFlow
 
 interface ProfileRepository {
     val profileUpdates: SharedFlow<UserProfile>
