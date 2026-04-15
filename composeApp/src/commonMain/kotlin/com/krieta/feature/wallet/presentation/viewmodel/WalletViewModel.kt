@@ -31,7 +31,6 @@ class WalletViewModel(
     val state: StateFlow<WalletState> = _state.asStateFlow()
 
     init {
-        fetchWalletData()
         webSocketService.connect()
         listenForWalletUpdates()
     }
@@ -60,11 +59,12 @@ class WalletViewModel(
         }
     }
 
-    fun fetchWalletData() {
+    fun fetchWalletData(regionCode: String? = null) {
+        val targetCurrency = regionCode?.let { getCurrencyFromRegion(it) }
         screenModelScope.launch {
             _state.value = WalletState.Loading
             
-            val balanceResult = walletRepository.getBalance()
+            val balanceResult = walletRepository.getBalance(targetCurrency)
             if (balanceResult is NetworkResult.Error) {
                 _state.value = WalletState.Error(balanceResult.message)
                 return@launch
@@ -86,5 +86,24 @@ class WalletViewModel(
     override fun onDispose() {
         webSocketService.disconnect()
         super.onDispose()
+    }
+
+    private fun getCurrencyFromRegion(region: String): String {
+        return when (region.uppercase()) {
+            "US" -> "USD"
+            "KE" -> "KES"
+            "GB", "UK" -> "GBP"
+            "DE", "FR", "IT", "ES", "NL", "IE" -> "EUR"
+            "IN" -> "INR"
+            "NG" -> "NGN"
+            "ZA" -> "ZAR"
+            "CA" -> "CAD"
+            "AU" -> "AUD"
+            "JP" -> "JPY"
+            "TZ" -> "TZS"
+            "UG" -> "UGX"
+            "RW" -> "RWF"
+            else -> "USD" // Default fallback
+        }
     }
 }

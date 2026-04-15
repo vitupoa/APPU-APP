@@ -6,7 +6,7 @@ export class WalletService {
   /**
    * Retrieves the wallet balance ensuring a wallet exists.
    */
-  static async getBalance(userId: string) {
+  static async getBalance(userId: string, targetCurrency?: string) {
     let wallet = await prisma.wallet.findUnique({
       where: { userId },
       include: { user: { select: { isWalletUnlocked: true, currency: true } } }
@@ -19,14 +19,18 @@ export class WalletService {
       });
     }
 
+    const currencyToUse = targetCurrency || wallet.user.currency;
+
     // Convert Kr balance to user fiat equivalent contextually
-    const fiatRate = await ExchangeService.getRate(wallet.user.currency);
-    const fiatEquivalent = Number(wallet.krBalance) * fiatRate;
+    // 1 Kr = $0.01 USD. Apply the exchange rate to the USD base equivalent
+    const fiatRate = await ExchangeService.getRate(currencyToUse);
+    const baseUsd = Number(wallet.krBalance) / 100;
+    const fiatEquivalent = baseUsd * fiatRate;
 
     return {
       krBalance: wallet.krBalance,
       fiatEquivalent,
-      currency: wallet.user.currency,
+      currency: currencyToUse,
       isWalletUnlocked: wallet.user.isWalletUnlocked
     };
   }

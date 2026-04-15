@@ -187,11 +187,12 @@ class ExploreScreen : Screen {
                 ) {
                     items(results, key = { it.id }) { result ->
                         SearchResultRow(result = result, onClick = {
+                            val rootNavigator = navigator.parent ?: navigator
                             when (result.type) {
-                                SearchResultType.USER -> navigator.push(ProfileScreen(result.id))
-                                SearchResultType.PRODUCT -> navigator.push(ShopScreen())
-                                SearchResultType.CONTEST -> navigator.push(com.krieta.feature.contests.presentation.screen.ContestFeedScreen())
-                                SearchResultType.SHORT -> navigator.push(com.krieta.feature.shorts.presentation.screen.ShortsScreen())
+                                SearchResultType.USER -> rootNavigator.push(ProfileScreen(result.id))
+                                SearchResultType.PRODUCT -> rootNavigator.push(ShopScreen())
+                                SearchResultType.CONTEST -> rootNavigator.push(com.krieta.feature.contests.presentation.screen.ContestFeedScreen())
+                                SearchResultType.SHORT -> rootNavigator.push(com.krieta.feature.shorts.presentation.screen.ShortsScreen())
                             }
                         })
                     }

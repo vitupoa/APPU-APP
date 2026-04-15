@@ -21,9 +21,9 @@ class WalletRepositoryImpl(
     private val _balance = MutableStateFlow<WalletBalance?>(null)
     override val balance: Flow<WalletBalance?> = _balance.asStateFlow()
 
-    override suspend fun getBalance(): NetworkResult<WalletBalance> {
+    override suspend fun getBalance(currency: String?): NetworkResult<WalletBalance> {
         return safeApiCall {
-            val dto = api.getBalance()
+            val dto = api.getBalance(currency)
             val mapped = WalletBalance(
                 krBalance = dto.krBalance,
                 fiatEquivalent = dto.fiatEquivalent,

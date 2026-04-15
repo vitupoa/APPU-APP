@@ -16,8 +16,10 @@ import io.ktor.client.request.setBody
 class WalletApi(
     private val httpClient: HttpClient
 ) {
-    suspend fun getBalance(): WalletBalanceDto {
-        return httpClient.get(ApiConstants.WALLET_BALANCE).body()
+    suspend fun getBalance(currency: String? = null): WalletBalanceDto {
+        return httpClient.get(ApiConstants.WALLET_BALANCE) {
+            if (currency != null) parameter("currency", currency)
+        }.body()
     }
 
     suspend fun getExchangeRate(currency: String): ExchangeRateResponseDto {

@@ -56,12 +56,33 @@ class FeedScreen : Screen {
             if (shouldLoadMore) viewModel.loadMore()
         }
 
+        var selectedTab by remember { mutableStateOf(0) }
+
         Scaffold(
             topBar = {
-                TopAppBar(title = { Text("Feed", fontWeight = FontWeight.Bold) })
+                SecondaryTabRow(
+                    selectedTabIndex = selectedTab,
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }) {
+                        Text("Contests", modifier = Modifier.padding(16.dp), fontWeight = FontWeight.SemiBold)
+                    }
+                    Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }) {
+                        Text("Discover", modifier = Modifier.padding(16.dp), fontWeight = FontWeight.SemiBold)
+                    }
+                    Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }) {
+                        Text("Admiring", modifier = Modifier.padding(16.dp), fontWeight = FontWeight.SemiBold)
+                    }
+                }
             }
         ) { padding ->
-            when {
+            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+                when (selectedTab) {
+                    0 -> com.krieta.feature.contests.presentation.screen.ContestFeedScreen().Content()
+                    1 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen().Content()
+                    2 -> {
+                        when {
                 state.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -93,6 +114,8 @@ class FeedScreen : Screen {
                         }
                     }
                 }
+            }
+        }
             }
         }
     }

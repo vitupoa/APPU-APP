@@ -7,7 +7,8 @@ import { tipSchema, exchangeRateSchema } from './wallet.validation';
 export class WalletController {
   static async getBalance(req: AuthRequest, res: Response) {
     try {
-      const result = await WalletService.getBalance(req.userId!);
+      const targetCurrency = req.query.currency as string;
+      const result = await WalletService.getBalance(req.userId!, targetCurrency);
       res.status(200).json(result);
     } catch (error: any) {
       res.status(500).json({ error: error.message });

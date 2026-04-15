@@ -42,6 +42,8 @@ import com.krieta.feature.wallet.presentation.screen.WalletScreen
 import com.krieta.com.core.theme.KrietaColors
 
 class ProfileScreen(val userId: String? = null) : Screen {
+    override val key: cafe.adriel.voyager.core.screen.ScreenKey = "ProfileScreen_${userId ?: "me"}"
+    
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -101,23 +103,25 @@ class ProfileScreen(val userId: String? = null) : Screen {
                             modifier = Modifier.fillMaxWidth().padding(16.dp),
                             horizontalArrangement = Arrangement.End
                         ) {
-                            Box {
-                                IconButton(onClick = { menuExpanded = true }) {
-                                    Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = KrietaColors.OnBackground)
-                                }
-                                DropdownMenu(
-                                    expanded = menuExpanded,
-                                    onDismissRequest = { menuExpanded = false },
-                                    modifier = Modifier.background(KrietaColors.SurfaceVariant)
-                                ) {
-                                    DropdownMenuItem(
-                                        text = { Text("Profile Views", color = KrietaColors.OnSurface) },
-                                        onClick = { menuExpanded = false }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text("Analytics", color = KrietaColors.OnSurface) },
-                                        onClick = { menuExpanded = false }
-                                    )
+                            if (isOwnProfile) {
+                                Box {
+                                    IconButton(onClick = { menuExpanded = true }) {
+                                        Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = KrietaColors.OnBackground)
+                                    }
+                                    DropdownMenu(
+                                        expanded = menuExpanded,
+                                        onDismissRequest = { menuExpanded = false },
+                                        modifier = Modifier.background(KrietaColors.SurfaceVariant)
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text("Profile Views", color = KrietaColors.OnSurface) },
+                                            onClick = { menuExpanded = false }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Analytics", color = KrietaColors.OnSurface) },
+                                            onClick = { menuExpanded = false }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -245,17 +249,28 @@ class ProfileScreen(val userId: String? = null) : Screen {
                     // Milestones and Bio Link
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Row(
-                        modifier = Modifier.clickable { navigator.push(MilestonesScreen()) },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("🎯 Milestones", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = KrietaColors.PrimaryLight)
+                    if (isOwnProfile) {
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(KrietaColors.Primary.copy(alpha = 0.1f))
+                                .clickable { navigator.push(MilestonesScreen()) }
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("🎯 Milestones", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = KrietaColors.PrimaryLight)
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
                     }
                     Row(
-                        modifier = Modifier.clickable { showBioLinkSheet = true },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(KrietaColors.Primary.copy(alpha = 0.1f))
+                            .clickable { showBioLinkSheet = true }
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("🔗 Bio Link", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = KrietaColors.PrimaryLight)

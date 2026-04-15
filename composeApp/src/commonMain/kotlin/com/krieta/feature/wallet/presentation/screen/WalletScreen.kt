@@ -49,6 +49,11 @@ class WalletScreen : Screen {
         val state by viewModel.state.collectAsState()
         
         var isBalanceHidden by remember { mutableStateOf(false) }
+        
+        val currentRegion = androidx.compose.ui.text.intl.Locale.current.region
+        LaunchedEffect(currentRegion) {
+            viewModel.fetchWalletData(currentRegion)
+        }
 
         Scaffold(
             topBar = {
