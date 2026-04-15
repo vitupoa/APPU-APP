@@ -144,17 +144,18 @@ class ExploreScreen : Screen {
             // Content: search results OR cards
             if (query.isBlank()) {
                 // Default Explore Cards
-                Column(
+                Row(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     ExploreCard(
                         emoji = "💧",
                         title = "Drips",
                         subtitle = "See what's trending — photos, videos & more",
                         gradient = listOf(KrietaColors.Primary.copy(alpha = 0.8f), KrietaColors.PrimaryDark),
+                        modifier = Modifier.weight(1f),
                         onClick = { navigator.push(DripsScreen()) }
                     )
                     ExploreCard(
@@ -162,6 +163,7 @@ class ExploreScreen : Screen {
                         title = "Shop",
                         subtitle = "Browse products from Krieta creators",
                         gradient = listOf(KrietaColors.Accent.copy(alpha = 0.8f), KrietaColors.AccentDark),
+                        modifier = Modifier.weight(1f),
                         onClick = { navigator.push(ShopScreen()) }
                     )
                 }
@@ -207,13 +209,12 @@ private fun ExploreCard(
     title: String,
     subtitle: String,
     gradient: List<androidx.compose.ui.graphics.Color>,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Card(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(130.dp),
+        modifier = modifier.height(130.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
     ) {

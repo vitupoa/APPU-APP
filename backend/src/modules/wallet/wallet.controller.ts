@@ -47,6 +47,16 @@ export class WalletController {
     }
   }
 
+  static async searchUsers(req: AuthRequest, res: Response) {
+    try {
+      const query = req.query.query as string || '';
+      const result = await WalletService.searchUsers(query);
+      res.status(200).json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   static async getExchangeRate(req: AuthRequest, res: Response) {
     try {
       const data = exchangeRateSchema.parse(req.query);

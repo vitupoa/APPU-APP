@@ -136,4 +136,33 @@ export class WalletService {
 
     return transactions;
   }
+
+  static async searchUsers(query: string) {
+    if (!query || query.length < 2) {
+      return [];
+    }
+    
+    // Search by username or display name
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { username: { contains: query, mode: 'insensitive' } },
+          { displayName: { contains: query, mode: 'insensitive' } }
+        ]
+      },
+      take: 20,
+      select: {
+        id: true,
+        username: true,
+        displayName: true,
+        avatarUrl: true,
+        isVerified: true
+      }
+    });
+
+    return users.map(u => ({
+      ...u,
+      isLovers: false // Adjust if necessary
+    }));
+  }
 }
