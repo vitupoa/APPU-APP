@@ -50,7 +50,7 @@ class LoginScreen : Screen {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Welcome to Krieta",
+                    text = "Karibu Krieta!",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -61,7 +61,7 @@ class LoginScreen : Screen {
                 OutlinedTextField(
                     value = email,
                     onValueChange = { viewModel.email.value = it },
-                    label = { Text("Email, Phone or Username") },
+                    label = { Text("Email or Username") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email),
                     enabled = authState !is AuthState.Loading

@@ -241,9 +241,8 @@ class ProfileScreen(val userId: String? = null) : Screen {
                             }
                         }
                     }
-                }
-
-                // Milestones and Bio Link
+                    
+                    // Milestones and Bio Link
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
@@ -289,6 +288,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
 
                 // Empty space since Grid is excluded
                 Spacer(modifier = Modifier.height(100.dp))
+                }
             }
         }
 
