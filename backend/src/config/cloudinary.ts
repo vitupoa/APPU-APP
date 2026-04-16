@@ -34,10 +34,10 @@ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINA
  * Generate signed upload params for client-side direct upload.
  * Enforces folder routing — client cannot choose arbitrary folders.
  * 
- * IMPORTANT: All parameters sent in the upload request (except file and api_key)
- * must be included in the signature generation. This includes timestamp, folder,
- * and resource_type. Cloudinary will reject the upload if any signed parameter
- * is missing from the signature.
+ * IMPORTANT: Cloudinary excludes these params from signature verification:
+ * file, cloud_name, resource_type, type, api_key.
+ * Only sign parameters that Cloudinary actually verifies (timestamp, folder, etc.).
+ * resource_type is conveyed via the URL path, NOT the signature.
  * 
  * @param folder - The Cloudinary folder path for organizing uploads
  * @param resourceType - The type of resource being uploaded ('image', 'video', or 'raw')
@@ -49,7 +49,7 @@ export function generateUploadSignature(
   const timestamp = Math.round(Date.now() / 1000);
   
   const signature = cloudinary.utils.api_sign_request(
-    { timestamp, folder, resource_type: resourceType },
+    { timestamp, folder },
     env.CLOUDINARY_API_SECRET
   );
 

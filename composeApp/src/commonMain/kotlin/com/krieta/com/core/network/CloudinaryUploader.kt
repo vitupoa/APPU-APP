@@ -86,9 +86,8 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                             append("timestamp", signatureDto.timestamp.toString())
                             append("signature", signatureDto.signature)
                             append("folder", signatureDto.folder)
-                            // NOTE: resource_type is NOT sent as a form parameter - it's only in the URL path
-                            // and included in the signature. Sending it as a form parameter causes Cloudinary
-                            // to reject the upload as "unsigned"
+                            // resource_type is in the URL path, NOT form data.
+                            // Cloudinary excludes it from signature verification.
                             append("file", fileBytes, Headers.build {
                                 append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                 append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
