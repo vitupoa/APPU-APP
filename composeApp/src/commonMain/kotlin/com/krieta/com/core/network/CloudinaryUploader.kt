@@ -19,10 +19,11 @@ import kotlinx.serialization.Serializable
 data class CloudinarySignatureDto(
     val signature: String,
     val timestamp: Long,
-    val folder: String,
+    val assetFolder: String,
     val resourceType: String,
     val apiKey: String,
-    val cloudName: String
+    val cloudName: String,
+    val uploadPreset: String
 )
 
 @Serializable
@@ -69,43 +70,97 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             val signatureDto: CloudinarySignatureDto = signatureResponse.body()
             
             // Enhanced logging for debugging
-            println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}")
+            println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.assetFolder}, resourceType=${signatureDto.resourceType}, preset=${signatureDto.uploadPreset}")
 
             // 2. Upload to Cloudinary directly
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
             
             println("Cloudinary Upload URL: $uploadUrl")
-            println("Cloudinary Upload Parameters: api_key=${signatureDto.apiKey}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}")
+            println("Cloudinary Upload Parameters: api_key=${signatureDto.apiKey}, timestamp=${signatureDto.timestamp}, asset_folder=${signatureDto.assetFolder}, upload_preset=${signatureDto.uploadPreset}")
             println("Cloudinary Signature includes resource_type=${signatureDto.resourceType} (in URL path, not form data)")
             
-            val uploadResponse = plainClient.post(uploadUrl) {
-                setBody(
-                    MultiPartFormDataContent(
-                        formData {
-                            append("api_key", signatureDto.apiKey)
-                            append("timestamp", signatureDto.timestamp.toString())
-                            append("signature", signatureDto.signature)
-                            append("folder", signatureDto.folder)
-                            // resource_type is in the URL path, NOT form data.
-                            // Cloudinary excludes it from signature verification.
-                            append("file", fileBytes, Headers.build {
-                                append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
-                                append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
-                            })
-                        }
+            val chunkSize = 5 * 1024 * 1024 // 5 MB chunks
+            val totalBytes = fileBytes.size
+            val uniqueUploadId = (1..16).map { kotlin.random.Random.nextInt(0, 16).toString(16) }.joinToString("")
+            
+            // For files smaller than chunk size, use standard upload
+            if (totalBytes <= chunkSize) {
+                val uploadResponse = plainClient.post(uploadUrl) {
+                    setBody(
+                        MultiPartFormDataContent(
+                            formData {
+                                append("api_key", signatureDto.apiKey)
+                                append("timestamp", signatureDto.timestamp.toString())
+                                append("signature", signatureDto.signature)
+                                append("asset_folder", signatureDto.assetFolder)
+                                append("upload_preset", signatureDto.uploadPreset)
+                                // resource_type is in the URL path, NOT form data.
+                                // Cloudinary excludes it from signature verification.
+                                append("file", fileBytes, Headers.build {
+                                    append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
+                                    append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+                                })
+                            }
+                        )
                     )
-                )
-            }
+                }
 
-            if (uploadResponse.status.value !in 200..299) {
-                val errorBody = uploadResponse.bodyAsText()
-                println("Cloudinary RAW ERROR: $errorBody")
-                println("Cloudinary Error Context: timestamp=${signatureDto.timestamp}, signature=${signatureDto.signature}, folder=${signatureDto.folder}, resource_type=${signatureDto.resourceType}")
-                throw Exception("Cloudinary upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
-            }
+                if (uploadResponse.status.value !in 200..299) {
+                    val errorBody = uploadResponse.bodyAsText()
+                    println("Cloudinary RAW ERROR: $errorBody")
+                    throw Exception("Cloudinary upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
+                }
 
-            val result: CloudinaryUploadResponse = uploadResponse.body()
-            result.secure_url
+                val result: CloudinaryUploadResponse = uploadResponse.body()
+                return@safeApiCall result.secure_url
+            } 
+            
+            // For larger files, perform chunked upload
+            var startByte = 0
+            var finalResultUrl: String? = null
+            
+            while (startByte < totalBytes) {
+                val endByte = kotlin.math.min(startByte + chunkSize - 1, totalBytes - 1)
+                val chunkBytes = fileBytes.sliceArray(startByte..endByte)
+                
+                println("Cloudinary Chunked Upload: sending bytes $startByte-$endByte/$totalBytes")
+                
+                val uploadResponse = plainClient.post(uploadUrl) {
+                    io.ktor.client.request.header("X-Unique-Upload-Id", uniqueUploadId)
+                    io.ktor.client.request.header("Content-Range", "bytes $startByte-$endByte/$totalBytes")
+                    setBody(
+                        MultiPartFormDataContent(
+                            formData {
+                                append("api_key", signatureDto.apiKey)
+                                append("timestamp", signatureDto.timestamp.toString())
+                                append("signature", signatureDto.signature)
+                                append("asset_folder", signatureDto.assetFolder)
+                                append("upload_preset", signatureDto.uploadPreset)
+                                append("file", chunkBytes, Headers.build {
+                                    append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
+                                    append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+                                })
+                            }
+                        )
+                    )
+                }
+
+                if (uploadResponse.status.value !in 200..299) {
+                    val errorBody = uploadResponse.bodyAsText()
+                    println("Cloudinary RAW ERROR on chunk: $errorBody")
+                    throw Exception("Cloudinary chunk upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
+                }
+
+                // If this is the last chunk, it will contain the final response JSON
+                if (endByte == totalBytes - 1) {
+                    val result: CloudinaryUploadResponse = uploadResponse.body()
+                    finalResultUrl = result.secure_url
+                }
+                
+                startByte = endByte + 1
+            }
+            
+            finalResultUrl ?: throw Exception("Chunked upload completed but final result URL was null")
         }
     }
 }

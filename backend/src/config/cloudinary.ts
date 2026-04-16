@@ -47,19 +47,26 @@ export function generateUploadSignature(
   resourceType: 'image' | 'video' | 'raw' = 'image'
 ) {
   const timestamp = Math.round(Date.now() / 1000);
+  const uploadPreset = 'krieta_signed_uploads';
+  const payloadToSign: Record<string, any> = { 
+    timestamp, 
+    asset_folder: folder,
+    upload_preset: uploadPreset 
+  };
   
   const signature = cloudinary.utils.api_sign_request(
-    { timestamp, folder },
+    payloadToSign,
     env.CLOUDINARY_API_SECRET
   );
 
   return {
     signature,
     timestamp,
-    folder,
+    assetFolder: folder,
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
+    uploadPreset,
   };
 }
 

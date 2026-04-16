@@ -7,12 +7,13 @@ describe('Cloudinary Signature Generation', () => {
       
       expect(result).toHaveProperty('signature');
       expect(result).toHaveProperty('timestamp');
-      expect(result).toHaveProperty('folder');
+      expect(result).toHaveProperty('assetFolder');
       expect(result).toHaveProperty('resourceType');
       expect(result).toHaveProperty('apiKey');
       expect(result).toHaveProperty('cloudName');
+      expect(result).toHaveProperty('uploadPreset');
       
-      expect(result.folder).toBe(CLOUDINARY_FOLDERS.FEED_IMAGES);
+      expect(result.assetFolder).toBe(CLOUDINARY_FOLDERS.FEED_IMAGES);
       expect(result.resourceType).toBe('image');
       expect(typeof result.signature).toBe('string');
       expect(result.signature.length).toBeGreaterThan(0);
@@ -23,12 +24,13 @@ describe('Cloudinary Signature Generation', () => {
       
       expect(result).toHaveProperty('signature');
       expect(result).toHaveProperty('timestamp');
-      expect(result).toHaveProperty('folder');
+      expect(result).toHaveProperty('assetFolder');
       expect(result).toHaveProperty('resourceType');
       expect(result).toHaveProperty('apiKey');
       expect(result).toHaveProperty('cloudName');
+      expect(result).toHaveProperty('uploadPreset');
       
-      expect(result.folder).toBe(CLOUDINARY_FOLDERS.SHORTS_VIDEOS);
+      expect(result.assetFolder).toBe(CLOUDINARY_FOLDERS.SHORTS_VIDEOS);
       expect(result.resourceType).toBe('video');
       expect(typeof result.signature).toBe('string');
       expect(result.signature.length).toBeGreaterThan(0);
@@ -39,12 +41,13 @@ describe('Cloudinary Signature Generation', () => {
       
       expect(result).toHaveProperty('signature');
       expect(result).toHaveProperty('timestamp');
-      expect(result).toHaveProperty('folder');
+      expect(result).toHaveProperty('assetFolder');
       expect(result).toHaveProperty('resourceType');
       expect(result).toHaveProperty('apiKey');
       expect(result).toHaveProperty('cloudName');
+      expect(result).toHaveProperty('uploadPreset');
       
-      expect(result.folder).toBe(CLOUDINARY_FOLDERS.CHAT_AUDIO);
+      expect(result.assetFolder).toBe(CLOUDINARY_FOLDERS.CHAT_AUDIO);
       expect(result.resourceType).toBe('raw');
       expect(typeof result.signature).toBe('string');
       expect(result.signature.length).toBeGreaterThan(0);
@@ -72,7 +75,7 @@ describe('Cloudinary Signature Generation', () => {
       const result1 = generateUploadSignature(CLOUDINARY_FOLDERS.FEED_IMAGES, 'image');
       const result2 = generateUploadSignature(CLOUDINARY_FOLDERS.CONTESTS_IMAGES, 'image');
       
-      expect(result1.folder).not.toBe(result2.folder);
+      expect(result1.assetFolder).not.toBe(result2.assetFolder);
       // Signatures should be different even if generated at same timestamp
       // because folder is included in signature
     });
