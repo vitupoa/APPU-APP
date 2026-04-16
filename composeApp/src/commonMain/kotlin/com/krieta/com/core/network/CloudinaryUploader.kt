@@ -75,7 +75,8 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
             
             println("Cloudinary Upload URL: $uploadUrl")
-            println("Cloudinary Upload Parameters: api_key=${signatureDto.apiKey}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resource_type=${signatureDto.resourceType}")
+            println("Cloudinary Upload Parameters: api_key=${signatureDto.apiKey}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}")
+            println("Cloudinary Signature includes resource_type=${signatureDto.resourceType} (in URL path, not form data)")
             
             val uploadResponse = plainClient.post(uploadUrl) {
                 setBody(
@@ -85,7 +86,9 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                             append("timestamp", signatureDto.timestamp.toString())
                             append("signature", signatureDto.signature)
                             append("folder", signatureDto.folder)
-                            append("resource_type", signatureDto.resourceType)
+                            // NOTE: resource_type is NOT sent as a form parameter - it's only in the URL path
+                            // and included in the signature. Sending it as a form parameter causes Cloudinary
+                            // to reject the upload as "unsigned"
                             append("file", fileBytes, Headers.build {
                                 append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                 append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")

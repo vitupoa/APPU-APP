@@ -187,9 +187,17 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        AnalyticsStat("${profile.stats.admirers}", "Admirers")
+                        AnalyticsStat(
+                            count = "${profile.stats.admirers}", 
+                            label = "Admirers", 
+                            modifier = Modifier.clickable { navigator.push(com.krieta.feature.profile.presentation.screen.SocialListScreen(userId = profile.id, title = "Admirers")) }.padding(8.dp)
+                        )
                         Spacer(modifier = Modifier.width(32.dp))
-                        AnalyticsStat("${profile.stats.admiring}", "Admiring")
+                        AnalyticsStat(
+                            count = "${profile.stats.admiring}", 
+                            label = "Admiring", 
+                            modifier = Modifier.clickable { navigator.push(com.krieta.feature.profile.presentation.screen.SocialListScreen(userId = profile.id, title = "Admiring")) }.padding(8.dp)
+                        )
                     }
 
                     // Action buttons
@@ -218,21 +226,29 @@ class ProfileScreen(val userId: String? = null) : Screen {
                             }
                         } else {
                             val relationship = profile.relationshipStatus
-                            val isFollowing = relationship.name == "ADMIRING" || relationship.name == "LOVERS"
+                            
+                            val buttonText = when (relationship.name) {
+                                "ADMIRING" -> "Unadmire"
+                                "ADMIRED_BY" -> "Love"
+                                "LOVERS" -> "Unlove"
+                                else -> "Admire"
+                            }
+                            
+                            val isActionPositive = relationship.name == "NONE" || relationship.name == "ADMIRED_BY"
                             
                             Button(
                                 onClick = { profileViewModel.toggleAdmire() }, 
                                 modifier = Modifier.weight(1f).height(44.dp),
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (isFollowing) KrietaColors.SurfaceVariant else KrietaColors.Accent, 
-                                    contentColor = if (isFollowing) KrietaColors.OnSurface else KrietaColors.OnAccent
+                                    containerColor = if (isActionPositive) KrietaColors.Accent else KrietaColors.SurfaceVariant, 
+                                    contentColor = if (isActionPositive) KrietaColors.OnAccent else KrietaColors.OnSurface
                                 )
                             ) {
                                 if (profileState.isRelationshipLoading) {
                                     CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = KrietaColors.OnBackground)
                                 } else {
-                                    Text(if (isFollowing) "Unadmire" else "Admire", fontWeight = FontWeight.SemiBold)
+                                    Text(buttonText, fontWeight = FontWeight.SemiBold)
                                 }
                             }
                             Button(
@@ -495,8 +511,8 @@ private fun BioLinkBottomSheet(
 }
 
 @Composable
-private fun AnalyticsStat(count: String, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+private fun AnalyticsStat(count: String, label: String, modifier: Modifier = Modifier) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         Text(count, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = KrietaColors.OnBackground)
         Text(label, fontSize = 13.sp, color = KrietaColors.OnSurfaceVariant)
     }

@@ -59,7 +59,7 @@ class ProfileViewModel(
                                 isRelationshipLoading = false,
                                 profile = profile.copy(
                                     relationshipStatus = if (isLovers) RelationshipStatus.LOVERS else RelationshipStatus.ADMIRING,
-                                    stats = profile.stats.copy(admirers = profile.stats.admirers + if (isLovers) 0 else 0)
+                                    stats = profile.stats.copy(admirers = profile.stats.admirers + 1)
                                 )
                             )
                         }
@@ -72,9 +72,13 @@ class ProfileViewModel(
                 RelationshipStatus.ADMIRING, RelationshipStatus.LOVERS -> {
                     when (repository.unadmire(profile.id)) {
                         is NetworkResult.Success -> {
+                            val newStatus = if (profile.relationshipStatus == RelationshipStatus.LOVERS) RelationshipStatus.ADMIRED_BY else RelationshipStatus.NONE
                             _state.value = _state.value.copy(
                                 isRelationshipLoading = false,
-                                profile = profile.copy(relationshipStatus = RelationshipStatus.NONE)
+                                profile = profile.copy(
+                                    relationshipStatus = newStatus,
+                                    stats = profile.stats.copy(admirers = maxOf(0, profile.stats.admirers - 1))
+                                )
                             )
                         }
                         is NetworkResult.Error -> {
