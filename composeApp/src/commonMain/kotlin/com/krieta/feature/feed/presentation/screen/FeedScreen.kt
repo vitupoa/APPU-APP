@@ -116,6 +116,7 @@ class FeedScreen : Screen {
                 }
             }
         }
+                }
             }
         }
     }
