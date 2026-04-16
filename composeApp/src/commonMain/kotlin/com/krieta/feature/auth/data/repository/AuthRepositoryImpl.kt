@@ -10,6 +10,10 @@ import com.krieta.feature.auth.data.remote.dto.OauthLoginRequestDto
 import com.krieta.feature.auth.data.remote.dto.RegisterRequestDto
 import com.krieta.feature.auth.domain.model.User
 import com.krieta.feature.auth.domain.repository.AuthRepository
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,11 +21,22 @@ import kotlinx.coroutines.flow.asStateFlow
 class AuthRepositoryImpl(
     private val api: AuthApi,
     private val tokenManager: TokenManager,
-    private val deviceSecurity: DeviceSecurity
+    private val deviceSecurity: DeviceSecurity,
+    private val httpClient: HttpClient
 ) : AuthRepository {
 
     private val _currentUser = MutableStateFlow<User?>(null)
     override val currentUser: Flow<User?> = _currentUser.asStateFlow()
+
+    /**
+     * Invalidate Ktor's cached bearer tokens so loadTokens is re-invoked
+     * on the next request, picking up the freshly saved tokens.
+     */
+    private fun invalidateBearerCache() {
+        try {
+            httpClient.authProvider<BearerAuthProvider>()?.clearToken()
+        } catch (_: Exception) { /* Auth plugin not installed — safe to ignore */ }
+    }
 
     private fun mapUser(dto: com.krieta.feature.auth.data.remote.dto.UserDto): User {
         return User(
@@ -55,6 +70,7 @@ class AuthRepositoryImpl(
 
             response.accessToken?.let { tokenManager.saveAccessToken(it) }
             response.refreshToken?.let { tokenManager.saveRefreshToken(it) }
+            invalidateBearerCache()
             
             val user = response.user?.let { mapUser(it) }
                 ?: throw IllegalStateException("Login failed: Invalid server response")
@@ -75,6 +91,7 @@ class AuthRepositoryImpl(
 
             response.accessToken?.let { tokenManager.saveAccessToken(it) }
             response.refreshToken?.let { tokenManager.saveRefreshToken(it) }
+            invalidateBearerCache()
             
             val user = response.user?.let { mapUser(it) }
                 ?: throw IllegalStateException("Login failed: Invalid server response")
@@ -96,6 +113,7 @@ class AuthRepositoryImpl(
 
             response.accessToken?.let { tokenManager.saveAccessToken(it) }
             response.refreshToken?.let { tokenManager.saveRefreshToken(it) }
+            invalidateBearerCache()
 
             val user = mapUser(response.user)
             _currentUser.value = user
@@ -115,6 +133,7 @@ class AuthRepositoryImpl(
                 }
             }
             clearSession()
+            invalidateBearerCache()
         }
     }
 
