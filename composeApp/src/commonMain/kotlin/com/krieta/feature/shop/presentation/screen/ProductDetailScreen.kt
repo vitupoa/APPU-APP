@@ -31,8 +31,10 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.krieta.com.core.util.KrCurrencyFormatter
+import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.feature.shop.presentation.viewmodel.ProductDetailViewModel
 import io.ktor.http.encodeURLParameter
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 class ProductDetailScreen(private val productId: String) : Screen {
@@ -43,6 +45,8 @@ class ProductDetailScreen(private val productId: String) : Screen {
         val uriHandler = LocalUriHandler.current
         val viewModel = koinScreenModel<ProductDetailViewModel>(parameters = { parametersOf(productId) })
         val state by viewModel.state.collectAsState()
+        val currencyProvider = koinInject<UserCurrencyProvider>()
+        val exchangeRate by currencyProvider.exchangeRate.collectAsState()
 
         Scaffold(
             topBar = {
@@ -112,7 +116,7 @@ class ProductDetailScreen(private val productId: String) : Screen {
                             Text(product.title, fontWeight = FontWeight.Bold, fontSize = 22.sp)
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                KrCurrencyFormatter.formatKr(product.priceKr),
+                                currencyProvider.formatWithFiat(product.priceKr),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 24.sp,
                                 color = MaterialTheme.colorScheme.primary
@@ -182,7 +186,7 @@ class ProductDetailScreen(private val productId: String) : Screen {
                                             append(product.imageUrls.first())
                                             append("\n")
                                         }
-                                        append("${product.title} - ${KrCurrencyFormatter.formatKr(product.priceKr)}")
+                                        append("${product.title} - ${currencyProvider.formatWithFiat(product.priceKr)}")
                                     }
                                     val encoded = message.encodeURLParameter()
                                     val whatsappUrl = "https://wa.me/${product.whatsappNumber}?text=$encoded"

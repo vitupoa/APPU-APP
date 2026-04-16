@@ -1,5 +1,6 @@
 package com.krieta.com.core.di
 
+import com.krieta.com.core.location.LocationProvider
 import com.krieta.com.core.security.AndroidDeviceSecurity
 import com.krieta.com.core.security.AndroidTokenManager
 import com.krieta.com.core.security.DeviceSecurity
@@ -11,4 +12,5 @@ import org.koin.dsl.module
 actual fun platformModule(): Module = module {
     single<TokenManager> { AndroidTokenManager(androidContext()) }
     single<DeviceSecurity> { AndroidDeviceSecurity(androidContext()) }
+    single { LocationProvider(androidContext()) }
 }

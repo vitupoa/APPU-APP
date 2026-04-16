@@ -24,8 +24,10 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.util.KrCurrencyFormatter
 import com.krieta.feature.contests.domain.model.Contest
 import com.krieta.feature.contests.domain.model.ContestStatus
+import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedState
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedViewModel
+import org.koin.compose.koinInject
 
 class ContestFeedScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +37,8 @@ class ContestFeedScreen : Screen {
         val viewModel = koinScreenModel<ContestFeedViewModel>()
         val state by viewModel.state.collectAsState()
         val isLoadingMore by viewModel.isLoadingMore.collectAsState()
+        val currencyProvider = koinInject<UserCurrencyProvider>()
+        val exchangeRate by currencyProvider.exchangeRate.collectAsState()
         val listState = rememberLazyListState()
 
         // Load more when reaching end
@@ -104,6 +108,7 @@ class ContestFeedScreen : Screen {
                                 items(currentState.items, key = { it.id }) { contest ->
                                     ContestCard(
                                         contest = contest,
+                                        currencyProvider = currencyProvider,
                                         onClick = { navigator.push(ContestDetailScreen(contest.id)) }
                                     )
                                 }
@@ -124,7 +129,7 @@ class ContestFeedScreen : Screen {
     }
 
     @Composable
-    private fun ContestCard(contest: Contest, onClick: () -> Unit) {
+    private fun ContestCard(contest: Contest, currencyProvider: UserCurrencyProvider, onClick: () -> Unit) {
         Card(
             onClick = onClick,
             modifier = Modifier.fillMaxWidth(),
@@ -177,7 +182,7 @@ class ContestFeedScreen : Screen {
                     Column {
                         Text("Prize Pool", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
-                            KrCurrencyFormatter.formatKr(contest.prizeKr),
+                            currencyProvider.formatWithFiat(contest.prizeKr),
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )

@@ -8,6 +8,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
@@ -126,8 +127,10 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                 println("Cloudinary Chunked Upload: sending bytes $startByte-$endByte/$totalBytes")
                 
                 val uploadResponse = plainClient.post(uploadUrl) {
-                    io.ktor.client.request.header("X-Unique-Upload-Id", uniqueUploadId)
-                    io.ktor.client.request.header("Content-Range", "bytes $startByte-$endByte/$totalBytes")
+                    headers {
+                        append("X-Unique-Upload-Id", uniqueUploadId)
+                        append("Content-Range", "bytes $startByte-$endByte/$totalBytes")
+                    }
                     setBody(
                         MultiPartFormDataContent(
                             formData {

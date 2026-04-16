@@ -29,9 +29,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.util.KrCurrencyFormatter
 import com.krieta.feature.contests.domain.model.ContestStatus
 import com.krieta.feature.contests.domain.model.ContestSubmission
+import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.feature.contests.presentation.viewmodel.ContestDetailViewModel
 import org.koin.core.parameter.parametersOf
 import cafe.adriel.voyager.koin.koinScreenModel
+import org.koin.compose.koinInject
 
 class ContestDetailScreen(private val contestId: String) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -41,6 +43,8 @@ class ContestDetailScreen(private val contestId: String) : Screen {
         val uriHandler = LocalUriHandler.current
         val viewModel = koinScreenModel<ContestDetailViewModel>(parameters = { parametersOf(contestId) })
         val state by viewModel.state.collectAsState()
+        val currencyProvider = koinInject<UserCurrencyProvider>()
+        val exchangeRate by currencyProvider.exchangeRate.collectAsState()
 
         Scaffold(
             topBar = {
@@ -86,13 +90,13 @@ class ContestDetailScreen(private val contestId: String) : Screen {
                                     Text("Prize Pool", style = MaterialTheme.typography.labelMedium)
                                     Spacer(Modifier.height(4.dp))
                                     Text(
-                                        KrCurrencyFormatter.formatKr(contest.prizeKr),
-                                        fontSize = 28.sp,
+                                        currencyProvider.formatWithFiat(contest.prizeKr),
+                                        fontSize = 24.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Text(
-                                        "Platform fee: ${KrCurrencyFormatter.formatKr(contest.platformFeeKr)} (15%)",
+                                        "Platform fee: ${currencyProvider.formatWithFiat(contest.platformFeeKr)} (15%)",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
                                     )

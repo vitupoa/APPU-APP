@@ -1,0 +1,640 @@
+Conversation with Cloudinary
+Started on April 16, 2026 at 04:19 AM Central Time (US & Canada) time CDT (GMT-0500)
+
+---
+
+04:19 AM | Krieta Group LTD: is this correct to fix whitelist unsigned error?
+package com.krieta.com.core.network
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.Serializable
+@Serializable
+data class CloudinarySignatureDto(
+ val signature: String,
+ val timestamp: Long,
+ val folder: String,
+ val resourceType: String,
+ val apiKey: String,
+ val cloudName: String
+)
+@Serializable
+data class CloudinaryUploadResponse(
+ val secure_url: String,
+ val public_id: String
+)
+class CloudinaryUploader(private val authenticatedClient: HttpClient) {
+ // A dedicated plain HTTP client for Cloudinary that has NO Auth plugin or interceptors installed.
+ private val plainClient = HttpClient {
+ install(ContentNegotiation) {
+ json(KtorClientFactory.json)
+ }
+ install(io.ktor.client.plugins.logging.Logging) {
+ logger = object : io.ktor.client.plugins.logging.Logger {
+ override fun log(message: String) {
+ println("CloudinaryHttp: $message")
+ }
+ }
+ level = io.ktor.client.plugins.logging.LogLevel.INFO
+ }
+ install(io.ktor.client.plugins.HttpTimeout) {
+ requestTimeoutMillis = 180_000L
+ connectTimeoutMillis = 180_000L
+ socketTimeoutMillis = 180_000L
+ }
+ }
+ suspend fun uploadMedia(folder: String, fileBytes: ByteArray, isVideo: Boolean = false): NetworkResult<String> {
+ return safeApiCall {
+ // 1. Get Signature from our backend
+ val resourceType = if (isVideo) "video" else "image"
+ val signatureResponse = authenticatedClient.get("${ApiConstants.API_VERSION}/media/upload-signature") {
+ parameter("folder", folder)
+ parameter("resourceType", resourceType)
+ }
+ 
+ if (!signatureResponse.status.let { it.value in 200..299 }) {
+ throw Exception("Failed to fetch upload signature: HTTP ${signatureResponse.status.value}. Ensure you are authenticated and backend is updated.")
+ }
+ 
+ val signatureDto: CloudinarySignatureDto = signatureResponse.body()
+ 
+ // Enhanced logging for debugging
+ println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}")
+ // 2. Upload to Cloudinary directly
+ val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
+ 
+ println("Cloudinary Upload URL: $uploadUrl")
+ println("Cloudinary Upload Parameters: api_key=${signatureDto.apiKey}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}")
+ println("Cloudinary Signature includes resource_type=${signatureDto.resourceType} (in URL path, not form data)")
+ 
+ val chunkSize = 5 * 1024 * 1024 // 5 MB chunks
+ val totalBytes = fileBytes.size
+ val uniqueUploadId = (1..16).map { kotlin.random.Random.nextInt(0, 16).toString(16) }.joinToString("")
+ 
+ // For files smaller than chunk size, use standard upload
+ if (totalBytes <= chunkSize) {
+ val uploadResponse = plainClient.post(uploadUrl) {
+ setBody(
+ MultiPartFormDataContent(
+ formData {
+ append("api_key", signatureDto.apiKey)
+ append("timestamp", signatureDto.timestamp.toString())
+ append("signature", signatureDto.signature)
+ append("folder", signatureDto.folder)
+ // resource_type is in the URL path, NOT form data.
+ // Cloudinary excludes it from signature verification.
+ append("file", fileBytes, Headers.build {
+ append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
+ append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+ })
+ }
+ )
+ )
+ }
+ if (uploadResponse.status.value !in 200..299) {
+ val errorBody = uploadResponse.bodyAsText()
+ println("Cloudinary RAW ERROR: $errorBody")
+ throw Exception("Cloudinary upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
+ }
+ val result: CloudinaryUploadResponse = uploadResponse.body()
+ return@safeApiCall result.secure_url
+ } 
+ 
+ // For larger files, perform chunked upload
+ var startByte = 0
+ var finalResultUrl: String? = null
+ 
+ while (startByte < totalBytes) {
+ val endByte = kotlin.math.min(startByte + chunkSize - 1, totalBytes - 1)
+ val chunkBytes = fileBytes.sliceArray(startByte..endByte)
+ 
+ println("Cloudinary Chunked Upload: sending bytes $startByte-$endByte/$totalBytes")
+ 
+ val uploadResponse = plainClient.post(uploadUrl) {
+ io.ktor.client.request.header("X-Unique-Upload-Id", uniqueUploadId)
+ io.ktor.client.request.header("Content-Range", "bytes $startByte-$endByte/$totalBytes")
+ setBody(
+ MultiPartFormDataContent(
+ formData {
+ append("api_key", signatureDto.apiKey)
+ append("timestamp", signatureDto.timestamp.toString())
+ append("signature", signatureDto.signature)
+ append("folder", signatureDto.folder)
+ append("file", chunkBytes, Headers.build {
+ append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
+ append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+ })
+ }
+ )
+ )
+ }
+ if (uploadResponse.status.value !in 200..299) {
+ val errorBody = uploadResponse.bodyAsText()
+ println("Cloudinary RAW ERROR on chunk: $errorBody")
+ throw Exception("Cloudinary chunk upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
+ }
+ // If this is the last chunk, it will contain the final response JSON
+ if (endByte == totalBytes - 1) {
+ val result: CloudinaryUploadResponse = uploadResponse.body()
+ finalResultUrl = result.secure_url
+ }
+ 
+ startByte = endByte + 1
+ }
+ 
+ finalResultUrl ?: throw Exception("Chunked upload completed but final result URL was null")
+ }
+ }
+}
+​
+
+04:19 AM | Ask Cloudinary AI: Yes, that approach is correct for fixing the “whitelist unsigned” error: you need to use an unsigned upload preset on Cloudinary, and then upload using that preset name (instead of trying to sign the request from the client). (https://cloudinary.com/documentation/upload_images) (https://cloudinary.com/blog/migrating_your_media_assets_to_the_cloud_using_cloudinary) 
+ What to do: 
+ - In Cloudinary Console, create an upload preset and set it to unsigned. 
+- Put any allowed options (like folder, allowed formats, tags) inside that preset. 
+- In your upload request, send only the restricted unsigned parameters and include upload_preset (no signature). (https://cloudinary.com/documentation/image_upload_api_reference) 
+ So your code should switch from signed POST (api_key + timestamp + signature) to an unsigned upload using the preset name. 
+ 
+Sources:
+Programmatically Uploading Images, Videos, and Other Files | Documentation (https://cloudinary.com/documentation/upload_images)
+Upload API Reference | Documentation (https://cloudinary.com/documentation/image_upload_api_reference)
+Easily Migrate your Media Assets to the Cloud with Cloudinary (https://cloudinary.com/blog/migrating_your_media_assets_to_the_cloud_using_cloudinary)
+
+04:19 AM | Ask Cloudinary AI: Is that what you were looking for?
+
+04:20 AM | Krieta Group LTD: i want to use signed preset
+
+04:20 AM | Ask Cloudinary AI: Yes, you can use a signed upload preset. Set the preset’s Signing Mode to Signed in the Cloudinary Console (Settings → Upload → Upload presets), then use that preset name in your upload request. (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc) 
+ Important detail: with signed uploads, you still sign the request using your API secret (the signature is generated from the upload parameters). The preset is optional, but if you use one, it must be a signed preset. (https://cloudinary.com/documentation/upload_widget) (https://cloudinary.com/documentation/upload_widget_reference) 
+ So your backend should return a signature that includes the same parameters you send in the upload request (and if you use upload_preset, include that too). 
+ 
+Sources:
+The Vibecoder Storefront: Automating Premium UGC With TanStack Start and Cloudinary AI (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc)
+Upload Widget | Documentation (https://cloudinary.com/documentation/upload_widget)
+Upload Widget API reference | Documentation (https://cloudinary.com/documentation/upload_widget_reference)
+
+04:20 AM | Ask Cloudinary AI: Did that answer your question?
+
+04:22 AM | Krieta Group LTD: what about this?
+import { v2 as cloudinary } from 'cloudinary';
+import { env } from './env'; 
+ cloudinary.config({
+ cloud_name: env.CLOUDINARY_CLOUD_NAME,
+ api_key: env.CLOUDINARY_API_KEY,
+ api_secret: env.CLOUDINARY_API_SECRET,
+ secure: true,
+}); 
+ export const CLOUDINARY_FOLDERS = {
+ // Profiles
+ PROFILE_IMAGES: 'Krieta/profile/Images',
+ PROFILE_VIDEOS: 'Krieta/profile/Videos',
+ // Shorts
+ SHORTS_VIDEOS: 'Krieta/shorts/Videos',
+ SHORTS_IMAGES: 'Krieta/shorts/Images',
+ // Contests
+ CONTESTS_IMAGES: 'Krieta/contests/Images',
+ CONTESTS_VIDEOS: 'Krieta/contests/Videos',
+ // Feed
+ FEED_IMAGES: 'Krieta/feed/Images',
+ // Shop
+ SHOP_IMAGES: 'Krieta/shop/Images',
+ // Chat
+ CHAT_IMAGES: 'Krieta/chat/Images',
+ CHAT_VIDEOS: 'Krieta/chat/Videos',
+ CHAT_AUDIO: 'Krieta/chat/Audio',
+} as const; 
+ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINARY_FOLDERS]; 
+ /**
+ * Generate signed upload params for client-side direct upload.
+ * Enforces folder routing — client cannot choose arbitrary folders.
+ * 
+ * IMPORTANT: Cloudinary excludes these params from signature verification:
+ * file, cloud_name, resource_type, type, api_key.
+ * Only sign parameters that Cloudinary actually verifies (timestamp, folder, etc.).
+ * resource_type is conveyed via the URL path, NOT the signature.
+ * 
+ * @param folder - The Cloudinary folder path for organizing uploads
+ * @param resourceType - The type of resource being uploaded ('image', 'video', or 'raw')
+ */
+export function generateUploadSignature(
+ folder: CloudinaryFolder,
+ resourceType: 'image' | 'video' | 'raw' = 'image'
+) {
+ const timestamp = Math.round(Date.now() / 1000);
+ 
+ const signature = cloudinary.utils.api_sign_request(
+ { timestamp, folder },
+ env.CLOUDINARY_API_SECRET
+ ); 
+ return {
+ signature,
+ timestamp,
+ folder,
+ resourceType,
+ apiKey: env.CLOUDINARY_API_KEY,
+ cloudName: env.CLOUDINARY_CLOUD_NAME,
+ };
+} 
+ /**
+ * Validate that an uploaded resource is in the expected folder.
+ * Called in webhooks to reject uploads to wrong folders.
+ */
+export function validateUploadFolder(
+ publicId: string,
+ expectedFolder: CloudinaryFolder
+): boolean {
+ return publicId.startsWith(expectedFolder);
+} 
+ export { cloudinary };
+​
+
+04:23 AM | Ask Cloudinary AI: Yes, that Node.js code is the right pattern for signed uploads: your backend generates a signature using api_sign_request, then the client sends api_key + timestamp + signature to Cloudinary. (https://cloudinary.com/documentation/node_image_and_video_upload) 
+ One important tweak: if you want to use a signed upload preset, include upload_preset in the parameters you sign (and make sure the preset is set to Signed in the Cloudinary Console). (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc) 
+ So your signature payload should be something like: 
+ - { timestamp, folder, upload_preset } (then sign it with api_secret) 
+ That way you keep the folder restriction on the backend, and the preset can enforce other allowed options. 
+ 
+Sources:
+Node.js image and video upload | Documentation (https://cloudinary.com/documentation/node_image_and_video_upload)
+The Vibecoder Storefront: Automating Premium UGC With TanStack Start and Cloudinary AI (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc)
+Upload Widget | Documentation (https://cloudinary.com/documentation/upload_widget)
+
+04:23 AM | Ask Cloudinary AI: Does this clarify things?
+
+04:25 AM | Krieta Group LTD: "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.cloudinary = exports.CLOUDINARY_FOLDERS = void 0;
+exports.generateUploadSignature = generateUploadSignature;
+exports.validateUploadFolder = validateUploadFolder;
+const cloudinary_1 = require("cloudinary");
+Object.defineProperty(exports, "cloudinary", { enumerable: true, get: function () { return cloudinary_1.v2; } });
+const env_1 = require("./env");
+cloudinary_1.v2.config({
+ cloud_name: env_1.env.CLOUDINARY_CLOUD_NAME,
+ api_key: env_1.env.CLOUDINARY_API_KEY,
+ api_secret: env_1.env.CLOUDINARY_API_SECRET,
+ secure: true,
+});
+exports.CLOUDINARY_FOLDERS = {
+ // Profiles
+ PROFILE_IMAGES: 'Krieta/profile/Images',
+ PROFILE_VIDEOS: 'Krieta/profile/Videos',
+ // Shorts
+ SHORTS_VIDEOS: 'Krieta/shorts/Videos',
+ SHORTS_IMAGES: 'Krieta/shorts/Images',
+ // Contests
+ CONTESTS_IMAGES: 'Krieta/contests/Images',
+ CONTESTS_VIDEOS: 'Krieta/contests/Videos',
+ // Feed
+ FEED_IMAGES: 'Krieta/feed/Images',
+ // Shop
+ SHOP_IMAGES: 'Krieta/shop/Images',
+ // Chat
+ CHAT_IMAGES: 'Krieta/chat/Images',
+ CHAT_VIDEOS: 'Krieta/chat/Videos',
+ CHAT_AUDIO: 'Krieta/chat/Audio',
+};
+/**
+ * Generate signed upload params for client-side direct upload.
+ * Enforces folder routing — client cannot choose arbitrary folders.
+ *
+ * IMPORTANT: All parameters sent in the upload request (except file and api_key)
+ * must be included in the signature generation. This includes timestamp, folder,
+ * and resource_type. Cloudinary will reject the upload if any signed parameter
+ * is missing from the signature.
+ *
+ * @param folder - The Cloudinary folder path for organizing uploads
+ * @param resourceType - The type of resource being uploaded ('image', 'video', or 'raw')
+ */
+function generateUploadSignature(folder, resourceType = 'image') {
+ const timestamp = Math.round(Date.now() / 1000);
+ const signature = cloudinary_1.v2.utils.api_sign_request({ timestamp, folder, resource_type: resourceType }, env_1.env.CLOUDINARY_API_SECRET);
+ return {
+ signature,
+ timestamp,
+ folder,
+ resourceType,
+ apiKey: env_1.env.CLOUDINARY_API_KEY,
+ cloudName: env_1.env.CLOUDINARY_CLOUD_NAME,
+ };
+}
+/**
+ * Validate that an uploaded resource is in the expected folder.
+ * Called in webhooks to reject uploads to wrong folders.
+ */
+function validateUploadFolder(publicId, expectedFolder) {
+ return publicId.startsWith(expectedFolder);
+}
+//# sourceMappingURL=cloudinary.js.map
+
+04:25 AM | Ask Cloudinary AI: That generated code is correct for signed uploads, and the key detail is exactly what you’re doing: sign only the parameters Cloudinary actually verifies, and exclude file, cloud_name, resource_type, and api_key from the signature payload. (https://cloudinary.com/documentation/authentication_signatures) 
+ So your backend signature should be generated from { timestamp, folder, resource_type } (and any other upload options you want to enforce), then the client sends api_key + timestamp + signature in the POST. (https://cloudinary.com/documentation/image_upload_api_reference) 
+ If you also want to use a signed upload preset, include upload_preset in the parameters you sign (and make sure the preset is set to Signed in the Cloudinary Console). (https://cloudinary.com/documentation/node_image_and_video_upload) 
+ 
+Sources:
+Generating authentication signatures | Documentation (https://cloudinary.com/documentation/authentication_signatures)
+Upload API Reference | Documentation (https://cloudinary.com/documentation/image_upload_api_reference)
+Node.js image and video upload | Documentation (https://cloudinary.com/documentation/node_image_and_video_upload)
+
+04:25 AM | Ask Cloudinary AI: Is that what you were looking for?
+
+04:27 AM | Krieta Group LTD: how do i create a singed preset folder in the dashboard?
+
+04:27 AM | Ask Cloudinary AI: To create a signed upload preset (with a folder) in the Cloudinary dashboard: 
+ 1. Go to Settings (gear icon) → Upload. (https://cloudinary.com/blog/smart-video-thumbnail-picker-next-js-cloudinary-prisma) 
+2. Scroll to Upload presets and click Add upload preset. 
+3. Set Signing mode to Signed. (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc) 
+4. Give it a name (example: vibecoder_signed). 
+5. In Folder, type the folder path you want uploads to land in (example: vibecoder_raw). 
+6. Click Save. 
+ That folder will be used automatically for any upload that uses that preset. (https://cloudinary.com/blog/trigger-video-optimizations-automatically-during-upload) 
+ 
+Sources:
+How to Trigger Video Optimizations Automatically During Upload (https://cloudinary.com/blog/trigger-video-optimizations-automatically-during-upload)
+Build a Video Thumbnail Picker With Next.js, Cloudinary and Prisma (https://cloudinary.com/blog/smart-video-thumbnail-picker-next-js-cloudinary-prisma)
+The Vibecoder Storefront: Automating Premium UGC With TanStack Start and Cloudinary AI (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc)
+Create Upload Presets in the Console (Video Tutorial) | Documentation (https://cloudinary.com/documentation/create_upload_presets_in_console_tutorial)
+
+04:27 AM | Ask Cloudinary AI: Did that answer your question?
+
+04:29 AM | Krieta Group LTD: i have set the paths and hierarchy for folders and where each file should be based on the module or feature:
+package com.krieta.com.core.network 
+ import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.Serializable 
+ @Serializable
+data class CloudinarySignatureDto(
+ val signature: String,
+ val timestamp: Long,
+ val folder: String,
+ val resourceType: String,
+ val apiKey: String,
+ val cloudName: String
+) 
+ @Serializable
+data class CloudinaryUploadResponse(
+ val secure_url: String,
+ val public_id: String
+) 
+ class CloudinaryUploader(private val authenticatedClient: HttpClient) { 
+ // A dedicated plain HTTP client for Cloudinary that has NO Auth plugin or interceptors installed.
+ private val plainClient = HttpClient {
+ install(ContentNegotiation) {
+ json(KtorClientFactory.json)
+ }
+ install(io.ktor.client.plugins.logging.Logging) {
+ logger = object : io.ktor.client.plugins.logging.Logger {
+ override fun log(message: String) {
+ println("CloudinaryHttp: $message")
+ }
+ }
+ level = io.ktor.client.plugins.logging.LogLevel.INFO
+ }
+ install(io.ktor.client.plugins.HttpTimeout) {
+ requestTimeoutMillis = 180_000L
+ connectTimeoutMillis = 180_000L
+ socketTimeoutMillis = 180_000L
+ }
+ } 
+ suspend fun uploadMedia(folder: String, fileBytes: ByteArray, isVideo: Boolean = false): NetworkResult<String> {
+ return safeApiCall {
+ // 1. Get Signature from our backend
+ val resourceType = if (isVideo) "video" else "image"
+ val signatureResponse = authenticatedClient.get("${ApiConstants.API_VERSION}/media/upload-signature") {
+ parameter("folder", folder)
+ parameter("resourceType", resourceType)
+ }
+ 
+ if (!signatureResponse.status.let { it.value in 200..299 }) {
+ throw Exception("Failed to fetch upload signature: HTTP ${signatureResponse.status.value}. Ensure you are authenticated and backend is updated.")
+ }
+ 
+ val signatureDto: CloudinarySignatureDto = signatureResponse.body()
+ 
+ // Enhanced logging for debugging
+ println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}") 
+ // 2. Upload to Cloudinary directly
+ val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
+ 
+ println("Cloudinary Upload URL: $uploadUrl")
+ println("Cloudinary Upload Parameters: api_key=${signatureDto.apiKey}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}")
+ println("Cloudinary Signature includes resource_type=${signatureDto.resourceType} (in URL path, not form data)")
+ 
+ val chunkSize = 5 * 1024 * 1024 // 5 MB chunks
+ val totalBytes = fileBytes.size
+ val uniqueUploadId = (1..16).map { kotlin.random.Random.nextInt(0, 16).toString(16) }.joinToString("")
+ 
+ // For files smaller than chunk size, use standard upload
+ if (totalBytes <= chunkSize) {
+ val uploadResponse = plainClient.post(uploadUrl) {
+ setBody(
+ MultiPartFormDataContent(
+ formData {
+ append("api_key", signatureDto.apiKey)
+ append("timestamp", signatureDto.timestamp.toString())
+ append("signature", signatureDto.signature)
+ append("folder", signatureDto.folder)
+ // resource_type is in the URL path, NOT form data.
+ // Cloudinary excludes it from signature verification.
+ append("file", fileBytes, Headers.build {
+ append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
+ append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+ })
+ }
+ )
+ )
+ } 
+ if (uploadResponse.status.value !in 200..299) {
+ val errorBody = uploadResponse.bodyAsText()
+ println("Cloudinary RAW ERROR: $errorBody")
+ throw Exception("Cloudinary upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
+ } 
+ val result: CloudinaryUploadResponse = uploadResponse.body()
+ return@safeApiCall result.secure_url
+ } 
+ 
+ // For larger files, perform chunked upload
+ var startByte = 0
+ var finalResultUrl: String? = null
+ 
+ while (startByte < totalBytes) {
+ val endByte = kotlin.math.min(startByte + chunkSize - 1, totalBytes - 1)
+ val chunkBytes = fileBytes.sliceArray(startByte..endByte)
+ 
+ println("Cloudinary Chunked Upload: sending bytes $startByte-$endByte/$totalBytes")
+ 
+ val uploadResponse = plainClient.post(uploadUrl) {
+ io.ktor.client.request.header("X-Unique-Upload-Id", uniqueUploadId)
+ io.ktor.client.request.header("Content-Range", "bytes $startByte-$endByte/$totalBytes")
+ setBody(
+ MultiPartFormDataContent(
+ formData {
+ append("api_key", signatureDto.apiKey)
+ append("timestamp", signatureDto.timestamp.toString())
+ append("signature", signatureDto.signature)
+ append("folder", signatureDto.folder)
+ append("file", chunkBytes, Headers.build {
+ append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
+ append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+ })
+ }
+ )
+ )
+ } 
+ if (uploadResponse.status.value !in 200..299) {
+ val errorBody = uploadResponse.bodyAsText()
+ println("Cloudinary RAW ERROR on chunk: $errorBody")
+ throw Exception("Cloudinary chunk upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
+ } 
+ // If this is the last chunk, it will contain the final response JSON
+ if (endByte == totalBytes - 1) {
+ val result: CloudinaryUploadResponse = uploadResponse.body()
+ finalResultUrl = result.secure_url
+ }
+ 
+ startByte = endByte + 1
+ }
+ 
+ finalResultUrl ?: throw Exception("Chunked upload completed but final result URL was null")
+ }
+ }
+}
+
+04:29 AM | Ask Cloudinary AI: Yes, you can keep your module-based folder hierarchy, but you don’t need a separate “signed preset per folder” to do it. A single signed upload preset can be used for all uploads, and you still control the destination folder from your backend signature. (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc) 
+ In the dashboard, create one signed preset and set its Folder to a single “catch-all” folder (for example Krieta/uploads). Then, in your backend, generate the signature with the real folder value you want (like Krieta/profile/Images), and send that folder in the upload request. (https://cloudinary.com/documentation/dam_admin_upload_presets) 
+ One important caveat: if your account is in dynamic folders mode, the folder parameter is not the recommended way to set the Media Library folder; use asset_folder instead (and use_asset_folder_as_public_id_prefix if you want the public ID path to match). (https://cloudinary.com/documentation/folder_modes_in_integrations) 
+ 
+Sources:
+The Vibecoder Storefront: Automating Premium UGC With TanStack Start and Cloudinary AI (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc)
+Assets (Digital Asset Management) - Upload Presets | Documentation (https://cloudinary.com/documentation/dam_admin_upload_presets)
+Folder Modes in Integrations | Documentation (https://cloudinary.com/documentation/folder_modes_in_integrations)
+
+04:29 AM | Ask Cloudinary AI: Was that useful?
+
+04:31 AM | Krieta Group LTD: how do i know my account is in dynamic folders mode
+
+04:31 AM | Ask Cloudinary AI: You can check it in the Cloudinary Console: go to Settings → Product Environments, then click the 3 dots next to your product environment and choose Edit. If the Dynamic folder mode toggle is ON, your account is in dynamic folders mode. If it’s OFF, you’re in fixed folders mode. (https://cloudinary.com/documentation/dam_folder_modes) (https://cloudinary.com/documentation/account_settings) 
+ If you want to check it programmatically, call the Admin API config endpoint and look for folder_mode in the response (it will be dynamic or fixed). (https://cloudinary.com/documentation/folder_modes_in_integrations) (https://cloudinary.com/documentation/folder_modes) 
+ 
+Sources:
+Account Console Settings for Developers | Documentation (https://cloudinary.com/documentation/account_settings)
+Folder modes | Documentation (https://cloudinary.com/documentation/dam_folder_modes)
+Folder Modes in Integrations | Documentation (https://cloudinary.com/documentation/folder_modes_in_integrations)
+Folder Modes | Documentation (https://cloudinary.com/documentation/folder_modes)
+
+04:31 AM | Ask Cloudinary AI: Was this helpful?
+
+04:32 AM | Krieta Group LTD: should i use dynamic folders mode or fixed? which is perfect?
+
+04:32 AM | Ask Cloudinary AI: Dynamic folders is usually the better fit for most apps, especially if you want to reorganize folders or rename assets later without breaking existing delivery URLs. In dynamic mode, moving or renaming folders does not change the public ID or the URL, so it’s safer for production. (https://cloudinary.com/documentation/folder_modes) (https://cloudinary.com/documentation/dam_admin_settings) 
+ Fixed folders is only “perfect” if you want the Media Library folder path to be tightly tied to the public ID and URL, and you’re confident you will never need to move or rename folders. In fixed mode, folder changes can break links. (https://cloudinary.com/documentation/dam_folder_modes) 
+ One important caveat: you can’t change folder mode on an existing product environment, and once you migrate to dynamic you can’t revert. So test it on a non production environment first. (https://cloudinary.com/documentation/account_settings) 
+ 
+Sources:
+Folder Modes | Documentation (https://cloudinary.com/documentation/folder_modes)
+Account Console Settings for Developers | Documentation (https://cloudinary.com/documentation/account_settings)
+Assets (Digital Asset Management) - Account Console Settings | Documentation (https://cloudinary.com/documentation/dam_admin_settings)
+Folder modes | Documentation (https://cloudinary.com/documentation/dam_folder_modes)
+
+04:32 AM | Ask Cloudinary AI: Is that what you were looking for?
+
+04:34 AM | Krieta Group LTD: how should i set my signed upload preset folder when creating it?
+
+04:34 AM | Ask Cloudinary AI: Set the preset’s Folder to a single “catch all” folder (for example Krieta/uploads), not one folder per module. That way you can still control the real destination folder from your backend signature, and keep your module-based hierarchy. (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc) (https://cloudinary.com/documentation/dam_admin_upload_presets) 
+ If your product environment is in dynamic folders mode, the preset’s Folder is still supported, but it’s recommended to use asset_folder in the upload request instead of folder for new code. (https://cloudinary.com/documentation/upload_widget_reference) (https://cloudinary.com/documentation/folder_modes) 
+ So in the dashboard, keep the preset Folder simple, and let your backend decide the exact module folder at upload time. 
+ 
+Sources:
+Assets (Digital Asset Management) - Upload Presets | Documentation (https://cloudinary.com/documentation/dam_admin_upload_presets)
+Upload Widget API reference | Documentation (https://cloudinary.com/documentation/upload_widget_reference)
+Folder Modes | Documentation (https://cloudinary.com/documentation/folder_modes)
+Upload Presets | Documentation (https://cloudinary.com/documentation/upload_presets)
+The Vibecoder Storefront: Automating Premium UGC With TanStack Start and Cloudinary AI (https://cloudinary.com/blog/vibecoder-storefront-automating-premium-ugc)
+
+04:34 AM | Ask Cloudinary AI: Did that answer your question?
+
+04:35 AM | Krieta Group LTD: should i set asset folder or it's not a must?
+
+04:35 AM | Ask Cloudinary AI: It’s not a must, but you should use asset_folder if your product environment is in dynamic folders mode. In dynamic mode, the old folder parameter is deprecated, and asset_folder is the recommended way to control where the asset shows up in the Media Library. (https://cloudinary.com/documentation/image_upload_api_reference) (https://cloudinary.com/documentation/folder_modes) 
+ If you’re in fixed folders mode, you can keep using folder (and asset_folder is not relevant there). 
+ One extra note: asset_folder only affects the asset’s location in the UI, not the public ID path (unless you also use use_asset_folder_as_public_id_prefix). (https://cloudinary.com/documentation/upload_presets) 
+ 
+Sources:
+Upload API Reference | Documentation (https://cloudinary.com/documentation/image_upload_api_reference)
+Folder Modes | Documentation (https://cloudinary.com/documentation/folder_modes)
+Upload Presets | Documentation (https://cloudinary.com/documentation/upload_presets)
+Assets (Digital Asset Management) - Upload Presets | Documentation (https://cloudinary.com/documentation/dam_admin_upload_presets)
+
+04:35 AM | Ask Cloudinary AI: Does that help?
+
+04:38 AM | Krieta Group LTD: so what name should i give my signed upload preset name? what name should i give the asset folder? do i need to set asset folder in my backend code or just in the dashboard?
+​
+
+04:38 AM | Ask Cloudinary AI: For the signed upload preset name, pick something simple and descriptive like krieta_signed or krieta_signed_uploads. The name is just for you to identify the preset in the dashboard and in your code (you’ll pass it as upload_preset). (https://cloudinary.com/blog/centralized_control_for_image_upload_image_size_format_thumbnail_generation_tagging_and_more) 
+ For the asset folder, use a single “catch all” folder in the preset, like Krieta/uploads. That keeps the preset simple, and you still control the real module folder from your backend signature (so your module hierarchy stays). (https://cloudinary.com/documentation/dam_admin_upload_presets) 
+ You should set asset_folder in your backend code (in the upload request), not only in the dashboard. In dynamic folder mode, asset_folder is the recommended way to control where the asset shows in the Media Library, and it does not affect the public ID path unless you also use use_asset_folder_as_public_id_prefix. (https://cloudinary.com/documentation/folder_modes) (https://cloudinary.com/documentation/image_upload_api_reference) 
+ 
+Sources:
+Assets (Digital Asset Management) - Upload Presets | Documentation (https://cloudinary.com/documentation/dam_admin_upload_presets)
+Folder Modes | Documentation (https://cloudinary.com/documentation/folder_modes)
+Upload Presets | Documentation (https://cloudinary.com/documentation/upload_presets)
+Upload API Reference | Documentation (https://cloudinary.com/documentation/image_upload_api_reference)
+Central control for image upload and post-upload actions (https://cloudinary.com/blog/centralized_control_for_image_upload_image_size_format_thumbnail_generation_tagging_and_more)
+
+04:38 AM | Ask Cloudinary AI: Is that what you were looking for?
+
+04:42 AM | Krieta Group LTD: under optimize and deliver tab should i set access control? if yes, what should i set it to?
+should i set format?
+should i set allowed formats?
+should i Discard original file name when delivering assets as attachments?
+
+04:42 AM | Ask Cloudinary AI: For your signed upload preset, set Access control only if you need to restrict who can view the delivered URL. If you want it open, leave it Public. If you want it protected, set it to Restricted (this is a premium feature and may not be enabled on every account). (https://cloudinary.com/documentation/dam_admin_upload_presets) (https://cloudinary.com/documentation/ecommerce_workflows_product) 
+ Set Format only if you want every upload converted to a specific format (for example, force everything to jpg). If you want to keep original formats, leave it off. 
+ Set Allowed formats if you want to limit uploads to specific file types (recommended for security, especially if you ever use unsigned presets). (https://cloudinary.com/documentation/upload_presets) 
+ “Discard original file name when delivering assets as attachments” is not covered in the options I have here, so I can’t confirm what it does or what to set it to. 
+ 
+Sources:
+Assets (Digital Asset Management) - Upload Presets | Documentation (https://cloudinary.com/documentation/dam_admin_upload_presets)
+Product Asset Workflows | Documentation (https://cloudinary.com/documentation/ecommerce_workflows_product)
+Upload Presets | Documentation (https://cloudinary.com/documentation/upload_presets)
+Upload API Reference | Documentation (https://cloudinary.com/documentation/image_upload_api_reference)
+
+04:42 AM | Ask Cloudinary AI: Did that answer your question?
+
+04:44 AM | Krieta Group LTD: if i set Access control to private will users see the post another user has posted in my app?
+
+04:44 AM | Ask Cloudinary AI: If you set Access control to Private (or Restricted), then users will only be able to view that asset if they have both the asset URL and an authentication token. So in your app, if you don’t provide that token to other users, they won’t be able to see the post’s media. (https://cloudinary.com/documentation/dam_admin_digital_rights_management) (https://cloudinary.com/blog/dam_for_developers_access_control) 
+ If you want users to see each other’s posts, keep the asset Public (or don’t enable access control). 
+ One extra nuance: if you upload with type: private, the original file is only accessible via a signed URL, but transformed versions can still be public unless you enable strict transformations. (https://cloudinary.com/documentation/upload_parameters) (https://cloudinary.com/documentation/control_access_to_media) 
+ 
+Sources:
+Customizing uploads | Documentation (https://cloudinary.com/documentation/upload_parameters)
+DAM - Digital Rights Management | Documentation (https://cloudinary.com/documentation/dam_admin_digital_rights_management)
+Media Access Control and Authentication | Documentation (https://cloudinary.com/documentation/control_access_to_media)
+DAM for Developers: Access Control (https://cloudinary.com/blog/dam_for_developers_access_control)
+
+04:44 AM | Ask Cloudinary AI: Was this helpful?
+
+---
+Exported from Cloudinary on April 16, 2026 at 04:46 AM Central Time (US & Canada) time CDT (GMT-0500)

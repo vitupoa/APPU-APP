@@ -1,6 +1,6 @@
 package com.krieta.com.core.di
 
-import com.krieta.com.core.location.LocationProvider
+import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.com.core.network.KtorClientFactory
 import com.krieta.com.core.security.TokenManager
 import com.krieta.feature.auth.di.authModule
@@ -21,16 +21,17 @@ expect fun platformModule(): Module
 val coreModule = module {
     single<HttpClient> { KtorClientFactory.create(get<TokenManager>()) }
     single { WebSocketService(get(), get()) }
-    single { LocationProvider() }
     single { com.krieta.com.core.network.CloudinaryUploader(get()) }
+    // UserCurrencyProvider depends on LocationProvider (from platformModule) + WalletRepository (from walletModule)
+    single { UserCurrencyProvider(get(), get()) }
 }
 
 val appModules: List<Module>
     get() = listOf(
+        platformModule(),  // LocationProvider lives here (platform-specific)
+        walletModule,      // WalletRepository must be available before coreModule's UserCurrencyProvider
         coreModule,
-        platformModule(),
         authModule,
-        walletModule,
         shortsModule,
         feedModule,
         contestsModule,

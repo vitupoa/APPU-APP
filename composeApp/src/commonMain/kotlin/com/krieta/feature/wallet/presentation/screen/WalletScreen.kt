@@ -3,9 +3,6 @@ package com.krieta.feature.wallet.presentation.screen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 
-
-import androidx.compose.runtime.collectAsState
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,6 +28,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.krieta.com.core.location.LocationProvider
+import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.com.core.theme.GlassmorphicContainer
 import com.krieta.com.core.theme.bounceClick
 import com.krieta.com.core.theme.KrietaColors
@@ -39,6 +38,7 @@ import com.krieta.feature.wallet.domain.model.Transaction
 import com.krieta.feature.wallet.domain.model.TransactionType
 import com.krieta.feature.wallet.presentation.viewmodel.WalletState
 import com.krieta.feature.wallet.presentation.viewmodel.WalletViewModel
+import org.koin.compose.koinInject
 
 class WalletScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -47,12 +47,16 @@ class WalletScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinScreenModel<WalletViewModel>()
         val state by viewModel.state.collectAsState()
+        val locationProvider = koinInject<LocationProvider>()
+        val currencyProvider = koinInject<UserCurrencyProvider>()
+        val exchangeRate by currencyProvider.exchangeRate.collectAsState()
         
         var isBalanceHidden by remember { mutableStateOf(false) }
         
-        val currentRegion = androidx.compose.ui.text.intl.Locale.current.region
-        LaunchedEffect(currentRegion) {
-            viewModel.fetchWalletData(currentRegion)
+        // Use LocationProvider for real country detection (SIM-based)
+        val countryCode = remember { locationProvider.getCurrentCountry() }
+        LaunchedEffect(countryCode) {
+            viewModel.fetchWalletData(countryCode)
         }
 
         Scaffold(
@@ -77,7 +81,7 @@ class WalletScreen : Screen {
                         ) {
                             Text("Failed to load wallet", color = MaterialTheme.colorScheme.error)
                             Spacer(modifier = Modifier.height(8.dp))
-                            Button(onClick = { viewModel.fetchWalletData() }) {
+                            Button(onClick = { viewModel.fetchWalletData(countryCode) }) {
                                 Text("Retry")
                             }
                         }
@@ -126,7 +130,7 @@ class WalletScreen : Screen {
                                         
                                         Spacer(modifier = Modifier.height(12.dp))
                                         
-                                        // Golden Kr Amount mapped elegantly
+                                        // Golden Kr Amount
                                         Text(
                                             text = if (isBalanceHidden) "Kr ****" else KrCurrencyFormatter.formatKr(currentState.balance.krBalance),
                                             style = MaterialTheme.typography.displayMedium,
@@ -134,7 +138,7 @@ class WalletScreen : Screen {
                                         )
                                         Spacer(modifier = Modifier.height(4.dp))
                                         
-                                        // Subtle Fiat mapping seamlessly aligned
+                                        // Real-time fiat equivalent based on detected location
                                         Text(
                                             text = if (isBalanceHidden) "~ $**.**" else "~ " + KrCurrencyFormatter.formatFiat(
                                                 currentState.balance.fiatEquivalent,
@@ -146,7 +150,7 @@ class WalletScreen : Screen {
 
                                         Spacer(modifier = Modifier.height(32.dp))
                                         
-                                        // Action Buttons - Organic Bounce Click enabled!
+                                        // Action Buttons
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceEvenly
@@ -186,7 +190,7 @@ class WalletScreen : Screen {
                                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                                 ) {
                                     items(currentState.recentTransactions) { tx ->
-                                        TransactionItem(tx)
+                                        TransactionItem(tx, currencyProvider)
                                     }
                                 }
                             }
@@ -222,11 +226,15 @@ class WalletScreen : Screen {
     }
 
     @Composable
-    private fun TransactionItem(transaction: Transaction) {
+    private fun TransactionItem(transaction: Transaction, currencyProvider: UserCurrencyProvider) {
         val isPositive = when (transaction.type) {
             TransactionType.TOPUP, TransactionType.TIP_RECEIVED, TransactionType.CONTEST_PRIZE, TransactionType.SUBSCRIPTION_EARNED -> true
             else -> false
         }
+        
+        // Calculate fiat equivalent for this transaction
+        val fiatAmount = currencyProvider.krToFiat(transaction.amountKr)
+        val currencyCode = currencyProvider.currencyCode
         
         Row(
             modifier = Modifier
@@ -259,20 +267,28 @@ class WalletScreen : Screen {
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = transaction.createdAt.take(10), // Simplistic date format, adapt with DateTimeUtil
+                    text = transaction.createdAt.take(10),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             
-            Text(
-                text = (if (isPositive) "+" else "-") + KrCurrencyFormatter.formatKr(transaction.amountKr),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = if (isPositive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = (if (isPositive) "+" else "-") + KrCurrencyFormatter.formatKr(transaction.amountKr),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isPositive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                )
+                if (fiatAmount > 0) {
+                    Text(
+                        text = "~${KrCurrencyFormatter.formatFiat(fiatAmount, currencyCode)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     }
 }
-

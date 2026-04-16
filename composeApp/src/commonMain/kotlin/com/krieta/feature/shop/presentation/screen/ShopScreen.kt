@@ -29,8 +29,10 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.krieta.com.core.util.KrCurrencyFormatter
+import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.feature.shop.domain.model.Product
 import com.krieta.feature.shop.presentation.viewmodel.ShopListViewModel
+import org.koin.compose.koinInject
 
 class ShopScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +41,8 @@ class ShopScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinScreenModel<ShopListViewModel>()
         val state by viewModel.state.collectAsState()
+        val currencyProvider = koinInject<UserCurrencyProvider>()
+        val exchangeRate by currencyProvider.exchangeRate.collectAsState()
 
         Scaffold(
             topBar = {
@@ -87,7 +91,11 @@ class ShopScreen : Screen {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(state.items, key = { it.id }) { product ->
-                            ProductCard(product, onClick = { navigator.push(ProductDetailScreen(product.id)) })
+                            ProductCard(
+                                product = product, 
+                                currencyProvider = currencyProvider,
+                                onClick = { navigator.push(ProductDetailScreen(product.id)) }
+                            )
                         }
 
                         if (state.nextCursor != null) {
@@ -129,7 +137,7 @@ class ShopScreen : Screen {
     }
 
     @Composable
-    private fun ProductCard(product: Product, onClick: () -> Unit) {
+    private fun ProductCard(product: Product, currencyProvider: UserCurrencyProvider, onClick: () -> Unit) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -160,10 +168,12 @@ class ShopScreen : Screen {
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        KrCurrencyFormatter.formatKr(product.priceKr),
+                        currencyProvider.formatWithFiat(product.priceKr),
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
-                        fontSize = 15.sp
+                        fontSize = 15.sp,
+                        maxLines = 2,
+                        minLines = 2
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(

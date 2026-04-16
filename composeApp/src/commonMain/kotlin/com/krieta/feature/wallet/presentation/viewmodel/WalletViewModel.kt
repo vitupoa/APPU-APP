@@ -2,6 +2,8 @@ package com.krieta.feature.wallet.presentation.viewmodel
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.krieta.com.core.location.LocationProvider
+import com.krieta.com.core.location.CurrencyMapper
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.wallet.domain.model.Transaction
 import com.krieta.feature.wallet.domain.model.WalletBalance
@@ -49,7 +51,7 @@ class WalletViewModel(
                             val updatedBalance = currentState.balance.copy(krBalance = newBalance)
                             _state.value = currentState.copy(balance = updatedBalance)
                         } catch (e: NumberFormatException) {
-                            // Safely ignore parse failures organically
+                            // Safely ignore parse failures
                         }
                     }
                 } catch (e: Exception) {
@@ -59,8 +61,8 @@ class WalletViewModel(
         }
     }
 
-    fun fetchWalletData(regionCode: String? = null) {
-        val targetCurrency = regionCode?.let { getCurrencyFromRegion(it) }
+    fun fetchWalletData(countryCode: String) {
+        val targetCurrency = CurrencyMapper.getCurrencyForCountry(countryCode)
         screenModelScope.launch {
             _state.value = WalletState.Loading
             
@@ -86,24 +88,5 @@ class WalletViewModel(
     override fun onDispose() {
         webSocketService.disconnect()
         super.onDispose()
-    }
-
-    private fun getCurrencyFromRegion(region: String): String {
-        return when (region.uppercase()) {
-            "US" -> "USD"
-            "KE" -> "KES"
-            "GB", "UK" -> "GBP"
-            "DE", "FR", "IT", "ES", "NL", "IE" -> "EUR"
-            "IN" -> "INR"
-            "NG" -> "NGN"
-            "ZA" -> "ZAR"
-            "CA" -> "CAD"
-            "AU" -> "AUD"
-            "JP" -> "JPY"
-            "TZ" -> "TZS"
-            "UG" -> "UGX"
-            "RW" -> "RWF"
-            else -> "USD" // Default fallback
-        }
     }
 }

@@ -1,5 +1,6 @@
 package com.krieta.feature.wallet.di
 
+import com.krieta.com.core.location.LocationProvider
 import com.krieta.feature.wallet.data.remote.WalletApi
 import com.krieta.feature.wallet.data.repository.WalletRepositoryImpl
 import com.krieta.feature.wallet.domain.repository.WalletRepository
@@ -13,6 +14,12 @@ val walletModule = module {
     single<WalletRepository> { WalletRepositoryImpl(get()) }
 
     factory { WalletViewModel(get(), get()) }
-    factory { TopupViewModel(get(), "USD") } // TODO: inject from user session currency
-    factory { WithdrawViewModel(get(), "USD") } // TODO: inject from user session currency
+    factory {
+        val locationProvider = get<LocationProvider>()
+        TopupViewModel(get(), locationProvider.getCurrentCurrency())
+    }
+    factory {
+        val locationProvider = get<LocationProvider>()
+        WithdrawViewModel(get(), locationProvider.getCurrentCurrency())
+    }
 }
