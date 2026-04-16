@@ -20,6 +20,7 @@ data class CloudinarySignatureDto(
     val signature: String,
     val timestamp: Long,
     val folder: String,
+    val resourceType: String,
     val apiKey: String,
     val cloudName: String
 )
@@ -55,8 +56,10 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
     suspend fun uploadMedia(folder: String, fileBytes: ByteArray, isVideo: Boolean = false): NetworkResult<String> {
         return safeApiCall {
             // 1. Get Signature from our backend
+            val resourceType = if (isVideo) "video" else "image"
             val signatureResponse = authenticatedClient.get("${ApiConstants.API_VERSION}/media/upload-signature") {
                 parameter("folder", folder)
+                parameter("resourceType", resourceType)
             }
             
             if (!signatureResponse.status.let { it.value in 200..299 }) {
@@ -64,9 +67,15 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             }
             
             val signatureDto: CloudinarySignatureDto = signatureResponse.body()
+            
+            // Enhanced logging for debugging
+            println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}")
 
             // 2. Upload to Cloudinary directly
-            val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${if (isVideo) "video" else "image"}/upload"
+            val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
+            
+            println("Cloudinary Upload URL: $uploadUrl")
+            println("Cloudinary Upload Parameters: api_key=${signatureDto.apiKey}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resource_type=${signatureDto.resourceType}")
             
             val uploadResponse = plainClient.post(uploadUrl) {
                 setBody(
@@ -76,6 +85,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                             append("timestamp", signatureDto.timestamp.toString())
                             append("signature", signatureDto.signature)
                             append("folder", signatureDto.folder)
+                            append("resource_type", signatureDto.resourceType)
                             append("file", fileBytes, Headers.build {
                                 append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                 append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
@@ -88,6 +98,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             if (uploadResponse.status.value !in 200..299) {
                 val errorBody = uploadResponse.bodyAsText()
                 println("Cloudinary RAW ERROR: $errorBody")
+                println("Cloudinary Error Context: timestamp=${signatureDto.timestamp}, signature=${signatureDto.signature}, folder=${signatureDto.folder}, resource_type=${signatureDto.resourceType}")
                 throw Exception("Cloudinary upload failed (HTTP ${uploadResponse.status.value}): $errorBody")
             }
 

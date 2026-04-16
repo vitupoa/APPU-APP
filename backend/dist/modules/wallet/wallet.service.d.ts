@@ -3,7 +3,7 @@ export declare class WalletService {
     /**
      * Retrieves the wallet balance ensuring a wallet exists.
      */
-    static getBalance(userId: string): Promise<{
+    static getBalance(userId: string, targetCurrency?: string): Promise<{
         krBalance: Prisma.Decimal;
         fiatEquivalent: number;
         currency: string;
@@ -31,6 +31,14 @@ export declare class WalletService {
         reference: string | null;
         counterpartyId: string | null;
         metadata: Prisma.JsonValue | null;
+    }[]>;
+    static searchUsers(query: string): Promise<{
+        isLovers: boolean;
+        id: string;
+        username: string;
+        displayName: string;
+        avatarUrl: string | null;
+        isVerified: boolean;
     }[]>;
 }
 //# sourceMappingURL=wallet.service.d.ts.map

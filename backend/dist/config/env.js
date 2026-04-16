@@ -21,9 +21,9 @@ const envSchema = zod_1.z.object({
     JWT_ACCESS_EXPIRY: zod_1.z.string().default('15m'),
     JWT_REFRESH_EXPIRY: zod_1.z.string().default('7d'),
     // Cloudinary
-    CLOUDINARY_CLOUD_NAME: zod_1.z.string().min(1),
-    CLOUDINARY_API_KEY: zod_1.z.string().min(1),
-    CLOUDINARY_API_SECRET: zod_1.z.string().min(1),
+    CLOUDINARY_CLOUD_NAME: zod_1.z.string().trim().min(1),
+    CLOUDINARY_API_KEY: zod_1.z.string().trim().min(1),
+    CLOUDINARY_API_SECRET: zod_1.z.string().trim().min(1),
     // PayPal
     PAYPAL_CLIENT_ID: zod_1.z.string().optional(),
     PAYPAL_CLIENT_SECRET: zod_1.z.string().optional(),

@@ -8,7 +8,7 @@ class WalletService {
     /**
      * Retrieves the wallet balance ensuring a wallet exists.
      */
-    static async getBalance(userId) {
+    static async getBalance(userId, targetCurrency) {
         let wallet = await database_1.prisma.wallet.findUnique({
             where: { userId },
             include: { user: { select: { isWalletUnlocked: true, currency: true } } }
@@ -19,13 +19,16 @@ class WalletService {
                 include: { user: { select: { isWalletUnlocked: true, currency: true } } }
             });
         }
+        const currencyToUse = targetCurrency || wallet.user.currency;
         // Convert Kr balance to user fiat equivalent contextually
-        const fiatRate = await exchange_service_1.ExchangeService.getRate(wallet.user.currency);
-        const fiatEquivalent = Number(wallet.krBalance) * fiatRate;
+        // 1 Kr = $0.01 USD. Apply the exchange rate to the USD base equivalent
+        const fiatRate = await exchange_service_1.ExchangeService.getRate(currencyToUse);
+        const baseUsd = Number(wallet.krBalance) / 100;
+        const fiatEquivalent = baseUsd * fiatRate;
         return {
             krBalance: wallet.krBalance,
             fiatEquivalent,
-            currency: wallet.user.currency,
+            currency: currencyToUse,
             isWalletUnlocked: wallet.user.isWalletUnlocked
         };
     }
@@ -121,6 +124,32 @@ class WalletService {
             skip: offset
         });
         return transactions;
+    }
+    static async searchUsers(query) {
+        if (!query || query.length < 2) {
+            return [];
+        }
+        // Search by username or display name
+        const users = await database_1.prisma.user.findMany({
+            where: {
+                OR: [
+                    { username: { contains: query, mode: 'insensitive' } },
+                    { displayName: { contains: query, mode: 'insensitive' } }
+                ]
+            },
+            take: 20,
+            select: {
+                id: true,
+                username: true,
+                displayName: true,
+                avatarUrl: true,
+                isVerified: true
+            }
+        });
+        return users.map(u => ({
+            ...u,
+            isLovers: false // Adjust if necessary
+        }));
     }
 }
 exports.WalletService = WalletService;

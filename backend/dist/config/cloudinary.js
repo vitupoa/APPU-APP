@@ -34,30 +34,25 @@ exports.CLOUDINARY_FOLDERS = {
 /**
  * Generate signed upload params for client-side direct upload.
  * Enforces folder routing — client cannot choose arbitrary folders.
+ *
+ * IMPORTANT: All parameters sent in the upload request (except file and api_key)
+ * must be included in the signature generation. This includes timestamp, folder,
+ * and resource_type. Cloudinary will reject the upload if any signed parameter
+ * is missing from the signature.
+ *
+ * @param folder - The Cloudinary folder path for organizing uploads
+ * @param resourceType - The type of resource being uploaded ('image', 'video', or 'raw')
  */
-function generateUploadSignature(folder) {
+function generateUploadSignature(folder, resourceType = 'image') {
     const timestamp = Math.round(Date.now() / 1000);
-    // Eager optimizations offloading thumbnails to Cloudinary Infrastructure asynchronously
-    const eagerTransformations = folder.includes('Videos')
-        ? 'c_fill,h_400,w_400,f_auto,so_0'
-        : 'c_fill,w_400,h_400,f_auto';
-    const params = {
-        timestamp,
-        folder,
-        upload_preset: 'krieta_signed',
-        eager: eagerTransformations,
-        eager_async: true,
-    };
-    const signature = cloudinary_1.v2.utils.api_sign_request(params, env_1.env.CLOUDINARY_API_SECRET);
+    const signature = cloudinary_1.v2.utils.api_sign_request({ timestamp, folder, resource_type: resourceType }, env_1.env.CLOUDINARY_API_SECRET);
     return {
         signature,
         timestamp,
         folder,
+        resourceType,
         apiKey: env_1.env.CLOUDINARY_API_KEY,
         cloudName: env_1.env.CLOUDINARY_CLOUD_NAME,
-        uploadPreset: 'krieta_signed',
-        eager: eagerTransformations,
-        eagerAsync: true,
     };
 }
 /**

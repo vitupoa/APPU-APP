@@ -10,6 +10,7 @@ router.get('/balance', wallet_controller_1.WalletController.getBalance);
 router.post('/tip', wallet_controller_1.WalletController.sendTip);
 router.get('/transactions', wallet_controller_1.WalletController.getTransactions);
 router.get('/exchange-rate', wallet_controller_1.WalletController.getExchangeRate);
+router.get('/search-users', wallet_controller_1.WalletController.searchUsers);
 // TODO: Add top-up and withdraw logic based on payment SDK endpoints later
 exports.default = router;
 //# sourceMappingURL=wallet.routes.js.map

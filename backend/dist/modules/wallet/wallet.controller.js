@@ -7,7 +7,8 @@ const wallet_validation_1 = require("./wallet.validation");
 class WalletController {
     static async getBalance(req, res) {
         try {
-            const result = await wallet_service_1.WalletService.getBalance(req.userId);
+            const targetCurrency = req.query.currency;
+            const result = await wallet_service_1.WalletService.getBalance(req.userId, targetCurrency);
             res.status(200).json(result);
         }
         catch (error) {
@@ -34,6 +35,16 @@ class WalletController {
             const limit = req.query.limit ? parseInt(req.query.limit) : 20;
             const offset = req.query.offset ? parseInt(req.query.offset) : 0;
             const result = await wallet_service_1.WalletService.getTransactions(req.userId, limit, offset);
+            res.status(200).json(result);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+    static async searchUsers(req, res) {
+        try {
+            const query = req.query.query || '';
+            const result = await wallet_service_1.WalletService.searchUsers(query);
             res.status(200).json(result);
         }
         catch (error) {
