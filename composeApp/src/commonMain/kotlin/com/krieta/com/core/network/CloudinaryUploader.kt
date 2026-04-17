@@ -88,11 +88,11 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                append("api_key", signatureDto.apiKey)
+                                // For fully signed uploads: send timestamp, signature, folder, and file
+                                // Do NOT send api_key (that triggers unsigned upload validation)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
                                 append("folder", signatureDto.folder)
-                                // Don't send upload_preset for fully signed uploads
                                 append("file", fileBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
@@ -130,11 +130,11 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                append("api_key", signatureDto.apiKey)
+                                // For fully signed uploads: send timestamp, signature, folder, and file
+                                // Do NOT send api_key (that triggers unsigned upload validation)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
                                 append("folder", signatureDto.folder)
-                                // Don't send upload_preset for fully signed uploads
                                 append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
