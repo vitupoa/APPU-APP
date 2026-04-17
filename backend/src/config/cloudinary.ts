@@ -67,7 +67,6 @@ export function generateUploadSignature(
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
-    uploadPreset: undefined, // Don't use preset
   };
 }
 

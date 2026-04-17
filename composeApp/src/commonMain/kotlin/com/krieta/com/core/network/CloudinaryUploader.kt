@@ -23,8 +23,8 @@ data class CloudinarySignatureDto(
     val folder: String,
     val resourceType: String,
     val apiKey: String,
-    val cloudName: String,
-    val uploadPreset: String? = null
+    val cloudName: String
+    // uploadPreset is not needed for fully signed uploads
 )
 
 @Serializable
@@ -70,10 +70,10 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             
             val signatureDto: CloudinarySignatureDto = signatureResponse.body()
             
-            println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}, uploadPreset=${signatureDto.uploadPreset}")
+            println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}")
 
             // 2. Upload to Cloudinary directly
-            // For signed uploads with a preset: send api_key, timestamp, signature, folder, upload_preset, file.
+            // For fully signed uploads: send timestamp, signature, folder, and file. Do NOT send api_key or upload_preset.
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
             
             println("Cloudinary Upload URL: $uploadUrl")
