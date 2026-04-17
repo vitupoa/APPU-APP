@@ -91,8 +91,8 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                                 append("api_key", signatureDto.apiKey)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
-                                append("upload_preset", signatureDto.uploadPreset ?: "Krieta")
-                                // Do NOT send folder - the preset controls it
+                                append("folder", signatureDto.folder)
+                                // Don't send upload_preset for fully signed uploads
                                 append("file", fileBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
@@ -133,8 +133,8 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                                 append("api_key", signatureDto.apiKey)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
-                                append("upload_preset", signatureDto.uploadPreset ?: "Krieta")
-                                // Do NOT send folder - the preset controls it
+                                append("folder", signatureDto.folder)
+                                // Don't send upload_preset for fully signed uploads
                                 append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
