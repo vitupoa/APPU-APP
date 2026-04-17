@@ -20,11 +20,10 @@ import kotlinx.serialization.Serializable
 data class CloudinarySignatureDto(
     val signature: String,
     val timestamp: Long,
-    val folder: String,
+    val uploadPreset: String,
     val resourceType: String,
     val apiKey: String,
     val cloudName: String
-    // uploadPreset is not needed for fully signed uploads
 )
 
 @Serializable
@@ -70,10 +69,10 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             
             val signatureDto: CloudinarySignatureDto = signatureResponse.body()
             
-            println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}")
+            println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, uploadPreset=${signatureDto.uploadPreset}, resourceType=${signatureDto.resourceType}")
 
             // 2. Upload to Cloudinary directly
-            // For fully signed uploads: send timestamp, signature, folder, and file. Do NOT send api_key or upload_preset.
+            // For signed uploads with a preset: send api_key, timestamp, signature, upload_preset, and file.
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
             
             println("Cloudinary Upload URL: $uploadUrl")
@@ -88,11 +87,11 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                // For fully signed uploads: send api_key, timestamp, signature, folder, and file
+                                // For signed uploads with a preset: send api_key, timestamp, signature, upload_preset, and file
                                 append("api_key", signatureDto.apiKey)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
-                                append("folder", signatureDto.folder)
+                                append("upload_preset", signatureDto.uploadPreset)
                                 append("file", fileBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
@@ -130,11 +129,11 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                // For fully signed uploads: send api_key, timestamp, signature, folder, and file
+                                // For signed uploads with a preset: send api_key, timestamp, signature, upload_preset, and file
                                 append("api_key", signatureDto.apiKey)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
-                                append("folder", signatureDto.folder)
+                                append("upload_preset", signatureDto.uploadPreset)
                                 append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")

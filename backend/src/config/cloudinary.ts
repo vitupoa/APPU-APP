@@ -47,12 +47,13 @@ export function generateUploadSignature(
   resourceType: 'image' | 'video' | 'raw' = 'image'
 ) {
   const timestamp = Math.round(Date.now() / 1000);
+  const uploadPreset = 'Krieta'; // Signed upload preset name
 
-  // For fully signed uploads without preset, sign timestamp and folder.
-  // Don't use upload_preset at all - just do a pure signed upload.
+  // For signed upload presets: sign timestamp and upload_preset
+  // The folder is controlled by the preset itself (Krieta/uploads), not by the signature
   const payloadToSign: Record<string, any> = { 
-    folder,
     timestamp,
+    upload_preset: uploadPreset,
   };
   
   const signature = cloudinary.utils.api_sign_request(
@@ -63,7 +64,7 @@ export function generateUploadSignature(
   return {
     signature,
     timestamp,
-    folder,
+    uploadPreset,
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
