@@ -48,17 +48,12 @@ export function generateUploadSignature(
 ) {
   const timestamp = Math.round(Date.now() / 1000);
 
-  // For signed uploads, sign the params Cloudinary verifies.
-  // We include upload_preset to support Signed Upload Presets.
-  // We include folder to allow dynamic routing to sub-folders (ensure "Allow override" is enabled in preset).
+  // For signed upload presets, only sign timestamp and upload_preset.
+  // The folder is controlled by the preset itself, not the signature.
   const payloadToSign: Record<string, any> = { 
-    timestamp, 
-    folder,
+    timestamp,
+    upload_preset: 'Krieta',
   };
-
-  if (env.CLOUDINARY_UPLOAD_PRESET) {
-    payloadToSign.upload_preset = env.CLOUDINARY_UPLOAD_PRESET;
-  }
   
   const signature = cloudinary.utils.api_sign_request(
     payloadToSign,
@@ -72,7 +67,7 @@ export function generateUploadSignature(
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
-    uploadPreset: env.CLOUDINARY_UPLOAD_PRESET,
+    uploadPreset: 'Krieta',
   };
 }
 
