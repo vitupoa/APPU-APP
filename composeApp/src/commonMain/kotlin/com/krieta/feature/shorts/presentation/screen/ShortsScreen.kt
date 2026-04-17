@@ -86,11 +86,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 }
             }
 
-            ShortsTabBar(
-                activeTab = state.activeTab,
-                onTabSelected = { viewModel.selectTab(it) },
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
+
 
             if (state.isLoadingMore) {
                 CircularProgressIndicator(
@@ -105,42 +101,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         }
     }
 
-    @Composable
-    private fun ShortsTabBar(
-        activeTab: ShortsTab,
-        onTabSelected: (ShortsTab) -> Unit,
-        modifier: Modifier = Modifier
-    ) {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(top = 48.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            ShortsTab.entries.forEach { tab ->
-                val isActive = tab == activeTab
-                TextButton(onClick = { onTabSelected(tab) }) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = tab.label,
-                            color = if (isActive) Color.White else Color.White.copy(alpha = 0.5f),
-                            fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                            fontSize = 15.sp
-                        )
-                        if (isActive) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Box(
-                                modifier = Modifier
-                                    .width(24.dp)
-                                    .height(2.dp)
-                                    .background(Color.White, shape = MaterialTheme.shapes.small)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
+
 
     @Composable
     private fun ShortItem(

@@ -40,6 +40,7 @@ import com.krieta.feature.profile.presentation.screen.MilestonesScreen
 import com.krieta.feature.profile.presentation.screen.EditProfileScreen
 import com.krieta.feature.wallet.presentation.screen.WalletScreen
 import com.krieta.com.core.theme.KrietaColors
+import androidx.compose.ui.platform.LocalUriHandler
 
 class ProfileScreen(val userId: String? = null) : Screen {
     override val key: cafe.adriel.voyager.core.screen.ScreenKey = "ProfileScreen_${userId ?: "me"}"
@@ -348,6 +349,7 @@ private fun BioLinkBottomSheet(
     var showAddLinkField by remember { mutableStateOf(false) }
     var newTitle by remember { mutableStateOf("") }
     var newUrl by remember { mutableStateOf("") }
+    val uriHandler = LocalUriHandler.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -394,7 +396,13 @@ private fun BioLinkBottomSheet(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .clickable { /* External Navigation logic */ },
+                        .clickable {
+                        val url = link.url.let { u ->
+                            if (u.startsWith("http://") || u.startsWith("https://")) u
+                            else "https://$u"
+                        }
+                        try { uriHandler.openUri(url) } catch (_: Exception) {}
+                    },
                     color = KrietaColors.SurfaceVariant,
                     border = BorderStroke(1.dp, KrietaColors.Outline.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(16.dp)

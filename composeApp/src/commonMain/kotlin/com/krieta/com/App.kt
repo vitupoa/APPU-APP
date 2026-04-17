@@ -1,23 +1,49 @@
 package com.krieta.com
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.krieta.feature.auth.presentation.screen.LoginScreen
+import com.krieta.com.core.navigation.MainScreen
+import com.krieta.com.core.security.TokenManager
 import com.krieta.com.core.theme.KrietaTheme
+import com.krieta.com.core.theme.KrietaColors
 import org.koin.compose.KoinContext
+import org.koin.compose.koinInject
+import kotlinx.coroutines.launch
 
 @Composable
 fun App() {
     KoinContext {
         KrietaTheme {
             Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                Navigator(LoginScreen()) { navigator ->
-                    SlideTransition(navigator)
+                val tokenManager = koinInject<TokenManager>()
+                var startScreen by remember { mutableStateOf<Screen?>(null) }
+
+                LaunchedEffect(Unit) {
+                    startScreen = if (tokenManager.isLoggedIn()) {
+                        MainScreen()
+                    } else {
+                        LoginScreen()
+                    }
+                }
+
+                if (startScreen != null) {
+                    Navigator(startScreen!!) { navigator ->
+                        SlideTransition(navigator)
+                    }
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = KrietaColors.Primary)
+                    }
                 }
             }
         }
