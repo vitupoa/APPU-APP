@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth.js';
 import { ShortsService } from './shorts.service.js';
 import { z } from 'zod';
-import { SubscriptionTierType } from '../../generated/client.js';
+import { SubscriptionTierType } from '../../generated/prisma/client.js';
 
 const router = Router();
 

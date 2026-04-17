@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '../../generated/client.js';
+import { Prisma } from '../../generated/prisma/client.js';
 
 export class ShopService {
   static async createProduct(data: {

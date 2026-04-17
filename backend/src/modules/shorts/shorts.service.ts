@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma, SubscriptionTierType } from '../../generated/client.js';
+import { Prisma, SubscriptionTierType } from '../../generated/prisma/client.js';
 import { emitLikeUpdate } from '../../shared/gateway/events.js';
 
 export class ShortsService {

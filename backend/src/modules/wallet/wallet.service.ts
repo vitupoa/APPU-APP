@@ -1,6 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
-import { Prisma } from '../../generated/client.js';
+import { Prisma } from '../../generated/prisma/client.js';
 
 export class WalletService {
   /**

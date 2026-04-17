@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '../../generated/client.js';
+import { Prisma } from '../../generated/prisma/client.js';
 import { emitVoteUpdate, emitContestUpdate } from '../../shared/gateway/events.js';
 
 const PLATFORM_FEE_RATE = 0.15; // 15%
