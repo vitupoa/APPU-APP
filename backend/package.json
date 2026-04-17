@@ -54,7 +54,7 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.4.9",
     "tsx": "^4.21.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.9.3"
   },
   "overrides": {
     "babel-plugin-istanbul": "^7.0.1",
