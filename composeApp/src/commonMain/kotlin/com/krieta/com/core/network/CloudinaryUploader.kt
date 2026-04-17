@@ -88,8 +88,8 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                // For fully signed uploads: send timestamp, signature, folder, and file
-                                // Do NOT send api_key (that triggers unsigned upload validation)
+                                // For fully signed uploads: send api_key, timestamp, signature, folder, and file
+                                append("api_key", signatureDto.apiKey)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
                                 append("folder", signatureDto.folder)
@@ -130,8 +130,8 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                // For fully signed uploads: send timestamp, signature, folder, and file
-                                // Do NOT send api_key (that triggers unsigned upload validation)
+                                // For fully signed uploads: send api_key, timestamp, signature, folder, and file
+                                append("api_key", signatureDto.apiKey)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
                                 append("folder", signatureDto.folder)
