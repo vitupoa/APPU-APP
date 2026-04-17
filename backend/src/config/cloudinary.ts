@@ -48,13 +48,17 @@ export function generateUploadSignature(
 ) {
   const timestamp = Math.round(Date.now() / 1000);
 
-  // For signed uploads, sign ONLY the params Cloudinary verifies.
-  // Do NOT include upload_preset — that triggers unsigned-mode validation.
-  // folder + timestamp is the standard signed upload approach.
+  // For signed uploads, sign the params Cloudinary verifies.
+  // We include upload_preset to support Signed Upload Presets.
+  // We include folder to allow dynamic routing to sub-folders (ensure "Allow override" is enabled in preset).
   const payloadToSign: Record<string, any> = { 
     timestamp, 
     folder,
   };
+
+  if (env.CLOUDINARY_UPLOAD_PRESET) {
+    payloadToSign.upload_preset = env.CLOUDINARY_UPLOAD_PRESET;
+  }
   
   const signature = cloudinary.utils.api_sign_request(
     payloadToSign,
@@ -68,6 +72,7 @@ export function generateUploadSignature(
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
+    uploadPreset: env.CLOUDINARY_UPLOAD_PRESET,
   };
 }
 

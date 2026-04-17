@@ -23,7 +23,8 @@ data class CloudinarySignatureDto(
     val folder: String,
     val resourceType: String,
     val apiKey: String,
-    val cloudName: String
+    val cloudName: String,
+    val uploadPreset: String? = null
 )
 
 @Serializable
@@ -72,8 +73,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}")
 
             // 2. Upload to Cloudinary directly
-            // For signed uploads: send api_key, timestamp, signature, folder, file.
-            // Do NOT send upload_preset — that's for unsigned uploads only.
+            // For signed uploads with a preset: send api_key, timestamp, signature, folder, upload_preset, file.
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
             
             println("Cloudinary Upload URL: $uploadUrl")
@@ -92,6 +92,9 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
                                 append("folder", signatureDto.folder)
+                                signatureDto.uploadPreset?.let { 
+                                    append("upload_preset", it)
+                                }
                                 append("file", fileBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
@@ -133,6 +136,9 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
                                 append("folder", signatureDto.folder)
+                                signatureDto.uploadPreset?.let { 
+                                    append("upload_preset", it)
+                                }
                                 append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
