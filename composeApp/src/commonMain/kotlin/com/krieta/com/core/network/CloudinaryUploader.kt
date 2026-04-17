@@ -20,11 +20,11 @@ import kotlinx.serialization.Serializable
 data class CloudinarySignatureDto(
     val signature: String,
     val timestamp: Long,
-    val assetFolder: String,
     val resourceType: String,
     val apiKey: String,
     val cloudName: String,
-    val uploadPreset: String
+    val uploadPreset: String? = null,
+    val folder: String? = null
 )
 
 @Serializable
@@ -71,13 +71,13 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             val signatureDto: CloudinarySignatureDto = signatureResponse.body()
             
             // Enhanced logging for debugging
-            println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.assetFolder}, resourceType=${signatureDto.resourceType}, preset=${signatureDto.uploadPreset}")
+            println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}, preset=${signatureDto.uploadPreset}")
 
             // 2. Upload to Cloudinary directly
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
             
             println("Cloudinary Upload URL: $uploadUrl")
-            println("Cloudinary Upload Parameters: api_key=${signatureDto.apiKey}, timestamp=${signatureDto.timestamp}, asset_folder=${signatureDto.assetFolder}, upload_preset=${signatureDto.uploadPreset}")
+            println("Cloudinary Upload Parameters: api_key=${signatureDto.apiKey}, timestamp=${signatureDto.timestamp}, upload_preset=${signatureDto.uploadPreset ?: "Krieta"}")
             println("Cloudinary Signature includes resource_type=${signatureDto.resourceType} (in URL path, not form data)")
             
             val chunkSize = 5 * 1024 * 1024 // 5 MB chunks
@@ -93,8 +93,8 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                                 append("api_key", signatureDto.apiKey)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
-                                append("asset_folder", signatureDto.assetFolder)
-                                append("upload_preset", signatureDto.uploadPreset)
+                                append("upload_preset", signatureDto.uploadPreset ?: "Krieta")
+                                signatureDto.folder?.let { append("folder", it) }
                                 // resource_type is in the URL path, NOT form data.
                                 // Cloudinary excludes it from signature verification.
                                 append("file", fileBytes, Headers.build {
@@ -137,8 +137,8 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                                 append("api_key", signatureDto.apiKey)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("signature", signatureDto.signature)
-                                append("asset_folder", signatureDto.assetFolder)
-                                append("upload_preset", signatureDto.uploadPreset)
+                                append("upload_preset", signatureDto.uploadPreset ?: "Krieta")
+                                signatureDto.folder?.let { append("folder", it) }
                                 append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")

@@ -11,13 +11,13 @@ export declare class FeedService {
                 username: string;
                 displayName: string;
                 avatarUrl: string | null;
-                accountType: import(".prisma/client").$Enums.AccountType;
+                accountType: import("../../generated/enums.js").AccountType;
                 isVerified: boolean;
             };
             imageUrls: string[];
             caption: string | null;
             isLocked: boolean;
-            requiredTier: import(".prisma/client").$Enums.SubscriptionTierType | null;
+            requiredTier: import("../../generated/enums.js").SubscriptionTierType | null;
             likesCount: number;
             commentsCount: number;
             isLiked: boolean;
@@ -49,7 +49,7 @@ export declare class FeedService {
         userId: string;
         caption: string | null;
         isLocked: boolean;
-        requiredTier: import(".prisma/client").$Enums.SubscriptionTierType | null;
+        requiredTier: import("../../generated/enums.js").SubscriptionTierType | null;
         likesCount: number;
         commentsCount: number;
         imageUrls: string[];
@@ -67,8 +67,8 @@ export declare class FeedService {
         };
         id: string;
         userId: string;
-        text: string;
         postId: string;
+        text: string;
     }>;
 }
 //# sourceMappingURL=feed.service.d.ts.map

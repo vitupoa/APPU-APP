@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 export declare class SubscriptionService {
     /**
      * Get creator's subscription tier config.
@@ -6,9 +5,9 @@ export declare class SubscriptionService {
     static getCreatorTiers(creatorId: string): Promise<{
         id: string;
         createdAt: Date;
+        krAmount: import("@prisma/client-runtime-utils").Decimal;
         creatorId: string;
-        tier: import(".prisma/client").$Enums.SubscriptionTierType;
-        krAmount: Prisma.Decimal;
+        tier: import("../../generated/enums.js").SubscriptionTierType;
         benefits: string;
         isEnabled: boolean;
     }[]>;
@@ -18,9 +17,9 @@ export declare class SubscriptionService {
     static getAvailableTiers(creatorId: string): Promise<{
         id: string;
         createdAt: Date;
+        krAmount: import("@prisma/client-runtime-utils").Decimal;
         creatorId: string;
-        tier: import(".prisma/client").$Enums.SubscriptionTierType;
-        krAmount: Prisma.Decimal;
+        tier: import("../../generated/enums.js").SubscriptionTierType;
         benefits: string;
         isEnabled: boolean;
     }[]>;
@@ -35,9 +34,9 @@ export declare class SubscriptionService {
     }[]): Promise<{
         id: string;
         createdAt: Date;
+        krAmount: import("@prisma/client-runtime-utils").Decimal;
         creatorId: string;
-        tier: import(".prisma/client").$Enums.SubscriptionTierType;
-        krAmount: Prisma.Decimal;
+        tier: import("../../generated/enums.js").SubscriptionTierType;
         benefits: string;
         isEnabled: boolean;
     }[]>;
@@ -47,9 +46,9 @@ export declare class SubscriptionService {
     static subscribe(subscriberId: string, creatorId: string, tierType: string): Promise<{
         status: string;
         id: string;
+        krAmount: import("@prisma/client-runtime-utils").Decimal;
         creatorId: string;
-        tier: import(".prisma/client").$Enums.SubscriptionTierType;
-        krAmount: Prisma.Decimal;
+        tier: import("../../generated/enums.js").SubscriptionTierType;
         subscriberId: string;
         tierId: string;
         startedAt: Date;
@@ -62,9 +61,9 @@ export declare class SubscriptionService {
     static unsubscribe(subscriberId: string, creatorId: string): Promise<{
         status: string;
         id: string;
+        krAmount: import("@prisma/client-runtime-utils").Decimal;
         creatorId: string;
-        tier: import(".prisma/client").$Enums.SubscriptionTierType;
-        krAmount: Prisma.Decimal;
+        tier: import("../../generated/enums.js").SubscriptionTierType;
         subscriberId: string;
         tierId: string;
         startedAt: Date;

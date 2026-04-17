@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
+import { AuthService } from './auth.service.js';
 import { 
   registerSchema, 
   loginSchema, 
@@ -7,7 +7,7 @@ import {
   refreshTokenSchema, 
   logoutSchema,
   checkUsernameSchema
-} from './auth.validation';
+} from './auth.validation.js';
 
 export class AuthController {
   static async register(req: Request, res: Response) {

@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserService = void 0;
-const database_1 = require("../../config/database");
+import { prisma } from '../../config/database.js';
 const SUBSCRIPTION_PLATFORM_FEE = 0.15; // 15%
-class UserService {
+export class UserService {
     /**
      * Get full user profile with relationship status and stats.
      */
     static async getProfile(userId, viewerId) {
-        const user = await database_1.prisma.user.findUniqueOrThrow({
+        const user = await prisma.user.findUniqueOrThrow({
             where: { id: userId },
             include: {
                 bioLinks: { orderBy: { sortOrder: 'asc' } },
@@ -22,16 +19,16 @@ class UserService {
             }
         });
         // Compute lovers count (mutual admires)
-        const loversCount = await database_1.prisma.admire.count({
+        const loversCount = await prisma.admire.count({
             where: { admirerId: userId, isLovers: true }
         });
         // Determine relationship status with viewer
         let relationshipStatus = 'NONE';
         if (viewerId && viewerId !== userId) {
-            const iAdmireThem = await database_1.prisma.admire.findUnique({
+            const iAdmireThem = await prisma.admire.findUnique({
                 where: { admirerId_admiredId: { admirerId: viewerId, admiredId: userId } }
             });
-            const theyAdmireMe = await database_1.prisma.admire.findUnique({
+            const theyAdmireMe = await prisma.admire.findUnique({
                 where: { admirerId_admiredId: { admirerId: userId, admiredId: viewerId } }
             });
             if (iAdmireThem && theyAdmireMe) {
@@ -73,7 +70,7 @@ class UserService {
      * Update own profile. Rejects name/username changes if wallet is unlocked.
      */
     static async updateProfile(userId, data) {
-        const user = await database_1.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+        const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
         // Identity lock check — reject name/username changes when wallet is unlocked
         if (user.isWalletUnlocked) {
             if (data.firstName || data.lastName || data.displayName || data.username) {
@@ -97,7 +94,7 @@ class UserService {
             if (data.username)
                 updateData.username = data.username;
         }
-        return database_1.prisma.user.update({ where: { id: userId }, data: updateData });
+        return prisma.user.update({ where: { id: userId }, data: updateData });
     }
     /**
      * Admire a user. If mutual, both records become lovers.
@@ -105,7 +102,7 @@ class UserService {
     static async admire(admirerId, admiredId) {
         if (admirerId === admiredId)
             throw new Error('Cannot admire yourself');
-        return database_1.prisma.$transaction(async (tx) => {
+        return prisma.$transaction(async (tx) => {
             // Create the admire record
             const admire = await tx.admire.create({
                 data: { admirerId, admiredId }
@@ -126,7 +123,7 @@ class UserService {
      * Unadmire a user. If they were lovers, both records lose lover status.
      */
     static async unadmire(admirerId, admiredId) {
-        return database_1.prisma.$transaction(async (tx) => {
+        return prisma.$transaction(async (tx) => {
             const admire = await tx.admire.findUnique({
                 where: { admirerId_admiredId: { admirerId, admiredId } }
             });
@@ -147,7 +144,7 @@ class UserService {
      * Get paginated list of users who admire the given userId.
      */
     static async getAdmirers(userId, cursor, limit = 20) {
-        const records = await database_1.prisma.admire.findMany({
+        const records = await prisma.admire.findMany({
             where: { admiredId: userId },
             take: limit + 1,
             ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
@@ -169,7 +166,7 @@ class UserService {
      * Get paginated list of users the given userId admires.
      */
     static async getAdmiring(userId, cursor, limit = 20) {
-        const records = await database_1.prisma.admire.findMany({
+        const records = await prisma.admire.findMany({
             where: { admirerId: userId },
             take: limit + 1,
             ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
@@ -191,7 +188,7 @@ class UserService {
      * Get mutual admirers (lovers).
      */
     static async getLovers(userId, cursor, limit = 20) {
-        const records = await database_1.prisma.admire.findMany({
+        const records = await prisma.admire.findMany({
             where: { admirerId: userId, isLovers: true },
             take: limit + 1,
             ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
@@ -211,7 +208,7 @@ class UserService {
     }
     // ─── BIO LINKS ─────────────────────────────────────
     static async updateBioLinks(userId, links) {
-        return database_1.prisma.$transaction(async (tx) => {
+        return prisma.$transaction(async (tx) => {
             await tx.bioLink.deleteMany({ where: { userId } });
             if (links.length > 0) {
                 await tx.bioLink.createMany({
@@ -229,7 +226,7 @@ class UserService {
     }
     // ─── MILESTONES ────────────────────────────────────
     static async getMilestones() {
-        return database_1.prisma.milestone.findMany({
+        return prisma.milestone.findMany({
             include: {
                 completions: {
                     include: { user: { select: { id: true, username: true, displayName: true } } }
@@ -238,7 +235,7 @@ class UserService {
         });
     }
     static async getUserMilestoneProgress(userId) {
-        const milestones = await database_1.prisma.milestone.findMany({
+        const milestones = await prisma.milestone.findMany({
             include: {
                 completions: {
                     where: { userId },
@@ -258,5 +255,4 @@ class UserService {
         }));
     }
 }
-exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

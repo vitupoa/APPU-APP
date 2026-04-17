@@ -1,28 +1,25 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdsService = void 0;
-const database_1 = require("../../config/database");
-const client_1 = require("@prisma/client");
+import { prisma } from '../../config/database.js';
+import { Prisma } from '@prisma/client';
 /**
  * Ads service — handles rewarded ad credit recording and ad impression tracking.
  * When a user watches a rewarded ad, we credit their wallet with a small Kr amount
  * and record it as an ad_revenue transaction.
  */
-class AdsService {
+export class AdsService {
     /**
      * Credit user wallet for watching a rewarded ad.
      * Atomic: creates transaction + increments wallet balance.
      */
     static async creditRewardedAd(userId, rewardKr = 0.5) {
-        const amount = new client_1.Prisma.Decimal(rewardKr);
-        await database_1.prisma.$transaction([
+        const amount = new Prisma.Decimal(rewardKr);
+        await prisma.$transaction([
             // Credit wallet
-            database_1.prisma.wallet.update({
+            prisma.wallet.update({
                 where: { userId },
                 data: { krBalance: { increment: amount } }
             }),
             // Record transaction
-            database_1.prisma.transaction.create({
+            prisma.transaction.create({
                 data: {
                     userId,
                     type: 'ad_revenue',
@@ -44,7 +41,7 @@ class AdsService {
         if (data.userId && data.adType === 'rewarded') {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            await database_1.prisma.dailyStat.upsert({
+            await prisma.dailyStat.upsert({
                 where: { userId_date: { userId: data.userId, date: today } },
                 create: {
                     userId: data.userId,
@@ -62,5 +59,4 @@ class AdsService {
         }
     }
 }
-exports.AdsService = AdsService;
 //# sourceMappingURL=ads.service.js.map

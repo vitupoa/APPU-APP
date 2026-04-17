@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import { prisma } from '../../config/database';
-import { generateAccessToken, JwtPayload } from '../../utils/jwt';
+import { prisma } from '../../config/database.js';
+import { generateAccessToken, JwtPayload } from '../../utils/jwt.js';
 import crypto from 'crypto';
 
 // Token expiration: 365 days simulating TikTok persistent logins securely!

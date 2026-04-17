@@ -43,12 +43,12 @@ export declare const feedQuerySchema: z.ZodObject<{
     limit: z.ZodEffects<z.ZodDefault<z.ZodString>, number, string | undefined>;
 }, "strip", z.ZodTypeAny, {
     limit: number;
-    tab: "admiring" | "home" | "discover";
+    tab: "admiring" | "discover" | "home";
     cursor?: string | undefined;
 }, {
     limit?: string | undefined;
     cursor?: string | undefined;
-    tab?: "admiring" | "home" | "discover" | undefined;
+    tab?: "admiring" | "discover" | "home" | undefined;
 }>;
 export declare const createCollectionSchema: z.ZodObject<{
     name: z.ZodString;

@@ -1,120 +1,71 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const auth_1 = require("../../middleware/auth");
-const shorts_service_1 = require("./shorts.service");
-const shorts_validation_1 = require("./shorts.validation");
-const router = (0, express_1.Router)();
-// GET /api/v1/shorts/feed — paginated feed (optional auth for personalization)
-router.get('/feed', auth_1.optionalAuth, async (req, res) => {
-    try {
-        const query = shorts_validation_1.feedQuerySchema.parse(req.query);
-        const result = await shorts_service_1.ShortsService.getFeed({
-            userId: req.userId || 'anonymous',
-            tab: query.tab,
-            cursor: query.cursor,
-            limit: query.limit
-        });
-        res.status(200).json(result);
-    }
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+import { Router } from 'express';
+import { authMiddleware, optionalAuth } from '../../middleware/auth.js';
+import { ShortsService } from './shorts.service.js';
+import { z } from 'zod';
+import { SubscriptionTierType } from '@prisma/client';
+const router = Router();
+const createShortSchema = z.object({
+    videoUrl: z.string().url(),
+    caption: z.string().max(500).optional(),
+    musicTrack: z.string().max(200).optional(),
+    linkedProductId: z.string().uuid().optional(),
+    isLocked: z.boolean().optional(),
+    requiredTier: z.nativeEnum(SubscriptionTierType).optional()
 });
-// POST /api/v1/shorts — create short
-router.post('/', auth_1.authMiddleware, async (req, res) => {
+// GET /api/v1/shorts/feed
+router.get('/feed', optionalAuth, async (req, res) => {
     try {
-        const data = shorts_validation_1.createShortSchema.parse(req.body);
-        const short = await shorts_service_1.ShortsService.createShort({ userId: req.userId, ...data });
-        res.status(201).json(short);
-    }
-    catch (error) {
-        if (error.name === 'ZodError') {
-            res.status(400).json({ error: 'Validation failed', details: error.errors });
-        }
-        else {
-            res.status(500).json({ error: error.message });
-        }
-    }
-});
-// POST /api/v1/shorts/:id/like — toggle like
-router.post('/:id/like', auth_1.authMiddleware, async (req, res) => {
-    try {
-        const result = await shorts_service_1.ShortsService.toggleLike(req.userId, String(req.params.id));
-        res.status(200).json(result);
-    }
-    catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-// DELETE /api/v1/shorts/:id/like — alias (same toggle logic)
-router.delete('/:id/like', auth_1.authMiddleware, async (req, res) => {
-    try {
-        const result = await shorts_service_1.ShortsService.toggleLike(req.userId, String(req.params.id));
-        res.status(200).json(result);
-    }
-    catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-// POST /api/v1/shorts/:id/comment
-router.post('/:id/comment', auth_1.authMiddleware, async (req, res) => {
-    try {
-        const { text } = shorts_validation_1.addCommentSchema.parse(req.body);
-        const comment = await shorts_service_1.ShortsService.addComment(req.userId, String(req.params.id), text);
-        res.status(201).json(comment);
-    }
-    catch (error) {
-        if (error.name === 'ZodError') {
-            res.status(400).json({ error: 'Validation failed', details: error.errors });
-        }
-        else {
-            res.status(500).json({ error: error.message });
-        }
-    }
-});
-// GET /api/v1/shorts/:id/comments
-router.get('/:id/comments', async (req, res) => {
-    try {
+        const type = req.query.type || 'discover';
         const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
         const limit = req.query.limit ? parseInt(req.query.limit) : 20;
-        const result = await shorts_service_1.ShortsService.getComments(String(req.params.id), cursor, limit);
-        res.status(200).json(result);
+        if (!['discover', 'admiring'].includes(type)) {
+            return res.status(400).json({ error: 'Invalid feed type. Must be "discover" or "admiring"' });
+        }
+        const result = await ShortsService.getFeed(type, cursor, limit, req.userId);
+        return res.status(200).json(result);
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
 });
-// POST /api/v1/shorts/:id/view — increment view counter (fire-and-forget)
-router.post('/:id/view', async (req, res) => {
-    shorts_service_1.ShortsService.incrementView(String(req.params.id));
-    res.status(204).send();
-});
-// GET /api/v1/shorts/collections/:userId
-router.get('/collections/:userId', async (req, res) => {
+// POST /api/v1/shorts
+router.post('/', authMiddleware, async (req, res) => {
     try {
-        const collections = await shorts_service_1.ShortsService.getCollections(String(req.params.userId));
-        res.status(200).json(collections);
-    }
-    catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-// POST /api/v1/shorts/collections
-router.post('/collections', auth_1.authMiddleware, async (req, res) => {
-    try {
-        const { name } = shorts_validation_1.createCollectionSchema.parse(req.body);
-        const collection = await shorts_service_1.ShortsService.createCollection(req.userId, name);
-        res.status(201).json(collection);
+        const data = createShortSchema.parse(req.body);
+        const short = await ShortsService.createShort({
+            creatorId: req.userId,
+            ...data
+        });
+        return res.status(201).json(short);
     }
     catch (error) {
         if (error.name === 'ZodError') {
-            res.status(400).json({ error: 'Validation failed', details: error.errors });
+            return res.status(400).json({ error: 'Validation failed', details: error.errors });
         }
         else {
-            res.status(500).json({ error: error.message });
+            return res.status(400).json({ error: error.message });
         }
     }
 });
-exports.default = router;
+// POST /api/v1/shorts/:id/like
+router.post('/:id/like', authMiddleware, async (req, res) => {
+    try {
+        const result = await ShortsService.toggleLike(req.userId, String(req.params.id));
+        return res.status(200).json(result);
+    }
+    catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+});
+// POST /api/v1/shorts/:id/view
+router.post('/:id/view', optionalAuth, async (req, res) => {
+    try {
+        await ShortsService.incrementView(String(req.params.id), req.userId);
+        return res.status(200).json({ success: true });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+export default router;
 //# sourceMappingURL=shorts.routes.js.map

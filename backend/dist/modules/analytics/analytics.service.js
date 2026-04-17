@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnalyticsService = void 0;
-const database_1 = require("../../config/database");
-class AnalyticsService {
+import { prisma } from '../../config/database.js';
+export class AnalyticsService {
     /**
      * Get aggregated analytics for a creator over a date range.
      * Returns daily stats + totals.
@@ -11,7 +8,7 @@ class AnalyticsService {
         const days = params.days ?? 30;
         const since = new Date();
         since.setDate(since.getDate() - days);
-        const dailyStats = await database_1.prisma.dailyStat.findMany({
+        const dailyStats = await prisma.dailyStat.findMany({
             where: {
                 userId,
                 date: { gte: since }
@@ -27,7 +24,7 @@ class AnalyticsService {
             totalKrSpent: acc.totalKrSpent + Number(stat.krSpent)
         }), { totalViews: 0, totalLikes: 0, totalNewAdmirers: 0, totalKrEarned: 0, totalKrSpent: 0 });
         // Earnings breakdown from completed transactions in the period
-        const earningsBreakdown = await database_1.prisma.transaction.groupBy({
+        const earningsBreakdown = await prisma.transaction.groupBy({
             by: ['type'],
             where: {
                 userId,
@@ -48,10 +45,10 @@ class AnalyticsService {
             _count: true
         });
         // Current follower counts
-        const admirerCount = await database_1.prisma.admire.count({
+        const admirerCount = await prisma.admire.count({
             where: { admiredId: userId }
         });
-        const admiringCount = await database_1.prisma.admire.count({
+        const admiringCount = await prisma.admire.count({
             where: { admirerId: userId }
         });
         return {
@@ -89,7 +86,7 @@ class AnalyticsService {
     static async recordStat(userId, update) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        await database_1.prisma.dailyStat.upsert({
+        await prisma.dailyStat.upsert({
             where: { userId_date: { userId, date: today } },
             create: {
                 userId,
@@ -110,5 +107,4 @@ class AnalyticsService {
         });
     }
 }
-exports.AnalyticsService = AnalyticsService;
 //# sourceMappingURL=analytics.service.js.map

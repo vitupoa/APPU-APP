@@ -1,30 +1,42 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ShortsService = void 0;
-const database_1 = require("../../config/database");
-class ShortsService {
-    static async getFeed(params) {
-        const { userId, tab, cursor, limit } = params;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+import { prisma } from '../../config/database.js';
+import { emitLikeUpdate } from '../../shared/gateway/events.js';
+export class ShortsService {
+    /**
+     * Get shorts feed based on type
+     * - discover: Users NOT in admiring list (For You)
+     * - admiring: Users in admiring list (Following)
+     */
+    static async getFeed(type, cursor, limit = 20, userId) {
         let whereClause = {};
-        if (tab === 'admiring') {
-            const admiring = await database_1.prisma.admire.findMany({
+        if (type === 'admiring' && userId) {
+            // Get list of users the current user is admiring
+            const admiringList = await prisma.admire.findMany({
                 where: { admirerId: userId },
                 select: { admiredId: true }
             });
-            const followingIds = admiring.map((a) => a.admiredId);
-            whereClause = { userId: { in: followingIds } };
+            const admiringIds = admiringList.map(a => a.admiredId);
+            if (admiringIds.length === 0) {
+                return { items: [], nextCursor: null };
+            }
+            whereClause.userId = { in: admiringIds };
         }
-        if (tab === 'home') {
-            whereClause = { contestId: { not: null } };
+        else if (type === 'discover' && userId) {
+            // Get list of users the current user is admiring
+            const admiringList = await prisma.admire.findMany({
+                where: { admirerId: userId },
+                select: { admiredId: true }
+            });
+            const admiringIds = admiringList.map(a => a.admiredId);
+            // Exclude admiring users and self
+            whereClause.userId = {
+                notIn: [...admiringIds, userId]
+            };
         }
-        const shorts = await database_1.prisma.short.findMany({
+        const shorts = await prisma.short.findMany({
             where: whereClause,
             take: limit + 1,
             ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-            orderBy: tab === 'discover'
-                ? [{ views: 'desc' }, { createdAt: 'desc' }]
-                : { createdAt: 'desc' },
+            orderBy: { createdAt: 'desc' },
             include: {
                 user: {
                     select: {
@@ -32,162 +44,155 @@ class ShortsService {
                         username: true,
                         displayName: true,
                         avatarUrl: true,
-                        isVerified: true,
-                        accountType: true
+                        isVerified: true
                     }
                 },
                 linkedProduct: {
                     select: {
                         id: true,
                         title: true,
-                        imageUrls: true,
-                        priceKr: true
+                        priceKr: true,
+                        imageUrls: true
                     }
                 }
             }
         });
         const hasMore = shorts.length > limit;
         const items = hasMore ? shorts.slice(0, limit) : shorts;
-        const nextCursor = hasMore ? items[items.length - 1].id : null;
         // Check if user has liked each short
-        const likedIds = new Set((await database_1.prisma.shortLike.findMany({
-            where: { userId, shortId: { in: items.map((s) => s.id) } },
-            select: { shortId: true }
-        })).map((l) => l.shortId));
+        const likedIds = new Set();
+        if (userId) {
+            const likes = await prisma.shortLike.findMany({
+                where: {
+                    userId,
+                    shortId: { in: items.map(s => s.id) }
+                },
+                select: { shortId: true }
+            });
+            likes.forEach((l) => likedIds.add(l.shortId));
+        }
         return {
-            items: items.map((s) => ({
+            items: items.map(s => ({
                 id: s.id,
                 creator: s.user,
                 videoUrl: s.videoUrl,
-                thumbnailUrl: s.thumbnailUrl,
-                caption: s.caption,
-                musicTrack: s.musicTitle ? `${s.musicTitle}${s.musicArtist ? ` - ${s.musicArtist}` : ''}` : null,
-                contestId: s.contestId,
-                collectionId: s.collectionId,
-                linkedProductId: s.linkedProductId,
+                caption: s.caption || '',
+                musicTrack: s.musicTitle ? `${s.musicTitle}${s.musicArtist ? ' - ' + s.musicArtist : ''}` : null,
+                likesCount: s.likesCount,
+                commentsCount: s.commentsCount,
+                isLiked: likedIds.has(s.id),
+                isLocked: s.isLocked,
+                requiredTier: s.requiredTier,
                 linkedProduct: s.linkedProduct ? {
                     id: s.linkedProduct.id,
                     title: s.linkedProduct.title,
-                    imageUrl: s.linkedProduct.imageUrls?.[0] ?? null,
-                    priceKr: Number(s.linkedProduct.priceKr)
+                    priceKr: Number(s.linkedProduct.priceKr),
+                    imageUrl: s.linkedProduct.imageUrls[0] || null
                 } : null,
-                isLocked: s.isLocked,
-                requiredTier: s.requiredTier,
-                likesCount: s.likesCount,
-                commentsCount: s.commentsCount,
-                views: s.views,
-                isLiked: likedIds.has(s.id),
                 createdAt: s.createdAt.toISOString()
             })),
-            nextCursor
+            nextCursor: hasMore ? items[items.length - 1].id : null
         };
     }
+    /**
+     * Create a new short
+     */
     static async createShort(data) {
-        // Parse musicTrack "Title - Artist" format
+        // Parse musicTrack into title and artist
         let musicTitle;
         let musicArtist;
         if (data.musicTrack) {
             const parts = data.musicTrack.split(' - ');
-            musicTitle = parts[0]?.trim();
-            musicArtist = parts[1]?.trim();
+            musicTitle = parts[0];
+            musicArtist = parts[1];
         }
-        const short = await database_1.prisma.short.create({
+        const short = await prisma.short.create({
             data: {
-                userId: data.userId,
+                userId: data.creatorId,
                 videoUrl: data.videoUrl,
-                thumbnailUrl: data.thumbnailUrl,
                 caption: data.caption,
                 musicTitle,
                 musicArtist,
-                contestId: data.contestId,
-                collectionId: data.collectionId,
                 linkedProductId: data.linkedProductId,
-                isLocked: data.isLocked,
+                isLocked: data.isLocked || false,
                 requiredTier: data.requiredTier
             },
             include: {
                 user: {
-                    select: { id: true, username: true, displayName: true, avatarUrl: true }
+                    select: {
+                        id: true,
+                        username: true,
+                        displayName: true,
+                        avatarUrl: true
+                    }
                 }
             }
         });
         return {
-            ...short,
+            id: short.id,
             creator: short.user,
+            videoUrl: short.videoUrl,
+            caption: short.caption,
+            musicTrack: short.musicTitle ? `${short.musicTitle}${short.musicArtist ? ' - ' + short.musicArtist : ''}` : null,
+            likesCount: 0,
+            commentsCount: 0,
+            isLiked: false,
+            isLocked: short.isLocked,
+            requiredTier: short.requiredTier,
             createdAt: short.createdAt.toISOString()
         };
     }
+    /**
+     * Toggle like on a short
+     */
     static async toggleLike(userId, shortId) {
-        const existing = await database_1.prisma.shortLike.findUnique({
-            where: { shortId_userId: { shortId, userId } }
-        });
-        if (existing) {
-            await database_1.prisma.$transaction([
-                database_1.prisma.shortLike.delete({ where: { id: existing.id } }),
-                database_1.prisma.short.update({ where: { id: shortId }, data: { likesCount: { decrement: 1 } } })
-            ]);
-            return { liked: false };
-        }
-        else {
-            await database_1.prisma.$transaction([
-                database_1.prisma.shortLike.create({ data: { userId, shortId } }),
-                database_1.prisma.short.update({ where: { id: shortId }, data: { likesCount: { increment: 1 } } })
-            ]);
-            return { liked: true };
-        }
-    }
-    static async addComment(userId, shortId, text) {
-        const [comment] = await database_1.prisma.$transaction([
-            database_1.prisma.shortComment.create({
-                data: { userId, shortId, text },
-                include: {
-                    user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+        const short = await prisma.short.findUniqueOrThrow({ where: { id: shortId } });
+        return prisma.$transaction(async (tx) => {
+            const existingLike = await tx.shortLike.findUnique({
+                where: {
+                    shortId_userId: {
+                        userId,
+                        shortId
+                    }
                 }
-            }),
-            database_1.prisma.short.update({ where: { id: shortId }, data: { commentsCount: { increment: 1 } } })
-        ]);
-        return {
-            ...comment,
-            createdAt: comment.createdAt.toISOString()
-        };
-    }
-    static async getComments(shortId, cursor, limit = 20) {
-        const comments = await database_1.prisma.shortComment.findMany({
-            where: { shortId },
-            take: limit + 1,
-            ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-            orderBy: { createdAt: 'desc' },
-            include: {
-                user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+            });
+            if (existingLike) {
+                // Unlike
+                await tx.shortLike.delete({ where: { id: existingLike.id } });
+                await tx.short.update({
+                    where: { id: shortId },
+                    data: { likesCount: { decrement: 1 } }
+                });
+                const newCount = short.likesCount - 1;
+                emitLikeUpdate(shortId, 'SHORT', newCount);
+                return { liked: false, likesCount: newCount };
+            }
+            else {
+                // Like
+                await tx.shortLike.create({
+                    data: {
+                        userId,
+                        shortId
+                    }
+                });
+                await tx.short.update({
+                    where: { id: shortId },
+                    data: { likesCount: { increment: 1 } }
+                });
+                const newCount = short.likesCount + 1;
+                emitLikeUpdate(shortId, 'SHORT', newCount);
+                return { liked: true, likesCount: newCount };
             }
         });
-        const hasMore = comments.length > limit;
-        const items = hasMore ? comments.slice(0, limit) : comments;
-        return {
-            items: items.map((c) => ({ ...c, createdAt: c.createdAt.toISOString() })),
-            nextCursor: hasMore ? items[items.length - 1].id : null
-        };
     }
-    static async incrementView(shortId) {
-        database_1.prisma.short.update({ where: { id: shortId }, data: { views: { increment: 1 } } })
-            .catch(() => { });
-    }
-    static async getCollections(userId) {
-        const collections = await database_1.prisma.shortCollection.findMany({
-            where: { userId },
-            orderBy: { sortOrder: 'asc' },
-            include: { _count: { select: { shorts: true } } }
+    /**
+     * Increment view count
+     */
+    static async incrementView(shortId, userId) {
+        await prisma.short.update({
+            where: { id: shortId },
+            data: { views: { increment: 1 } }
         });
-        return collections.map((c) => ({
-            ...c,
-            shortCount: c._count.shorts,
-            createdAt: c.createdAt.toISOString()
-        }));
-    }
-    static async createCollection(userId, name) {
-        const collection = await database_1.prisma.shortCollection.create({ data: { userId, name } });
-        return { ...collection, createdAt: collection.createdAt.toISOString() };
     }
 }
-exports.ShortsService = ShortsService;
 //# sourceMappingURL=shorts.service.js.map

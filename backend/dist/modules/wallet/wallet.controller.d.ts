@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { AuthRequest } from '../../middleware/auth';
+import { AuthRequest } from '../../middleware/auth.js';
 export declare class WalletController {
     static getBalance(req: AuthRequest, res: Response): Promise<void>;
     static sendTip(req: AuthRequest, res: Response): Promise<void>;

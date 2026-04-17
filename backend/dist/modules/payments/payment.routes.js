@@ -1,22 +1,20 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const auth_1 = require("../../middleware/auth");
-const exchange_service_1 = require("../../services/exchange/exchange.service");
-const mpesa_service_1 = require("../../services/payments/mpesa.service");
-const paypal_service_1 = require("../../services/payments/paypal.service");
-const paystack_service_1 = require("../../services/payments/paystack.service");
-const wallet_validation_1 = require("../wallet/wallet.validation");
-const database_1 = require("../../config/database");
-const client_1 = require("@prisma/client");
-const router = (0, express_1.Router)();
+import { Router } from 'express';
+import { authMiddleware } from '../../middleware/auth.js';
+import { ExchangeService } from '../../services/exchange/exchange.service.js';
+import { MpesaService } from '../../services/payments/mpesa.service.js';
+import { PaypalService } from '../../services/payments/paypal.service.js';
+import { PaystackService } from '../../services/payments/paystack.service.js';
+import { topupInitiateSchema } from '../wallet/wallet.validation.js';
+import { prisma } from '../../config/database.js';
+import { Prisma } from '@prisma/client';
+const router = Router();
 /**
  * POST /api/v1/payments/topup
  * Initiates a top-up via user's chosen provider.
  */
-router.post('/topup', auth_1.authMiddleware, async (req, res) => {
+router.post('/topup', authMiddleware, async (req, res) => {
     try {
-        const data = wallet_validation_1.topupInitiateSchema.parse(req.body);
+        const data = topupInitiateSchema.parse(req.body);
         const userId = req.userId;
         const reference = `topup_${userId}_${Date.now()}`;
         let result;
@@ -26,7 +24,7 @@ router.post('/topup', auth_1.authMiddleware, async (req, res) => {
                     res.status(400).json({ error: 'Phone number required for M-Pesa' });
                     return;
                 }
-                result = await mpesa_service_1.MpesaService.initiateStk({
+                result = await MpesaService.initiateStk({
                     phoneNumber: data.phoneNumber,
                     amount: data.fiatAmount,
                     accountReference: reference,
@@ -35,7 +33,7 @@ router.post('/topup', auth_1.authMiddleware, async (req, res) => {
                 break;
             }
             case 'paypal': {
-                result = await paypal_service_1.PaypalService.createOrder({
+                result = await PaypalService.createOrder({
                     amount: data.fiatAmount,
                     currency: data.currency,
                     description: 'Krieta Wallet Top-Up',
@@ -44,12 +42,12 @@ router.post('/topup', auth_1.authMiddleware, async (req, res) => {
                 break;
             }
             case 'paystack': {
-                const user = await database_1.prisma.user.findUnique({ where: { id: userId } });
+                const user = await prisma.user.findUnique({ where: { id: userId } });
                 if (!user?.email) {
                     res.status(400).json({ error: 'Email required for Paystack' });
                     return;
                 }
-                result = await paystack_service_1.PaystackService.initializeTransaction({
+                result = await PaystackService.initializeTransaction({
                     email: user.email,
                     amount: data.fiatAmount,
                     currency: data.currency,
@@ -59,12 +57,12 @@ router.post('/topup', auth_1.authMiddleware, async (req, res) => {
             }
         }
         // Record pending transaction
-        await database_1.prisma.transaction.create({
+        await prisma.transaction.create({
             data: {
                 userId,
                 type: 'topup',
                 amountFiat: data.fiatAmount,
-                amountKr: new client_1.Prisma.Decimal(0), // Calculated on confirmation
+                amountKr: new Prisma.Decimal(0), // Calculated on confirmation
                 currency: data.currency,
                 status: 'pending',
                 provider: data.provider,
@@ -88,9 +86,9 @@ router.post('/topup', auth_1.authMiddleware, async (req, res) => {
  */
 router.post('/mpesa/callback', async (req, res) => {
     try {
-        const parsed = mpesa_service_1.MpesaService.parseCallback(req.body);
+        const parsed = MpesaService.parseCallback(req.body);
         // Find the pending transaction
-        const tx = await database_1.prisma.transaction.findFirst({
+        const tx = await prisma.transaction.findFirst({
             where: {
                 provider: 'mpesa',
                 status: 'pending',
@@ -104,9 +102,9 @@ router.post('/mpesa/callback', async (req, res) => {
             return;
         }
         if (parsed.success && parsed.amount) {
-            const rate = await exchange_service_1.ExchangeService.getTransactionRate('KES', 'buy');
-            const krAmount = new client_1.Prisma.Decimal(parsed.amount / rate);
-            await database_1.prisma.$transaction(async (dbTx) => {
+            const rate = await ExchangeService.getTransactionRate('KES', 'buy');
+            const krAmount = new Prisma.Decimal(parsed.amount / rate);
+            await prisma.$transaction(async (dbTx) => {
                 await dbTx.transaction.update({
                     where: { id: tx.id },
                     data: {
@@ -128,7 +126,7 @@ router.post('/mpesa/callback', async (req, res) => {
             });
         }
         else {
-            await database_1.prisma.transaction.update({
+            await prisma.transaction.update({
                 where: { id: tx.id },
                 data: { status: 'failed' }
             });
@@ -145,18 +143,18 @@ router.post('/mpesa/callback', async (req, res) => {
  * POST /api/v1/payments/paypal/capture
  * Frontend calls after user approves PayPal order.
  */
-router.post('/paypal/capture', auth_1.authMiddleware, async (req, res) => {
+router.post('/paypal/capture', authMiddleware, async (req, res) => {
     try {
         const { orderId } = req.body;
         if (!orderId) {
             res.status(400).json({ error: 'orderId is required' });
             return;
         }
-        const capture = await paypal_service_1.PaypalService.captureOrder(orderId);
+        const capture = await PaypalService.captureOrder(orderId);
         if (capture.success) {
-            const rate = await exchange_service_1.ExchangeService.getTransactionRate(capture.currency, 'buy');
-            const krAmount = new client_1.Prisma.Decimal(capture.amount / rate);
-            await database_1.prisma.$transaction(async (dbTx) => {
+            const rate = await ExchangeService.getTransactionRate(capture.currency, 'buy');
+            const krAmount = new Prisma.Decimal(capture.amount / rate);
+            await prisma.$transaction(async (dbTx) => {
                 // Find pending tx
                 const tx = await dbTx.transaction.findFirst({
                     where: { userId: req.userId, provider: 'paypal', status: 'pending' },
@@ -201,19 +199,19 @@ router.post('/paystack/webhook', async (req, res) => {
         // Verify signature
         const signature = req.headers['x-paystack-signature'];
         const rawBody = JSON.stringify(req.body);
-        if (!paystack_service_1.PaystackService.verifyWebhookSignature(rawBody, signature)) {
+        if (!PaystackService.verifyWebhookSignature(rawBody, signature)) {
             res.status(401).json({ error: 'Invalid signature' });
             return;
         }
-        const parsed = paystack_service_1.PaystackService.parseWebhook(req.body);
+        const parsed = PaystackService.parseWebhook(req.body);
         if (parsed.event === 'charge.success') {
-            const tx = await database_1.prisma.transaction.findFirst({
+            const tx = await prisma.transaction.findFirst({
                 where: { reference: parsed.reference, status: 'pending' }
             });
             if (tx) {
-                const rate = await exchange_service_1.ExchangeService.getTransactionRate(parsed.currency, 'buy');
-                const krAmount = new client_1.Prisma.Decimal(parsed.amount / rate);
-                await database_1.prisma.$transaction(async (dbTx) => {
+                const rate = await ExchangeService.getTransactionRate(parsed.currency, 'buy');
+                const krAmount = new Prisma.Decimal(parsed.amount / rate);
+                await prisma.$transaction(async (dbTx) => {
                     await dbTx.transaction.update({
                         where: { id: tx.id },
                         data: { status: 'completed', amountKr: krAmount }
@@ -237,5 +235,5 @@ router.post('/paystack/webhook', async (req, res) => {
         res.status(200).json({ status: 'ok' });
     }
 });
-exports.default = router;
+export default router;
 //# sourceMappingURL=payment.routes.js.map

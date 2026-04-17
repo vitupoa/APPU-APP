@@ -1,8 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppError = void 0;
-exports.errorHandler = errorHandler;
-const zod_1 = require("zod");
+import { ZodError } from 'zod';
 const EMAIL_REGEX = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
 const PHONE_REGEX = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
 const SECRET_REGEX = /(password|secret|token|hash|key)[\s]*[:=][\s]*['"]?([^\s'",}]+)/gi;
@@ -14,7 +10,7 @@ function redactPII(text) {
         .replace(PHONE_REGEX, '[REDACTED_PHONE]')
         .replace(SECRET_REGEX, '$1: [REDACTED_SECRET]');
 }
-class AppError extends Error {
+export class AppError extends Error {
     status;
     code;
     constructor(message, status = 500, code) {
@@ -24,12 +20,11 @@ class AppError extends Error {
         this.name = 'AppError';
     }
 }
-exports.AppError = AppError;
-function errorHandler(err, _req, res, _next) {
+export function errorHandler(err, _req, res, _next) {
     const secureMessage = redactPII(err.message);
     console.error(`[ERROR] ${err.name}: ${secureMessage}`);
     // Zod validation errors
-    if (err instanceof zod_1.ZodError) {
+    if (err instanceof ZodError) {
         const details = err.issues.map((issue) => ({
             field: issue.path.join('.'),
             message: issue.message,

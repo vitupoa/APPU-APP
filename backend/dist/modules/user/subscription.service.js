@@ -1,15 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SubscriptionService = void 0;
-const database_1 = require("../../config/database");
-const client_1 = require("@prisma/client");
+import { prisma } from '../../config/database.js';
+import { Prisma } from '@prisma/client';
 const SUBSCRIPTION_PLATFORM_FEE = 0.15; // 15%
-class SubscriptionService {
+export class SubscriptionService {
     /**
      * Get creator's subscription tier config.
      */
     static async getCreatorTiers(creatorId) {
-        return database_1.prisma.subscriptionTier.findMany({
+        return prisma.subscriptionTier.findMany({
             where: { creatorId },
             orderBy: { tier: 'asc' }
         });
@@ -18,7 +15,7 @@ class SubscriptionService {
      * Get available tiers for a user (public — for subscriber view).
      */
     static async getAvailableTiers(creatorId) {
-        return database_1.prisma.subscriptionTier.findMany({
+        return prisma.subscriptionTier.findMany({
             where: { creatorId, isEnabled: true },
             orderBy: { tier: 'asc' }
         });
@@ -27,19 +24,19 @@ class SubscriptionService {
      * Creator updates their tier config (upsert up to 4 tiers).
      */
     static async updateTiers(creatorId, tiers) {
-        return database_1.prisma.$transaction(async (tx) => {
+        return prisma.$transaction(async (tx) => {
             for (const t of tiers) {
                 await tx.subscriptionTier.upsert({
                     where: { creatorId_tier: { creatorId, tier: t.tier } },
                     create: {
                         creatorId,
                         tier: t.tier,
-                        krAmount: new client_1.Prisma.Decimal(t.krAmount),
+                        krAmount: new Prisma.Decimal(t.krAmount),
                         benefits: t.benefits,
                         isEnabled: t.isEnabled
                     },
                     update: {
-                        krAmount: new client_1.Prisma.Decimal(t.krAmount),
+                        krAmount: new Prisma.Decimal(t.krAmount),
                         benefits: t.benefits,
                         isEnabled: t.isEnabled
                     }
@@ -54,7 +51,7 @@ class SubscriptionService {
     static async subscribe(subscriberId, creatorId, tierType) {
         if (subscriberId === creatorId)
             throw new Error('Cannot subscribe to yourself');
-        return database_1.prisma.$transaction(async (tx) => {
+        return prisma.$transaction(async (tx) => {
             const tier = await tx.subscriptionTier.findUniqueOrThrow({
                 where: { creatorId_tier: { creatorId, tier: tierType } }
             });
@@ -144,13 +141,13 @@ class SubscriptionService {
      * Unsubscribe from a creator.
      */
     static async unsubscribe(subscriberId, creatorId) {
-        const subscription = await database_1.prisma.subscription.findUnique({
+        const subscription = await prisma.subscription.findUnique({
             where: { subscriberId_creatorId: { subscriberId, creatorId } }
         });
         if (!subscription || subscription.status !== 'active') {
             throw new Error('No active subscription found');
         }
-        return database_1.prisma.subscription.update({
+        return prisma.subscription.update({
             where: { id: subscription.id },
             data: { status: 'cancelled', cancelledAt: new Date() }
         });
@@ -161,7 +158,7 @@ class SubscriptionService {
     static async hasAccess(subscriberId, creatorId, requiredTier) {
         const tierOrder = ['TOP_FUN', 'REAL_FAN', 'TRUE_FAN', 'SUPER_FAN'];
         const requiredIndex = tierOrder.indexOf(requiredTier);
-        const subscription = await database_1.prisma.subscription.findUnique({
+        const subscription = await prisma.subscription.findUnique({
             where: { subscriberId_creatorId: { subscriberId, creatorId } }
         });
         if (!subscription || subscription.status !== 'active')
@@ -170,5 +167,4 @@ class SubscriptionService {
         return subscribedIndex >= requiredIndex;
     }
 }
-exports.SubscriptionService = SubscriptionService;
 //# sourceMappingURL=subscription.service.js.map

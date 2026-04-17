@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
-import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth';
-import { ShopService } from './shop.service';
+import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth.js';
+import { ShopService } from './shop.service.js';
 import { z } from 'zod';
 
 const router = Router();

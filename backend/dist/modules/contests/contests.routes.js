@@ -1,57 +1,55 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const auth_1 = require("../../middleware/auth");
-const contests_service_1 = require("./contests.service");
-const zod_1 = require("zod");
-const router = (0, express_1.Router)();
-const createContestSchema = zod_1.z.object({
-    title: zod_1.z.string().min(5).max(100),
-    description: zod_1.z.string().min(10).max(2000),
-    mediaType: zod_1.z.enum(['PHOTO', 'VIDEO', 'PHOTO_AND_VIDEO']),
-    category: zod_1.z.enum(['DANCE', 'CHALLENGE', 'PROMOTION', 'CREATIVE', 'ART', 'MUSIC']),
-    prizeKr: zod_1.z.number().positive('Prize must be positive'),
-    requiredActions: zod_1.z.array(zod_1.z.object({
-        type: zod_1.z.string(),
-        targetUrl: zod_1.z.string().optional(),
-        label: zod_1.z.string()
+import { Router } from 'express';
+import { authMiddleware, optionalAuth, adminAuth } from '../../middleware/auth.js';
+import { ContestService } from './contests.service.js';
+import { z } from 'zod';
+const router = Router();
+const createContestSchema = z.object({
+    title: z.string().min(5).max(100),
+    description: z.string().min(10).max(2000),
+    mediaType: z.enum(['PHOTO', 'VIDEO', 'PHOTO_AND_VIDEO']),
+    category: z.enum(['DANCE', 'CHALLENGE', 'PROMOTION', 'CREATIVE', 'ART', 'MUSIC']),
+    prizeKr: z.number().positive('Prize must be positive'),
+    requiredActions: z.array(z.object({
+        type: z.string(),
+        targetUrl: z.string().optional(),
+        label: z.string()
     })).min(1),
-    maxWinners: zod_1.z.number().int().min(1).max(3),
-    prizeDistribution: zod_1.z.array(zod_1.z.object({
-        rank: zod_1.z.number().int().min(1),
-        percentage: zod_1.z.number().min(0).max(100)
+    maxWinners: z.number().int().min(1).max(3),
+    prizeDistribution: z.array(z.object({
+        rank: z.number().int().min(1),
+        percentage: z.number().min(0).max(100)
     })).min(1),
-    judgingCriteria: zod_1.z.enum(['CREATOR_PICKS', 'COMMUNITY_VOTE', 'MOST_ENGAGEMENT', 'COMBINATION']),
-    sponsorName: zod_1.z.string().max(100).optional(),
-    sponsorUrl: zod_1.z.string().url().optional(),
-    deadline: zod_1.z.string().datetime(),
-    coverMediaUrl: zod_1.z.string().url().optional(),
+    judgingCriteria: z.enum(['CREATOR_PICKS', 'COMMUNITY_VOTE', 'MOST_ENGAGEMENT', 'COMBINATION']),
+    sponsorName: z.string().max(100).optional(),
+    sponsorUrl: z.string().url().optional(),
+    deadline: z.string().datetime(),
+    coverMediaUrl: z.string().url().optional(),
     // Wizard Gamification Metrics
-    entryFeeKr: zod_1.z.number().positive().optional(),
-    publicVoteWeight: zod_1.z.number().min(0).max(100).optional(),
-    allowDailyPrizes: zod_1.z.boolean().optional(),
-    dailyPrizeKr: zod_1.z.number().positive().optional(),
-    targetAges: zod_1.z.array(zod_1.z.number()).length(2).optional(),
-    targetGeos: zod_1.z.array(zod_1.z.string().length(2)).optional(),
-    airdropKr: zod_1.z.number().positive().optional(),
-    airdropLimit: zod_1.z.number().int().positive().optional(),
-    judges: zod_1.z.array(zod_1.z.string().uuid()).max(20).optional(), // 20 Judge limit explicitly enforced natively
+    entryFeeKr: z.number().positive().optional(),
+    publicVoteWeight: z.number().min(0).max(100).optional(),
+    allowDailyPrizes: z.boolean().optional(),
+    dailyPrizeKr: z.number().positive().optional(),
+    targetAges: z.array(z.number()).length(2).optional(),
+    targetGeos: z.array(z.string().length(2)).optional(),
+    airdropKr: z.number().positive().optional(),
+    airdropLimit: z.number().int().positive().optional(),
+    judges: z.array(z.string().uuid()).max(20).optional(), // 20 Judge limit explicitly enforced natively
 });
-const submitEntrySchema = zod_1.z.object({
-    mediaUrl: zod_1.z.string().url('Invalid media URL'),
-    mediaType: zod_1.z.enum(['PHOTO', 'VIDEO']),
-    proofUrls: zod_1.z.array(zod_1.z.string().url()).optional()
+const submitEntrySchema = z.object({
+    mediaUrl: z.string().url('Invalid media URL'),
+    mediaType: z.enum(['PHOTO', 'VIDEO']),
+    proofUrls: z.array(z.string().url()).optional()
 });
-const distributeSchema = zod_1.z.object({
-    winnerIds: zod_1.z.array(zod_1.z.string().uuid()).min(1).max(3)
+const distributeSchema = z.object({
+    winnerIds: z.array(z.string().uuid()).min(1).max(3)
 });
 // GET /api/v1/contests
-router.get('/', auth_1.optionalAuth, async (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
     try {
         const status = req.query.status;
         const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
         const limit = req.query.limit ? parseInt(req.query.limit) : 20;
-        const result = await contests_service_1.ContestService.listContests({ status, cursor, limit, userId: req.userId });
+        const result = await ContestService.listContests({ status, cursor, limit, userId: req.userId });
         res.status(200).json(result);
     }
     catch (error) {
@@ -59,10 +57,10 @@ router.get('/', auth_1.optionalAuth, async (req, res) => {
     }
 });
 // POST /api/v1/contests
-router.post('/', auth_1.authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         const data = createContestSchema.parse(req.body);
-        const contest = await contests_service_1.ContestService.createContest({
+        const contest = await ContestService.createContest({
             creatorId: req.userId,
             ...data,
             deadline: new Date(data.deadline)
@@ -79,9 +77,9 @@ router.post('/', auth_1.authMiddleware, async (req, res) => {
     }
 });
 // GET /api/v1/contests/my-contests
-router.get('/my-contests', auth_1.authMiddleware, async (req, res) => {
+router.get('/my-contests', authMiddleware, async (req, res) => {
     try {
-        const result = await contests_service_1.ContestService.listContests({ userId: req.userId, limit: 50 });
+        const result = await ContestService.listContests({ userId: req.userId, limit: 50 });
         const mine = result.items.filter((c) => c.creator?.id === req.userId);
         res.status(200).json(mine);
     }
@@ -90,9 +88,9 @@ router.get('/my-contests', auth_1.authMiddleware, async (req, res) => {
     }
 });
 // GET /api/v1/contests/:id
-router.get('/:id', auth_1.optionalAuth, async (req, res) => {
+router.get('/:id', optionalAuth, async (req, res) => {
     try {
-        const contest = await contests_service_1.ContestService.getContestById(String(req.params.id), req.userId);
+        const contest = await ContestService.getContestById(String(req.params.id), req.userId);
         res.status(200).json(contest);
     }
     catch (error) {
@@ -100,9 +98,9 @@ router.get('/:id', auth_1.optionalAuth, async (req, res) => {
     }
 });
 // POST /api/v1/contests/:id/join
-router.post('/:id/join', auth_1.authMiddleware, async (req, res) => {
+router.post('/:id/join', authMiddleware, async (req, res) => {
     try {
-        const result = await contests_service_1.ContestService.joinContest(req.userId, String(req.params.id));
+        const result = await ContestService.joinContest(req.userId, String(req.params.id));
         res.status(200).json(result);
     }
     catch (error) {
@@ -110,10 +108,10 @@ router.post('/:id/join', auth_1.authMiddleware, async (req, res) => {
     }
 });
 // POST /api/v1/contests/:id/submit
-router.post('/:id/submit', auth_1.authMiddleware, async (req, res) => {
+router.post('/:id/submit', authMiddleware, async (req, res) => {
     try {
         const data = submitEntrySchema.parse(req.body);
-        const submission = await contests_service_1.ContestService.submitEntry({
+        const submission = await ContestService.submitEntry({
             userId: req.userId,
             contestId: String(req.params.id),
             ...data
@@ -134,17 +132,45 @@ router.get('/:id/submissions', async (req, res) => {
     try {
         const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
         const limit = req.query.limit ? parseInt(req.query.limit) : 20;
-        const result = await contests_service_1.ContestService.getSubmissions(String(req.params.id), cursor, limit);
+        const result = await ContestService.getSubmissions(String(req.params.id), cursor, limit);
         res.status(200).json(result);
     }
     catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+// GET /api/v1/contests/submissions/feed — All contest submissions feed
+router.get('/submissions/feed', optionalAuth, async (req, res) => {
+    try {
+        const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
+        const limit = req.query.limit ? parseInt(req.query.limit) : 20;
+        const result = await ContestService.getSubmissionsFeed(cursor, limit, req.userId);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+// POST /api/v1/contests/submissions/:submissionId/vote
+router.post('/submissions/:submissionId/vote', authMiddleware, async (req, res) => {
+    try {
+        const { voteType } = z.object({ voteType: z.enum(['UPVOTE', 'DOWNVOTE']) }).parse(req.body);
+        const result = await ContestService.voteOnSubmission(req.userId, String(req.params.submissionId), voteType);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        if (error.name === 'ZodError') {
+            res.status(400).json({ error: 'Validation failed', details: error.errors });
+        }
+        else {
+            res.status(400).json({ error: error.message });
+        }
+    }
+});
 // GET /api/v1/contests/:id/leaderboard
 router.get('/:id/leaderboard', async (req, res) => {
     try {
-        const result = await contests_service_1.ContestService.getLeaderboard(String(req.params.id));
+        const result = await ContestService.getLeaderboard(String(req.params.id));
         res.status(200).json(result);
     }
     catch (error) {
@@ -152,10 +178,10 @@ router.get('/:id/leaderboard', async (req, res) => {
     }
 });
 // POST /api/v1/contests/:id/distribute — Admin only
-router.post('/:id/distribute', auth_1.authMiddleware, auth_1.adminAuth, async (req, res) => {
+router.post('/:id/distribute', authMiddleware, adminAuth, async (req, res) => {
     try {
         const { winnerIds } = distributeSchema.parse(req.body);
-        await contests_service_1.ContestService.distributeContestPrizes(String(req.params.id), winnerIds);
+        await ContestService.distributeContestPrizes(String(req.params.id), winnerIds);
         res.status(200).json({ success: true, message: 'Prizes distributed successfully' });
     }
     catch (error) {
@@ -167,5 +193,5 @@ router.post('/:id/distribute', auth_1.authMiddleware, auth_1.adminAuth, async (r
         }
     }
 });
-exports.default = router;
+export default router;
 //# sourceMappingURL=contests.routes.js.map

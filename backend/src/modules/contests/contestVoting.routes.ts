@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { prisma } from '../../config/database';
+import { prisma } from '../../config/database.js';
 import { rateLimit } from 'express-rate-limit';
 import { z } from 'zod';
-import { validateRequest } from '../../middleware/validate';
-// import { authenticate } from '../../middleware/auth'; // Ensure you have authentication logic securely checking token headers
+import { validateRequest } from '../../middleware/validate.js';
+// import { authenticate } from '../../middleware/auth.js'; // Ensure you have authentication logic securely checking token headers
 
 const router = Router();
 

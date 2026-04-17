@@ -1,15 +1,9 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExchangeService = void 0;
-const axios_1 = __importDefault(require("axios"));
-const env_1 = require("../../config/env");
+import axios from 'axios';
+import { env } from '../../config/env.js';
 // In-memory cache fallback if Redis isn't fully set up yet
 const rateCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-class ExchangeService {
+export class ExchangeService {
     /**
      * Fetches the exchange rate from a base currency to Kr equivalent (which is usually USD).
      * For Krieta, 1 Kr is technically pegged internally (e.g., to $1),
@@ -25,8 +19,8 @@ class ExchangeService {
         }
         try {
             // fawazahmed0 API provides rates relative to USD (base)
-            const url = `${env_1.env.EXCHANGE_RATE_BASE_URL}/usd.json`;
-            const response = await axios_1.default.get(url);
+            const url = `${env.EXCHANGE_RATE_BASE_URL}/usd.json`;
+            const response = await axios.get(url);
             const rates = response.data.usd;
             if (!rates || !rates[currency]) {
                 throw new Error(`Currency ${currency} not supported`);
@@ -77,5 +71,4 @@ class ExchangeService {
         }
     }
 }
-exports.ExchangeService = ExchangeService;
 //# sourceMappingURL=exchange.service.js.map

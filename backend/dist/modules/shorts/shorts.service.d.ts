@@ -1,10 +1,11 @@
+import { SubscriptionTierType } from '@prisma/client';
 export declare class ShortsService {
-    static getFeed(params: {
-        userId: string;
-        tab: 'home' | 'discover' | 'admiring';
-        cursor?: string;
-        limit: number;
-    }): Promise<{
+    /**
+     * Get shorts feed based on type
+     * - discover: Users NOT in admiring list (For You)
+     * - admiring: Users in admiring list (Following)
+     */
+    static getFeed(type: string, cursor?: string, limit?: number, userId?: string): Promise<{
         items: {
             id: string;
             creator: {
@@ -12,125 +13,65 @@ export declare class ShortsService {
                 username: string;
                 displayName: string;
                 avatarUrl: string | null;
-                accountType: import(".prisma/client").$Enums.AccountType;
                 isVerified: boolean;
             };
             videoUrl: string;
-            thumbnailUrl: string | null;
-            caption: string | null;
+            caption: string;
             musicTrack: string | null;
-            contestId: string | null;
-            collectionId: string | null;
-            linkedProductId: string | null;
+            likesCount: number;
+            commentsCount: number;
+            isLiked: boolean;
+            isLocked: boolean;
+            requiredTier: import("../../generated/enums.js").SubscriptionTierType | null;
             linkedProduct: {
                 id: string;
                 title: string;
-                imageUrl: string;
                 priceKr: number;
+                imageUrl: string | null;
             } | null;
-            isLocked: boolean;
-            requiredTier: import(".prisma/client").$Enums.SubscriptionTierType | null;
-            likesCount: number;
-            commentsCount: number;
-            views: number;
-            isLiked: boolean;
             createdAt: string;
         }[];
         nextCursor: string | null;
     }>;
+    /**
+     * Create a new short
+     */
     static createShort(data: {
-        userId: string;
+        creatorId: string;
         videoUrl: string;
-        thumbnailUrl?: string;
-        caption: string;
+        caption?: string;
         musicTrack?: string;
-        contestId?: string;
-        collectionId?: string;
         linkedProductId?: string;
-        isLocked: boolean;
-        requiredTier?: string;
+        isLocked?: boolean;
+        requiredTier?: SubscriptionTierType;
     }): Promise<{
+        id: string;
         creator: {
             id: string;
             username: string;
             displayName: string;
             avatarUrl: string | null;
         };
-        createdAt: string;
-        user: {
-            id: string;
-            username: string;
-            displayName: string;
-            avatarUrl: string | null;
-        };
-        id: string;
-        userId: string;
         videoUrl: string;
-        thumbnailUrl: string | null;
         caption: string | null;
-        musicTitle: string | null;
-        musicArtist: string | null;
-        isLocked: boolean;
-        requiredTier: import(".prisma/client").$Enums.SubscriptionTierType | null;
-        contestId: string | null;
-        collectionId: string | null;
-        linkedProductId: string | null;
-        views: number;
+        musicTrack: string | null;
         likesCount: number;
         commentsCount: number;
+        isLiked: boolean;
+        isLocked: boolean;
+        requiredTier: import("../../generated/enums.js").SubscriptionTierType | null;
+        createdAt: string;
     }>;
+    /**
+     * Toggle like on a short
+     */
     static toggleLike(userId: string, shortId: string): Promise<{
         liked: boolean;
+        likesCount: number;
     }>;
-    static addComment(userId: string, shortId: string, text: string): Promise<{
-        createdAt: string;
-        user: {
-            id: string;
-            username: string;
-            displayName: string;
-            avatarUrl: string | null;
-        };
-        id: string;
-        userId: string;
-        shortId: string;
-        text: string;
-    }>;
-    static getComments(shortId: string, cursor?: string, limit?: number): Promise<{
-        items: {
-            createdAt: string;
-            user: {
-                id: string;
-                username: string;
-                displayName: string;
-                avatarUrl: string | null;
-            };
-            id: string;
-            userId: string;
-            shortId: string;
-            text: string;
-        }[];
-        nextCursor: string | null;
-    }>;
-    static incrementView(shortId: string): Promise<void>;
-    static getCollections(userId: string): Promise<{
-        shortCount: number;
-        createdAt: string;
-        _count: {
-            shorts: number;
-        };
-        name: string;
-        id: string;
-        userId: string;
-        sortOrder: number;
-        coverUrl: string | null;
-    }[]>;
-    static createCollection(userId: string, name: string): Promise<{
-        createdAt: string;
-        name: string;
-        id: string;
-        userId: string;
-        sortOrder: number;
-        coverUrl: string | null;
-    }>;
+    /**
+     * Increment view count
+     */
+    static incrementView(shortId: string, userId?: string): Promise<void>;
 }
 //# sourceMappingURL=shorts.service.d.ts.map

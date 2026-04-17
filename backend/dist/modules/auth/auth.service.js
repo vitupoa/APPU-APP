@@ -1,24 +1,18 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthService = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const database_1 = require("../../config/database");
-const jwt_1 = require("../../utils/jwt");
-const crypto_1 = __importDefault(require("crypto"));
+import bcrypt from 'bcrypt';
+import { prisma } from '../../config/database.js';
+import { generateAccessToken } from '../../utils/jwt.js';
+import crypto from 'crypto';
 // Token expiration: 365 days simulating TikTok persistent logins securely!
 const REFRESH_TOKEN_TTL = 365 * 24 * 60 * 60 * 1000;
-class AuthService {
+export class AuthService {
     /**
      * Helper to generate a unique refresh token, hash it, and store it
      */
     static async createRefreshToken(userId, deviceId) {
-        const rawToken = crypto_1.default.randomBytes(40).toString('hex');
-        const tokenHash = crypto_1.default.createHash('sha256').update(rawToken).digest('hex');
+        const rawToken = crypto.randomBytes(40).toString('hex');
+        const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
         const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL);
-        await database_1.prisma.refreshToken.create({
+        await prisma.refreshToken.create({
             data: {
                 userId,
                 deviceId,
@@ -44,7 +38,7 @@ class AuthService {
         for (const variant of variants) {
             if (variant.length < 3)
                 continue;
-            const exists = await database_1.prisma.user.findUnique({ where: { username: variant } });
+            const exists = await prisma.user.findUnique({ where: { username: variant } });
             if (!exists && !suggestions.includes(variant)) {
                 suggestions.push(variant);
             }
@@ -54,7 +48,7 @@ class AuthService {
         // Fallbacks if we still don't have 3
         while (suggestions.length < 3) {
             const fallback = `user_${Math.floor(Math.random() * 100000)}`;
-            const exists = await database_1.prisma.user.findUnique({ where: { username: fallback } });
+            const exists = await prisma.user.findUnique({ where: { username: fallback } });
             if (!exists && !suggestions.includes(fallback)) {
                 suggestions.push(fallback);
             }
@@ -62,17 +56,17 @@ class AuthService {
         return suggestions;
     }
     static async register(data) {
-        const existingEmail = await database_1.prisma.user.findUnique({ where: { email: data.email } });
+        const existingEmail = await prisma.user.findUnique({ where: { email: data.email } });
         if (existingEmail) {
             throw new Error('Email already in use');
         }
-        const existingUsername = await database_1.prisma.user.findUnique({ where: { username: data.username } });
+        const existingUsername = await prisma.user.findUnique({ where: { username: data.username } });
         if (existingUsername) {
             throw new Error('Username already taken');
         }
-        const passwordHash = await bcrypt_1.default.hash(data.password, 12);
+        const passwordHash = await bcrypt.hash(data.password, 12);
         const displayName = `${data.firstName} ${data.lastName}`;
-        const user = await database_1.prisma.user.create({
+        const user = await prisma.user.create({
             data: {
                 email: data.email,
                 passwordHash,
@@ -92,7 +86,7 @@ class AuthService {
             isWalletUnlocked: user.isWalletUnlocked,
             accountType: user.accountType
         };
-        const accessToken = (0, jwt_1.generateAccessToken)(payload);
+        const accessToken = generateAccessToken(payload);
         const refreshToken = await this.createRefreshToken(user.id, data.deviceId);
         return {
             user: {
@@ -117,21 +111,21 @@ class AuthService {
         let user = null;
         if (data.email) {
             const emailLower = data.email.toLowerCase();
-            user = await database_1.prisma.user.findFirst({ where: { email: emailLower } });
+            user = await prisma.user.findFirst({ where: { email: emailLower } });
             if (!user) {
                 // Fallback for insensitive check if database allows it or for differently cased registrations
-                user = await database_1.prisma.user.findFirst({ where: { email: { equals: data.email, mode: 'insensitive' } } }) ||
-                    await database_1.prisma.user.findFirst({ where: { email: data.email } });
+                user = await prisma.user.findFirst({ where: { email: { equals: data.email, mode: 'insensitive' } } }) ||
+                    await prisma.user.findFirst({ where: { email: data.email } });
             }
         }
         else if (data.username) {
-            user = await database_1.prisma.user.findFirst({ where: { username: { equals: data.username, mode: 'insensitive' } } }) ||
-                await database_1.prisma.user.findUnique({ where: { username: data.username } });
+            user = await prisma.user.findFirst({ where: { username: { equals: data.username, mode: 'insensitive' } } }) ||
+                await prisma.user.findUnique({ where: { username: data.username } });
         }
         if (!user || !user.passwordHash) {
             throw new Error('Invalid credentials');
         }
-        const isValid = await bcrypt_1.default.compare(data.password, user.passwordHash);
+        const isValid = await bcrypt.compare(data.password, user.passwordHash);
         if (!isValid) {
             throw new Error('Invalid credentials');
         }
@@ -142,9 +136,9 @@ class AuthService {
             isWalletUnlocked: user.isWalletUnlocked,
             accountType: user.accountType
         };
-        const accessToken = (0, jwt_1.generateAccessToken)(payload);
+        const accessToken = generateAccessToken(payload);
         // Revoke old tokens for this specific device
-        await database_1.prisma.refreshToken.deleteMany({
+        await prisma.refreshToken.deleteMany({
             where: { userId: user.id, deviceId: data.deviceId }
         });
         const refreshToken = await this.createRefreshToken(user.id, data.deviceId);
@@ -172,7 +166,7 @@ class AuthService {
         // Mocking email extraction:
         const providerEmail = `oauth_${data.token.substring(0, 8)}@example.com`; // Placeholder
         const providerId = data.token.substring(0, 20); // Placeholder
-        let user = await database_1.prisma.user.findFirst({
+        let user = await prisma.user.findFirst({
             where: data.provider === 'google' ? { googleId: providerId } : { appleId: providerId }
         });
         let isNewUser = false;
@@ -188,7 +182,7 @@ class AuthService {
                     suggestions
                 }));
             }
-            const existingUsername = await database_1.prisma.user.findUnique({ where: { username: data.username } });
+            const existingUsername = await prisma.user.findUnique({ where: { username: data.username } });
             if (existingUsername) {
                 const suggestions = await this.suggestUsernames(data.username);
                 throw new Error(JSON.stringify({
@@ -198,7 +192,7 @@ class AuthService {
                 }));
             }
             const displayName = `${data.firstName} ${data.lastName}`;
-            user = await database_1.prisma.user.create({
+            user = await prisma.user.create({
                 data: {
                     email: providerEmail, // The real verified email from Google/Apple
                     googleId: data.provider === 'google' ? providerId : null,
@@ -221,8 +215,8 @@ class AuthService {
             isWalletUnlocked: user.isWalletUnlocked,
             accountType: user.accountType
         };
-        const accessToken = (0, jwt_1.generateAccessToken)(payload);
-        await database_1.prisma.refreshToken.deleteMany({
+        const accessToken = generateAccessToken(payload);
+        await prisma.refreshToken.deleteMany({
             where: { userId: user.id, deviceId: data.deviceId }
         });
         const refreshToken = await this.createRefreshToken(user.id, data.deviceId);
@@ -241,9 +235,9 @@ class AuthService {
         };
     }
     static async refreshToken(data) {
-        const tokenHash = crypto_1.default.createHash('sha256').update(data.refreshToken).digest('hex');
+        const tokenHash = crypto.createHash('sha256').update(data.refreshToken).digest('hex');
         // Find the token
-        const tokenRecord = await database_1.prisma.refreshToken.findFirst({
+        const tokenRecord = await prisma.refreshToken.findFirst({
             where: { tokenHash, deviceId: data.deviceId },
             include: { user: true }
         });
@@ -251,12 +245,12 @@ class AuthService {
             throw new Error('Invalid refresh token');
         }
         if (tokenRecord.expiresAt.getTime() < Date.now()) {
-            await database_1.prisma.refreshToken.delete({ where: { id: tokenRecord.id } });
+            await prisma.refreshToken.delete({ where: { id: tokenRecord.id } });
             throw new Error('Refresh token expired');
         }
         const { user } = tokenRecord;
         // Remove old token (Refresh Token Rotation)
-        await database_1.prisma.refreshToken.delete({ where: { id: tokenRecord.id } });
+        await prisma.refreshToken.delete({ where: { id: tokenRecord.id } });
         // Generate new set
         const payload = {
             userId: user.id,
@@ -265,7 +259,7 @@ class AuthService {
             isWalletUnlocked: user.isWalletUnlocked,
             accountType: user.accountType
         };
-        const accessToken = (0, jwt_1.generateAccessToken)(payload);
+        const accessToken = generateAccessToken(payload);
         const newRefreshToken = await this.createRefreshToken(user.id, data.deviceId);
         return {
             accessToken,
@@ -273,12 +267,11 @@ class AuthService {
         };
     }
     static async logout(data) {
-        const tokenHash = crypto_1.default.createHash('sha256').update(data.refreshToken).digest('hex');
-        await database_1.prisma.refreshToken.deleteMany({
+        const tokenHash = crypto.createHash('sha256').update(data.refreshToken).digest('hex');
+        await prisma.refreshToken.deleteMany({
             where: { tokenHash, deviceId: data.deviceId }
         });
         return { success: true };
     }
 }
-exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

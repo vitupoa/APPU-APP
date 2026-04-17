@@ -1,17 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ShopService = void 0;
-const database_1 = require("../../config/database");
-const client_1 = require("@prisma/client");
-class ShopService {
+import { prisma } from '../../config/database.js';
+import { Prisma } from '@prisma/client';
+export class ShopService {
     static async createProduct(data) {
-        const product = await database_1.prisma.product.create({
+        const product = await prisma.product.create({
             data: {
                 sellerId: data.sellerId,
                 title: data.title,
                 description: data.description,
                 imageUrls: data.imageUrls,
-                priceKr: new client_1.Prisma.Decimal(data.priceKr),
+                priceKr: new Prisma.Decimal(data.priceKr),
                 category: data.category,
                 whatsappNumber: data.whatsappNumber,
                 status: 'active'
@@ -26,17 +23,17 @@ class ShopService {
     }
     static async updateProduct(productId, sellerId, data) {
         // Verify ownership
-        const existing = await database_1.prisma.product.findUniqueOrThrow({ where: { id: productId } });
+        const existing = await prisma.product.findUniqueOrThrow({ where: { id: productId } });
         if (existing.sellerId !== sellerId) {
             throw new Error('You can only edit your own products');
         }
-        const product = await database_1.prisma.product.update({
+        const product = await prisma.product.update({
             where: { id: productId },
             data: {
                 ...(data.title !== undefined && { title: data.title }),
                 ...(data.description !== undefined && { description: data.description }),
                 ...(data.imageUrls !== undefined && { imageUrls: data.imageUrls }),
-                ...(data.priceKr !== undefined && { priceKr: new client_1.Prisma.Decimal(data.priceKr) }),
+                ...(data.priceKr !== undefined && { priceKr: new Prisma.Decimal(data.priceKr) }),
                 ...(data.category !== undefined && { category: data.category }),
                 ...(data.whatsappNumber !== undefined && { whatsappNumber: data.whatsappNumber }),
                 ...(data.status !== undefined && { status: data.status })
@@ -50,17 +47,17 @@ class ShopService {
         return formatProduct(product);
     }
     static async deleteProduct(productId, sellerId) {
-        const existing = await database_1.prisma.product.findUniqueOrThrow({ where: { id: productId } });
+        const existing = await prisma.product.findUniqueOrThrow({ where: { id: productId } });
         if (existing.sellerId !== sellerId) {
             throw new Error('You can only delete your own products');
         }
-        await database_1.prisma.product.update({
+        await prisma.product.update({
             where: { id: productId },
             data: { status: 'removed' }
         });
     }
     static async getProduct(productId) {
-        const product = await database_1.prisma.product.findUniqueOrThrow({
+        const product = await prisma.product.findUniqueOrThrow({
             where: { id: productId },
             include: {
                 seller: {
@@ -84,7 +81,7 @@ class ShopService {
                 { description: { contains: query, mode: 'insensitive' } }
             ];
         }
-        const products = await database_1.prisma.product.findMany({
+        const products = await prisma.product.findMany({
             where,
             take: limit + 1,
             ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
@@ -103,7 +100,7 @@ class ShopService {
         };
     }
     static async getMyProducts(sellerId) {
-        const products = await database_1.prisma.product.findMany({
+        const products = await prisma.product.findMany({
             where: { sellerId, status: { not: 'removed' } },
             orderBy: { createdAt: 'desc' },
             include: {
@@ -115,7 +112,6 @@ class ShopService {
         return products.map(formatProduct);
     }
 }
-exports.ShopService = ShopService;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function formatProduct(p) {
     return {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { redis } from '../../config/redis';
+import { redis } from '../../config/redis.js';
 
 export const getCacheValue = async (req: Request, res: Response): Promise<void> => {
   try {

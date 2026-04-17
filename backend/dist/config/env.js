@@ -1,55 +1,53 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.env = void 0;
-const zod_1 = require("zod");
-const envSchema = zod_1.z.object({
-    NODE_ENV: zod_1.z.enum(['development', 'production', 'test']).default('development'),
-    PORT: zod_1.z.string().default('3000').transform(Number),
-    CORS_ORIGIN: zod_1.z.string().default('*'),
+import { z } from 'zod';
+const envSchema = z.object({
+    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    PORT: z.string().default('3000').transform(Number),
+    CORS_ORIGIN: z.string().default('*'),
     // Rate Limiting
-    RATE_LIMIT_MAX: zod_1.z.string().default('100').transform(Number),
-    RATE_LIMIT_WINDOW_MS: zod_1.z.string().default('900000').transform(Number),
+    RATE_LIMIT_MAX: z.string().default('100').transform(Number),
+    RATE_LIMIT_WINDOW_MS: z.string().default('900000').transform(Number),
     // Security
-    REQUEST_SIGNING_KEY: zod_1.z.string().min(16, 'REQUEST_SIGNING_KEY must be at least 16 characters'),
+    REQUEST_SIGNING_KEY: z.string().min(16, 'REQUEST_SIGNING_KEY must be at least 16 characters'),
     // Database
-    DATABASE_URL: zod_1.z.string().min(1, 'DATABASE_URL is required'),
+    DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
     // Redis
-    REDIS_URL: zod_1.z.string().min(1, 'REDIS_URL is required'),
+    REDIS_URL: z.string().min(1, 'REDIS_URL is required'),
     // JWT
-    JWT_ACCESS_SECRET: zod_1.z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
-    JWT_REFRESH_SECRET: zod_1.z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 characters'),
-    JWT_ACCESS_EXPIRY: zod_1.z.string().default('15m'),
-    JWT_REFRESH_EXPIRY: zod_1.z.string().default('7d'),
+    JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
+    JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 characters'),
+    JWT_ACCESS_EXPIRY: z.string().default('15m'),
+    JWT_REFRESH_EXPIRY: z.string().default('7d'),
     // Cloudinary
-    CLOUDINARY_CLOUD_NAME: zod_1.z.string().trim().min(1),
-    CLOUDINARY_API_KEY: zod_1.z.string().trim().min(1),
-    CLOUDINARY_API_SECRET: zod_1.z.string().trim().min(1),
+    CLOUDINARY_CLOUD_NAME: z.string().trim().min(1),
+    CLOUDINARY_API_KEY: z.string().trim().min(1),
+    CLOUDINARY_API_SECRET: z.string().trim().min(1),
+    CLOUDINARY_UPLOAD_PRESET: z.string().trim().optional(),
     // PayPal
-    PAYPAL_CLIENT_ID: zod_1.z.string().optional(),
-    PAYPAL_CLIENT_SECRET: zod_1.z.string().optional(),
-    PAYPAL_MODE: zod_1.z.enum(['sandbox', 'live']).default('sandbox'),
+    PAYPAL_CLIENT_ID: z.string().optional(),
+    PAYPAL_CLIENT_SECRET: z.string().optional(),
+    PAYPAL_MODE: z.enum(['sandbox', 'live']).default('sandbox'),
     // Paystack
-    PAYSTACK_SECRET_KEY: zod_1.z.string().optional(),
-    PAYSTACK_PUBLIC_KEY: zod_1.z.string().optional(),
+    PAYSTACK_SECRET_KEY: z.string().optional(),
+    PAYSTACK_PUBLIC_KEY: z.string().optional(),
     // M-Pesa (Daraja)
-    MPESA_CONSUMER_KEY: zod_1.z.string().optional(),
-    MPESA_CONSUMER_SECRET: zod_1.z.string().optional(),
-    MPESA_SHORTCODE: zod_1.z.string().optional(),
-    MPESA_PASSKEY: zod_1.z.string().optional(),
-    MPESA_ENV: zod_1.z.enum(['sandbox', 'production']).default('sandbox'),
-    MPESA_CALLBACK_URL: zod_1.z.string().optional(),
+    MPESA_CONSUMER_KEY: z.string().optional(),
+    MPESA_CONSUMER_SECRET: z.string().optional(),
+    MPESA_SHORTCODE: z.string().optional(),
+    MPESA_PASSKEY: z.string().optional(),
+    MPESA_ENV: z.enum(['sandbox', 'production']).default('sandbox'),
+    MPESA_CALLBACK_URL: z.string().optional(),
     // Payoneer
-    PAYONEER_PARTNER_ID: zod_1.z.string().optional(),
-    PAYONEER_API_TOKEN: zod_1.z.string().optional(),
+    PAYONEER_PARTNER_ID: z.string().optional(),
+    PAYONEER_API_TOKEN: z.string().optional(),
     // Exchange Rate API
-    EXCHANGE_RATE_BASE_URL: zod_1.z.string().default('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies'),
+    EXCHANGE_RATE_BASE_URL: z.string().default('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies'),
 });
 function validateEnv() {
     try {
         return envSchema.parse(process.env);
     }
     catch (error) {
-        if (error instanceof zod_1.z.ZodError) {
+        if (error instanceof z.ZodError) {
             const missing = error.issues.map((i) => i.path.join('.')).join(', ');
             console.error(`❌ Environment validation failed: ${missing}`);
             throw new Error(`Invalid environment variables: ${missing}`);
@@ -57,5 +55,5 @@ function validateEnv() {
         throw error;
     }
 }
-exports.env = validateEnv();
+export const env = validateEnv();
 //# sourceMappingURL=env.js.map

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { env } from '../../config/env';
+import { env } from '../../config/env.js';
 
 const MPESA_AUTH_URL = env.MPESA_ENV === 'production'
   ? 'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'

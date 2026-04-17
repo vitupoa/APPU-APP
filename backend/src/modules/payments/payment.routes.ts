@@ -1,12 +1,12 @@
 import { Router, Request, Response } from 'express';
-import { authMiddleware, AuthRequest } from '../../middleware/auth';
-import { WalletService } from '../wallet/wallet.service';
-import { ExchangeService } from '../../services/exchange/exchange.service';
-import { MpesaService } from '../../services/payments/mpesa.service';
-import { PaypalService } from '../../services/payments/paypal.service';
-import { PaystackService } from '../../services/payments/paystack.service';
-import { topupInitiateSchema, withdrawInitiateSchema } from '../wallet/wallet.validation';
-import { prisma } from '../../config/database';
+import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
+import { WalletService } from '../wallet/wallet.service.js';
+import { ExchangeService } from '../../services/exchange/exchange.service.js';
+import { MpesaService } from '../../services/payments/mpesa.service.js';
+import { PaypalService } from '../../services/payments/paypal.service.js';
+import { PaystackService } from '../../services/payments/paystack.service.js';
+import { topupInitiateSchema, withdrawInitiateSchema } from '../wallet/wallet.validation.js';
+import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
 

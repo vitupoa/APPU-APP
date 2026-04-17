@@ -1,0 +1,2518 @@
+import type * as runtime from "@prisma/client/runtime/client";
+import type * as $Enums from "../enums";
+import type * as Prisma from "../internal/prismaNamespace";
+/**
+ * Model Short
+ *
+ */
+export type ShortModel = runtime.Types.Result.DefaultSelection<Prisma.$ShortPayload>;
+export type AggregateShort = {
+    _count: ShortCountAggregateOutputType | null;
+    _avg: ShortAvgAggregateOutputType | null;
+    _sum: ShortSumAggregateOutputType | null;
+    _min: ShortMinAggregateOutputType | null;
+    _max: ShortMaxAggregateOutputType | null;
+};
+export type ShortAvgAggregateOutputType = {
+    views: number | null;
+    likesCount: number | null;
+    commentsCount: number | null;
+};
+export type ShortSumAggregateOutputType = {
+    views: number | null;
+    likesCount: number | null;
+    commentsCount: number | null;
+};
+export type ShortMinAggregateOutputType = {
+    id: string | null;
+    userId: string | null;
+    videoUrl: string | null;
+    thumbnailUrl: string | null;
+    caption: string | null;
+    musicTitle: string | null;
+    musicArtist: string | null;
+    isLocked: boolean | null;
+    requiredTier: $Enums.SubscriptionTierType | null;
+    contestId: string | null;
+    collectionId: string | null;
+    linkedProductId: string | null;
+    views: number | null;
+    likesCount: number | null;
+    commentsCount: number | null;
+    createdAt: Date | null;
+};
+export type ShortMaxAggregateOutputType = {
+    id: string | null;
+    userId: string | null;
+    videoUrl: string | null;
+    thumbnailUrl: string | null;
+    caption: string | null;
+    musicTitle: string | null;
+    musicArtist: string | null;
+    isLocked: boolean | null;
+    requiredTier: $Enums.SubscriptionTierType | null;
+    contestId: string | null;
+    collectionId: string | null;
+    linkedProductId: string | null;
+    views: number | null;
+    likesCount: number | null;
+    commentsCount: number | null;
+    createdAt: Date | null;
+};
+export type ShortCountAggregateOutputType = {
+    id: number;
+    userId: number;
+    videoUrl: number;
+    thumbnailUrl: number;
+    caption: number;
+    musicTitle: number;
+    musicArtist: number;
+    isLocked: number;
+    requiredTier: number;
+    contestId: number;
+    collectionId: number;
+    linkedProductId: number;
+    views: number;
+    likesCount: number;
+    commentsCount: number;
+    createdAt: number;
+    _all: number;
+};
+export type ShortAvgAggregateInputType = {
+    views?: true;
+    likesCount?: true;
+    commentsCount?: true;
+};
+export type ShortSumAggregateInputType = {
+    views?: true;
+    likesCount?: true;
+    commentsCount?: true;
+};
+export type ShortMinAggregateInputType = {
+    id?: true;
+    userId?: true;
+    videoUrl?: true;
+    thumbnailUrl?: true;
+    caption?: true;
+    musicTitle?: true;
+    musicArtist?: true;
+    isLocked?: true;
+    requiredTier?: true;
+    contestId?: true;
+    collectionId?: true;
+    linkedProductId?: true;
+    views?: true;
+    likesCount?: true;
+    commentsCount?: true;
+    createdAt?: true;
+};
+export type ShortMaxAggregateInputType = {
+    id?: true;
+    userId?: true;
+    videoUrl?: true;
+    thumbnailUrl?: true;
+    caption?: true;
+    musicTitle?: true;
+    musicArtist?: true;
+    isLocked?: true;
+    requiredTier?: true;
+    contestId?: true;
+    collectionId?: true;
+    linkedProductId?: true;
+    views?: true;
+    likesCount?: true;
+    commentsCount?: true;
+    createdAt?: true;
+};
+export type ShortCountAggregateInputType = {
+    id?: true;
+    userId?: true;
+    videoUrl?: true;
+    thumbnailUrl?: true;
+    caption?: true;
+    musicTitle?: true;
+    musicArtist?: true;
+    isLocked?: true;
+    requiredTier?: true;
+    contestId?: true;
+    collectionId?: true;
+    linkedProductId?: true;
+    views?: true;
+    likesCount?: true;
+    commentsCount?: true;
+    createdAt?: true;
+    _all?: true;
+};
+export type ShortAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which Short to aggregate.
+     */
+    where?: Prisma.ShortWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Shorts to fetch.
+     */
+    orderBy?: Prisma.ShortOrderByWithRelationInput | Prisma.ShortOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: Prisma.ShortWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Shorts from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Shorts.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned Shorts
+    **/
+    _count?: true | ShortCountAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to average
+    **/
+    _avg?: ShortAvgAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to sum
+    **/
+    _sum?: ShortSumAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: ShortMinAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: ShortMaxAggregateInputType;
+};
+export type GetShortAggregateType<T extends ShortAggregateArgs> = {
+    [P in keyof T & keyof AggregateShort]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateShort[P]> : Prisma.GetScalarType<T[P], AggregateShort[P]>;
+};
+export type ShortGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ShortWhereInput;
+    orderBy?: Prisma.ShortOrderByWithAggregationInput | Prisma.ShortOrderByWithAggregationInput[];
+    by: Prisma.ShortScalarFieldEnum[] | Prisma.ShortScalarFieldEnum;
+    having?: Prisma.ShortScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: ShortCountAggregateInputType | true;
+    _avg?: ShortAvgAggregateInputType;
+    _sum?: ShortSumAggregateInputType;
+    _min?: ShortMinAggregateInputType;
+    _max?: ShortMaxAggregateInputType;
+};
+export type ShortGroupByOutputType = {
+    id: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl: string | null;
+    caption: string | null;
+    musicTitle: string | null;
+    musicArtist: string | null;
+    isLocked: boolean;
+    requiredTier: $Enums.SubscriptionTierType | null;
+    contestId: string | null;
+    collectionId: string | null;
+    linkedProductId: string | null;
+    views: number;
+    likesCount: number;
+    commentsCount: number;
+    createdAt: Date;
+    _count: ShortCountAggregateOutputType | null;
+    _avg: ShortAvgAggregateOutputType | null;
+    _sum: ShortSumAggregateOutputType | null;
+    _min: ShortMinAggregateOutputType | null;
+    _max: ShortMaxAggregateOutputType | null;
+};
+type GetShortGroupByPayload<T extends ShortGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<ShortGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof ShortGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], ShortGroupByOutputType[P]> : Prisma.GetScalarType<T[P], ShortGroupByOutputType[P]>;
+}>>;
+export type ShortWhereInput = {
+    AND?: Prisma.ShortWhereInput | Prisma.ShortWhereInput[];
+    OR?: Prisma.ShortWhereInput[];
+    NOT?: Prisma.ShortWhereInput | Prisma.ShortWhereInput[];
+    id?: Prisma.StringFilter<"Short"> | string;
+    userId?: Prisma.StringFilter<"Short"> | string;
+    videoUrl?: Prisma.StringFilter<"Short"> | string;
+    thumbnailUrl?: Prisma.StringNullableFilter<"Short"> | string | null;
+    caption?: Prisma.StringNullableFilter<"Short"> | string | null;
+    musicTitle?: Prisma.StringNullableFilter<"Short"> | string | null;
+    musicArtist?: Prisma.StringNullableFilter<"Short"> | string | null;
+    isLocked?: Prisma.BoolFilter<"Short"> | boolean;
+    requiredTier?: Prisma.EnumSubscriptionTierTypeNullableFilter<"Short"> | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.StringNullableFilter<"Short"> | string | null;
+    collectionId?: Prisma.StringNullableFilter<"Short"> | string | null;
+    linkedProductId?: Prisma.StringNullableFilter<"Short"> | string | null;
+    views?: Prisma.IntFilter<"Short"> | number;
+    likesCount?: Prisma.IntFilter<"Short"> | number;
+    commentsCount?: Prisma.IntFilter<"Short"> | number;
+    createdAt?: Prisma.DateTimeFilter<"Short"> | Date | string;
+    user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
+    contest?: Prisma.XOR<Prisma.ContestNullableScalarRelationFilter, Prisma.ContestWhereInput> | null;
+    collection?: Prisma.XOR<Prisma.ShortCollectionNullableScalarRelationFilter, Prisma.ShortCollectionWhereInput> | null;
+    linkedProduct?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null;
+    likes?: Prisma.ShortLikeListRelationFilter;
+    comments?: Prisma.ShortCommentListRelationFilter;
+};
+export type ShortOrderByWithRelationInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    videoUrl?: Prisma.SortOrder;
+    thumbnailUrl?: Prisma.SortOrderInput | Prisma.SortOrder;
+    caption?: Prisma.SortOrderInput | Prisma.SortOrder;
+    musicTitle?: Prisma.SortOrderInput | Prisma.SortOrder;
+    musicArtist?: Prisma.SortOrderInput | Prisma.SortOrder;
+    isLocked?: Prisma.SortOrder;
+    requiredTier?: Prisma.SortOrderInput | Prisma.SortOrder;
+    contestId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    collectionId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    linkedProductId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    views?: Prisma.SortOrder;
+    likesCount?: Prisma.SortOrder;
+    commentsCount?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    user?: Prisma.UserOrderByWithRelationInput;
+    contest?: Prisma.ContestOrderByWithRelationInput;
+    collection?: Prisma.ShortCollectionOrderByWithRelationInput;
+    linkedProduct?: Prisma.ProductOrderByWithRelationInput;
+    likes?: Prisma.ShortLikeOrderByRelationAggregateInput;
+    comments?: Prisma.ShortCommentOrderByRelationAggregateInput;
+};
+export type ShortWhereUniqueInput = Prisma.AtLeast<{
+    id?: string;
+    AND?: Prisma.ShortWhereInput | Prisma.ShortWhereInput[];
+    OR?: Prisma.ShortWhereInput[];
+    NOT?: Prisma.ShortWhereInput | Prisma.ShortWhereInput[];
+    userId?: Prisma.StringFilter<"Short"> | string;
+    videoUrl?: Prisma.StringFilter<"Short"> | string;
+    thumbnailUrl?: Prisma.StringNullableFilter<"Short"> | string | null;
+    caption?: Prisma.StringNullableFilter<"Short"> | string | null;
+    musicTitle?: Prisma.StringNullableFilter<"Short"> | string | null;
+    musicArtist?: Prisma.StringNullableFilter<"Short"> | string | null;
+    isLocked?: Prisma.BoolFilter<"Short"> | boolean;
+    requiredTier?: Prisma.EnumSubscriptionTierTypeNullableFilter<"Short"> | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.StringNullableFilter<"Short"> | string | null;
+    collectionId?: Prisma.StringNullableFilter<"Short"> | string | null;
+    linkedProductId?: Prisma.StringNullableFilter<"Short"> | string | null;
+    views?: Prisma.IntFilter<"Short"> | number;
+    likesCount?: Prisma.IntFilter<"Short"> | number;
+    commentsCount?: Prisma.IntFilter<"Short"> | number;
+    createdAt?: Prisma.DateTimeFilter<"Short"> | Date | string;
+    user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
+    contest?: Prisma.XOR<Prisma.ContestNullableScalarRelationFilter, Prisma.ContestWhereInput> | null;
+    collection?: Prisma.XOR<Prisma.ShortCollectionNullableScalarRelationFilter, Prisma.ShortCollectionWhereInput> | null;
+    linkedProduct?: Prisma.XOR<Prisma.ProductNullableScalarRelationFilter, Prisma.ProductWhereInput> | null;
+    likes?: Prisma.ShortLikeListRelationFilter;
+    comments?: Prisma.ShortCommentListRelationFilter;
+}, "id">;
+export type ShortOrderByWithAggregationInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    videoUrl?: Prisma.SortOrder;
+    thumbnailUrl?: Prisma.SortOrderInput | Prisma.SortOrder;
+    caption?: Prisma.SortOrderInput | Prisma.SortOrder;
+    musicTitle?: Prisma.SortOrderInput | Prisma.SortOrder;
+    musicArtist?: Prisma.SortOrderInput | Prisma.SortOrder;
+    isLocked?: Prisma.SortOrder;
+    requiredTier?: Prisma.SortOrderInput | Prisma.SortOrder;
+    contestId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    collectionId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    linkedProductId?: Prisma.SortOrderInput | Prisma.SortOrder;
+    views?: Prisma.SortOrder;
+    likesCount?: Prisma.SortOrder;
+    commentsCount?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    _count?: Prisma.ShortCountOrderByAggregateInput;
+    _avg?: Prisma.ShortAvgOrderByAggregateInput;
+    _max?: Prisma.ShortMaxOrderByAggregateInput;
+    _min?: Prisma.ShortMinOrderByAggregateInput;
+    _sum?: Prisma.ShortSumOrderByAggregateInput;
+};
+export type ShortScalarWhereWithAggregatesInput = {
+    AND?: Prisma.ShortScalarWhereWithAggregatesInput | Prisma.ShortScalarWhereWithAggregatesInput[];
+    OR?: Prisma.ShortScalarWhereWithAggregatesInput[];
+    NOT?: Prisma.ShortScalarWhereWithAggregatesInput | Prisma.ShortScalarWhereWithAggregatesInput[];
+    id?: Prisma.StringWithAggregatesFilter<"Short"> | string;
+    userId?: Prisma.StringWithAggregatesFilter<"Short"> | string;
+    videoUrl?: Prisma.StringWithAggregatesFilter<"Short"> | string;
+    thumbnailUrl?: Prisma.StringNullableWithAggregatesFilter<"Short"> | string | null;
+    caption?: Prisma.StringNullableWithAggregatesFilter<"Short"> | string | null;
+    musicTitle?: Prisma.StringNullableWithAggregatesFilter<"Short"> | string | null;
+    musicArtist?: Prisma.StringNullableWithAggregatesFilter<"Short"> | string | null;
+    isLocked?: Prisma.BoolWithAggregatesFilter<"Short"> | boolean;
+    requiredTier?: Prisma.EnumSubscriptionTierTypeNullableWithAggregatesFilter<"Short"> | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.StringNullableWithAggregatesFilter<"Short"> | string | null;
+    collectionId?: Prisma.StringNullableWithAggregatesFilter<"Short"> | string | null;
+    linkedProductId?: Prisma.StringNullableWithAggregatesFilter<"Short"> | string | null;
+    views?: Prisma.IntWithAggregatesFilter<"Short"> | number;
+    likesCount?: Prisma.IntWithAggregatesFilter<"Short"> | number;
+    commentsCount?: Prisma.IntWithAggregatesFilter<"Short"> | number;
+    createdAt?: Prisma.DateTimeWithAggregatesFilter<"Short"> | Date | string;
+};
+export type ShortCreateInput = {
+    id?: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutShortsInput;
+    contest?: Prisma.ContestCreateNestedOneWithoutShortsInput;
+    collection?: Prisma.ShortCollectionCreateNestedOneWithoutShortsInput;
+    linkedProduct?: Prisma.ProductCreateNestedOneWithoutLinkedShortsInput;
+    likes?: Prisma.ShortLikeCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentCreateNestedManyWithoutShortInput;
+};
+export type ShortUncheckedCreateInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    collectionId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    likes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutShortInput;
+};
+export type ShortUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutShortsNestedInput;
+    contest?: Prisma.ContestUpdateOneWithoutShortsNestedInput;
+    collection?: Prisma.ShortCollectionUpdateOneWithoutShortsNestedInput;
+    linkedProduct?: Prisma.ProductUpdateOneWithoutLinkedShortsNestedInput;
+    likes?: Prisma.ShortLikeUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    likes?: Prisma.ShortLikeUncheckedUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUncheckedUpdateManyWithoutShortNestedInput;
+};
+export type ShortCreateManyInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    collectionId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+};
+export type ShortUpdateManyMutationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type ShortUncheckedUpdateManyInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type ShortListRelationFilter = {
+    every?: Prisma.ShortWhereInput;
+    some?: Prisma.ShortWhereInput;
+    none?: Prisma.ShortWhereInput;
+};
+export type ShortOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
+};
+export type ShortCountOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    videoUrl?: Prisma.SortOrder;
+    thumbnailUrl?: Prisma.SortOrder;
+    caption?: Prisma.SortOrder;
+    musicTitle?: Prisma.SortOrder;
+    musicArtist?: Prisma.SortOrder;
+    isLocked?: Prisma.SortOrder;
+    requiredTier?: Prisma.SortOrder;
+    contestId?: Prisma.SortOrder;
+    collectionId?: Prisma.SortOrder;
+    linkedProductId?: Prisma.SortOrder;
+    views?: Prisma.SortOrder;
+    likesCount?: Prisma.SortOrder;
+    commentsCount?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+};
+export type ShortAvgOrderByAggregateInput = {
+    views?: Prisma.SortOrder;
+    likesCount?: Prisma.SortOrder;
+    commentsCount?: Prisma.SortOrder;
+};
+export type ShortMaxOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    videoUrl?: Prisma.SortOrder;
+    thumbnailUrl?: Prisma.SortOrder;
+    caption?: Prisma.SortOrder;
+    musicTitle?: Prisma.SortOrder;
+    musicArtist?: Prisma.SortOrder;
+    isLocked?: Prisma.SortOrder;
+    requiredTier?: Prisma.SortOrder;
+    contestId?: Prisma.SortOrder;
+    collectionId?: Prisma.SortOrder;
+    linkedProductId?: Prisma.SortOrder;
+    views?: Prisma.SortOrder;
+    likesCount?: Prisma.SortOrder;
+    commentsCount?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+};
+export type ShortMinOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    videoUrl?: Prisma.SortOrder;
+    thumbnailUrl?: Prisma.SortOrder;
+    caption?: Prisma.SortOrder;
+    musicTitle?: Prisma.SortOrder;
+    musicArtist?: Prisma.SortOrder;
+    isLocked?: Prisma.SortOrder;
+    requiredTier?: Prisma.SortOrder;
+    contestId?: Prisma.SortOrder;
+    collectionId?: Prisma.SortOrder;
+    linkedProductId?: Prisma.SortOrder;
+    views?: Prisma.SortOrder;
+    likesCount?: Prisma.SortOrder;
+    commentsCount?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+};
+export type ShortSumOrderByAggregateInput = {
+    views?: Prisma.SortOrder;
+    likesCount?: Prisma.SortOrder;
+    commentsCount?: Prisma.SortOrder;
+};
+export type ShortScalarRelationFilter = {
+    is?: Prisma.ShortWhereInput;
+    isNot?: Prisma.ShortWhereInput;
+};
+export type ShortCreateNestedManyWithoutUserInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutUserInput, Prisma.ShortUncheckedCreateWithoutUserInput> | Prisma.ShortCreateWithoutUserInput[] | Prisma.ShortUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutUserInput | Prisma.ShortCreateOrConnectWithoutUserInput[];
+    createMany?: Prisma.ShortCreateManyUserInputEnvelope;
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+};
+export type ShortUncheckedCreateNestedManyWithoutUserInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutUserInput, Prisma.ShortUncheckedCreateWithoutUserInput> | Prisma.ShortCreateWithoutUserInput[] | Prisma.ShortUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutUserInput | Prisma.ShortCreateOrConnectWithoutUserInput[];
+    createMany?: Prisma.ShortCreateManyUserInputEnvelope;
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+};
+export type ShortUpdateManyWithoutUserNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutUserInput, Prisma.ShortUncheckedCreateWithoutUserInput> | Prisma.ShortCreateWithoutUserInput[] | Prisma.ShortUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutUserInput | Prisma.ShortCreateOrConnectWithoutUserInput[];
+    upsert?: Prisma.ShortUpsertWithWhereUniqueWithoutUserInput | Prisma.ShortUpsertWithWhereUniqueWithoutUserInput[];
+    createMany?: Prisma.ShortCreateManyUserInputEnvelope;
+    set?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    disconnect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    delete?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    update?: Prisma.ShortUpdateWithWhereUniqueWithoutUserInput | Prisma.ShortUpdateWithWhereUniqueWithoutUserInput[];
+    updateMany?: Prisma.ShortUpdateManyWithWhereWithoutUserInput | Prisma.ShortUpdateManyWithWhereWithoutUserInput[];
+    deleteMany?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+};
+export type ShortUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutUserInput, Prisma.ShortUncheckedCreateWithoutUserInput> | Prisma.ShortCreateWithoutUserInput[] | Prisma.ShortUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutUserInput | Prisma.ShortCreateOrConnectWithoutUserInput[];
+    upsert?: Prisma.ShortUpsertWithWhereUniqueWithoutUserInput | Prisma.ShortUpsertWithWhereUniqueWithoutUserInput[];
+    createMany?: Prisma.ShortCreateManyUserInputEnvelope;
+    set?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    disconnect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    delete?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    update?: Prisma.ShortUpdateWithWhereUniqueWithoutUserInput | Prisma.ShortUpdateWithWhereUniqueWithoutUserInput[];
+    updateMany?: Prisma.ShortUpdateManyWithWhereWithoutUserInput | Prisma.ShortUpdateManyWithWhereWithoutUserInput[];
+    deleteMany?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+};
+export type NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput = {
+    set?: $Enums.SubscriptionTierType | null;
+};
+export type ShortCreateNestedManyWithoutCollectionInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutCollectionInput, Prisma.ShortUncheckedCreateWithoutCollectionInput> | Prisma.ShortCreateWithoutCollectionInput[] | Prisma.ShortUncheckedCreateWithoutCollectionInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutCollectionInput | Prisma.ShortCreateOrConnectWithoutCollectionInput[];
+    createMany?: Prisma.ShortCreateManyCollectionInputEnvelope;
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+};
+export type ShortUncheckedCreateNestedManyWithoutCollectionInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutCollectionInput, Prisma.ShortUncheckedCreateWithoutCollectionInput> | Prisma.ShortCreateWithoutCollectionInput[] | Prisma.ShortUncheckedCreateWithoutCollectionInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutCollectionInput | Prisma.ShortCreateOrConnectWithoutCollectionInput[];
+    createMany?: Prisma.ShortCreateManyCollectionInputEnvelope;
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+};
+export type ShortUpdateManyWithoutCollectionNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutCollectionInput, Prisma.ShortUncheckedCreateWithoutCollectionInput> | Prisma.ShortCreateWithoutCollectionInput[] | Prisma.ShortUncheckedCreateWithoutCollectionInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutCollectionInput | Prisma.ShortCreateOrConnectWithoutCollectionInput[];
+    upsert?: Prisma.ShortUpsertWithWhereUniqueWithoutCollectionInput | Prisma.ShortUpsertWithWhereUniqueWithoutCollectionInput[];
+    createMany?: Prisma.ShortCreateManyCollectionInputEnvelope;
+    set?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    disconnect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    delete?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    update?: Prisma.ShortUpdateWithWhereUniqueWithoutCollectionInput | Prisma.ShortUpdateWithWhereUniqueWithoutCollectionInput[];
+    updateMany?: Prisma.ShortUpdateManyWithWhereWithoutCollectionInput | Prisma.ShortUpdateManyWithWhereWithoutCollectionInput[];
+    deleteMany?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+};
+export type ShortUncheckedUpdateManyWithoutCollectionNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutCollectionInput, Prisma.ShortUncheckedCreateWithoutCollectionInput> | Prisma.ShortCreateWithoutCollectionInput[] | Prisma.ShortUncheckedCreateWithoutCollectionInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutCollectionInput | Prisma.ShortCreateOrConnectWithoutCollectionInput[];
+    upsert?: Prisma.ShortUpsertWithWhereUniqueWithoutCollectionInput | Prisma.ShortUpsertWithWhereUniqueWithoutCollectionInput[];
+    createMany?: Prisma.ShortCreateManyCollectionInputEnvelope;
+    set?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    disconnect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    delete?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    update?: Prisma.ShortUpdateWithWhereUniqueWithoutCollectionInput | Prisma.ShortUpdateWithWhereUniqueWithoutCollectionInput[];
+    updateMany?: Prisma.ShortUpdateManyWithWhereWithoutCollectionInput | Prisma.ShortUpdateManyWithWhereWithoutCollectionInput[];
+    deleteMany?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+};
+export type ShortCreateNestedOneWithoutLikesInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutLikesInput, Prisma.ShortUncheckedCreateWithoutLikesInput>;
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutLikesInput;
+    connect?: Prisma.ShortWhereUniqueInput;
+};
+export type ShortUpdateOneRequiredWithoutLikesNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutLikesInput, Prisma.ShortUncheckedCreateWithoutLikesInput>;
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutLikesInput;
+    upsert?: Prisma.ShortUpsertWithoutLikesInput;
+    connect?: Prisma.ShortWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.ShortUpdateToOneWithWhereWithoutLikesInput, Prisma.ShortUpdateWithoutLikesInput>, Prisma.ShortUncheckedUpdateWithoutLikesInput>;
+};
+export type ShortCreateNestedOneWithoutCommentsInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutCommentsInput, Prisma.ShortUncheckedCreateWithoutCommentsInput>;
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutCommentsInput;
+    connect?: Prisma.ShortWhereUniqueInput;
+};
+export type ShortUpdateOneRequiredWithoutCommentsNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutCommentsInput, Prisma.ShortUncheckedCreateWithoutCommentsInput>;
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutCommentsInput;
+    upsert?: Prisma.ShortUpsertWithoutCommentsInput;
+    connect?: Prisma.ShortWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.ShortUpdateToOneWithWhereWithoutCommentsInput, Prisma.ShortUpdateWithoutCommentsInput>, Prisma.ShortUncheckedUpdateWithoutCommentsInput>;
+};
+export type ShortCreateNestedManyWithoutContestInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutContestInput, Prisma.ShortUncheckedCreateWithoutContestInput> | Prisma.ShortCreateWithoutContestInput[] | Prisma.ShortUncheckedCreateWithoutContestInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutContestInput | Prisma.ShortCreateOrConnectWithoutContestInput[];
+    createMany?: Prisma.ShortCreateManyContestInputEnvelope;
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+};
+export type ShortUncheckedCreateNestedManyWithoutContestInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutContestInput, Prisma.ShortUncheckedCreateWithoutContestInput> | Prisma.ShortCreateWithoutContestInput[] | Prisma.ShortUncheckedCreateWithoutContestInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutContestInput | Prisma.ShortCreateOrConnectWithoutContestInput[];
+    createMany?: Prisma.ShortCreateManyContestInputEnvelope;
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+};
+export type ShortUpdateManyWithoutContestNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutContestInput, Prisma.ShortUncheckedCreateWithoutContestInput> | Prisma.ShortCreateWithoutContestInput[] | Prisma.ShortUncheckedCreateWithoutContestInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutContestInput | Prisma.ShortCreateOrConnectWithoutContestInput[];
+    upsert?: Prisma.ShortUpsertWithWhereUniqueWithoutContestInput | Prisma.ShortUpsertWithWhereUniqueWithoutContestInput[];
+    createMany?: Prisma.ShortCreateManyContestInputEnvelope;
+    set?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    disconnect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    delete?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    update?: Prisma.ShortUpdateWithWhereUniqueWithoutContestInput | Prisma.ShortUpdateWithWhereUniqueWithoutContestInput[];
+    updateMany?: Prisma.ShortUpdateManyWithWhereWithoutContestInput | Prisma.ShortUpdateManyWithWhereWithoutContestInput[];
+    deleteMany?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+};
+export type ShortUncheckedUpdateManyWithoutContestNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutContestInput, Prisma.ShortUncheckedCreateWithoutContestInput> | Prisma.ShortCreateWithoutContestInput[] | Prisma.ShortUncheckedCreateWithoutContestInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutContestInput | Prisma.ShortCreateOrConnectWithoutContestInput[];
+    upsert?: Prisma.ShortUpsertWithWhereUniqueWithoutContestInput | Prisma.ShortUpsertWithWhereUniqueWithoutContestInput[];
+    createMany?: Prisma.ShortCreateManyContestInputEnvelope;
+    set?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    disconnect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    delete?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    update?: Prisma.ShortUpdateWithWhereUniqueWithoutContestInput | Prisma.ShortUpdateWithWhereUniqueWithoutContestInput[];
+    updateMany?: Prisma.ShortUpdateManyWithWhereWithoutContestInput | Prisma.ShortUpdateManyWithWhereWithoutContestInput[];
+    deleteMany?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+};
+export type ShortCreateNestedManyWithoutLinkedProductInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutLinkedProductInput, Prisma.ShortUncheckedCreateWithoutLinkedProductInput> | Prisma.ShortCreateWithoutLinkedProductInput[] | Prisma.ShortUncheckedCreateWithoutLinkedProductInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutLinkedProductInput | Prisma.ShortCreateOrConnectWithoutLinkedProductInput[];
+    createMany?: Prisma.ShortCreateManyLinkedProductInputEnvelope;
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+};
+export type ShortUncheckedCreateNestedManyWithoutLinkedProductInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutLinkedProductInput, Prisma.ShortUncheckedCreateWithoutLinkedProductInput> | Prisma.ShortCreateWithoutLinkedProductInput[] | Prisma.ShortUncheckedCreateWithoutLinkedProductInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutLinkedProductInput | Prisma.ShortCreateOrConnectWithoutLinkedProductInput[];
+    createMany?: Prisma.ShortCreateManyLinkedProductInputEnvelope;
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+};
+export type ShortUpdateManyWithoutLinkedProductNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutLinkedProductInput, Prisma.ShortUncheckedCreateWithoutLinkedProductInput> | Prisma.ShortCreateWithoutLinkedProductInput[] | Prisma.ShortUncheckedCreateWithoutLinkedProductInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutLinkedProductInput | Prisma.ShortCreateOrConnectWithoutLinkedProductInput[];
+    upsert?: Prisma.ShortUpsertWithWhereUniqueWithoutLinkedProductInput | Prisma.ShortUpsertWithWhereUniqueWithoutLinkedProductInput[];
+    createMany?: Prisma.ShortCreateManyLinkedProductInputEnvelope;
+    set?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    disconnect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    delete?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    update?: Prisma.ShortUpdateWithWhereUniqueWithoutLinkedProductInput | Prisma.ShortUpdateWithWhereUniqueWithoutLinkedProductInput[];
+    updateMany?: Prisma.ShortUpdateManyWithWhereWithoutLinkedProductInput | Prisma.ShortUpdateManyWithWhereWithoutLinkedProductInput[];
+    deleteMany?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+};
+export type ShortUncheckedUpdateManyWithoutLinkedProductNestedInput = {
+    create?: Prisma.XOR<Prisma.ShortCreateWithoutLinkedProductInput, Prisma.ShortUncheckedCreateWithoutLinkedProductInput> | Prisma.ShortCreateWithoutLinkedProductInput[] | Prisma.ShortUncheckedCreateWithoutLinkedProductInput[];
+    connectOrCreate?: Prisma.ShortCreateOrConnectWithoutLinkedProductInput | Prisma.ShortCreateOrConnectWithoutLinkedProductInput[];
+    upsert?: Prisma.ShortUpsertWithWhereUniqueWithoutLinkedProductInput | Prisma.ShortUpsertWithWhereUniqueWithoutLinkedProductInput[];
+    createMany?: Prisma.ShortCreateManyLinkedProductInputEnvelope;
+    set?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    disconnect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    delete?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    connect?: Prisma.ShortWhereUniqueInput | Prisma.ShortWhereUniqueInput[];
+    update?: Prisma.ShortUpdateWithWhereUniqueWithoutLinkedProductInput | Prisma.ShortUpdateWithWhereUniqueWithoutLinkedProductInput[];
+    updateMany?: Prisma.ShortUpdateManyWithWhereWithoutLinkedProductInput | Prisma.ShortUpdateManyWithWhereWithoutLinkedProductInput[];
+    deleteMany?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+};
+export type ShortCreateWithoutUserInput = {
+    id?: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    contest?: Prisma.ContestCreateNestedOneWithoutShortsInput;
+    collection?: Prisma.ShortCollectionCreateNestedOneWithoutShortsInput;
+    linkedProduct?: Prisma.ProductCreateNestedOneWithoutLinkedShortsInput;
+    likes?: Prisma.ShortLikeCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentCreateNestedManyWithoutShortInput;
+};
+export type ShortUncheckedCreateWithoutUserInput = {
+    id?: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    collectionId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    likes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutShortInput;
+};
+export type ShortCreateOrConnectWithoutUserInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutUserInput, Prisma.ShortUncheckedCreateWithoutUserInput>;
+};
+export type ShortCreateManyUserInputEnvelope = {
+    data: Prisma.ShortCreateManyUserInput | Prisma.ShortCreateManyUserInput[];
+    skipDuplicates?: boolean;
+};
+export type ShortUpsertWithWhereUniqueWithoutUserInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    update: Prisma.XOR<Prisma.ShortUpdateWithoutUserInput, Prisma.ShortUncheckedUpdateWithoutUserInput>;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutUserInput, Prisma.ShortUncheckedCreateWithoutUserInput>;
+};
+export type ShortUpdateWithWhereUniqueWithoutUserInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    data: Prisma.XOR<Prisma.ShortUpdateWithoutUserInput, Prisma.ShortUncheckedUpdateWithoutUserInput>;
+};
+export type ShortUpdateManyWithWhereWithoutUserInput = {
+    where: Prisma.ShortScalarWhereInput;
+    data: Prisma.XOR<Prisma.ShortUpdateManyMutationInput, Prisma.ShortUncheckedUpdateManyWithoutUserInput>;
+};
+export type ShortScalarWhereInput = {
+    AND?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+    OR?: Prisma.ShortScalarWhereInput[];
+    NOT?: Prisma.ShortScalarWhereInput | Prisma.ShortScalarWhereInput[];
+    id?: Prisma.StringFilter<"Short"> | string;
+    userId?: Prisma.StringFilter<"Short"> | string;
+    videoUrl?: Prisma.StringFilter<"Short"> | string;
+    thumbnailUrl?: Prisma.StringNullableFilter<"Short"> | string | null;
+    caption?: Prisma.StringNullableFilter<"Short"> | string | null;
+    musicTitle?: Prisma.StringNullableFilter<"Short"> | string | null;
+    musicArtist?: Prisma.StringNullableFilter<"Short"> | string | null;
+    isLocked?: Prisma.BoolFilter<"Short"> | boolean;
+    requiredTier?: Prisma.EnumSubscriptionTierTypeNullableFilter<"Short"> | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.StringNullableFilter<"Short"> | string | null;
+    collectionId?: Prisma.StringNullableFilter<"Short"> | string | null;
+    linkedProductId?: Prisma.StringNullableFilter<"Short"> | string | null;
+    views?: Prisma.IntFilter<"Short"> | number;
+    likesCount?: Prisma.IntFilter<"Short"> | number;
+    commentsCount?: Prisma.IntFilter<"Short"> | number;
+    createdAt?: Prisma.DateTimeFilter<"Short"> | Date | string;
+};
+export type ShortCreateWithoutCollectionInput = {
+    id?: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutShortsInput;
+    contest?: Prisma.ContestCreateNestedOneWithoutShortsInput;
+    linkedProduct?: Prisma.ProductCreateNestedOneWithoutLinkedShortsInput;
+    likes?: Prisma.ShortLikeCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentCreateNestedManyWithoutShortInput;
+};
+export type ShortUncheckedCreateWithoutCollectionInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    likes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutShortInput;
+};
+export type ShortCreateOrConnectWithoutCollectionInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutCollectionInput, Prisma.ShortUncheckedCreateWithoutCollectionInput>;
+};
+export type ShortCreateManyCollectionInputEnvelope = {
+    data: Prisma.ShortCreateManyCollectionInput | Prisma.ShortCreateManyCollectionInput[];
+    skipDuplicates?: boolean;
+};
+export type ShortUpsertWithWhereUniqueWithoutCollectionInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    update: Prisma.XOR<Prisma.ShortUpdateWithoutCollectionInput, Prisma.ShortUncheckedUpdateWithoutCollectionInput>;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutCollectionInput, Prisma.ShortUncheckedCreateWithoutCollectionInput>;
+};
+export type ShortUpdateWithWhereUniqueWithoutCollectionInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    data: Prisma.XOR<Prisma.ShortUpdateWithoutCollectionInput, Prisma.ShortUncheckedUpdateWithoutCollectionInput>;
+};
+export type ShortUpdateManyWithWhereWithoutCollectionInput = {
+    where: Prisma.ShortScalarWhereInput;
+    data: Prisma.XOR<Prisma.ShortUpdateManyMutationInput, Prisma.ShortUncheckedUpdateManyWithoutCollectionInput>;
+};
+export type ShortCreateWithoutLikesInput = {
+    id?: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutShortsInput;
+    contest?: Prisma.ContestCreateNestedOneWithoutShortsInput;
+    collection?: Prisma.ShortCollectionCreateNestedOneWithoutShortsInput;
+    linkedProduct?: Prisma.ProductCreateNestedOneWithoutLinkedShortsInput;
+    comments?: Prisma.ShortCommentCreateNestedManyWithoutShortInput;
+};
+export type ShortUncheckedCreateWithoutLikesInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    collectionId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    comments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutShortInput;
+};
+export type ShortCreateOrConnectWithoutLikesInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutLikesInput, Prisma.ShortUncheckedCreateWithoutLikesInput>;
+};
+export type ShortUpsertWithoutLikesInput = {
+    update: Prisma.XOR<Prisma.ShortUpdateWithoutLikesInput, Prisma.ShortUncheckedUpdateWithoutLikesInput>;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutLikesInput, Prisma.ShortUncheckedCreateWithoutLikesInput>;
+    where?: Prisma.ShortWhereInput;
+};
+export type ShortUpdateToOneWithWhereWithoutLikesInput = {
+    where?: Prisma.ShortWhereInput;
+    data: Prisma.XOR<Prisma.ShortUpdateWithoutLikesInput, Prisma.ShortUncheckedUpdateWithoutLikesInput>;
+};
+export type ShortUpdateWithoutLikesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutShortsNestedInput;
+    contest?: Prisma.ContestUpdateOneWithoutShortsNestedInput;
+    collection?: Prisma.ShortCollectionUpdateOneWithoutShortsNestedInput;
+    linkedProduct?: Prisma.ProductUpdateOneWithoutLinkedShortsNestedInput;
+    comments?: Prisma.ShortCommentUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateWithoutLikesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    comments?: Prisma.ShortCommentUncheckedUpdateManyWithoutShortNestedInput;
+};
+export type ShortCreateWithoutCommentsInput = {
+    id?: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutShortsInput;
+    contest?: Prisma.ContestCreateNestedOneWithoutShortsInput;
+    collection?: Prisma.ShortCollectionCreateNestedOneWithoutShortsInput;
+    linkedProduct?: Prisma.ProductCreateNestedOneWithoutLinkedShortsInput;
+    likes?: Prisma.ShortLikeCreateNestedManyWithoutShortInput;
+};
+export type ShortUncheckedCreateWithoutCommentsInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    collectionId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    likes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutShortInput;
+};
+export type ShortCreateOrConnectWithoutCommentsInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutCommentsInput, Prisma.ShortUncheckedCreateWithoutCommentsInput>;
+};
+export type ShortUpsertWithoutCommentsInput = {
+    update: Prisma.XOR<Prisma.ShortUpdateWithoutCommentsInput, Prisma.ShortUncheckedUpdateWithoutCommentsInput>;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutCommentsInput, Prisma.ShortUncheckedCreateWithoutCommentsInput>;
+    where?: Prisma.ShortWhereInput;
+};
+export type ShortUpdateToOneWithWhereWithoutCommentsInput = {
+    where?: Prisma.ShortWhereInput;
+    data: Prisma.XOR<Prisma.ShortUpdateWithoutCommentsInput, Prisma.ShortUncheckedUpdateWithoutCommentsInput>;
+};
+export type ShortUpdateWithoutCommentsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutShortsNestedInput;
+    contest?: Prisma.ContestUpdateOneWithoutShortsNestedInput;
+    collection?: Prisma.ShortCollectionUpdateOneWithoutShortsNestedInput;
+    linkedProduct?: Prisma.ProductUpdateOneWithoutLinkedShortsNestedInput;
+    likes?: Prisma.ShortLikeUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateWithoutCommentsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    likes?: Prisma.ShortLikeUncheckedUpdateManyWithoutShortNestedInput;
+};
+export type ShortCreateWithoutContestInput = {
+    id?: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutShortsInput;
+    collection?: Prisma.ShortCollectionCreateNestedOneWithoutShortsInput;
+    linkedProduct?: Prisma.ProductCreateNestedOneWithoutLinkedShortsInput;
+    likes?: Prisma.ShortLikeCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentCreateNestedManyWithoutShortInput;
+};
+export type ShortUncheckedCreateWithoutContestInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    collectionId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    likes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutShortInput;
+};
+export type ShortCreateOrConnectWithoutContestInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutContestInput, Prisma.ShortUncheckedCreateWithoutContestInput>;
+};
+export type ShortCreateManyContestInputEnvelope = {
+    data: Prisma.ShortCreateManyContestInput | Prisma.ShortCreateManyContestInput[];
+    skipDuplicates?: boolean;
+};
+export type ShortUpsertWithWhereUniqueWithoutContestInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    update: Prisma.XOR<Prisma.ShortUpdateWithoutContestInput, Prisma.ShortUncheckedUpdateWithoutContestInput>;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutContestInput, Prisma.ShortUncheckedCreateWithoutContestInput>;
+};
+export type ShortUpdateWithWhereUniqueWithoutContestInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    data: Prisma.XOR<Prisma.ShortUpdateWithoutContestInput, Prisma.ShortUncheckedUpdateWithoutContestInput>;
+};
+export type ShortUpdateManyWithWhereWithoutContestInput = {
+    where: Prisma.ShortScalarWhereInput;
+    data: Prisma.XOR<Prisma.ShortUpdateManyMutationInput, Prisma.ShortUncheckedUpdateManyWithoutContestInput>;
+};
+export type ShortCreateWithoutLinkedProductInput = {
+    id?: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    user: Prisma.UserCreateNestedOneWithoutShortsInput;
+    contest?: Prisma.ContestCreateNestedOneWithoutShortsInput;
+    collection?: Prisma.ShortCollectionCreateNestedOneWithoutShortsInput;
+    likes?: Prisma.ShortLikeCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentCreateNestedManyWithoutShortInput;
+};
+export type ShortUncheckedCreateWithoutLinkedProductInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    collectionId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+    likes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutShortInput;
+    comments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutShortInput;
+};
+export type ShortCreateOrConnectWithoutLinkedProductInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutLinkedProductInput, Prisma.ShortUncheckedCreateWithoutLinkedProductInput>;
+};
+export type ShortCreateManyLinkedProductInputEnvelope = {
+    data: Prisma.ShortCreateManyLinkedProductInput | Prisma.ShortCreateManyLinkedProductInput[];
+    skipDuplicates?: boolean;
+};
+export type ShortUpsertWithWhereUniqueWithoutLinkedProductInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    update: Prisma.XOR<Prisma.ShortUpdateWithoutLinkedProductInput, Prisma.ShortUncheckedUpdateWithoutLinkedProductInput>;
+    create: Prisma.XOR<Prisma.ShortCreateWithoutLinkedProductInput, Prisma.ShortUncheckedCreateWithoutLinkedProductInput>;
+};
+export type ShortUpdateWithWhereUniqueWithoutLinkedProductInput = {
+    where: Prisma.ShortWhereUniqueInput;
+    data: Prisma.XOR<Prisma.ShortUpdateWithoutLinkedProductInput, Prisma.ShortUncheckedUpdateWithoutLinkedProductInput>;
+};
+export type ShortUpdateManyWithWhereWithoutLinkedProductInput = {
+    where: Prisma.ShortScalarWhereInput;
+    data: Prisma.XOR<Prisma.ShortUpdateManyMutationInput, Prisma.ShortUncheckedUpdateManyWithoutLinkedProductInput>;
+};
+export type ShortCreateManyUserInput = {
+    id?: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    collectionId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+};
+export type ShortUpdateWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    contest?: Prisma.ContestUpdateOneWithoutShortsNestedInput;
+    collection?: Prisma.ShortCollectionUpdateOneWithoutShortsNestedInput;
+    linkedProduct?: Prisma.ProductUpdateOneWithoutLinkedShortsNestedInput;
+    likes?: Prisma.ShortLikeUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    likes?: Prisma.ShortLikeUncheckedUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUncheckedUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateManyWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type ShortCreateManyCollectionInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+};
+export type ShortUpdateWithoutCollectionInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutShortsNestedInput;
+    contest?: Prisma.ContestUpdateOneWithoutShortsNestedInput;
+    linkedProduct?: Prisma.ProductUpdateOneWithoutLinkedShortsNestedInput;
+    likes?: Prisma.ShortLikeUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateWithoutCollectionInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    likes?: Prisma.ShortLikeUncheckedUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUncheckedUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateManyWithoutCollectionInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type ShortCreateManyContestInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    collectionId?: string | null;
+    linkedProductId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+};
+export type ShortUpdateWithoutContestInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutShortsNestedInput;
+    collection?: Prisma.ShortCollectionUpdateOneWithoutShortsNestedInput;
+    linkedProduct?: Prisma.ProductUpdateOneWithoutLinkedShortsNestedInput;
+    likes?: Prisma.ShortLikeUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateWithoutContestInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    likes?: Prisma.ShortLikeUncheckedUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUncheckedUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateManyWithoutContestInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    linkedProductId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type ShortCreateManyLinkedProductInput = {
+    id?: string;
+    userId: string;
+    videoUrl: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    musicTitle?: string | null;
+    musicArtist?: string | null;
+    isLocked?: boolean;
+    requiredTier?: $Enums.SubscriptionTierType | null;
+    contestId?: string | null;
+    collectionId?: string | null;
+    views?: number;
+    likesCount?: number;
+    commentsCount?: number;
+    createdAt?: Date | string;
+};
+export type ShortUpdateWithoutLinkedProductInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    user?: Prisma.UserUpdateOneRequiredWithoutShortsNestedInput;
+    contest?: Prisma.ContestUpdateOneWithoutShortsNestedInput;
+    collection?: Prisma.ShortCollectionUpdateOneWithoutShortsNestedInput;
+    likes?: Prisma.ShortLikeUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateWithoutLinkedProductInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    likes?: Prisma.ShortLikeUncheckedUpdateManyWithoutShortNestedInput;
+    comments?: Prisma.ShortCommentUncheckedUpdateManyWithoutShortNestedInput;
+};
+export type ShortUncheckedUpdateManyWithoutLinkedProductInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    videoUrl?: Prisma.StringFieldUpdateOperationsInput | string;
+    thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    musicArtist?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    requiredTier?: Prisma.NullableEnumSubscriptionTierTypeFieldUpdateOperationsInput | $Enums.SubscriptionTierType | null;
+    contestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    collectionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    views?: Prisma.IntFieldUpdateOperationsInput | number;
+    likesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    commentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+/**
+ * Count Type ShortCountOutputType
+ */
+export type ShortCountOutputType = {
+    likes: number;
+    comments: number;
+};
+export type ShortCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    likes?: boolean | ShortCountOutputTypeCountLikesArgs;
+    comments?: boolean | ShortCountOutputTypeCountCommentsArgs;
+};
+/**
+ * ShortCountOutputType without action
+ */
+export type ShortCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ShortCountOutputType
+     */
+    select?: Prisma.ShortCountOutputTypeSelect<ExtArgs> | null;
+};
+/**
+ * ShortCountOutputType without action
+ */
+export type ShortCountOutputTypeCountLikesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ShortLikeWhereInput;
+};
+/**
+ * ShortCountOutputType without action
+ */
+export type ShortCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ShortCommentWhereInput;
+};
+export type ShortSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    userId?: boolean;
+    videoUrl?: boolean;
+    thumbnailUrl?: boolean;
+    caption?: boolean;
+    musicTitle?: boolean;
+    musicArtist?: boolean;
+    isLocked?: boolean;
+    requiredTier?: boolean;
+    contestId?: boolean;
+    collectionId?: boolean;
+    linkedProductId?: boolean;
+    views?: boolean;
+    likesCount?: boolean;
+    commentsCount?: boolean;
+    createdAt?: boolean;
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    contest?: boolean | Prisma.Short$contestArgs<ExtArgs>;
+    collection?: boolean | Prisma.Short$collectionArgs<ExtArgs>;
+    linkedProduct?: boolean | Prisma.Short$linkedProductArgs<ExtArgs>;
+    likes?: boolean | Prisma.Short$likesArgs<ExtArgs>;
+    comments?: boolean | Prisma.Short$commentsArgs<ExtArgs>;
+    _count?: boolean | Prisma.ShortCountOutputTypeDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["short"]>;
+export type ShortSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    userId?: boolean;
+    videoUrl?: boolean;
+    thumbnailUrl?: boolean;
+    caption?: boolean;
+    musicTitle?: boolean;
+    musicArtist?: boolean;
+    isLocked?: boolean;
+    requiredTier?: boolean;
+    contestId?: boolean;
+    collectionId?: boolean;
+    linkedProductId?: boolean;
+    views?: boolean;
+    likesCount?: boolean;
+    commentsCount?: boolean;
+    createdAt?: boolean;
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    contest?: boolean | Prisma.Short$contestArgs<ExtArgs>;
+    collection?: boolean | Prisma.Short$collectionArgs<ExtArgs>;
+    linkedProduct?: boolean | Prisma.Short$linkedProductArgs<ExtArgs>;
+}, ExtArgs["result"]["short"]>;
+export type ShortSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    userId?: boolean;
+    videoUrl?: boolean;
+    thumbnailUrl?: boolean;
+    caption?: boolean;
+    musicTitle?: boolean;
+    musicArtist?: boolean;
+    isLocked?: boolean;
+    requiredTier?: boolean;
+    contestId?: boolean;
+    collectionId?: boolean;
+    linkedProductId?: boolean;
+    views?: boolean;
+    likesCount?: boolean;
+    commentsCount?: boolean;
+    createdAt?: boolean;
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    contest?: boolean | Prisma.Short$contestArgs<ExtArgs>;
+    collection?: boolean | Prisma.Short$collectionArgs<ExtArgs>;
+    linkedProduct?: boolean | Prisma.Short$linkedProductArgs<ExtArgs>;
+}, ExtArgs["result"]["short"]>;
+export type ShortSelectScalar = {
+    id?: boolean;
+    userId?: boolean;
+    videoUrl?: boolean;
+    thumbnailUrl?: boolean;
+    caption?: boolean;
+    musicTitle?: boolean;
+    musicArtist?: boolean;
+    isLocked?: boolean;
+    requiredTier?: boolean;
+    contestId?: boolean;
+    collectionId?: boolean;
+    linkedProductId?: boolean;
+    views?: boolean;
+    likesCount?: boolean;
+    commentsCount?: boolean;
+    createdAt?: boolean;
+};
+export type ShortOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "videoUrl" | "thumbnailUrl" | "caption" | "musicTitle" | "musicArtist" | "isLocked" | "requiredTier" | "contestId" | "collectionId" | "linkedProductId" | "views" | "likesCount" | "commentsCount" | "createdAt", ExtArgs["result"]["short"]>;
+export type ShortInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    contest?: boolean | Prisma.Short$contestArgs<ExtArgs>;
+    collection?: boolean | Prisma.Short$collectionArgs<ExtArgs>;
+    linkedProduct?: boolean | Prisma.Short$linkedProductArgs<ExtArgs>;
+    likes?: boolean | Prisma.Short$likesArgs<ExtArgs>;
+    comments?: boolean | Prisma.Short$commentsArgs<ExtArgs>;
+    _count?: boolean | Prisma.ShortCountOutputTypeDefaultArgs<ExtArgs>;
+};
+export type ShortIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    contest?: boolean | Prisma.Short$contestArgs<ExtArgs>;
+    collection?: boolean | Prisma.Short$collectionArgs<ExtArgs>;
+    linkedProduct?: boolean | Prisma.Short$linkedProductArgs<ExtArgs>;
+};
+export type ShortIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+    contest?: boolean | Prisma.Short$contestArgs<ExtArgs>;
+    collection?: boolean | Prisma.Short$collectionArgs<ExtArgs>;
+    linkedProduct?: boolean | Prisma.Short$linkedProductArgs<ExtArgs>;
+};
+export type $ShortPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    name: "Short";
+    objects: {
+        user: Prisma.$UserPayload<ExtArgs>;
+        contest: Prisma.$ContestPayload<ExtArgs> | null;
+        collection: Prisma.$ShortCollectionPayload<ExtArgs> | null;
+        linkedProduct: Prisma.$ProductPayload<ExtArgs> | null;
+        likes: Prisma.$ShortLikePayload<ExtArgs>[];
+        comments: Prisma.$ShortCommentPayload<ExtArgs>[];
+    };
+    scalars: runtime.Types.Extensions.GetPayloadResult<{
+        id: string;
+        userId: string;
+        videoUrl: string;
+        thumbnailUrl: string | null;
+        caption: string | null;
+        musicTitle: string | null;
+        musicArtist: string | null;
+        isLocked: boolean;
+        requiredTier: $Enums.SubscriptionTierType | null;
+        contestId: string | null;
+        collectionId: string | null;
+        linkedProductId: string | null;
+        views: number;
+        likesCount: number;
+        commentsCount: number;
+        createdAt: Date;
+    }, ExtArgs["result"]["short"]>;
+    composites: {};
+};
+export type ShortGetPayload<S extends boolean | null | undefined | ShortDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ShortPayload, S>;
+export type ShortCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<ShortFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: ShortCountAggregateInputType | true;
+};
+export interface ShortDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: {
+        types: Prisma.TypeMap<ExtArgs>['model']['Short'];
+        meta: {
+            name: 'Short';
+        };
+    };
+    /**
+     * Find zero or one Short that matches the filter.
+     * @param {ShortFindUniqueArgs} args - Arguments to find a Short
+     * @example
+     * // Get one Short
+     * const short = await prisma.short.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ShortFindUniqueArgs>(args: Prisma.SelectSubset<T, ShortFindUniqueArgs<ExtArgs>>): Prisma.Prisma__ShortClient<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find one Short that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ShortFindUniqueOrThrowArgs} args - Arguments to find a Short
+     * @example
+     * // Get one Short
+     * const short = await prisma.short.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ShortFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, ShortFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__ShortClient<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first Short that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ShortFindFirstArgs} args - Arguments to find a Short
+     * @example
+     * // Get one Short
+     * const short = await prisma.short.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ShortFindFirstArgs>(args?: Prisma.SelectSubset<T, ShortFindFirstArgs<ExtArgs>>): Prisma.Prisma__ShortClient<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first Short that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ShortFindFirstOrThrowArgs} args - Arguments to find a Short
+     * @example
+     * // Get one Short
+     * const short = await prisma.short.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ShortFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, ShortFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__ShortClient<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find zero or more Shorts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ShortFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Shorts
+     * const shorts = await prisma.short.findMany()
+     *
+     * // Get first 10 Shorts
+     * const shorts = await prisma.short.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const shortWithIdOnly = await prisma.short.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends ShortFindManyArgs>(args?: Prisma.SelectSubset<T, ShortFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>;
+    /**
+     * Create a Short.
+     * @param {ShortCreateArgs} args - Arguments to create a Short.
+     * @example
+     * // Create one Short
+     * const Short = await prisma.short.create({
+     *   data: {
+     *     // ... data to create a Short
+     *   }
+     * })
+     *
+     */
+    create<T extends ShortCreateArgs>(args: Prisma.SelectSubset<T, ShortCreateArgs<ExtArgs>>): Prisma.Prisma__ShortClient<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Create many Shorts.
+     * @param {ShortCreateManyArgs} args - Arguments to create many Shorts.
+     * @example
+     * // Create many Shorts
+     * const short = await prisma.short.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends ShortCreateManyArgs>(args?: Prisma.SelectSubset<T, ShortCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Create many Shorts and returns the data saved in the database.
+     * @param {ShortCreateManyAndReturnArgs} args - Arguments to create many Shorts.
+     * @example
+     * // Create many Shorts
+     * const short = await prisma.short.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many Shorts and only return the `id`
+     * const shortWithIdOnly = await prisma.short.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends ShortCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, ShortCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Delete a Short.
+     * @param {ShortDeleteArgs} args - Arguments to delete one Short.
+     * @example
+     * // Delete one Short
+     * const Short = await prisma.short.delete({
+     *   where: {
+     *     // ... filter to delete one Short
+     *   }
+     * })
+     *
+     */
+    delete<T extends ShortDeleteArgs>(args: Prisma.SelectSubset<T, ShortDeleteArgs<ExtArgs>>): Prisma.Prisma__ShortClient<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Update one Short.
+     * @param {ShortUpdateArgs} args - Arguments to update one Short.
+     * @example
+     * // Update one Short
+     * const short = await prisma.short.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends ShortUpdateArgs>(args: Prisma.SelectSubset<T, ShortUpdateArgs<ExtArgs>>): Prisma.Prisma__ShortClient<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Delete zero or more Shorts.
+     * @param {ShortDeleteManyArgs} args - Arguments to filter Shorts to delete.
+     * @example
+     * // Delete a few Shorts
+     * const { count } = await prisma.short.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends ShortDeleteManyArgs>(args?: Prisma.SelectSubset<T, ShortDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more Shorts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ShortUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Shorts
+     * const short = await prisma.short.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends ShortUpdateManyArgs>(args: Prisma.SelectSubset<T, ShortUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more Shorts and returns the data updated in the database.
+     * @param {ShortUpdateManyAndReturnArgs} args - Arguments to update many Shorts.
+     * @example
+     * // Update many Shorts
+     * const short = await prisma.short.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more Shorts and only return the `id`
+     * const shortWithIdOnly = await prisma.short.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends ShortUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, ShortUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Create or update one Short.
+     * @param {ShortUpsertArgs} args - Arguments to update or create a Short.
+     * @example
+     * // Update or create a Short
+     * const short = await prisma.short.upsert({
+     *   create: {
+     *     // ... data to create a Short
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Short we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ShortUpsertArgs>(args: Prisma.SelectSubset<T, ShortUpsertArgs<ExtArgs>>): Prisma.Prisma__ShortClient<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Count the number of Shorts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ShortCountArgs} args - Arguments to filter Shorts to count.
+     * @example
+     * // Count the number of Shorts
+     * const count = await prisma.short.count({
+     *   where: {
+     *     // ... the filter for the Shorts we want to count
+     *   }
+     * })
+    **/
+    count<T extends ShortCountArgs>(args?: Prisma.Subset<T, ShortCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], ShortCountAggregateOutputType> : number>;
+    /**
+     * Allows you to perform aggregations operations on a Short.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ShortAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ShortAggregateArgs>(args: Prisma.Subset<T, ShortAggregateArgs>): Prisma.PrismaPromise<GetShortAggregateType<T>>;
+    /**
+     * Group by Short.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ShortGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<T extends ShortGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: ShortGroupByArgs['orderBy'];
+    } : {
+        orderBy?: ShortGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
+            Error,
+            'Field ',
+            P,
+            ` in "having" needs to be provided in "by"`
+        ];
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields]>(args: Prisma.SubsetIntersection<T, ShortGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetShortGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>;
+    /**
+     * Fields of the Short model
+     */
+    readonly fields: ShortFieldRefs;
+}
+/**
+ * The delegate class that acts as a "Promise-like" for Short.
+ * Why is this prefixed with `Prisma__`?
+ * Because we want to prevent naming conflicts as mentioned in
+ * https://github.com/prisma/prisma-client-js/issues/707
+ */
+export interface Prisma__ShortClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise";
+    user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    contest<T extends Prisma.Short$contestArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Short$contestArgs<ExtArgs>>): Prisma.Prisma__ContestClient<runtime.Types.Result.GetResult<Prisma.$ContestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    collection<T extends Prisma.Short$collectionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Short$collectionArgs<ExtArgs>>): Prisma.Prisma__ShortCollectionClient<runtime.Types.Result.GetResult<Prisma.$ShortCollectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    linkedProduct<T extends Prisma.Short$linkedProductArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Short$linkedProductArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    likes<T extends Prisma.Short$likesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Short$likesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    comments<T extends Prisma.Short$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Short$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
+}
+/**
+ * Fields of the Short model
+ */
+export interface ShortFieldRefs {
+    readonly id: Prisma.FieldRef<"Short", 'String'>;
+    readonly userId: Prisma.FieldRef<"Short", 'String'>;
+    readonly videoUrl: Prisma.FieldRef<"Short", 'String'>;
+    readonly thumbnailUrl: Prisma.FieldRef<"Short", 'String'>;
+    readonly caption: Prisma.FieldRef<"Short", 'String'>;
+    readonly musicTitle: Prisma.FieldRef<"Short", 'String'>;
+    readonly musicArtist: Prisma.FieldRef<"Short", 'String'>;
+    readonly isLocked: Prisma.FieldRef<"Short", 'Boolean'>;
+    readonly requiredTier: Prisma.FieldRef<"Short", 'SubscriptionTierType'>;
+    readonly contestId: Prisma.FieldRef<"Short", 'String'>;
+    readonly collectionId: Prisma.FieldRef<"Short", 'String'>;
+    readonly linkedProductId: Prisma.FieldRef<"Short", 'String'>;
+    readonly views: Prisma.FieldRef<"Short", 'Int'>;
+    readonly likesCount: Prisma.FieldRef<"Short", 'Int'>;
+    readonly commentsCount: Prisma.FieldRef<"Short", 'Int'>;
+    readonly createdAt: Prisma.FieldRef<"Short", 'DateTime'>;
+}
+/**
+ * Short findUnique
+ */
+export type ShortFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+    /**
+     * Filter, which Short to fetch.
+     */
+    where: Prisma.ShortWhereUniqueInput;
+};
+/**
+ * Short findUniqueOrThrow
+ */
+export type ShortFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+    /**
+     * Filter, which Short to fetch.
+     */
+    where: Prisma.ShortWhereUniqueInput;
+};
+/**
+ * Short findFirst
+ */
+export type ShortFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+    /**
+     * Filter, which Short to fetch.
+     */
+    where?: Prisma.ShortWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Shorts to fetch.
+     */
+    orderBy?: Prisma.ShortOrderByWithRelationInput | Prisma.ShortOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Shorts.
+     */
+    cursor?: Prisma.ShortWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Shorts from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Shorts.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Shorts.
+     */
+    distinct?: Prisma.ShortScalarFieldEnum | Prisma.ShortScalarFieldEnum[];
+};
+/**
+ * Short findFirstOrThrow
+ */
+export type ShortFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+    /**
+     * Filter, which Short to fetch.
+     */
+    where?: Prisma.ShortWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Shorts to fetch.
+     */
+    orderBy?: Prisma.ShortOrderByWithRelationInput | Prisma.ShortOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Shorts.
+     */
+    cursor?: Prisma.ShortWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Shorts from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Shorts.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Shorts.
+     */
+    distinct?: Prisma.ShortScalarFieldEnum | Prisma.ShortScalarFieldEnum[];
+};
+/**
+ * Short findMany
+ */
+export type ShortFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+    /**
+     * Filter, which Shorts to fetch.
+     */
+    where?: Prisma.ShortWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Shorts to fetch.
+     */
+    orderBy?: Prisma.ShortOrderByWithRelationInput | Prisma.ShortOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing Shorts.
+     */
+    cursor?: Prisma.ShortWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Shorts from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Shorts.
+     */
+    skip?: number;
+    distinct?: Prisma.ShortScalarFieldEnum | Prisma.ShortScalarFieldEnum[];
+};
+/**
+ * Short create
+ */
+export type ShortCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+    /**
+     * The data needed to create a Short.
+     */
+    data: Prisma.XOR<Prisma.ShortCreateInput, Prisma.ShortUncheckedCreateInput>;
+};
+/**
+ * Short createMany
+ */
+export type ShortCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Shorts.
+     */
+    data: Prisma.ShortCreateManyInput | Prisma.ShortCreateManyInput[];
+    skipDuplicates?: boolean;
+};
+/**
+ * Short createManyAndReturn
+ */
+export type ShortCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelectCreateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * The data used to create many Shorts.
+     */
+    data: Prisma.ShortCreateManyInput | Prisma.ShortCreateManyInput[];
+    skipDuplicates?: boolean;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortIncludeCreateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * Short update
+ */
+export type ShortUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+    /**
+     * The data needed to update a Short.
+     */
+    data: Prisma.XOR<Prisma.ShortUpdateInput, Prisma.ShortUncheckedUpdateInput>;
+    /**
+     * Choose, which Short to update.
+     */
+    where: Prisma.ShortWhereUniqueInput;
+};
+/**
+ * Short updateMany
+ */
+export type ShortUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Shorts.
+     */
+    data: Prisma.XOR<Prisma.ShortUpdateManyMutationInput, Prisma.ShortUncheckedUpdateManyInput>;
+    /**
+     * Filter which Shorts to update
+     */
+    where?: Prisma.ShortWhereInput;
+    /**
+     * Limit how many Shorts to update.
+     */
+    limit?: number;
+};
+/**
+ * Short updateManyAndReturn
+ */
+export type ShortUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelectUpdateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * The data used to update Shorts.
+     */
+    data: Prisma.XOR<Prisma.ShortUpdateManyMutationInput, Prisma.ShortUncheckedUpdateManyInput>;
+    /**
+     * Filter which Shorts to update
+     */
+    where?: Prisma.ShortWhereInput;
+    /**
+     * Limit how many Shorts to update.
+     */
+    limit?: number;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortIncludeUpdateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * Short upsert
+ */
+export type ShortUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+    /**
+     * The filter to search for the Short to update in case it exists.
+     */
+    where: Prisma.ShortWhereUniqueInput;
+    /**
+     * In case the Short found by the `where` argument doesn't exist, create a new Short with this data.
+     */
+    create: Prisma.XOR<Prisma.ShortCreateInput, Prisma.ShortUncheckedCreateInput>;
+    /**
+     * In case the Short was found with the provided `where` argument, update it with this data.
+     */
+    update: Prisma.XOR<Prisma.ShortUpdateInput, Prisma.ShortUncheckedUpdateInput>;
+};
+/**
+ * Short delete
+ */
+export type ShortDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+    /**
+     * Filter which Short to delete.
+     */
+    where: Prisma.ShortWhereUniqueInput;
+};
+/**
+ * Short deleteMany
+ */
+export type ShortDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which Shorts to delete
+     */
+    where?: Prisma.ShortWhereInput;
+    /**
+     * Limit how many Shorts to delete.
+     */
+    limit?: number;
+};
+/**
+ * Short.contest
+ */
+export type Short$contestArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contest
+     */
+    select?: Prisma.ContestSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Contest
+     */
+    omit?: Prisma.ContestOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ContestInclude<ExtArgs> | null;
+    where?: Prisma.ContestWhereInput;
+};
+/**
+ * Short.collection
+ */
+export type Short$collectionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ShortCollection
+     */
+    select?: Prisma.ShortCollectionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the ShortCollection
+     */
+    omit?: Prisma.ShortCollectionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortCollectionInclude<ExtArgs> | null;
+    where?: Prisma.ShortCollectionWhereInput;
+};
+/**
+ * Short.linkedProduct
+ */
+export type Short$linkedProductArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Product
+     */
+    select?: Prisma.ProductSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Product
+     */
+    omit?: Prisma.ProductOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ProductInclude<ExtArgs> | null;
+    where?: Prisma.ProductWhereInput;
+};
+/**
+ * Short.likes
+ */
+export type Short$likesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ShortLike
+     */
+    select?: Prisma.ShortLikeSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the ShortLike
+     */
+    omit?: Prisma.ShortLikeOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortLikeInclude<ExtArgs> | null;
+    where?: Prisma.ShortLikeWhereInput;
+    orderBy?: Prisma.ShortLikeOrderByWithRelationInput | Prisma.ShortLikeOrderByWithRelationInput[];
+    cursor?: Prisma.ShortLikeWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.ShortLikeScalarFieldEnum | Prisma.ShortLikeScalarFieldEnum[];
+};
+/**
+ * Short.comments
+ */
+export type Short$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ShortComment
+     */
+    select?: Prisma.ShortCommentSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the ShortComment
+     */
+    omit?: Prisma.ShortCommentOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortCommentInclude<ExtArgs> | null;
+    where?: Prisma.ShortCommentWhereInput;
+    orderBy?: Prisma.ShortCommentOrderByWithRelationInput | Prisma.ShortCommentOrderByWithRelationInput[];
+    cursor?: Prisma.ShortCommentWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.ShortCommentScalarFieldEnum | Prisma.ShortCommentScalarFieldEnum[];
+};
+/**
+ * Short without action
+ */
+export type ShortDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Short
+     */
+    select?: Prisma.ShortSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Short
+     */
+    omit?: Prisma.ShortOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ShortInclude<ExtArgs> | null;
+};
+export {};
+//# sourceMappingURL=Short.d.ts.map

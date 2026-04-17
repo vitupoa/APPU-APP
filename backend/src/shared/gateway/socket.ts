@@ -1,8 +1,8 @@
 import { Server as SocketServer } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { pubClient, subClient } from './redis';
+import { pubClient, subClient } from './redis.js';
 import { Server as HttpServer } from 'http';
-import { env } from '../../config/env';
+import { env } from '../../config/env.js';
 
 export let io: SocketServer;
 

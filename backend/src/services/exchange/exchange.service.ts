@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { env } from '../../config/env';
+import { env } from '../../config/env.js';
 
 // In-memory cache fallback if Redis isn't fully set up yet
 const rateCache = new Map<string, { rate: number; expiresAt: number }>();

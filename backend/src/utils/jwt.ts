@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { env } from '../config/env';
+import { env } from '../config/env.js';
 
 const JWT_EXPIRES_IN = '15m'; // 15 minutes for access token
 

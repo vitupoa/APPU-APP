@@ -37,12 +37,12 @@ export declare const tipSchema: z.ZodObject<{
     currency: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     currency: string;
-    krAmount: number;
     recipientId: string;
+    krAmount: number;
 }, {
     currency: string;
-    krAmount: number;
     recipientId: string;
+    krAmount: number;
 }>;
 export declare const exchangeRateSchema: z.ZodObject<{
     currency: z.ZodOptional<z.ZodString>;

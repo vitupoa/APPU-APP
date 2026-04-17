@@ -1,21 +1,18 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.io = void 0;
-exports.initializeGateway = initializeGateway;
-const socket_io_1 = require("socket.io");
-const redis_adapter_1 = require("@socket.io/redis-adapter");
-const redis_1 = require("./redis");
-const env_1 = require("../../config/env");
-function initializeGateway(httpServer) {
-    exports.io = new socket_io_1.Server(httpServer, {
+import { Server as SocketServer } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { pubClient, subClient } from './redis.js';
+import { env } from '../../config/env.js';
+export let io;
+export function initializeGateway(httpServer) {
+    io = new SocketServer(httpServer, {
         cors: {
-            origin: env_1.env.CORS_ORIGIN,
+            origin: env.CORS_ORIGIN,
             methods: ['GET', 'POST'],
         },
     });
     // Attach Redis Adapter for horizontal clustered scaling
-    exports.io.adapter((0, redis_adapter_1.createAdapter)(redis_1.pubClient, redis_1.subClient));
-    exports.io.on('connection', (socket) => {
+    io.adapter(createAdapter(pubClient, subClient));
+    io.on('connection', (socket) => {
         console.log(`[Gateway] Client connection initiated: ${socket.id}`);
         // Join secure room authenticated mapping
         socket.on('authenticate', (data) => {
@@ -29,6 +26,6 @@ function initializeGateway(httpServer) {
             console.log(`[Gateway] Client disconnected: ${socket.id}`);
         });
     });
-    return exports.io;
+    return io;
 }
 //# sourceMappingURL=socket.js.map

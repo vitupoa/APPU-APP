@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 export declare class ContestService {
     /**
      * Creates contest with escrowed prize + 15% platform fee.
@@ -36,9 +35,9 @@ export declare class ContestService {
         airdropLimit?: number;
         judges?: string[];
     }): Promise<{
-        prizeKr: Prisma.Decimal;
-        platformFeeKr: Prisma.Decimal;
-        totalChargedKr: Prisma.Decimal;
+        prizeKr: import("@prisma/client-runtime-utils").Decimal;
+        platformFeeKr: import("@prisma/client-runtime-utils").Decimal;
+        totalChargedKr: any;
         participantsCount: number;
         submissionsCount: number;
         createdAt: string;
@@ -50,44 +49,44 @@ export declare class ContestService {
         };
         actions: {
             id: string;
-            label: string;
-            sortOrder: number;
             contestId: string;
-            actionType: import(".prisma/client").$Enums.RequirementType;
+            actionType: import("../../generated/enums.js").RequirementType;
             targetUrl: string | null;
+            label: string;
             isVerifiable: boolean;
             requiresUpload: boolean;
+            sortOrder: number;
         }[];
         distributions: {
             id: string;
             contestId: string;
             rank: number;
-            percentage: Prisma.Decimal;
+            percentage: import("@prisma/client-runtime-utils").Decimal;
         }[];
-        status: import(".prisma/client").$Enums.ContestStatus;
+        status: import("../../generated/enums.js").ContestStatus;
         description: string | null;
         id: string;
-        creatorId: string;
         title: string;
-        mediaType: import(".prisma/client").$Enums.ContestMediaType;
         category: string;
+        mediaType: import("../../generated/enums.js").ContestMediaType;
         coverMediaUrl: string | null;
-        prizeTotalKr: Prisma.Decimal;
-        entryFeeKr: Prisma.Decimal | null;
+        prizeTotalKr: import("@prisma/client-runtime-utils").Decimal;
+        entryFeeKr: import("@prisma/client-runtime-utils").Decimal | null;
         publicVoteWeight: number | null;
         targetAges: number[];
         targetGeos: string[];
-        airdropKr: Prisma.Decimal | null;
+        airdropKr: import("@prisma/client-runtime-utils").Decimal | null;
         airdropLimit: number | null;
         allowDailyPrizes: boolean;
-        dailyPrizeKr: Prisma.Decimal | null;
+        dailyPrizeKr: import("@prisma/client-runtime-utils").Decimal | null;
         maxWinners: number;
-        judgingCriteria: import(".prisma/client").$Enums.JudgingCriteria;
+        judgingCriteria: import("../../generated/enums.js").JudgingCriteria;
         sponsorName: string | null;
         sponsorUrl: string | null;
         deadline: Date;
         totalParticipants: number;
         totalSubmissions: number;
+        creatorId: string;
     }>;
     static listContests(params: {
         status?: string;
@@ -96,31 +95,26 @@ export declare class ContestService {
         userId?: string;
     }): Promise<{
         items: {
-            id: string;
-            creator: {
-                id: string;
-                username: string;
-                displayName: string;
-                avatarUrl: string | null;
-            };
-            title: string;
-            description: string | null;
-            mediaType: import(".prisma/client").$Enums.ContestMediaType;
-            contestCategory: string;
+            id: any;
+            creator: any;
+            title: any;
+            description: any;
+            mediaType: any;
+            contestCategory: any;
             prizeKr: number;
             platformFeeKr: number;
             totalChargedKr: number;
-            maxWinners: number;
-            judgingCriteria: import(".prisma/client").$Enums.JudgingCriteria;
-            sponsorName: string | null;
-            sponsorUrl: string | null;
-            deadline: string;
-            coverMediaUrl: string | null;
-            status: import(".prisma/client").$Enums.ContestStatus;
-            participantsCount: number;
-            submissionsCount: number;
+            maxWinners: any;
+            judgingCriteria: any;
+            sponsorName: any;
+            sponsorUrl: any;
+            deadline: any;
+            coverMediaUrl: any;
+            status: any;
+            participantsCount: any;
+            submissionsCount: any;
             isJoined: boolean;
-            createdAt: string;
+            createdAt: any;
         }[];
         nextCursor: string | null;
     }>;
@@ -134,24 +128,24 @@ export declare class ContestService {
         };
         title: string;
         description: string | null;
-        mediaType: import(".prisma/client").$Enums.ContestMediaType;
+        mediaType: import("../../generated/enums.js").ContestMediaType;
         contestCategory: string;
         prizeKr: number;
         platformFeeKr: number;
         totalChargedKr: number;
-        rules: string[];
+        rules: any[];
         requiredActions: {
-            type: import(".prisma/client").$Enums.RequirementType;
-            targetUrl: string | null;
-            label: string;
+            type: any;
+            targetUrl: any;
+            label: any;
         }[];
         maxWinners: number;
-        judgingCriteria: import(".prisma/client").$Enums.JudgingCriteria;
+        judgingCriteria: import("../../generated/enums.js").JudgingCriteria;
         sponsorName: string | null;
         sponsorUrl: string | null;
         deadline: string;
         coverMediaUrl: string | null;
-        status: import(".prisma/client").$Enums.ContestStatus;
+        status: import("../../generated/enums.js").ContestStatus;
         participantsCount: number;
         submissionsCount: number;
         isJoined: boolean;
@@ -183,12 +177,12 @@ export declare class ContestService {
         userId: string;
         contestId: string;
         mediaType: string;
+        rank: number | null;
         mediaUrl: string;
         proofUrls: string[];
         votesCount: number;
-        judgeScore: Prisma.Decimal | null;
-        finalScore: Prisma.Decimal | null;
-        rank: number | null;
+        judgeScore: import("@prisma/client-runtime-utils").Decimal | null;
+        finalScore: import("@prisma/client-runtime-utils").Decimal | null;
         submittedAt: Date;
     }>;
     static getSubmissions(contestId: string, cursor?: string, limit?: number): Promise<{
@@ -226,6 +220,43 @@ export declare class ContestService {
         rank: number | null;
         createdAt: string;
     }[]>;
+    /**
+     * Get all contest submissions feed from active contests
+     */
+    static getSubmissionsFeed(cursor?: string, limit?: number, userId?: string): Promise<{
+        items: {
+            id: string;
+            user: {
+                id: string;
+                username: string;
+                displayName: string;
+                avatarUrl: string | null;
+                isVerified: boolean;
+            };
+            contestId: string;
+            contest: {
+                id: string;
+                title: string;
+                prizeKr: number;
+                status: import("../../generated/enums.js").ContestStatus;
+            };
+            mediaUrl: string;
+            mediaType: string;
+            caption: string;
+            proofScreenshots: string[];
+            votes: number;
+            rank: number | null;
+            createdAt: string;
+        }[];
+        nextCursor: string | null;
+    }>;
+    /**
+     * Vote on a contest submission
+     */
+    static voteOnSubmission(userId: string, submissionId: string, voteType: 'UPVOTE' | 'DOWNVOTE'): Promise<{
+        success: boolean;
+        newVoteCount: number;
+    }>;
     /**
      * Distributes prizes to winners atomically.
      * Uses prize distribution percentages from the contest.

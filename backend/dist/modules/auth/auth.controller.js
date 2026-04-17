@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthController = void 0;
-const auth_service_1 = require("./auth.service");
-const auth_validation_1 = require("./auth.validation");
-class AuthController {
+import { AuthService } from './auth.service.js';
+import { registerSchema, loginSchema, oauthSchema, refreshTokenSchema, logoutSchema, checkUsernameSchema } from './auth.validation.js';
+export class AuthController {
     static async register(req, res) {
         try {
-            const data = auth_validation_1.registerSchema.parse(req.body);
-            const result = await auth_service_1.AuthService.register(data);
+            const data = registerSchema.parse(req.body);
+            const result = await AuthService.register(data);
             res.status(201).json(result);
         }
         catch (error) {
@@ -21,8 +18,8 @@ class AuthController {
     }
     static async login(req, res) {
         try {
-            const data = auth_validation_1.loginSchema.parse(req.body);
-            const result = await auth_service_1.AuthService.login(data);
+            const data = loginSchema.parse(req.body);
+            const result = await AuthService.login(data);
             res.status(200).json(result);
         }
         catch (error) {
@@ -36,8 +33,8 @@ class AuthController {
     }
     static async oauthLogin(req, res) {
         try {
-            const data = auth_validation_1.oauthSchema.parse(req.body);
-            const result = await auth_service_1.AuthService.oauthLogin(data);
+            const data = oauthSchema.parse(req.body);
+            const result = await AuthService.oauthLogin(data);
             res.status(result.isNewUser ? 201 : 200).json(result);
         }
         catch (error) {
@@ -60,8 +57,8 @@ class AuthController {
     }
     static async refreshToken(req, res) {
         try {
-            const data = auth_validation_1.refreshTokenSchema.parse(req.body);
-            const result = await auth_service_1.AuthService.refreshToken(data);
+            const data = refreshTokenSchema.parse(req.body);
+            const result = await AuthService.refreshToken(data);
             res.status(200).json(result);
         }
         catch (error) {
@@ -75,8 +72,8 @@ class AuthController {
     }
     static async logout(req, res) {
         try {
-            const data = auth_validation_1.logoutSchema.parse(req.body);
-            await auth_service_1.AuthService.logout(data);
+            const data = logoutSchema.parse(req.body);
+            await AuthService.logout(data);
             res.status(200).json({ success: true, message: 'Logged out successfully' });
         }
         catch (error) {
@@ -90,9 +87,9 @@ class AuthController {
     }
     static async checkUsername(req, res) {
         try {
-            const data = auth_validation_1.checkUsernameSchema.parse(req.query);
+            const data = checkUsernameSchema.parse(req.query);
             // Wait we actually need to just check suggestions for availability
-            const suggestions = await auth_service_1.AuthService.suggestUsernames(data.username);
+            const suggestions = await AuthService.suggestUsernames(data.username);
             // If the exact username they asked for is in suggestions, it's available!
             // But if the first suggestion is NOT exact match, it means it was taken.
             const isAvailable = suggestions[0] === data.username;
@@ -112,5 +109,4 @@ class AuthController {
         }
     }
 }
-exports.AuthController = AuthController;
 //# sourceMappingURL=auth.controller.js.map

@@ -1,6 +1,6 @@
 import cron from 'node-cron';
-import { prisma } from '../config/database'; // Assumes exported prisma instance 
-import { pubClient, RedisChannels } from '../shared/gateway/redis';
+import { prisma } from '../config/database.js'; // Assumes exported prisma instance 
+import { pubClient, RedisChannels } from '../shared/gateway/redis.js';
 
 export function startDailyPrizeWorker() {
     console.log('[Worker] Daily Prize Cron Job Scheduled: Runs daily at 00:00 Server Time (Midnight)');

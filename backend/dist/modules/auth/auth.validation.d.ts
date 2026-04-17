@@ -11,6 +11,7 @@ export declare const registerSchema: z.ZodObject<{
     currency: z.ZodString;
     deviceId: z.ZodString;
 }, "strip", z.ZodTypeAny, {
+    deviceId: string;
     email: string;
     username: string;
     firstName: string;
@@ -18,17 +19,16 @@ export declare const registerSchema: z.ZodObject<{
     country: string;
     currency: string;
     accountType: "CREATOR" | "BUSINESS";
-    deviceId: string;
     password: string;
     phone?: string | undefined;
 }, {
+    deviceId: string;
     email: string;
     username: string;
     firstName: string;
     lastName: string;
     country: string;
     currency: string;
-    deviceId: string;
     password: string;
     accountType?: "CREATOR" | "BUSINESS" | undefined;
     phone?: string | undefined;
@@ -99,21 +99,21 @@ export declare const refreshTokenSchema: z.ZodObject<{
     refreshToken: z.ZodString;
     deviceId: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    refreshToken: string;
     deviceId: string;
+    refreshToken: string;
 }, {
-    refreshToken: string;
     deviceId: string;
+    refreshToken: string;
 }>;
 export declare const logoutSchema: z.ZodObject<{
     refreshToken: z.ZodString;
     deviceId: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    refreshToken: string;
     deviceId: string;
+    refreshToken: string;
 }, {
-    refreshToken: string;
     deviceId: string;
+    refreshToken: string;
 }>;
 export declare const checkUsernameSchema: z.ZodObject<{
     username: z.ZodString;

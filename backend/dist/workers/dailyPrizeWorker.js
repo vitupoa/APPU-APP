@@ -1,20 +1,14 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.startDailyPrizeWorker = startDailyPrizeWorker;
-const node_cron_1 = __importDefault(require("node-cron"));
-const database_1 = require("../config/database"); // Assumes exported prisma instance 
-const redis_1 = require("../shared/gateway/redis");
-function startDailyPrizeWorker() {
+import cron from 'node-cron';
+import { prisma } from '../config/database.js'; // Assumes exported prisma instance 
+import { pubClient, RedisChannels } from '../shared/gateway/redis.js';
+export function startDailyPrizeWorker() {
     console.log('[Worker] Daily Prize Cron Job Scheduled: Runs daily at 00:00 Server Time (Midnight)');
     // Runs every day at midnight "0 0 * * *"
-    node_cron_1.default.schedule('0 0 * * *', async () => {
+    cron.schedule('0 0 * * *', async () => {
         console.log('[Worker] Executing Daily Random Sweepstakes for Active Contests...');
         try {
             // Find all active contests allowing daily prizes fundamentally
-            const activeContests = await database_1.prisma.contest.findMany({
+            const activeContests = await prisma.contest.findMany({
                 where: {
                     status: 'ACTIVE',
                     allowDailyPrizes: true,
@@ -27,7 +21,7 @@ function startDailyPrizeWorker() {
                 if (!contest.dailyPrizeKr || contest.dailyPrizeKr.toNumber() <= 0)
                     continue;
                 // Find all unique submissions submitted strictly within the last 24 hours
-                const eligibleSubmissions = await database_1.prisma.contestSubmission.findMany({
+                const eligibleSubmissions = await prisma.contestSubmission.findMany({
                     where: {
                         contestId: contest.id,
                         submittedAt: { gte: yesterday }
@@ -42,7 +36,7 @@ function startDailyPrizeWorker() {
                 const randomIndex = Math.floor(Math.random() * eligibleSubmissions.length);
                 const winner = eligibleSubmissions[randomIndex];
                 // Deposit the Kr securely using Prisma Transactions
-                await database_1.prisma.$transaction(async (tx) => {
+                await prisma.$transaction(async (tx) => {
                     // Update user's actual KR balance cleanly
                     await tx.wallet.update({
                         where: { userId: winner.userId },
@@ -69,7 +63,7 @@ function startDailyPrizeWorker() {
                     message: `You won the ${contest.dailyPrizeKr} Kr Daily Random Drop for Contest: ${contest.title}!`,
                     amount: contest.dailyPrizeKr
                 });
-                redis_1.pubClient.publish(`${redis_1.RedisChannels.NOTIFICATIONS}:${winner.userId}`, notificationPayload);
+                pubClient.publish(`${RedisChannels.NOTIFICATIONS}:${winner.userId}`, notificationPayload);
                 console.log(`[Worker] Rewarded User ${winner.userId} ${contest.dailyPrizeKr} Kr successfully.`);
             }
         }

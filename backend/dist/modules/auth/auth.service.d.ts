@@ -18,7 +18,7 @@ export declare class AuthService {
             displayName: string;
             country: string;
             currency: string;
-            accountType: import(".prisma/client").$Enums.AccountType;
+            accountType: import("../../generated/enums.js").AccountType;
             isVerified: boolean;
             isWalletUnlocked: boolean;
             createdAt: Date;
@@ -36,7 +36,7 @@ export declare class AuthService {
             displayName: string;
             country: string;
             currency: string;
-            accountType: import(".prisma/client").$Enums.AccountType;
+            accountType: import("../../generated/enums.js").AccountType;
             isVerified: boolean;
             isWalletUnlocked: boolean;
             createdAt: Date;
@@ -50,7 +50,7 @@ export declare class AuthService {
             username: string;
             email: string;
             displayName: string;
-            accountType: import(".prisma/client").$Enums.AccountType;
+            accountType: import("../../generated/enums.js").AccountType;
             isWalletUnlocked: boolean;
         };
         accessToken: string;

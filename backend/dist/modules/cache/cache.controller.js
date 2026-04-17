@@ -1,15 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCacheValue = exports.setCacheValue = exports.getCacheValue = void 0;
-const redis_1 = require("../../config/redis");
-const getCacheValue = async (req, res) => {
+import { redis } from '../../config/redis.js';
+export const getCacheValue = async (req, res) => {
     try {
         const key = req.params.key;
         if (!key) {
             res.status(400).json({ error: 'Cache key is required' });
             return;
         }
-        const value = await redis_1.redis.get(key);
+        const value = await redis.get(key);
         if (value === null) {
             res.status(404).json({ error: 'Cache miss', data: null });
             return;
@@ -27,8 +24,7 @@ const getCacheValue = async (req, res) => {
         res.status(500).json({ error: 'Internal cache error' });
     }
 };
-exports.getCacheValue = getCacheValue;
-const setCacheValue = async (req, res) => {
+export const setCacheValue = async (req, res) => {
     try {
         const { key, value, ttlSeconds } = req.body;
         if (!key || value === undefined) {
@@ -37,10 +33,10 @@ const setCacheValue = async (req, res) => {
         }
         const valueString = typeof value === 'object' ? JSON.stringify(value) : String(value);
         if (ttlSeconds && typeof ttlSeconds === 'number') {
-            await redis_1.redis.setex(key, ttlSeconds, valueString);
+            await redis.setex(key, ttlSeconds, valueString);
         }
         else {
-            await redis_1.redis.set(key, valueString);
+            await redis.set(key, valueString);
         }
         res.json({ success: true, message: `Key ${key} cached successfully` });
     }
@@ -49,15 +45,14 @@ const setCacheValue = async (req, res) => {
         res.status(500).json({ error: 'Internal cache error' });
     }
 };
-exports.setCacheValue = setCacheValue;
-const deleteCacheValue = async (req, res) => {
+export const deleteCacheValue = async (req, res) => {
     try {
         const key = req.params.key;
         if (!key) {
             res.status(400).json({ error: 'Cache key is required' });
             return;
         }
-        await redis_1.redis.del(key);
+        await redis.del(key);
         res.json({ success: true, message: `Key ${key} cleared` });
     }
     catch (error) {
@@ -65,5 +60,4 @@ const deleteCacheValue = async (req, res) => {
         res.status(500).json({ error: 'Internal cache error' });
     }
 };
-exports.deleteCacheValue = deleteCacheValue;
 //# sourceMappingURL=cache.controller.js.map

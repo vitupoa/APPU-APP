@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { env } from '../../config/env';
+import { env } from '../../config/env.js';
 
 const PAYPAL_BASE = env.PAYPAL_MODE === 'live'
   ? 'https://api-m.paypal.com'

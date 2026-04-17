@@ -1,8 +1,8 @@
 import { Response } from 'express';
-import { AuthRequest } from '../../middleware/auth';
-import { WalletService } from './wallet.service';
-import { ExchangeService } from '../../services/exchange/exchange.service';
-import { tipSchema, exchangeRateSchema } from './wallet.validation';
+import { AuthRequest } from '../../middleware/auth.js';
+import { WalletService } from './wallet.service.js';
+import { ExchangeService } from '../../services/exchange/exchange.service.js';
+import { tipSchema, exchangeRateSchema } from './wallet.validation.js';
 
 export class WalletController {
   static async getBalance(req: AuthRequest, res: Response) {

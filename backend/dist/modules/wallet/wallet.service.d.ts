@@ -1,10 +1,9 @@
-import { Prisma } from '@prisma/client';
 export declare class WalletService {
     /**
      * Retrieves the wallet balance ensuring a wallet exists.
      */
     static getBalance(userId: string, targetCurrency?: string): Promise<{
-        krBalance: Prisma.Decimal;
+        krBalance: import("@prisma/client-runtime-utils").Decimal;
         fiatEquivalent: number;
         currency: string;
         isWalletUnlocked: boolean;
@@ -15,22 +14,22 @@ export declare class WalletService {
     static sendTip(senderId: string, recipientId: string, senderKrAmount: number, senderCurrency: string): Promise<{
         success: boolean;
         krTipped: number;
-        krReceived: number;
+        krReceived: any;
         platformFee: number;
     }>;
     static getTransactions(userId: string, limit?: number, offset?: number): Promise<{
         status: string;
         type: string;
         id: string;
-        currency: string | null;
         createdAt: Date;
         userId: string;
-        amountKr: Prisma.Decimal;
-        amountFiat: Prisma.Decimal | null;
+        currency: string | null;
         provider: string | null;
+        amountKr: import("@prisma/client-runtime-utils").Decimal;
+        amountFiat: import("@prisma/client-runtime-utils").Decimal | null;
         reference: string | null;
         counterpartyId: string | null;
-        metadata: Prisma.JsonValue | null;
+        metadata: import("@prisma/client/runtime/client").JsonValue | null;
     }[]>;
     static searchUsers(query: string): Promise<{
         isLovers: boolean;

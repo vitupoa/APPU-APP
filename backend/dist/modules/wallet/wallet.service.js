@@ -1,20 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.WalletService = void 0;
-const database_1 = require("../../config/database");
-const exchange_service_1 = require("../../services/exchange/exchange.service");
-const client_1 = require("@prisma/client");
-class WalletService {
+import { prisma } from '../../config/database.js';
+import { ExchangeService } from '../../services/exchange/exchange.service.js';
+import { Prisma } from '@prisma/client';
+export class WalletService {
     /**
      * Retrieves the wallet balance ensuring a wallet exists.
      */
     static async getBalance(userId, targetCurrency) {
-        let wallet = await database_1.prisma.wallet.findUnique({
+        let wallet = await prisma.wallet.findUnique({
             where: { userId },
             include: { user: { select: { isWalletUnlocked: true, currency: true } } }
         });
         if (!wallet) {
-            wallet = await database_1.prisma.wallet.create({
+            wallet = await prisma.wallet.create({
                 data: { userId },
                 include: { user: { select: { isWalletUnlocked: true, currency: true } } }
             });
@@ -22,7 +19,7 @@ class WalletService {
         const currencyToUse = targetCurrency || wallet.user.currency;
         // Convert Kr balance to user fiat equivalent contextually
         // 1 Kr = $0.01 USD. Apply the exchange rate to the USD base equivalent
-        const fiatRate = await exchange_service_1.ExchangeService.getRate(currencyToUse);
+        const fiatRate = await ExchangeService.getRate(currencyToUse);
         const baseUsd = Number(wallet.krBalance) / 100;
         const fiatEquivalent = baseUsd * fiatRate;
         return {
@@ -43,17 +40,17 @@ class WalletService {
             throw new Error("Tip amount must be a whole Kr integer strictly above 0.");
         }
         // 1 Kr = $0.01. Calculate specific fiat tracking values!
-        const baseUsd = exchange_service_1.ExchangeService.getUSDFromKr(senderKrAmount);
-        const localRate = await exchange_service_1.ExchangeService.getTransactionRate(senderCurrency, 'sell');
+        const baseUsd = ExchangeService.getUSDFromKr(senderKrAmount);
+        const localRate = await ExchangeService.getTransactionRate(senderCurrency, 'sell');
         const fiatAmount = baseUsd * localRate;
-        const krDecimal = new client_1.Prisma.Decimal(senderKrAmount);
+        const krDecimal = new Prisma.Decimal(senderKrAmount);
         // TIPPING TAX LOGIC
         const PLATFORM_FEE_RATE = 0.15; // 15% Explicit Cut mapped
         const platformCut = senderKrAmount * PLATFORM_FEE_RATE;
-        const recipientReceiveAmount = new client_1.Prisma.Decimal(senderKrAmount - platformCut);
-        const platformCutDecimal = new client_1.Prisma.Decimal(platformCut);
+        const recipientReceiveAmount = new Prisma.Decimal(senderKrAmount - platformCut);
+        const platformCutDecimal = new Prisma.Decimal(platformCut);
         // Execute atomic transaction for balance safety
-        return database_1.prisma.$transaction(async (tx) => {
+        return prisma.$transaction(async (tx) => {
             const senderWallet = await tx.wallet.findUnique({ where: { userId: senderId } });
             if (!senderWallet || senderWallet.krBalance.lessThan(krDecimal)) {
                 throw new Error("Insufficient Kr balance to tip");
@@ -117,7 +114,7 @@ class WalletService {
         });
     }
     static async getTransactions(userId, limit = 20, offset = 0) {
-        const transactions = await database_1.prisma.transaction.findMany({
+        const transactions = await prisma.transaction.findMany({
             where: { userId },
             orderBy: { createdAt: 'desc' },
             take: limit,
@@ -130,7 +127,7 @@ class WalletService {
             return [];
         }
         // Search by username or display name
-        const users = await database_1.prisma.user.findMany({
+        const users = await prisma.user.findMany({
             where: {
                 OR: [
                     { username: { contains: query, mode: 'insensitive' } },
@@ -152,5 +149,4 @@ class WalletService {
         }));
     }
 }
-exports.WalletService = WalletService;
 //# sourceMappingURL=wallet.service.js.map

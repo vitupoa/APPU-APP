@@ -1,5 +1,5 @@
 import { Redis } from 'ioredis';
-import { env } from '../../config/env';
+import { env } from '../../config/env.js';
 
 export const pubClient = new Redis(env.REDIS_URL);
 export const subClient = pubClient.duplicate();

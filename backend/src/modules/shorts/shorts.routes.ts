@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
-import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth';
-import { ShortsService } from './shorts.service';
+import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth.js';
+import { ShortsService } from './shorts.service.js';
 import { z } from 'zod';
 import { SubscriptionTierType } from '@prisma/client';
 

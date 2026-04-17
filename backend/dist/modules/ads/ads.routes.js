@@ -1,13 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const auth_1 = require("../../middleware/auth");
-const ads_service_1 = require("./ads.service");
-const router = (0, express_1.Router)();
+import { Router } from 'express';
+import { authMiddleware } from '../../middleware/auth.js';
+import { AdsService } from './ads.service.js';
+const router = Router();
 // POST /api/v1/ads/rewarded — Credit user for watching rewarded ad
-router.post('/rewarded', auth_1.authMiddleware, async (req, res) => {
+router.post('/rewarded', authMiddleware, async (req, res) => {
     try {
-        const result = await ads_service_1.AdsService.creditRewardedAd(req.userId);
+        const result = await AdsService.creditRewardedAd(req.userId);
         res.status(200).json(result);
     }
     catch (error) {
@@ -15,10 +13,10 @@ router.post('/rewarded', auth_1.authMiddleware, async (req, res) => {
     }
 });
 // POST /api/v1/ads/impression — Record ad impression (analytics)
-router.post('/impression', auth_1.authMiddleware, async (req, res) => {
+router.post('/impression', authMiddleware, async (req, res) => {
     try {
         const { adUnitId, adType, placement } = req.body;
-        await ads_service_1.AdsService.recordImpression({
+        await AdsService.recordImpression({
             userId: req.userId,
             adUnitId,
             adType,
@@ -30,5 +28,5 @@ router.post('/impression', auth_1.authMiddleware, async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-exports.default = router;
+export default router;
 //# sourceMappingURL=ads.routes.js.map

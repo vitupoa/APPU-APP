@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
-import { authMiddleware, AuthRequest } from '../../middleware/auth';
-import { generateUploadSignature, validateUploadFolder, CloudinaryFolder } from '../../config/cloudinary';
+import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
+import { generateUploadSignature, validateUploadFolder, CloudinaryFolder } from '../../config/cloudinary.js';
 import { z } from 'zod';
 
 const router = Router();

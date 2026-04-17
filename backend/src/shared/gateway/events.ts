@@ -1,4 +1,4 @@
-import { io } from './socket';
+import { io } from './socket.js';
 
 /**
  * Emit vote update to all connected clients

@@ -15,6 +15,7 @@ declare const envSchema: z.ZodObject<{
     CLOUDINARY_CLOUD_NAME: z.ZodString;
     CLOUDINARY_API_KEY: z.ZodString;
     CLOUDINARY_API_SECRET: z.ZodString;
+    CLOUDINARY_UPLOAD_PRESET: z.ZodOptional<z.ZodString>;
     PAYPAL_CLIENT_ID: z.ZodOptional<z.ZodString>;
     PAYPAL_CLIENT_SECRET: z.ZodOptional<z.ZodString>;
     PAYPAL_MODE: z.ZodDefault<z.ZodEnum<["sandbox", "live"]>>;
@@ -48,6 +49,7 @@ declare const envSchema: z.ZodObject<{
     PAYPAL_MODE: "sandbox" | "live";
     MPESA_ENV: "production" | "sandbox";
     EXCHANGE_RATE_BASE_URL: string;
+    CLOUDINARY_UPLOAD_PRESET?: string | undefined;
     PAYPAL_CLIENT_ID?: string | undefined;
     PAYPAL_CLIENT_SECRET?: string | undefined;
     PAYSTACK_SECRET_KEY?: string | undefined;
@@ -75,6 +77,7 @@ declare const envSchema: z.ZodObject<{
     RATE_LIMIT_WINDOW_MS?: string | undefined;
     JWT_ACCESS_EXPIRY?: string | undefined;
     JWT_REFRESH_EXPIRY?: string | undefined;
+    CLOUDINARY_UPLOAD_PRESET?: string | undefined;
     PAYPAL_CLIENT_ID?: string | undefined;
     PAYPAL_CLIENT_SECRET?: string | undefined;
     PAYPAL_MODE?: "sandbox" | "live" | undefined;
@@ -110,6 +113,7 @@ export declare const env: {
     PAYPAL_MODE: "sandbox" | "live";
     MPESA_ENV: "production" | "sandbox";
     EXCHANGE_RATE_BASE_URL: string;
+    CLOUDINARY_UPLOAD_PRESET?: string | undefined;
     PAYPAL_CLIENT_ID?: string | undefined;
     PAYPAL_CLIENT_SECRET?: string | undefined;
     PAYSTACK_SECRET_KEY?: string | undefined;

@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 export declare class UserService {
     /**
      * Get full user profile with relationship status and stats.
@@ -14,16 +13,16 @@ export declare class UserService {
         bio: string | null;
         country: string;
         currency: string;
-        accountType: import(".prisma/client").$Enums.AccountType;
+        accountType: import("../../generated/enums.js").AccountType;
         isVerified: boolean;
         isWalletUnlocked: boolean;
         bioLinks: {
             id: string;
             userId: string;
             label: string;
+            sortOrder: number;
             url: string;
             icon: string | null;
-            sortOrder: number;
         }[];
         stats: {
             admirers: number;
@@ -47,8 +46,11 @@ export declare class UserService {
         coverPhotoUrl?: string;
     }): Promise<{
         id: string;
+        createdAt: Date;
         email: string;
         username: string;
+        googleId: string | null;
+        appleId: string | null;
         firstName: string;
         lastName: string;
         displayName: string;
@@ -57,15 +59,12 @@ export declare class UserService {
         bio: string | null;
         country: string;
         currency: string;
-        googleId: string | null;
-        appleId: string | null;
-        accountType: import(".prisma/client").$Enums.AccountType;
+        accountType: import("../../generated/enums.js").AccountType;
         isAdmin: boolean;
         isVerified: boolean;
         isWalletUnlocked: boolean;
         walletPinHash: string | null;
         passwordHash: string | null;
-        createdAt: Date;
         updatedAt: Date;
     }>;
     /**
@@ -130,9 +129,9 @@ export declare class UserService {
         id: string;
         userId: string;
         label: string;
+        sortOrder: number;
         url: string;
         icon: string | null;
-        sortOrder: number;
     }[]>;
     static getMilestones(): Promise<({
         completions: ({
@@ -155,7 +154,7 @@ export declare class UserService {
         title: string;
         requirementType: string;
         requirementValue: number;
-        rewardKr: Prisma.Decimal;
+        rewardKr: import("@prisma/client-runtime-utils").Decimal;
     })[]>;
     static getUserMilestoneProgress(userId: string): Promise<{
         id: string;

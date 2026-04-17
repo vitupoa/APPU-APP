@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { getCacheValue, setCacheValue, deleteCacheValue } from './cache.controller';
-import { authMiddleware } from '../../middleware/auth';
+import { getCacheValue, setCacheValue, deleteCacheValue } from './cache.controller.js';
+import { authMiddleware } from '../../middleware/auth.js';
 
 const router = Router();
 

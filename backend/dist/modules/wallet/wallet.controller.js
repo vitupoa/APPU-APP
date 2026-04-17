@@ -1,14 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.WalletController = void 0;
-const wallet_service_1 = require("./wallet.service");
-const exchange_service_1 = require("../../services/exchange/exchange.service");
-const wallet_validation_1 = require("./wallet.validation");
-class WalletController {
+import { WalletService } from './wallet.service.js';
+import { ExchangeService } from '../../services/exchange/exchange.service.js';
+import { tipSchema, exchangeRateSchema } from './wallet.validation.js';
+export class WalletController {
     static async getBalance(req, res) {
         try {
             const targetCurrency = req.query.currency;
-            const result = await wallet_service_1.WalletService.getBalance(req.userId, targetCurrency);
+            const result = await WalletService.getBalance(req.userId, targetCurrency);
             res.status(200).json(result);
         }
         catch (error) {
@@ -17,8 +14,8 @@ class WalletController {
     }
     static async sendTip(req, res) {
         try {
-            const data = wallet_validation_1.tipSchema.parse(req.body);
-            const result = await wallet_service_1.WalletService.sendTip(req.userId, data.recipientId, data.krAmount, data.currency);
+            const data = tipSchema.parse(req.body);
+            const result = await WalletService.sendTip(req.userId, data.recipientId, data.krAmount, data.currency);
             res.status(200).json(result);
         }
         catch (error) {
@@ -34,7 +31,7 @@ class WalletController {
         try {
             const limit = req.query.limit ? parseInt(req.query.limit) : 20;
             const offset = req.query.offset ? parseInt(req.query.offset) : 0;
-            const result = await wallet_service_1.WalletService.getTransactions(req.userId, limit, offset);
+            const result = await WalletService.getTransactions(req.userId, limit, offset);
             res.status(200).json(result);
         }
         catch (error) {
@@ -44,7 +41,7 @@ class WalletController {
     static async searchUsers(req, res) {
         try {
             const query = req.query.query || '';
-            const result = await wallet_service_1.WalletService.searchUsers(query);
+            const result = await WalletService.searchUsers(query);
             res.status(200).json(result);
         }
         catch (error) {
@@ -53,11 +50,11 @@ class WalletController {
     }
     static async getExchangeRate(req, res) {
         try {
-            const data = wallet_validation_1.exchangeRateSchema.parse(req.query);
+            const data = exchangeRateSchema.parse(req.query);
             const currency = data.currency || 'USD';
-            const rate = await exchange_service_1.ExchangeService.getRate(currency);
-            const buyRate = await exchange_service_1.ExchangeService.getTransactionRate(currency, 'buy');
-            const sellRate = await exchange_service_1.ExchangeService.getTransactionRate(currency, 'sell');
+            const rate = await ExchangeService.getRate(currency);
+            const buyRate = await ExchangeService.getTransactionRate(currency, 'buy');
+            const sellRate = await ExchangeService.getTransactionRate(currency, 'sell');
             res.status(200).json({
                 currency,
                 baseRate: rate,
@@ -76,5 +73,4 @@ class WalletController {
         }
     }
 }
-exports.WalletController = WalletController;
 //# sourceMappingURL=wallet.controller.js.map
