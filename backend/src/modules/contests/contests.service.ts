@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database';
 import { Prisma } from '@prisma/client';
+import { emitVoteUpdate, emitContestUpdate } from '../../shared/gateway/events';
 
 const PLATFORM_FEE_RATE = 0.15; // 15%
 
@@ -182,11 +183,11 @@ export class ContestService {
         where: { userId, contestId: { in: items.map((c) => c.id) } },
         select: { contestId: true }
       });
-      joined.forEach((j) => joinedIds.add(j.contestId));
+      joined.forEach((j: { contestId: string }) => joinedIds.add(j.contestId));
     }
 
     return {
-      items: items.map((c) => ({
+      items: items.map((c: any) => ({
         id: c.id,
         creator: c.creator,
         title: c.title,
@@ -238,8 +239,8 @@ export class ContestService {
       prizeKr: Number(contest.prizeTotalKr),
       platformFeeKr: Number(contest.platformFeeKr),
       totalChargedKr: Number(contest.prizeTotalKr) + Number(contest.platformFeeKr),
-      rules: contest.actions.map((a) => a.label),
-      requiredActions: contest.actions.map((a) => ({
+      rules: contest.actions.map((a: any) => a.label),
+      requiredActions: contest.actions.map((a: any) => ({
         type: a.actionType,
         targetUrl: a.targetUrl,
         label: a.label
@@ -274,6 +275,9 @@ export class ContestService {
       prisma.contestParticipant.create({ data: { userId, contestId } }),
       prisma.contest.update({ where: { id: contestId }, data: { totalParticipants: { increment: 1 } } })
     ]);
+
+    // Emit contest update
+    emitContestUpdate(contestId, contest.status, contest.totalParticipants + 1);
 
     return participant;
   }
@@ -368,6 +372,114 @@ export class ContestService {
       rank: s.rank,
       createdAt: s.submittedAt.toISOString()
     }));
+  }
+
+  /**
+   * Get all contest submissions feed from active contests
+   */
+  static async getSubmissionsFeed(cursor?: string, limit = 20, userId?: string) {
+    const submissions = await prisma.contestSubmission.findMany({
+      where: {
+        contest: { status: 'ACTIVE' }
+      },
+      take: limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      orderBy: { submittedAt: 'desc' },
+      include: {
+        user: { select: { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true } },
+        contest: {
+          select: {
+            id: true,
+            title: true,
+            prizeTotalKr: true,
+            status: true
+          }
+        }
+      }
+    });
+
+    const hasMore = submissions.length > limit;
+    const items = hasMore ? submissions.slice(0, limit) : submissions;
+
+    return {
+      items: items.map((s) => ({
+        id: s.id,
+        user: s.user,
+        contestId: s.contestId,
+        contest: {
+          id: s.contest.id,
+          title: s.contest.title,
+          prizeKr: Number(s.contest.prizeTotalKr),
+          status: s.contest.status
+        },
+        mediaUrl: s.mediaUrl,
+        mediaType: s.mediaType,
+        caption: '', // Add caption field if needed
+        proofScreenshots: s.proofUrls,
+        votes: s.votesCount,
+        rank: s.rank,
+        createdAt: s.submittedAt.toISOString()
+      })),
+      nextCursor: hasMore ? items[items.length - 1].id : null
+    };
+  }
+
+  /**
+   * Vote on a contest submission
+   */
+  static async voteOnSubmission(userId: string, submissionId: string, voteType: 'UPVOTE' | 'DOWNVOTE') {
+    const submission = await prisma.contestSubmission.findUniqueOrThrow({
+      where: { id: submissionId },
+      include: { contest: true }
+    });
+
+    if (submission.contest.status !== 'ACTIVE') {
+      throw new Error('Contest is not active');
+    }
+
+    if (submission.userId === userId) {
+      throw new Error('Cannot vote on your own submission');
+    }
+
+    return prisma.$transaction(async (tx) => {
+      // Check if user already voted
+      const existingVote = await tx.contestVote.findUnique({
+        where: {
+          submissionId_voterId: { submissionId, voterId: userId }
+        }
+      });
+
+      if (existingVote) {
+        throw new Error('You have already voted on this submission');
+      }
+
+      // Create new vote
+      await tx.contestVote.create({
+        data: {
+          voterId: userId,
+          submissionId
+        }
+      });
+
+      // Update counts
+      await tx.contestSubmission.update({
+        where: { id: submissionId },
+        data: { votesCount: { increment: 1 } }
+      });
+
+      // Get updated submission
+      const updated = await tx.contestSubmission.findUniqueOrThrow({
+        where: { id: submissionId }
+      });
+
+      // Emit real-time vote update
+      emitVoteUpdate(submissionId, updated.votesCount, userId);
+
+      return {
+        success: true,
+        newVoteCount: updated.votesCount
+      };
+    });
   }
 
   /**

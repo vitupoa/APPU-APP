@@ -2,6 +2,7 @@ package com.krieta.feature.profile.presentation.viewmodel
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.krieta.com.core.network.CloudinaryUploader
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.profile.domain.model.UserProfile
 import com.krieta.feature.profile.domain.repository.ProfileRepository
@@ -21,12 +22,15 @@ data class EditProfileState(
     val coverPhotoUrl: String = "",
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
+    val isUploadingAvatar: Boolean = false,
+    val isUploadingBanner: Boolean = false,
     val saveSuccess: Boolean = false,
     val error: String? = null
 )
 
 class EditProfileViewModel(
-    private val repository: ProfileRepository
+    private val repository: ProfileRepository,
+    private val cloudinaryUploader: CloudinaryUploader
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(EditProfileState())
@@ -39,8 +43,30 @@ class EditProfileViewModel(
     fun onDisplayNameChange(v: String) { _state.value = _state.value.copy(displayName = v) }
     fun onUsernameChange(v: String) { _state.value = _state.value.copy(username = v) }
     fun onBioChange(v: String) { _state.value = _state.value.copy(bio = v) }
-    fun onAvatarUrlChange(v: String) { _state.value = _state.value.copy(avatarUrl = v) }
-    fun onCoverPhotoUrlChange(v: String) { _state.value = _state.value.copy(coverPhotoUrl = v) }
+
+    fun uploadAvatar(bytes: ByteArray) {
+        screenModelScope.launch {
+            _state.value = _state.value.copy(isUploadingAvatar = true, error = null)
+            try {
+                val url = cloudinaryUploader.uploadImage(bytes, "avatars")
+                _state.value = _state.value.copy(avatarUrl = url, isUploadingAvatar = false)
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(isUploadingAvatar = false, error = e.message)
+            }
+        }
+    }
+
+    fun uploadBanner(bytes: ByteArray) {
+        screenModelScope.launch {
+            _state.value = _state.value.copy(isUploadingBanner = true, error = null)
+            try {
+                val url = cloudinaryUploader.uploadImage(bytes, "banners")
+                _state.value = _state.value.copy(coverPhotoUrl = url, isUploadingBanner = false)
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(isUploadingBanner = false, error = e.message)
+            }
+        }
+    }
 
     fun save() {
         val s = _state.value

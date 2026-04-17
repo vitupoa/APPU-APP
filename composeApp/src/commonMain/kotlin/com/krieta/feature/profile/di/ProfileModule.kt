@@ -11,7 +11,7 @@ val profileModule = module {
     single<ProfileRepository> { ProfileRepositoryImpl(get()) }
 
     factory { (userId: String?) -> ProfileViewModel(userId, get()) }
-    factory { EditProfileViewModel(get()) }
+    factory { EditProfileViewModel(get(), get()) }
     factory { (userId: String, listType: SocialListType) -> SocialListViewModel(userId, listType, get()) }
     factory { MilestonesViewModel(get(), get()) }
     factory { SubscriptionTierSetupViewModel(get()) }

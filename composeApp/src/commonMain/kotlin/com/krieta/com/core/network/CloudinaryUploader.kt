@@ -166,5 +166,14 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             finalResultUrl ?: throw Exception("Chunked upload completed but final result URL was null")
         }
     }
+
+    suspend fun uploadImage(fileBytes: ByteArray, folder: String): String {
+        val result = uploadMedia(folder, fileBytes, isVideo = false)
+        return when (result) {
+            is NetworkResult.Success -> result.data
+            is NetworkResult.Error -> throw Exception(result.message)
+            is NetworkResult.Loading -> throw Exception("Upload in progress")
+        }
+    }
 }
 

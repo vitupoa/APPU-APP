@@ -37,6 +37,14 @@ class ShortsViewModel(
         loadFeed()
     }
 
+    fun setFeedType(feedType: ShortsFeedType) {
+        val tab = when (feedType) {
+            ShortsFeedType.DISCOVER -> ShortsTab.DISCOVER
+            ShortsFeedType.ADMIRING -> ShortsTab.ADMIRING
+        }
+        selectTab(tab)
+    }
+
     fun selectTab(tab: ShortsTab) {
         if (_state.value.activeTab == tab) return
         _state.value = ShortsState(activeTab = tab) // Reset state on tab change

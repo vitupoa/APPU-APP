@@ -6,22 +6,31 @@ import androidx.compose.runtime.collectAsState
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import coil3.compose.AsyncImage
 import com.krieta.feature.profile.presentation.viewmodel.EditProfileViewModel
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
+import kotlinx.coroutines.launch
 
 class EditProfileScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -30,9 +39,34 @@ class EditProfileScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinScreenModel<EditProfileViewModel>()
         val state by viewModel.state.collectAsState()
+        val scope = rememberCoroutineScope()
 
         LaunchedEffect(state.saveSuccess) {
             if (state.saveSuccess) navigator.pop()
+        }
+
+        val avatarPicker = rememberFilePickerLauncher(
+            type = PickerType.Image,
+            mode = PickerMode.Single
+        ) { file ->
+            file?.let {
+                scope.launch {
+                    val bytes = it.readBytes()
+                    viewModel.uploadAvatar(bytes)
+                }
+            }
+        }
+
+        val bannerPicker = rememberFilePickerLauncher(
+            type = PickerType.Image,
+            mode = PickerMode.Single
+        ) { file ->
+            file?.let {
+                scope.launch {
+                    val bytes = it.readBytes()
+                    viewModel.uploadBanner(bytes)
+                }
+            }
         }
 
         Scaffold(
@@ -136,23 +170,65 @@ class EditProfileScreen : Screen {
                             shape = RoundedCornerShape(12.dp)
                         )
 
-                        OutlinedTextField(
-                            value = state.avatarUrl,
-                            onValueChange = { viewModel.onAvatarUrlChange(it) },
-                            label = { Text("Avatar URL") },
+                        // Avatar Image Picker
+                        Text("Avatar Image", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
-                        )
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (state.avatarUrl.isNotEmpty()) {
+                                AsyncImage(
+                                    model = state.avatarUrl,
+                                    contentDescription = "Avatar",
+                                    modifier = Modifier.size(80.dp).clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Button(
+                                    onClick = { avatarPicker.launch() },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Icon(Icons.Default.PhotoCamera, "Upload")
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("Upload from Device")
+                                }
+                            }
+                        }
 
-                        OutlinedTextField(
-                            value = state.coverPhotoUrl,
-                            onValueChange = { viewModel.onCoverPhotoUrlChange(it) },
-                            label = { Text("Cover Photo URL") },
+                        if (state.isUploadingAvatar) {
+                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                        }
+
+                        // Banner Image Picker
+                        Text("Banner Image", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp)
-                        )
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (state.coverPhotoUrl.isNotEmpty()) {
+                                AsyncImage(
+                                    model = state.coverPhotoUrl,
+                                    contentDescription = "Banner",
+                                    modifier = Modifier.fillMaxWidth().height(120.dp).clip(RoundedCornerShape(12.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                            Button(
+                                onClick = { bannerPicker.launch() },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.PhotoCamera, "Upload")
+                                Spacer(Modifier.width(8.dp))
+                                Text("Upload from Device")
+                            }
+                        }
+
+                        if (state.isUploadingBanner) {
+                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                        }
 
                         // Error
                         state.error?.let {

@@ -16,7 +16,7 @@
     "lint": "eslint src/ --ext .ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.5.0",
+    "@prisma/client": "^6.19.3",
     "@socket.io/redis-adapter": "^8.3.0",
     "axios": "^1.7.9",
     "bcrypt": "^6.0.0",
@@ -47,7 +47,7 @@
     "@types/nodemailer": "^8.0.0",
     "@types/uuid": "^10.0.0",
     "jest": "^30.3.0",
-    "prisma": "^6.5.0",
+    "prisma": "^6.19.3",
     "supertest": "^7.0.0",
     "ts-jest": "^29.4.9",
     "tsx": "^4.21.0",

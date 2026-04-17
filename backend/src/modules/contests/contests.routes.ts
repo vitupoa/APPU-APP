@@ -143,6 +143,33 @@ router.get('/:id/submissions', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// GET /api/v1/contests/submissions/feed — All contest submissions feed
+router.get('/submissions/feed', optionalAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+    const result = await ContestService.getSubmissionsFeed(cursor, limit, req.userId);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/v1/contests/submissions/:submissionId/vote
+router.post('/submissions/:submissionId/vote', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const { voteType } = z.object({ voteType: z.enum(['UPVOTE', 'DOWNVOTE']) }).parse(req.body);
+    const result = await ContestService.voteOnSubmission(req.userId!, String(req.params.submissionId), voteType);
+    res.status(200).json(result);
+  } catch (error: any) {
+    if (error.name === 'ZodError') {
+      res.status(400).json({ error: 'Validation failed', details: error.errors });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
+  }
+});
+
 // GET /api/v1/contests/:id/leaderboard
 router.get('/:id/leaderboard', async (req: AuthRequest, res: Response) => {
   try {

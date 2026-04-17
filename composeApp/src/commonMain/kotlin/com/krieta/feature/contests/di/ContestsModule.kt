@@ -12,6 +12,7 @@ val contestsModule = module {
     single<ContestsRepository> { ContestsRepositoryImpl(get()) }
 
     factory { ContestFeedViewModel(get()) }
+    factory { (contestId: String?) -> com.krieta.feature.contests.presentation.viewmodel.ContestSubmissionFeedViewModel(get(), contestId) }
     // ContestDetailViewModel needs contestId injected via parametersOf
     factory { (contestId: String) -> ContestDetailViewModel(contestId, get()) }
     factory { com.krieta.feature.contests.presentation.viewmodel.CreateContestViewModel(get(), get()) }

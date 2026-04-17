@@ -34,18 +34,25 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import coil3.compose.AsyncImage
+import com.krieta.com.core.ui.components.VideoPlayer
 import com.krieta.com.core.util.KrCurrencyFormatter
 import com.krieta.feature.shorts.domain.model.LinkedProduct
 import com.krieta.feature.shorts.domain.model.Short
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsTab
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsViewModel
+import com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType
 import kotlinx.coroutines.delay
 
-class ShortsScreen : Screen {
+class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVER) : Screen {
     @Composable
     override fun Content() {
         val viewModel = koinScreenModel<ShortsViewModel>()
         val state by viewModel.state.collectAsState()
+
+        // Set feed type in viewModel
+        LaunchedEffect(feedType) {
+            viewModel.setFeedType(feedType)
+        }
 
         val pagerState = rememberPagerState(pageCount = { state.items.size })
 
@@ -142,21 +149,21 @@ class ShortsScreen : Screen {
         onLike: () -> Unit
     ) {
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-            // Placeholder for VideoPlayer expect/actual — shows thumbnail for now
-            Box(
-                modifier = Modifier.fillMaxSize().background(Color.DarkGray),
-                contentAlignment = Alignment.Center
-            ) {
-                if (!isActive) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.3f),
-                        modifier = Modifier.size(64.dp)
-                    )
-                }
-                // TODO: Swap with VideoPlayer expect/actual (ExoPlayer/AVPlayer)
+            // Video Player
+            var isPlaying by remember { mutableStateOf(isActive) }
+            
+            LaunchedEffect(isActive) {
+                isPlaying = isActive
             }
+            
+            VideoPlayer(
+                url = short.videoUrl,
+                isPlaying = isPlaying,
+                modifier = Modifier.fillMaxSize(),
+                onPlaybackStateChanged = { playing ->
+                    isPlaying = playing
+                }
+            )
 
             // Locked overlay
             if (short.isLocked) {

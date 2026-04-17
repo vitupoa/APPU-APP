@@ -52,7 +52,7 @@ object HomeTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(com.krieta.feature.feed.presentation.screen.FeedScreen()) {
+        Navigator(com.krieta.feature.feed.presentation.screen.HomeScreen()) {
             CurrentScreen()
         }
     }
@@ -156,7 +156,7 @@ class ExploreScreen : Screen {
                         subtitle = "See what's trending — photos, videos & more",
                         gradient = listOf(KrietaColors.Primary.copy(alpha = 0.8f), KrietaColors.PrimaryDark),
                         modifier = Modifier.weight(1f),
-                        onClick = { navigator.push(DripsScreen()) }
+                        onClick = { navigator.push(com.krieta.feature.feed.presentation.screen.DripsScreen()) }
                     )
                     ExploreCard(
                         emoji = "🛍️",

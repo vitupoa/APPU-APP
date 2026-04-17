@@ -45,6 +45,12 @@ class WebSocketService(
     private val _walletFlow = MutableSharedFlow<String>()
     val walletFlow: SharedFlow<String> = _walletFlow
 
+    private val _voteUpdateFlow = MutableSharedFlow<String>()
+    val voteUpdateFlow: SharedFlow<String> = _voteUpdateFlow
+
+    private val _contestUpdateFlow = MutableSharedFlow<String>()
+    val contestUpdateFlow: SharedFlow<String> = _contestUpdateFlow
+
     /**
      * Connects to the Redis-backed Socket.io equivalent Ktor Gateway.
      */
@@ -104,6 +110,8 @@ class WebSocketService(
                     "notification_received" -> _notificationsFlow.emit(dataContent)
                     "milestone_completed" -> _milestonesFlow.emit(dataContent)
                     "wallet_updated" -> _walletFlow.emit(dataContent)
+                    "vote_update" -> _voteUpdateFlow.emit(dataContent)
+                    "contest_update" -> _contestUpdateFlow.emit(dataContent)
                 }
             } catch (e: Exception) {
                 // Ignore parsing constraints organically

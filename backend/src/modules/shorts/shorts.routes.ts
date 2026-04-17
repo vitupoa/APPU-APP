@@ -1,121 +1,73 @@
 import { Router, Response } from 'express';
 import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth';
 import { ShortsService } from './shorts.service';
-import {
-  createShortSchema,
-  addCommentSchema,
-  feedQuerySchema,
-  createCollectionSchema
-} from './shorts.validation';
+import { z } from 'zod';
+import { SubscriptionTierType } from '@prisma/client';
 
 const router = Router();
 
-// GET /api/v1/shorts/feed — paginated feed (optional auth for personalization)
+const createShortSchema = z.object({
+  videoUrl: z.string().url(),
+  caption: z.string().max(500).optional(),
+  musicTrack: z.string().max(200).optional(),
+  linkedProductId: z.string().uuid().optional(),
+  isLocked: z.boolean().optional(),
+  requiredTier: z.nativeEnum(SubscriptionTierType).optional()
+});
+
+// GET /api/v1/shorts/feed
 router.get('/feed', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const query = feedQuerySchema.parse(req.query);
-    const result = await ShortsService.getFeed({
-      userId: req.userId || 'anonymous',
-      tab: query.tab,
-      cursor: query.cursor,
-      limit: query.limit
-    });
-    res.status(200).json(result);
+    const type = req.query.type as string || 'discover';
+    const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+    
+    if (!['discover', 'admiring'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid feed type. Must be "discover" or "admiring"' });
+    }
+
+    const result = await ShortsService.getFeed(type, cursor, limit, req.userId);
+    return res.status(200).json(result);
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
-// POST /api/v1/shorts — create short
+// POST /api/v1/shorts
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createShortSchema.parse(req.body);
-    const short = await ShortsService.createShort({ userId: req.userId!, ...data });
-    res.status(201).json(short);
+    const short = await ShortsService.createShort({
+      creatorId: req.userId!,
+      ...data
+    });
+    return res.status(201).json(short);
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      res.status(400).json({ error: 'Validation failed', details: error.errors });
+      return res.status(400).json({ error: 'Validation failed', details: error.errors });
     } else {
-      res.status(500).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
   }
 });
 
-// POST /api/v1/shorts/:id/like — toggle like
+// POST /api/v1/shorts/:id/like
 router.post('/:id/like', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const result = await ShortsService.toggleLike(req.userId!, String(req.params.id));
-    res.status(200).json(result);
+    return res.status(200).json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 });
 
-// DELETE /api/v1/shorts/:id/like — alias (same toggle logic)
-router.delete('/:id/like', authMiddleware, async (req: AuthRequest, res: Response) => {
+// POST /api/v1/shorts/:id/view
+router.post('/:id/view', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const result = await ShortsService.toggleLike(req.userId!, String(req.params.id));
-    res.status(200).json(result);
+    await ShortsService.incrementView(String(req.params.id), req.userId);
+    return res.status(200).json({ success: true });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /api/v1/shorts/:id/comment
-router.post('/:id/comment', authMiddleware, async (req: AuthRequest, res: Response) => {
-  try {
-    const { text } = addCommentSchema.parse(req.body);
-    const comment = await ShortsService.addComment(req.userId!, String(req.params.id), text);
-    res.status(201).json(comment);
-  } catch (error: any) {
-    if (error.name === 'ZodError') {
-      res.status(400).json({ error: 'Validation failed', details: error.errors });
-    } else {
-      res.status(500).json({ error: error.message });
-    }
-  }
-});
-
-// GET /api/v1/shorts/:id/comments
-router.get('/:id/comments', async (req: AuthRequest, res: Response) => {
-  try {
-    const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
-    const result = await ShortsService.getComments(String(req.params.id), cursor, limit);
-    res.status(200).json(result);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /api/v1/shorts/:id/view — increment view counter (fire-and-forget)
-router.post('/:id/view', async (req: AuthRequest, res: Response) => {
-  ShortsService.incrementView(String(req.params.id));
-  res.status(204).send();
-});
-
-// GET /api/v1/shorts/collections/:userId
-router.get('/collections/:userId', async (req: AuthRequest, res: Response) => {
-  try {
-    const collections = await ShortsService.getCollections(String(req.params.userId));
-    res.status(200).json(collections);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /api/v1/shorts/collections
-router.post('/collections', authMiddleware, async (req: AuthRequest, res: Response) => {
-  try {
-    const { name } = createCollectionSchema.parse(req.body);
-    const collection = await ShortsService.createCollection(req.userId!, name);
-    res.status(201).json(collection);
-  } catch (error: any) {
-    if (error.name === 'ZodError') {
-      res.status(400).json({ error: 'Validation failed', details: error.errors });
-    } else {
-      res.status(500).json({ error: error.message });
-    }
+    return res.status(500).json({ error: error.message });
   }
 });
 

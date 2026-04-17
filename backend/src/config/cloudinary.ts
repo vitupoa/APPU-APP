@@ -19,7 +19,7 @@ export const CLOUDINARY_FOLDERS = {
   CONTESTS_IMAGES: 'Krieta/contests/Images',
   CONTESTS_VIDEOS: 'Krieta/contests/Videos',
   // Feed
-  FEED_IMAGES: 'Krieta/feed/Images',
+  DRIPS_IMAGES: 'Krieta/drips/Images',
   // Shop
   SHOP_IMAGES: 'Krieta/shop/Images',
   // Chat
