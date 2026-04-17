@@ -48,10 +48,9 @@ export function generateUploadSignature(
 ) {
   const timestamp = Math.round(Date.now() / 1000);
 
-  // For signed upload presets, sign timestamp, upload_preset, and folder.
-  // The folder parameter allows dynamic routing within the preset's base folder.
+  // For signed upload presets, only sign timestamp and upload_preset.
+  // Do NOT include folder - the preset's Asset folder controls where files go.
   const payloadToSign: Record<string, any> = { 
-    folder,
     timestamp,
     upload_preset: 'Krieta',
   };
@@ -64,7 +63,7 @@ export function generateUploadSignature(
   return {
     signature,
     timestamp,
-    folder,
+    folder, // Still return for reference, but don't sign or send it
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
