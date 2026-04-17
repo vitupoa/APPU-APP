@@ -48,9 +48,10 @@ export function generateUploadSignature(
 ) {
   const timestamp = Math.round(Date.now() / 1000);
 
-  // For signed upload presets, only sign timestamp and upload_preset.
-  // The folder is controlled by the preset itself, not the signature.
+  // For signed upload presets, sign timestamp, upload_preset, and folder.
+  // The folder parameter allows dynamic routing within the preset's base folder.
   const payloadToSign: Record<string, any> = { 
+    folder,
     timestamp,
     upload_preset: 'Krieta',
   };
