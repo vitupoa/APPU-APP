@@ -37,7 +37,7 @@ export declare class ContestService {
     }): Promise<{
         prizeKr: import("@prisma/client-runtime-utils").Decimal;
         platformFeeKr: import("@prisma/client-runtime-utils").Decimal;
-        totalChargedKr: any;
+        totalChargedKr: import("@prisma/client-runtime-utils").Decimal;
         participantsCount: number;
         submissionsCount: number;
         createdAt: string;

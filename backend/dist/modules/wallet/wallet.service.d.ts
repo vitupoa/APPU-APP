@@ -14,7 +14,7 @@ export declare class WalletService {
     static sendTip(senderId: string, recipientId: string, senderKrAmount: number, senderCurrency: string): Promise<{
         success: boolean;
         krTipped: number;
-        krReceived: any;
+        krReceived: number;
         platformFee: number;
     }>;
     static getTransactions(userId: string, limit?: number, offset?: number): Promise<{

@@ -70,19 +70,19 @@ export declare const NullTypes: {
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export declare const DbNull: import("@prisma/client-runtime-utils").DbNullClass;
+export declare const DbNull: runtime.DbNullClass;
 /**
  * Helper for filtering JSON entries that have JSON `null` values (not empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export declare const JsonNull: import("@prisma/client-runtime-utils").JsonNullClass;
+export declare const JsonNull: runtime.JsonNullClass;
 /**
  * Helper for filtering JSON entries that are `Prisma.DbNull` or `Prisma.JsonNull`
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export declare const AnyNull: import("@prisma/client-runtime-utils").AnyNullClass;
+export declare const AnyNull: runtime.AnyNullClass;
 type SelectAndInclude = {
     select: any;
     include: any;
@@ -2782,8 +2782,8 @@ export declare const SortOrder: {
 };
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder];
 export declare const NullableJsonNullValueInput: {
-    readonly DbNull: import("@prisma/client-runtime-utils").DbNullClass;
-    readonly JsonNull: import("@prisma/client-runtime-utils").JsonNullClass;
+    readonly DbNull: runtime.DbNullClass;
+    readonly JsonNull: runtime.JsonNullClass;
 };
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput];
 export declare const QueryMode: {
@@ -2797,9 +2797,9 @@ export declare const NullsOrder: {
 };
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder];
 export declare const JsonNullValueFilter: {
-    readonly DbNull: import("@prisma/client-runtime-utils").DbNullClass;
-    readonly JsonNull: import("@prisma/client-runtime-utils").JsonNullClass;
-    readonly AnyNull: import("@prisma/client-runtime-utils").AnyNullClass;
+    readonly DbNull: runtime.DbNullClass;
+    readonly JsonNull: runtime.JsonNullClass;
+    readonly AnyNull: runtime.AnyNullClass;
 };
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter];
 /**

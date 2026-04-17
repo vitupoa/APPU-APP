@@ -6,7 +6,7 @@ import { PaypalService } from '../../services/payments/paypal.service.js';
 import { PaystackService } from '../../services/payments/paystack.service.js';
 import { topupInitiateSchema } from '../wallet/wallet.validation.js';
 import { prisma } from '../../config/database.js';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../generated/client.js';
 const router = Router();
 /**
  * POST /api/v1/payments/topup

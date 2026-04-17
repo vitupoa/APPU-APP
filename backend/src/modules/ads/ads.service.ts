@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../generated/client.js';
 
 /**
  * Ads service — handles rewarded ad credit recording and ad impression tracking.

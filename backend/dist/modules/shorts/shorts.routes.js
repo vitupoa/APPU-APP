@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authMiddleware, optionalAuth } from '../../middleware/auth.js';
 import { ShortsService } from './shorts.service.js';
 import { z } from 'zod';
-import { SubscriptionTierType } from '@prisma/client';
+import { SubscriptionTierType } from '../../generated/client.js';
 const router = Router();
 const createShortSchema = z.object({
     videoUrl: z.string().url(),

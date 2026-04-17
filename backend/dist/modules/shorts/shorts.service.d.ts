@@ -1,4 +1,4 @@
-import { SubscriptionTierType } from '@prisma/client';
+import { SubscriptionTierType } from '../../generated/client.js';
 export declare class ShortsService {
     /**
      * Get shorts feed based on type
@@ -22,7 +22,7 @@ export declare class ShortsService {
             commentsCount: number;
             isLiked: boolean;
             isLocked: boolean;
-            requiredTier: import("../../generated/enums.js").SubscriptionTierType | null;
+            requiredTier: SubscriptionTierType | null;
             linkedProduct: {
                 id: string;
                 title: string;
@@ -59,7 +59,7 @@ export declare class ShortsService {
         commentsCount: number;
         isLiked: boolean;
         isLocked: boolean;
-        requiredTier: import("../../generated/enums.js").SubscriptionTierType | null;
+        requiredTier: SubscriptionTierType | null;
         createdAt: string;
     }>;
     /**
