@@ -47,10 +47,13 @@ export function generateUploadSignature(
   resourceType: 'image' | 'video' | 'raw' = 'image'
 ) {
   const timestamp = Math.round(Date.now() / 1000);
-  const uploadPreset = 'Krieta';
+
+  // For signed uploads, sign ONLY the params Cloudinary verifies.
+  // Do NOT include upload_preset — that triggers unsigned-mode validation.
+  // folder + timestamp is the standard signed upload approach.
   const payloadToSign: Record<string, any> = { 
     timestamp, 
-    upload_preset: uploadPreset 
+    folder,
   };
   
   const signature = cloudinary.utils.api_sign_request(
@@ -61,10 +64,10 @@ export function generateUploadSignature(
   return {
     signature,
     timestamp,
+    folder,
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
-    uploadPreset,
   };
 }
 
