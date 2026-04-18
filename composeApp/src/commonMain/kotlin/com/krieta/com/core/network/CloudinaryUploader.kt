@@ -21,6 +21,7 @@ data class CloudinarySignatureDto(
     val signature: String,
     val timestamp: Long,
     val uploadPreset: String,
+    val folder: String,
     val resourceType: String,
     val apiKey: String,
     val cloudName: String
@@ -85,6 +86,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             if (totalBytes <= chunkSize) {
                 println("Cloudinary Upload Parameters being sent:")
                 println("  - api_key: ${signatureDto.apiKey}")
+                println("  - folder: ${signatureDto.folder}")
                 println("  - timestamp: ${signatureDto.timestamp}")
                 println("  - signature: ${signatureDto.signature}")
                 println("  - upload_preset: ${signatureDto.uploadPreset}")
@@ -95,12 +97,13 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                         MultiPartFormDataContent(
                             formData {
                                 // For signed uploads: parameters must be in alphabetical order
-                                // api_key, file, signature, timestamp, upload_preset
+                                // api_key, file, folder, signature, timestamp, upload_preset
                                 append("api_key", signatureDto.apiKey)
                                 append("file", fileBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
+                                append("folder", signatureDto.folder)
                                 append("signature", signatureDto.signature)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("upload_preset", signatureDto.uploadPreset)
@@ -138,12 +141,13 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                         MultiPartFormDataContent(
                             formData {
                                 // For signed uploads: parameters must be in alphabetical order
-                                // api_key, file, signature, timestamp, upload_preset
+                                // api_key, file, folder, signature, timestamp, upload_preset
                                 append("api_key", signatureDto.apiKey)
                                 append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
+                                append("folder", signatureDto.folder)
                                 append("signature", signatureDto.signature)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("upload_preset", signatureDto.uploadPreset)

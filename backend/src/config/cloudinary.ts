@@ -8,22 +8,25 @@ cloudinary.config({
   secure: true,
 });
 
-// For signed upload presets, all uploads go to the folder configured in the preset
-// In this case: Krieta/uploads
-// We keep these constants for reference, but they all point to the same folder
+// Folder structure for organizing uploads by module
 export const CLOUDINARY_FOLDERS = {
-  // All uploads go to Krieta/uploads (configured in the preset)
-  PROFILE_IMAGES: 'Krieta/uploads',
-  PROFILE_VIDEOS: 'Krieta/uploads',
-  SHORTS_VIDEOS: 'Krieta/uploads',
-  SHORTS_IMAGES: 'Krieta/uploads',
-  CONTESTS_IMAGES: 'Krieta/uploads',
-  CONTESTS_VIDEOS: 'Krieta/uploads',
-  DRIPS_IMAGES: 'Krieta/uploads',
-  SHOP_IMAGES: 'Krieta/uploads',
-  CHAT_IMAGES: 'Krieta/uploads',
-  CHAT_VIDEOS: 'Krieta/uploads',
-  CHAT_AUDIO: 'Krieta/uploads',
+  // Profiles
+  PROFILE_IMAGES: 'Krieta/profile/Images',
+  PROFILE_VIDEOS: 'Krieta/profile/Videos',
+  // Shorts
+  SHORTS_VIDEOS: 'Krieta/shorts/Videos',
+  SHORTS_IMAGES: 'Krieta/shorts/Images',
+  // Contests
+  CONTESTS_IMAGES: 'Krieta/contests/Images',
+  CONTESTS_VIDEOS: 'Krieta/contests/Videos',
+  // Feed
+  DRIPS_IMAGES: 'Krieta/drips/Images',
+  // Shop
+  SHOP_IMAGES: 'Krieta/shop/Images',
+  // Chat
+  CHAT_IMAGES: 'Krieta/chat/Images',
+  CHAT_VIDEOS: 'Krieta/chat/Videos',
+  CHAT_AUDIO: 'Krieta/chat/Audio',
 } as const;
 
 export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINARY_FOLDERS];
@@ -32,10 +35,15 @@ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINA
  * Generate signed upload params for client-side direct upload.
  * Enforces folder routing — client cannot choose arbitrary folders.
  * 
+ * For signed uploads with folder specification, the signature must include:
+ * - folder: The target folder path
+ * - timestamp: Unix timestamp
+ * - upload_preset: The signed preset name
+ * 
  * IMPORTANT: Cloudinary excludes these params from signature verification:
  * file, cloud_name, resource_type, type, api_key.
- * Only sign parameters that Cloudinary actually verifies (timestamp, folder, etc.).
- * resource_type is conveyed via the URL path, NOT the signature.
+ * 
+ * Parameters are automatically sorted alphabetically by api_sign_request.
  * 
  * @param folder - The Cloudinary folder path for organizing uploads
  * @param resourceType - The type of resource being uploaded ('image', 'video', or 'raw')
@@ -47,10 +55,12 @@ export function generateUploadSignature(
   const timestamp = Math.round(Date.now() / 1000);
   const uploadPreset = 'Krieta'; // Signed upload preset name
 
-  // For signed upload presets: sign timestamp and upload_preset
-  // The folder is controlled by the preset itself (Krieta/uploads), not by the signature
+  // For signed upload presets with folder specification:
+  // Include folder, timestamp, and upload_preset in the signature
   // IMPORTANT: Use snake_case (upload_preset) not camelCase for Cloudinary API
+  // Parameters are automatically sorted alphabetically by api_sign_request
   const paramsToSign = { 
+    folder,
     timestamp,
     upload_preset: uploadPreset,
   };
@@ -70,6 +80,7 @@ export function generateUploadSignature(
     signature,
     timestamp,
     uploadPreset,
+    folder,
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
