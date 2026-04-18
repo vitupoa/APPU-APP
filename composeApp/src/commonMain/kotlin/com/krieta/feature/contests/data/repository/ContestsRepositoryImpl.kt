@@ -5,10 +5,13 @@ import com.krieta.com.core.network.safeApiCall
 import com.krieta.feature.contests.data.remote.ContestsApi
 import com.krieta.feature.contests.data.remote.dto.ContestDto
 import com.krieta.feature.contests.data.remote.dto.ContestSubmissionDto
+import com.krieta.feature.contests.data.remote.dto.SubmitEntryRequestDto
 import com.krieta.feature.contests.domain.model.Contest
+import com.krieta.feature.contests.domain.model.ContestAction
 import com.krieta.feature.contests.domain.model.ContestCategory
 import com.krieta.feature.contests.domain.model.ContestCreator
 import com.krieta.feature.contests.domain.model.ContestMediaType
+import com.krieta.feature.contests.domain.model.ContestRequirements
 import com.krieta.feature.contests.domain.model.ContestStatus
 import com.krieta.feature.contests.domain.model.ContestSubmission
 import com.krieta.feature.contests.domain.model.JudgingCriteria
@@ -55,6 +58,23 @@ class ContestsRepositoryImpl(
 
     override suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto): NetworkResult<Unit> {
         return safeApiCall { api.createContest(request); Unit }
+    }
+
+    override suspend fun getContestRequirements(contestId: String): NetworkResult<ContestRequirements> {
+        return safeApiCall {
+            val dto = api.getContestRequirements(contestId)
+            ContestRequirements(
+                actions = dto.actions.map { ContestAction(it.id, it.actionType, it.targetUrl, it.label, it.isVerifiable, it.requiresUpload, it.sortOrder) },
+                hasSubmitted = dto.hasSubmitted,
+                canSubmit = dto.canSubmit
+            )
+        }
+    }
+
+    override suspend fun submitEntry(contestId: String, mediaUrl: String, mediaType: String, proofUrls: List<String>): NetworkResult<Unit> {
+        return safeApiCall {
+            api.submitEntry(contestId, SubmitEntryRequestDto(mediaUrl, mediaType, proofUrls))
+        }
     }
 
     private fun ContestDto.toDomain(): Contest = Contest(

@@ -112,6 +112,16 @@ router.post('/:id/join', authMiddleware, async (req: AuthRequest, res: Response)
   }
 });
 
+// GET /api/v1/contests/:id/requirements
+router.get('/:id/requirements', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const result = await ContestService.getContestRequirements(req.userId!, String(req.params.id));
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // POST /api/v1/contests/:id/submit
 router.post('/:id/submit', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {

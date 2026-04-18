@@ -210,8 +210,8 @@ export class CommentsService {
       throw new Error('Replies are disabled for this content');
     }
 
-    const [comment] = await prisma.$transaction([
-      prisma.comment.create({
+    const [comment] = await prisma.$transaction(async (tx) => {
+      const newComment = await tx.comment.create({
         data: {
           userId,
           contentType,
@@ -240,17 +240,19 @@ export class CommentsService {
             },
           },
         },
-      }),
-      ...(parentId
-        ? [
-            prisma.comment.update({
-              where: { id: parentId },
-              data: { repliesCount: { increment: 1 } },
-            }),
-          ]
-        : []),
-      this.incrementContentCommentCount(contentType, contentId),
-    ]);
+      });
+
+      if (parentId) {
+        await tx.comment.update({
+          where: { id: parentId },
+          data: { repliesCount: { increment: 1 } },
+        });
+      }
+
+      await this.incrementContentCommentCountTx(tx, contentType, contentId);
+
+      return [newComment];
+    });
 
     const contentOwner = await this.getContentOwner(contentType, contentId);
 
@@ -377,18 +379,18 @@ export class CommentsService {
       throw new Error('Cannot delete this comment');
     }
 
-    await prisma.$transaction([
-      prisma.comment.delete({ where: { id: commentId } }),
-      ...(comment.parentId
-        ? [
-            prisma.comment.update({
-              where: { id: comment.parentId },
-              data: { repliesCount: { decrement: 1 } },
-            }),
-          ]
-        : []),
-      this.decrementContentCommentCount(comment.contentType, comment.contentId),
-    ]);
+    await prisma.$transaction(async (tx) => {
+      await tx.comment.delete({ where: { id: commentId } });
+
+      if (comment.parentId) {
+        await tx.comment.update({
+          where: { id: comment.parentId },
+          data: { repliesCount: { decrement: 1 } },
+        });
+      }
+
+      await this.decrementContentCommentCountTx(tx, comment.contentType, comment.contentId);
+    });
 
     io.to(`content:${comment.contentId}`).emit('comment_update', {
       contentId: comment.contentId,
@@ -604,6 +606,44 @@ export class CommentsService {
     return userId === contentOwnerId;
   }
 
+  private incrementContentCommentCountTx(tx: any, contentType: string, contentId: string) {
+    switch (contentType) {
+      case 'post':
+        return tx.post.update({
+          where: { id: contentId },
+          data: { commentsCount: { increment: 1 } },
+        });
+      case 'short':
+        return tx.short.update({
+          where: { id: contentId },
+          data: { commentsCount: { increment: 1 } },
+        });
+      case 'contest_submission':
+        return Promise.resolve();
+      default:
+        return Promise.resolve();
+    }
+  }
+
+  private decrementContentCommentCountTx(tx: any, contentType: string, contentId: string) {
+    switch (contentType) {
+      case 'post':
+        return tx.post.update({
+          where: { id: contentId },
+          data: { commentsCount: { decrement: 1 } },
+        });
+      case 'short':
+        return tx.short.update({
+          where: { id: contentId },
+          data: { commentsCount: { decrement: 1 } },
+        });
+      case 'contest_submission':
+        return Promise.resolve();
+      default:
+        return Promise.resolve();
+    }
+  }
+
   private incrementContentCommentCount(contentType: string, contentId: string) {
     switch (contentType) {
       case 'post':
@@ -617,10 +657,7 @@ export class CommentsService {
           data: { commentsCount: { increment: 1 } },
         });
       case 'contest_submission':
-        return prisma.contestSubmission.update({
-          where: { id: contentId },
-          data: { commentsCount: { increment: 1 } },
-        });
+        return Promise.resolve();
       default:
         return Promise.resolve();
     }
@@ -639,10 +676,7 @@ export class CommentsService {
           data: { commentsCount: { decrement: 1 } },
         });
       case 'contest_submission':
-        return prisma.contestSubmission.update({
-          where: { id: contentId },
-          data: { commentsCount: { decrement: 1 } },
-        });
+        return Promise.resolve();
       default:
         return Promise.resolve();
     }

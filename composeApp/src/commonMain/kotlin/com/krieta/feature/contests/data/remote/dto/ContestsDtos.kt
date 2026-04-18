@@ -104,3 +104,21 @@ data class SubmitEntryRequestDto(
     val mediaType: String,
     val proofScreenshots: List<String> = emptyList()
 )
+
+@Serializable
+data class ContestActionDto(
+    val id: String,
+    val actionType: String,
+    val targetUrl: String?,
+    val label: String,
+    val isVerifiable: Boolean,
+    val requiresUpload: Boolean,
+    val sortOrder: Int
+)
+
+@Serializable
+data class ContestRequirementsResponseDto(
+    val actions: List<ContestActionDto>,
+    val hasSubmitted: Boolean,
+    val canSubmit: Boolean
+)

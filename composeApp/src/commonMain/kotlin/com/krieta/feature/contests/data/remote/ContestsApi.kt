@@ -1,6 +1,7 @@
 package com.krieta.feature.contests.data.remote
 
 import com.krieta.com.core.network.ApiConstants
+import com.krieta.feature.contests.data.remote.dto.ContestRequirementsResponseDto
 import com.krieta.feature.contests.data.remote.dto.ContestDto
 import com.krieta.feature.contests.data.remote.dto.ContestListResponseDto
 import com.krieta.feature.contests.data.remote.dto.ContestSubmissionDto
@@ -43,6 +44,16 @@ class ContestsApi(private val httpClient: HttpClient) {
 
     suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto) {
         httpClient.post(ApiConstants.CONTESTS) {
+            setBody(request)
+        }
+    }
+
+    suspend fun getContestRequirements(contestId: String): ContestRequirementsResponseDto {
+        return httpClient.get("${ApiConstants.CONTESTS}/$contestId/requirements").body()
+    }
+
+    suspend fun submitEntry(contestId: String, request: SubmitEntryRequestDto) {
+        httpClient.post("${ApiConstants.CONTESTS}/$contestId/submit") {
             setBody(request)
         }
     }

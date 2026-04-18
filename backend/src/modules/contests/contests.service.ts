@@ -282,6 +282,35 @@ export class ContestService {
     return participant;
   }
 
+  static async getContestRequirements(userId: string, contestId: string) {
+    const contest = await prisma.contest.findUniqueOrThrow({
+      where: { id: contestId },
+      include: { actions: { orderBy: { sortOrder: 'asc' } } }
+    });
+
+    const hasSubmitted = !!(await prisma.contestSubmission.findUnique({
+      where: { contestId_userId: { contestId, userId } }
+    }));
+
+    const hasJoined = !!(await prisma.contestParticipant.findUnique({
+      where: { contestId_userId: { contestId, userId } }
+    }));
+
+    return {
+      actions: contest.actions.map((a: any) => ({
+        id: a.id,
+        actionType: a.actionType,
+        targetUrl: a.targetUrl,
+        label: a.label,
+        isVerifiable: a.isVerifiable,
+        requiresUpload: a.requiresUpload,
+        sortOrder: a.sortOrder
+      })),
+      hasSubmitted,
+      canSubmit: hasJoined && !hasSubmitted && contest.status === 'ACTIVE'
+    };
+  }
+
   static async submitEntry(data: {
     userId: string;
     contestId: string;

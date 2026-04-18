@@ -2,6 +2,7 @@ package com.krieta.feature.contests.domain.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.contests.domain.model.Contest
+import com.krieta.feature.contests.domain.model.ContestRequirements
 import com.krieta.feature.contests.domain.model.ContestSubmission
 
 data class ContestListResult(val items: List<Contest>, val nextCursor: String?)
@@ -14,4 +15,6 @@ interface ContestsRepository {
     suspend fun getSubmissions(contestId: String, cursor: String?): NetworkResult<SubmissionsResult>
     suspend fun getLeaderboard(contestId: String): NetworkResult<List<ContestSubmission>>
     suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto): NetworkResult<Unit>
+    suspend fun getContestRequirements(contestId: String): NetworkResult<ContestRequirements>
+    suspend fun submitEntry(contestId: String, mediaUrl: String, mediaType: String, proofUrls: List<String>): NetworkResult<Unit>
 }

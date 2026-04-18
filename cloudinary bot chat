@@ -1,0 +1,175 @@
+i still get this error as depicted in the screenshot when i try to upload media in the app
+see my chat with cloudinary bot:
+hi ai, i keep getting error while uploading
+That error means your app is trying to upload without sending two required fields: asset_folder and uploadPreset (they’re required for the Cloudinary signature DTO you’re using).
+Fix it by making sure every upload call includes:
+uploadPreset (the name of an upload preset in your Cloudinary environment).
+asset_folder (the folder path where the uploaded image should be stored).
+If you’re using dynamic folders, note that asset_folder controls where the asset is placed, and it does not change the public ID path (unless you also use use_asset_folder_as_public_id_prefix).
+To better understand and troubleshoot the issue, could you please provide the following details?
+The exact steps or process you followed leading up to the issue. If applicable, let us know if you're following any of our documentation or guides.
+If the issue occurs when using our SDKs, please share a sample of your code highlighting where the error occurs. Additionally, let us know which version of the SDK you're using.
+Any error messages or stack traces you’re seeing, from your application, browser console, or Cloudinary API responses. Screenshots or logs would be particularly helpful.
+If relevant, details about your setup, such as your programming language, framework, or any additional integrations in use.
+So do this:
+Create an Upload Preset in the Cloudinary Console (Settings gear icon → Upload → Upload presets → Add upload preset).
+Set the Asset folder (this is the folder where uploaded assets will be stored).
+Set the Preset name (this is your uploadPreset).
+In your app, include both asset_folder and uploadPreset when uploading, and the upload will go to that folder automatically.
+my signed upload preset name is Krieta, the asset folder name is Krieta/uploads
+Perfect, that’s exactly how it should be. 
+So you’re good to go:
+uploadPreset = Krieta (the preset name you created). 
+asset_folder = Krieta/uploads (the folder path where uploads will land).
+In your upload request, make sure you send both values, and Cloudinary will upload into that folder automatically.
+Here’s a simple backend upload handler that will use your upload preset and asset folder.
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: 'your-cloud-name',
+  api_key: 'your-api-key',
+  api_secret: 'your-api-secret'
+});
+
+const uploadImage = async (req, res) => {
+  const file = req.body.file; // or however you receive the file in your request
+  const uploadResult = await cloudinary.uploader.upload(file, {
+    upload_preset: 'Krieta',
+    folder: 'Krieta/uploads'
+  });
+  res.json(uploadResult);
+};
+
+module.exports = { uploadImage };
+
+If you’re uploading from the frontend (not a serverless function), you can also send the file as FormData and include upload_preset in the request body.
+If you’re using a signed upload preset, you still send upload_preset in the upload request, but you also need to sign the request with a signature (and a timestamp).
+So your backend upload call should include:
+upload_preset: 'Krieta'
+signature (generated from your API secret + timestamp + other params)
+timestamp
+The asset_folder (like Krieta/uploads) is set in the preset itself, so you don’t need to pass it in the upload call for signed presets.
+For a signed upload preset in Node.js, your backend should generate a signature, then your mobile app sends upload_preset, api_key, timestamp, and signature in the upload request (the SDK can do this automatically if you use it).
+Backend (signature endpoint):
+const cloudinary = require('cloudinary').v2;
+
+const getUploadSignature = (req, res) => {
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  const signature = cloudinary.utils.api_sign_request(
+    { timestamp, upload_preset: 'Krieta' },
+    process.env.CLOUDINARY_API_SECRET
+  );
+  res.json({ signature, timestamp, apiKey: process.env.CLOUDINARY_API_KEY });
+};
+Your mobile app then uploads using upload_preset: 'Krieta' plus the returned signature and timestamp (and api_key).
+i also shared with the bot this code:
+what should i fix in this?
+import { v2 as cloudinary } from 'cloudinary';
+import { env } from './env';
+cloudinary.config({
+cloud_name: env.CLOUDINARY_CLOUD_NAME,
+api_key: env.CLOUDINARY_API_KEY,
+api_secret: env.CLOUDINARY_API_SECRET,
+secure: true,
+});
+export const CLOUDINARY_FOLDERS = {
+// Profiles
+PROFILE_IMAGES: 'Krieta/profile/Images',
+PROFILE_VIDEOS: 'Krieta/profile/Videos',
+// Shorts
+SHORTS_VIDEOS: 'Krieta/shorts/Videos',
+SHORTS_IMAGES: 'Krieta/shorts/Images',
+// Contests
+CONTESTS_IMAGES: 'Krieta/contests/Images',
+CONTESTS_VIDEOS: 'Krieta/contests/Videos',
+// Feed
+DRIPS_IMAGES: 'Krieta/drips/Images',
+// Shop
+SHOP_IMAGES: 'Krieta/shop/Images',
+// Chat
+CHAT_IMAGES: 'Krieta/chat/Images',
+CHAT_VIDEOS: 'Krieta/chat/Videos',
+CHAT_AUDIO: 'Krieta/chat/Audio',
+} as const;
+export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINARY_FOLDERS];
+/**
+* Generate signed upload params for client-side direct upload.
+* Enforces folder routing — client cannot choose arbitrary folders.
+*
+* IMPORTANT: Cloudinary excludes these params from signature verification:
+* file, cloud_name, resource_type, type, api_key.
+* Only sign parameters that Cloudinary actually verifies (timestamp, folder, etc.).
+* resource_type is conveyed via the URL path, NOT the signature.
+*
+* @param folder - The Cloudinary folder path for organizing uploads
+* @param resourceType - The type of resource being uploaded ('image', 'video', or 'raw')
+*/
+export function generateUploadSignature(
+folder: CloudinaryFolder,
+resourceType: 'image' | 'video' | 'raw' = 'image'
+) {
+const timestamp = Math.round(Date.now() / 1000);
+const uploadPreset = 'krieta_signed_uploads';
+const payloadToSign: Record<string, any> = {
+timestamp,
+asset_folder: folder,
+upload_preset: uploadPreset
+};
+
+const signature = cloudinary.utils.api_sign_request(
+payloadToSign,
+env.CLOUDINARY_API_SECRET
+);
+return {
+signature,
+timestamp,
+assetFolder: folder,
+resourceType,
+apiKey: env.CLOUDINARY_API_KEY,
+cloudName: env.CLOUDINARY_CLOUD_NAME,
+uploadPreset,
+};
+}
+/**
+* Validate that an uploaded resource is in the expected folder.
+* Called in webhooks to reject uploads to wrong folders.
+*/
+export function validateUploadFolder(
+publicId: string,
+expectedFolder: CloudinaryFolder
+): boolean {
+return publicId.startsWith(expectedFolder);
+}
+export { cloudinary };
+​
+Krieta • 11h
+Your code is mostly correct, but there’s one key fix: for signed upload presets, the folder is set in the preset, so you should not include asset_folder in the signature payload (Cloudinary ignores it for signature verification).
+
+Change this:
+const payloadToSign: Record<string, any> = {  
+  timestamp,  
+  asset_folder: folder,  // ❌ remove this for signed presets
+  upload_preset: uploadPreset  
+};
+to this:
+const payloadToSign: Record<string, any> = {  
+  timestamp,  
+  upload_preset: uploadPreset  
+};
+
+Then your mobile app uploads with upload_preset, timestamp, signature, and apiKey (and cloud_name).
+If you’re using the Upload Widget, it also expects source=uw to be included in the signature string (serialized in alphabetical order, snake_case).
+
+since you’re uploading from the mobile app, your backend code is already set up correctly: you generate the signature on the server, then the mobile app uploads using upload_preset, timestamp, signature, and api_key (and cloud_name).
+So the only thing to fix in your current code is: remove asset_folder from the signature payload, because for signed upload presets the folder is controlled by the preset, not by the signature.
+Change this:
+const payloadToSign: Record<string, any> = { timestamp, asset_folder: folder, upload_preset };
+to this:
+const payloadToSign: Record<string, any> = { timestamp, upload_preset };
+Then your mobile app uploads with upload_preset: 'krieta_signed_uploads' plus the returned timestamp and signature.
+Cloudinary supports uploading media for a social media app on both Android and iOS. 
+For both platforms, the usual flow is:
+Create an upload preset in the Cloudinary Console (Settings → Upload → Upload presets). 
+Use Cloudinary’s mobile SDKs to let users upload directly from their devices (no need to send files through your own servers). 
+Optionally use the Upload Widget for a ready-made UI that supports both Android and iOS.
+So you can build a simple “upload media” flow where users pick images/videos from their phone and upload straight to Cloudinary.

@@ -56,3 +56,19 @@ data class ContestSubmission(
     val rank: Int?,
     val createdAt: String
 )
+
+data class ContestAction(
+    val id: String,
+    val actionType: String,
+    val targetUrl: String?,
+    val label: String,
+    val isVerifiable: Boolean,
+    val requiresUpload: Boolean,
+    val sortOrder: Int
+)
+
+data class ContestRequirements(
+    val actions: List<ContestAction>,
+    val hasSubmitted: Boolean,
+    val canSubmit: Boolean
+)
