@@ -82,28 +82,27 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             val totalBytes = fileBytes.size
             val uniqueUploadId = (1..16).map { kotlin.random.Random.nextInt(0, 16).toString(16) }.joinToString("")
             
-            // For files smaller than chunk size, use standard upload
+            // For larger files, use standard upload
             if (totalBytes <= chunkSize) {
                 println("Cloudinary Upload Parameters being sent:")
                 println("  - api_key: ${signatureDto.apiKey}")
-                println("  - folder: ${signatureDto.folder}")
                 println("  - timestamp: ${signatureDto.timestamp}")
                 println("  - signature: ${signatureDto.signature}")
                 println("  - upload_preset: ${signatureDto.uploadPreset}")
                 println("  - file size: ${fileBytes.size} bytes")
+                println("  - NOTE: folder is configured in the upload preset, not sent as parameter")
                 
                 val uploadResponse = plainClient.post(uploadUrl) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                // For signed uploads: parameters must be in alphabetical order
-                                // api_key, file, folder, signature, timestamp, upload_preset
+                                // For signed uploads with preset: DO NOT send folder parameter
+                                // The folder is configured in the Cloudinary preset settings
                                 append("api_key", signatureDto.apiKey)
                                 append("file", fileBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
-                                append("folder", signatureDto.folder)
                                 append("signature", signatureDto.signature)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("upload_preset", signatureDto.uploadPreset)
@@ -140,14 +139,13 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                // For signed uploads: parameters must be in alphabetical order
-                                // api_key, file, folder, signature, timestamp, upload_preset
+                                // For signed uploads with preset: DO NOT send folder parameter
+                                // The folder is configured in the Cloudinary preset settings
                                 append("api_key", signatureDto.apiKey)
                                 append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
-                                append("folder", signatureDto.folder)
                                 append("signature", signatureDto.signature)
                                 append("timestamp", signatureDto.timestamp.toString())
                                 append("upload_preset", signatureDto.uploadPreset)

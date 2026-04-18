@@ -68,6 +68,10 @@ model User {
   escrows             Escrow[]
   products            Product[]
   dailyStats          DailyStat[]
+  comments            Comment[]         @relation("CommentAuthor")
+  commentLikes        CommentLike[]     @relation("CommentLikes")
+  commentReports      CommentReport[]   @relation("CommentReports")
+  commentRepliesTo    Comment[]         @relation("CommentReplyTo")
 
   @@map("users")
 }
@@ -595,4 +599,75 @@ model DailyStat {
 
   @@unique([userId, date])
   @@map("daily_stats")
+}
+
+// ─── COMMENTS ─────────────────────────────────────────────
+
+model Comment {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  contentId     String    @map("content_id")
+  contentType   String    @map("content_type")
+  text          String
+  parentId      String?   @map("parent_id")
+  replyToUserId String?   @map("reply_to_user_id")
+  likesCount    Int       @default(0) @map("likes_count")
+  repliesCount  Int       @default(0) @map("replies_count")
+  isPinned      Boolean   @default(false) @map("is_pinned")
+  isEdited      Boolean   @default(false) @map("is_edited")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  editedAt      DateTime? @map("edited_at")
+
+  author       User           @relation("CommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  parent       Comment?       @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies      Comment[]      @relation("CommentReplies")
+  replyToUser  User?          @relation("CommentReplyTo", fields: [replyToUserId], references: [id], onDelete: SetNull)
+  likes        CommentLike[]
+  reports      CommentReport[]
+
+  @@index([contentType, contentId, createdAt])
+  @@index([parentId])
+  @@index([userId])
+  @@index([isPinned, createdAt])
+  @@map("comments")
+}
+
+model CommentLike {
+  id        String   @id @default(uuid())
+  commentId String   @map("comment_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation("CommentLikes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+  @@map("comment_likes")
+}
+
+model CommentReport {
+  id         String   @id @default(uuid())
+  commentId  String   @map("comment_id")
+  reporterId String   @map("reporter_id")
+  reason     String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  comment  Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporter User    @relation("CommentReports", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([commentId])
+  @@map("comment_reports")
+}
+
+model CommentSettings {
+  id              String  @id @default(uuid())
+  contentId       String  @map("content_id")
+  contentType     String  @map("content_type")
+  commentsEnabled Boolean @default(true) @map("comments_enabled")
+  repliesEnabled  Boolean @default(true) @map("replies_enabled")
+
+  @@unique([contentId, contentType])
+  @@map("comment_settings")
 }

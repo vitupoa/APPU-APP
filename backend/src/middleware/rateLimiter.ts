@@ -8,6 +8,7 @@ export const rateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later' },
+  validate: { trustProxy: false }, // Disable trust proxy validation
 });
 
 // Stricter limits for auth endpoints
@@ -15,6 +16,7 @@ export const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
   message: { error: 'Too many authentication attempts' },
+  validate: { trustProxy: false },
 });
 
 // Stricter limits for payment endpoints
@@ -22,4 +24,5 @@ export const paymentRateLimiter = rateLimit({
   windowMs: 60 * 1000,       // 1 minute
   max: 5,
   message: { error: 'Too many payment requests' },
+  validate: { trustProxy: false },
 });

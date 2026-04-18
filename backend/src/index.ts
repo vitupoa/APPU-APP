@@ -18,6 +18,7 @@ import analyticsRoutes from './modules/analytics/analytics.routes.js';
 import adsRoutes from './modules/ads/ads.routes.js';
 import cacheRoutes from './modules/cache/cache.routes.js';
 import mediaRoutes from './modules/media/media.routes.js';
+import commentsRoutes from './modules/comments/comments.routes.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -53,6 +54,7 @@ app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/ads', adsRoutes);
 app.use('/api/v1/cache', cacheRoutes);
 app.use('/api/v1/media', mediaRoutes);
+app.use('/api/v1/comments', commentsRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

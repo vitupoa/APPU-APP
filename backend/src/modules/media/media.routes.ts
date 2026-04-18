@@ -15,17 +15,10 @@ router.get('/upload-signature', authMiddleware, (req: AuthRequest, res: Response
   try {
     const { folder, resourceType } = signatureSchema.parse(req.query);
     
-    // Diagnostic logging for signature generation
-    console.log(`[Cloudinary Signature] Generating signature for folder: ${folder}, resourceType: ${resourceType || 'image'}`);
-    
     const signatureData = generateUploadSignature(
       folder as CloudinaryFolder,
       resourceType as 'image' | 'video' | 'raw' | undefined
     );
-    
-    console.log(`[Cloudinary Signature] Generated signature with timestamp: ${signatureData.timestamp}`);
-    console.log(`[Cloudinary Signature] Full response:`, JSON.stringify(signatureData, null, 2));
-    console.log(`[Cloudinary Signature] Signature was generated from: { timestamp: ${signatureData.timestamp}, upload_preset: "${signatureData.uploadPreset}" }`);
     
     res.status(200).json(signatureData);
   } catch (error: any) {

@@ -35,17 +35,17 @@ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINA
  * Generate signed upload params for client-side direct upload.
  * Enforces folder routing — client cannot choose arbitrary folders.
  * 
- * For signed uploads with folder specification, the signature must include:
- * - folder: The target folder path
- * - timestamp: Unix timestamp
- * - upload_preset: The signed preset name
+ * For signed uploads with upload preset:
+ * - The signature includes: timestamp, upload_preset
+ * - The folder is configured in the Cloudinary upload preset settings
+ * - DO NOT include folder in the signature or upload request
  * 
  * IMPORTANT: Cloudinary excludes these params from signature verification:
  * file, cloud_name, resource_type, type, api_key.
  * 
  * Parameters are automatically sorted alphabetically by api_sign_request.
  * 
- * @param folder - The Cloudinary folder path for organizing uploads
+ * @param folder - The Cloudinary folder path (returned for reference, not used in signature)
  * @param resourceType - The type of resource being uploaded ('image', 'video', or 'raw')
  */
 export function generateUploadSignature(
@@ -55,32 +55,23 @@ export function generateUploadSignature(
   const timestamp = Math.round(Date.now() / 1000);
   const uploadPreset = 'Krieta'; // Signed upload preset name
 
-  // For signed upload presets with folder specification:
-  // Include folder, timestamp, and upload_preset in the signature
-  // IMPORTANT: Use snake_case (upload_preset) not camelCase for Cloudinary API
-  // Parameters are automatically sorted alphabetically by api_sign_request
+  // For signed upload presets: ONLY sign timestamp and upload_preset
+  // The folder should be configured in the Cloudinary preset settings
   const paramsToSign = { 
-    folder,
     timestamp,
     upload_preset: uploadPreset,
   };
-  
-  console.log('[Cloudinary] Params being signed:', JSON.stringify(paramsToSign, null, 2));
-  console.log('[Cloudinary] API Secret length:', env.CLOUDINARY_API_SECRET?.length || 0, 'characters');
-  console.log('[Cloudinary] API Secret starts with:', env.CLOUDINARY_API_SECRET?.substring(0, 4) + '...');
   
   const signature = cloudinary.utils.api_sign_request(
     paramsToSign,
     env.CLOUDINARY_API_SECRET
   );
-  
-  console.log('[Cloudinary] Generated signature:', signature);
 
   return {
     signature,
     timestamp,
     uploadPreset,
-    folder,
+    folder, // Returned for reference only, should NOT be sent to Cloudinary
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
