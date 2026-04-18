@@ -88,20 +88,22 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                 println("  - timestamp: ${signatureDto.timestamp}")
                 println("  - signature: ${signatureDto.signature}")
                 println("  - upload_preset: ${signatureDto.uploadPreset}")
+                println("  - file size: ${fileBytes.size} bytes")
                 
                 val uploadResponse = plainClient.post(uploadUrl) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                // For signed uploads with a preset: send api_key, timestamp, signature, upload_preset, and file
+                                // For signed uploads: parameters must be in alphabetical order
+                                // api_key, file, signature, timestamp, upload_preset
                                 append("api_key", signatureDto.apiKey)
-                                append("timestamp", signatureDto.timestamp.toString())
-                                append("signature", signatureDto.signature)
-                                append("upload_preset", signatureDto.uploadPreset)
                                 append("file", fileBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
+                                append("signature", signatureDto.signature)
+                                append("timestamp", signatureDto.timestamp.toString())
+                                append("upload_preset", signatureDto.uploadPreset)
                             }
                         )
                     )
@@ -135,15 +137,16 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     setBody(
                         MultiPartFormDataContent(
                             formData {
-                                // For signed uploads with a preset: send api_key, timestamp, signature, upload_preset, and file
+                                // For signed uploads: parameters must be in alphabetical order
+                                // api_key, file, signature, timestamp, upload_preset
                                 append("api_key", signatureDto.apiKey)
-                                append("timestamp", signatureDto.timestamp.toString())
-                                append("signature", signatureDto.signature)
-                                append("upload_preset", signatureDto.uploadPreset)
                                 append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
                                     append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
+                                append("signature", signatureDto.signature)
+                                append("timestamp", signatureDto.timestamp.toString())
+                                append("upload_preset", signatureDto.uploadPreset)
                             }
                         )
                     )
