@@ -22,6 +22,9 @@ import mediaRoutes from './modules/media/media.routes.js';
 const app = express();
 const httpServer = createServer(app);
 
+// Configure Express to trust proxy headers. This is required when the app runs behind a reverse proxy (nginx, load balancer, CDN). It allows Express to correctly extract client IP from X-Forwarded-For header.
+app.set('trust proxy', true);
+
 // Socket.io Redis Clustered Gateway for real-time features (milestones, contests, notifications)
 const io = initializeGateway(httpServer);
 
