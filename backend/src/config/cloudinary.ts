@@ -8,24 +8,22 @@ cloudinary.config({
   secure: true,
 });
 
+// For signed upload presets, all uploads go to the folder configured in the preset
+// In this case: Krieta/uploads
+// We keep these constants for reference, but they all point to the same folder
 export const CLOUDINARY_FOLDERS = {
-  // Profiles
-  PROFILE_IMAGES: 'Krieta/profile/Images',
-  PROFILE_VIDEOS: 'Krieta/profile/Videos',
-  // Shorts
-  SHORTS_VIDEOS: 'Krieta/shorts/Videos',
-  SHORTS_IMAGES: 'Krieta/shorts/Images',
-  // Contests
-  CONTESTS_IMAGES: 'Krieta/contests/Images',
-  CONTESTS_VIDEOS: 'Krieta/contests/Videos',
-  // Feed
-  DRIPS_IMAGES: 'Krieta/drips/Images',
-  // Shop
-  SHOP_IMAGES: 'Krieta/shop/Images',
-  // Chat
-  CHAT_IMAGES: 'Krieta/chat/Images',
-  CHAT_VIDEOS: 'Krieta/chat/Videos',
-  CHAT_AUDIO: 'Krieta/chat/Audio',
+  // All uploads go to Krieta/uploads (configured in the preset)
+  PROFILE_IMAGES: 'Krieta/uploads',
+  PROFILE_VIDEOS: 'Krieta/uploads',
+  SHORTS_VIDEOS: 'Krieta/uploads',
+  SHORTS_IMAGES: 'Krieta/uploads',
+  CONTESTS_IMAGES: 'Krieta/uploads',
+  CONTESTS_VIDEOS: 'Krieta/uploads',
+  DRIPS_IMAGES: 'Krieta/uploads',
+  SHOP_IMAGES: 'Krieta/uploads',
+  CHAT_IMAGES: 'Krieta/uploads',
+  CHAT_VIDEOS: 'Krieta/uploads',
+  CHAT_AUDIO: 'Krieta/uploads',
 } as const;
 
 export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINARY_FOLDERS];
