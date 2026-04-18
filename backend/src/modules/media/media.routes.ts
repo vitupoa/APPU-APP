@@ -25,6 +25,7 @@ router.get('/upload-signature', authMiddleware, (req: AuthRequest, res: Response
     
     console.log(`[Cloudinary Signature] Generated signature with timestamp: ${signatureData.timestamp}`);
     console.log(`[Cloudinary Signature] Full response:`, JSON.stringify(signatureData, null, 2));
+    console.log(`[Cloudinary Signature] Signature was generated from: { timestamp: ${signatureData.timestamp}, upload_preset: "${signatureData.uploadPreset}" }`);
     
     res.status(200).json(signatureData);
   } catch (error: any) {

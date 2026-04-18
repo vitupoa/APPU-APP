@@ -83,6 +83,12 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             
             // For files smaller than chunk size, use standard upload
             if (totalBytes <= chunkSize) {
+                println("Cloudinary Upload Parameters being sent:")
+                println("  - api_key: ${signatureDto.apiKey}")
+                println("  - timestamp: ${signatureDto.timestamp}")
+                println("  - signature: ${signatureDto.signature}")
+                println("  - upload_preset: ${signatureDto.uploadPreset}")
+                
                 val uploadResponse = plainClient.post(uploadUrl) {
                     setBody(
                         MultiPartFormDataContent(

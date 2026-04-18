@@ -51,15 +51,22 @@ export function generateUploadSignature(
 
   // For signed upload presets: sign timestamp and upload_preset
   // The folder is controlled by the preset itself (Krieta/uploads), not by the signature
-  const payloadToSign: Record<string, any> = { 
+  // IMPORTANT: Use snake_case (upload_preset) not camelCase for Cloudinary API
+  const paramsToSign = { 
     timestamp,
     upload_preset: uploadPreset,
   };
   
+  console.log('[Cloudinary] Params being signed:', JSON.stringify(paramsToSign, null, 2));
+  console.log('[Cloudinary] API Secret length:', env.CLOUDINARY_API_SECRET?.length || 0, 'characters');
+  console.log('[Cloudinary] API Secret starts with:', env.CLOUDINARY_API_SECRET?.substring(0, 4) + '...');
+  
   const signature = cloudinary.utils.api_sign_request(
-    payloadToSign,
+    paramsToSign,
     env.CLOUDINARY_API_SECRET
   );
+  
+  console.log('[Cloudinary] Generated signature:', signature);
 
   return {
     signature,
