@@ -72,6 +72,12 @@ model User {
   commentLikes        CommentLike[]     @relation("CommentLikes")
   commentReports      CommentReport[]   @relation("CommentReports")
   commentRepliesTo    Comment[]         @relation("CommentReplyTo")
+  teamsLed            Team[]            @relation("TeamLeader")
+  teamMemberships     TeamMember[]      @relation("TeamMemberships")
+  teamInvitationsSent TeamInvitation[]  @relation("TeamInvitationsSent")
+  teamInvitationsReceived TeamInvitation[] @relation("TeamInvitationsReceived")
+  teamSubmissionVotes TeamSubmissionVote[] @relation("TeamSubmissionVotes")
+  judgeInvites        JudgeInvite[]     @relation("JudgeInvites")
 
   @@map("users")
 }
@@ -375,9 +381,15 @@ enum ContestStatus {
   DRAFT
   ACTIVE
   JUDGING
-  PENDING_PAYOUT  // Results declared algorithmically. Enters 72h Escrow freeze pending manual Verification!
+  PENDING_PAYOUT
   COMPLETED
   CANCELLED
+}
+
+enum ParticipationType {
+  INDIVIDUAL_ONLY
+  TEAM_ONLY
+  BOTH
 }
 
 enum JudgingCriteria {
@@ -409,20 +421,23 @@ model Contest {
   prizeTotalKr      Decimal         @map("prize_total_kr") @db.Decimal(18, 4)
   platformFeeKr     Decimal         @map("platform_fee_kr") @db.Decimal(18, 4)
   
-  // Custom Execution Mechanics
+  participationType ParticipationType @default(INDIVIDUAL_ONLY) @map("participation_type")
+  teamSize          Int?            @map("team_size")
+  maxTeams          Int?            @map("max_teams")
+  
   entryFeeKr        Decimal?        @map("entry_fee_kr") @db.Decimal(18, 4)
-  publicVoteWeight  Int?            @map("public_vote_weight") // Scale 0-100 indicating percentage weight vs Judge
-  targetAges        Int[]           @map("target_ages") // Optional range: [18, 35]
-  targetGeos        String[]        @map("target_geos") // Optional array ["US", "KE", "UK"] Array mapping ISOs
+  publicVoteWeight  Int?            @map("public_vote_weight")
+  targetAges        Int[]           @map("target_ages")
+  targetGeos        String[]        @map("target_geos")
   airdropKr         Decimal?        @map("airdrop_kr") @db.Decimal(18, 4)
-  airdropLimit      Int?            @map("airdrop_limit") // Defines maximum initial users receiving FOMO drops dynamically
+  airdropLimit      Int?            @map("airdrop_limit")
   allowDailyPrizes  Boolean         @default(false) @map("allow_daily_prizes")
-  dailyPrizeKr      Decimal?        @map("daily_prize_kr") @db.Decimal(18, 4) // Amount pushed securely by Node-Cron
+  dailyPrizeKr      Decimal?        @map("daily_prize_kr") @db.Decimal(18, 4)
   
   maxWinners        Int             @map("max_winners") @db.SmallInt
   judgingCriteria   JudgingCriteria @map("judging_criteria")
-  sponsorName       String?         @map("sponsor_name") // "Sponsored by [NAME]" clickable text
-  sponsorUrl        String?         @map("sponsor_url")  // Link opened when sponsor name is tapped
+  sponsorName       String?         @map("sponsor_name")
+  sponsorUrl        String?         @map("sponsor_url")
   deadline          DateTime
   status            ContestStatus   @default(ACTIVE)
   totalParticipants Int             @default(0) @map("total_participants")
@@ -438,7 +453,10 @@ model Contest {
   escrows        Escrow[]
   shorts         Short[]
   judges         ContestJudge[]
-  milestones     Milestone[]   // Explicit Native Link powering FOMO Airdrops!
+  milestones     Milestone[]
+  teamRegistrations TeamContestRegistration[]
+  teamSubmissions   TeamSubmission[]
+  judgeInvites      JudgeInvite[]     @relation("JudgeInvites")
 
   @@index([status, deadline])
   @@map("contests")
@@ -545,6 +563,32 @@ model ContestJudge {
 
   @@unique([contestId, userId])
   @@map("contest_judges")
+}
+
+enum JudgeInviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model JudgeInvite {
+  id          String            @id @default(uuid())
+  contestId   String            @map("contest_id")
+  judgeId     String            @map("judge_id")
+  status      JudgeInviteStatus @default(PENDING)
+  invitedAt   DateTime          @default(now()) @map("invited_at")
+  respondedAt DateTime?         @map("responded_at")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  contest Contest @relation("JudgeInvites", fields: [contestId], references: [id], onDelete: Cascade)
+  judge   User    @relation("JudgeInvites", fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@unique([contestId, judgeId])
+  @@index([judgeId])
+  @@index([contestId])
+  @@index([status])
+  @@map("judge_invites")
 }
 
 model ContestVote {
@@ -670,4 +714,138 @@ model CommentSettings {
 
   @@unique([contentId, contentType])
   @@map("comment_settings")
+}
+
+// ─── TEAMS ────────────────────────────────────────────────
+
+enum TeamRole {
+  LEADER
+  CO_LEADER
+  MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model Team {
+  id          String   @id @default(uuid())
+  name        String   @unique @db.VarChar(50)
+  avatarUrl   String?  @map("avatar_url")
+  leaderId    String   @map("leader_id")
+  maxMembers  Int      @default(5) @map("max_members")
+  totalWins   Int      @default(0) @map("total_wins")
+  totalPrizes Decimal  @default(0) @map("total_prizes") @db.Decimal(18, 4)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  leader        User                      @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Cascade)
+  members       TeamMember[]
+  invitations   TeamInvitation[]
+  registrations TeamContestRegistration[]
+  submissions   TeamSubmission[]
+  chat          TeamChat?
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  teamId    String   @map("team_id")
+  userId    String   @map("user_id")
+  role      TeamRole @default(MEMBER)
+  joinedAt  DateTime @default(now()) @map("joined_at")
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation("TeamMemberships", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
+  @@map("team_members")
+}
+
+model TeamInvitation {
+  id         String           @id @default(uuid())
+  teamId     String           @map("team_id")
+  inviterId  String           @map("inviter_id")
+  inviteeId  String           @map("invitee_id")
+  status     InvitationStatus @default(PENDING)
+  expiresAt  DateTime         @map("expires_at")
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  team     Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  inviter  User @relation("TeamInvitationsSent", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee  User @relation("TeamInvitationsReceived", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, inviteeId, status])
+  @@index([inviteeId, status])
+  @@index([teamId, status])
+  @@map("team_invitations")
+}
+
+model TeamContestRegistration {
+  id           String   @id @default(uuid())
+  contestId    String   @map("contest_id")
+  teamId       String   @map("team_id")
+  registeredAt DateTime @default(now()) @map("registered_at")
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([contestId, teamId])
+  @@index([contestId])
+  @@index([teamId])
+  @@map("team_contest_registrations")
+}
+
+model TeamSubmission {
+  id           String   @id @default(uuid())
+  contestId    String   @map("contest_id")
+  teamId       String   @map("team_id")
+  mediaUrl     String   @map("media_url")
+  mediaType    String   @map("media_type")
+  caption      String?
+  contributors String[] // Array of user IDs
+  votesCount   Int      @default(0) @map("votes_count")
+  judgeScore   Decimal? @default(0) @map("judge_score") @db.Decimal(5, 2)
+  finalScore   Decimal? @map("final_score") @db.Decimal(7, 2)
+  rank         Int?
+  submittedAt  DateTime @default(now()) @map("submitted_at")
+
+  contest Contest              @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  team    Team                 @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  votes   TeamSubmissionVote[]
+
+  @@unique([contestId, teamId])
+  @@index([contestId, votesCount])
+  @@map("team_submissions")
+}
+
+model TeamSubmissionVote {
+  id           String   @id @default(uuid())
+  submissionId String   @map("submission_id")
+  voterId      String   @map("voter_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  submission TeamSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  voter      User           @relation("TeamSubmissionVotes", fields: [voterId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, voterId])
+  @@index([submissionId])
+  @@map("team_submission_votes")
+}
+
+model TeamChat {
+  id        String   @id @default(uuid())
+  teamId    String   @unique @map("team_id")
+  chatId    String   @map("chat_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@map("team_chats")
 }

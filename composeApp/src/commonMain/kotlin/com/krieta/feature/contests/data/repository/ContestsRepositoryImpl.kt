@@ -6,6 +6,7 @@ import com.krieta.feature.contests.data.remote.ContestsApi
 import com.krieta.feature.contests.data.remote.dto.ContestDto
 import com.krieta.feature.contests.data.remote.dto.ContestSubmissionDto
 import com.krieta.feature.contests.data.remote.dto.SubmitEntryRequestDto
+import com.krieta.feature.contests.data.remote.dto.toDomain
 import com.krieta.feature.contests.domain.model.Contest
 import com.krieta.feature.contests.domain.model.ContestAction
 import com.krieta.feature.contests.domain.model.ContestCategory
@@ -39,7 +40,28 @@ class ContestsRepositoryImpl(
     }
 
     override suspend fun joinContest(contestId: String): NetworkResult<Unit> {
-        return safeApiCall { api.joinContest(contestId) }
+        // Task 14.1: Validate individual registration against contest participation type
+        // First, get the contest details to check participation type
+        val contestResult = getContest(contestId)
+        
+        return when (contestResult) {
+            is NetworkResult.Success -> {
+                val contest = contestResult.data
+                
+                // Validate individual registration is allowed
+                val validationResult = com.krieta.feature.contests.domain.validation.TeamParticipationValidator
+                    .validateIndividualRegistration(contest)
+                
+                if (validationResult is com.krieta.feature.contests.domain.validation.ValidationResult.Error) {
+                    NetworkResult.Error(code = null, message = validationResult.message)
+                } else {
+                    // Proceed with registration if validation passes
+                    safeApiCall { api.joinContest(contestId) }
+                }
+            }
+            is NetworkResult.Error -> contestResult
+            else -> NetworkResult.Error(code = null, message = "Failed to validate contest participation type")
+        }
     }
 
     override suspend fun getSubmissions(contestId: String, cursor: String?): NetworkResult<SubmissionsResult> {
@@ -56,8 +78,11 @@ class ContestsRepositoryImpl(
         return safeApiCall { api.getLeaderboard(contestId).map { it.toDomain() } }
     }
 
-    override suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto): NetworkResult<Unit> {
-        return safeApiCall { api.createContest(request); Unit }
+    override suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto): NetworkResult<String> {
+        return safeApiCall { 
+            val response = api.createContest(request)
+            response.contestId
+        }
     }
 
     override suspend fun getContestRequirements(contestId: String): NetworkResult<ContestRequirements> {
@@ -72,8 +97,29 @@ class ContestsRepositoryImpl(
     }
 
     override suspend fun submitEntry(contestId: String, mediaUrl: String, mediaType: String, proofUrls: List<String>): NetworkResult<Unit> {
-        return safeApiCall {
-            api.submitEntry(contestId, SubmitEntryRequestDto(mediaUrl, mediaType, proofUrls))
+        // Task 14.1: Validate individual submission against contest participation type
+        // First, get the contest details to check participation type
+        val contestResult = getContest(contestId)
+        
+        return when (contestResult) {
+            is NetworkResult.Success -> {
+                val contest = contestResult.data
+                
+                // Validate individual submission is allowed
+                val validationResult = com.krieta.feature.contests.domain.validation.TeamParticipationValidator
+                    .validateIndividualRegistration(contest)
+                
+                if (validationResult is com.krieta.feature.contests.domain.validation.ValidationResult.Error) {
+                    NetworkResult.Error(code = null, message = validationResult.message)
+                } else {
+                    // Proceed with submission if validation passes
+                    safeApiCall {
+                        api.submitEntry(contestId, SubmitEntryRequestDto(mediaUrl, mediaType, proofUrls))
+                    }
+                }
+            }
+            is NetworkResult.Error -> contestResult
+            else -> NetworkResult.Error(code = null, message = "Failed to validate contest participation type")
         }
     }
 
@@ -104,7 +150,12 @@ class ContestsRepositoryImpl(
         participantsCount = participantsCount,
         submissionsCount = submissionsCount,
         isJoined = isJoined,
-        createdAt = createdAt
+        createdAt = createdAt,
+        // Task 14.1: Map team participation fields
+        participationType = com.krieta.feature.contests.domain.model.ParticipationType.fromString(participationType),
+        teamSize = teamSize,
+        maxTeams = maxTeams,
+        registeredTeamsCount = registeredTeamsCount
     )
 
     private fun ContestSubmissionDto.toDomain(): ContestSubmission = ContestSubmission(
@@ -134,4 +185,31 @@ class ContestsRepositoryImpl(
     private fun parseStatus(value: String) = try {
         ContestStatus.valueOf(value)
     } catch (_: Exception) { ContestStatus.ACTIVE }
+    
+    // Judge Invite Methods Implementation
+    override suspend fun inviteJudges(contestId: String, judgeIds: List<String>): NetworkResult<List<com.krieta.feature.contests.domain.model.JudgeInvite>> {
+        return safeApiCall {
+            val request = com.krieta.feature.contests.data.remote.dto.JudgeInviteRequestDto(judgeIds)
+            val response = api.inviteJudges(contestId, request)
+            response.accepted.map { it.toDomain() }
+        }
+    }
+    
+    override suspend fun getJudgeInvitations(): NetworkResult<List<com.krieta.feature.contests.domain.model.JudgeInvite>> {
+        return safeApiCall {
+            api.getJudgeInvitations().map { it.toDomain() }
+        }
+    }
+    
+    override suspend fun acceptJudgeInvite(inviteId: String): NetworkResult<Unit> {
+        return safeApiCall {
+            api.acceptJudgeInvite(inviteId)
+        }
+    }
+    
+    override suspend fun declineJudgeInvite(inviteId: String): NetworkResult<Unit> {
+        return safeApiCall {
+            api.declineJudgeInvite(inviteId)
+        }
+    }
 }

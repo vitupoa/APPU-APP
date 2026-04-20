@@ -47,7 +47,12 @@ data class ContestDto(
     val participantsCount: Int = 0,
     val submissionsCount: Int = 0,
     val isJoined: Boolean = false,
-    val createdAt: String
+    val createdAt: String,
+    // Team Participation Fields (Task 14.1)
+    val participationType: String = "INDIVIDUAL_ONLY", // INDIVIDUAL_ONLY, TEAM_ONLY, or BOTH
+    val teamSize: Int? = null, // Optional: 2-10 members
+    val maxTeams: Int? = null, // Optional: maximum team registration limit
+    val registeredTeamsCount: Int = 0 // Current number of registered teams
 )
 
 @Serializable
@@ -95,7 +100,17 @@ data class CreateContestRequestDto(
     val sponsorName: String? = null,
     val sponsorUrl: String? = null,
     val deadline: String,
-    val coverMediaUrl: String? = null
+    val coverMediaUrl: String? = null,
+    // Team Participation Fields (Task 12.1)
+    val participationType: String, // INDIVIDUAL_ONLY, TEAM_ONLY, or BOTH
+    val teamSize: Int? = null, // Optional: 2-10 members
+    val maxTeams: Int? = null // Optional: maximum team registration limit
+)
+
+@Serializable
+data class CreateContestResponseDto(
+    val contestId: String,
+    val message: String = "Contest created successfully"
 )
 
 @Serializable

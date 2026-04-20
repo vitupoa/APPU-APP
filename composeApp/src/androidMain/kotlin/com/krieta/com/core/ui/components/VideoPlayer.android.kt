@@ -99,7 +99,7 @@ actual fun VideoPlayer(
                     .background(Color.Black.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = KrietaColors.primary)
+                CircularProgressIndicator(color = KrietaColors.Primary)
             }
         }
         

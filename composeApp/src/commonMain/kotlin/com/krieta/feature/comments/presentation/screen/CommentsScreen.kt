@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
@@ -46,9 +46,10 @@ data class CommentsScreen(
     val onVideoStateChange: ((Boolean) -> Unit)? = null // Callback to pause/resume video
 ) : Screen {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val viewModel = getScreenModel<CommentsViewModel> {
+        val viewModel = koinScreenModel<CommentsViewModel> {
             parametersOf(contentType, contentId, currentUserId)
         }
         val state by viewModel.state.collectAsState()
@@ -104,7 +105,7 @@ data class CommentsScreen(
                                     },
                                     leadingIcon = {
                                         if (state.sortType == sortType) {
-                                            Icon(Icons.Default.Check, null, tint = KrietaColors.primary)
+                                            Icon(Icons.Default.Check, null, tint = KrietaColors.Primary)
                                         }
                                     }
                                 )
@@ -140,7 +141,7 @@ data class CommentsScreen(
                 if (state.isLoading && state.comments.isEmpty()) {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = KrietaColors.primary
+                        color = KrietaColors.Primary
                     )
                 } else if (state.comments.isEmpty()) {
                     EmptyCommentsState(
@@ -181,7 +182,7 @@ data class CommentsScreen(
                                     if (state.isLoadingMore) {
                                         CircularProgressIndicator(
                                             modifier = Modifier.size(24.dp),
-                                            color = KrietaColors.primary
+                                            color = KrietaColors.Primary
                                         )
                                     } else {
                                         TextButton(onClick = { viewModel.loadMoreComments() }) {
@@ -291,9 +292,9 @@ private fun CommentItem(
                         Text(
                             "Creator",
                             style = MaterialTheme.typography.labelSmall,
-                            color = KrietaColors.primary,
+                            color = KrietaColors.Primary,
                             modifier = Modifier
-                                .background(KrietaColors.primary.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                                .background(KrietaColors.Primary.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
                                 .padding(horizontal = 4.dp, vertical = 2.dp)
                         )
                     }
@@ -302,12 +303,12 @@ private fun CommentItem(
                             Icons.Default.PushPin,
                             contentDescription = "Pinned",
                             modifier = Modifier.size(14.dp),
-                            tint = KrietaColors.primary
+                            tint = KrietaColors.Primary
                         )
                     }
                     Spacer(Modifier.weight(1f))
                     Text(
-                        DateTimeUtil.getTimeAgo(comment.createdAt),
+                        DateTimeUtil.timeAgo(comment.createdAt),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -496,7 +497,7 @@ private fun CommentItem(
                         onReport = onReport,
                         onToggleExpand = onToggleExpand,
                         onProfileClick = onProfileClick,
-                        isExpanded = reply.id in emptySet(), // Nested expansion handled separately
+                        isExpanded = false,
                         depth = depth + 1
                     )
                 }
@@ -621,7 +622,7 @@ private fun CommentInputBar(
                 Icon(
                     Icons.Default.Send,
                     contentDescription = "Send",
-                    tint = if (text.trim().isNotEmpty()) KrietaColors.primary else Color.Gray
+                    tint = if (text.trim().isNotEmpty()) KrietaColors.Primary else Color.Gray
                 )
             }
         }

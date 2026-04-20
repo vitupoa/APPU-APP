@@ -148,6 +148,11 @@ export type ContestWinner = Prisma.ContestWinnerModel
  */
 export type ContestJudge = Prisma.ContestJudgeModel
 /**
+ * Model JudgeInvite
+ * 
+ */
+export type JudgeInvite = Prisma.JudgeInviteModel
+/**
  * Model ContestVote
  * 
  */
@@ -162,3 +167,58 @@ export type Product = Prisma.ProductModel
  * 
  */
 export type DailyStat = Prisma.DailyStatModel
+/**
+ * Model Comment
+ * 
+ */
+export type Comment = Prisma.CommentModel
+/**
+ * Model CommentLike
+ * 
+ */
+export type CommentLike = Prisma.CommentLikeModel
+/**
+ * Model CommentReport
+ * 
+ */
+export type CommentReport = Prisma.CommentReportModel
+/**
+ * Model CommentSettings
+ * 
+ */
+export type CommentSettings = Prisma.CommentSettingsModel
+/**
+ * Model Team
+ * 
+ */
+export type Team = Prisma.TeamModel
+/**
+ * Model TeamMember
+ * 
+ */
+export type TeamMember = Prisma.TeamMemberModel
+/**
+ * Model TeamInvitation
+ * 
+ */
+export type TeamInvitation = Prisma.TeamInvitationModel
+/**
+ * Model TeamContestRegistration
+ * 
+ */
+export type TeamContestRegistration = Prisma.TeamContestRegistrationModel
+/**
+ * Model TeamSubmission
+ * 
+ */
+export type TeamSubmission = Prisma.TeamSubmissionModel
+/**
+ * Model TeamSubmissionVote
+ * 
+ */
+export type TeamSubmissionVote = Prisma.TeamSubmissionVoteModel
+/**
+ * Model TeamChat
+ * 
+ */
+export type TeamChat = Prisma.TeamChatModel

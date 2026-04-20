@@ -20,6 +20,24 @@ enum class ContestCategory { DANCE, CHALLENGE, PROMOTION, CREATIVE, ART, MUSIC }
 enum class JudgingCriteria { CREATOR_PICKS, COMMUNITY_VOTE, MOST_ENGAGEMENT }
 enum class ContestStatus { DRAFT, ACTIVE, JUDGING, PENDING_PAYOUT, COMPLETED, CANCELLED }
 
+// Team Participation Type (Task 14.1)
+enum class ParticipationType {
+    INDIVIDUAL_ONLY,
+    TEAM_ONLY,
+    BOTH;
+    
+    companion object {
+        fun fromString(value: String): ParticipationType {
+            return when (value.uppercase()) {
+                "INDIVIDUAL_ONLY" -> INDIVIDUAL_ONLY
+                "TEAM_ONLY" -> TEAM_ONLY
+                "BOTH" -> BOTH
+                else -> INDIVIDUAL_ONLY // Default fallback
+            }
+        }
+    }
+}
+
 data class Contest(
     val id: String,
     val creator: ContestCreator,
@@ -42,7 +60,12 @@ data class Contest(
     val participantsCount: Int,
     val submissionsCount: Int,
     val isJoined: Boolean,
-    val createdAt: String
+    val createdAt: String,
+    // Team Participation Fields (Task 14.1)
+    val participationType: ParticipationType = ParticipationType.INDIVIDUAL_ONLY,
+    val teamSize: Int? = null, // Optional: 2-10 members
+    val maxTeams: Int? = null, // Optional: maximum team registration limit
+    val registeredTeamsCount: Int = 0 // Current number of registered teams
 )
 
 data class ContestSubmission(

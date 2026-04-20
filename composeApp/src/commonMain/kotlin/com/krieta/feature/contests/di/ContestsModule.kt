@@ -16,5 +16,6 @@ val contestsModule = module {
     factory { (contestId: String?) -> com.krieta.feature.contests.presentation.viewmodel.ContestSubmissionFeedViewModel(get(), contestId) }
     factory { (contestId: String) -> ContestDetailViewModel(contestId, get()) }
     factory { (contestId: String) -> SubmitContestViewModel(contestId, get()) }
-    factory { com.krieta.feature.contests.presentation.viewmodel.CreateContestViewModel(get(), get()) }
+    factory { com.krieta.feature.contests.presentation.viewmodel.CreateContestViewModel(get(), get(), get(), get()) }
+    factory { com.krieta.feature.contests.presentation.viewmodel.JudgeInvitationsViewModel(get()) }
 }

@@ -37,6 +37,11 @@ const createContestSchema = z.object({
   airdropKr: z.number().positive().optional(),
   airdropLimit: z.number().int().positive().optional(),
   judges: z.array(z.string().uuid()).max(20).optional(), // 20 Judge limit explicitly enforced natively
+
+  // Team Participation Fields
+  participationType: z.enum(['INDIVIDUAL_ONLY', 'TEAM_ONLY', 'BOTH']),
+  teamSize: z.number().int().min(2).max(10).optional(),
+  maxTeams: z.number().int().positive().optional(),
 });
 
 const submitEntrySchema = z.object({
@@ -202,6 +207,67 @@ router.post('/:id/distribute', authMiddleware, adminAuth, async (req: AuthReques
     } else {
       res.status(400).json({ error: error.message });
     }
+  }
+});
+
+// ─── JUDGE INVITE ENDPOINTS ───────────────────────────────
+
+const inviteJudgesSchema = z.object({
+  judgeIds: z.array(z.string().uuid()).min(1).max(15)
+});
+
+// POST /api/v1/contests/:id/judges/invite
+router.post('/:id/judges/invite', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const { judgeIds } = inviteJudgesSchema.parse(req.body);
+    const result = await ContestService.inviteJudges(String(req.params.id), judgeIds);
+    res.status(200).json(result);
+  } catch (error: any) {
+    if (error.name === 'ZodError') {
+      res.status(400).json({ error: 'Validation failed', details: error.errors });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
+  }
+});
+
+// GET /api/v1/contests/judge/invitations
+router.get('/judge/invitations', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const invitations = await ContestService.getJudgeInvitations(req.userId!);
+    res.status(200).json(invitations);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/v1/contests/judge/invitations/:inviteId/accept
+router.post('/judge/invitations/:inviteId/accept', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const result = await ContestService.acceptJudgeInvite(String(req.params.inviteId), req.userId!);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// POST /api/v1/contests/judge/invitations/:inviteId/decline
+router.post('/judge/invitations/:inviteId/decline', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const result = await ContestService.declineJudgeInvite(String(req.params.inviteId), req.userId!);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// GET /api/v1/contests/judge/assigned
+router.get('/judge/assigned', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const contests = await ContestService.getAssignedContests(req.userId!);
+    res.status(200).json(contests);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 });
 

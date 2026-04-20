@@ -51,6 +51,7 @@ async function runMigrations() {
       'add_contest_vote_fields.sql',
       'add_feeds_and_voting.sql',
       'add_comments_system.sql',
+      'add_team_contests.sql',
     ];
 
     let executedCount = 0;

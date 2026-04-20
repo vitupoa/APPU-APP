@@ -48,6 +48,15 @@ export const ContestStatus = {
 export type ContestStatus = (typeof ContestStatus)[keyof typeof ContestStatus]
 
 
+export const ParticipationType = {
+  INDIVIDUAL_ONLY: 'INDIVIDUAL_ONLY',
+  TEAM_ONLY: 'TEAM_ONLY',
+  BOTH: 'BOTH'
+} as const
+
+export type ParticipationType = (typeof ParticipationType)[keyof typeof ParticipationType]
+
+
 export const JudgingCriteria = {
   CREATOR_PICKS: 'CREATOR_PICKS',
   COMMUNITY_VOTE: 'COMMUNITY_VOTE',
@@ -70,3 +79,31 @@ export const RequirementType = {
 } as const
 
 export type RequirementType = (typeof RequirementType)[keyof typeof RequirementType]
+
+
+export const JudgeInviteStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED'
+} as const
+
+export type JudgeInviteStatus = (typeof JudgeInviteStatus)[keyof typeof JudgeInviteStatus]
+
+
+export const TeamRole = {
+  LEADER: 'LEADER',
+  CO_LEADER: 'CO_LEADER',
+  MEMBER: 'MEMBER'
+} as const
+
+export type TeamRole = (typeof TeamRole)[keyof typeof TeamRole]
+
+
+export const InvitationStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type InvitationStatus = (typeof InvitationStatus)[keyof typeof InvitationStatus]

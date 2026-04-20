@@ -6,6 +6,7 @@ import com.krieta.feature.contests.data.remote.dto.ContestDto
 import com.krieta.feature.contests.data.remote.dto.ContestListResponseDto
 import com.krieta.feature.contests.data.remote.dto.ContestSubmissionDto
 import com.krieta.feature.contests.data.remote.dto.SubmissionsResponseDto
+import com.krieta.feature.contests.data.remote.dto.SubmitEntryRequestDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -42,19 +43,38 @@ class ContestsApi(private val httpClient: HttpClient) {
         return httpClient.get("${ApiConstants.CONTESTS}/$contestId/leaderboard").body()
     }
 
-    suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto) {
-        httpClient.post(ApiConstants.CONTESTS) {
+    suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto): com.krieta.feature.contests.data.remote.dto.CreateContestResponseDto {
+        return httpClient.post(ApiConstants.CONTESTS) {
             setBody(request)
-        }
+        }.body()
     }
 
     suspend fun getContestRequirements(contestId: String): ContestRequirementsResponseDto {
         return httpClient.get("${ApiConstants.CONTESTS}/$contestId/requirements").body()
     }
 
-    suspend fun submitEntry(contestId: String, request: SubmitEntryRequestDto) {
-        httpClient.post("${ApiConstants.CONTESTS}/$contestId/submit") {
+    suspend fun submitEntry(contestId: String, request: SubmitEntryRequestDto): ContestSubmissionDto {
+        return httpClient.post("${ApiConstants.CONTESTS}/$contestId/submit") {
             setBody(request)
-        }
+        }.body()
+    }
+    
+    // Judge Invite Endpoints
+    suspend fun inviteJudges(contestId: String, request: com.krieta.feature.contests.data.remote.dto.JudgeInviteRequestDto): com.krieta.feature.contests.data.remote.dto.JudgeInviteResponseDto {
+        return httpClient.post("${ApiConstants.CONTESTS}/$contestId/judges/invite") {
+            setBody(request)
+        }.body()
+    }
+    
+    suspend fun getJudgeInvitations(): List<com.krieta.feature.contests.data.remote.dto.JudgeInviteDto> {
+        return httpClient.get("${ApiConstants.CONTESTS}/judge/invitations").body()
+    }
+    
+    suspend fun acceptJudgeInvite(inviteId: String) {
+        httpClient.post("${ApiConstants.CONTESTS}/judge/invitations/$inviteId/accept")
+    }
+    
+    suspend fun declineJudgeInvite(inviteId: String) {
+        httpClient.post("${ApiConstants.CONTESTS}/judge/invitations/$inviteId/decline")
     }
 }

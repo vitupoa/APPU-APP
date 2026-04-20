@@ -19,9 +19,9 @@ object DateTimeUtil {
     fun Instant.toLocalTime(): LocalDateTime =
         this.toLocalDateTime(TimeZone.currentSystemDefault())
 
-    fun Instant.timeAgo(): String {
+    fun timeAgo(instant: Instant): String {
         val currentTime = now()
-        val duration = currentTime - this
+        val duration = currentTime - instant
         val seconds = duration.inWholeSeconds
         val minutes = seconds / 60
         val hours = seconds / 3600
@@ -37,6 +37,8 @@ object DateTimeUtil {
             else -> "${days / 365}y ago"
         }
     }
+
+    fun Instant.timeAgo(): String = timeAgo(this)
 
     fun Instant.formatCountdown(): String {
         val currentTime = now()

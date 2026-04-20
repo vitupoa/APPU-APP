@@ -143,6 +143,7 @@ export class ContestService {
       });
 
       return {
+        contestId: contest.id,
         ...contest,
         prizeKr: contest.prizeTotalKr,
         platformFeeKr: contest.platformFeeKr,
@@ -152,6 +153,255 @@ export class ContestService {
         createdAt: contest.createdAt.toISOString()
       };
     });
+  }
+
+  /**
+   * Invite judges to a contest
+   * Creates judge invite records with PENDING status
+   */
+  static async inviteJudges(contestId: string, judgeIds: string[]) {
+    const contest = await prisma.contest.findUniqueOrThrow({ where: { id: contestId } });
+    
+    const results = {
+      accepted: [] as any[],
+      failed: [] as string[]
+    };
+
+    for (const judgeId of judgeIds) {
+      try {
+        // Check if judge exists
+        const judge = await prisma.user.findUnique({ where: { id: judgeId } });
+        if (!judge) {
+          results.failed.push(judgeId);
+          continue;
+        }
+
+        // Check if already invited
+        const existing = await prisma.judgeInvite.findUnique({
+          where: { contestId_judgeId: { contestId, judgeId } }
+        });
+
+        if (existing) {
+          results.failed.push(judgeId);
+          continue;
+        }
+
+        // Create invite
+        const invite = await prisma.judgeInvite.create({
+          data: {
+            contestId,
+            judgeId,
+            status: 'PENDING'
+          },
+          include: {
+            contest: {
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                coverMediaUrl: true,
+                prizeTotalKr: true,
+                deadline: true,
+                creator: {
+                  select: {
+                    username: true,
+                    displayName: true
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        results.accepted.push({
+          id: invite.id,
+          contestId: invite.contestId,
+          judgeId: invite.judgeId,
+          status: invite.status,
+          invitedAt: invite.invitedAt.toISOString(),
+          respondedAt: invite.respondedAt?.toISOString() || null,
+          contest: {
+            id: invite.contest.id,
+            title: invite.contest.title,
+            description: invite.contest.description,
+            coverMediaUrl: invite.contest.coverMediaUrl,
+            creatorUsername: invite.contest.creator.username,
+            creatorDisplayName: invite.contest.creator.displayName,
+            deadline: invite.contest.deadline.toISOString(),
+            prizeKr: Number(invite.contest.prizeTotalKr)
+          }
+        });
+
+        // TODO: Send notification to judge
+        // await NotificationService.sendJudgeInvite(judgeId, contestId);
+      } catch (error) {
+        results.failed.push(judgeId);
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Get judge invitations for a user
+   * Returns pending invitations with contest details
+   */
+  static async getJudgeInvitations(userId: string) {
+    const invites = await prisma.judgeInvite.findMany({
+      where: {
+        judgeId: userId,
+        status: 'PENDING'
+      },
+      include: {
+        contest: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            coverMediaUrl: true,
+            prizeTotalKr: true,
+            deadline: true,
+            creator: {
+              select: {
+                username: true,
+                displayName: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { invitedAt: 'desc' }
+    });
+
+    return invites.map((invite) => ({
+      id: invite.id,
+      contestId: invite.contestId,
+      judgeId: invite.judgeId,
+      status: invite.status,
+      invitedAt: invite.invitedAt.toISOString(),
+      respondedAt: invite.respondedAt?.toISOString() || null,
+      contest: {
+        id: invite.contest.id,
+        title: invite.contest.title,
+        description: invite.contest.description,
+        coverMediaUrl: invite.contest.coverMediaUrl,
+        creatorUsername: invite.contest.creator.username,
+        creatorDisplayName: invite.contest.creator.displayName,
+        deadline: invite.contest.deadline.toISOString(),
+        prizeKr: Number(invite.contest.prizeTotalKr)
+      }
+    }));
+  }
+
+  /**
+   * Accept a judge invitation
+   * Updates invite status and grants judge access
+   */
+  static async acceptJudgeInvite(inviteId: string, userId: string) {
+    const invite = await prisma.judgeInvite.findUniqueOrThrow({
+      where: { id: inviteId }
+    });
+
+    if (invite.judgeId !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    if (invite.status !== 'PENDING') {
+      throw new Error('Invitation already responded to');
+    }
+
+    await prisma.judgeInvite.update({
+      where: { id: inviteId },
+      data: {
+        status: 'ACCEPTED',
+        respondedAt: new Date()
+      }
+    });
+
+    // TODO: Send notification to contest creator
+    // await NotificationService.notifyJudgeAccepted(invite.contestId, userId);
+
+    return { success: true };
+  }
+
+  /**
+   * Decline a judge invitation
+   */
+  static async declineJudgeInvite(inviteId: string, userId: string) {
+    const invite = await prisma.judgeInvite.findUniqueOrThrow({
+      where: { id: inviteId }
+    });
+
+    if (invite.judgeId !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    if (invite.status !== 'PENDING') {
+      throw new Error('Invitation already responded to');
+    }
+
+    await prisma.judgeInvite.update({
+      where: { id: inviteId },
+      data: {
+        status: 'DECLINED',
+        respondedAt: new Date()
+      }
+    });
+
+    // TODO: Send notification to contest creator
+    // await NotificationService.notifyJudgeDeclined(invite.contestId, userId);
+
+    return { success: true };
+  }
+
+  /**
+   * Get contests assigned to a judge
+   * Returns contests where judge has accepted the invitation
+   */
+  static async getAssignedContests(judgeId: string) {
+    const invites = await prisma.judgeInvite.findMany({
+      where: {
+        judgeId,
+        status: 'ACCEPTED'
+      },
+      include: {
+        contest: {
+          include: {
+            creator: {
+              select: {
+                id: true,
+                username: true,
+                displayName: true,
+                avatarUrl: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { invitedAt: 'desc' }
+    });
+
+    return invites.map((invite) => ({
+      id: invite.contest.id,
+      creator: invite.contest.creator,
+      title: invite.contest.title,
+      description: invite.contest.description,
+      mediaType: invite.contest.mediaType,
+      contestCategory: invite.contest.category,
+      prizeKr: Number(invite.contest.prizeTotalKr),
+      platformFeeKr: Number(invite.contest.platformFeeKr),
+      totalChargedKr: Number(invite.contest.prizeTotalKr) + Number(invite.contest.platformFeeKr),
+      maxWinners: invite.contest.maxWinners,
+      judgingCriteria: invite.contest.judgingCriteria,
+      sponsorName: invite.contest.sponsorName,
+      sponsorUrl: invite.contest.sponsorUrl,
+      deadline: invite.contest.deadline.toISOString(),
+      coverMediaUrl: invite.contest.coverMediaUrl,
+      status: invite.contest.status,
+      participantsCount: invite.contest.totalParticipants,
+      submissionsCount: invite.contest.totalSubmissions,
+      createdAt: invite.contest.createdAt.toISOString()
+    }));
   }
 
   static async listContests(params: {

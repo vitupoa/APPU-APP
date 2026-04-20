@@ -29,6 +29,8 @@ export type AggregateContest = {
 export type ContestAvgAggregateOutputType = {
   prizeTotalKr: runtime.Decimal | null
   platformFeeKr: runtime.Decimal | null
+  teamSize: number | null
+  maxTeams: number | null
   entryFeeKr: runtime.Decimal | null
   publicVoteWeight: number | null
   targetAges: number | null
@@ -43,6 +45,8 @@ export type ContestAvgAggregateOutputType = {
 export type ContestSumAggregateOutputType = {
   prizeTotalKr: runtime.Decimal | null
   platformFeeKr: runtime.Decimal | null
+  teamSize: number | null
+  maxTeams: number | null
   entryFeeKr: runtime.Decimal | null
   publicVoteWeight: number | null
   targetAges: number[]
@@ -64,6 +68,9 @@ export type ContestMinAggregateOutputType = {
   coverMediaUrl: string | null
   prizeTotalKr: runtime.Decimal | null
   platformFeeKr: runtime.Decimal | null
+  participationType: $Enums.ParticipationType | null
+  teamSize: number | null
+  maxTeams: number | null
   entryFeeKr: runtime.Decimal | null
   publicVoteWeight: number | null
   airdropKr: runtime.Decimal | null
@@ -91,6 +98,9 @@ export type ContestMaxAggregateOutputType = {
   coverMediaUrl: string | null
   prizeTotalKr: runtime.Decimal | null
   platformFeeKr: runtime.Decimal | null
+  participationType: $Enums.ParticipationType | null
+  teamSize: number | null
+  maxTeams: number | null
   entryFeeKr: runtime.Decimal | null
   publicVoteWeight: number | null
   airdropKr: runtime.Decimal | null
@@ -118,6 +128,9 @@ export type ContestCountAggregateOutputType = {
   coverMediaUrl: number
   prizeTotalKr: number
   platformFeeKr: number
+  participationType: number
+  teamSize: number
+  maxTeams: number
   entryFeeKr: number
   publicVoteWeight: number
   targetAges: number
@@ -142,6 +155,8 @@ export type ContestCountAggregateOutputType = {
 export type ContestAvgAggregateInputType = {
   prizeTotalKr?: true
   platformFeeKr?: true
+  teamSize?: true
+  maxTeams?: true
   entryFeeKr?: true
   publicVoteWeight?: true
   targetAges?: true
@@ -156,6 +171,8 @@ export type ContestAvgAggregateInputType = {
 export type ContestSumAggregateInputType = {
   prizeTotalKr?: true
   platformFeeKr?: true
+  teamSize?: true
+  maxTeams?: true
   entryFeeKr?: true
   publicVoteWeight?: true
   targetAges?: true
@@ -177,6 +194,9 @@ export type ContestMinAggregateInputType = {
   coverMediaUrl?: true
   prizeTotalKr?: true
   platformFeeKr?: true
+  participationType?: true
+  teamSize?: true
+  maxTeams?: true
   entryFeeKr?: true
   publicVoteWeight?: true
   airdropKr?: true
@@ -204,6 +224,9 @@ export type ContestMaxAggregateInputType = {
   coverMediaUrl?: true
   prizeTotalKr?: true
   platformFeeKr?: true
+  participationType?: true
+  teamSize?: true
+  maxTeams?: true
   entryFeeKr?: true
   publicVoteWeight?: true
   airdropKr?: true
@@ -231,6 +254,9 @@ export type ContestCountAggregateInputType = {
   coverMediaUrl?: true
   prizeTotalKr?: true
   platformFeeKr?: true
+  participationType?: true
+  teamSize?: true
+  maxTeams?: true
   entryFeeKr?: true
   publicVoteWeight?: true
   targetAges?: true
@@ -347,6 +373,9 @@ export type ContestGroupByOutputType = {
   coverMediaUrl: string | null
   prizeTotalKr: runtime.Decimal
   platformFeeKr: runtime.Decimal
+  participationType: $Enums.ParticipationType
+  teamSize: number | null
+  maxTeams: number | null
   entryFeeKr: runtime.Decimal | null
   publicVoteWeight: number | null
   targetAges: number[]
@@ -399,6 +428,9 @@ export type ContestWhereInput = {
   coverMediaUrl?: Prisma.StringNullableFilter<"Contest"> | string | null
   prizeTotalKr?: Prisma.DecimalFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFilter<"Contest"> | $Enums.ParticipationType
+  teamSize?: Prisma.IntNullableFilter<"Contest"> | number | null
+  maxTeams?: Prisma.IntNullableFilter<"Contest"> | number | null
   entryFeeKr?: Prisma.DecimalNullableFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.IntNullableFilter<"Contest"> | number | null
   targetAges?: Prisma.IntNullableListFilter<"Contest">
@@ -426,6 +458,9 @@ export type ContestWhereInput = {
   shorts?: Prisma.ShortListRelationFilter
   judges?: Prisma.ContestJudgeListRelationFilter
   milestones?: Prisma.MilestoneListRelationFilter
+  teamRegistrations?: Prisma.TeamContestRegistrationListRelationFilter
+  teamSubmissions?: Prisma.TeamSubmissionListRelationFilter
+  judgeInvites?: Prisma.JudgeInviteListRelationFilter
 }
 
 export type ContestOrderByWithRelationInput = {
@@ -438,6 +473,9 @@ export type ContestOrderByWithRelationInput = {
   coverMediaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   prizeTotalKr?: Prisma.SortOrder
   platformFeeKr?: Prisma.SortOrder
+  participationType?: Prisma.SortOrder
+  teamSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxTeams?: Prisma.SortOrderInput | Prisma.SortOrder
   entryFeeKr?: Prisma.SortOrderInput | Prisma.SortOrder
   publicVoteWeight?: Prisma.SortOrderInput | Prisma.SortOrder
   targetAges?: Prisma.SortOrder
@@ -465,6 +503,9 @@ export type ContestOrderByWithRelationInput = {
   shorts?: Prisma.ShortOrderByRelationAggregateInput
   judges?: Prisma.ContestJudgeOrderByRelationAggregateInput
   milestones?: Prisma.MilestoneOrderByRelationAggregateInput
+  teamRegistrations?: Prisma.TeamContestRegistrationOrderByRelationAggregateInput
+  teamSubmissions?: Prisma.TeamSubmissionOrderByRelationAggregateInput
+  judgeInvites?: Prisma.JudgeInviteOrderByRelationAggregateInput
 }
 
 export type ContestWhereUniqueInput = Prisma.AtLeast<{
@@ -480,6 +521,9 @@ export type ContestWhereUniqueInput = Prisma.AtLeast<{
   coverMediaUrl?: Prisma.StringNullableFilter<"Contest"> | string | null
   prizeTotalKr?: Prisma.DecimalFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFilter<"Contest"> | $Enums.ParticipationType
+  teamSize?: Prisma.IntNullableFilter<"Contest"> | number | null
+  maxTeams?: Prisma.IntNullableFilter<"Contest"> | number | null
   entryFeeKr?: Prisma.DecimalNullableFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.IntNullableFilter<"Contest"> | number | null
   targetAges?: Prisma.IntNullableListFilter<"Contest">
@@ -507,6 +551,9 @@ export type ContestWhereUniqueInput = Prisma.AtLeast<{
   shorts?: Prisma.ShortListRelationFilter
   judges?: Prisma.ContestJudgeListRelationFilter
   milestones?: Prisma.MilestoneListRelationFilter
+  teamRegistrations?: Prisma.TeamContestRegistrationListRelationFilter
+  teamSubmissions?: Prisma.TeamSubmissionListRelationFilter
+  judgeInvites?: Prisma.JudgeInviteListRelationFilter
 }, "id">
 
 export type ContestOrderByWithAggregationInput = {
@@ -519,6 +566,9 @@ export type ContestOrderByWithAggregationInput = {
   coverMediaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   prizeTotalKr?: Prisma.SortOrder
   platformFeeKr?: Prisma.SortOrder
+  participationType?: Prisma.SortOrder
+  teamSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxTeams?: Prisma.SortOrderInput | Prisma.SortOrder
   entryFeeKr?: Prisma.SortOrderInput | Prisma.SortOrder
   publicVoteWeight?: Prisma.SortOrderInput | Prisma.SortOrder
   targetAges?: Prisma.SortOrder
@@ -556,6 +606,9 @@ export type ContestScalarWhereWithAggregatesInput = {
   coverMediaUrl?: Prisma.StringNullableWithAggregatesFilter<"Contest"> | string | null
   prizeTotalKr?: Prisma.DecimalWithAggregatesFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalWithAggregatesFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeWithAggregatesFilter<"Contest"> | $Enums.ParticipationType
+  teamSize?: Prisma.IntNullableWithAggregatesFilter<"Contest"> | number | null
+  maxTeams?: Prisma.IntNullableWithAggregatesFilter<"Contest"> | number | null
   entryFeeKr?: Prisma.DecimalNullableWithAggregatesFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.IntNullableWithAggregatesFilter<"Contest"> | number | null
   targetAges?: Prisma.IntNullableListFilter<"Contest">
@@ -584,6 +637,9 @@ export type ContestCreateInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -611,6 +667,9 @@ export type ContestCreateInput = {
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateInput = {
@@ -623,6 +682,9 @@ export type ContestUncheckedCreateInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -649,6 +711,9 @@ export type ContestUncheckedCreateInput = {
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestUpdateInput = {
@@ -660,6 +725,9 @@ export type ContestUpdateInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -687,6 +755,9 @@ export type ContestUpdateInput = {
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateInput = {
@@ -699,6 +770,9 @@ export type ContestUncheckedUpdateInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -725,6 +799,9 @@ export type ContestUncheckedUpdateInput = {
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateManyInput = {
@@ -737,6 +814,9 @@ export type ContestCreateManyInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -765,6 +845,9 @@ export type ContestUpdateManyMutationInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -794,6 +877,9 @@ export type ContestUncheckedUpdateManyInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -851,6 +937,9 @@ export type ContestCountOrderByAggregateInput = {
   coverMediaUrl?: Prisma.SortOrder
   prizeTotalKr?: Prisma.SortOrder
   platformFeeKr?: Prisma.SortOrder
+  participationType?: Prisma.SortOrder
+  teamSize?: Prisma.SortOrder
+  maxTeams?: Prisma.SortOrder
   entryFeeKr?: Prisma.SortOrder
   publicVoteWeight?: Prisma.SortOrder
   targetAges?: Prisma.SortOrder
@@ -873,6 +962,8 @@ export type ContestCountOrderByAggregateInput = {
 export type ContestAvgOrderByAggregateInput = {
   prizeTotalKr?: Prisma.SortOrder
   platformFeeKr?: Prisma.SortOrder
+  teamSize?: Prisma.SortOrder
+  maxTeams?: Prisma.SortOrder
   entryFeeKr?: Prisma.SortOrder
   publicVoteWeight?: Prisma.SortOrder
   targetAges?: Prisma.SortOrder
@@ -894,6 +985,9 @@ export type ContestMaxOrderByAggregateInput = {
   coverMediaUrl?: Prisma.SortOrder
   prizeTotalKr?: Prisma.SortOrder
   platformFeeKr?: Prisma.SortOrder
+  participationType?: Prisma.SortOrder
+  teamSize?: Prisma.SortOrder
+  maxTeams?: Prisma.SortOrder
   entryFeeKr?: Prisma.SortOrder
   publicVoteWeight?: Prisma.SortOrder
   airdropKr?: Prisma.SortOrder
@@ -921,6 +1015,9 @@ export type ContestMinOrderByAggregateInput = {
   coverMediaUrl?: Prisma.SortOrder
   prizeTotalKr?: Prisma.SortOrder
   platformFeeKr?: Prisma.SortOrder
+  participationType?: Prisma.SortOrder
+  teamSize?: Prisma.SortOrder
+  maxTeams?: Prisma.SortOrder
   entryFeeKr?: Prisma.SortOrder
   publicVoteWeight?: Prisma.SortOrder
   airdropKr?: Prisma.SortOrder
@@ -941,6 +1038,8 @@ export type ContestMinOrderByAggregateInput = {
 export type ContestSumOrderByAggregateInput = {
   prizeTotalKr?: Prisma.SortOrder
   platformFeeKr?: Prisma.SortOrder
+  teamSize?: Prisma.SortOrder
+  maxTeams?: Prisma.SortOrder
   entryFeeKr?: Prisma.SortOrder
   publicVoteWeight?: Prisma.SortOrder
   targetAges?: Prisma.SortOrder
@@ -1050,6 +1149,10 @@ export type ContestCreatetargetGeosInput = {
 
 export type EnumContestMediaTypeFieldUpdateOperationsInput = {
   set?: $Enums.ContestMediaType
+}
+
+export type EnumParticipationTypeFieldUpdateOperationsInput = {
+  set?: $Enums.ParticipationType
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
@@ -1162,6 +1265,48 @@ export type ContestUpdateOneRequiredWithoutJudgesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutJudgesInput, Prisma.ContestUpdateWithoutJudgesInput>, Prisma.ContestUncheckedUpdateWithoutJudgesInput>
 }
 
+export type ContestCreateNestedOneWithoutJudgeInvitesInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutJudgeInvitesInput, Prisma.ContestUncheckedCreateWithoutJudgeInvitesInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutJudgeInvitesInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneRequiredWithoutJudgeInvitesNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutJudgeInvitesInput, Prisma.ContestUncheckedCreateWithoutJudgeInvitesInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutJudgeInvitesInput
+  upsert?: Prisma.ContestUpsertWithoutJudgeInvitesInput
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutJudgeInvitesInput, Prisma.ContestUpdateWithoutJudgeInvitesInput>, Prisma.ContestUncheckedUpdateWithoutJudgeInvitesInput>
+}
+
+export type ContestCreateNestedOneWithoutTeamRegistrationsInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutTeamRegistrationsInput, Prisma.ContestUncheckedCreateWithoutTeamRegistrationsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutTeamRegistrationsInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneRequiredWithoutTeamRegistrationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutTeamRegistrationsInput, Prisma.ContestUncheckedCreateWithoutTeamRegistrationsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutTeamRegistrationsInput
+  upsert?: Prisma.ContestUpsertWithoutTeamRegistrationsInput
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutTeamRegistrationsInput, Prisma.ContestUpdateWithoutTeamRegistrationsInput>, Prisma.ContestUncheckedUpdateWithoutTeamRegistrationsInput>
+}
+
+export type ContestCreateNestedOneWithoutTeamSubmissionsInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutTeamSubmissionsInput, Prisma.ContestUncheckedCreateWithoutTeamSubmissionsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutTeamSubmissionsInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneRequiredWithoutTeamSubmissionsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutTeamSubmissionsInput, Prisma.ContestUncheckedCreateWithoutTeamSubmissionsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutTeamSubmissionsInput
+  upsert?: Prisma.ContestUpsertWithoutTeamSubmissionsInput
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutTeamSubmissionsInput, Prisma.ContestUpdateWithoutTeamSubmissionsInput>, Prisma.ContestUncheckedUpdateWithoutTeamSubmissionsInput>
+}
+
 export type ContestCreateWithoutCreatorInput = {
   id?: string
   title: string
@@ -1171,6 +1316,9 @@ export type ContestCreateWithoutCreatorInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1197,6 +1345,9 @@ export type ContestCreateWithoutCreatorInput = {
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutCreatorInput = {
@@ -1208,6 +1359,9 @@ export type ContestUncheckedCreateWithoutCreatorInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1234,6 +1388,9 @@ export type ContestUncheckedCreateWithoutCreatorInput = {
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutCreatorInput = {
@@ -1275,6 +1432,9 @@ export type ContestScalarWhereInput = {
   coverMediaUrl?: Prisma.StringNullableFilter<"Contest"> | string | null
   prizeTotalKr?: Prisma.DecimalFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFilter<"Contest"> | $Enums.ParticipationType
+  teamSize?: Prisma.IntNullableFilter<"Contest"> | number | null
+  maxTeams?: Prisma.IntNullableFilter<"Contest"> | number | null
   entryFeeKr?: Prisma.DecimalNullableFilter<"Contest"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.IntNullableFilter<"Contest"> | number | null
   targetAges?: Prisma.IntNullableListFilter<"Contest">
@@ -1303,6 +1463,9 @@ export type ContestCreateWithoutEscrowsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1329,6 +1492,9 @@ export type ContestCreateWithoutEscrowsInput = {
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutEscrowsInput = {
@@ -1341,6 +1507,9 @@ export type ContestUncheckedCreateWithoutEscrowsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1366,6 +1535,9 @@ export type ContestUncheckedCreateWithoutEscrowsInput = {
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutEscrowsInput = {
@@ -1393,6 +1565,9 @@ export type ContestUpdateWithoutEscrowsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -1419,6 +1594,9 @@ export type ContestUpdateWithoutEscrowsInput = {
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutEscrowsInput = {
@@ -1431,6 +1609,9 @@ export type ContestUncheckedUpdateWithoutEscrowsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -1456,6 +1637,9 @@ export type ContestUncheckedUpdateWithoutEscrowsInput = {
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutMilestonesInput = {
@@ -1467,6 +1651,9 @@ export type ContestCreateWithoutMilestonesInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1493,6 +1680,9 @@ export type ContestCreateWithoutMilestonesInput = {
   escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutMilestonesInput = {
@@ -1505,6 +1695,9 @@ export type ContestUncheckedCreateWithoutMilestonesInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1530,6 +1723,9 @@ export type ContestUncheckedCreateWithoutMilestonesInput = {
   escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutMilestonesInput = {
@@ -1557,6 +1753,9 @@ export type ContestUpdateWithoutMilestonesInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -1583,6 +1782,9 @@ export type ContestUpdateWithoutMilestonesInput = {
   escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutMilestonesInput = {
@@ -1595,6 +1797,9 @@ export type ContestUncheckedUpdateWithoutMilestonesInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -1620,6 +1825,9 @@ export type ContestUncheckedUpdateWithoutMilestonesInput = {
   escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutShortsInput = {
@@ -1631,6 +1839,9 @@ export type ContestCreateWithoutShortsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1657,6 +1868,9 @@ export type ContestCreateWithoutShortsInput = {
   escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutShortsInput = {
@@ -1669,6 +1883,9 @@ export type ContestUncheckedCreateWithoutShortsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1694,6 +1911,9 @@ export type ContestUncheckedCreateWithoutShortsInput = {
   escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutShortsInput = {
@@ -1721,6 +1941,9 @@ export type ContestUpdateWithoutShortsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -1747,6 +1970,9 @@ export type ContestUpdateWithoutShortsInput = {
   escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutShortsInput = {
@@ -1759,6 +1985,9 @@ export type ContestUncheckedUpdateWithoutShortsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -1784,6 +2013,9 @@ export type ContestUncheckedUpdateWithoutShortsInput = {
   escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutActionsInput = {
@@ -1795,6 +2027,9 @@ export type ContestCreateWithoutActionsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1821,6 +2056,9 @@ export type ContestCreateWithoutActionsInput = {
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutActionsInput = {
@@ -1833,6 +2071,9 @@ export type ContestUncheckedCreateWithoutActionsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1858,6 +2099,9 @@ export type ContestUncheckedCreateWithoutActionsInput = {
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutActionsInput = {
@@ -1885,6 +2129,9 @@ export type ContestUpdateWithoutActionsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -1911,6 +2158,9 @@ export type ContestUpdateWithoutActionsInput = {
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutActionsInput = {
@@ -1923,6 +2173,9 @@ export type ContestUncheckedUpdateWithoutActionsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -1948,6 +2201,9 @@ export type ContestUncheckedUpdateWithoutActionsInput = {
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutDistributionsInput = {
@@ -1959,6 +2215,9 @@ export type ContestCreateWithoutDistributionsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -1985,6 +2244,9 @@ export type ContestCreateWithoutDistributionsInput = {
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutDistributionsInput = {
@@ -1997,6 +2259,9 @@ export type ContestUncheckedCreateWithoutDistributionsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2022,6 +2287,9 @@ export type ContestUncheckedCreateWithoutDistributionsInput = {
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutDistributionsInput = {
@@ -2049,6 +2317,9 @@ export type ContestUpdateWithoutDistributionsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2075,6 +2346,9 @@ export type ContestUpdateWithoutDistributionsInput = {
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutDistributionsInput = {
@@ -2087,6 +2361,9 @@ export type ContestUncheckedUpdateWithoutDistributionsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2112,6 +2389,9 @@ export type ContestUncheckedUpdateWithoutDistributionsInput = {
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutParticipantsInput = {
@@ -2123,6 +2403,9 @@ export type ContestCreateWithoutParticipantsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2149,6 +2432,9 @@ export type ContestCreateWithoutParticipantsInput = {
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutParticipantsInput = {
@@ -2161,6 +2447,9 @@ export type ContestUncheckedCreateWithoutParticipantsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2186,6 +2475,9 @@ export type ContestUncheckedCreateWithoutParticipantsInput = {
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutParticipantsInput = {
@@ -2213,6 +2505,9 @@ export type ContestUpdateWithoutParticipantsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2239,6 +2534,9 @@ export type ContestUpdateWithoutParticipantsInput = {
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutParticipantsInput = {
@@ -2251,6 +2549,9 @@ export type ContestUncheckedUpdateWithoutParticipantsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2276,6 +2577,9 @@ export type ContestUncheckedUpdateWithoutParticipantsInput = {
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutSubmissionsInput = {
@@ -2287,6 +2591,9 @@ export type ContestCreateWithoutSubmissionsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2313,6 +2620,9 @@ export type ContestCreateWithoutSubmissionsInput = {
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutSubmissionsInput = {
@@ -2325,6 +2635,9 @@ export type ContestUncheckedCreateWithoutSubmissionsInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2350,6 +2663,9 @@ export type ContestUncheckedCreateWithoutSubmissionsInput = {
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutSubmissionsInput = {
@@ -2377,6 +2693,9 @@ export type ContestUpdateWithoutSubmissionsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2403,6 +2722,9 @@ export type ContestUpdateWithoutSubmissionsInput = {
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutSubmissionsInput = {
@@ -2415,6 +2737,9 @@ export type ContestUncheckedUpdateWithoutSubmissionsInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2440,6 +2765,9 @@ export type ContestUncheckedUpdateWithoutSubmissionsInput = {
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutWinnersInput = {
@@ -2451,6 +2779,9 @@ export type ContestCreateWithoutWinnersInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2477,6 +2808,9 @@ export type ContestCreateWithoutWinnersInput = {
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutWinnersInput = {
@@ -2489,6 +2823,9 @@ export type ContestUncheckedCreateWithoutWinnersInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2514,6 +2851,9 @@ export type ContestUncheckedCreateWithoutWinnersInput = {
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutWinnersInput = {
@@ -2541,6 +2881,9 @@ export type ContestUpdateWithoutWinnersInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2567,6 +2910,9 @@ export type ContestUpdateWithoutWinnersInput = {
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutWinnersInput = {
@@ -2579,6 +2925,9 @@ export type ContestUncheckedUpdateWithoutWinnersInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2604,6 +2953,9 @@ export type ContestUncheckedUpdateWithoutWinnersInput = {
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutJudgesInput = {
@@ -2615,6 +2967,9 @@ export type ContestCreateWithoutJudgesInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2641,6 +2996,9 @@ export type ContestCreateWithoutJudgesInput = {
   escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
   shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutJudgesInput = {
@@ -2653,6 +3011,9 @@ export type ContestUncheckedCreateWithoutJudgesInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2678,6 +3039,9 @@ export type ContestUncheckedCreateWithoutJudgesInput = {
   escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
   shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutJudgesInput = {
@@ -2705,6 +3069,9 @@ export type ContestUpdateWithoutJudgesInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2731,6 +3098,9 @@ export type ContestUpdateWithoutJudgesInput = {
   escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutJudgesInput = {
@@ -2743,6 +3113,9 @@ export type ContestUncheckedUpdateWithoutJudgesInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2768,6 +3141,573 @@ export type ContestUncheckedUpdateWithoutJudgesInput = {
   escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutJudgeInvitesInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutJudgeInvitesInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutJudgeInvitesInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutJudgeInvitesInput, Prisma.ContestUncheckedCreateWithoutJudgeInvitesInput>
+}
+
+export type ContestUpsertWithoutJudgeInvitesInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutJudgeInvitesInput, Prisma.ContestUncheckedUpdateWithoutJudgeInvitesInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutJudgeInvitesInput, Prisma.ContestUncheckedCreateWithoutJudgeInvitesInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutJudgeInvitesInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutJudgeInvitesInput, Prisma.ContestUncheckedUpdateWithoutJudgeInvitesInput>
+}
+
+export type ContestUpdateWithoutJudgeInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutJudgeInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutTeamRegistrationsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutTeamRegistrationsInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutTeamRegistrationsInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutTeamRegistrationsInput, Prisma.ContestUncheckedCreateWithoutTeamRegistrationsInput>
+}
+
+export type ContestUpsertWithoutTeamRegistrationsInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutTeamRegistrationsInput, Prisma.ContestUncheckedUpdateWithoutTeamRegistrationsInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutTeamRegistrationsInput, Prisma.ContestUncheckedCreateWithoutTeamRegistrationsInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutTeamRegistrationsInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutTeamRegistrationsInput, Prisma.ContestUncheckedUpdateWithoutTeamRegistrationsInput>
+}
+
+export type ContestUpdateWithoutTeamRegistrationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutTeamRegistrationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutTeamSubmissionsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutTeamSubmissionsInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutTeamSubmissionsInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutTeamSubmissionsInput, Prisma.ContestUncheckedCreateWithoutTeamSubmissionsInput>
+}
+
+export type ContestUpsertWithoutTeamSubmissionsInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutTeamSubmissionsInput, Prisma.ContestUncheckedUpdateWithoutTeamSubmissionsInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutTeamSubmissionsInput, Prisma.ContestUncheckedCreateWithoutTeamSubmissionsInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutTeamSubmissionsInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutTeamSubmissionsInput, Prisma.ContestUncheckedUpdateWithoutTeamSubmissionsInput>
+}
+
+export type ContestUpdateWithoutTeamSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutTeamSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateManyCreatorInput = {
@@ -2779,6 +3719,9 @@ export type ContestCreateManyCreatorInput = {
   coverMediaUrl?: string | null
   prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
   entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: number | null
   targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
@@ -2807,6 +3750,9 @@ export type ContestUpdateWithoutCreatorInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2833,6 +3779,9 @@ export type ContestUpdateWithoutCreatorInput = {
   shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutCreatorInput = {
@@ -2844,6 +3793,9 @@ export type ContestUncheckedUpdateWithoutCreatorInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2870,6 +3822,9 @@ export type ContestUncheckedUpdateWithoutCreatorInput = {
   shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
   judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateManyWithoutCreatorInput = {
@@ -2881,6 +3836,9 @@ export type ContestUncheckedUpdateManyWithoutCreatorInput = {
   coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
@@ -2915,6 +3873,9 @@ export type ContestCountOutputType = {
   shorts: number
   judges: number
   milestones: number
+  teamRegistrations: number
+  teamSubmissions: number
+  judgeInvites: number
 }
 
 export type ContestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2927,6 +3888,9 @@ export type ContestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   shorts?: boolean | ContestCountOutputTypeCountShortsArgs
   judges?: boolean | ContestCountOutputTypeCountJudgesArgs
   milestones?: boolean | ContestCountOutputTypeCountMilestonesArgs
+  teamRegistrations?: boolean | ContestCountOutputTypeCountTeamRegistrationsArgs
+  teamSubmissions?: boolean | ContestCountOutputTypeCountTeamSubmissionsArgs
+  judgeInvites?: boolean | ContestCountOutputTypeCountJudgeInvitesArgs
 }
 
 /**
@@ -3002,6 +3966,27 @@ export type ContestCountOutputTypeCountMilestonesArgs<ExtArgs extends runtime.Ty
   where?: Prisma.MilestoneWhereInput
 }
 
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountTeamRegistrationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TeamContestRegistrationWhereInput
+}
+
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountTeamSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TeamSubmissionWhereInput
+}
+
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountJudgeInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JudgeInviteWhereInput
+}
+
 
 export type ContestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3013,6 +3998,9 @@ export type ContestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   coverMediaUrl?: boolean
   prizeTotalKr?: boolean
   platformFeeKr?: boolean
+  participationType?: boolean
+  teamSize?: boolean
+  maxTeams?: boolean
   entryFeeKr?: boolean
   publicVoteWeight?: boolean
   targetAges?: boolean
@@ -3040,6 +4028,9 @@ export type ContestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   shorts?: boolean | Prisma.Contest$shortsArgs<ExtArgs>
   judges?: boolean | Prisma.Contest$judgesArgs<ExtArgs>
   milestones?: boolean | Prisma.Contest$milestonesArgs<ExtArgs>
+  teamRegistrations?: boolean | Prisma.Contest$teamRegistrationsArgs<ExtArgs>
+  teamSubmissions?: boolean | Prisma.Contest$teamSubmissionsArgs<ExtArgs>
+  judgeInvites?: boolean | Prisma.Contest$judgeInvitesArgs<ExtArgs>
   _count?: boolean | Prisma.ContestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contest"]>
 
@@ -3053,6 +4044,9 @@ export type ContestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   coverMediaUrl?: boolean
   prizeTotalKr?: boolean
   platformFeeKr?: boolean
+  participationType?: boolean
+  teamSize?: boolean
+  maxTeams?: boolean
   entryFeeKr?: boolean
   publicVoteWeight?: boolean
   targetAges?: boolean
@@ -3083,6 +4077,9 @@ export type ContestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   coverMediaUrl?: boolean
   prizeTotalKr?: boolean
   platformFeeKr?: boolean
+  participationType?: boolean
+  teamSize?: boolean
+  maxTeams?: boolean
   entryFeeKr?: boolean
   publicVoteWeight?: boolean
   targetAges?: boolean
@@ -3113,6 +4110,9 @@ export type ContestSelectScalar = {
   coverMediaUrl?: boolean
   prizeTotalKr?: boolean
   platformFeeKr?: boolean
+  participationType?: boolean
+  teamSize?: boolean
+  maxTeams?: boolean
   entryFeeKr?: boolean
   publicVoteWeight?: boolean
   targetAges?: boolean
@@ -3132,7 +4132,7 @@ export type ContestSelectScalar = {
   createdAt?: boolean
 }
 
-export type ContestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "creatorId" | "title" | "description" | "mediaType" | "category" | "coverMediaUrl" | "prizeTotalKr" | "platformFeeKr" | "entryFeeKr" | "publicVoteWeight" | "targetAges" | "targetGeos" | "airdropKr" | "airdropLimit" | "allowDailyPrizes" | "dailyPrizeKr" | "maxWinners" | "judgingCriteria" | "sponsorName" | "sponsorUrl" | "deadline" | "status" | "totalParticipants" | "totalSubmissions" | "createdAt", ExtArgs["result"]["contest"]>
+export type ContestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "creatorId" | "title" | "description" | "mediaType" | "category" | "coverMediaUrl" | "prizeTotalKr" | "platformFeeKr" | "participationType" | "teamSize" | "maxTeams" | "entryFeeKr" | "publicVoteWeight" | "targetAges" | "targetGeos" | "airdropKr" | "airdropLimit" | "allowDailyPrizes" | "dailyPrizeKr" | "maxWinners" | "judgingCriteria" | "sponsorName" | "sponsorUrl" | "deadline" | "status" | "totalParticipants" | "totalSubmissions" | "createdAt", ExtArgs["result"]["contest"]>
 export type ContestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   actions?: boolean | Prisma.Contest$actionsArgs<ExtArgs>
@@ -3144,6 +4144,9 @@ export type ContestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   shorts?: boolean | Prisma.Contest$shortsArgs<ExtArgs>
   judges?: boolean | Prisma.Contest$judgesArgs<ExtArgs>
   milestones?: boolean | Prisma.Contest$milestonesArgs<ExtArgs>
+  teamRegistrations?: boolean | Prisma.Contest$teamRegistrationsArgs<ExtArgs>
+  teamSubmissions?: boolean | Prisma.Contest$teamSubmissionsArgs<ExtArgs>
+  judgeInvites?: boolean | Prisma.Contest$judgeInvitesArgs<ExtArgs>
   _count?: boolean | Prisma.ContestCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3166,6 +4169,9 @@ export type $ContestPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     shorts: Prisma.$ShortPayload<ExtArgs>[]
     judges: Prisma.$ContestJudgePayload<ExtArgs>[]
     milestones: Prisma.$MilestonePayload<ExtArgs>[]
+    teamRegistrations: Prisma.$TeamContestRegistrationPayload<ExtArgs>[]
+    teamSubmissions: Prisma.$TeamSubmissionPayload<ExtArgs>[]
+    judgeInvites: Prisma.$JudgeInvitePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3177,6 +4183,9 @@ export type $ContestPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     coverMediaUrl: string | null
     prizeTotalKr: runtime.Decimal
     platformFeeKr: runtime.Decimal
+    participationType: $Enums.ParticipationType
+    teamSize: number | null
+    maxTeams: number | null
     entryFeeKr: runtime.Decimal | null
     publicVoteWeight: number | null
     targetAges: number[]
@@ -3598,6 +4607,9 @@ export interface Prisma__ContestClient<T, Null = never, ExtArgs extends runtime.
   shorts<T extends Prisma.Contest$shortsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$shortsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShortPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   judges<T extends Prisma.Contest$judgesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$judgesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContestJudgePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   milestones<T extends Prisma.Contest$milestonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$milestonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MilestonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  teamRegistrations<T extends Prisma.Contest$teamRegistrationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$teamRegistrationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamContestRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  teamSubmissions<T extends Prisma.Contest$teamSubmissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$teamSubmissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  judgeInvites<T extends Prisma.Contest$judgeInvitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$judgeInvitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JudgeInvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3636,6 +4648,9 @@ export interface ContestFieldRefs {
   readonly coverMediaUrl: Prisma.FieldRef<"Contest", 'String'>
   readonly prizeTotalKr: Prisma.FieldRef<"Contest", 'Decimal'>
   readonly platformFeeKr: Prisma.FieldRef<"Contest", 'Decimal'>
+  readonly participationType: Prisma.FieldRef<"Contest", 'ParticipationType'>
+  readonly teamSize: Prisma.FieldRef<"Contest", 'Int'>
+  readonly maxTeams: Prisma.FieldRef<"Contest", 'Int'>
   readonly entryFeeKr: Prisma.FieldRef<"Contest", 'Decimal'>
   readonly publicVoteWeight: Prisma.FieldRef<"Contest", 'Int'>
   readonly targetAges: Prisma.FieldRef<"Contest", 'Int[]'>
@@ -4267,6 +5282,78 @@ export type Contest$milestonesArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.MilestoneScalarFieldEnum | Prisma.MilestoneScalarFieldEnum[]
+}
+
+/**
+ * Contest.teamRegistrations
+ */
+export type Contest$teamRegistrationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TeamContestRegistration
+   */
+  select?: Prisma.TeamContestRegistrationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TeamContestRegistration
+   */
+  omit?: Prisma.TeamContestRegistrationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TeamContestRegistrationInclude<ExtArgs> | null
+  where?: Prisma.TeamContestRegistrationWhereInput
+  orderBy?: Prisma.TeamContestRegistrationOrderByWithRelationInput | Prisma.TeamContestRegistrationOrderByWithRelationInput[]
+  cursor?: Prisma.TeamContestRegistrationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TeamContestRegistrationScalarFieldEnum | Prisma.TeamContestRegistrationScalarFieldEnum[]
+}
+
+/**
+ * Contest.teamSubmissions
+ */
+export type Contest$teamSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TeamSubmission
+   */
+  select?: Prisma.TeamSubmissionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TeamSubmission
+   */
+  omit?: Prisma.TeamSubmissionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TeamSubmissionInclude<ExtArgs> | null
+  where?: Prisma.TeamSubmissionWhereInput
+  orderBy?: Prisma.TeamSubmissionOrderByWithRelationInput | Prisma.TeamSubmissionOrderByWithRelationInput[]
+  cursor?: Prisma.TeamSubmissionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TeamSubmissionScalarFieldEnum | Prisma.TeamSubmissionScalarFieldEnum[]
+}
+
+/**
+ * Contest.judgeInvites
+ */
+export type Contest$judgeInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JudgeInvite
+   */
+  select?: Prisma.JudgeInviteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JudgeInvite
+   */
+  omit?: Prisma.JudgeInviteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JudgeInviteInclude<ExtArgs> | null
+  where?: Prisma.JudgeInviteWhereInput
+  orderBy?: Prisma.JudgeInviteOrderByWithRelationInput | Prisma.JudgeInviteOrderByWithRelationInput[]
+  cursor?: Prisma.JudgeInviteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JudgeInviteScalarFieldEnum | Prisma.JudgeInviteScalarFieldEnum[]
 }
 
 /**

@@ -77,9 +77,21 @@ export const ModelName = {
   ContestActionCompletion: 'ContestActionCompletion',
   ContestWinner: 'ContestWinner',
   ContestJudge: 'ContestJudge',
+  JudgeInvite: 'JudgeInvite',
   ContestVote: 'ContestVote',
   Product: 'Product',
-  DailyStat: 'DailyStat'
+  DailyStat: 'DailyStat',
+  Comment: 'Comment',
+  CommentLike: 'CommentLike',
+  CommentReport: 'CommentReport',
+  CommentSettings: 'CommentSettings',
+  Team: 'Team',
+  TeamMember: 'TeamMember',
+  TeamInvitation: 'TeamInvitation',
+  TeamContestRegistration: 'TeamContestRegistration',
+  TeamSubmission: 'TeamSubmission',
+  TeamSubmissionVote: 'TeamSubmissionVote',
+  TeamChat: 'TeamChat'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -356,6 +368,9 @@ export const ContestScalarFieldEnum = {
   coverMediaUrl: 'coverMediaUrl',
   prizeTotalKr: 'prizeTotalKr',
   platformFeeKr: 'platformFeeKr',
+  participationType: 'participationType',
+  teamSize: 'teamSize',
+  maxTeams: 'maxTeams',
   entryFeeKr: 'entryFeeKr',
   publicVoteWeight: 'publicVoteWeight',
   targetAges: 'targetAges',
@@ -463,6 +478,20 @@ export const ContestJudgeScalarFieldEnum = {
 export type ContestJudgeScalarFieldEnum = (typeof ContestJudgeScalarFieldEnum)[keyof typeof ContestJudgeScalarFieldEnum]
 
 
+export const JudgeInviteScalarFieldEnum = {
+  id: 'id',
+  contestId: 'contestId',
+  judgeId: 'judgeId',
+  status: 'status',
+  invitedAt: 'invitedAt',
+  respondedAt: 'respondedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JudgeInviteScalarFieldEnum = (typeof JudgeInviteScalarFieldEnum)[keyof typeof JudgeInviteScalarFieldEnum]
+
+
 export const ContestVoteScalarFieldEnum = {
   id: 'id',
   submissionId: 'submissionId',
@@ -503,6 +532,144 @@ export const DailyStatScalarFieldEnum = {
 } as const
 
 export type DailyStatScalarFieldEnum = (typeof DailyStatScalarFieldEnum)[keyof typeof DailyStatScalarFieldEnum]
+
+
+export const CommentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  contentId: 'contentId',
+  contentType: 'contentType',
+  text: 'text',
+  parentId: 'parentId',
+  replyToUserId: 'replyToUserId',
+  likesCount: 'likesCount',
+  repliesCount: 'repliesCount',
+  isPinned: 'isPinned',
+  isEdited: 'isEdited',
+  createdAt: 'createdAt',
+  editedAt: 'editedAt'
+} as const
+
+export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
+
+
+export const CommentLikeScalarFieldEnum = {
+  id: 'id',
+  commentId: 'commentId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type CommentLikeScalarFieldEnum = (typeof CommentLikeScalarFieldEnum)[keyof typeof CommentLikeScalarFieldEnum]
+
+
+export const CommentReportScalarFieldEnum = {
+  id: 'id',
+  commentId: 'commentId',
+  reporterId: 'reporterId',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type CommentReportScalarFieldEnum = (typeof CommentReportScalarFieldEnum)[keyof typeof CommentReportScalarFieldEnum]
+
+
+export const CommentSettingsScalarFieldEnum = {
+  id: 'id',
+  contentId: 'contentId',
+  contentType: 'contentType',
+  commentsEnabled: 'commentsEnabled',
+  repliesEnabled: 'repliesEnabled'
+} as const
+
+export type CommentSettingsScalarFieldEnum = (typeof CommentSettingsScalarFieldEnum)[keyof typeof CommentSettingsScalarFieldEnum]
+
+
+export const TeamScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  avatarUrl: 'avatarUrl',
+  leaderId: 'leaderId',
+  maxMembers: 'maxMembers',
+  totalWins: 'totalWins',
+  totalPrizes: 'totalPrizes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TeamScalarFieldEnum = (typeof TeamScalarFieldEnum)[keyof typeof TeamScalarFieldEnum]
+
+
+export const TeamMemberScalarFieldEnum = {
+  id: 'id',
+  teamId: 'teamId',
+  userId: 'userId',
+  role: 'role',
+  joinedAt: 'joinedAt'
+} as const
+
+export type TeamMemberScalarFieldEnum = (typeof TeamMemberScalarFieldEnum)[keyof typeof TeamMemberScalarFieldEnum]
+
+
+export const TeamInvitationScalarFieldEnum = {
+  id: 'id',
+  teamId: 'teamId',
+  inviterId: 'inviterId',
+  inviteeId: 'inviteeId',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type TeamInvitationScalarFieldEnum = (typeof TeamInvitationScalarFieldEnum)[keyof typeof TeamInvitationScalarFieldEnum]
+
+
+export const TeamContestRegistrationScalarFieldEnum = {
+  id: 'id',
+  contestId: 'contestId',
+  teamId: 'teamId',
+  registeredAt: 'registeredAt'
+} as const
+
+export type TeamContestRegistrationScalarFieldEnum = (typeof TeamContestRegistrationScalarFieldEnum)[keyof typeof TeamContestRegistrationScalarFieldEnum]
+
+
+export const TeamSubmissionScalarFieldEnum = {
+  id: 'id',
+  contestId: 'contestId',
+  teamId: 'teamId',
+  mediaUrl: 'mediaUrl',
+  mediaType: 'mediaType',
+  caption: 'caption',
+  contributors: 'contributors',
+  votesCount: 'votesCount',
+  judgeScore: 'judgeScore',
+  finalScore: 'finalScore',
+  rank: 'rank',
+  submittedAt: 'submittedAt'
+} as const
+
+export type TeamSubmissionScalarFieldEnum = (typeof TeamSubmissionScalarFieldEnum)[keyof typeof TeamSubmissionScalarFieldEnum]
+
+
+export const TeamSubmissionVoteScalarFieldEnum = {
+  id: 'id',
+  submissionId: 'submissionId',
+  voterId: 'voterId',
+  createdAt: 'createdAt'
+} as const
+
+export type TeamSubmissionVoteScalarFieldEnum = (typeof TeamSubmissionVoteScalarFieldEnum)[keyof typeof TeamSubmissionVoteScalarFieldEnum]
+
+
+export const TeamChatScalarFieldEnum = {
+  id: 'id',
+  teamId: 'teamId',
+  chatId: 'chatId',
+  createdAt: 'createdAt'
+} as const
+
+export type TeamChatScalarFieldEnum = (typeof TeamChatScalarFieldEnum)[keyof typeof TeamChatScalarFieldEnum]
 
 
 export const SortOrder = {
