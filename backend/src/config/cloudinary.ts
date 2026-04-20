@@ -35,18 +35,18 @@ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINA
  * Generate signed upload params for client-side direct upload.
  * Enforces folder routing — client cannot choose arbitrary folders.
  * 
- * For signed uploads with upload preset:
- * - The signature includes ONLY: timestamp
- * - upload_preset is sent as a form field but excluded from signature verification
- * - The folder is configured in the Cloudinary upload preset settings
- * - DO NOT include folder in the signature or upload request
+ * Direct signed upload (no upload_preset):
+ * - Sign: timestamp + folder
+ * - Send: api_key, timestamp, signature, folder, file
  * 
- * IMPORTANT: Cloudinary excludes these params from signature verification:
- * file, cloud_name, resource_type, type, api_key, upload_preset.
+ * NOTE: upload_preset is NOT used because sending it causes Cloudinary
+ * to treat the request as unsigned regardless of signature presence.
+ * Instead, folder is sent directly as a signed parameter.
  * 
- * Parameters are automatically sorted alphabetically by api_sign_request.
+ * Cloudinary excludes from signature: file, cloud_name, resource_type, type, api_key.
+ * Parameters are sorted alphabetically by api_sign_request.
  * 
- * @param folder - The Cloudinary folder path (returned for reference, not used in signature)
+ * @param folder - The Cloudinary folder path (signed and sent to Cloudinary)
  * @param resourceType - The type of resource being uploaded ('image', 'video', or 'raw')
  */
 export function generateUploadSignature(
@@ -54,14 +54,11 @@ export function generateUploadSignature(
   resourceType: 'image' | 'video' | 'raw' = 'image'
 ) {
   const timestamp = Math.round(Date.now() / 1000);
-  const uploadPreset = 'Krieta'; // Signed upload preset name
 
-  // For signed uploads: sign ONLY timestamp
-  // upload_preset is excluded from Cloudinary's server-side signature verification
-  // (like file, cloud_name, resource_type, api_key, and type)
-  // Including it causes a signature mismatch → Cloudinary treats request as unsigned
+  // Sign timestamp + folder. Do NOT include upload_preset.
   const paramsToSign = { 
     timestamp,
+    folder,
   };
   
   const signature = cloudinary.utils.api_sign_request(
@@ -72,8 +69,7 @@ export function generateUploadSignature(
   return {
     signature,
     timestamp,
-    uploadPreset,
-    folder, // Returned for reference only, should NOT be sent to Cloudinary
+    folder,
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
