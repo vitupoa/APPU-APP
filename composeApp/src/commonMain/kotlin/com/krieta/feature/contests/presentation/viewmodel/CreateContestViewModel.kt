@@ -1014,7 +1014,7 @@ class CreateContestViewModel(
                         _state.value = _state.value.copy(
                             isPublishing = false,
                             success = false,
-                            error = result.message ?: "Failed to publish contest. Please try again."
+                            error = result.message
                         )
                         // Note: The UI remains on step 5 to allow the user to correct errors
                     }

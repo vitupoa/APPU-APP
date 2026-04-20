@@ -31,7 +31,7 @@ import com.krieta.feature.contests.presentation.viewmodel.JudgeInvitationsViewMo
  * Screen for viewing and managing judge invitations
  * Shows pending invitations that the user can accept or decline
  */
-class JudgeInvitationsScreen : Screen {
+object JudgeInvitationsScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -203,7 +203,7 @@ private fun JudgeInvitationCard(
                             color = Color(0xFFA0A0A0)
                         )
                         Text(
-                            text = "Prize: Kr.${String.format("%.2f", contest.prizeKr)}",
+                            text = "Prize: Kr.${"%2f".format(contest.prizeKr)}",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFFF5A623)
@@ -219,7 +219,7 @@ private fun JudgeInvitationCard(
                     maxLines = 2
                 )
                 
-                Divider(color = Color(0xFF3A3A3F))
+                HorizontalDivider(color = Color(0xFF3A3A3F))
             }
             
             // Invitation Message

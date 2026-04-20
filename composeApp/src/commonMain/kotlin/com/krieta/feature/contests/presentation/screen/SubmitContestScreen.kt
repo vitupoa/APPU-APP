@@ -8,12 +8,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,7 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
@@ -44,7 +45,7 @@ data class SubmitContestScreen(val contestId: String) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val viewModel = getScreenModel<SubmitContestViewModel> { parametersOf(contestId) }
+        val viewModel = koinScreenModel<SubmitContestViewModel> { parametersOf(contestId) }
         val navigator = LocalNavigator.currentOrThrow
         val state = viewModel.state
 
@@ -60,7 +61,7 @@ data class SubmitContestScreen(val contestId: String) : Screen {
                     title = { Text("Submit Entry") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.ArrowBack, "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                         }
                     }
                 )
@@ -114,7 +115,7 @@ data class SubmitContestScreen(val contestId: String) : Screen {
                     }
 
                     item {
-                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         Text(
                             "Your Submission",
                             style = MaterialTheme.typography.titleMedium,
@@ -247,7 +248,7 @@ private fun RequirementItem(action: ContestAction) {
                 }
             }
             if (action.targetUrl != null) {
-                Icon(Icons.Default.OpenInNew, "Open", tint = MaterialTheme.colorScheme.primary)
+                Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open", tint = MaterialTheme.colorScheme.primary)
             }
         }
     }

@@ -44,7 +44,7 @@ class JudgeInvitationsViewModel(
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = result.message ?: "Failed to load invitations"
+                        error = result.message
                     )
                 }
                 else -> {

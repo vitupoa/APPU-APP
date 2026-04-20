@@ -36,12 +36,13 @@ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINA
  * Enforces folder routing — client cannot choose arbitrary folders.
  * 
  * For signed uploads with upload preset:
- * - The signature includes: timestamp, upload_preset
+ * - The signature includes ONLY: timestamp
+ * - upload_preset is sent as a form field but excluded from signature verification
  * - The folder is configured in the Cloudinary upload preset settings
  * - DO NOT include folder in the signature or upload request
  * 
  * IMPORTANT: Cloudinary excludes these params from signature verification:
- * file, cloud_name, resource_type, type, api_key.
+ * file, cloud_name, resource_type, type, api_key, upload_preset.
  * 
  * Parameters are automatically sorted alphabetically by api_sign_request.
  * 
@@ -55,11 +56,12 @@ export function generateUploadSignature(
   const timestamp = Math.round(Date.now() / 1000);
   const uploadPreset = 'Krieta'; // Signed upload preset name
 
-  // For signed upload presets: ONLY sign timestamp and upload_preset
-  // The folder should be configured in the Cloudinary preset settings
+  // For signed uploads: sign ONLY timestamp
+  // upload_preset is excluded from Cloudinary's server-side signature verification
+  // (like file, cloud_name, resource_type, api_key, and type)
+  // Including it causes a signature mismatch → Cloudinary treats request as unsigned
   const paramsToSign = { 
     timestamp,
-    upload_preset: uploadPreset,
   };
   
   const signature = cloudinary.utils.api_sign_request(

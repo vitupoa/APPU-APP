@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -85,12 +86,12 @@ data class CommentsScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.ArrowBack, "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                         }
                     },
                     actions = {
                         IconButton(onClick = { showSortMenu = true }) {
-                            Icon(Icons.Default.Sort, "Sort")
+                            Icon(Icons.AutoMirrored.Filled.Sort, "Sort")
                         }
                         DropdownMenu(
                             expanded = showSortMenu,
@@ -98,7 +99,7 @@ data class CommentsScreen(
                         ) {
                             CommentSortType.values().forEach { sortType ->
                                 DropdownMenuItem(
-                                    text = { Text(sortType.name.lowercase().capitalize()) },
+                                    text = { Text(sortType.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
                                     onClick = {
                                         viewModel.setSortType(sortType)
                                         showSortMenu = false
@@ -375,7 +376,7 @@ private fun CommentItem(
                             modifier = Modifier.clickable { onReply(comment) }
                         ) {
                             Icon(
-                                Icons.Default.Reply,
+                                Icons.AutoMirrored.Filled.Reply,
                                 contentDescription = "Reply",
                                 modifier = Modifier.size(18.dp),
                                 tint = Color.Gray
@@ -504,7 +505,7 @@ private fun CommentItem(
             }
         }
 
-        Divider(color = Color(0xFF1A1A1A), thickness = 1.dp)
+        HorizontalDivider(color = Color(0xFF1A1A1A), thickness = 1.dp)
     }
 }
 
@@ -536,7 +537,7 @@ private fun CommentInputBar(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        Icons.Default.Reply,
+                        Icons.AutoMirrored.Filled.Reply,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = Color.Gray
@@ -620,7 +621,7 @@ private fun CommentInputBar(
                 enabled = enabled && text.trim().isNotEmpty()
             ) {
                 Icon(
-                    Icons.Default.Send,
+                    Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send",
                     tint = if (text.trim().isNotEmpty()) KrietaColors.Primary else Color.Gray
                 )
