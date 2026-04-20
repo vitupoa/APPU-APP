@@ -1,7 +1,7 @@
 package com.krieta.feature.comments.presentation.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.comments.domain.model.Comment
 import com.krieta.feature.comments.domain.model.CommentSettings
@@ -33,7 +33,7 @@ class CommentsViewModel(
     private val contentType: ContentType,
     private val contentId: String,
     private val currentUserId: String
-) : ViewModel() {
+) : ScreenModel {
 
     private val _state = MutableStateFlow(CommentsState())
     val state: StateFlow<CommentsState> = _state
@@ -50,7 +50,7 @@ class CommentsViewModel(
             repliesCache.clear()
         }
 
-        viewModelScope.launch {
+        screenModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
 
             when (val result = repository.getComments(
@@ -83,7 +83,7 @@ class CommentsViewModel(
         val cursor = _state.value.nextCursor ?: return
         if (_state.value.isLoadingMore) return
 
-        viewModelScope.launch {
+        screenModelScope.launch {
             _state.update { it.copy(isLoadingMore = true) }
 
             when (val result = repository.getComments(
@@ -118,7 +118,7 @@ class CommentsViewModel(
             return
         }
 
-        viewModelScope.launch {
+        screenModelScope.launch {
             when (val result = repository.getReplies(commentId, null, 10)) {
                 is NetworkResult.Success -> {
                     val (replies, nextCursor) = result.data
@@ -139,7 +139,7 @@ class CommentsViewModel(
         val parentId = replyingTo?.id
         val replyToUserId = replyingTo?.author?.id
 
-        viewModelScope.launch {
+        screenModelScope.launch {
             // Optimistic update
             val tempComment = createTempComment(text, parentId, replyToUserId)
             addCommentOptimistically(tempComment)
@@ -169,7 +169,7 @@ class CommentsViewModel(
         val text = _state.value.commentText.trim()
         if (text.isEmpty()) return
 
-        viewModelScope.launch {
+        screenModelScope.launch {
             when (val result = repository.updateComment(editing.id, text)) {
                 is NetworkResult.Success -> {
                     updateCommentInList(result.data)
@@ -184,7 +184,7 @@ class CommentsViewModel(
     }
 
     fun deleteComment(commentId: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             // Optimistic delete
             removeCommentFromList(commentId)
 
@@ -202,7 +202,7 @@ class CommentsViewModel(
     }
 
     fun toggleLike(comment: Comment) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             // Optimistic update
             val updatedComment = comment.copy(
                 isLiked = !comment.isLiked,
@@ -229,7 +229,7 @@ class CommentsViewModel(
     }
 
     fun togglePin(comment: Comment) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             val result = if (comment.isPinned) {
                 repository.unpinComment(comment.id)
             } else {
@@ -249,7 +249,7 @@ class CommentsViewModel(
     }
 
     fun reportComment(commentId: String, reason: String) {
-        viewModelScope.launch {
+        screenModelScope.launch {
             when (repository.reportComment(commentId, reason)) {
                 is NetworkResult.Success -> {
                     // Show success message
@@ -303,7 +303,7 @@ class CommentsViewModel(
     }
 
     private fun loadSettings() {
-        viewModelScope.launch {
+        screenModelScope.launch {
             when (val result = repository.getCommentSettings(contentType, contentId)) {
                 is NetworkResult.Success -> {
                     _state.update { it.copy(settings = result.data) }

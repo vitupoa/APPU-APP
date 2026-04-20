@@ -38,6 +38,7 @@ object DateTimeUtil {
         }
     }
 
+    @kotlin.jvm.JvmName("timeAgoExt")
     fun Instant.timeAgo(): String = timeAgo(this)
 
     fun Instant.formatCountdown(): String {
