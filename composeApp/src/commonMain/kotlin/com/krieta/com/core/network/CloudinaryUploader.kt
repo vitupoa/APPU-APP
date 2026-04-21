@@ -4,7 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.PartData
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
@@ -14,8 +14,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.utils.io.core.buildPacket
-import io.ktor.utils.io.core.writeFully
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -94,24 +92,16 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                 val uploadResponse = plainClient.post(uploadUrl) {
                     setBody(
                         MultiPartFormDataContent(
-                            listOf(
-                                PartData.FormItem(signatureDto.apiKey, {}, Headers.build {
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"api_key\"")
-                                }),
-                                PartData.FormItem(signatureDto.timestamp.toString(), {}, Headers.build {
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"timestamp\"")
-                                }),
-                                PartData.FormItem(signatureDto.signature, {}, Headers.build {
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"signature\"")
-                                }),
-                                PartData.FormItem(signatureDto.folder, {}, Headers.build {
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"folder\"")
-                                }),
-                                PartData.FileItem({ buildPacket { writeFully(fileBytes) } }, {}, Headers.build {
+                            formData {
+                                append("api_key", signatureDto.apiKey)
+                                append("timestamp", signatureDto.timestamp.toString())
+                                append("signature", signatureDto.signature)
+                                append("folder", signatureDto.folder)
+                                append("file", fileBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+                                    append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
-                            )
+                            }
                         )
                     )
                 }
@@ -143,24 +133,16 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                     }
                     setBody(
                         MultiPartFormDataContent(
-                            listOf(
-                                PartData.FormItem(signatureDto.apiKey, {}, Headers.build {
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"api_key\"")
-                                }),
-                                PartData.FormItem(signatureDto.timestamp.toString(), {}, Headers.build {
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"timestamp\"")
-                                }),
-                                PartData.FormItem(signatureDto.signature, {}, Headers.build {
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"signature\"")
-                                }),
-                                PartData.FormItem(signatureDto.folder, {}, Headers.build {
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"folder\"")
-                                }),
-                                PartData.FileItem({ buildPacket { writeFully(chunkBytes) } }, {}, Headers.build {
+                            formData {
+                                append("api_key", signatureDto.apiKey)
+                                append("timestamp", signatureDto.timestamp.toString())
+                                append("signature", signatureDto.signature)
+                                append("folder", signatureDto.folder)
+                                append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+                                    append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
-                            )
+                            }
                         )
                     )
                 }
