@@ -3,17 +3,17 @@ package com.krieta.com.core.network
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
+import io.ktor.http.ContentType
+import io.ktor.http.content.OutgoingContent
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -31,6 +31,53 @@ data class CloudinaryUploadResponse(
     val secure_url: String,
     val public_id: String
 )
+
+/**
+ * Manually builds a multipart/form-data body as raw bytes.
+ * This bypasses Ktor's formData builder which has issues with Cloudinary
+ * (generates BinaryItem with conflicting Content-Disposition headers in Ktor 3.x).
+ */
+private class RawMultipartContent(
+    private val fields: Map<String, String>,
+    private val fileFieldName: String,
+    private val fileBytes: ByteArray,
+    private val fileName: String,
+    private val fileMimeType: String
+) : OutgoingContent.ByteArrayContent() {
+
+    private val boundary = "----KrietaUpload${kotlin.random.Random.nextLong().toString(16)}"
+
+    override val contentType: ContentType =
+        ContentType.MultiPart.FormData.withParameter("boundary", boundary)
+
+    override fun bytes(): ByteArray {
+        val sb = StringBuilder()
+
+        // Text fields
+        for ((key, value) in fields) {
+            sb.append("--$boundary\r\n")
+            sb.append("Content-Disposition: form-data; name=\"$key\"\r\n")
+            sb.append("\r\n")
+            sb.append("$value\r\n")
+        }
+
+        // File field header
+        sb.append("--$boundary\r\n")
+        sb.append("Content-Disposition: form-data; name=\"$fileFieldName\"; filename=\"$fileName\"\r\n")
+        sb.append("Content-Type: $fileMimeType\r\n")
+        sb.append("\r\n")
+
+        val headerBytes = sb.toString().encodeToByteArray()
+        val footerBytes = "\r\n--$boundary--\r\n".encodeToByteArray()
+
+        // Combine: headers + file bytes + footer
+        val result = ByteArray(headerBytes.size + fileBytes.size + footerBytes.size)
+        headerBytes.copyInto(result, 0)
+        fileBytes.copyInto(result, headerBytes.size)
+        footerBytes.copyInto(result, headerBytes.size + fileBytes.size)
+        return result
+    }
+}
 
 class CloudinaryUploader(private val authenticatedClient: HttpClient) {
 
@@ -54,6 +101,29 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
         }
     }
 
+    private fun buildMultipartBody(
+        signatureDto: CloudinarySignatureDto,
+        fileBytes: ByteArray,
+        isVideo: Boolean
+    ): RawMultipartContent {
+        val fields = linkedMapOf(
+            "api_key" to signatureDto.apiKey,
+            "timestamp" to signatureDto.timestamp.toString(),
+            "signature" to signatureDto.signature,
+            "folder" to signatureDto.folder
+        )
+        val mimeType = if (isVideo) "video/mp4" else "image/jpeg"
+        val fileName = "upload.${if (isVideo) "mp4" else "jpg"}"
+
+        return RawMultipartContent(
+            fields = fields,
+            fileFieldName = "file",
+            fileBytes = fileBytes,
+            fileName = fileName,
+            fileMimeType = mimeType
+        )
+    }
+
     suspend fun uploadMedia(folder: String, fileBytes: ByteArray, isVideo: Boolean = false): NetworkResult<String> {
         return safeApiCall {
             // 1. Get Signature from our backend
@@ -72,7 +142,6 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             println("Cloudinary Signature Response: signature=${signatureDto.signature}, timestamp=${signatureDto.timestamp}, folder=${signatureDto.folder}, resourceType=${signatureDto.resourceType}")
 
             // 2. Upload to Cloudinary directly (signed upload, no preset)
-            // Send: api_key, timestamp, signature, folder, file
             val uploadUrl = "https://api.cloudinary.com/v1_1/${signatureDto.cloudName}/${signatureDto.resourceType}/upload"
             
             println("Cloudinary Upload URL: $uploadUrl")
@@ -90,20 +159,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                 println("  - file size: ${fileBytes.size} bytes")
                 
                 val uploadResponse = plainClient.post(uploadUrl) {
-                    setBody(
-                        MultiPartFormDataContent(
-                            formData {
-                                append("api_key", signatureDto.apiKey)
-                                append("timestamp", signatureDto.timestamp.toString())
-                                append("signature", signatureDto.signature)
-                                append("folder", signatureDto.folder)
-                                append("file", fileBytes, Headers.build {
-                                    append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
-                                })
-                            }
-                        )
-                    )
+                    setBody(buildMultipartBody(signatureDto, fileBytes, isVideo))
                 }
 
                 if (uploadResponse.status.value !in 200..299) {
@@ -131,20 +187,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                         append("X-Unique-Upload-Id", uniqueUploadId)
                         append("Content-Range", "bytes $startByte-$endByte/$totalBytes")
                     }
-                    setBody(
-                        MultiPartFormDataContent(
-                            formData {
-                                append("api_key", signatureDto.apiKey)
-                                append("timestamp", signatureDto.timestamp.toString())
-                                append("signature", signatureDto.signature)
-                                append("folder", signatureDto.folder)
-                                append("file", chunkBytes, Headers.build {
-                                    append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
-                                })
-                            }
-                        )
-                    )
+                    setBody(buildMultipartBody(signatureDto, chunkBytes, isVideo))
                 }
 
                 if (uploadResponse.status.value !in 200..299) {
