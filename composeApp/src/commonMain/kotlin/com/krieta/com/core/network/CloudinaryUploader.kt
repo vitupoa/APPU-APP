@@ -99,7 +99,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                                 append("folder", signatureDto.folder)
                                 append("file", fileBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
-                                    append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
                             }
                         )
@@ -140,7 +140,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
                                 append("folder", signatureDto.folder)
                                 append("file", chunkBytes, Headers.build {
                                     append(HttpHeaders.ContentType, if (isVideo) "video/mp4" else "image/jpeg")
-                                    append(HttpHeaders.ContentDisposition, "filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
+                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"upload.${if (isVideo) "mp4" else "jpg"}\"")
                                 })
                             }
                         )
