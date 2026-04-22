@@ -29,6 +29,9 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import coil3.compose.AsyncImage
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerType
+import kotlinx.coroutines.launch
 
 /**
  * Step 1: Contest Details and Dates
@@ -409,7 +412,7 @@ private fun formatDateTime(instant: Instant): String {
 
 /**
  * Cover Image Upload Component
- * Allows users to select and preview a cover image for the contest
+ * Uses FileKit's rememberFilePickerLauncher for cross-platform image picking (Android + iOS)
  */
 @Composable
 private fun CoverImageUpload(
@@ -417,7 +420,18 @@ private fun CoverImageUpload(
     onImageSelected: (ByteArray) -> Unit,
     onImageRemoved: () -> Unit
 ) {
-    var showImagePicker by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    
+    val launcher = rememberFilePickerLauncher(
+        type = PickerType.Image
+    ) { file ->
+        file?.let {
+            scope.launch {
+                val bytes = it.readBytes()
+                onImageSelected(bytes)
+            }
+        }
+    }
     
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -465,7 +479,7 @@ private fun CoverImageUpload(
                 }
             }
         } else {
-            // Show image picker button
+            // Show image picker button — launches native file picker on tap
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -477,7 +491,7 @@ private fun CoverImageUpload(
                         color = Color(0xFF3A3A3F),
                         shape = RoundedCornerShape(12.dp)
                     )
-                    .clickable { showImagePicker = true },
+                    .clickable { launcher.launch() },
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -499,43 +513,5 @@ private fun CoverImageUpload(
             }
         }
     }
-    
-    // Show platform-specific image picker
-    if (showImagePicker) {
-        ImagePickerDialog(
-            onImageSelected = { bytes ->
-                onImageSelected(bytes)
-                showImagePicker = false
-            },
-            onDismiss = { showImagePicker = false }
-        )
-    }
 }
 
-/**
- * Platform-specific image picker dialog
- * This is a placeholder that should be implemented with platform-specific code
- */
-@Composable
-private fun ImagePickerDialog(
-    onImageSelected: (ByteArray) -> Unit,
-    onDismiss: () -> Unit
-) {
-    // TODO: Implement platform-specific image picker
-    // For now, show a dialog explaining that image picker needs platform implementation
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Image Picker") },
-        text = { 
-            Text("Image picker requires platform-specific implementation. Please implement ImagePickerDialog for your target platform (Android/iOS).")
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK")
-            }
-        },
-        containerColor = Color(0xFF1A1A1F),
-        titleContentColor = Color.White,
-        textContentColor = Color(0xFFA0A0A0)
-    )
-}

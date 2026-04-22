@@ -9,7 +9,7 @@ data class CreatorDto(
     val displayName: String,
     val avatarUrl: String? = null,
     val isVerified: Boolean = false,
-    val accountType: String
+    val accountType: String = "PERSONAL"
 )
 
 @Serializable

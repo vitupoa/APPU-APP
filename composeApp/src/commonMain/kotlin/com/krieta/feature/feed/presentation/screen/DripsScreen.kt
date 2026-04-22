@@ -35,6 +35,15 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.krieta.feature.comments.domain.model.ContentType
+import com.krieta.feature.comments.presentation.screen.CommentsScreen
+import com.krieta.com.core.location.UserCurrencyProvider
+import com.krieta.com.core.ui.components.TippingModal
+import com.krieta.feature.wallet.presentation.viewmodel.WalletViewModel
+import com.krieta.feature.wallet.presentation.viewmodel.WalletState
+import com.krieta.feature.wallet.domain.repository.WalletRepository
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import com.krieta.feature.feed.domain.model.Post
 import com.krieta.feature.feed.presentation.viewmodel.FeedViewModel
 
@@ -48,7 +57,21 @@ class DripsScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinScreenModel<FeedViewModel>()
+        val walletViewModel = koinScreenModel<WalletViewModel>()
+        val walletRepository = koinInject<WalletRepository>()
+        val currencyProvider = koinInject<UserCurrencyProvider>()
+        val scope = rememberCoroutineScope()
+        
         val state by viewModel.state.collectAsState()
+        val walletState by walletViewModel.state.collectAsState()
+        val currentBalance = (walletState as? WalletState.Success)?.balance?.krBalance ?: 0.0
+
+        var showTippingFor by remember { mutableStateOf<Post?>(null) }
+        
+        LaunchedEffect(Unit) {
+            walletViewModel.fetchWalletData(currencyProvider.countryCode)
+        }
+
         val listState = rememberLazyListState()
 
         // Infinite scroll trigger
@@ -66,15 +89,30 @@ class DripsScreen : Screen {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Drips", fontWeight = FontWeight.Bold) },
-                    navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
-                        }
-                    }
+                    title = { Text("Drips", fontWeight = FontWeight.Bold) }
                 )
             }
         ) { padding ->
+            showTippingFor?.let { post ->
+                TippingModal(
+                    recipientUsername = post.creator.username,
+                    recipientDisplayName = post.creator.displayName,
+                    currentBalance = currentBalance,
+                    currencyProvider = currencyProvider,
+                    onDismiss = { showTippingFor = null },
+                    onConfirm = { krAmount ->
+                        val fiatAmount = currencyProvider.krToFiat(krAmount)
+                        scope.launch {
+                            walletRepository.sendTip(post.creator.id, fiatAmount, currencyProvider.currencyCode)
+                            showTippingFor = null
+                        }
+                    },
+                    onInsufficientBalance = {
+                        showTippingFor = null
+                    }
+                )
+            }
+
             when {
                 state.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -94,7 +132,9 @@ class DripsScreen : Screen {
                     items(state.items, key = { it.id }) { post ->
                         PostCard(
                             post = post,
-                            onLike = { viewModel.toggleLike(post.id) }
+                            onLike = { viewModel.toggleLike(post.id) },
+                            onComment = { navigator.push(CommentsScreen(ContentType.POST, post.id, "me")) },
+                            onTip = { showTippingFor = post }
                         )
                         HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
                     }
@@ -112,7 +152,7 @@ class DripsScreen : Screen {
     }
 
     @Composable
-    private fun PostCard(post: Post, onLike: () -> Unit) {
+    private fun PostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit) {
         Column(modifier = Modifier.fillMaxWidth()) {
 
             // Header: avatar + username
@@ -228,7 +268,7 @@ class DripsScreen : Screen {
                     modifier = Modifier.padding(end = 8.dp)
                 )
 
-                IconButton(onClick = { /* Open comments */ }) {
+                IconButton(onClick = onComment) {
                     Icon(Icons.Default.ModeComment, contentDescription = "Comment")
                 }
                 Text(
@@ -239,7 +279,7 @@ class DripsScreen : Screen {
 
                 // Tip only on unlocked posts
                 if (!post.isLocked) {
-                    IconButton(onClick = { /* Open tip dialog */ }) {
+                    IconButton(onClick = onTip) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Tip")
                     }
                 }
@@ -247,10 +287,17 @@ class DripsScreen : Screen {
 
             // Caption
             if (post.caption.isNotBlank()) {
-                Text(
+                com.krieta.com.core.ui.components.HashtagMentionText(
                     text = post.caption,
                     modifier = Modifier.padding(horizontal = 12.dp).padding(bottom = 10.dp),
-                    style = MaterialTheme.typography.bodyMedium
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 14.sp,
+                    onHashtagClick = { tag ->
+                        // Navigate to hashtag search (future implementation)
+                    },
+                    onMentionClick = { username ->
+                        // Navigate to user profile (future implementation)
+                    }
                 )
             }
         }

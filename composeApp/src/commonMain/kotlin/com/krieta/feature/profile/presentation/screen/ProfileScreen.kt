@@ -157,15 +157,15 @@ class ProfileScreen(val userId: String? = null) : Screen {
                             color = KrietaColors.OnBackground
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        // Creator Badge
-                        if (profile.accountType.name == "CREATOR") {
-                            Box(
-                                modifier = Modifier
-                                    .border(1.dp, KrietaColors.PrimaryDark, RoundedCornerShape(12.dp))
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                            ) {
-                                Text("★ Creator", fontSize = 10.sp, color = KrietaColors.Primary)
-                            }
+                        // Account Type Badge
+                        val isCreator = profile.accountType.name == "CREATOR"
+                        val badgeText = if (isCreator) "★ Creator" else "💼 Business"
+                        Box(
+                            modifier = Modifier
+                                .border(1.dp, KrietaColors.PrimaryDark, RoundedCornerShape(12.dp))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(badgeText, fontSize = 10.sp, color = KrietaColors.Primary)
                         }
                     }
 

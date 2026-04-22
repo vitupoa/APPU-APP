@@ -1,4 +1,5 @@
 import { prisma } from '../../config/database.js';
+import { HashtagService } from '../../shared/hashtag.service.js';
 
 export class FeedService {
   static async getFeed(params: {
@@ -76,6 +77,11 @@ export class FeedService {
         user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
       }
     });
+
+    // Process hashtags and mentions from caption (fire-and-forget)
+    if (post.caption) {
+      HashtagService.processContent(post.id, 'POST', post.caption).catch(() => {});
+    }
 
     return {
       ...post,

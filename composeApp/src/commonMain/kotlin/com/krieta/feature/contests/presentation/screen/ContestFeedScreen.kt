@@ -28,6 +28,9 @@ import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedState
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedViewModel
 import org.koin.compose.koinInject
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 
 class ContestFeedScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -57,8 +60,21 @@ class ContestFeedScreen : Screen {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Contests", fontWeight = FontWeight.Bold) }
+                    title = { Text("Contests", fontWeight = FontWeight.Bold) },
+                    navigationIcon = {
+                        IconButton(onClick = { navigator.pop() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
                 )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { navigator.push(CreateContestScreen()) },
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Create Contest")
+                }
             }
         ) { padding ->
             Column(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -168,10 +184,10 @@ class ContestFeedScreen : Screen {
 
                 Text(contest.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Spacer(Modifier.height(4.dp))
-                Text(
-                    contest.description,
-                    style = MaterialTheme.typography.bodySmall,
+                com.krieta.com.core.ui.components.HashtagMentionText(
+                    text = contest.description,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
                     maxLines = 2
                 )
 

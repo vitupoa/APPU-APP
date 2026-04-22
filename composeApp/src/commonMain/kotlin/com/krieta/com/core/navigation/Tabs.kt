@@ -58,6 +58,22 @@ object HomeTab : Tab {
     }
 }
 
+// ─── DRIPS TAB ────────────────────────────────────────────────────
+object DripsTab : Tab {
+    override val options: TabOptions
+        @Composable get() {
+            val icon = rememberVectorPainter(Icons.Default.Favorite)
+            return remember { TabOptions(index = 3u, title = "Drips", icon = icon) }
+        }
+
+    @Composable
+    override fun Content() {
+        Navigator(com.krieta.feature.feed.presentation.screen.DripsScreen()) {
+            CurrentScreen()
+        }
+    }
+}
+
 // ─── EXPLORE TAB ──────────────────────────────────────────────────
 object ExploreTab : Tab {
     override val options: TabOptions
@@ -151,12 +167,12 @@ class ExploreScreen : Screen {
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     ExploreCard(
-                        emoji = "💧",
-                        title = "Drips",
-                        subtitle = "See what's trending — photos, videos & more",
-                        gradient = listOf(KrietaColors.Primary.copy(alpha = 0.8f), KrietaColors.PrimaryDark),
+                        emoji = "🏆",
+                        title = "Contests",
+                        subtitle = "Compete, win prizes & grow your following",
+                        gradient = listOf(KrietaColors.Warning.copy(alpha = 0.8f), KrietaColors.Warning),
                         modifier = Modifier.weight(1f),
-                        onClick = { navigator.push(com.krieta.feature.feed.presentation.screen.DripsScreen()) }
+                        onClick = { navigator.push(com.krieta.feature.contests.presentation.screen.ContestFeedScreen()) }
                     )
                     ExploreCard(
                         emoji = "🛍️",
@@ -300,66 +316,8 @@ private fun SearchResultRow(result: SearchResult, onClick: () -> Unit) {
     }
 }
 
-// ─── DRIPS SCREEN ─────────────────────────────────────────────────
-class DripsScreen : Screen {
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Drips", fontWeight = FontWeight.Bold) },
-                    navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = KrietaColors.BackgroundElevated)
-                )
-            },
-            containerColor = KrietaColors.Background
-        ) { padding ->
-            Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("💧", fontSize = 64.sp)
-                    Spacer(Modifier.height(16.dp))
-                    Text(
-                        "Drips is coming soon!",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = KrietaColors.OnBackground
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        "A feed for photos, videos & more from creators you follow.",
-                        color = KrietaColors.OnSurfaceVariant,
-                        fontSize = 14.sp
-                    )
-                }
-            }
-        }
-    }
-}
-
-// ─── CONTESTS TAB ─────────────────────────────────────────────────
-object ContestsTab : Tab {
-    override val options: TabOptions
-        @Composable get() {
-            val icon = rememberVectorPainter(Icons.Default.EmojiEvents)
-            return remember { TabOptions(index = 2u, title = "Contests", icon = icon) }
-        }
-
-    @Composable
-    override fun Content() {
-        Navigator(com.krieta.feature.contests.presentation.screen.ContestFeedScreen()) {
-            CurrentScreen()
-        }
-    }
-}
+// ─── NOTE: Old DripsScreen placeholder and ContestsTab removed ───
+// DripsTab now lives above. Contests accessed via Explore card.
 
 // ─── PROFILE TAB ──────────────────────────────────────────────────
 object ProfileTab : Tab {

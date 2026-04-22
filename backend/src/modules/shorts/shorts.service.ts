@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { Prisma, SubscriptionTierType } from '../../generated/prisma/client.js';
 import { emitLikeUpdate } from '../../shared/gateway/events.js';
+import { HashtagService } from '../../shared/hashtag.service.js';
 
 export class ShortsService {
   /**
@@ -147,6 +148,10 @@ export class ShortsService {
         }
       }
     });
+    // Process hashtags and mentions from caption (fire-and-forget)
+    if (short.caption) {
+      HashtagService.processContent(short.id, 'SHORT', short.caption).catch(() => {});
+    }
 
     return {
       id: short.id,

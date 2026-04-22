@@ -15,7 +15,7 @@ import cafe.adriel.voyager.core.screen.Screen
 class HomeScreen : Screen {
     @Composable
     override fun Content() {
-        var selectedTab by remember { mutableStateOf(0) }
+        var selectedTab by remember { mutableStateOf(1) }
 
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             // Content based on selected tab - full immersive experience

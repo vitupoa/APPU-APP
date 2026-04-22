@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { emitVoteUpdate, emitContestUpdate } from '../../shared/gateway/events.js';
+import { HashtagService } from '../../shared/hashtag.service.js';
 
 const PLATFORM_FEE_RATE = 0.15; // 15%
 
@@ -152,6 +153,11 @@ export class ContestService {
         submissionsCount: 0,
         createdAt: contest.createdAt.toISOString()
       };
+    }).then(result => {
+      // Process hashtags and mentions from description (fire-and-forget, outside transaction)
+      const text = `${data.title} ${data.description}`;
+      HashtagService.processContent(result.contestId, 'CONTEST', text).catch(() => {});
+      return result;
     });
   }
 

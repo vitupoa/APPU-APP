@@ -33,25 +33,50 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.krieta.com.core.ui.components.VideoPlayer
 import com.krieta.com.core.util.KrCurrencyFormatter
+import com.krieta.feature.comments.domain.model.ContentType
+import com.krieta.feature.comments.presentation.screen.CommentsScreen
 import com.krieta.feature.shorts.domain.model.LinkedProduct
 import com.krieta.feature.shorts.domain.model.Short
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsTab
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsViewModel
+import com.krieta.com.core.location.UserCurrencyProvider
+import com.krieta.com.core.ui.components.TippingModal
+import com.krieta.feature.wallet.presentation.viewmodel.WalletViewModel
+import com.krieta.feature.wallet.presentation.viewmodel.WalletState
+import com.krieta.feature.wallet.domain.repository.WalletRepository
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType
 import kotlinx.coroutines.delay
 
 class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVER) : Screen {
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinScreenModel<ShortsViewModel>()
+        val walletViewModel = koinScreenModel<WalletViewModel>()
+        val walletRepository = koinInject<WalletRepository>()
+        val currencyProvider = koinInject<UserCurrencyProvider>()
+        val scope = rememberCoroutineScope()
+        
         val state by viewModel.state.collectAsState()
+        val walletState by walletViewModel.state.collectAsState()
+        val currentBalance = (walletState as? WalletState.Success)?.balance?.krBalance ?: 0.0
+
+        var showTippingFor by remember { mutableStateOf<Short?>(null) }
 
         // Set feed type in viewModel
         LaunchedEffect(feedType) {
             viewModel.setFeedType(feedType)
+        }
+
+        LaunchedEffect(Unit) {
+            walletViewModel.fetchWalletData(currencyProvider.countryCode)
         }
 
         val pagerState = rememberPagerState(pageCount = { state.items.size })
@@ -81,7 +106,9 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     ShortItem(
                         short = short,
                         isActive = page == pagerState.currentPage,
-                        onLike = { viewModel.toggleLike(short.id) }
+                        onLike = { viewModel.toggleLike(short.id) },
+                        onComment = { navigator.push(CommentsScreen(ContentType.SHORT, short.id, "me")) },
+                        onTip = { showTippingFor = short }
                     )
                 }
             }
@@ -98,6 +125,26 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     strokeWidth = 2.dp
                 )
             }
+
+            showTippingFor?.let { short ->
+                TippingModal(
+                    recipientUsername = short.creator.username,
+                    recipientDisplayName = short.creator.displayName,
+                    currentBalance = currentBalance,
+                    currencyProvider = currencyProvider,
+                    onDismiss = { showTippingFor = null },
+                    onConfirm = { krAmount ->
+                        val fiatAmount = currencyProvider.krToFiat(krAmount)
+                        scope.launch {
+                            walletRepository.sendTip(short.creator.id, fiatAmount, currencyProvider.currencyCode)
+                            showTippingFor = null
+                        }
+                    },
+                    onInsufficientBalance = {
+                        showTippingFor = null
+                    }
+                )
+            }
         }
     }
 
@@ -107,7 +154,9 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
     private fun ShortItem(
         short: Short,
         isActive: Boolean,
-        onLike: () -> Unit
+        onLike: () -> Unit,
+        onComment: () -> Unit,
+        onTip: () -> Unit
     ) {
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             // Video Player
@@ -175,11 +224,17 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     fontSize = 15.sp
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    short.caption,
+                com.krieta.com.core.ui.components.HashtagMentionText(
+                    text = short.caption,
                     color = Color.White,
                     fontSize = 14.sp,
-                    maxLines = 3
+                    maxLines = 3,
+                    onHashtagClick = { tag ->
+                        // Navigate to hashtag search (future)
+                    },
+                    onMentionClick = { username ->
+                        // Navigate to user profile (future)
+                    }
                 )
                 short.musicTrack?.let {
                     Spacer(modifier = Modifier.height(6.dp))
@@ -210,7 +265,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
 
                 // Comment
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    IconButton(onClick = { /* Open comment sheet */ }) {
+                    IconButton(onClick = onComment) {
                         Icon(
                             Icons.Default.ModeComment,
                             contentDescription = "Comment",
@@ -224,7 +279,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 // Tip (only if not locked)
                 if (!short.isLocked) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        IconButton(onClick = { /* Open tip dialog */ }) {
+                        IconButton(onClick = onTip) {
                             Icon(
                                 Icons.AutoMirrored.Filled.Send,
                                 contentDescription = "Tip",

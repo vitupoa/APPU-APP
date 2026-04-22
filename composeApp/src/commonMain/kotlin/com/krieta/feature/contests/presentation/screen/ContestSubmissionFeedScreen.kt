@@ -32,6 +32,8 @@ import coil3.compose.AsyncImage
 import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.com.core.ui.components.TippingModal
 import com.krieta.com.core.ui.components.VideoPlayer
+import com.krieta.feature.comments.domain.model.ContentType
+import com.krieta.feature.comments.presentation.screen.CommentsScreen
 import com.krieta.feature.contests.domain.model.ContestSubmission
 import com.krieta.feature.contests.presentation.viewmodel.ContestSubmissionFeedViewModel
 import org.koin.compose.koinInject
@@ -88,7 +90,7 @@ class ContestSubmissionFeedScreen : Screen {
                             isActive = page == pagerState.currentPage,
                             onUpvote = { viewModel.upvoteSubmission(submission.id) },
                             onDownvote = { viewModel.downvoteSubmission(submission.id) },
-                            onComment = { /* Open comments */ },
+                            onComment = { navigator.push(CommentsScreen(ContentType.CONTEST_SUBMISSION, submission.id, "me")) },
                             onShare = { /* Handle share */ },
                             onContestClick = { navigator.push(ContestDetailScreen(submission.contestId)) },
                             currencyProvider = currencyProvider

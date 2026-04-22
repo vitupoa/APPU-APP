@@ -18,7 +18,7 @@ const createShortSchema = z.object({
 // GET /api/v1/shorts/feed
 router.get('/feed', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const type = req.query.type as string || 'discover';
+    const type = (req.query.type || req.query.tab) as string || 'discover';
     const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
     

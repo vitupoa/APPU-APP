@@ -849,3 +849,45 @@ model TeamChat {
 
   @@map("team_chats")
 }
+
+// ─── HASHTAGS & MENTIONS ──────────────────────────────────
+
+model Hashtag {
+  id          String   @id @default(uuid())
+  tag         String   @unique // normalized lowercase, no #
+  usageCount  Int      @default(1) @map("usage_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  contentTags ContentHashtag[]
+
+  @@index([usageCount])
+  @@map("hashtags")
+}
+
+model ContentHashtag {
+  id          String   @id @default(uuid())
+  hashtagId   String   @map("hashtag_id")
+  contentId   String   @map("content_id")
+  contentType String   @map("content_type") // POST, SHORT, CONTEST
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  hashtag Hashtag @relation(fields: [hashtagId], references: [id], onDelete: Cascade)
+
+  @@unique([hashtagId, contentId, contentType])
+  @@index([contentId, contentType])
+  @@index([hashtagId])
+  @@map("content_hashtags")
+}
+
+model ContentMention {
+  id              String   @id @default(uuid())
+  mentionedUserId String   @map("mentioned_user_id")
+  contentId       String   @map("content_id")
+  contentType     String   @map("content_type") // POST, SHORT, CONTEST
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@unique([mentionedUserId, contentId, contentType])
+  @@index([contentId, contentType])
+  @@index([mentionedUserId])
+  @@map("content_mentions")
+}
