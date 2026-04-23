@@ -94,7 +94,10 @@ export const ModelName = {
   TeamChat: 'TeamChat',
   Hashtag: 'Hashtag',
   ContentHashtag: 'ContentHashtag',
-  ContentMention: 'ContentMention'
+  ContentMention: 'ContentMention',
+  Chat: 'Chat',
+  ChatParticipant: 'ChatParticipant',
+  Message: 'Message'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -705,6 +708,47 @@ export const ContentMentionScalarFieldEnum = {
 } as const
 
 export type ContentMentionScalarFieldEnum = (typeof ContentMentionScalarFieldEnum)[keyof typeof ContentMentionScalarFieldEnum]
+
+
+export const ChatScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  name: 'name',
+  description: 'description',
+  avatarUrl: 'avatarUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChatScalarFieldEnum = (typeof ChatScalarFieldEnum)[keyof typeof ChatScalarFieldEnum]
+
+
+export const ChatParticipantScalarFieldEnum = {
+  id: 'id',
+  chatId: 'chatId',
+  userId: 'userId',
+  role: 'role',
+  joinedAt: 'joinedAt',
+  lastRead: 'lastRead'
+} as const
+
+export type ChatParticipantScalarFieldEnum = (typeof ChatParticipantScalarFieldEnum)[keyof typeof ChatParticipantScalarFieldEnum]
+
+
+export const MessageScalarFieldEnum = {
+  id: 'id',
+  chatId: 'chatId',
+  senderId: 'senderId',
+  payload: 'payload',
+  mediaUrl: 'mediaUrl',
+  mediaType: 'mediaType',
+  isSystemEvent: 'isSystemEvent',
+  status: 'status',
+  replyToId: 'replyToId',
+  createdAt: 'createdAt'
+} as const
+
+export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
 
 
 export const SortOrder = {

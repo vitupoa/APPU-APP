@@ -40,4 +40,5 @@ val appModules: List<Module>
         shopModule,
         analyticsModule,
         commentsModule,
+        com.krieta.feature.chat.di.chatModule,
     )

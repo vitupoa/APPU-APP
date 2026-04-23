@@ -55,6 +55,9 @@ object ApiConstants {
     // Analytics
     const val ANALYTICS = "$API_VERSION/analytics"
 
+    // Chat
+    const val CHAT = "$API_VERSION/chat"
+
     // Cloudinary folder paths
     object CloudinaryFolders {
         const val PROFILE_PHOTO = "Krieta/profile/Images"

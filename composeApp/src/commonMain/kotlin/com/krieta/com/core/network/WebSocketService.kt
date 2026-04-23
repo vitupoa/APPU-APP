@@ -79,6 +79,19 @@ class WebSocketService(
     private val _likeUpdateFlow = MutableSharedFlow<String>(replay = 0)
     val likeUpdateFlow: SharedFlow<String> = _likeUpdateFlow
 
+    // Chat Flows
+    private val _chatNewMessageFlow = MutableSharedFlow<String>(replay = 0)
+    val chatNewMessageFlow: SharedFlow<String> = _chatNewMessageFlow
+
+    private val _chatNewChatFlow = MutableSharedFlow<String>(replay = 0)
+    val chatNewChatFlow: SharedFlow<String> = _chatNewChatFlow
+
+    private val _chatTypingFlow = MutableSharedFlow<String>(replay = 0)
+    val chatTypingFlow: SharedFlow<String> = _chatTypingFlow
+
+    private val _chatReadReceiptFlow = MutableSharedFlow<String>(replay = 0)
+    val chatReadReceiptFlow: SharedFlow<String> = _chatReadReceiptFlow
+
     /**
      * Connects to the Redis-backed Socket.io equivalent Ktor Gateway.
      */
@@ -225,6 +238,10 @@ class WebSocketService(
                         "vote_update" -> _voteUpdateFlow.emit(dataContent)
                         "contest_update" -> _contestUpdateFlow.emit(dataContent)
                         "like_update" -> _likeUpdateFlow.emit(dataContent)
+                        "chat:new_message" -> _chatNewMessageFlow.emit(dataContent)
+                        "chat:new_chat" -> _chatNewChatFlow.emit(dataContent)
+                        "chat:typing" -> _chatTypingFlow.emit(dataContent)
+                        "chat:read_receipt" -> _chatReadReceiptFlow.emit(dataContent)
                         "authenticated" -> println("[WebSocket] Authentication successful")
                         else -> println("[WebSocket] Unknown event: $eventName")
                     }

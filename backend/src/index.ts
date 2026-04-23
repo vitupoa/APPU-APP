@@ -20,6 +20,7 @@ import cacheRoutes from './modules/cache/cache.routes.js';
 import mediaRoutes from './modules/media/media.routes.js';
 import commentsRoutes from './modules/comments/comments.routes.js';
 import teamsRoutes from './modules/teams/teams.routes.js';
+import chatRoutes from './modules/chat/chat.routes.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -57,6 +58,7 @@ app.use('/api/v1/cache', cacheRoutes);
 app.use('/api/v1/media', mediaRoutes);
 app.use('/api/v1/comments', commentsRoutes);
 app.use('/api/v1/teams', teamsRoutes);
+app.use('/api/v1/chat', chatRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

@@ -65,3 +65,53 @@ export function emitMilestoneCompleted(userId: string, milestone: any) {
   
   io.to(`user:${userId}`).emit('milestone_completed', milestone);
 }
+
+// ─── CHAT EVENTS ──────────────────────────────────────────
+
+/**
+ * Emit new message to all chat participants
+ */
+export function emitChatMessage(participantUserIds: string[], message: any) {
+  if (!io) return;
+
+  participantUserIds.forEach(uid => {
+    io.to(`user:${uid}`).emit('chat:new_message', message);
+  });
+}
+
+/**
+ * Emit typing indicator to chat participants
+ */
+export function emitChatTyping(participantUserIds: string[], data: { chatId: string; userId: string; username: string; isTyping: boolean }) {
+  if (!io) return;
+
+  participantUserIds.forEach(uid => {
+    if (uid !== data.userId) {
+      io.to(`user:${uid}`).emit('chat:typing', data);
+    }
+  });
+}
+
+/**
+ * Emit read receipt to chat participants
+ */
+export function emitChatReadReceipt(participantUserIds: string[], data: { chatId: string; userId: string; lastRead: string }) {
+  if (!io) return;
+
+  participantUserIds.forEach(uid => {
+    if (uid !== data.userId) {
+      io.to(`user:${uid}`).emit('chat:read_receipt', data);
+    }
+  });
+}
+
+/**
+ * Emit new chat creation notification to all participants
+ */
+export function emitNewChat(participantUserIds: string[], chat: any) {
+  if (!io) return;
+
+  participantUserIds.forEach(uid => {
+    io.to(`user:${uid}`).emit('chat:new_chat', chat);
+  });
+}

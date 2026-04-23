@@ -237,3 +237,18 @@ export type ContentHashtag = Prisma.ContentHashtagModel
  * 
  */
 export type ContentMention = Prisma.ContentMentionModel
+/**
+ * Model Chat
+ * 
+ */
+export type Chat = Prisma.ChatModel
+/**
+ * Model ChatParticipant
+ * 
+ */
+export type ChatParticipant = Prisma.ChatParticipantModel
+/**
+ * Model Message
+ * 
+ */
+export type Message = Prisma.MessageModel
