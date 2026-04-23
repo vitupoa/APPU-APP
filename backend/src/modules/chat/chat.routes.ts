@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAuth } from '../../middleware/requireAuth.js';
+import { authMiddleware as requireAuth } from '../../middleware/auth.js';
 import { ChatController } from './chat.controller.js';
 import { validateRequest } from '../../middleware/validate.js';
 import { createDirectChatSchema, createGroupChatSchema, sendMessageSchema } from './chat.validation.js';

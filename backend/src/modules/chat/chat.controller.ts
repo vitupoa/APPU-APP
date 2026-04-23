@@ -1,10 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
+import { AuthRequest } from '../../middleware/auth.js';
 import { ChatService } from './chat.service.js';
 
 export class ChatController {
-  static async createDirectChat(req: Request, res: Response, next: NextFunction) {
+  static async createDirectChat(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user!.id;
+      const userId = req.userId!;
       const { recipientId } = req.body;
       const chat = await ChatService.createDirectChat(userId, recipientId);
       res.status(201).json({ success: true, chat });
@@ -13,9 +14,9 @@ export class ChatController {
     }
   }
 
-  static async createGroupChat(req: Request, res: Response, next: NextFunction) {
+  static async createGroupChat(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user!.id;
+      const userId = req.userId!;
       const { name, description, participantIds } = req.body;
       const chat = await ChatService.createGroupChat(userId, name, description, participantIds);
       res.status(201).json({ success: true, chat });
@@ -24,11 +25,11 @@ export class ChatController {
     }
   }
 
-  static async getChats(req: Request, res: Response, next: NextFunction) {
+  static async getChats(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user!.id;
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
+      const userId = req.userId!;
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 20;
       const chats = await ChatService.getChats(userId, page, limit);
       res.json({ success: true, chats });
     } catch (error) {
@@ -36,10 +37,10 @@ export class ChatController {
     }
   }
 
-  static async sendMessage(req: Request, res: Response, next: NextFunction) {
+  static async sendMessage(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const senderId = req.user!.id;
-      const { chatId } = req.params;
+      const senderId = req.userId!;
+      const chatId = String(req.params.chatId);
       const { payload, mediaUrl, mediaType, replyToId } = req.body;
 
       const message = await ChatService.sendMessage(
@@ -57,12 +58,12 @@ export class ChatController {
     }
   }
 
-  static async getMessages(req: Request, res: Response, next: NextFunction) {
+  static async getMessages(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user!.id;
-      const { chatId } = req.params;
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 50;
+      const userId = req.userId!;
+      const chatId = String(req.params.chatId);
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 50;
 
       const messages = await ChatService.getMessages(userId, chatId, page, limit);
       res.json({ success: true, messages });
@@ -71,3 +72,4 @@ export class ChatController {
     }
   }
 }
+
