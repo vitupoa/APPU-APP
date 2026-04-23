@@ -10,7 +10,7 @@ val profileModule = module {
     single { ProfileApi(get()) }
     single<ProfileRepository> { ProfileRepositoryImpl(get()) }
 
-    factory { (userId: String?) -> ProfileViewModel(userId, get()) }
+    factory { (userId: String?) -> ProfileViewModel(userId, get(), get()) }
     factory { EditProfileViewModel(get(), get()) }
     factory { (userId: String, listType: SocialListType) -> SocialListViewModel(userId, listType, get()) }
     factory { MilestonesViewModel(get(), get()) }

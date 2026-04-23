@@ -74,15 +74,16 @@ fun TippingModal(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    listOf(50.0, 100.0, 500.0, 1000.0).forEach { amount ->
+                    listOf(500.0, 1000.0, 2000.0, 5000.0).forEach { amount ->
                         OutlinedButton(
                             onClick = {
                                 krAmount = amount
                                 fiatAmount = currencyProvider.krToFiat(amount)
                             },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(0.dp)
                         ) {
-                            Text("${amount.toInt()}")
+                            Text("${amount.toInt()}", fontSize = 12.sp)
                         }
                     }
                 }
@@ -99,6 +100,23 @@ fun TippingModal(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
+                }
+
+                if (krAmount > currentBalance) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Insufficient balance",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        OutlinedButton(onClick = onInsufficientBalance, modifier = Modifier.height(36.dp)) {
+                            Text("Top Up / Recharge Wallet")
+                        }
+                    }
                 }
 
                 Button(

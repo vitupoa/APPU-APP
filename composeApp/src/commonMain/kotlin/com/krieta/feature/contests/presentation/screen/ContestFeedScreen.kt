@@ -65,16 +65,13 @@ class ContestFeedScreen : Screen {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
+                    },
+                    actions = {
+                        TextButton(onClick = { navigator.push(CreateContestScreen()) }) {
+                            Text("Create", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        }
                     }
                 )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigator.push(CreateContestScreen()) },
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Create Contest")
-                }
             }
         ) { padding ->
             Column(modifier = Modifier.fillMaxSize().padding(padding)) {

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.krieta.feature.auth.domain.repository.AuthRepository
 
 data class ProfileState(
     val profile: UserProfile? = null,
@@ -23,7 +24,8 @@ data class ProfileState(
 
 class ProfileViewModel(
     private val userId: String?,  // null = my own profile
-    private val repository: ProfileRepository
+    private val repository: ProfileRepository,
+    private val authRepository: AuthRepository
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -43,6 +45,20 @@ class ProfileViewModel(
                     _state.value = _state.value.copy(profile = updatedProfile)
                 }
             }
+        }
+    }
+
+    fun logout(onSuccess: () -> Unit) {
+        screenModelScope.launch {
+            authRepository.logout()
+            onSuccess()
+        }
+    }
+    
+    fun wipeCache(onSuccess: () -> Unit) {
+        screenModelScope.launch {
+            authRepository.logout()
+            onSuccess()
         }
     }
 

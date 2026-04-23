@@ -107,7 +107,6 @@ class CreateContestScreen : Screen {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .verticalScroll(rememberScrollState())
             ) {
                 // Progress Indicator
                 ProgressIndicator(currentStep = state.currentStep)
@@ -119,8 +118,9 @@ class CreateContestScreen : Screen {
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 20.dp)
                         .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .verticalScroll(rememberScrollState())
                 ) {
                     when (state.currentStep) {
                         1 -> Step1DetailsAndDates(viewModel, state)

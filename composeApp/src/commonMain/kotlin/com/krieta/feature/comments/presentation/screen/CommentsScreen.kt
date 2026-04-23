@@ -70,6 +70,7 @@ data class CommentsScreen(
         }
 
         Scaffold(
+            modifier = Modifier.imePadding(),
             topBar = {
                 TopAppBar(
                     title = {

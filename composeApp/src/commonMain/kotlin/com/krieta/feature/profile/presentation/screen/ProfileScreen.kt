@@ -41,6 +41,7 @@ import com.krieta.feature.profile.presentation.screen.EditProfileScreen
 import com.krieta.feature.wallet.presentation.screen.WalletScreen
 import com.krieta.com.core.theme.KrietaColors
 import androidx.compose.ui.platform.LocalUriHandler
+import com.krieta.feature.auth.presentation.screen.LoginScreen
 
 class ProfileScreen(val userId: String? = null) : Screen {
     override val key: cafe.adriel.voyager.core.screen.ScreenKey = "ProfileScreen_${userId ?: "me"}"
@@ -121,6 +122,24 @@ class ProfileScreen(val userId: String? = null) : Screen {
                                         DropdownMenuItem(
                                             text = { Text("Analytics", color = KrietaColors.OnSurface) },
                                             onClick = { menuExpanded = false }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Log Out", color = Color.Red) },
+                                            onClick = {
+                                                menuExpanded = false
+                                                profileViewModel.logout {
+                                                    navigator.replaceAll(LoginScreen())
+                                                }
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Wipe Local Cache", color = Color.Red) },
+                                            onClick = {
+                                                menuExpanded = false
+                                                profileViewModel.wipeCache {
+                                                    navigator.replaceAll(LoginScreen())
+                                                }
+                                            }
                                         )
                                     }
                                 }
