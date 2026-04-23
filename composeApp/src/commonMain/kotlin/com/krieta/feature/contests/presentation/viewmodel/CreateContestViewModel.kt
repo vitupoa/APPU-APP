@@ -72,6 +72,7 @@ data class CreateContestState(
     val title: String = "",
     val description: String = "",
     val rules: String = "",
+    val coverImageFile: io.github.vinceglb.filekit.core.PlatformFile? = null,
     val startDate: Instant? = null,
     val endDate: Instant? = null,
     val exampleContentUrl: String = "",
@@ -118,7 +119,6 @@ data class CreateContestState(
     val prizeKr: String = "",
     val category: String = "CHALLENGE",
     val mediaType: String = "PHOTO_AND_VIDEO",
-    val coverImageBytes: ByteArray? = null,
     
     // UI State
     val isPosting: Boolean = false,
@@ -648,6 +648,7 @@ class CreateContestViewModel(
     fun updateTitle(v: String) { _state.value = _state.value.copy(title = v) }
     fun updateDescription(v: String) { _state.value = _state.value.copy(description = v) }
     fun updateRules(v: String) { _state.value = _state.value.copy(rules = v) }
+    fun setCoverImage(file: io.github.vinceglb.filekit.core.PlatformFile?) { _state.value = _state.value.copy(coverImageFile = file) }
     fun updateStartDate(v: Instant?) { _state.value = _state.value.copy(startDate = v) }
     fun updateEndDate(v: Instant?) { _state.value = _state.value.copy(endDate = v) }
     fun updateExampleContentUrl(v: String) { _state.value = _state.value.copy(exampleContentUrl = v) }
@@ -810,7 +811,6 @@ class CreateContestViewModel(
     // Legacy update functions (kept for backward compatibility)
     fun updatePrizeKr(v: String) { _state.value = _state.value.copy(prizeKr = v) }
     fun updateCategory(v: String) { _state.value = _state.value.copy(category = v) }
-    fun setCoverImage(bytes: ByteArray) { _state.value = _state.value.copy(coverImageBytes = bytes) }
 
     fun post() {
         val currentState = _state.value
@@ -824,43 +824,19 @@ class CreateContestViewModel(
         screenModelScope.launch {
             _state.value = currentState.copy(isPosting = true, error = null)
 
-            var coverMediaUrl: String? = null
-            if (currentState.coverImageBytes != null) {
-                when (val result = cloudinaryUploader.uploadMedia(ApiConstants.CloudinaryFolders.CONTESTS_PHOTO, currentState.coverImageBytes, isVideo = false)) {
-                    is NetworkResult.Success -> coverMediaUrl = result.data
-                    is NetworkResult.Error -> {
-                        _state.value = _state.value.copy(isPosting = false, error = "Cover image upload failed: ${result.message}")
-                        return@launch
-                    }
-                    else -> {}
-                }
+            if (currentState.coverImageFile != null) {
+                val filePath = com.krieta.com.core.util.FileStreamer.getFilePathOrUri(currentState.coverImageFile)
+                com.krieta.com.core.upload.BackgroundUploader.enqueueUpload(
+                    type = com.krieta.com.core.upload.UploadType.CONTEST,
+                    filePath = filePath,
+                    caption = currentState.title,
+                    additionalData = mapOf(
+                        "PRIZE" to prize.toString()
+                    )
+                )
             }
-
-            // Defaults required by backend Zod validation
-            val request = CreateContestRequestDto(
-                title = currentState.title,
-                description = currentState.description,
-                mediaType = currentState.mediaType,
-                category = currentState.category,
-                prizeKr = prize,
-                requiredActions = listOf(RequiredActionDto(type = "FOLLOW_CREATOR", label = "Follow Creator to Enter")),
-                maxWinners = 1,
-                prizeDistribution = listOf(PrizeDistributionDto(rank = 1, percentage = 100.0)),
-                judgingCriteria = "CREATOR_PICKS",
-                deadline = Clock.System.now().plus(7, DateTimeUnit.DAY, kotlinx.datetime.TimeZone.UTC).toString(),
-                coverMediaUrl = coverMediaUrl,
-                participationType = "INDIVIDUAL_ONLY" // Default for legacy post function
-            )
-
-            when (val result = repository.createContest(request)) {
-                is NetworkResult.Success -> {
-                    _state.value = _state.value.copy(isPosting = false, success = true)
-                }
-                is NetworkResult.Error -> {
-                    _state.value = _state.value.copy(isPosting = false, error = result.message)
-                }
-                else -> {}
-            }
+            
+            _state.value = _state.value.copy(isPosting = false, success = true)
         }
     }
     

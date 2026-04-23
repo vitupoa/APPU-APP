@@ -13,6 +13,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,11 @@ fun KrAmountInput(
         }
     }
 
+    // Fire callback whenever the computed krAmount actually changes
+    LaunchedEffect(fiatAmount, krAmount) {
+        onAmountChanged(fiatAmount, krAmount)
+    }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -59,7 +65,6 @@ fun KrAmountInput(
             onValueChange = { value ->
                 if (value.isEmpty() || value.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
                     inputText = value
-                    onAmountChanged(fiatAmount, krAmount)
                 }
             },
             label = { Text(label) },

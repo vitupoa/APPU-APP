@@ -43,6 +43,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation("androidx.work:work-runtime-ktx:2.9.0")
 
             // Ktor Android engine
             implementation(libs.ktor.client.okhttp)

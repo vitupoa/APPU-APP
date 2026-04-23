@@ -65,9 +65,9 @@ fun Step1DetailsAndDates(
         
         // Cover Image Upload (Optional)
         CoverImageUpload(
-            coverImageBytes = state.coverImageBytes,
-            onImageSelected = { bytes -> viewModel.setCoverImage(bytes) },
-            onImageRemoved = { viewModel.setCoverImage(ByteArray(0)) }
+            coverImageFile = state.coverImageFile,
+            onImageSelected = { file -> viewModel.setCoverImage(file) },
+            onImageRemoved = { viewModel.setCoverImage(null) }
         )
         
         // Title Input Field (Requirements 2.1, 2.9)
@@ -215,6 +215,7 @@ private fun DescriptionInputField(
             minLines = 3,
             maxLines = 6,
             modifier = Modifier.fillMaxWidth(),
+            visualTransformation = com.krieta.com.core.ui.components.HashtagVisualTransformation(Color(0xFFF5A623)),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFFF5A623),
                 cursorColor = Color(0xFFF5A623),
@@ -416,20 +417,15 @@ private fun formatDateTime(instant: Instant): String {
  */
 @Composable
 private fun CoverImageUpload(
-    coverImageBytes: ByteArray?,
-    onImageSelected: (ByteArray) -> Unit,
+    coverImageFile: io.github.vinceglb.filekit.core.PlatformFile?,
+    onImageSelected: (io.github.vinceglb.filekit.core.PlatformFile) -> Unit,
     onImageRemoved: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    
     val launcher = rememberFilePickerLauncher(
         type = PickerType.Image
     ) { file ->
         file?.let {
-            scope.launch {
-                val bytes = it.readBytes()
-                onImageSelected(bytes)
-            }
+            onImageSelected(it)
         }
     }
     
@@ -444,7 +440,7 @@ private fun CoverImageUpload(
             color = Color(0xFFA0A0A0)
         )
         
-        if (coverImageBytes != null && coverImageBytes.isNotEmpty()) {
+        if (coverImageFile != null) {
             // Show selected image with remove button
             Box(
                 modifier = Modifier
@@ -455,7 +451,7 @@ private fun CoverImageUpload(
             ) {
                 // Display the image
                 AsyncImage(
-                    model = coverImageBytes,
+                    model = com.krieta.com.core.util.FileStreamer.getFilePathOrUri(coverImageFile),
                     contentDescription = "Contest cover image",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop

@@ -51,8 +51,8 @@ class EditProfileScreen : Screen {
         ) { file ->
             file?.let {
                 scope.launch {
-                    val bytes = it.readBytes()
-                    viewModel.uploadAvatar(bytes)
+                    val filePath = com.krieta.com.core.util.FileStreamer.getFilePathOrUri(it)
+                    viewModel.uploadAvatar(filePath)
                 }
             }
         }
@@ -63,8 +63,8 @@ class EditProfileScreen : Screen {
         ) { file ->
             file?.let {
                 scope.launch {
-                    val bytes = it.readBytes()
-                    viewModel.uploadBanner(bytes)
+                    val filePath = com.krieta.com.core.util.FileStreamer.getFilePathOrUri(it)
+                    viewModel.uploadBanner(filePath)
                 }
             }
         }

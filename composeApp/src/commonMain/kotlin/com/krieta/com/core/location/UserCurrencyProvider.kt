@@ -63,7 +63,7 @@ class UserCurrencyProvider(
      */
     fun krToFiat(krAmount: Double): Double {
         val rate = _exchangeRate.value ?: return 0.0
-        return if (rate.baseRate > 0) krAmount * rate.baseRate else 0.0
+        return com.krieta.com.core.util.KrCurrencyFormatter.krToFiat(krAmount, rate.baseRate, applySellMargin = false)
     }
 
     /**

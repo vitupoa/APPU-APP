@@ -31,7 +31,7 @@ data class CommentAuthorDto(
     val displayName: String,
     val avatarUrl: String?,
     val isVerified: Boolean,
-    val isContentOwner: Boolean
+    val isContentOwner: Boolean = false
 )
 
 @Serializable

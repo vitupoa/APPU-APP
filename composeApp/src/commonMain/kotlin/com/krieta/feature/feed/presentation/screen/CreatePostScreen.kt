@@ -40,11 +40,7 @@ class CreatePostScreen : Screen {
             mode = PickerMode.Multiple()
         ) { files ->
             files?.forEach { file ->
-                // Coroutine to read bytes
-                scope.launch {
-                    val bytes = file.readBytes()
-                    viewModel.addImage(bytes)
-                }
+                viewModel.addImage(file)
             }
         }
 
@@ -74,6 +70,7 @@ class CreatePostScreen : Screen {
                     onValueChange = { viewModel.updateCaption(it) },
                     placeholder = { Text("What's on your mind?") },
                     modifier = Modifier.fillMaxWidth().height(150.dp),
+                    visualTransformation = com.krieta.com.core.ui.components.HashtagVisualTransformation(MaterialTheme.colorScheme.primary)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -85,8 +82,8 @@ class CreatePostScreen : Screen {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Display selected images preview count or error
-                if (state.imageBytes.isNotEmpty()) {
-                    Text("${state.imageBytes.size} images selected", fontWeight = FontWeight.Bold)
+                if (state.imageFiles.isNotEmpty()) {
+                    Text("${state.imageFiles.size} images selected", fontWeight = FontWeight.Bold)
                 }
 
                 if (state.isPosting) {

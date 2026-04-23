@@ -222,3 +222,18 @@ export type TeamSubmissionVote = Prisma.TeamSubmissionVoteModel
  * 
  */
 export type TeamChat = Prisma.TeamChatModel
+/**
+ * Model Hashtag
+ * 
+ */
+export type Hashtag = Prisma.HashtagModel
+/**
+ * Model ContentHashtag
+ * 
+ */
+export type ContentHashtag = Prisma.ContentHashtagModel
+/**
+ * Model ContentMention
+ * 
+ */
+export type ContentMention = Prisma.ContentMentionModel

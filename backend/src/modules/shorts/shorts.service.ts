@@ -13,12 +13,17 @@ export class ShortsService {
     let whereClause: any = {};
 
     if (type === 'admiring' && userId) {
-      // Get list of users the current user is admiring
+      // Get list of users the current user is admiring, or mutual lovers
       const admiringList = await prisma.admire.findMany({
-        where: { admirerId: userId },
-        select: { admiredId: true }
+        where: {
+          OR: [
+            { admirerId: userId },
+            { admiredId: userId, isLovers: true }
+          ]
+        },
+        select: { admiredId: true, admirerId: true }
       });
-      const admiringIds = admiringList.map(a => a.admiredId);
+      const admiringIds = admiringList.map(a => a.admirerId === userId ? a.admiredId : a.admirerId);
 
       if (admiringIds.length === 0) {
         return { items: [], nextCursor: null };
@@ -26,12 +31,17 @@ export class ShortsService {
 
       whereClause.userId = { in: admiringIds };
     } else if (type === 'discover' && userId) {
-      // Get list of users the current user is admiring
+      // Get list of users the current user is admiring, or mutual lovers
       const admiringList = await prisma.admire.findMany({
-        where: { admirerId: userId },
-        select: { admiredId: true }
+        where: {
+          OR: [
+            { admirerId: userId },
+            { admiredId: userId, isLovers: true }
+          ]
+        },
+        select: { admiredId: true, admirerId: true }
       });
-      const admiringIds = admiringList.map(a => a.admiredId);
+      const admiringIds = admiringList.map(a => a.admirerId === userId ? a.admiredId : a.admirerId);
 
       // Exclude admiring users and self
       whereClause.userId = {

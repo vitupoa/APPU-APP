@@ -15,7 +15,7 @@ junit = "4.13.2"
 kotlin = "2.3.20"
 
 # Networking
-ktor = "3.1.1"
+ktor = "3.4.2"
 
 # DI
 koin = "4.0.3"

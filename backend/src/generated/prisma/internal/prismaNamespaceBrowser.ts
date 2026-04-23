@@ -91,7 +91,10 @@ export const ModelName = {
   TeamContestRegistration: 'TeamContestRegistration',
   TeamSubmission: 'TeamSubmission',
   TeamSubmissionVote: 'TeamSubmissionVote',
-  TeamChat: 'TeamChat'
+  TeamChat: 'TeamChat',
+  Hashtag: 'Hashtag',
+  ContentHashtag: 'ContentHashtag',
+  ContentMention: 'ContentMention'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -670,6 +673,38 @@ export const TeamChatScalarFieldEnum = {
 } as const
 
 export type TeamChatScalarFieldEnum = (typeof TeamChatScalarFieldEnum)[keyof typeof TeamChatScalarFieldEnum]
+
+
+export const HashtagScalarFieldEnum = {
+  id: 'id',
+  tag: 'tag',
+  usageCount: 'usageCount',
+  createdAt: 'createdAt'
+} as const
+
+export type HashtagScalarFieldEnum = (typeof HashtagScalarFieldEnum)[keyof typeof HashtagScalarFieldEnum]
+
+
+export const ContentHashtagScalarFieldEnum = {
+  id: 'id',
+  hashtagId: 'hashtagId',
+  contentId: 'contentId',
+  contentType: 'contentType',
+  createdAt: 'createdAt'
+} as const
+
+export type ContentHashtagScalarFieldEnum = (typeof ContentHashtagScalarFieldEnum)[keyof typeof ContentHashtagScalarFieldEnum]
+
+
+export const ContentMentionScalarFieldEnum = {
+  id: 'id',
+  mentionedUserId: 'mentionedUserId',
+  contentId: 'contentId',
+  contentType: 'contentType',
+  createdAt: 'createdAt'
+} as const
+
+export type ContentMentionScalarFieldEnum = (typeof ContentMentionScalarFieldEnum)[keyof typeof ContentMentionScalarFieldEnum]
 
 
 export const SortOrder = {

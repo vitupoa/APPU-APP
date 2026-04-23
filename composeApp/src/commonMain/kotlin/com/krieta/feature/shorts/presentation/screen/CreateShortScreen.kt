@@ -39,10 +39,7 @@ class CreateShortScreen : Screen {
             type = PickerType.Video
         ) { file ->
             file?.let {
-                scope.launch {
-                    val bytes = it.readBytes()
-                    viewModel.setVideo(bytes)
-                }
+                viewModel.setVideo(it)
             }
         }
 
@@ -72,6 +69,7 @@ class CreateShortScreen : Screen {
                     onValueChange = { viewModel.updateCaption(it) },
                     placeholder = { Text("Write a caption...") },
                     modifier = Modifier.fillMaxWidth().height(100.dp),
+                    visualTransformation = com.krieta.com.core.ui.components.HashtagVisualTransformation(MaterialTheme.colorScheme.primary)
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -82,8 +80,10 @@ class CreateShortScreen : Screen {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (state.videoBytes != null) {
-                    Text("Video selected (${state.videoBytes!!.size / 1024 / 1024} MB)", fontWeight = FontWeight.Bold)
+                if (state.videoFile != null) {
+                    val filePath = com.krieta.com.core.util.FileStreamer.getFilePathOrUri(state.videoFile!!)
+                    val fileSizeMB = com.krieta.com.core.util.FileStreamer.getFileSize(filePath) / 1024 / 1024
+                    Text("Video selected ($fileSizeMB MB)", fontWeight = FontWeight.Bold)
                 }
 
                 if (state.isPosting) {

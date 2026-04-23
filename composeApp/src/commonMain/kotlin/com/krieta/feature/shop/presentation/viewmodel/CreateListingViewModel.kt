@@ -36,12 +36,12 @@ class CreateListingViewModel(
     fun onCategoryChange(v: String) { _state.value = _state.value.copy(category = v) }
     fun onWhatsappChange(v: String) { _state.value = _state.value.copy(whatsappNumber = v) }
 
-    fun uploadImage(bytes: ByteArray) {
+    fun uploadImage(filePath: String) {
         val current = _state.value.imageUrls
         if (current.size < 10) {
             screenModelScope.launch {
                 _state.value = _state.value.copy(isSaving = true, error = null)
-                when (val result = cloudinaryUploader.uploadMedia(com.krieta.com.core.network.ApiConstants.CloudinaryFolders.SHOP_PHOTO, bytes, isVideo = false)) {
+                when (val result = cloudinaryUploader.uploadMedia(com.krieta.com.core.network.ApiConstants.CloudinaryFolders.SHOP_PHOTO, filePath, isVideo = false)) {
                     is NetworkResult.Success -> {
                         _state.value = _state.value.copy(
                             imageUrls = current + result.data,

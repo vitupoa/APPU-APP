@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ModeComment
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
@@ -53,6 +56,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType
 import kotlinx.coroutines.delay
+import com.krieta.feature.wallet.presentation.screen.TopupScreen
 
 class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVER) : Screen {
     @Composable
@@ -106,6 +110,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     ShortItem(
                         short = short,
                         isActive = page == pagerState.currentPage,
+                        isTipModalOpen = showTippingFor != null,
                         onLike = { viewModel.toggleLike(short.id) },
                         onComment = { navigator.push(CommentsScreen(ContentType.SHORT, short.id, "me")) },
                         onTip = { showTippingFor = short }
@@ -142,6 +147,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     },
                     onInsufficientBalance = {
                         showTippingFor = null
+                        navigator.push(TopupScreen())
                     }
                 )
             }
@@ -154,6 +160,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
     private fun ShortItem(
         short: Short,
         isActive: Boolean,
+        isTipModalOpen: Boolean,
         onLike: () -> Unit,
         onComment: () -> Unit,
         onTip: () -> Unit
@@ -161,9 +168,19 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             // Video Player
             var isPlaying by remember { mutableStateOf(isActive) }
+            var showPlayPauseIcon by remember { mutableStateOf(false) }
             
-            LaunchedEffect(isActive) {
-                isPlaying = isActive
+            // Pause when tip modal opens
+            LaunchedEffect(isActive, isTipModalOpen) {
+                isPlaying = isActive && !isTipModalOpen
+            }
+
+            // Auto-hide play/pause icon after 1.5 seconds
+            LaunchedEffect(showPlayPauseIcon) {
+                if (showPlayPauseIcon) {
+                    delay(1500)
+                    showPlayPauseIcon = false
+                }
             }
             
             VideoPlayer(
@@ -174,6 +191,41 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     isPlaying = playing
                 }
             )
+
+            // Tap to toggle play/pause
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                    ) {
+                        isPlaying = !isPlaying
+                        showPlayPauseIcon = true
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                // Play/Pause icon overlay
+                AnimatedVisibility(
+                    visible = showPlayPauseIcon,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .background(Color.Black.copy(alpha = 0.5f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                            contentDescription = if (isPlaying) "Pause" else "Play",
+                            tint = Color.White,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                }
+            }
 
             // Locked overlay
             if (short.isLocked) {

@@ -424,7 +424,10 @@ export const ModelName = {
   TeamContestRegistration: 'TeamContestRegistration',
   TeamSubmission: 'TeamSubmission',
   TeamSubmissionVote: 'TeamSubmissionVote',
-  TeamChat: 'TeamChat'
+  TeamChat: 'TeamChat',
+  Hashtag: 'Hashtag',
+  ContentHashtag: 'ContentHashtag',
+  ContentMention: 'ContentMention'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -440,7 +443,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "wallet" | "transaction" | "escrow" | "admire" | "bioLink" | "subscriptionTier" | "subscription" | "milestone" | "milestoneCompletion" | "short" | "shortCollection" | "shortLike" | "shortComment" | "post" | "postLike" | "postComment" | "contest" | "contestAction" | "contestPrizeDistribution" | "contestParticipant" | "contestSubmission" | "contestActionCompletion" | "contestWinner" | "contestJudge" | "judgeInvite" | "contestVote" | "product" | "dailyStat" | "comment" | "commentLike" | "commentReport" | "commentSettings" | "team" | "teamMember" | "teamInvitation" | "teamContestRegistration" | "teamSubmission" | "teamSubmissionVote" | "teamChat"
+    modelProps: "user" | "refreshToken" | "wallet" | "transaction" | "escrow" | "admire" | "bioLink" | "subscriptionTier" | "subscription" | "milestone" | "milestoneCompletion" | "short" | "shortCollection" | "shortLike" | "shortComment" | "post" | "postLike" | "postComment" | "contest" | "contestAction" | "contestPrizeDistribution" | "contestParticipant" | "contestSubmission" | "contestActionCompletion" | "contestWinner" | "contestJudge" | "judgeInvite" | "contestVote" | "product" | "dailyStat" | "comment" | "commentLike" | "commentReport" | "commentSettings" | "team" | "teamMember" | "teamInvitation" | "teamContestRegistration" | "teamSubmission" | "teamSubmissionVote" | "teamChat" | "hashtag" | "contentHashtag" | "contentMention"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3478,6 +3481,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Hashtag: {
+      payload: Prisma.$HashtagPayload<ExtArgs>
+      fields: Prisma.HashtagFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.HashtagFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.HashtagFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload>
+        }
+        findFirst: {
+          args: Prisma.HashtagFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.HashtagFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload>
+        }
+        findMany: {
+          args: Prisma.HashtagFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload>[]
+        }
+        create: {
+          args: Prisma.HashtagCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload>
+        }
+        createMany: {
+          args: Prisma.HashtagCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.HashtagCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload>[]
+        }
+        delete: {
+          args: Prisma.HashtagDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload>
+        }
+        update: {
+          args: Prisma.HashtagUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload>
+        }
+        deleteMany: {
+          args: Prisma.HashtagDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.HashtagUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.HashtagUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload>[]
+        }
+        upsert: {
+          args: Prisma.HashtagUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HashtagPayload>
+        }
+        aggregate: {
+          args: Prisma.HashtagAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateHashtag>
+        }
+        groupBy: {
+          args: Prisma.HashtagGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HashtagGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.HashtagCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HashtagCountAggregateOutputType> | number
+        }
+      }
+    }
+    ContentHashtag: {
+      payload: Prisma.$ContentHashtagPayload<ExtArgs>
+      fields: Prisma.ContentHashtagFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContentHashtagFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContentHashtagFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload>
+        }
+        findFirst: {
+          args: Prisma.ContentHashtagFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContentHashtagFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload>
+        }
+        findMany: {
+          args: Prisma.ContentHashtagFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload>[]
+        }
+        create: {
+          args: Prisma.ContentHashtagCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload>
+        }
+        createMany: {
+          args: Prisma.ContentHashtagCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContentHashtagCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload>[]
+        }
+        delete: {
+          args: Prisma.ContentHashtagDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload>
+        }
+        update: {
+          args: Prisma.ContentHashtagUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContentHashtagDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContentHashtagUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContentHashtagUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContentHashtagUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentHashtagPayload>
+        }
+        aggregate: {
+          args: Prisma.ContentHashtagAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContentHashtag>
+        }
+        groupBy: {
+          args: Prisma.ContentHashtagGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentHashtagGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContentHashtagCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentHashtagCountAggregateOutputType> | number
+        }
+      }
+    }
+    ContentMention: {
+      payload: Prisma.$ContentMentionPayload<ExtArgs>
+      fields: Prisma.ContentMentionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContentMentionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContentMentionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload>
+        }
+        findFirst: {
+          args: Prisma.ContentMentionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContentMentionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload>
+        }
+        findMany: {
+          args: Prisma.ContentMentionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload>[]
+        }
+        create: {
+          args: Prisma.ContentMentionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload>
+        }
+        createMany: {
+          args: Prisma.ContentMentionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContentMentionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload>[]
+        }
+        delete: {
+          args: Prisma.ContentMentionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload>
+        }
+        update: {
+          args: Prisma.ContentMentionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContentMentionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContentMentionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContentMentionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContentMentionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentMentionPayload>
+        }
+        aggregate: {
+          args: Prisma.ContentMentionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContentMention>
+        }
+        groupBy: {
+          args: Prisma.ContentMentionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentMentionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContentMentionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentMentionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4079,6 +4304,38 @@ export const TeamChatScalarFieldEnum = {
 export type TeamChatScalarFieldEnum = (typeof TeamChatScalarFieldEnum)[keyof typeof TeamChatScalarFieldEnum]
 
 
+export const HashtagScalarFieldEnum = {
+  id: 'id',
+  tag: 'tag',
+  usageCount: 'usageCount',
+  createdAt: 'createdAt'
+} as const
+
+export type HashtagScalarFieldEnum = (typeof HashtagScalarFieldEnum)[keyof typeof HashtagScalarFieldEnum]
+
+
+export const ContentHashtagScalarFieldEnum = {
+  id: 'id',
+  hashtagId: 'hashtagId',
+  contentId: 'contentId',
+  contentType: 'contentType',
+  createdAt: 'createdAt'
+} as const
+
+export type ContentHashtagScalarFieldEnum = (typeof ContentHashtagScalarFieldEnum)[keyof typeof ContentHashtagScalarFieldEnum]
+
+
+export const ContentMentionScalarFieldEnum = {
+  id: 'id',
+  mentionedUserId: 'mentionedUserId',
+  contentId: 'contentId',
+  contentType: 'contentType',
+  createdAt: 'createdAt'
+} as const
+
+export type ContentMentionScalarFieldEnum = (typeof ContentMentionScalarFieldEnum)[keyof typeof ContentMentionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -4492,6 +4749,9 @@ export type GlobalOmitConfig = {
   teamSubmission?: Prisma.TeamSubmissionOmit
   teamSubmissionVote?: Prisma.TeamSubmissionVoteOmit
   teamChat?: Prisma.TeamChatOmit
+  hashtag?: Prisma.HashtagOmit
+  contentHashtag?: Prisma.ContentHashtagOmit
+  contentMention?: Prisma.ContentMentionOmit
 }
 
 /* Types for Logging */

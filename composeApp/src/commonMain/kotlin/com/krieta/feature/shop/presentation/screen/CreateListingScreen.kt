@@ -53,8 +53,8 @@ class CreateListingScreen : Screen {
         ) { files ->
             files?.forEach { file ->
                 scope.launch {
-                    val bytes = file.readBytes()
-                    viewModel.uploadImage(bytes)
+                    val filePath = com.krieta.com.core.util.FileStreamer.getFilePathOrUri(file)
+                    viewModel.uploadImage(filePath)
                 }
             }
         }

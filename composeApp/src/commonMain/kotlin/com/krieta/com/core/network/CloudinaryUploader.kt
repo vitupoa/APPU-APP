@@ -124,7 +124,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
         )
     }
 
-    suspend fun uploadMedia(folder: String, fileBytes: ByteArray, isVideo: Boolean = false): NetworkResult<String> {
+    suspend fun uploadMedia(folder: String, filePath: String, isVideo: Boolean = false): NetworkResult<String> {
         return safeApiCall {
             // 1. Get Signature from our backend
             val resourceType = if (isVideo) "video" else "image"
@@ -147,10 +147,11 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             println("Cloudinary Upload URL: $uploadUrl")
             
             val chunkSize = 5 * 1024 * 1024 // 5 MB chunks
-            val totalBytes = fileBytes.size
+            val totalBytes = com.krieta.com.core.util.FileStreamer.getFileSize(filePath).toInt()
             val uniqueUploadId = (1..16).map { kotlin.random.Random.nextInt(0, 16).toString(16) }.joinToString("")
             
             if (totalBytes <= chunkSize) {
+                val fileBytes = com.krieta.com.core.util.FileStreamer.readChunk(filePath, 0L, totalBytes)
                 println("Cloudinary Upload Parameters being sent:")
                 println("  - api_key: ${signatureDto.apiKey}")
                 println("  - timestamp: ${signatureDto.timestamp}")
@@ -178,7 +179,7 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             
             while (startByte < totalBytes) {
                 val endByte = kotlin.math.min(startByte + chunkSize - 1, totalBytes - 1)
-                val chunkBytes = fileBytes.sliceArray(startByte..endByte)
+                val chunkBytes = com.krieta.com.core.util.FileStreamer.readChunk(filePath, startByte.toLong(), endByte - startByte + 1)
                 
                 println("Cloudinary Chunked Upload: sending bytes $startByte-$endByte/$totalBytes")
                 
@@ -209,8 +210,8 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
         }
     }
 
-    suspend fun uploadImage(fileBytes: ByteArray, folder: String): String {
-        val result = uploadMedia(folder, fileBytes, isVideo = false)
+    suspend fun uploadImage(filePath: String, folder: String): String {
+        val result = uploadMedia(folder, filePath, isVideo = false)
         return when (result) {
             is NetworkResult.Success -> result.data
             is NetworkResult.Error -> throw Exception(result.message)

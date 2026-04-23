@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 data class CreateShortState(
     val caption: String = "",
-    val videoBytes: ByteArray? = null,
+    val videoFile: io.github.vinceglb.filekit.core.PlatformFile? = null,
     val isPosting: Boolean = false,
     val success: Boolean = false,
     val error: String? = null
@@ -31,13 +31,13 @@ class CreateShortViewModel(
         _state.value = _state.value.copy(caption = caption)
     }
 
-    fun setVideo(bytes: ByteArray) {
-        _state.value = _state.value.copy(videoBytes = bytes)
+    fun setVideo(file: io.github.vinceglb.filekit.core.PlatformFile) {
+        _state.value = _state.value.copy(videoFile = file)
     }
 
     fun post() {
         val currentState = _state.value
-        if (currentState.videoBytes == null) {
+        if (currentState.videoFile == null) {
             _state.value = currentState.copy(error = "Please select a video")
             return
         }
@@ -45,27 +45,14 @@ class CreateShortViewModel(
         screenModelScope.launch {
             _state.value = currentState.copy(isPosting = true, error = null)
 
-            // 1. Upload video to Cloudinary
-            when (val result = cloudinaryUploader.uploadMedia(ApiConstants.CloudinaryFolders.SHORTS_VIDEO, currentState.videoBytes, isVideo = true)) {
-                is NetworkResult.Success -> {
-                    val videoUrl = result.data
-
-                    // 2. Create short via backend
-                    when (val createResult = repository.createShort(videoUrl, currentState.caption)) {
-                        is NetworkResult.Success -> {
-                            _state.value = _state.value.copy(isPosting = false, success = true)
-                        }
-                        is NetworkResult.Error -> {
-                            _state.value = _state.value.copy(isPosting = false, error = createResult.message)
-                        }
-                        else -> {}
-                    }
-                }
-                is NetworkResult.Error -> {
-                    _state.value = _state.value.copy(isPosting = false, error = "Failed to upload video: ${result.message}")
-                }
-                else -> {}
-            }
+            val filePath = com.krieta.com.core.util.FileStreamer.getFilePathOrUri(currentState.videoFile!!)
+            com.krieta.com.core.upload.BackgroundUploader.enqueueUpload(
+                type = com.krieta.com.core.upload.UploadType.SHORT,
+                filePath = filePath,
+                caption = currentState.caption
+            )
+            
+            _state.value = _state.value.copy(isPosting = false, success = true)
         }
     }
 }

@@ -47,20 +47,20 @@ object KrCurrencyFormatter {
      * Sell margin (withdraw): User gets LESS fiat (rate reduced by 4.5%)
      */
     fun fiatToKr(fiatAmount: Double, rate: Double, applyBuyMargin: Boolean = true): Double {
-        val effectiveRate = if (applyBuyMargin) rate * (1 - PLATFORM_MARGIN) else rate
-        return fiatAmount * effectiveRate
+        val baseKr = if (rate > 0) fiatAmount / (100.0 * rate) else 0.0
+        return if (applyBuyMargin) baseKr * (1 - PLATFORM_MARGIN) else baseKr
     }
 
     fun krToFiat(krAmount: Double, rate: Double, applySellMargin: Boolean = true): Double {
-        val effectiveRate = if (applySellMargin) rate * (1 - PLATFORM_MARGIN) else rate
-        return if (effectiveRate > 0) krAmount / effectiveRate else 0.0
+        val baseFiat = krAmount * 100.0 * rate
+        return if (applySellMargin) baseFiat * (1 - PLATFORM_MARGIN) else baseFiat
     }
 
     /**
      * Formats a display-only Kr conversion (no margin, for display purposes)
      */
     fun formatDisplayConversion(krAmount: Double, rate: Double, currencyCode: String): String {
-        val fiatAmount = if (rate > 0) krAmount / rate else 0.0
+        val fiatAmount = krToFiat(krAmount, rate, applySellMargin = false)
         return formatKrWithFiat(krAmount, fiatAmount, currencyCode)
     }
 

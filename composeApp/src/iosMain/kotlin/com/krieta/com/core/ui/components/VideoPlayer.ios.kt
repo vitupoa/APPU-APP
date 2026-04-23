@@ -37,8 +37,10 @@ actual fun VideoPlayer(
     LaunchedEffect(isPlaying) {
         if (!hasError) {
             if (isPlaying) {
+                platform.UIKit.UIApplication.sharedApplication.idleTimerDisabled = true
                 player.play()
             } else {
+                platform.UIKit.UIApplication.sharedApplication.idleTimerDisabled = false
                 player.pause()
             }
         }
@@ -78,6 +80,7 @@ actual fun VideoPlayer(
         }
         
         onDispose {
+            platform.UIKit.UIApplication.sharedApplication.idleTimerDisabled = false
             player.removeTimeObserver(observer)
             player.pause()
         }

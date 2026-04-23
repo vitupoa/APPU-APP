@@ -107,6 +107,16 @@ router.delete('/:id/admire', authMiddleware, async (req: AuthRequest, res: Respo
   }
 });
 
+// DELETE /api/v1/users/:id/love — Unlove: remove mutual Lovers status but keep Admiring
+router.delete('/:id/love', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const result = await UserService.unlove(req.userId!, String(req.params.id));
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // GET /api/v1/users/:id/admirers
 router.get('/:id/admirers', async (req: AuthRequest, res: Response) => {
   try {

@@ -159,6 +159,28 @@ export class UserService {
   }
 
   /**
+   * Unlove a user. Removes the lovers status from both records, but keeps the admiring.
+   */
+  static async unlove(admirerId: string, admiredId: string) {
+    return prisma.$transaction(async (tx) => {
+      const admire = await tx.admire.findUnique({
+        where: { admirerId_admiredId: { admirerId, admiredId } }
+      });
+      if (!admire || !admire.isLovers) throw new Error('Not lovers with this user');
+
+      // Unloving means completely breaking the admire link from this side
+      await tx.admire.updateMany({
+        where: { admirerId: admiredId, admiredId: admirerId },
+        data: { isLovers: false }
+      });
+
+      await tx.admire.delete({ where: { id: admire.id } });
+
+      return { isLovers: false };
+    });
+  }
+
+  /**
    * Get paginated list of users who admire the given userId.
    */
   static async getAdmirers(userId: string, cursor?: string, limit = 20) {
@@ -187,12 +209,20 @@ export class UserService {
    */
   static async getAdmiring(userId: string, cursor?: string, limit = 20) {
     const records = await prisma.admire.findMany({
-      where: { admirerId: userId },
+      where: {
+        OR: [
+          { admirerId: userId },
+          { admiredId: userId, isLovers: true }
+        ]
+      },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { createdAt: 'desc' },
       include: {
         admired: {
+          select: { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true }
+        },
+        admirer: {
           select: { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true }
         }
       }
@@ -201,7 +231,10 @@ export class UserService {
     const hasMore = records.length > limit;
     const items = hasMore ? records.slice(0, limit) : records;
     return {
-      items: items.map((r) => ({ ...r.admired, isLovers: r.isLovers })),
+      items: items.map((r) => {
+        const otherUser = r.admirerId === userId ? r.admired : r.admirer;
+        return { ...otherUser, isLovers: r.isLovers };
+      }),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
   }

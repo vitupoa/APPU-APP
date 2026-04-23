@@ -44,11 +44,11 @@ class EditProfileViewModel(
     fun onUsernameChange(v: String) { _state.value = _state.value.copy(username = v) }
     fun onBioChange(v: String) { _state.value = _state.value.copy(bio = v) }
 
-    fun uploadAvatar(bytes: ByteArray) {
+    fun uploadAvatar(filePath: String) {
         screenModelScope.launch {
             _state.value = _state.value.copy(isUploadingAvatar = true, error = null)
             try {
-                val url = cloudinaryUploader.uploadImage(bytes, "avatars")
+                val url = cloudinaryUploader.uploadImage(filePath, "avatars")
                 _state.value = _state.value.copy(avatarUrl = url, isUploadingAvatar = false)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(isUploadingAvatar = false, error = e.message)
@@ -56,11 +56,11 @@ class EditProfileViewModel(
         }
     }
 
-    fun uploadBanner(bytes: ByteArray) {
+    fun uploadBanner(filePath: String) {
         screenModelScope.launch {
             _state.value = _state.value.copy(isUploadingBanner = true, error = null)
             try {
-                val url = cloudinaryUploader.uploadImage(bytes, "banners")
+                val url = cloudinaryUploader.uploadImage(filePath, "banners")
                 _state.value = _state.value.copy(coverPhotoUrl = url, isUploadingBanner = false)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(isUploadingBanner = false, error = e.message)
