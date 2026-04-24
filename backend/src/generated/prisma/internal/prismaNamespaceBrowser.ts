@@ -97,7 +97,10 @@ export const ModelName = {
   ContentMention: 'ContentMention',
   Chat: 'Chat',
   ChatParticipant: 'ChatParticipant',
-  Message: 'Message'
+  Message: 'Message',
+  Story: 'Story',
+  StoryView: 'StoryView',
+  StoryViewerPreference: 'StoryViewerPreference'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -749,6 +752,41 @@ export const MessageScalarFieldEnum = {
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const StoryScalarFieldEnum = {
+  id: 'id',
+  creatorId: 'creatorId',
+  mediaUrl: 'mediaUrl',
+  mediaType: 'mediaType',
+  text: 'text',
+  privacy: 'privacy',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type StoryScalarFieldEnum = (typeof StoryScalarFieldEnum)[keyof typeof StoryScalarFieldEnum]
+
+
+export const StoryViewScalarFieldEnum = {
+  id: 'id',
+  storyId: 'storyId',
+  viewerId: 'viewerId',
+  viewedAt: 'viewedAt',
+  isTipped: 'isTipped',
+  tipAmount: 'tipAmount'
+} as const
+
+export type StoryViewScalarFieldEnum = (typeof StoryViewScalarFieldEnum)[keyof typeof StoryViewScalarFieldEnum]
+
+
+export const StoryViewerPreferenceScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  preferredViewerId: 'preferredViewerId'
+} as const
+
+export type StoryViewerPreferenceScalarFieldEnum = (typeof StoryViewerPreferenceScalarFieldEnum)[keyof typeof StoryViewerPreferenceScalarFieldEnum]
 
 
 export const SortOrder = {

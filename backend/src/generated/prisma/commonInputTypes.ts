@@ -511,6 +511,23 @@ export type EnumChatTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumChatTypeFilter<$PrismaModel>
 }
 
+export type EnumStoryPrivacyFilter<$PrismaModel = never> = {
+  equals?: $Enums.StoryPrivacy | Prisma.EnumStoryPrivacyFieldRefInput<$PrismaModel>
+  in?: $Enums.StoryPrivacy[] | Prisma.ListEnumStoryPrivacyFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StoryPrivacy[] | Prisma.ListEnumStoryPrivacyFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStoryPrivacyFilter<$PrismaModel> | $Enums.StoryPrivacy
+}
+
+export type EnumStoryPrivacyWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StoryPrivacy | Prisma.EnumStoryPrivacyFieldRefInput<$PrismaModel>
+  in?: $Enums.StoryPrivacy[] | Prisma.ListEnumStoryPrivacyFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StoryPrivacy[] | Prisma.ListEnumStoryPrivacyFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStoryPrivacyWithAggregatesFilter<$PrismaModel> | $Enums.StoryPrivacy
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStoryPrivacyFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStoryPrivacyFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -992,6 +1009,23 @@ export type NestedEnumChatTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumChatTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumChatTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumStoryPrivacyFilter<$PrismaModel = never> = {
+  equals?: $Enums.StoryPrivacy | Prisma.EnumStoryPrivacyFieldRefInput<$PrismaModel>
+  in?: $Enums.StoryPrivacy[] | Prisma.ListEnumStoryPrivacyFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StoryPrivacy[] | Prisma.ListEnumStoryPrivacyFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStoryPrivacyFilter<$PrismaModel> | $Enums.StoryPrivacy
+}
+
+export type NestedEnumStoryPrivacyWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StoryPrivacy | Prisma.EnumStoryPrivacyFieldRefInput<$PrismaModel>
+  in?: $Enums.StoryPrivacy[] | Prisma.ListEnumStoryPrivacyFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StoryPrivacy[] | Prisma.ListEnumStoryPrivacyFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStoryPrivacyWithAggregatesFilter<$PrismaModel> | $Enums.StoryPrivacy
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStoryPrivacyFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStoryPrivacyFilter<$PrismaModel>
 }
 
 

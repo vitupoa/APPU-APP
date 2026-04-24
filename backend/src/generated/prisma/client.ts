@@ -276,3 +276,18 @@ export type ChatParticipant = Prisma.ChatParticipantModel
  * 
  */
 export type Message = Prisma.MessageModel
+/**
+ * Model Story
+ * 
+ */
+export type Story = Prisma.StoryModel
+/**
+ * Model StoryView
+ * 
+ */
+export type StoryView = Prisma.StoryViewModel
+/**
+ * Model StoryViewerPreference
+ * 
+ */
+export type StoryViewerPreference = Prisma.StoryViewerPreferenceModel

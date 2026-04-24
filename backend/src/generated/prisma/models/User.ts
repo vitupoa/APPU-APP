@@ -348,6 +348,10 @@ export type UserWhereInput = {
   judgeInvites?: Prisma.JudgeInviteListRelationFilter
   chatParticipations?: Prisma.ChatParticipantListRelationFilter
   sentMessages?: Prisma.MessageListRelationFilter
+  stories?: Prisma.StoryListRelationFilter
+  storyViews?: Prisma.StoryViewListRelationFilter
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceListRelationFilter
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -410,6 +414,10 @@ export type UserOrderByWithRelationInput = {
   judgeInvites?: Prisma.JudgeInviteOrderByRelationAggregateInput
   chatParticipations?: Prisma.ChatParticipantOrderByRelationAggregateInput
   sentMessages?: Prisma.MessageOrderByRelationAggregateInput
+  stories?: Prisma.StoryOrderByRelationAggregateInput
+  storyViews?: Prisma.StoryViewOrderByRelationAggregateInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceOrderByRelationAggregateInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -475,6 +483,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   judgeInvites?: Prisma.JudgeInviteListRelationFilter
   chatParticipations?: Prisma.ChatParticipantListRelationFilter
   sentMessages?: Prisma.MessageListRelationFilter
+  stories?: Prisma.StoryListRelationFilter
+  storyViews?: Prisma.StoryViewListRelationFilter
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceListRelationFilter
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceListRelationFilter
 }, "id" | "email" | "username" | "googleId" | "appleId">
 
 export type UserOrderByWithAggregationInput = {
@@ -591,6 +603,10 @@ export type UserCreateInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -653,6 +669,10 @@ export type UserUncheckedCreateInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUpdateInput = {
@@ -715,6 +735,10 @@ export type UserUpdateInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -777,6 +801,10 @@ export type UserUncheckedUpdateInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1487,6 +1515,62 @@ export type UserUpdateOneRequiredWithoutSentMessagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSentMessagesInput, Prisma.UserUpdateWithoutSentMessagesInput>, Prisma.UserUncheckedUpdateWithoutSentMessagesInput>
 }
 
+export type UserCreateNestedOneWithoutStoriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStoriesInput, Prisma.UserUncheckedCreateWithoutStoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStoriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutStoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStoriesInput, Prisma.UserUncheckedCreateWithoutStoriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStoriesInput
+  upsert?: Prisma.UserUpsertWithoutStoriesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStoriesInput, Prisma.UserUpdateWithoutStoriesInput>, Prisma.UserUncheckedUpdateWithoutStoriesInput>
+}
+
+export type UserCreateNestedOneWithoutStoryViewsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStoryViewsInput, Prisma.UserUncheckedCreateWithoutStoryViewsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStoryViewsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutStoryViewsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStoryViewsInput, Prisma.UserUncheckedCreateWithoutStoryViewsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStoryViewsInput
+  upsert?: Prisma.UserUpsertWithoutStoryViewsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStoryViewsInput, Prisma.UserUpdateWithoutStoryViewsInput>, Prisma.UserUncheckedUpdateWithoutStoryViewsInput>
+}
+
+export type UserCreateNestedOneWithoutStoryViewerPreferencesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStoryViewerPreferencesInput, Prisma.UserUncheckedCreateWithoutStoryViewerPreferencesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStoryViewerPreferencesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutPreferredStoryViewersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPreferredStoryViewersInput, Prisma.UserUncheckedCreateWithoutPreferredStoryViewersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPreferredStoryViewersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutStoryViewerPreferencesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStoryViewerPreferencesInput, Prisma.UserUncheckedCreateWithoutStoryViewerPreferencesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStoryViewerPreferencesInput
+  upsert?: Prisma.UserUpsertWithoutStoryViewerPreferencesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStoryViewerPreferencesInput, Prisma.UserUpdateWithoutStoryViewerPreferencesInput>, Prisma.UserUncheckedUpdateWithoutStoryViewerPreferencesInput>
+}
+
+export type UserUpdateOneRequiredWithoutPreferredStoryViewersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPreferredStoryViewersInput, Prisma.UserUncheckedCreateWithoutPreferredStoryViewersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPreferredStoryViewersInput
+  upsert?: Prisma.UserUpsertWithoutPreferredStoryViewersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPreferredStoryViewersInput, Prisma.UserUpdateWithoutPreferredStoryViewersInput>, Prisma.UserUncheckedUpdateWithoutPreferredStoryViewersInput>
+}
+
 export type UserCreateWithoutRefreshTokensInput = {
   id?: string
   email: string
@@ -1546,6 +1630,10 @@ export type UserCreateWithoutRefreshTokensInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -1607,6 +1695,10 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -1684,6 +1776,10 @@ export type UserUpdateWithoutRefreshTokensInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -1745,6 +1841,10 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -1806,6 +1906,10 @@ export type UserCreateWithoutWalletInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -1867,6 +1971,10 @@ export type UserUncheckedCreateWithoutWalletInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -1944,6 +2052,10 @@ export type UserUpdateWithoutWalletInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -2005,6 +2117,10 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutTransactionsInput = {
@@ -2066,6 +2182,10 @@ export type UserCreateWithoutTransactionsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutTransactionsInput = {
@@ -2127,6 +2247,10 @@ export type UserUncheckedCreateWithoutTransactionsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutTransactionsInput = {
@@ -2204,6 +2328,10 @@ export type UserUpdateWithoutTransactionsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTransactionsInput = {
@@ -2265,6 +2393,10 @@ export type UserUncheckedUpdateWithoutTransactionsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutEscrowsInput = {
@@ -2326,6 +2458,10 @@ export type UserCreateWithoutEscrowsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutEscrowsInput = {
@@ -2387,6 +2523,10 @@ export type UserUncheckedCreateWithoutEscrowsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutEscrowsInput = {
@@ -2464,6 +2604,10 @@ export type UserUpdateWithoutEscrowsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEscrowsInput = {
@@ -2525,6 +2669,10 @@ export type UserUncheckedUpdateWithoutEscrowsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutAdmiringInput = {
@@ -2586,6 +2734,10 @@ export type UserCreateWithoutAdmiringInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutAdmiringInput = {
@@ -2647,6 +2799,10 @@ export type UserUncheckedCreateWithoutAdmiringInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutAdmiringInput = {
@@ -2713,6 +2869,10 @@ export type UserCreateWithoutAdmirersInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutAdmirersInput = {
@@ -2774,6 +2934,10 @@ export type UserUncheckedCreateWithoutAdmirersInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutAdmirersInput = {
@@ -2851,6 +3015,10 @@ export type UserUpdateWithoutAdmiringInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdmiringInput = {
@@ -2912,6 +3080,10 @@ export type UserUncheckedUpdateWithoutAdmiringInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUpsertWithoutAdmirersInput = {
@@ -2984,6 +3156,10 @@ export type UserUpdateWithoutAdmirersInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdmirersInput = {
@@ -3045,6 +3221,10 @@ export type UserUncheckedUpdateWithoutAdmirersInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutBioLinksInput = {
@@ -3106,6 +3286,10 @@ export type UserCreateWithoutBioLinksInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutBioLinksInput = {
@@ -3167,6 +3351,10 @@ export type UserUncheckedCreateWithoutBioLinksInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutBioLinksInput = {
@@ -3244,6 +3432,10 @@ export type UserUpdateWithoutBioLinksInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBioLinksInput = {
@@ -3305,6 +3497,10 @@ export type UserUncheckedUpdateWithoutBioLinksInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutSubscriptionTiersInput = {
@@ -3366,6 +3562,10 @@ export type UserCreateWithoutSubscriptionTiersInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutSubscriptionTiersInput = {
@@ -3427,6 +3627,10 @@ export type UserUncheckedCreateWithoutSubscriptionTiersInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutSubscriptionTiersInput = {
@@ -3504,6 +3708,10 @@ export type UserUpdateWithoutSubscriptionTiersInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubscriptionTiersInput = {
@@ -3565,6 +3773,10 @@ export type UserUncheckedUpdateWithoutSubscriptionTiersInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutSubscribedToInput = {
@@ -3626,6 +3838,10 @@ export type UserCreateWithoutSubscribedToInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutSubscribedToInput = {
@@ -3687,6 +3903,10 @@ export type UserUncheckedCreateWithoutSubscribedToInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutSubscribedToInput = {
@@ -3753,6 +3973,10 @@ export type UserCreateWithoutSubscribersInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutSubscribersInput = {
@@ -3814,6 +4038,10 @@ export type UserUncheckedCreateWithoutSubscribersInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutSubscribersInput = {
@@ -3891,6 +4119,10 @@ export type UserUpdateWithoutSubscribedToInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubscribedToInput = {
@@ -3952,6 +4184,10 @@ export type UserUncheckedUpdateWithoutSubscribedToInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUpsertWithoutSubscribersInput = {
@@ -4024,6 +4260,10 @@ export type UserUpdateWithoutSubscribersInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubscribersInput = {
@@ -4085,6 +4325,10 @@ export type UserUncheckedUpdateWithoutSubscribersInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutMilestoneCompletionsInput = {
@@ -4146,6 +4390,10 @@ export type UserCreateWithoutMilestoneCompletionsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutMilestoneCompletionsInput = {
@@ -4207,6 +4455,10 @@ export type UserUncheckedCreateWithoutMilestoneCompletionsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutMilestoneCompletionsInput = {
@@ -4284,6 +4536,10 @@ export type UserUpdateWithoutMilestoneCompletionsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMilestoneCompletionsInput = {
@@ -4345,6 +4601,10 @@ export type UserUncheckedUpdateWithoutMilestoneCompletionsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutShortsInput = {
@@ -4406,6 +4666,10 @@ export type UserCreateWithoutShortsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutShortsInput = {
@@ -4467,6 +4731,10 @@ export type UserUncheckedCreateWithoutShortsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutShortsInput = {
@@ -4544,6 +4812,10 @@ export type UserUpdateWithoutShortsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortsInput = {
@@ -4605,6 +4877,10 @@ export type UserUncheckedUpdateWithoutShortsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutShortCollectionsInput = {
@@ -4666,6 +4942,10 @@ export type UserCreateWithoutShortCollectionsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutShortCollectionsInput = {
@@ -4727,6 +5007,10 @@ export type UserUncheckedCreateWithoutShortCollectionsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutShortCollectionsInput = {
@@ -4804,6 +5088,10 @@ export type UserUpdateWithoutShortCollectionsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortCollectionsInput = {
@@ -4865,6 +5153,10 @@ export type UserUncheckedUpdateWithoutShortCollectionsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutShortLikesInput = {
@@ -4926,6 +5218,10 @@ export type UserCreateWithoutShortLikesInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutShortLikesInput = {
@@ -4987,6 +5283,10 @@ export type UserUncheckedCreateWithoutShortLikesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutShortLikesInput = {
@@ -5064,6 +5364,10 @@ export type UserUpdateWithoutShortLikesInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortLikesInput = {
@@ -5125,6 +5429,10 @@ export type UserUncheckedUpdateWithoutShortLikesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutShortCommentsInput = {
@@ -5186,6 +5494,10 @@ export type UserCreateWithoutShortCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutShortCommentsInput = {
@@ -5247,6 +5559,10 @@ export type UserUncheckedCreateWithoutShortCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutShortCommentsInput = {
@@ -5324,6 +5640,10 @@ export type UserUpdateWithoutShortCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortCommentsInput = {
@@ -5385,6 +5705,10 @@ export type UserUncheckedUpdateWithoutShortCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutPostsInput = {
@@ -5446,6 +5770,10 @@ export type UserCreateWithoutPostsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutPostsInput = {
@@ -5507,6 +5835,10 @@ export type UserUncheckedCreateWithoutPostsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutPostsInput = {
@@ -5584,6 +5916,10 @@ export type UserUpdateWithoutPostsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostsInput = {
@@ -5645,6 +5981,10 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutPostLikesInput = {
@@ -5706,6 +6046,10 @@ export type UserCreateWithoutPostLikesInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutPostLikesInput = {
@@ -5767,6 +6111,10 @@ export type UserUncheckedCreateWithoutPostLikesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutPostLikesInput = {
@@ -5844,6 +6192,10 @@ export type UserUpdateWithoutPostLikesInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostLikesInput = {
@@ -5905,6 +6257,10 @@ export type UserUncheckedUpdateWithoutPostLikesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutPostCommentsInput = {
@@ -5966,6 +6322,10 @@ export type UserCreateWithoutPostCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutPostCommentsInput = {
@@ -6027,6 +6387,10 @@ export type UserUncheckedCreateWithoutPostCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutPostCommentsInput = {
@@ -6104,6 +6468,10 @@ export type UserUpdateWithoutPostCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostCommentsInput = {
@@ -6165,6 +6533,10 @@ export type UserUncheckedUpdateWithoutPostCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutContestsCreatedInput = {
@@ -6226,6 +6598,10 @@ export type UserCreateWithoutContestsCreatedInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutContestsCreatedInput = {
@@ -6287,6 +6663,10 @@ export type UserUncheckedCreateWithoutContestsCreatedInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutContestsCreatedInput = {
@@ -6364,6 +6744,10 @@ export type UserUpdateWithoutContestsCreatedInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestsCreatedInput = {
@@ -6425,6 +6809,10 @@ export type UserUncheckedUpdateWithoutContestsCreatedInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutContestParticipationsInput = {
@@ -6486,6 +6874,10 @@ export type UserCreateWithoutContestParticipationsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutContestParticipationsInput = {
@@ -6547,6 +6939,10 @@ export type UserUncheckedCreateWithoutContestParticipationsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutContestParticipationsInput = {
@@ -6624,6 +7020,10 @@ export type UserUpdateWithoutContestParticipationsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestParticipationsInput = {
@@ -6685,6 +7085,10 @@ export type UserUncheckedUpdateWithoutContestParticipationsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutContestSubmissionsInput = {
@@ -6746,6 +7150,10 @@ export type UserCreateWithoutContestSubmissionsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutContestSubmissionsInput = {
@@ -6807,6 +7215,10 @@ export type UserUncheckedCreateWithoutContestSubmissionsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutContestSubmissionsInput = {
@@ -6884,6 +7296,10 @@ export type UserUpdateWithoutContestSubmissionsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestSubmissionsInput = {
@@ -6945,6 +7361,10 @@ export type UserUncheckedUpdateWithoutContestSubmissionsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutContestWinsInput = {
@@ -7006,6 +7426,10 @@ export type UserCreateWithoutContestWinsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutContestWinsInput = {
@@ -7067,6 +7491,10 @@ export type UserUncheckedCreateWithoutContestWinsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutContestWinsInput = {
@@ -7144,6 +7572,10 @@ export type UserUpdateWithoutContestWinsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestWinsInput = {
@@ -7205,6 +7637,10 @@ export type UserUncheckedUpdateWithoutContestWinsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutContestJudgesInput = {
@@ -7266,6 +7702,10 @@ export type UserCreateWithoutContestJudgesInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutContestJudgesInput = {
@@ -7327,6 +7767,10 @@ export type UserUncheckedCreateWithoutContestJudgesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutContestJudgesInput = {
@@ -7404,6 +7848,10 @@ export type UserUpdateWithoutContestJudgesInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestJudgesInput = {
@@ -7465,6 +7913,10 @@ export type UserUncheckedUpdateWithoutContestJudgesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutJudgeInvitesInput = {
@@ -7526,6 +7978,10 @@ export type UserCreateWithoutJudgeInvitesInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutJudgeInvitesInput = {
@@ -7587,6 +8043,10 @@ export type UserUncheckedCreateWithoutJudgeInvitesInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutJudgeInvitesInput = {
@@ -7664,6 +8124,10 @@ export type UserUpdateWithoutJudgeInvitesInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutJudgeInvitesInput = {
@@ -7725,6 +8189,10 @@ export type UserUncheckedUpdateWithoutJudgeInvitesInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutContestVotesInput = {
@@ -7786,6 +8254,10 @@ export type UserCreateWithoutContestVotesInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutContestVotesInput = {
@@ -7847,6 +8319,10 @@ export type UserUncheckedCreateWithoutContestVotesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutContestVotesInput = {
@@ -7924,6 +8400,10 @@ export type UserUpdateWithoutContestVotesInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestVotesInput = {
@@ -7985,6 +8465,10 @@ export type UserUncheckedUpdateWithoutContestVotesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutProductsInput = {
@@ -8046,6 +8530,10 @@ export type UserCreateWithoutProductsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutProductsInput = {
@@ -8107,6 +8595,10 @@ export type UserUncheckedCreateWithoutProductsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutProductsInput = {
@@ -8184,6 +8676,10 @@ export type UserUpdateWithoutProductsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductsInput = {
@@ -8245,6 +8741,10 @@ export type UserUncheckedUpdateWithoutProductsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutDailyStatsInput = {
@@ -8306,6 +8806,10 @@ export type UserCreateWithoutDailyStatsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutDailyStatsInput = {
@@ -8367,6 +8871,10 @@ export type UserUncheckedCreateWithoutDailyStatsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutDailyStatsInput = {
@@ -8444,6 +8952,10 @@ export type UserUpdateWithoutDailyStatsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDailyStatsInput = {
@@ -8505,6 +9017,10 @@ export type UserUncheckedUpdateWithoutDailyStatsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -8566,6 +9082,10 @@ export type UserCreateWithoutCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -8627,6 +9147,10 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -8693,6 +9217,10 @@ export type UserCreateWithoutCommentRepliesToInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutCommentRepliesToInput = {
@@ -8754,6 +9282,10 @@ export type UserUncheckedCreateWithoutCommentRepliesToInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutCommentRepliesToInput = {
@@ -8831,6 +9363,10 @@ export type UserUpdateWithoutCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -8892,6 +9428,10 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUpsertWithoutCommentRepliesToInput = {
@@ -8964,6 +9504,10 @@ export type UserUpdateWithoutCommentRepliesToInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentRepliesToInput = {
@@ -9025,6 +9569,10 @@ export type UserUncheckedUpdateWithoutCommentRepliesToInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutCommentLikesInput = {
@@ -9086,6 +9634,10 @@ export type UserCreateWithoutCommentLikesInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutCommentLikesInput = {
@@ -9147,6 +9699,10 @@ export type UserUncheckedCreateWithoutCommentLikesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutCommentLikesInput = {
@@ -9224,6 +9780,10 @@ export type UserUpdateWithoutCommentLikesInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentLikesInput = {
@@ -9285,6 +9845,10 @@ export type UserUncheckedUpdateWithoutCommentLikesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutCommentReportsInput = {
@@ -9346,6 +9910,10 @@ export type UserCreateWithoutCommentReportsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutCommentReportsInput = {
@@ -9407,6 +9975,10 @@ export type UserUncheckedCreateWithoutCommentReportsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutCommentReportsInput = {
@@ -9484,6 +10056,10 @@ export type UserUpdateWithoutCommentReportsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentReportsInput = {
@@ -9545,6 +10121,10 @@ export type UserUncheckedUpdateWithoutCommentReportsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutTeamsLedInput = {
@@ -9606,6 +10186,10 @@ export type UserCreateWithoutTeamsLedInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutTeamsLedInput = {
@@ -9667,6 +10251,10 @@ export type UserUncheckedCreateWithoutTeamsLedInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutTeamsLedInput = {
@@ -9744,6 +10332,10 @@ export type UserUpdateWithoutTeamsLedInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamsLedInput = {
@@ -9805,6 +10397,10 @@ export type UserUncheckedUpdateWithoutTeamsLedInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutTeamMembershipsInput = {
@@ -9866,6 +10462,10 @@ export type UserCreateWithoutTeamMembershipsInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutTeamMembershipsInput = {
@@ -9927,6 +10527,10 @@ export type UserUncheckedCreateWithoutTeamMembershipsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutTeamMembershipsInput = {
@@ -10004,6 +10608,10 @@ export type UserUpdateWithoutTeamMembershipsInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
@@ -10065,6 +10673,10 @@ export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutTeamInvitationsSentInput = {
@@ -10126,6 +10738,10 @@ export type UserCreateWithoutTeamInvitationsSentInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutTeamInvitationsSentInput = {
@@ -10187,6 +10803,10 @@ export type UserUncheckedCreateWithoutTeamInvitationsSentInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutTeamInvitationsSentInput = {
@@ -10253,6 +10873,10 @@ export type UserCreateWithoutTeamInvitationsReceivedInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutTeamInvitationsReceivedInput = {
@@ -10314,6 +10938,10 @@ export type UserUncheckedCreateWithoutTeamInvitationsReceivedInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutTeamInvitationsReceivedInput = {
@@ -10391,6 +11019,10 @@ export type UserUpdateWithoutTeamInvitationsSentInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamInvitationsSentInput = {
@@ -10452,6 +11084,10 @@ export type UserUncheckedUpdateWithoutTeamInvitationsSentInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUpsertWithoutTeamInvitationsReceivedInput = {
@@ -10524,6 +11160,10 @@ export type UserUpdateWithoutTeamInvitationsReceivedInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamInvitationsReceivedInput = {
@@ -10585,6 +11225,10 @@ export type UserUncheckedUpdateWithoutTeamInvitationsReceivedInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutTeamSubmissionVotesInput = {
@@ -10646,6 +11290,10 @@ export type UserCreateWithoutTeamSubmissionVotesInput = {
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutTeamSubmissionVotesInput = {
@@ -10707,6 +11355,10 @@ export type UserUncheckedCreateWithoutTeamSubmissionVotesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutTeamSubmissionVotesInput = {
@@ -10784,6 +11436,10 @@ export type UserUpdateWithoutTeamSubmissionVotesInput = {
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamSubmissionVotesInput = {
@@ -10845,6 +11501,10 @@ export type UserUncheckedUpdateWithoutTeamSubmissionVotesInput = {
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutChatParticipationsInput = {
@@ -10906,6 +11566,10 @@ export type UserCreateWithoutChatParticipationsInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutChatParticipationsInput = {
@@ -10967,6 +11631,10 @@ export type UserUncheckedCreateWithoutChatParticipationsInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutChatParticipationsInput = {
@@ -11044,6 +11712,10 @@ export type UserUpdateWithoutChatParticipationsInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChatParticipationsInput = {
@@ -11105,6 +11777,10 @@ export type UserUncheckedUpdateWithoutChatParticipationsInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserCreateWithoutSentMessagesInput = {
@@ -11166,6 +11842,10 @@ export type UserCreateWithoutSentMessagesInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserUncheckedCreateWithoutSentMessagesInput = {
@@ -11227,6 +11907,10 @@ export type UserUncheckedCreateWithoutSentMessagesInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
   chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
 }
 
 export type UserCreateOrConnectWithoutSentMessagesInput = {
@@ -11304,6 +11988,10 @@ export type UserUpdateWithoutSentMessagesInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentMessagesInput = {
@@ -11365,6 +12053,1114 @@ export type UserUncheckedUpdateWithoutSentMessagesInput = {
   teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
   chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
+}
+
+export type UserCreateWithoutStoriesInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
+}
+
+export type UserUncheckedCreateWithoutStoriesInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentUncheckedCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestUncheckedCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteUncheckedCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeUncheckedCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportUncheckedCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentUncheckedCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamUncheckedCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
+}
+
+export type UserCreateOrConnectWithoutStoriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutStoriesInput, Prisma.UserUncheckedCreateWithoutStoriesInput>
+}
+
+export type UserUpsertWithoutStoriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutStoriesInput, Prisma.UserUncheckedUpdateWithoutStoriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutStoriesInput, Prisma.UserUncheckedCreateWithoutStoriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutStoriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutStoriesInput, Prisma.UserUncheckedUpdateWithoutStoriesInput>
+}
+
+export type UserUpdateWithoutStoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutStoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUncheckedUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUncheckedUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUncheckedUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUncheckedUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUncheckedUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUncheckedUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUncheckedUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUncheckedUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUncheckedUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUncheckedUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUncheckedUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
+}
+
+export type UserCreateWithoutStoryViewsInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
+}
+
+export type UserUncheckedCreateWithoutStoryViewsInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentUncheckedCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestUncheckedCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteUncheckedCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeUncheckedCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportUncheckedCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentUncheckedCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamUncheckedCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
+}
+
+export type UserCreateOrConnectWithoutStoryViewsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutStoryViewsInput, Prisma.UserUncheckedCreateWithoutStoryViewsInput>
+}
+
+export type UserUpsertWithoutStoryViewsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutStoryViewsInput, Prisma.UserUncheckedUpdateWithoutStoryViewsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutStoryViewsInput, Prisma.UserUncheckedCreateWithoutStoryViewsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutStoryViewsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutStoryViewsInput, Prisma.UserUncheckedUpdateWithoutStoryViewsInput>
+}
+
+export type UserUpdateWithoutStoryViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutStoryViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUncheckedUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUncheckedUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUncheckedUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUncheckedUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUncheckedUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUncheckedUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUncheckedUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUncheckedUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUncheckedUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUncheckedUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUncheckedUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
+}
+
+export type UserCreateWithoutStoryViewerPreferencesInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
+}
+
+export type UserUncheckedCreateWithoutStoryViewerPreferencesInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentUncheckedCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestUncheckedCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteUncheckedCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeUncheckedCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportUncheckedCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentUncheckedCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamUncheckedCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
+}
+
+export type UserCreateOrConnectWithoutStoryViewerPreferencesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutStoryViewerPreferencesInput, Prisma.UserUncheckedCreateWithoutStoryViewerPreferencesInput>
+}
+
+export type UserCreateWithoutPreferredStoryViewersInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+}
+
+export type UserUncheckedCreateWithoutPreferredStoryViewersInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentUncheckedCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestUncheckedCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteUncheckedCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeUncheckedCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportUncheckedCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentUncheckedCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamUncheckedCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+}
+
+export type UserCreateOrConnectWithoutPreferredStoryViewersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPreferredStoryViewersInput, Prisma.UserUncheckedCreateWithoutPreferredStoryViewersInput>
+}
+
+export type UserUpsertWithoutStoryViewerPreferencesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutStoryViewerPreferencesInput, Prisma.UserUncheckedUpdateWithoutStoryViewerPreferencesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutStoryViewerPreferencesInput, Prisma.UserUncheckedCreateWithoutStoryViewerPreferencesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutStoryViewerPreferencesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutStoryViewerPreferencesInput, Prisma.UserUncheckedUpdateWithoutStoryViewerPreferencesInput>
+}
+
+export type UserUpdateWithoutStoryViewerPreferencesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutStoryViewerPreferencesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUncheckedUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUncheckedUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUncheckedUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUncheckedUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUncheckedUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUncheckedUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUncheckedUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUncheckedUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUncheckedUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUncheckedUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUncheckedUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
+}
+
+export type UserUpsertWithoutPreferredStoryViewersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPreferredStoryViewersInput, Prisma.UserUncheckedUpdateWithoutPreferredStoryViewersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPreferredStoryViewersInput, Prisma.UserUncheckedCreateWithoutPreferredStoryViewersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPreferredStoryViewersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPreferredStoryViewersInput, Prisma.UserUncheckedUpdateWithoutPreferredStoryViewersInput>
+}
+
+export type UserUpdateWithoutPreferredStoryViewersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPreferredStoryViewersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUncheckedUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUncheckedUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUncheckedUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUncheckedUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUncheckedUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUncheckedUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUncheckedUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUncheckedUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUncheckedUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUncheckedUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUncheckedUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 
@@ -11410,6 +13206,10 @@ export type UserCountOutputType = {
   judgeInvites: number
   chatParticipations: number
   sentMessages: number
+  stories: number
+  storyViews: number
+  storyViewerPreferences: number
+  preferredStoryViewers: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -11450,6 +13250,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   judgeInvites?: boolean | UserCountOutputTypeCountJudgeInvitesArgs
   chatParticipations?: boolean | UserCountOutputTypeCountChatParticipationsArgs
   sentMessages?: boolean | UserCountOutputTypeCountSentMessagesArgs
+  stories?: boolean | UserCountOutputTypeCountStoriesArgs
+  storyViews?: boolean | UserCountOutputTypeCountStoryViewsArgs
+  storyViewerPreferences?: boolean | UserCountOutputTypeCountStoryViewerPreferencesArgs
+  preferredStoryViewers?: boolean | UserCountOutputTypeCountPreferredStoryViewersArgs
 }
 
 /**
@@ -11721,6 +13525,34 @@ export type UserCountOutputTypeCountSentMessagesArgs<ExtArgs extends runtime.Typ
   where?: Prisma.MessageWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountStoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StoryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountStoryViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StoryViewWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountStoryViewerPreferencesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StoryViewerPreferenceWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPreferredStoryViewersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StoryViewerPreferenceWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -11782,6 +13614,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   judgeInvites?: boolean | Prisma.User$judgeInvitesArgs<ExtArgs>
   chatParticipations?: boolean | Prisma.User$chatParticipationsArgs<ExtArgs>
   sentMessages?: boolean | Prisma.User$sentMessagesArgs<ExtArgs>
+  stories?: boolean | Prisma.User$storiesArgs<ExtArgs>
+  storyViews?: boolean | Prisma.User$storyViewsArgs<ExtArgs>
+  storyViewerPreferences?: boolean | Prisma.User$storyViewerPreferencesArgs<ExtArgs>
+  preferredStoryViewers?: boolean | Prisma.User$preferredStoryViewersArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -11897,6 +13733,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   judgeInvites?: boolean | Prisma.User$judgeInvitesArgs<ExtArgs>
   chatParticipations?: boolean | Prisma.User$chatParticipationsArgs<ExtArgs>
   sentMessages?: boolean | Prisma.User$sentMessagesArgs<ExtArgs>
+  stories?: boolean | Prisma.User$storiesArgs<ExtArgs>
+  storyViews?: boolean | Prisma.User$storyViewsArgs<ExtArgs>
+  storyViewerPreferences?: boolean | Prisma.User$storyViewerPreferencesArgs<ExtArgs>
+  preferredStoryViewers?: boolean | Prisma.User$preferredStoryViewersArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -11943,6 +13783,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     judgeInvites: Prisma.$JudgeInvitePayload<ExtArgs>[]
     chatParticipations: Prisma.$ChatParticipantPayload<ExtArgs>[]
     sentMessages: Prisma.$MessagePayload<ExtArgs>[]
+    stories: Prisma.$StoryPayload<ExtArgs>[]
+    storyViews: Prisma.$StoryViewPayload<ExtArgs>[]
+    storyViewerPreferences: Prisma.$StoryViewerPreferencePayload<ExtArgs>[]
+    preferredStoryViewers: Prisma.$StoryViewerPreferencePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -12398,6 +14242,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   judgeInvites<T extends Prisma.User$judgeInvitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$judgeInvitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JudgeInvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   chatParticipations<T extends Prisma.User$chatParticipationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$chatParticipationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentMessages<T extends Prisma.User$sentMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  stories<T extends Prisma.User$storiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$storiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  storyViews<T extends Prisma.User$storyViewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$storyViewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoryViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  storyViewerPreferences<T extends Prisma.User$storyViewerPreferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$storyViewerPreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoryViewerPreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  preferredStoryViewers<T extends Prisma.User$preferredStoryViewersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$preferredStoryViewersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoryViewerPreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13745,6 +15593,102 @@ export type User$sentMessagesArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * User.stories
+ */
+export type User$storiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Story
+   */
+  select?: Prisma.StorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Story
+   */
+  omit?: Prisma.StoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StoryInclude<ExtArgs> | null
+  where?: Prisma.StoryWhereInput
+  orderBy?: Prisma.StoryOrderByWithRelationInput | Prisma.StoryOrderByWithRelationInput[]
+  cursor?: Prisma.StoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StoryScalarFieldEnum | Prisma.StoryScalarFieldEnum[]
+}
+
+/**
+ * User.storyViews
+ */
+export type User$storyViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StoryView
+   */
+  select?: Prisma.StoryViewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StoryView
+   */
+  omit?: Prisma.StoryViewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StoryViewInclude<ExtArgs> | null
+  where?: Prisma.StoryViewWhereInput
+  orderBy?: Prisma.StoryViewOrderByWithRelationInput | Prisma.StoryViewOrderByWithRelationInput[]
+  cursor?: Prisma.StoryViewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StoryViewScalarFieldEnum | Prisma.StoryViewScalarFieldEnum[]
+}
+
+/**
+ * User.storyViewerPreferences
+ */
+export type User$storyViewerPreferencesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StoryViewerPreference
+   */
+  select?: Prisma.StoryViewerPreferenceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StoryViewerPreference
+   */
+  omit?: Prisma.StoryViewerPreferenceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StoryViewerPreferenceInclude<ExtArgs> | null
+  where?: Prisma.StoryViewerPreferenceWhereInput
+  orderBy?: Prisma.StoryViewerPreferenceOrderByWithRelationInput | Prisma.StoryViewerPreferenceOrderByWithRelationInput[]
+  cursor?: Prisma.StoryViewerPreferenceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StoryViewerPreferenceScalarFieldEnum | Prisma.StoryViewerPreferenceScalarFieldEnum[]
+}
+
+/**
+ * User.preferredStoryViewers
+ */
+export type User$preferredStoryViewersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StoryViewerPreference
+   */
+  select?: Prisma.StoryViewerPreferenceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StoryViewerPreference
+   */
+  omit?: Prisma.StoryViewerPreferenceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StoryViewerPreferenceInclude<ExtArgs> | null
+  where?: Prisma.StoryViewerPreferenceWhereInput
+  orderBy?: Prisma.StoryViewerPreferenceOrderByWithRelationInput | Prisma.StoryViewerPreferenceOrderByWithRelationInput[]
+  cursor?: Prisma.StoryViewerPreferenceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StoryViewerPreferenceScalarFieldEnum | Prisma.StoryViewerPreferenceScalarFieldEnum[]
 }
 
 /**

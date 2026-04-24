@@ -80,6 +80,10 @@ model User {
   judgeInvites        JudgeInvite[]     @relation("JudgeInvites")
   chatParticipations  ChatParticipant[] @relation("ChatParticipations")
   sentMessages        Message[]         @relation("SentMessages")
+  stories             Story[]
+  storyViews          StoryView[]
+  storyViewerPreferences StoryViewerPreference[] @relation("ViewerPreferences")
+  preferredStoryViewers  StoryViewerPreference[] @relation("PreferredViewers")
 
   @@map("users")
 }
@@ -950,4 +954,57 @@ model Message {
 
   @@index([chatId, createdAt])
   @@map("messages")
+}
+
+// ─── STORIES (PHASE 2) ────────────────────────────────────
+
+enum StoryPrivacy {
+  PUBLIC
+  LOVERS
+  ADMIRERS
+  SPECIFIC_USERS
+}
+
+model Story {
+  id          String       @id @default(uuid())
+  creatorId   String       @map("creator_id")
+  mediaUrl    String       @map("media_url")
+  mediaType   String       @map("media_type") // image, video, text
+  text        String?      @db.Text
+  privacy     StoryPrivacy @default(PUBLIC)
+  expiresAt   DateTime     @map("expires_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  creator User        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  views   StoryView[]
+
+  @@index([creatorId, expiresAt])
+  @@map("stories")
+}
+
+model StoryView {
+  id        String   @id @default(uuid())
+  storyId   String   @map("story_id")
+  viewerId  String   @map("viewer_id")
+  viewedAt  DateTime @default(now()) @map("viewed_at")
+  isTipped  Boolean  @default(false) @map("is_tipped")
+  tipAmount Decimal? @db.Decimal(10, 2) @map("tip_amount")
+
+  story  Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  viewer User  @relation(fields: [viewerId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, viewerId])
+  @@map("story_views")
+}
+
+model StoryViewerPreference {
+  id               String   @id @default(uuid())
+  ownerId          String   @map("owner_id")
+  preferredViewerId String  @map("preferred_viewer_id")
+
+  owner           User @relation("ViewerPreferences", fields: [ownerId], references: [id], onDelete: Cascade)
+  preferredViewer User @relation("PreferredViewers", fields: [preferredViewerId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, preferredViewerId])
+  @@map("story_viewer_preferences")
 }

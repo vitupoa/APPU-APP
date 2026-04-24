@@ -115,3 +115,13 @@ export const ChatType = {
 } as const
 
 export type ChatType = (typeof ChatType)[keyof typeof ChatType]
+
+
+export const StoryPrivacy = {
+  PUBLIC: 'PUBLIC',
+  LOVERS: 'LOVERS',
+  ADMIRERS: 'ADMIRERS',
+  SPECIFIC_USERS: 'SPECIFIC_USERS'
+} as const
+
+export type StoryPrivacy = (typeof StoryPrivacy)[keyof typeof StoryPrivacy]

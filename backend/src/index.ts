@@ -21,6 +21,7 @@ import mediaRoutes from './modules/media/media.routes.js';
 import commentsRoutes from './modules/comments/comments.routes.js';
 import teamsRoutes from './modules/teams/teams.routes.js';
 import chatRoutes from './modules/chat/chat.routes.js';
+import { storiesRoutes } from './modules/stories/stories.routes.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -59,6 +60,7 @@ app.use('/api/v1/media', mediaRoutes);
 app.use('/api/v1/comments', commentsRoutes);
 app.use('/api/v1/teams', teamsRoutes);
 app.use('/api/v1/chat', chatRoutes);
+app.use('/api/v1/stories', storiesRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
