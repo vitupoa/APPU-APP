@@ -44,9 +44,9 @@ export class ChamaController {
       const chamaId = String(req.params.id);
       const chama = await ChamaService.getChamaById(chamaId);
       if (!chama) return res.status(404).json({ success: false, error: 'Chama not found' });
-      res.json({ success: true, chama });
+      return res.json({ success: true, chama });
     } catch (e: any) {
-      res.status(400).json({ success: false, error: e.message });
+      return res.status(400).json({ success: false, error: e.message });
     }
   }
 

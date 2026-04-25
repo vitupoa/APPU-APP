@@ -1,3 +1,4 @@
+import cron from 'node-cron';
 import { prisma } from '../config/database.js';
 import { BudgetService } from '../modules/budget/budget.service.js';
 import { FCMService } from '../services/fcm.service.js';
@@ -20,11 +21,11 @@ export function startBudgetAlertWorker() {
           if (analytics.shouldAlert && analytics.percentageSpent >= budget.alertAt) {
             console.log(`[BudgetAlertWorker] Alert for budget ${budget.id}: ${analytics.percentageSpent}% spent`);
             
-            if (budget.user.fcmToken) {
+            if (budget.user.deviceToken) {
               if (analytics.percentageSpent >= 100) {
-                await fcmService.sendBudgetExceeded(budget.user.fcmToken, budget.name);
+                await fcmService.sendBudgetExceeded(budget.user.deviceToken, budget.name);
               } else {
-                await fcmService.sendBudgetAlert(budget.user.fcmToken, budget.name, analytics.percentageSpent);
+                await fcmService.sendBudgetAlert(budget.user.deviceToken, budget.name, analytics.percentageSpent);
               }
             }
           }
@@ -33,8 +34,8 @@ export function startBudgetAlertWorker() {
           if (daysUntilEnd <= 3 && daysUntilEnd > 0) {
             console.log(`[BudgetAlertWorker] Budget ${budget.id} ending in ${daysUntilEnd} days`);
             
-            if (budget.user.fcmToken) {
-              await fcmService.sendBudgetEnding(budget.user.fcmToken, budget.name, daysUntilEnd);
+            if (budget.user.deviceToken) {
+              await fcmService.sendBudgetEnding(budget.user.deviceToken, budget.name, daysUntilEnd);
             }
           }
         } catch (error) {

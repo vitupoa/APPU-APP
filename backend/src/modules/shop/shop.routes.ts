@@ -61,7 +61,8 @@ router.get('/categories', async (_req: AuthRequest, res: Response) => {
 // GET /products/:id
 router.get('/products/:id', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const product = await ShopService.getProduct(req.params.id, req.userId);
+    const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const product = await ShopService.getProduct(productId, req.userId);
     res.json(product);
   } catch (e: any) { res.status(404).json({ error: 'Product not found' }); }
 });
@@ -81,7 +82,8 @@ router.post('/products', authMiddleware, async (req: AuthRequest, res: Response)
 router.put('/products/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = updateProductSchema.parse(req.body);
-    const product = await ShopService.updateProduct(req.params.id, req.userId!, data);
+    const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const product = await ShopService.updateProduct(productId, req.userId!, data);
     res.json(product);
   } catch (e: any) {
     res.status(e.name === 'ZodError' ? 400 : 400).json({ error: e.message });
@@ -91,7 +93,8 @@ router.put('/products/:id', authMiddleware, async (req: AuthRequest, res: Respon
 // DELETE /products/:id
 router.delete('/products/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    await ShopService.deleteProduct(req.params.id, req.userId!);
+    const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    await ShopService.deleteProduct(productId, req.userId!);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -110,8 +113,8 @@ router.get('/parts/compatible', async (req: AuthRequest, res: Response) => {
       year: year ? parseInt(year as string) : undefined,
       partType: partType as string,
     });
-    res.json(parts);
-  } catch (e: any) { res.status(500).json({ error: e.message }); }
+    return res.json(parts);
+  } catch (e: any) { return res.status(500).json({ error: e.message }); }
 });
 
 // ═══════════════════════════════════════════════════════════
@@ -120,9 +123,10 @@ router.get('/parts/compatible', async (req: AuthRequest, res: Response) => {
 
 router.get('/products/:id/reviews', async (req: AuthRequest, res: Response) => {
   try {
+    const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const cursor = req.query.cursor as string | undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
-    const result = await ReviewService.getProductReviews(req.params.id, cursor, limit);
+    const result = await ReviewService.getProductReviews(productId, cursor, limit);
     res.json(result);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
@@ -139,7 +143,8 @@ router.post('/reviews', authMiddleware, async (req: AuthRequest, res: Response) 
 
 router.delete('/reviews/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    await ReviewService.deleteReview(req.params.id, req.userId!);
+    const reviewId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    await ReviewService.deleteReview(reviewId, req.userId!);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -157,7 +162,8 @@ router.get('/wishlists', authMiddleware, async (req: AuthRequest, res: Response)
 
 router.get('/wishlists/public/:userId', async (req: AuthRequest, res: Response) => {
   try {
-    const wishlists = await WishlistService.getPublicWishlists(req.params.userId);
+    const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
+    const wishlists = await WishlistService.getPublicWishlists(userId);
     res.json(wishlists);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
@@ -174,22 +180,26 @@ router.post('/wishlists', authMiddleware, async (req: AuthRequest, res: Response
 
 router.post('/wishlists/:id/items', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const wishlistId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const data = addWishlistItemSchema.parse(req.body);
-    const item = await WishlistService.addItem(req.params.id, req.userId!, data);
+    const item = await WishlistService.addItem(wishlistId, req.userId!, data);
     res.status(201).json(item);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
 
 router.delete('/wishlists/:id/items/:itemId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    await WishlistService.removeItem(req.params.id, req.params.itemId, req.userId!);
+    const wishlistId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const itemId = Array.isArray(req.params.itemId) ? req.params.itemId[0] : req.params.itemId;
+    await WishlistService.removeItem(wishlistId, itemId, req.userId!);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
 
 router.delete('/wishlists/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    await WishlistService.deleteWishlist(req.params.id, req.userId!);
+    const wishlistId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    await WishlistService.deleteWishlist(wishlistId, req.userId!);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -217,7 +227,8 @@ router.post('/cart', authMiddleware, async (req: AuthRequest, res: Response) => 
 
 router.delete('/cart/:productId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    await CartService.removeFromCart(req.userId!, req.params.productId);
+    const productId = Array.isArray(req.params.productId) ? req.params.productId[0] : req.params.productId;
+    await CartService.removeFromCart(req.userId!, productId);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -304,7 +315,8 @@ router.post('/group-buys', authMiddleware, async (req: AuthRequest, res: Respons
 
 router.post('/group-buys/:id/join', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const result = await GroupBuyService.joinGroupBuy(req.params.id, req.userId!);
+    const groupBuyId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const result = await GroupBuyService.joinGroupBuy(groupBuyId, req.userId!);
     res.json(result);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -330,7 +342,8 @@ router.post('/deal-alerts', authMiddleware, async (req: AuthRequest, res: Respon
 
 router.delete('/deal-alerts/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    await DealAlertService.deleteAlert(req.params.id, req.userId!);
+    const alertId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    await DealAlertService.deleteAlert(alertId, req.userId!);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -353,7 +366,8 @@ router.get('/garages', async (req: AuthRequest, res: Response) => {
 
 router.get('/garages/:id', async (req: AuthRequest, res: Response) => {
   try {
-    const garage = await GarageService.getProfile(req.params.id);
+    const garageId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const garage = await GarageService.getProfile(garageId);
     res.json(garage);
   } catch (e: any) { res.status(404).json({ error: 'Garage not found' }); }
 });
@@ -383,15 +397,17 @@ router.get('/garages/bookings/mine', authMiddleware, async (req: AuthRequest, re
 
 router.patch('/garages/bookings/:id/status', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const booking = await GarageService.updateBookingStatus(req.params.id, req.userId!, req.body.status);
+    const bookingId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const booking = await GarageService.updateBookingStatus(bookingId, req.userId!, req.body.status);
     res.json(booking);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
 
 router.post('/garages/:id/reviews', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const garageId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const review = await GarageService.createReview(req.userId!, {
-      garageId: req.params.id, rating: req.body.rating, text: req.body.text
+      garageId, rating: req.body.rating, text: req.body.text
     });
     res.status(201).json(review);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
@@ -437,8 +453,9 @@ router.get('/import-requests', authMiddleware, async (req: AuthRequest, res: Res
 
 router.post('/import-requests/:id/quotes', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const requestId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const quote = await ImporterService.submitQuote(req.userId!, {
-      requestId: req.params.id, ...req.body
+      requestId, ...req.body
     });
     res.status(201).json(quote);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
@@ -446,7 +463,9 @@ router.post('/import-requests/:id/quotes', authMiddleware, async (req: AuthReque
 
 router.post('/import-requests/:id/accept/:quoteId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const result = await ImporterService.acceptQuote(req.params.id, req.params.quoteId, req.userId!);
+    const requestId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const quoteId = Array.isArray(req.params.quoteId) ? req.params.quoteId[0] : req.params.quoteId;
+    const result = await ImporterService.acceptQuote(requestId, quoteId, req.userId!);
     res.json(result);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -509,14 +528,16 @@ router.post('/live-sessions', authMiddleware, async (req: AuthRequest, res: Resp
 
 router.post('/live-sessions/:id/start', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const session = await LiveShoppingService.startSession(req.params.id, req.userId!);
+    const sessionId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const session = await LiveShoppingService.startSession(sessionId, req.userId!);
     res.json(session);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
 
 router.post('/live-sessions/:id/end', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const session = await LiveShoppingService.endSession(req.params.id, req.userId!);
+    const sessionId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const session = await LiveShoppingService.endSession(sessionId, req.userId!);
     res.json(session);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -554,7 +575,9 @@ router.post('/tags', authMiddleware, async (req: AuthRequest, res: Response) => 
 
 router.get('/tags/:contentType/:contentId', async (req: AuthRequest, res: Response) => {
   try {
-    const tags = await ProductShareService.getProductTags(req.params.contentId, req.params.contentType);
+    const contentId = Array.isArray(req.params.contentId) ? req.params.contentId[0] : req.params.contentId;
+    const contentType = Array.isArray(req.params.contentType) ? req.params.contentType[0] : req.params.contentType;
+    const tags = await ProductShareService.getProductTags(contentId, contentType);
     res.json(tags);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
@@ -566,21 +589,24 @@ router.get('/tags/:contentType/:contentId', async (req: AuthRequest, res: Respon
 router.post('/products/:id/discounts', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createDiscountSchema.parse(req.body);
-    const discount = await DiscountService.createDiscount(req.userId!, req.params.id, data);
+    const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const discount = await DiscountService.createDiscount(req.userId!, productId, data);
     res.status(201).json(discount);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
 
 router.get('/products/:id/discounts', async (req: AuthRequest, res: Response) => {
   try {
-    const discounts = await DiscountService.getProductDiscounts(req.params.id);
+    const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const discounts = await DiscountService.getProductDiscounts(productId);
     res.json(discounts);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 router.delete('/discounts/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    await DiscountService.deleteDiscount(req.params.id, req.userId!);
+    const discountId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    await DiscountService.deleteDiscount(discountId, req.userId!);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -616,21 +642,25 @@ router.get('/orders/seller', authMiddleware, async (req: AuthRequest, res: Respo
 
 router.get('/orders/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const order = await OrderService.getOrder(req.params.id, req.userId!);
+    const orderId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const order = await OrderService.getOrder(orderId, req.userId!);
     res.json(order);
   } catch (e: any) { res.status(404).json({ error: 'Order not found' }); }
 });
 
 router.patch('/orders/:id/status', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const order = await OrderService.updateOrderStatus(req.params.id, req.userId!, req.body.status);
+    const orderId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const order = await OrderService.updateOrderStatus(orderId, req.userId!, req.body.status);
     res.json(order);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
 
 router.post('/orders/:orderId/items/:itemId/confirm-delivery', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const result = await OrderService.confirmDelivery(req.params.orderId, req.params.itemId, req.userId!);
+    const orderId = Array.isArray(req.params.orderId) ? req.params.orderId[0] : req.params.orderId;
+    const itemId = Array.isArray(req.params.itemId) ? req.params.itemId[0] : req.params.itemId;
+    const result = await OrderService.confirmDelivery(orderId, itemId, req.userId!);
     res.json(result);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -641,8 +671,9 @@ router.post('/orders/:orderId/items/:itemId/confirm-delivery', authMiddleware, a
 
 router.get('/analytics/products/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const days = req.query.days ? parseInt(req.query.days as string) : 30;
-    const analytics = await ShopAnalyticsService.getProductAnalytics(req.params.id, days);
+    const analytics = await ShopAnalyticsService.getProductAnalytics(productId, days);
     res.json(analytics);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
@@ -676,7 +707,8 @@ router.post('/vehicles/favorites', authMiddleware, async (req: AuthRequest, res:
 
 router.delete('/vehicles/favorites/:productId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    await ShopService.removeVehicleFavorite(req.userId!, req.params.productId);
+    const productId = Array.isArray(req.params.productId) ? req.params.productId[0] : req.params.productId;
+    await ShopService.removeVehicleFavorite(req.userId!, productId);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -706,7 +738,8 @@ router.post('/calculator/import-cost', async (req: AuthRequest, res: Response) =
 
 router.get('/products/:id/friends-bought', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const friends = await ShopService.getFriendsWhoBought(req.userId!, req.params.id);
+    const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const friends = await ShopService.getFriendsWhoBought(req.userId!, productId);
     res.json(friends);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

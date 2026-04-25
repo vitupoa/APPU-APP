@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../config/database.js';
 import axios from 'axios';
-
-const prisma = new PrismaClient();
 
 interface SocialMetrics {
   followerCount: number;

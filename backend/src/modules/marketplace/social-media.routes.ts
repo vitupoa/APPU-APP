@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { SocialMediaService } from './social-media.service.js';
-import { authenticate } from '../../middleware/authenticate.js';
+import { authMiddleware } from '../../middleware/auth.js';
 
 const router = Router();
 const socialMediaService = new SocialMediaService();
 
 // ─── ADD SOCIAL MEDIA ACCOUNT ──────────────────────────────
 
-router.post('/social-accounts', authenticate, async (req, res) => {
+router.post('/social-accounts', authMiddleware, async (req, res) => {
   try {
     const { influencerId, platform, username, accessToken } = req.body;
     
@@ -29,7 +29,7 @@ router.post('/social-accounts', authenticate, async (req, res) => {
 
 // ─── GET INFLUENCER'S SOCIAL ACCOUNTS ──────────────────────
 
-router.get('/social-accounts/:influencerId', authenticate, async (req, res) => {
+router.get('/social-accounts/:influencerId', authMiddleware, async (req, res) => {
   try {
     const { influencerId } = req.params;
     
@@ -43,7 +43,7 @@ router.get('/social-accounts/:influencerId', authenticate, async (req, res) => {
 
 // ─── SYNC ACCOUNT METRICS ──────────────────────────────────
 
-router.post('/social-accounts/:accountId/sync', authenticate, async (req, res) => {
+router.post('/social-accounts/:accountId/sync', authMiddleware, async (req, res) => {
   try {
     const { accountId } = req.params;
     
@@ -57,7 +57,7 @@ router.post('/social-accounts/:accountId/sync', authenticate, async (req, res) =
 
 // ─── SET PRIMARY ACCOUNT ───────────────────────────────────
 
-router.patch('/social-accounts/:accountId/primary', authenticate, async (req, res) => {
+router.patch('/social-accounts/:accountId/primary', authMiddleware, async (req, res) => {
   try {
     const { accountId } = req.params;
     const { influencerId } = req.body;
@@ -72,7 +72,7 @@ router.patch('/social-accounts/:accountId/primary', authenticate, async (req, re
 
 // ─── DELETE SOCIAL ACCOUNT ─────────────────────────────────
 
-router.delete('/social-accounts/:accountId', authenticate, async (req, res) => {
+router.delete('/social-accounts/:accountId', authMiddleware, async (req, res) => {
   try {
     const { accountId } = req.params;
     
@@ -86,7 +86,7 @@ router.delete('/social-accounts/:accountId', authenticate, async (req, res) => {
 
 // ─── SYNC ALL ACCOUNTS (ADMIN/CRON) ───────────────────────
 
-router.post('/social-accounts/sync-all', authenticate, async (req, res) => {
+router.post('/social-accounts/sync-all', authMiddleware, async (req, res) => {
   try {
     // TODO: Add admin authorization check
     

@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.js';
+import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { prisma } from '../../config/database.js';
 
 const router = Router();
 
-router.post('/register-token', authenticate, async (req, res) => {
+router.post('/register-token', authMiddleware, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
     const { deviceToken, platform } = req.body;
@@ -19,41 +19,41 @@ router.post('/register-token', authenticate, async (req, res) => {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        fcmToken: deviceToken,
+        deviceToken,
         devicePlatform: platform,
       },
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Device token registered successfully',
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
   }
 });
 
-router.delete('/unregister-token', authenticate, async (req, res) => {
+router.delete('/unregister-token', authMiddleware, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
 
     await prisma.user.update({
       where: { id: userId },
       data: {
-        fcmToken: null,
+        deviceToken: null,
         devicePlatform: null,
       },
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Device token unregistered successfully',
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });

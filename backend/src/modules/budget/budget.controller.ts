@@ -31,9 +31,9 @@ export class BudgetController {
       if (!budget) {
         return res.status(404).json({ success: false, error: 'Budget not found' });
       }
-      res.json({ success: true, budget });
+      return res.json({ success: true, budget });
     } catch (e: any) {
-      res.status(400).json({ success: false, error: e.message });
+      return res.status(400).json({ success: false, error: e.message });
     }
   }
 
