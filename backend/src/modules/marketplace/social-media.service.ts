@@ -358,17 +358,14 @@ export class SocialMediaService {
       where: { influencerId },
     });
     
-    // Calculate total followers across all platforms
     const totalFollowers = accounts.reduce((sum: number, acc) => sum + acc.followerCount, 0);
     
-    // Determine tier
-    let tier = 'NANO';
+    let tier: 'NANO' | 'MICRO' | 'MID' | 'MACRO' | 'MEGA' = 'NANO';
     if (totalFollowers >= 1000000) tier = 'MEGA';
     else if (totalFollowers >= 500000) tier = 'MACRO';
     else if (totalFollowers >= 100000) tier = 'MID';
     else if (totalFollowers >= 10000) tier = 'MICRO';
     
-    // Calculate average engagement rate
     const avgEngagement = accounts.reduce((sum: number, acc) => sum + Number(acc.engagementRate), 0) / accounts.length;
     
     await prisma.influencerProfile.update({

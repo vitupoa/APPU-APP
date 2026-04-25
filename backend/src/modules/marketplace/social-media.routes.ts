@@ -31,7 +31,7 @@ router.post('/social-accounts', authMiddleware, async (req, res) => {
 
 router.get('/social-accounts/:influencerId', authMiddleware, async (req, res) => {
   try {
-    const { influencerId } = req.params;
+    const influencerId = Array.isArray(req.params.influencerId) ? req.params.influencerId[0] : req.params.influencerId;
     
     const accounts = await socialMediaService.getInfluencerSocialAccounts(influencerId);
     
@@ -45,7 +45,7 @@ router.get('/social-accounts/:influencerId', authMiddleware, async (req, res) =>
 
 router.post('/social-accounts/:accountId/sync', authMiddleware, async (req, res) => {
   try {
-    const { accountId } = req.params;
+    const accountId = Array.isArray(req.params.accountId) ? req.params.accountId[0] : req.params.accountId;
     
     const account = await socialMediaService.syncAccountMetrics(accountId);
     
@@ -59,7 +59,7 @@ router.post('/social-accounts/:accountId/sync', authMiddleware, async (req, res)
 
 router.patch('/social-accounts/:accountId/primary', authMiddleware, async (req, res) => {
   try {
-    const { accountId } = req.params;
+    const accountId = Array.isArray(req.params.accountId) ? req.params.accountId[0] : req.params.accountId;
     const { influencerId } = req.body;
     
     const account = await socialMediaService.setPrimaryAccount(accountId, influencerId);
@@ -74,7 +74,7 @@ router.patch('/social-accounts/:accountId/primary', authMiddleware, async (req, 
 
 router.delete('/social-accounts/:accountId', authMiddleware, async (req, res) => {
   try {
-    const { accountId } = req.params;
+    const accountId = Array.isArray(req.params.accountId) ? req.params.accountId[0] : req.params.accountId;
     
     await socialMediaService.deleteSocialAccount(accountId);
     

@@ -106,14 +106,17 @@ router.delete('/products/:id', authMiddleware, async (req: AuthRequest, res: Res
 router.get('/parts/compatible', async (req: AuthRequest, res: Response) => {
   try {
     const { make, model, year, partType } = req.query;
-    if (!make) return res.status(400).json({ error: 'make is required' });
+    if (!make) {
+      res.status(400).json({ error: 'make is required' });
+      return;
+    }
     const parts = await ShopService.findCompatibleParts({
       make: make as string,
       model: model as string,
       year: year ? parseInt(year as string) : undefined,
       partType: partType as string,
     });
-    return res.json(parts);
+    res.json(parts);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
