@@ -471,3 +471,65 @@ export const FunnelStage = {
 } as const
 
 export type FunnelStage = (typeof FunnelStage)[keyof typeof FunnelStage]
+
+
+export const SocialPlatform = {
+  TIKTOK: 'TIKTOK',
+  YOUTUBE: 'YOUTUBE',
+  INSTAGRAM: 'INSTAGRAM',
+  FACEBOOK: 'FACEBOOK',
+  TWITTER: 'TWITTER',
+  TWITCH: 'TWITCH',
+  LINKEDIN: 'LINKEDIN',
+  SNAPCHAT: 'SNAPCHAT'
+} as const
+
+export type SocialPlatform = (typeof SocialPlatform)[keyof typeof SocialPlatform]
+
+
+export const AdminRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  CONTENT_MODERATOR: 'CONTENT_MODERATOR',
+  FINANCIAL_ADMIN: 'FINANCIAL_ADMIN',
+  SUPPORT_ADMIN: 'SUPPORT_ADMIN',
+  MARKETING_ADMIN: 'MARKETING_ADMIN',
+  ANALYTICS_ADMIN: 'ANALYTICS_ADMIN',
+  SECURITY_ADMIN: 'SECURITY_ADMIN',
+  COMMUNITY_MANAGER: 'COMMUNITY_MANAGER'
+} as const
+
+export type AdminRole = (typeof AdminRole)[keyof typeof AdminRole]
+
+
+export const FeatureFlagScope = {
+  GLOBAL: 'GLOBAL',
+  CONTINENT: 'CONTINENT',
+  COUNTRY: 'COUNTRY',
+  REGION: 'REGION',
+  CITY: 'CITY',
+  USER: 'USER'
+} as const
+
+export type FeatureFlagScope = (typeof FeatureFlagScope)[keyof typeof FeatureFlagScope]
+
+
+export const WithdrawalStatus = {
+  PENDING: 'PENDING',
+  FLAGGED: 'FLAGGED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+
+export type WithdrawalStatus = (typeof WithdrawalStatus)[keyof typeof WithdrawalStatus]
+
+
+export const SuspensionType = {
+  SUSPENDED: 'SUSPENDED',
+  BANNED: 'BANNED',
+  BLOCKED: 'BLOCKED'
+} as const
+
+export type SuspensionType = (typeof SuspensionType)[keyof typeof SuspensionType]

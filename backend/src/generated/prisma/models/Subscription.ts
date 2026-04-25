@@ -607,10 +607,6 @@ export type SubscriptionUncheckedUpdateManyWithoutSubscriptionTierNestedInput = 
   deleteMany?: Prisma.SubscriptionScalarWhereInput | Prisma.SubscriptionScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type SubscriptionCreateWithoutSubscriberInput = {
   id?: string
   tier: $Enums.SubscriptionTierType

@@ -133,6 +133,13 @@ model User {
   gamificationPoints    GamificationPoints?
   gamificationActivities GamificationActivity[] @relation("GamificationActivities")
 
+  // RembrandtRAR (Platform Governance)
+  adminProfile          AdminProfile?
+  suspensions           UserSuspension[]
+  withdrawalRequests    WithdrawalRequest[]
+  isSuspended           Boolean           @default(false) @map("is_suspended")
+  suspendedAt           DateTime?         @map("suspended_at")
+
   @@map("users")
 }
 
@@ -3060,4 +3067,200 @@ model PlatformRateLimit {
 
   @@unique([platform])
   @@map("platform_rate_limits")
+}
+
+// ─── REMBRANDT RAR (PLATFORM GOVERNANCE) ──────────────────
+
+enum AdminRole {
+  SUPER_ADMIN
+  CONTENT_MODERATOR
+  FINANCIAL_ADMIN
+  SUPPORT_ADMIN
+  MARKETING_ADMIN
+  ANALYTICS_ADMIN
+  SECURITY_ADMIN
+  COMMUNITY_MANAGER
+}
+
+enum FeatureFlagScope {
+  GLOBAL
+  CONTINENT
+  COUNTRY
+  REGION
+  CITY
+  USER
+}
+
+enum WithdrawalStatus {
+  PENDING
+  FLAGGED
+  APPROVED
+  REJECTED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SuspensionType {
+  SUSPENDED
+  BANNED
+  BLOCKED
+}
+
+model AdminProfile {
+  id          String    @id @default(uuid())
+  userId      String    @unique @map("user_id")
+  role        AdminRole
+  permissions Json?
+  grantedBy   String?   @map("granted_by")
+  isActive    Boolean   @default(true) @map("is_active")
+  lastLoginAt DateTime? @map("last_login_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admin_profiles")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  adminId    String   @map("admin_id")
+  action     String
+  targetType String   @map("target_type")
+  targetId   String   @map("target_id")
+  details    Json?
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([adminId, createdAt])
+  @@index([targetType, targetId])
+  @@map("audit_logs")
+}
+
+model FeatureFlag {
+  id         String           @id @default(uuid())
+  featureKey String           @map("feature_key")
+  isEnabled  Boolean          @default(true) @map("is_enabled")
+  scope      FeatureFlagScope @default(GLOBAL)
+  scopeValue String?          @map("scope_value")
+  priority   Int              @default(0)
+  createdBy  String?          @map("created_by")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+
+  @@unique([featureKey, scope, scopeValue])
+  @@index([featureKey, scope])
+  @@map("feature_flags")
+}
+
+model ProhibitedName {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  type      String   // "username", "display_name", "both"
+  reason    String?
+  addedBy   String?  @map("added_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("prohibited_names")
+}
+
+model ReservedUsername {
+  id          String   @id @default(uuid())
+  username    String   @unique
+  reservedFor String?  @map("reserved_for")
+  reason      String?
+  reservedBy  String?  @map("reserved_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("reserved_usernames")
+}
+
+model WithdrawalRequest {
+  id              String           @id @default(uuid())
+  userId          String           @map("user_id")
+  amountKr        Decimal          @map("amount_kr") @db.Decimal(18, 4)
+  amountFiat      Decimal?         @map("amount_fiat") @db.Decimal(18, 4)
+  currency        String           @db.VarChar(3)
+  provider        String           // "mpesa", "bank", "paypal", "payoneer"
+  accountName     String           @map("account_name")
+  accountDetails  Json             @map("account_details")
+  nameMatchStatus String           @default("pending") @map("name_match_status") // "match", "mismatch", "pending"
+  status          WithdrawalStatus @default(PENDING)
+  reviewedBy      String?          @map("reviewed_by")
+  reviewNote      String?          @map("review_note")
+  reviewedAt      DateTime?        @map("reviewed_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("withdrawal_requests")
+}
+
+model PlatformWallet {
+  id        String   @id @default(uuid())
+  krBalance Decimal  @default(0) @map("kr_balance") @db.Decimal(18, 4)
+  label     String   @default("main") // "main", "escrow_reserve", "fee_pool"
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([label])
+  @@map("platform_wallets")
+}
+
+model UserSuspension {
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")
+  reason      String
+  suspendedBy String         @map("suspended_by")
+  type        SuspensionType
+  expiresAt   DateTime?      @map("expires_at")
+  liftedAt    DateTime?      @map("lifted_at")
+  liftedBy    String?        @map("lifted_by")
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("user_suspensions")
+}
+
+model PlatformAnnouncement {
+  id          String    @id @default(uuid())
+  title       String
+  message     String    @db.Text
+  type        String    // "banner", "push", "email", "in_app"
+  targetScope String    @default("all") @map("target_scope")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdBy   String    @map("created_by")
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("platform_announcements")
+}
+
+model PlatformConfig {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  updatedBy String?  @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("platform_configs")
+}
+
+model ContentModerationLog {
+  id          String   @id @default(uuid())
+  adminId     String   @map("admin_id")
+  contentType String   @map("content_type") // "short", "post", "contest", "comment", "product", "story"
+  contentId   String   @map("content_id")
+  action      String   // "hide", "delete", "approve", "flag", "restore"
+  reason      String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([adminId, createdAt])
+  @@index([contentType, contentId])
+  @@map("content_moderation_logs")
 }

@@ -409,6 +409,7 @@ export type InfluencerProfileWhereInput = {
   deliverables?: Prisma.CampaignDeliverableListRelationFilter
   reviews?: Prisma.InfluencerReviewListRelationFilter
   portfolio?: Prisma.InfluencerPortfolioListRelationFilter
+  socialAccounts?: Prisma.SocialMediaAccountListRelationFilter
 }
 
 export type InfluencerProfileOrderByWithRelationInput = {
@@ -441,6 +442,7 @@ export type InfluencerProfileOrderByWithRelationInput = {
   deliverables?: Prisma.CampaignDeliverableOrderByRelationAggregateInput
   reviews?: Prisma.InfluencerReviewOrderByRelationAggregateInput
   portfolio?: Prisma.InfluencerPortfolioOrderByRelationAggregateInput
+  socialAccounts?: Prisma.SocialMediaAccountOrderByRelationAggregateInput
 }
 
 export type InfluencerProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -476,6 +478,7 @@ export type InfluencerProfileWhereUniqueInput = Prisma.AtLeast<{
   deliverables?: Prisma.CampaignDeliverableListRelationFilter
   reviews?: Prisma.InfluencerReviewListRelationFilter
   portfolio?: Prisma.InfluencerPortfolioListRelationFilter
+  socialAccounts?: Prisma.SocialMediaAccountListRelationFilter
 }, "id" | "userId">
 
 export type InfluencerProfileOrderByWithAggregationInput = {
@@ -569,6 +572,7 @@ export type InfluencerProfileCreateInput = {
   deliverables?: Prisma.CampaignDeliverableCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileUncheckedCreateInput = {
@@ -600,6 +604,7 @@ export type InfluencerProfileUncheckedCreateInput = {
   deliverables?: Prisma.CampaignDeliverableUncheckedCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewUncheckedCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileUpdateInput = {
@@ -631,6 +636,7 @@ export type InfluencerProfileUpdateInput = {
   deliverables?: Prisma.CampaignDeliverableUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileUncheckedUpdateInput = {
@@ -662,6 +668,7 @@ export type InfluencerProfileUncheckedUpdateInput = {
   deliverables?: Prisma.CampaignDeliverableUncheckedUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUncheckedUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileCreateManyInput = {
@@ -962,6 +969,20 @@ export type InfluencerProfileUpdateOneRequiredWithoutReviewsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.InfluencerProfileUpdateToOneWithWhereWithoutReviewsInput, Prisma.InfluencerProfileUpdateWithoutReviewsInput>, Prisma.InfluencerProfileUncheckedUpdateWithoutReviewsInput>
 }
 
+export type InfluencerProfileCreateNestedOneWithoutSocialAccountsInput = {
+  create?: Prisma.XOR<Prisma.InfluencerProfileCreateWithoutSocialAccountsInput, Prisma.InfluencerProfileUncheckedCreateWithoutSocialAccountsInput>
+  connectOrCreate?: Prisma.InfluencerProfileCreateOrConnectWithoutSocialAccountsInput
+  connect?: Prisma.InfluencerProfileWhereUniqueInput
+}
+
+export type InfluencerProfileUpdateOneRequiredWithoutSocialAccountsNestedInput = {
+  create?: Prisma.XOR<Prisma.InfluencerProfileCreateWithoutSocialAccountsInput, Prisma.InfluencerProfileUncheckedCreateWithoutSocialAccountsInput>
+  connectOrCreate?: Prisma.InfluencerProfileCreateOrConnectWithoutSocialAccountsInput
+  upsert?: Prisma.InfluencerProfileUpsertWithoutSocialAccountsInput
+  connect?: Prisma.InfluencerProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InfluencerProfileUpdateToOneWithWhereWithoutSocialAccountsInput, Prisma.InfluencerProfileUpdateWithoutSocialAccountsInput>, Prisma.InfluencerProfileUncheckedUpdateWithoutSocialAccountsInput>
+}
+
 export type InfluencerProfileCreateWithoutUserInput = {
   id?: string
   tier: $Enums.InfluencerTier
@@ -990,6 +1011,7 @@ export type InfluencerProfileCreateWithoutUserInput = {
   deliverables?: Prisma.CampaignDeliverableCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileUncheckedCreateWithoutUserInput = {
@@ -1020,6 +1042,7 @@ export type InfluencerProfileUncheckedCreateWithoutUserInput = {
   deliverables?: Prisma.CampaignDeliverableUncheckedCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewUncheckedCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileCreateOrConnectWithoutUserInput = {
@@ -1066,6 +1089,7 @@ export type InfluencerProfileUpdateWithoutUserInput = {
   deliverables?: Prisma.CampaignDeliverableUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileUncheckedUpdateWithoutUserInput = {
@@ -1096,6 +1120,7 @@ export type InfluencerProfileUncheckedUpdateWithoutUserInput = {
   deliverables?: Prisma.CampaignDeliverableUncheckedUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUncheckedUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileCreateWithoutPortfolioInput = {
@@ -1126,6 +1151,7 @@ export type InfluencerProfileCreateWithoutPortfolioInput = {
   applications?: Prisma.CampaignApplicationCreateNestedManyWithoutInfluencerInput
   deliverables?: Prisma.CampaignDeliverableCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileUncheckedCreateWithoutPortfolioInput = {
@@ -1156,6 +1182,7 @@ export type InfluencerProfileUncheckedCreateWithoutPortfolioInput = {
   applications?: Prisma.CampaignApplicationUncheckedCreateNestedManyWithoutInfluencerInput
   deliverables?: Prisma.CampaignDeliverableUncheckedCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewUncheckedCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileCreateOrConnectWithoutPortfolioInput = {
@@ -1202,6 +1229,7 @@ export type InfluencerProfileUpdateWithoutPortfolioInput = {
   applications?: Prisma.CampaignApplicationUpdateManyWithoutInfluencerNestedInput
   deliverables?: Prisma.CampaignDeliverableUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileUncheckedUpdateWithoutPortfolioInput = {
@@ -1232,6 +1260,7 @@ export type InfluencerProfileUncheckedUpdateWithoutPortfolioInput = {
   applications?: Prisma.CampaignApplicationUncheckedUpdateManyWithoutInfluencerNestedInput
   deliverables?: Prisma.CampaignDeliverableUncheckedUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUncheckedUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileCreateWithoutApplicationsInput = {
@@ -1262,6 +1291,7 @@ export type InfluencerProfileCreateWithoutApplicationsInput = {
   deliverables?: Prisma.CampaignDeliverableCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileUncheckedCreateWithoutApplicationsInput = {
@@ -1292,6 +1322,7 @@ export type InfluencerProfileUncheckedCreateWithoutApplicationsInput = {
   deliverables?: Prisma.CampaignDeliverableUncheckedCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewUncheckedCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileCreateOrConnectWithoutApplicationsInput = {
@@ -1338,6 +1369,7 @@ export type InfluencerProfileUpdateWithoutApplicationsInput = {
   deliverables?: Prisma.CampaignDeliverableUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileUncheckedUpdateWithoutApplicationsInput = {
@@ -1368,6 +1400,7 @@ export type InfluencerProfileUncheckedUpdateWithoutApplicationsInput = {
   deliverables?: Prisma.CampaignDeliverableUncheckedUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUncheckedUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileCreateWithoutDeliverablesInput = {
@@ -1398,6 +1431,7 @@ export type InfluencerProfileCreateWithoutDeliverablesInput = {
   applications?: Prisma.CampaignApplicationCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileUncheckedCreateWithoutDeliverablesInput = {
@@ -1428,6 +1462,7 @@ export type InfluencerProfileUncheckedCreateWithoutDeliverablesInput = {
   applications?: Prisma.CampaignApplicationUncheckedCreateNestedManyWithoutInfluencerInput
   reviews?: Prisma.InfluencerReviewUncheckedCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileCreateOrConnectWithoutDeliverablesInput = {
@@ -1474,6 +1509,7 @@ export type InfluencerProfileUpdateWithoutDeliverablesInput = {
   applications?: Prisma.CampaignApplicationUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileUncheckedUpdateWithoutDeliverablesInput = {
@@ -1504,6 +1540,7 @@ export type InfluencerProfileUncheckedUpdateWithoutDeliverablesInput = {
   applications?: Prisma.CampaignApplicationUncheckedUpdateManyWithoutInfluencerNestedInput
   reviews?: Prisma.InfluencerReviewUncheckedUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileCreateWithoutReviewsInput = {
@@ -1534,6 +1571,7 @@ export type InfluencerProfileCreateWithoutReviewsInput = {
   applications?: Prisma.CampaignApplicationCreateNestedManyWithoutInfluencerInput
   deliverables?: Prisma.CampaignDeliverableCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileUncheckedCreateWithoutReviewsInput = {
@@ -1564,6 +1602,7 @@ export type InfluencerProfileUncheckedCreateWithoutReviewsInput = {
   applications?: Prisma.CampaignApplicationUncheckedCreateNestedManyWithoutInfluencerInput
   deliverables?: Prisma.CampaignDeliverableUncheckedCreateNestedManyWithoutInfluencerInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedCreateNestedManyWithoutInfluencerInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedCreateNestedManyWithoutInfluencerInput
 }
 
 export type InfluencerProfileCreateOrConnectWithoutReviewsInput = {
@@ -1610,6 +1649,7 @@ export type InfluencerProfileUpdateWithoutReviewsInput = {
   applications?: Prisma.CampaignApplicationUpdateManyWithoutInfluencerNestedInput
   deliverables?: Prisma.CampaignDeliverableUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUpdateManyWithoutInfluencerNestedInput
 }
 
 export type InfluencerProfileUncheckedUpdateWithoutReviewsInput = {
@@ -1640,6 +1680,147 @@ export type InfluencerProfileUncheckedUpdateWithoutReviewsInput = {
   applications?: Prisma.CampaignApplicationUncheckedUpdateManyWithoutInfluencerNestedInput
   deliverables?: Prisma.CampaignDeliverableUncheckedUpdateManyWithoutInfluencerNestedInput
   portfolio?: Prisma.InfluencerPortfolioUncheckedUpdateManyWithoutInfluencerNestedInput
+  socialAccounts?: Prisma.SocialMediaAccountUncheckedUpdateManyWithoutInfluencerNestedInput
+}
+
+export type InfluencerProfileCreateWithoutSocialAccountsInput = {
+  id?: string
+  tier: $Enums.InfluencerTier
+  bio?: string | null
+  categories?: Prisma.InfluencerProfileCreatecategoriesInput | string[]
+  instagramHandle?: string | null
+  instagramFollowers?: number
+  tiktokHandle?: string | null
+  tiktokFollowers?: number
+  youtubeHandle?: string | null
+  youtubeSubscribers?: number
+  avgEngagementRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  avgViews?: number
+  ratePerPost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  ratePerVideo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  ratePerStory?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isAvailable?: boolean
+  isVerified?: boolean
+  verifiedAt?: Date | string | null
+  totalCampaigns?: number
+  totalEarningsKr?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  avgRating?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutInfluencerProfileInput
+  applications?: Prisma.CampaignApplicationCreateNestedManyWithoutInfluencerInput
+  deliverables?: Prisma.CampaignDeliverableCreateNestedManyWithoutInfluencerInput
+  reviews?: Prisma.InfluencerReviewCreateNestedManyWithoutInfluencerInput
+  portfolio?: Prisma.InfluencerPortfolioCreateNestedManyWithoutInfluencerInput
+}
+
+export type InfluencerProfileUncheckedCreateWithoutSocialAccountsInput = {
+  id?: string
+  userId: string
+  tier: $Enums.InfluencerTier
+  bio?: string | null
+  categories?: Prisma.InfluencerProfileCreatecategoriesInput | string[]
+  instagramHandle?: string | null
+  instagramFollowers?: number
+  tiktokHandle?: string | null
+  tiktokFollowers?: number
+  youtubeHandle?: string | null
+  youtubeSubscribers?: number
+  avgEngagementRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  avgViews?: number
+  ratePerPost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  ratePerVideo?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  ratePerStory?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isAvailable?: boolean
+  isVerified?: boolean
+  verifiedAt?: Date | string | null
+  totalCampaigns?: number
+  totalEarningsKr?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  avgRating?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  applications?: Prisma.CampaignApplicationUncheckedCreateNestedManyWithoutInfluencerInput
+  deliverables?: Prisma.CampaignDeliverableUncheckedCreateNestedManyWithoutInfluencerInput
+  reviews?: Prisma.InfluencerReviewUncheckedCreateNestedManyWithoutInfluencerInput
+  portfolio?: Prisma.InfluencerPortfolioUncheckedCreateNestedManyWithoutInfluencerInput
+}
+
+export type InfluencerProfileCreateOrConnectWithoutSocialAccountsInput = {
+  where: Prisma.InfluencerProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.InfluencerProfileCreateWithoutSocialAccountsInput, Prisma.InfluencerProfileUncheckedCreateWithoutSocialAccountsInput>
+}
+
+export type InfluencerProfileUpsertWithoutSocialAccountsInput = {
+  update: Prisma.XOR<Prisma.InfluencerProfileUpdateWithoutSocialAccountsInput, Prisma.InfluencerProfileUncheckedUpdateWithoutSocialAccountsInput>
+  create: Prisma.XOR<Prisma.InfluencerProfileCreateWithoutSocialAccountsInput, Prisma.InfluencerProfileUncheckedCreateWithoutSocialAccountsInput>
+  where?: Prisma.InfluencerProfileWhereInput
+}
+
+export type InfluencerProfileUpdateToOneWithWhereWithoutSocialAccountsInput = {
+  where?: Prisma.InfluencerProfileWhereInput
+  data: Prisma.XOR<Prisma.InfluencerProfileUpdateWithoutSocialAccountsInput, Prisma.InfluencerProfileUncheckedUpdateWithoutSocialAccountsInput>
+}
+
+export type InfluencerProfileUpdateWithoutSocialAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tier?: Prisma.EnumInfluencerTierFieldUpdateOperationsInput | $Enums.InfluencerTier
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  categories?: Prisma.InfluencerProfileUpdatecategoriesInput | string[]
+  instagramHandle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagramFollowers?: Prisma.IntFieldUpdateOperationsInput | number
+  tiktokHandle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tiktokFollowers?: Prisma.IntFieldUpdateOperationsInput | number
+  youtubeHandle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeSubscribers?: Prisma.IntFieldUpdateOperationsInput | number
+  avgEngagementRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  avgViews?: Prisma.IntFieldUpdateOperationsInput | number
+  ratePerPost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  ratePerVideo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  ratePerStory?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totalCampaigns?: Prisma.IntFieldUpdateOperationsInput | number
+  totalEarningsKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  avgRating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutInfluencerProfileNestedInput
+  applications?: Prisma.CampaignApplicationUpdateManyWithoutInfluencerNestedInput
+  deliverables?: Prisma.CampaignDeliverableUpdateManyWithoutInfluencerNestedInput
+  reviews?: Prisma.InfluencerReviewUpdateManyWithoutInfluencerNestedInput
+  portfolio?: Prisma.InfluencerPortfolioUpdateManyWithoutInfluencerNestedInput
+}
+
+export type InfluencerProfileUncheckedUpdateWithoutSocialAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  tier?: Prisma.EnumInfluencerTierFieldUpdateOperationsInput | $Enums.InfluencerTier
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  categories?: Prisma.InfluencerProfileUpdatecategoriesInput | string[]
+  instagramHandle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagramFollowers?: Prisma.IntFieldUpdateOperationsInput | number
+  tiktokHandle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tiktokFollowers?: Prisma.IntFieldUpdateOperationsInput | number
+  youtubeHandle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  youtubeSubscribers?: Prisma.IntFieldUpdateOperationsInput | number
+  avgEngagementRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  avgViews?: Prisma.IntFieldUpdateOperationsInput | number
+  ratePerPost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  ratePerVideo?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  ratePerStory?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totalCampaigns?: Prisma.IntFieldUpdateOperationsInput | number
+  totalEarningsKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  avgRating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  applications?: Prisma.CampaignApplicationUncheckedUpdateManyWithoutInfluencerNestedInput
+  deliverables?: Prisma.CampaignDeliverableUncheckedUpdateManyWithoutInfluencerNestedInput
+  reviews?: Prisma.InfluencerReviewUncheckedUpdateManyWithoutInfluencerNestedInput
+  portfolio?: Prisma.InfluencerPortfolioUncheckedUpdateManyWithoutInfluencerNestedInput
 }
 
 
@@ -1652,6 +1833,7 @@ export type InfluencerProfileCountOutputType = {
   deliverables: number
   reviews: number
   portfolio: number
+  socialAccounts: number
 }
 
 export type InfluencerProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1659,6 +1841,7 @@ export type InfluencerProfileCountOutputTypeSelect<ExtArgs extends runtime.Types
   deliverables?: boolean | InfluencerProfileCountOutputTypeCountDeliverablesArgs
   reviews?: boolean | InfluencerProfileCountOutputTypeCountReviewsArgs
   portfolio?: boolean | InfluencerProfileCountOutputTypeCountPortfolioArgs
+  socialAccounts?: boolean | InfluencerProfileCountOutputTypeCountSocialAccountsArgs
 }
 
 /**
@@ -1699,6 +1882,13 @@ export type InfluencerProfileCountOutputTypeCountPortfolioArgs<ExtArgs extends r
   where?: Prisma.InfluencerPortfolioWhereInput
 }
 
+/**
+ * InfluencerProfileCountOutputType without action
+ */
+export type InfluencerProfileCountOutputTypeCountSocialAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SocialMediaAccountWhereInput
+}
+
 
 export type InfluencerProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1730,6 +1920,7 @@ export type InfluencerProfileSelect<ExtArgs extends runtime.Types.Extensions.Int
   deliverables?: boolean | Prisma.InfluencerProfile$deliverablesArgs<ExtArgs>
   reviews?: boolean | Prisma.InfluencerProfile$reviewsArgs<ExtArgs>
   portfolio?: boolean | Prisma.InfluencerProfile$portfolioArgs<ExtArgs>
+  socialAccounts?: boolean | Prisma.InfluencerProfile$socialAccountsArgs<ExtArgs>
   _count?: boolean | Prisma.InfluencerProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["influencerProfile"]>
 
@@ -1823,6 +2014,7 @@ export type InfluencerProfileInclude<ExtArgs extends runtime.Types.Extensions.In
   deliverables?: boolean | Prisma.InfluencerProfile$deliverablesArgs<ExtArgs>
   reviews?: boolean | Prisma.InfluencerProfile$reviewsArgs<ExtArgs>
   portfolio?: boolean | Prisma.InfluencerProfile$portfolioArgs<ExtArgs>
+  socialAccounts?: boolean | Prisma.InfluencerProfile$socialAccountsArgs<ExtArgs>
   _count?: boolean | Prisma.InfluencerProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type InfluencerProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1840,6 +2032,7 @@ export type $InfluencerProfilePayload<ExtArgs extends runtime.Types.Extensions.I
     deliverables: Prisma.$CampaignDeliverablePayload<ExtArgs>[]
     reviews: Prisma.$InfluencerReviewPayload<ExtArgs>[]
     portfolio: Prisma.$InfluencerPortfolioPayload<ExtArgs>[]
+    socialAccounts: Prisma.$SocialMediaAccountPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2265,6 +2458,7 @@ export interface Prisma__InfluencerProfileClient<T, Null = never, ExtArgs extend
   deliverables<T extends Prisma.InfluencerProfile$deliverablesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InfluencerProfile$deliverablesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CampaignDeliverablePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviews<T extends Prisma.InfluencerProfile$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InfluencerProfile$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InfluencerReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   portfolio<T extends Prisma.InfluencerProfile$portfolioArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InfluencerProfile$portfolioArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InfluencerPortfolioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  socialAccounts<T extends Prisma.InfluencerProfile$socialAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InfluencerProfile$socialAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SocialMediaAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2812,6 +3006,30 @@ export type InfluencerProfile$portfolioArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.InfluencerPortfolioScalarFieldEnum | Prisma.InfluencerPortfolioScalarFieldEnum[]
+}
+
+/**
+ * InfluencerProfile.socialAccounts
+ */
+export type InfluencerProfile$socialAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SocialMediaAccount
+   */
+  select?: Prisma.SocialMediaAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SocialMediaAccount
+   */
+  omit?: Prisma.SocialMediaAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SocialMediaAccountInclude<ExtArgs> | null
+  where?: Prisma.SocialMediaAccountWhereInput
+  orderBy?: Prisma.SocialMediaAccountOrderByWithRelationInput | Prisma.SocialMediaAccountOrderByWithRelationInput[]
+  cursor?: Prisma.SocialMediaAccountWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SocialMediaAccountScalarFieldEnum | Prisma.SocialMediaAccountScalarFieldEnum[]
 }
 
 /**

@@ -26,6 +26,7 @@ import { chamaRoutes } from './modules/chama/chama.routes.js';
 import { budgetRoutes } from './modules/budget/budget.routes.js';
 import notificationsRoutes from './modules/notifications/notifications.routes.js';
 import marketplaceRoutes from './modules/marketplace/marketplace.routes.js';
+import { rembrandtRarRoutes } from './modules/rembrandt-rar/rembrandt-rar.routes.js';
 import { startChamaDefaultWorker } from './workers/chamaDefaultWorker.js';
 import { startStoryCleanupWorker } from './workers/storyCleanupWorker.js';
 import { startDailyPrizeWorker } from './workers/dailyPrizeWorker.js';
@@ -76,6 +77,7 @@ app.use('/api/v1/chamas', chamaRoutes);
 app.use('/api/v1/budgets', budgetRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
 app.use('/api/v1/marketplace', marketplaceRoutes);
+app.use('/api/v1/rar', rembrandtRarRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

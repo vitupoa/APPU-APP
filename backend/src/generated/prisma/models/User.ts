@@ -47,6 +47,10 @@ export type UserMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   isRotationLocked: boolean | null
+  fcmToken: string | null
+  devicePlatform: string | null
+  isSuspended: boolean | null
+  suspendedAt: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -72,6 +76,10 @@ export type UserMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   isRotationLocked: boolean | null
+  fcmToken: string | null
+  devicePlatform: string | null
+  isSuspended: boolean | null
+  suspendedAt: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -97,6 +105,10 @@ export type UserCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   isRotationLocked: number
+  fcmToken: number
+  devicePlatform: number
+  isSuspended: number
+  suspendedAt: number
   _all: number
 }
 
@@ -124,6 +136,10 @@ export type UserMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   isRotationLocked?: true
+  fcmToken?: true
+  devicePlatform?: true
+  isSuspended?: true
+  suspendedAt?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -149,6 +165,10 @@ export type UserMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   isRotationLocked?: true
+  fcmToken?: true
+  devicePlatform?: true
+  isSuspended?: true
+  suspendedAt?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -174,6 +194,10 @@ export type UserCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   isRotationLocked?: true
+  fcmToken?: true
+  devicePlatform?: true
+  isSuspended?: true
+  suspendedAt?: true
   _all?: true
 }
 
@@ -272,6 +296,10 @@ export type UserGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   isRotationLocked: boolean
+  fcmToken: string | null
+  devicePlatform: string | null
+  isSuspended: boolean
+  suspendedAt: Date | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -318,6 +346,10 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   isRotationLocked?: Prisma.BoolFilter<"User"> | boolean
+  fcmToken?: Prisma.StringNullableFilter<"User"> | string | null
+  devicePlatform?: Prisma.StringNullableFilter<"User"> | string | null
+  isSuspended?: Prisma.BoolFilter<"User"> | boolean
+  suspendedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   bioLinks?: Prisma.BioLinkListRelationFilter
@@ -401,6 +433,9 @@ export type UserWhereInput = {
   funnelEvents?: Prisma.SalesFunnelEventListRelationFilter
   gamificationPoints?: Prisma.XOR<Prisma.GamificationPointsNullableScalarRelationFilter, Prisma.GamificationPointsWhereInput> | null
   gamificationActivities?: Prisma.GamificationActivityListRelationFilter
+  adminProfile?: Prisma.XOR<Prisma.AdminProfileNullableScalarRelationFilter, Prisma.AdminProfileWhereInput> | null
+  suspensions?: Prisma.UserSuspensionListRelationFilter
+  withdrawalRequests?: Prisma.WithdrawalRequestListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -426,6 +461,10 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isRotationLocked?: Prisma.SortOrder
+  fcmToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  devicePlatform?: Prisma.SortOrderInput | Prisma.SortOrder
+  isSuspended?: Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   wallet?: Prisma.WalletOrderByWithRelationInput
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
   bioLinks?: Prisma.BioLinkOrderByRelationAggregateInput
@@ -509,6 +548,9 @@ export type UserOrderByWithRelationInput = {
   funnelEvents?: Prisma.SalesFunnelEventOrderByRelationAggregateInput
   gamificationPoints?: Prisma.GamificationPointsOrderByWithRelationInput
   gamificationActivities?: Prisma.GamificationActivityOrderByRelationAggregateInput
+  adminProfile?: Prisma.AdminProfileOrderByWithRelationInput
+  suspensions?: Prisma.UserSuspensionOrderByRelationAggregateInput
+  withdrawalRequests?: Prisma.WithdrawalRequestOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -537,6 +579,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   isRotationLocked?: Prisma.BoolFilter<"User"> | boolean
+  fcmToken?: Prisma.StringNullableFilter<"User"> | string | null
+  devicePlatform?: Prisma.StringNullableFilter<"User"> | string | null
+  isSuspended?: Prisma.BoolFilter<"User"> | boolean
+  suspendedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   bioLinks?: Prisma.BioLinkListRelationFilter
@@ -620,6 +666,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   funnelEvents?: Prisma.SalesFunnelEventListRelationFilter
   gamificationPoints?: Prisma.XOR<Prisma.GamificationPointsNullableScalarRelationFilter, Prisma.GamificationPointsWhereInput> | null
   gamificationActivities?: Prisma.GamificationActivityListRelationFilter
+  adminProfile?: Prisma.XOR<Prisma.AdminProfileNullableScalarRelationFilter, Prisma.AdminProfileWhereInput> | null
+  suspensions?: Prisma.UserSuspensionListRelationFilter
+  withdrawalRequests?: Prisma.WithdrawalRequestListRelationFilter
 }, "id" | "email" | "username" | "googleId" | "appleId">
 
 export type UserOrderByWithAggregationInput = {
@@ -645,6 +694,10 @@ export type UserOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isRotationLocked?: Prisma.SortOrder
+  fcmToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  devicePlatform?: Prisma.SortOrderInput | Prisma.SortOrder
+  isSuspended?: Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -676,6 +729,10 @@ export type UserScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   isRotationLocked?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  fcmToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  devicePlatform?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  isSuspended?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  suspendedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -701,6 +758,10 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -784,6 +845,9 @@ export type UserCreateInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -809,6 +873,10 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -892,6 +960,9 @@ export type UserUncheckedCreateInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -917,6 +988,10 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -1000,6 +1075,9 @@ export type UserUpdateInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -1025,6 +1103,10 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -1108,6 +1190,9 @@ export type UserUncheckedUpdateInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1133,6 +1218,10 @@ export type UserCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -1158,6 +1247,10 @@ export type UserUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -1183,6 +1276,10 @@ export type UserUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -1208,6 +1305,10 @@ export type UserCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isRotationLocked?: Prisma.SortOrder
+  fcmToken?: Prisma.SortOrder
+  devicePlatform?: Prisma.SortOrder
+  isSuspended?: Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -1233,6 +1334,10 @@ export type UserMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isRotationLocked?: Prisma.SortOrder
+  fcmToken?: Prisma.SortOrder
+  devicePlatform?: Prisma.SortOrder
+  isSuspended?: Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -1258,6 +1363,10 @@ export type UserMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isRotationLocked?: Prisma.SortOrder
+  fcmToken?: Prisma.SortOrder
+  devicePlatform?: Prisma.SortOrder
+  isSuspended?: Prisma.SortOrder
+  suspendedAt?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -1288,6 +1397,10 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type UserCreateNestedOneWithoutRefreshTokensInput = {
@@ -2458,6 +2571,48 @@ export type UserUpdateOneRequiredWithoutGamificationActivitiesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutGamificationActivitiesInput, Prisma.UserUpdateWithoutGamificationActivitiesInput>, Prisma.UserUncheckedUpdateWithoutGamificationActivitiesInput>
 }
 
+export type UserCreateNestedOneWithoutAdminProfileInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminProfileInput, Prisma.UserUncheckedCreateWithoutAdminProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAdminProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminProfileInput, Prisma.UserUncheckedCreateWithoutAdminProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminProfileInput
+  upsert?: Prisma.UserUpsertWithoutAdminProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdminProfileInput, Prisma.UserUpdateWithoutAdminProfileInput>, Prisma.UserUncheckedUpdateWithoutAdminProfileInput>
+}
+
+export type UserCreateNestedOneWithoutWithdrawalRequestsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWithdrawalRequestsInput, Prisma.UserUncheckedCreateWithoutWithdrawalRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWithdrawalRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutWithdrawalRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWithdrawalRequestsInput, Prisma.UserUncheckedCreateWithoutWithdrawalRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWithdrawalRequestsInput
+  upsert?: Prisma.UserUpsertWithoutWithdrawalRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWithdrawalRequestsInput, Prisma.UserUpdateWithoutWithdrawalRequestsInput>, Prisma.UserUncheckedUpdateWithoutWithdrawalRequestsInput>
+}
+
+export type UserCreateNestedOneWithoutSuspensionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsInput, Prisma.UserUncheckedCreateWithoutSuspensionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSuspensionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSuspensionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsInput, Prisma.UserUncheckedCreateWithoutSuspensionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSuspensionsInput
+  upsert?: Prisma.UserUpsertWithoutSuspensionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSuspensionsInput, Prisma.UserUpdateWithoutSuspensionsInput>, Prisma.UserUncheckedUpdateWithoutSuspensionsInput>
+}
+
 export type UserCreateWithoutRefreshTokensInput = {
   id?: string
   email: string
@@ -2481,6 +2636,10 @@ export type UserCreateWithoutRefreshTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
   admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
@@ -2563,6 +2722,9 @@ export type UserCreateWithoutRefreshTokensInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -2588,6 +2750,10 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
   admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
@@ -2670,6 +2836,9 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -2711,6 +2880,10 @@ export type UserUpdateWithoutRefreshTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
   admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
@@ -2793,6 +2966,9 @@ export type UserUpdateWithoutRefreshTokensInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -2818,6 +2994,10 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
   admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
@@ -2900,6 +3080,9 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -2925,6 +3108,10 @@ export type UserCreateWithoutWalletInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
   admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
@@ -3007,6 +3194,9 @@ export type UserCreateWithoutWalletInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -3032,6 +3222,10 @@ export type UserUncheckedCreateWithoutWalletInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
   admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
@@ -3114,6 +3308,9 @@ export type UserUncheckedCreateWithoutWalletInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -3155,6 +3352,10 @@ export type UserUpdateWithoutWalletInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
   admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
@@ -3237,6 +3438,9 @@ export type UserUpdateWithoutWalletInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -3262,6 +3466,10 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
   admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
@@ -3344,6 +3552,9 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTransactionsInput = {
@@ -3369,6 +3580,10 @@ export type UserCreateWithoutTransactionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -3451,6 +3666,9 @@ export type UserCreateWithoutTransactionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTransactionsInput = {
@@ -3476,6 +3694,10 @@ export type UserUncheckedCreateWithoutTransactionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -3558,6 +3780,9 @@ export type UserUncheckedCreateWithoutTransactionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTransactionsInput = {
@@ -3599,6 +3824,10 @@ export type UserUpdateWithoutTransactionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -3681,6 +3910,9 @@ export type UserUpdateWithoutTransactionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTransactionsInput = {
@@ -3706,6 +3938,10 @@ export type UserUncheckedUpdateWithoutTransactionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -3788,6 +4024,9 @@ export type UserUncheckedUpdateWithoutTransactionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEscrowsInput = {
@@ -3813,6 +4052,10 @@ export type UserCreateWithoutEscrowsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -3895,6 +4138,9 @@ export type UserCreateWithoutEscrowsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEscrowsInput = {
@@ -3920,6 +4166,10 @@ export type UserUncheckedCreateWithoutEscrowsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -4002,6 +4252,9 @@ export type UserUncheckedCreateWithoutEscrowsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEscrowsInput = {
@@ -4043,6 +4296,10 @@ export type UserUpdateWithoutEscrowsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -4125,6 +4382,9 @@ export type UserUpdateWithoutEscrowsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEscrowsInput = {
@@ -4150,6 +4410,10 @@ export type UserUncheckedUpdateWithoutEscrowsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -4232,6 +4496,9 @@ export type UserUncheckedUpdateWithoutEscrowsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAdmiringInput = {
@@ -4257,6 +4524,10 @@ export type UserCreateWithoutAdmiringInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -4339,6 +4610,9 @@ export type UserCreateWithoutAdmiringInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdmiringInput = {
@@ -4364,6 +4638,10 @@ export type UserUncheckedCreateWithoutAdmiringInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -4446,6 +4724,9 @@ export type UserUncheckedCreateWithoutAdmiringInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdmiringInput = {
@@ -4476,6 +4757,10 @@ export type UserCreateWithoutAdmirersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -4558,6 +4843,9 @@ export type UserCreateWithoutAdmirersInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAdmirersInput = {
@@ -4583,6 +4871,10 @@ export type UserUncheckedCreateWithoutAdmirersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -4665,6 +4957,9 @@ export type UserUncheckedCreateWithoutAdmirersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAdmirersInput = {
@@ -4706,6 +5001,10 @@ export type UserUpdateWithoutAdmiringInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -4788,6 +5087,9 @@ export type UserUpdateWithoutAdmiringInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdmiringInput = {
@@ -4813,6 +5115,10 @@ export type UserUncheckedUpdateWithoutAdmiringInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -4895,6 +5201,9 @@ export type UserUncheckedUpdateWithoutAdmiringInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutAdmirersInput = {
@@ -4931,6 +5240,10 @@ export type UserUpdateWithoutAdmirersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -5013,6 +5326,9 @@ export type UserUpdateWithoutAdmirersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdmirersInput = {
@@ -5038,6 +5354,10 @@ export type UserUncheckedUpdateWithoutAdmirersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -5120,6 +5440,9 @@ export type UserUncheckedUpdateWithoutAdmirersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBioLinksInput = {
@@ -5145,6 +5468,10 @@ export type UserCreateWithoutBioLinksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
@@ -5227,6 +5554,9 @@ export type UserCreateWithoutBioLinksInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBioLinksInput = {
@@ -5252,6 +5582,10 @@ export type UserUncheckedCreateWithoutBioLinksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
@@ -5334,6 +5668,9 @@ export type UserUncheckedCreateWithoutBioLinksInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBioLinksInput = {
@@ -5375,6 +5712,10 @@ export type UserUpdateWithoutBioLinksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
@@ -5457,6 +5798,9 @@ export type UserUpdateWithoutBioLinksInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBioLinksInput = {
@@ -5482,6 +5826,10 @@ export type UserUncheckedUpdateWithoutBioLinksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
@@ -5564,6 +5912,9 @@ export type UserUncheckedUpdateWithoutBioLinksInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSubscriptionTiersInput = {
@@ -5589,6 +5940,10 @@ export type UserCreateWithoutSubscriptionTiersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -5671,6 +6026,9 @@ export type UserCreateWithoutSubscriptionTiersInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSubscriptionTiersInput = {
@@ -5696,6 +6054,10 @@ export type UserUncheckedCreateWithoutSubscriptionTiersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -5778,6 +6140,9 @@ export type UserUncheckedCreateWithoutSubscriptionTiersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSubscriptionTiersInput = {
@@ -5819,6 +6184,10 @@ export type UserUpdateWithoutSubscriptionTiersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -5901,6 +6270,9 @@ export type UserUpdateWithoutSubscriptionTiersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubscriptionTiersInput = {
@@ -5926,6 +6298,10 @@ export type UserUncheckedUpdateWithoutSubscriptionTiersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -6008,6 +6384,9 @@ export type UserUncheckedUpdateWithoutSubscriptionTiersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSubscribedToInput = {
@@ -6033,6 +6412,10 @@ export type UserCreateWithoutSubscribedToInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -6115,6 +6498,9 @@ export type UserCreateWithoutSubscribedToInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSubscribedToInput = {
@@ -6140,6 +6526,10 @@ export type UserUncheckedCreateWithoutSubscribedToInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -6222,6 +6612,9 @@ export type UserUncheckedCreateWithoutSubscribedToInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSubscribedToInput = {
@@ -6252,6 +6645,10 @@ export type UserCreateWithoutSubscribersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -6334,6 +6731,9 @@ export type UserCreateWithoutSubscribersInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSubscribersInput = {
@@ -6359,6 +6759,10 @@ export type UserUncheckedCreateWithoutSubscribersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -6441,6 +6845,9 @@ export type UserUncheckedCreateWithoutSubscribersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSubscribersInput = {
@@ -6482,6 +6889,10 @@ export type UserUpdateWithoutSubscribedToInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -6564,6 +6975,9 @@ export type UserUpdateWithoutSubscribedToInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubscribedToInput = {
@@ -6589,6 +7003,10 @@ export type UserUncheckedUpdateWithoutSubscribedToInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -6671,6 +7089,9 @@ export type UserUncheckedUpdateWithoutSubscribedToInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSubscribersInput = {
@@ -6707,6 +7128,10 @@ export type UserUpdateWithoutSubscribersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -6789,6 +7214,9 @@ export type UserUpdateWithoutSubscribersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubscribersInput = {
@@ -6814,6 +7242,10 @@ export type UserUncheckedUpdateWithoutSubscribersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -6896,6 +7328,9 @@ export type UserUncheckedUpdateWithoutSubscribersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMilestoneCompletionsInput = {
@@ -6921,6 +7356,10 @@ export type UserCreateWithoutMilestoneCompletionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -7003,6 +7442,9 @@ export type UserCreateWithoutMilestoneCompletionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMilestoneCompletionsInput = {
@@ -7028,6 +7470,10 @@ export type UserUncheckedCreateWithoutMilestoneCompletionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -7110,6 +7556,9 @@ export type UserUncheckedCreateWithoutMilestoneCompletionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMilestoneCompletionsInput = {
@@ -7151,6 +7600,10 @@ export type UserUpdateWithoutMilestoneCompletionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -7233,6 +7686,9 @@ export type UserUpdateWithoutMilestoneCompletionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMilestoneCompletionsInput = {
@@ -7258,6 +7714,10 @@ export type UserUncheckedUpdateWithoutMilestoneCompletionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -7340,6 +7800,9 @@ export type UserUncheckedUpdateWithoutMilestoneCompletionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutShortsInput = {
@@ -7365,6 +7828,10 @@ export type UserCreateWithoutShortsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -7447,6 +7914,9 @@ export type UserCreateWithoutShortsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutShortsInput = {
@@ -7472,6 +7942,10 @@ export type UserUncheckedCreateWithoutShortsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -7554,6 +8028,9 @@ export type UserUncheckedCreateWithoutShortsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutShortsInput = {
@@ -7595,6 +8072,10 @@ export type UserUpdateWithoutShortsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -7677,6 +8158,9 @@ export type UserUpdateWithoutShortsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortsInput = {
@@ -7702,6 +8186,10 @@ export type UserUncheckedUpdateWithoutShortsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -7784,6 +8272,9 @@ export type UserUncheckedUpdateWithoutShortsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutShortCollectionsInput = {
@@ -7809,6 +8300,10 @@ export type UserCreateWithoutShortCollectionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -7891,6 +8386,9 @@ export type UserCreateWithoutShortCollectionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutShortCollectionsInput = {
@@ -7916,6 +8414,10 @@ export type UserUncheckedCreateWithoutShortCollectionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -7998,6 +8500,9 @@ export type UserUncheckedCreateWithoutShortCollectionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutShortCollectionsInput = {
@@ -8039,6 +8544,10 @@ export type UserUpdateWithoutShortCollectionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -8121,6 +8630,9 @@ export type UserUpdateWithoutShortCollectionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortCollectionsInput = {
@@ -8146,6 +8658,10 @@ export type UserUncheckedUpdateWithoutShortCollectionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -8228,6 +8744,9 @@ export type UserUncheckedUpdateWithoutShortCollectionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutShortLikesInput = {
@@ -8253,6 +8772,10 @@ export type UserCreateWithoutShortLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -8335,6 +8858,9 @@ export type UserCreateWithoutShortLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutShortLikesInput = {
@@ -8360,6 +8886,10 @@ export type UserUncheckedCreateWithoutShortLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -8442,6 +8972,9 @@ export type UserUncheckedCreateWithoutShortLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutShortLikesInput = {
@@ -8483,6 +9016,10 @@ export type UserUpdateWithoutShortLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -8565,6 +9102,9 @@ export type UserUpdateWithoutShortLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortLikesInput = {
@@ -8590,6 +9130,10 @@ export type UserUncheckedUpdateWithoutShortLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -8672,6 +9216,9 @@ export type UserUncheckedUpdateWithoutShortLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutShortCommentsInput = {
@@ -8697,6 +9244,10 @@ export type UserCreateWithoutShortCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -8779,6 +9330,9 @@ export type UserCreateWithoutShortCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutShortCommentsInput = {
@@ -8804,6 +9358,10 @@ export type UserUncheckedCreateWithoutShortCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -8886,6 +9444,9 @@ export type UserUncheckedCreateWithoutShortCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutShortCommentsInput = {
@@ -8927,6 +9488,10 @@ export type UserUpdateWithoutShortCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -9009,6 +9574,9 @@ export type UserUpdateWithoutShortCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShortCommentsInput = {
@@ -9034,6 +9602,10 @@ export type UserUncheckedUpdateWithoutShortCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -9116,6 +9688,9 @@ export type UserUncheckedUpdateWithoutShortCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPostsInput = {
@@ -9141,6 +9716,10 @@ export type UserCreateWithoutPostsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -9223,6 +9802,9 @@ export type UserCreateWithoutPostsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPostsInput = {
@@ -9248,6 +9830,10 @@ export type UserUncheckedCreateWithoutPostsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -9330,6 +9916,9 @@ export type UserUncheckedCreateWithoutPostsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPostsInput = {
@@ -9371,6 +9960,10 @@ export type UserUpdateWithoutPostsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -9453,6 +10046,9 @@ export type UserUpdateWithoutPostsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostsInput = {
@@ -9478,6 +10074,10 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -9560,6 +10160,9 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPostLikesInput = {
@@ -9585,6 +10188,10 @@ export type UserCreateWithoutPostLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -9667,6 +10274,9 @@ export type UserCreateWithoutPostLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPostLikesInput = {
@@ -9692,6 +10302,10 @@ export type UserUncheckedCreateWithoutPostLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -9774,6 +10388,9 @@ export type UserUncheckedCreateWithoutPostLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPostLikesInput = {
@@ -9815,6 +10432,10 @@ export type UserUpdateWithoutPostLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -9897,6 +10518,9 @@ export type UserUpdateWithoutPostLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostLikesInput = {
@@ -9922,6 +10546,10 @@ export type UserUncheckedUpdateWithoutPostLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -10004,6 +10632,9 @@ export type UserUncheckedUpdateWithoutPostLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPostCommentsInput = {
@@ -10029,6 +10660,10 @@ export type UserCreateWithoutPostCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -10111,6 +10746,9 @@ export type UserCreateWithoutPostCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPostCommentsInput = {
@@ -10136,6 +10774,10 @@ export type UserUncheckedCreateWithoutPostCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -10218,6 +10860,9 @@ export type UserUncheckedCreateWithoutPostCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPostCommentsInput = {
@@ -10259,6 +10904,10 @@ export type UserUpdateWithoutPostCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -10341,6 +10990,9 @@ export type UserUpdateWithoutPostCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostCommentsInput = {
@@ -10366,6 +11018,10 @@ export type UserUncheckedUpdateWithoutPostCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -10448,6 +11104,9 @@ export type UserUncheckedUpdateWithoutPostCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutContestsCreatedInput = {
@@ -10473,6 +11132,10 @@ export type UserCreateWithoutContestsCreatedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -10555,6 +11218,9 @@ export type UserCreateWithoutContestsCreatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutContestsCreatedInput = {
@@ -10580,6 +11246,10 @@ export type UserUncheckedCreateWithoutContestsCreatedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -10662,6 +11332,9 @@ export type UserUncheckedCreateWithoutContestsCreatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutContestsCreatedInput = {
@@ -10703,6 +11376,10 @@ export type UserUpdateWithoutContestsCreatedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -10785,6 +11462,9 @@ export type UserUpdateWithoutContestsCreatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestsCreatedInput = {
@@ -10810,6 +11490,10 @@ export type UserUncheckedUpdateWithoutContestsCreatedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -10892,6 +11576,9 @@ export type UserUncheckedUpdateWithoutContestsCreatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutContestParticipationsInput = {
@@ -10917,6 +11604,10 @@ export type UserCreateWithoutContestParticipationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -10999,6 +11690,9 @@ export type UserCreateWithoutContestParticipationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutContestParticipationsInput = {
@@ -11024,6 +11718,10 @@ export type UserUncheckedCreateWithoutContestParticipationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -11106,6 +11804,9 @@ export type UserUncheckedCreateWithoutContestParticipationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutContestParticipationsInput = {
@@ -11147,6 +11848,10 @@ export type UserUpdateWithoutContestParticipationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -11229,6 +11934,9 @@ export type UserUpdateWithoutContestParticipationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestParticipationsInput = {
@@ -11254,6 +11962,10 @@ export type UserUncheckedUpdateWithoutContestParticipationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -11336,6 +12048,9 @@ export type UserUncheckedUpdateWithoutContestParticipationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutContestSubmissionsInput = {
@@ -11361,6 +12076,10 @@ export type UserCreateWithoutContestSubmissionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -11443,6 +12162,9 @@ export type UserCreateWithoutContestSubmissionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutContestSubmissionsInput = {
@@ -11468,6 +12190,10 @@ export type UserUncheckedCreateWithoutContestSubmissionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -11550,6 +12276,9 @@ export type UserUncheckedCreateWithoutContestSubmissionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutContestSubmissionsInput = {
@@ -11591,6 +12320,10 @@ export type UserUpdateWithoutContestSubmissionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -11673,6 +12406,9 @@ export type UserUpdateWithoutContestSubmissionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestSubmissionsInput = {
@@ -11698,6 +12434,10 @@ export type UserUncheckedUpdateWithoutContestSubmissionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -11780,6 +12520,9 @@ export type UserUncheckedUpdateWithoutContestSubmissionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutContestWinsInput = {
@@ -11805,6 +12548,10 @@ export type UserCreateWithoutContestWinsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -11887,6 +12634,9 @@ export type UserCreateWithoutContestWinsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutContestWinsInput = {
@@ -11912,6 +12662,10 @@ export type UserUncheckedCreateWithoutContestWinsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -11994,6 +12748,9 @@ export type UserUncheckedCreateWithoutContestWinsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutContestWinsInput = {
@@ -12035,6 +12792,10 @@ export type UserUpdateWithoutContestWinsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -12117,6 +12878,9 @@ export type UserUpdateWithoutContestWinsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestWinsInput = {
@@ -12142,6 +12906,10 @@ export type UserUncheckedUpdateWithoutContestWinsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -12224,6 +12992,9 @@ export type UserUncheckedUpdateWithoutContestWinsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutContestJudgesInput = {
@@ -12249,6 +13020,10 @@ export type UserCreateWithoutContestJudgesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -12331,6 +13106,9 @@ export type UserCreateWithoutContestJudgesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutContestJudgesInput = {
@@ -12356,6 +13134,10 @@ export type UserUncheckedCreateWithoutContestJudgesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -12438,6 +13220,9 @@ export type UserUncheckedCreateWithoutContestJudgesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutContestJudgesInput = {
@@ -12479,6 +13264,10 @@ export type UserUpdateWithoutContestJudgesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -12561,6 +13350,9 @@ export type UserUpdateWithoutContestJudgesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestJudgesInput = {
@@ -12586,6 +13378,10 @@ export type UserUncheckedUpdateWithoutContestJudgesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -12668,6 +13464,9 @@ export type UserUncheckedUpdateWithoutContestJudgesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutJudgeInvitesInput = {
@@ -12693,6 +13492,10 @@ export type UserCreateWithoutJudgeInvitesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -12775,6 +13578,9 @@ export type UserCreateWithoutJudgeInvitesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutJudgeInvitesInput = {
@@ -12800,6 +13606,10 @@ export type UserUncheckedCreateWithoutJudgeInvitesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -12882,6 +13692,9 @@ export type UserUncheckedCreateWithoutJudgeInvitesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutJudgeInvitesInput = {
@@ -12923,6 +13736,10 @@ export type UserUpdateWithoutJudgeInvitesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -13005,6 +13822,9 @@ export type UserUpdateWithoutJudgeInvitesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutJudgeInvitesInput = {
@@ -13030,6 +13850,10 @@ export type UserUncheckedUpdateWithoutJudgeInvitesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -13112,6 +13936,9 @@ export type UserUncheckedUpdateWithoutJudgeInvitesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutContestVotesInput = {
@@ -13137,6 +13964,10 @@ export type UserCreateWithoutContestVotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -13219,6 +14050,9 @@ export type UserCreateWithoutContestVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutContestVotesInput = {
@@ -13244,6 +14078,10 @@ export type UserUncheckedCreateWithoutContestVotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -13326,6 +14164,9 @@ export type UserUncheckedCreateWithoutContestVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutContestVotesInput = {
@@ -13367,6 +14208,10 @@ export type UserUpdateWithoutContestVotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -13449,6 +14294,9 @@ export type UserUpdateWithoutContestVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestVotesInput = {
@@ -13474,6 +14322,10 @@ export type UserUncheckedUpdateWithoutContestVotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -13556,6 +14408,9 @@ export type UserUncheckedUpdateWithoutContestVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductsInput = {
@@ -13581,6 +14436,10 @@ export type UserCreateWithoutProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -13663,6 +14522,9 @@ export type UserCreateWithoutProductsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductsInput = {
@@ -13688,6 +14550,10 @@ export type UserUncheckedCreateWithoutProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -13770,6 +14636,9 @@ export type UserUncheckedCreateWithoutProductsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductsInput = {
@@ -13811,6 +14680,10 @@ export type UserUpdateWithoutProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -13893,6 +14766,9 @@ export type UserUpdateWithoutProductsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductsInput = {
@@ -13918,6 +14794,10 @@ export type UserUncheckedUpdateWithoutProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -14000,6 +14880,9 @@ export type UserUncheckedUpdateWithoutProductsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGroupBuyPartsInput = {
@@ -14025,6 +14908,10 @@ export type UserCreateWithoutGroupBuyPartsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -14107,6 +14994,9 @@ export type UserCreateWithoutGroupBuyPartsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGroupBuyPartsInput = {
@@ -14132,6 +15022,10 @@ export type UserUncheckedCreateWithoutGroupBuyPartsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -14214,6 +15108,9 @@ export type UserUncheckedCreateWithoutGroupBuyPartsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGroupBuyPartsInput = {
@@ -14255,6 +15152,10 @@ export type UserUpdateWithoutGroupBuyPartsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -14337,6 +15238,9 @@ export type UserUpdateWithoutGroupBuyPartsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGroupBuyPartsInput = {
@@ -14362,6 +15266,10 @@ export type UserUncheckedUpdateWithoutGroupBuyPartsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -14444,6 +15352,9 @@ export type UserUncheckedUpdateWithoutGroupBuyPartsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCartItemsInput = {
@@ -14469,6 +15380,10 @@ export type UserCreateWithoutCartItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -14551,6 +15466,9 @@ export type UserCreateWithoutCartItemsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCartItemsInput = {
@@ -14576,6 +15494,10 @@ export type UserUncheckedCreateWithoutCartItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -14658,6 +15580,9 @@ export type UserUncheckedCreateWithoutCartItemsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCartItemsInput = {
@@ -14699,6 +15624,10 @@ export type UserUpdateWithoutCartItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -14781,6 +15710,9 @@ export type UserUpdateWithoutCartItemsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCartItemsInput = {
@@ -14806,6 +15738,10 @@ export type UserUncheckedUpdateWithoutCartItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -14888,6 +15824,9 @@ export type UserUncheckedUpdateWithoutCartItemsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBuyerOrdersInput = {
@@ -14913,6 +15852,10 @@ export type UserCreateWithoutBuyerOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -14995,6 +15938,9 @@ export type UserCreateWithoutBuyerOrdersInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBuyerOrdersInput = {
@@ -15020,6 +15966,10 @@ export type UserUncheckedCreateWithoutBuyerOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -15102,6 +16052,9 @@ export type UserUncheckedCreateWithoutBuyerOrdersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBuyerOrdersInput = {
@@ -15143,6 +16096,10 @@ export type UserUpdateWithoutBuyerOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -15225,6 +16182,9 @@ export type UserUpdateWithoutBuyerOrdersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBuyerOrdersInput = {
@@ -15250,6 +16210,10 @@ export type UserUncheckedUpdateWithoutBuyerOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -15332,6 +16296,9 @@ export type UserUncheckedUpdateWithoutBuyerOrdersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWishlistsInput = {
@@ -15357,6 +16324,10 @@ export type UserCreateWithoutWishlistsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -15439,6 +16410,9 @@ export type UserCreateWithoutWishlistsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWishlistsInput = {
@@ -15464,6 +16438,10 @@ export type UserUncheckedCreateWithoutWishlistsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -15546,6 +16524,9 @@ export type UserUncheckedCreateWithoutWishlistsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWishlistsInput = {
@@ -15587,6 +16568,10 @@ export type UserUpdateWithoutWishlistsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -15669,6 +16654,9 @@ export type UserUpdateWithoutWishlistsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWishlistsInput = {
@@ -15694,6 +16682,10 @@ export type UserUncheckedUpdateWithoutWishlistsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -15776,6 +16768,9 @@ export type UserUncheckedUpdateWithoutWishlistsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGiftsSentInput = {
@@ -15801,6 +16796,10 @@ export type UserCreateWithoutGiftsSentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -15883,6 +16882,9 @@ export type UserCreateWithoutGiftsSentInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGiftsSentInput = {
@@ -15908,6 +16910,10 @@ export type UserUncheckedCreateWithoutGiftsSentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -15990,6 +16996,9 @@ export type UserUncheckedCreateWithoutGiftsSentInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGiftsSentInput = {
@@ -16020,6 +17029,10 @@ export type UserCreateWithoutGiftsReceivedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -16102,6 +17115,9 @@ export type UserCreateWithoutGiftsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGiftsReceivedInput = {
@@ -16127,6 +17143,10 @@ export type UserUncheckedCreateWithoutGiftsReceivedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -16209,6 +17229,9 @@ export type UserUncheckedCreateWithoutGiftsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGiftsReceivedInput = {
@@ -16250,6 +17273,10 @@ export type UserUpdateWithoutGiftsSentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -16332,6 +17359,9 @@ export type UserUpdateWithoutGiftsSentInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGiftsSentInput = {
@@ -16357,6 +17387,10 @@ export type UserUncheckedUpdateWithoutGiftsSentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -16439,6 +17473,9 @@ export type UserUncheckedUpdateWithoutGiftsSentInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutGiftsReceivedInput = {
@@ -16475,6 +17512,10 @@ export type UserUpdateWithoutGiftsReceivedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -16557,6 +17598,9 @@ export type UserUpdateWithoutGiftsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGiftsReceivedInput = {
@@ -16582,6 +17626,10 @@ export type UserUncheckedUpdateWithoutGiftsReceivedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -16664,6 +17712,9 @@ export type UserUncheckedUpdateWithoutGiftsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductReviewsInput = {
@@ -16689,6 +17740,10 @@ export type UserCreateWithoutProductReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -16771,6 +17826,9 @@ export type UserCreateWithoutProductReviewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductReviewsInput = {
@@ -16796,6 +17854,10 @@ export type UserUncheckedCreateWithoutProductReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -16878,6 +17940,9 @@ export type UserUncheckedCreateWithoutProductReviewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductReviewsInput = {
@@ -16919,6 +17984,10 @@ export type UserUpdateWithoutProductReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -17001,6 +18070,9 @@ export type UserUpdateWithoutProductReviewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductReviewsInput = {
@@ -17026,6 +18098,10 @@ export type UserUncheckedUpdateWithoutProductReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -17108,6 +18184,9 @@ export type UserUncheckedUpdateWithoutProductReviewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGarageProfileInput = {
@@ -17133,6 +18212,10 @@ export type UserCreateWithoutGarageProfileInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -17215,6 +18298,9 @@ export type UserCreateWithoutGarageProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGarageProfileInput = {
@@ -17240,6 +18326,10 @@ export type UserUncheckedCreateWithoutGarageProfileInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -17322,6 +18412,9 @@ export type UserUncheckedCreateWithoutGarageProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGarageProfileInput = {
@@ -17363,6 +18456,10 @@ export type UserUpdateWithoutGarageProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -17445,6 +18542,9 @@ export type UserUpdateWithoutGarageProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGarageProfileInput = {
@@ -17470,6 +18570,10 @@ export type UserUncheckedUpdateWithoutGarageProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -17552,6 +18656,9 @@ export type UserUncheckedUpdateWithoutGarageProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGarageBookingsInput = {
@@ -17577,6 +18684,10 @@ export type UserCreateWithoutGarageBookingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -17659,6 +18770,9 @@ export type UserCreateWithoutGarageBookingsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGarageBookingsInput = {
@@ -17684,6 +18798,10 @@ export type UserUncheckedCreateWithoutGarageBookingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -17766,6 +18884,9 @@ export type UserUncheckedCreateWithoutGarageBookingsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGarageBookingsInput = {
@@ -17807,6 +18928,10 @@ export type UserUpdateWithoutGarageBookingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -17889,6 +19014,9 @@ export type UserUpdateWithoutGarageBookingsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGarageBookingsInput = {
@@ -17914,6 +19042,10 @@ export type UserUncheckedUpdateWithoutGarageBookingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -17996,6 +19128,9 @@ export type UserUncheckedUpdateWithoutGarageBookingsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGarageReviewsInput = {
@@ -18021,6 +19156,10 @@ export type UserCreateWithoutGarageReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -18103,6 +19242,9 @@ export type UserCreateWithoutGarageReviewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGarageReviewsInput = {
@@ -18128,6 +19270,10 @@ export type UserUncheckedCreateWithoutGarageReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -18210,6 +19356,9 @@ export type UserUncheckedCreateWithoutGarageReviewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGarageReviewsInput = {
@@ -18251,6 +19400,10 @@ export type UserUpdateWithoutGarageReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -18333,6 +19486,9 @@ export type UserUpdateWithoutGarageReviewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGarageReviewsInput = {
@@ -18358,6 +19514,10 @@ export type UserUncheckedUpdateWithoutGarageReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -18440,6 +19600,9 @@ export type UserUncheckedUpdateWithoutGarageReviewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutImporterProfileInput = {
@@ -18465,6 +19628,10 @@ export type UserCreateWithoutImporterProfileInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -18547,6 +19714,9 @@ export type UserCreateWithoutImporterProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutImporterProfileInput = {
@@ -18572,6 +19742,10 @@ export type UserUncheckedCreateWithoutImporterProfileInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -18654,6 +19828,9 @@ export type UserUncheckedCreateWithoutImporterProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutImporterProfileInput = {
@@ -18695,6 +19872,10 @@ export type UserUpdateWithoutImporterProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -18777,6 +19958,9 @@ export type UserUpdateWithoutImporterProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImporterProfileInput = {
@@ -18802,6 +19986,10 @@ export type UserUncheckedUpdateWithoutImporterProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -18884,6 +20072,9 @@ export type UserUncheckedUpdateWithoutImporterProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutImportRequestsInput = {
@@ -18909,6 +20100,10 @@ export type UserCreateWithoutImportRequestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -18991,6 +20186,9 @@ export type UserCreateWithoutImportRequestsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutImportRequestsInput = {
@@ -19016,6 +20214,10 @@ export type UserUncheckedCreateWithoutImportRequestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -19098,6 +20300,9 @@ export type UserUncheckedCreateWithoutImportRequestsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutImportRequestsInput = {
@@ -19139,6 +20344,10 @@ export type UserUpdateWithoutImportRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -19221,6 +20430,9 @@ export type UserUpdateWithoutImportRequestsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutImportRequestsInput = {
@@ -19246,6 +20458,10 @@ export type UserUncheckedUpdateWithoutImportRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -19328,6 +20544,9 @@ export type UserUncheckedUpdateWithoutImportRequestsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVehicleFavoritesInput = {
@@ -19353,6 +20572,10 @@ export type UserCreateWithoutVehicleFavoritesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -19435,6 +20658,9 @@ export type UserCreateWithoutVehicleFavoritesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVehicleFavoritesInput = {
@@ -19460,6 +20686,10 @@ export type UserUncheckedCreateWithoutVehicleFavoritesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -19542,6 +20772,9 @@ export type UserUncheckedCreateWithoutVehicleFavoritesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVehicleFavoritesInput = {
@@ -19583,6 +20816,10 @@ export type UserUpdateWithoutVehicleFavoritesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -19665,6 +20902,9 @@ export type UserUpdateWithoutVehicleFavoritesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVehicleFavoritesInput = {
@@ -19690,6 +20930,10 @@ export type UserUncheckedUpdateWithoutVehicleFavoritesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -19772,6 +21016,9 @@ export type UserUncheckedUpdateWithoutVehicleFavoritesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLogisticsCompanyInput = {
@@ -19797,6 +21044,10 @@ export type UserCreateWithoutLogisticsCompanyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -19879,6 +21130,9 @@ export type UserCreateWithoutLogisticsCompanyInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLogisticsCompanyInput = {
@@ -19904,6 +21158,10 @@ export type UserUncheckedCreateWithoutLogisticsCompanyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -19986,6 +21244,9 @@ export type UserUncheckedCreateWithoutLogisticsCompanyInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLogisticsCompanyInput = {
@@ -20027,6 +21288,10 @@ export type UserUpdateWithoutLogisticsCompanyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -20109,6 +21374,9 @@ export type UserUpdateWithoutLogisticsCompanyInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLogisticsCompanyInput = {
@@ -20134,6 +21402,10 @@ export type UserUncheckedUpdateWithoutLogisticsCompanyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -20216,6 +21488,9 @@ export type UserUncheckedUpdateWithoutLogisticsCompanyInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutShippingJobsInput = {
@@ -20241,6 +21516,10 @@ export type UserCreateWithoutShippingJobsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -20323,6 +21602,9 @@ export type UserCreateWithoutShippingJobsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutShippingJobsInput = {
@@ -20348,6 +21630,10 @@ export type UserUncheckedCreateWithoutShippingJobsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -20430,6 +21716,9 @@ export type UserUncheckedCreateWithoutShippingJobsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutShippingJobsInput = {
@@ -20471,6 +21760,10 @@ export type UserUpdateWithoutShippingJobsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -20553,6 +21846,9 @@ export type UserUpdateWithoutShippingJobsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShippingJobsInput = {
@@ -20578,6 +21874,10 @@ export type UserUncheckedUpdateWithoutShippingJobsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -20660,6 +21960,9 @@ export type UserUncheckedUpdateWithoutShippingJobsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLiveSessionsHostedInput = {
@@ -20685,6 +21988,10 @@ export type UserCreateWithoutLiveSessionsHostedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -20767,6 +22074,9 @@ export type UserCreateWithoutLiveSessionsHostedInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLiveSessionsHostedInput = {
@@ -20792,6 +22102,10 @@ export type UserUncheckedCreateWithoutLiveSessionsHostedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -20874,6 +22188,9 @@ export type UserUncheckedCreateWithoutLiveSessionsHostedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLiveSessionsHostedInput = {
@@ -20915,6 +22232,10 @@ export type UserUpdateWithoutLiveSessionsHostedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -20997,6 +22318,9 @@ export type UserUpdateWithoutLiveSessionsHostedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLiveSessionsHostedInput = {
@@ -21022,6 +22346,10 @@ export type UserUncheckedUpdateWithoutLiveSessionsHostedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -21104,6 +22432,9 @@ export type UserUncheckedUpdateWithoutLiveSessionsHostedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProductSharesInput = {
@@ -21129,6 +22460,10 @@ export type UserCreateWithoutProductSharesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -21211,6 +22546,9 @@ export type UserCreateWithoutProductSharesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProductSharesInput = {
@@ -21236,6 +22574,10 @@ export type UserUncheckedCreateWithoutProductSharesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -21318,6 +22660,9 @@ export type UserUncheckedCreateWithoutProductSharesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProductSharesInput = {
@@ -21359,6 +22704,10 @@ export type UserUpdateWithoutProductSharesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -21441,6 +22790,9 @@ export type UserUpdateWithoutProductSharesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProductSharesInput = {
@@ -21466,6 +22818,10 @@ export type UserUncheckedUpdateWithoutProductSharesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -21548,6 +22904,9 @@ export type UserUncheckedUpdateWithoutProductSharesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDealAlertsInput = {
@@ -21573,6 +22932,10 @@ export type UserCreateWithoutDealAlertsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -21655,6 +23018,9 @@ export type UserCreateWithoutDealAlertsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDealAlertsInput = {
@@ -21680,6 +23046,10 @@ export type UserUncheckedCreateWithoutDealAlertsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -21762,6 +23132,9 @@ export type UserUncheckedCreateWithoutDealAlertsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDealAlertsInput = {
@@ -21803,6 +23176,10 @@ export type UserUpdateWithoutDealAlertsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -21885,6 +23262,9 @@ export type UserUpdateWithoutDealAlertsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDealAlertsInput = {
@@ -21910,6 +23290,10 @@ export type UserUncheckedUpdateWithoutDealAlertsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -21992,6 +23376,9 @@ export type UserUncheckedUpdateWithoutDealAlertsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDailyStatsInput = {
@@ -22017,6 +23404,10 @@ export type UserCreateWithoutDailyStatsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -22099,6 +23490,9 @@ export type UserCreateWithoutDailyStatsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDailyStatsInput = {
@@ -22124,6 +23518,10 @@ export type UserUncheckedCreateWithoutDailyStatsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -22206,6 +23604,9 @@ export type UserUncheckedCreateWithoutDailyStatsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDailyStatsInput = {
@@ -22247,6 +23648,10 @@ export type UserUpdateWithoutDailyStatsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -22329,6 +23734,9 @@ export type UserUpdateWithoutDailyStatsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDailyStatsInput = {
@@ -22354,6 +23762,10 @@ export type UserUncheckedUpdateWithoutDailyStatsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -22436,6 +23848,9 @@ export type UserUncheckedUpdateWithoutDailyStatsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -22461,6 +23876,10 @@ export type UserCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -22543,6 +23962,9 @@ export type UserCreateWithoutCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -22568,6 +23990,10 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -22650,6 +24076,9 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -22680,6 +24109,10 @@ export type UserCreateWithoutCommentRepliesToInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -22762,6 +24195,9 @@ export type UserCreateWithoutCommentRepliesToInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentRepliesToInput = {
@@ -22787,6 +24223,10 @@ export type UserUncheckedCreateWithoutCommentRepliesToInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -22869,6 +24309,9 @@ export type UserUncheckedCreateWithoutCommentRepliesToInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentRepliesToInput = {
@@ -22910,6 +24353,10 @@ export type UserUpdateWithoutCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -22992,6 +24439,9 @@ export type UserUpdateWithoutCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -23017,6 +24467,10 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -23099,6 +24553,9 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCommentRepliesToInput = {
@@ -23135,6 +24592,10 @@ export type UserUpdateWithoutCommentRepliesToInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -23217,6 +24678,9 @@ export type UserUpdateWithoutCommentRepliesToInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentRepliesToInput = {
@@ -23242,6 +24706,10 @@ export type UserUncheckedUpdateWithoutCommentRepliesToInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -23324,6 +24792,9 @@ export type UserUncheckedUpdateWithoutCommentRepliesToInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentLikesInput = {
@@ -23349,6 +24820,10 @@ export type UserCreateWithoutCommentLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -23431,6 +24906,9 @@ export type UserCreateWithoutCommentLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentLikesInput = {
@@ -23456,6 +24934,10 @@ export type UserUncheckedCreateWithoutCommentLikesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -23538,6 +25020,9 @@ export type UserUncheckedCreateWithoutCommentLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentLikesInput = {
@@ -23579,6 +25064,10 @@ export type UserUpdateWithoutCommentLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -23661,6 +25150,9 @@ export type UserUpdateWithoutCommentLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentLikesInput = {
@@ -23686,6 +25178,10 @@ export type UserUncheckedUpdateWithoutCommentLikesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -23768,6 +25264,9 @@ export type UserUncheckedUpdateWithoutCommentLikesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentReportsInput = {
@@ -23793,6 +25292,10 @@ export type UserCreateWithoutCommentReportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -23875,6 +25378,9 @@ export type UserCreateWithoutCommentReportsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentReportsInput = {
@@ -23900,6 +25406,10 @@ export type UserUncheckedCreateWithoutCommentReportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -23982,6 +25492,9 @@ export type UserUncheckedCreateWithoutCommentReportsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentReportsInput = {
@@ -24023,6 +25536,10 @@ export type UserUpdateWithoutCommentReportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -24105,6 +25622,9 @@ export type UserUpdateWithoutCommentReportsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentReportsInput = {
@@ -24130,6 +25650,10 @@ export type UserUncheckedUpdateWithoutCommentReportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -24212,6 +25736,9 @@ export type UserUncheckedUpdateWithoutCommentReportsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTeamsLedInput = {
@@ -24237,6 +25764,10 @@ export type UserCreateWithoutTeamsLedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -24319,6 +25850,9 @@ export type UserCreateWithoutTeamsLedInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamsLedInput = {
@@ -24344,6 +25878,10 @@ export type UserUncheckedCreateWithoutTeamsLedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -24426,6 +25964,9 @@ export type UserUncheckedCreateWithoutTeamsLedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamsLedInput = {
@@ -24467,6 +26008,10 @@ export type UserUpdateWithoutTeamsLedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -24549,6 +26094,9 @@ export type UserUpdateWithoutTeamsLedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamsLedInput = {
@@ -24574,6 +26122,10 @@ export type UserUncheckedUpdateWithoutTeamsLedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -24656,6 +26208,9 @@ export type UserUncheckedUpdateWithoutTeamsLedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTeamMembershipsInput = {
@@ -24681,6 +26236,10 @@ export type UserCreateWithoutTeamMembershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -24763,6 +26322,9 @@ export type UserCreateWithoutTeamMembershipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamMembershipsInput = {
@@ -24788,6 +26350,10 @@ export type UserUncheckedCreateWithoutTeamMembershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -24870,6 +26436,9 @@ export type UserUncheckedCreateWithoutTeamMembershipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamMembershipsInput = {
@@ -24911,6 +26480,10 @@ export type UserUpdateWithoutTeamMembershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -24993,6 +26566,9 @@ export type UserUpdateWithoutTeamMembershipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
@@ -25018,6 +26594,10 @@ export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -25100,6 +26680,9 @@ export type UserUncheckedUpdateWithoutTeamMembershipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTeamInvitationsSentInput = {
@@ -25125,6 +26708,10 @@ export type UserCreateWithoutTeamInvitationsSentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -25207,6 +26794,9 @@ export type UserCreateWithoutTeamInvitationsSentInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamInvitationsSentInput = {
@@ -25232,6 +26822,10 @@ export type UserUncheckedCreateWithoutTeamInvitationsSentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -25314,6 +26908,9 @@ export type UserUncheckedCreateWithoutTeamInvitationsSentInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamInvitationsSentInput = {
@@ -25344,6 +26941,10 @@ export type UserCreateWithoutTeamInvitationsReceivedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -25426,6 +27027,9 @@ export type UserCreateWithoutTeamInvitationsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamInvitationsReceivedInput = {
@@ -25451,6 +27055,10 @@ export type UserUncheckedCreateWithoutTeamInvitationsReceivedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -25533,6 +27141,9 @@ export type UserUncheckedCreateWithoutTeamInvitationsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamInvitationsReceivedInput = {
@@ -25574,6 +27185,10 @@ export type UserUpdateWithoutTeamInvitationsSentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -25656,6 +27271,9 @@ export type UserUpdateWithoutTeamInvitationsSentInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamInvitationsSentInput = {
@@ -25681,6 +27299,10 @@ export type UserUncheckedUpdateWithoutTeamInvitationsSentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -25763,6 +27385,9 @@ export type UserUncheckedUpdateWithoutTeamInvitationsSentInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutTeamInvitationsReceivedInput = {
@@ -25799,6 +27424,10 @@ export type UserUpdateWithoutTeamInvitationsReceivedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -25881,6 +27510,9 @@ export type UserUpdateWithoutTeamInvitationsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamInvitationsReceivedInput = {
@@ -25906,6 +27538,10 @@ export type UserUncheckedUpdateWithoutTeamInvitationsReceivedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -25988,6 +27624,9 @@ export type UserUncheckedUpdateWithoutTeamInvitationsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTeamSubmissionVotesInput = {
@@ -26013,6 +27652,10 @@ export type UserCreateWithoutTeamSubmissionVotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -26095,6 +27738,9 @@ export type UserCreateWithoutTeamSubmissionVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamSubmissionVotesInput = {
@@ -26120,6 +27766,10 @@ export type UserUncheckedCreateWithoutTeamSubmissionVotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -26202,6 +27852,9 @@ export type UserUncheckedCreateWithoutTeamSubmissionVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamSubmissionVotesInput = {
@@ -26243,6 +27896,10 @@ export type UserUpdateWithoutTeamSubmissionVotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -26325,6 +27982,9 @@ export type UserUpdateWithoutTeamSubmissionVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamSubmissionVotesInput = {
@@ -26350,6 +28010,10 @@ export type UserUncheckedUpdateWithoutTeamSubmissionVotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -26432,6 +28096,9 @@ export type UserUncheckedUpdateWithoutTeamSubmissionVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChatParticipationsInput = {
@@ -26457,6 +28124,10 @@ export type UserCreateWithoutChatParticipationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -26539,6 +28210,9 @@ export type UserCreateWithoutChatParticipationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChatParticipationsInput = {
@@ -26564,6 +28238,10 @@ export type UserUncheckedCreateWithoutChatParticipationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -26646,6 +28324,9 @@ export type UserUncheckedCreateWithoutChatParticipationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChatParticipationsInput = {
@@ -26687,6 +28368,10 @@ export type UserUpdateWithoutChatParticipationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -26769,6 +28454,9 @@ export type UserUpdateWithoutChatParticipationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChatParticipationsInput = {
@@ -26794,6 +28482,10 @@ export type UserUncheckedUpdateWithoutChatParticipationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -26876,6 +28568,9 @@ export type UserUncheckedUpdateWithoutChatParticipationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSentMessagesInput = {
@@ -26901,6 +28596,10 @@ export type UserCreateWithoutSentMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -26983,6 +28682,9 @@ export type UserCreateWithoutSentMessagesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSentMessagesInput = {
@@ -27008,6 +28710,10 @@ export type UserUncheckedCreateWithoutSentMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -27090,6 +28796,9 @@ export type UserUncheckedCreateWithoutSentMessagesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSentMessagesInput = {
@@ -27131,6 +28840,10 @@ export type UserUpdateWithoutSentMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -27213,6 +28926,9 @@ export type UserUpdateWithoutSentMessagesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentMessagesInput = {
@@ -27238,6 +28954,10 @@ export type UserUncheckedUpdateWithoutSentMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -27320,6 +29040,9 @@ export type UserUncheckedUpdateWithoutSentMessagesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStoriesInput = {
@@ -27345,6 +29068,10 @@ export type UserCreateWithoutStoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -27427,6 +29154,9 @@ export type UserCreateWithoutStoriesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStoriesInput = {
@@ -27452,6 +29182,10 @@ export type UserUncheckedCreateWithoutStoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -27534,6 +29268,9 @@ export type UserUncheckedCreateWithoutStoriesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStoriesInput = {
@@ -27575,6 +29312,10 @@ export type UserUpdateWithoutStoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -27657,6 +29398,9 @@ export type UserUpdateWithoutStoriesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStoriesInput = {
@@ -27682,6 +29426,10 @@ export type UserUncheckedUpdateWithoutStoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -27764,6 +29512,9 @@ export type UserUncheckedUpdateWithoutStoriesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStoryViewsInput = {
@@ -27789,6 +29540,10 @@ export type UserCreateWithoutStoryViewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -27871,6 +29626,9 @@ export type UserCreateWithoutStoryViewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStoryViewsInput = {
@@ -27896,6 +29654,10 @@ export type UserUncheckedCreateWithoutStoryViewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -27978,6 +29740,9 @@ export type UserUncheckedCreateWithoutStoryViewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStoryViewsInput = {
@@ -28019,6 +29784,10 @@ export type UserUpdateWithoutStoryViewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -28101,6 +29870,9 @@ export type UserUpdateWithoutStoryViewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStoryViewsInput = {
@@ -28126,6 +29898,10 @@ export type UserUncheckedUpdateWithoutStoryViewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -28208,6 +29984,9 @@ export type UserUncheckedUpdateWithoutStoryViewsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStoryViewerPreferencesInput = {
@@ -28233,6 +30012,10 @@ export type UserCreateWithoutStoryViewerPreferencesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -28315,6 +30098,9 @@ export type UserCreateWithoutStoryViewerPreferencesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStoryViewerPreferencesInput = {
@@ -28340,6 +30126,10 @@ export type UserUncheckedCreateWithoutStoryViewerPreferencesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -28422,6 +30212,9 @@ export type UserUncheckedCreateWithoutStoryViewerPreferencesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStoryViewerPreferencesInput = {
@@ -28452,6 +30245,10 @@ export type UserCreateWithoutPreferredStoryViewersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -28534,6 +30331,9 @@ export type UserCreateWithoutPreferredStoryViewersInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPreferredStoryViewersInput = {
@@ -28559,6 +30359,10 @@ export type UserUncheckedCreateWithoutPreferredStoryViewersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -28641,6 +30445,9 @@ export type UserUncheckedCreateWithoutPreferredStoryViewersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPreferredStoryViewersInput = {
@@ -28682,6 +30489,10 @@ export type UserUpdateWithoutStoryViewerPreferencesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -28764,6 +30575,9 @@ export type UserUpdateWithoutStoryViewerPreferencesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStoryViewerPreferencesInput = {
@@ -28789,6 +30603,10 @@ export type UserUncheckedUpdateWithoutStoryViewerPreferencesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -28871,6 +30689,9 @@ export type UserUncheckedUpdateWithoutStoryViewerPreferencesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutPreferredStoryViewersInput = {
@@ -28907,6 +30728,10 @@ export type UserUpdateWithoutPreferredStoryViewersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -28989,6 +30814,9 @@ export type UserUpdateWithoutPreferredStoryViewersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPreferredStoryViewersInput = {
@@ -29014,6 +30842,10 @@ export type UserUncheckedUpdateWithoutPreferredStoryViewersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -29096,6 +30928,9 @@ export type UserUncheckedUpdateWithoutPreferredStoryViewersInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamasCreatedInput = {
@@ -29121,6 +30956,10 @@ export type UserCreateWithoutChamasCreatedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -29203,6 +31042,9 @@ export type UserCreateWithoutChamasCreatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamasCreatedInput = {
@@ -29228,6 +31070,10 @@ export type UserUncheckedCreateWithoutChamasCreatedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -29310,6 +31156,9 @@ export type UserUncheckedCreateWithoutChamasCreatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamasCreatedInput = {
@@ -29351,6 +31200,10 @@ export type UserUpdateWithoutChamasCreatedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -29433,6 +31286,9 @@ export type UserUpdateWithoutChamasCreatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamasCreatedInput = {
@@ -29458,6 +31314,10 @@ export type UserUncheckedUpdateWithoutChamasCreatedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -29540,6 +31400,9 @@ export type UserUncheckedUpdateWithoutChamasCreatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamaMembershipsInput = {
@@ -29565,6 +31428,10 @@ export type UserCreateWithoutChamaMembershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -29647,6 +31514,9 @@ export type UserCreateWithoutChamaMembershipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaMembershipsInput = {
@@ -29672,6 +31542,10 @@ export type UserUncheckedCreateWithoutChamaMembershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -29754,6 +31628,9 @@ export type UserUncheckedCreateWithoutChamaMembershipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaMembershipsInput = {
@@ -29795,6 +31672,10 @@ export type UserUpdateWithoutChamaMembershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -29877,6 +31758,9 @@ export type UserUpdateWithoutChamaMembershipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaMembershipsInput = {
@@ -29902,6 +31786,10 @@ export type UserUncheckedUpdateWithoutChamaMembershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -29984,6 +31872,9 @@ export type UserUncheckedUpdateWithoutChamaMembershipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamaContributionsInput = {
@@ -30009,6 +31900,10 @@ export type UserCreateWithoutChamaContributionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -30091,6 +31986,9 @@ export type UserCreateWithoutChamaContributionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaContributionsInput = {
@@ -30116,6 +32014,10 @@ export type UserUncheckedCreateWithoutChamaContributionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -30198,6 +32100,9 @@ export type UserUncheckedCreateWithoutChamaContributionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaContributionsInput = {
@@ -30239,6 +32144,10 @@ export type UserUpdateWithoutChamaContributionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -30321,6 +32230,9 @@ export type UserUpdateWithoutChamaContributionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaContributionsInput = {
@@ -30346,6 +32258,10 @@ export type UserUncheckedUpdateWithoutChamaContributionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -30428,6 +32344,9 @@ export type UserUncheckedUpdateWithoutChamaContributionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamaPayoutsReceivedInput = {
@@ -30453,6 +32372,10 @@ export type UserCreateWithoutChamaPayoutsReceivedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -30535,6 +32458,9 @@ export type UserCreateWithoutChamaPayoutsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaPayoutsReceivedInput = {
@@ -30560,6 +32486,10 @@ export type UserUncheckedCreateWithoutChamaPayoutsReceivedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -30642,6 +32572,9 @@ export type UserUncheckedCreateWithoutChamaPayoutsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaPayoutsReceivedInput = {
@@ -30683,6 +32616,10 @@ export type UserUpdateWithoutChamaPayoutsReceivedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -30765,6 +32702,9 @@ export type UserUpdateWithoutChamaPayoutsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaPayoutsReceivedInput = {
@@ -30790,6 +32730,10 @@ export type UserUncheckedUpdateWithoutChamaPayoutsReceivedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -30872,6 +32816,9 @@ export type UserUncheckedUpdateWithoutChamaPayoutsReceivedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamaPayoutApprovalsInput = {
@@ -30897,6 +32844,10 @@ export type UserCreateWithoutChamaPayoutApprovalsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -30979,6 +32930,9 @@ export type UserCreateWithoutChamaPayoutApprovalsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaPayoutApprovalsInput = {
@@ -31004,6 +32958,10 @@ export type UserUncheckedCreateWithoutChamaPayoutApprovalsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -31086,6 +33044,9 @@ export type UserUncheckedCreateWithoutChamaPayoutApprovalsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaPayoutApprovalsInput = {
@@ -31127,6 +33088,10 @@ export type UserUpdateWithoutChamaPayoutApprovalsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -31209,6 +33174,9 @@ export type UserUpdateWithoutChamaPayoutApprovalsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaPayoutApprovalsInput = {
@@ -31234,6 +33202,10 @@ export type UserUncheckedUpdateWithoutChamaPayoutApprovalsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -31316,6 +33288,9 @@ export type UserUncheckedUpdateWithoutChamaPayoutApprovalsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamaTransactionsInput = {
@@ -31341,6 +33316,10 @@ export type UserCreateWithoutChamaTransactionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -31423,6 +33402,9 @@ export type UserCreateWithoutChamaTransactionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaTransactionsInput = {
@@ -31448,6 +33430,10 @@ export type UserUncheckedCreateWithoutChamaTransactionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -31530,6 +33516,9 @@ export type UserUncheckedCreateWithoutChamaTransactionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaTransactionsInput = {
@@ -31571,6 +33560,10 @@ export type UserUpdateWithoutChamaTransactionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -31653,6 +33646,9 @@ export type UserUpdateWithoutChamaTransactionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaTransactionsInput = {
@@ -31678,6 +33674,10 @@ export type UserUncheckedUpdateWithoutChamaTransactionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -31760,6 +33760,9 @@ export type UserUncheckedUpdateWithoutChamaTransactionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamaDefaultsInput = {
@@ -31785,6 +33788,10 @@ export type UserCreateWithoutChamaDefaultsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -31867,6 +33874,9 @@ export type UserCreateWithoutChamaDefaultsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaDefaultsInput = {
@@ -31892,6 +33902,10 @@ export type UserUncheckedCreateWithoutChamaDefaultsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -31974,6 +33988,9 @@ export type UserUncheckedCreateWithoutChamaDefaultsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaDefaultsInput = {
@@ -32015,6 +34032,10 @@ export type UserUpdateWithoutChamaDefaultsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -32097,6 +34118,9 @@ export type UserUpdateWithoutChamaDefaultsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaDefaultsInput = {
@@ -32122,6 +34146,10 @@ export type UserUncheckedUpdateWithoutChamaDefaultsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -32204,6 +34232,9 @@ export type UserUncheckedUpdateWithoutChamaDefaultsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamaNominatedInput = {
@@ -32229,6 +34260,10 @@ export type UserCreateWithoutChamaNominatedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -32311,6 +34346,9 @@ export type UserCreateWithoutChamaNominatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaNominatedInput = {
@@ -32336,6 +34374,10 @@ export type UserUncheckedCreateWithoutChamaNominatedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -32418,6 +34460,9 @@ export type UserUncheckedCreateWithoutChamaNominatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaNominatedInput = {
@@ -32448,6 +34493,10 @@ export type UserCreateWithoutChamaNominationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -32530,6 +34579,9 @@ export type UserCreateWithoutChamaNominationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaNominationsInput = {
@@ -32555,6 +34607,10 @@ export type UserUncheckedCreateWithoutChamaNominationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -32637,6 +34693,9 @@ export type UserUncheckedCreateWithoutChamaNominationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaNominationsInput = {
@@ -32678,6 +34737,10 @@ export type UserUpdateWithoutChamaNominatedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -32760,6 +34823,9 @@ export type UserUpdateWithoutChamaNominatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaNominatedInput = {
@@ -32785,6 +34851,10 @@ export type UserUncheckedUpdateWithoutChamaNominatedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -32867,6 +34937,9 @@ export type UserUncheckedUpdateWithoutChamaNominatedInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutChamaNominationsInput = {
@@ -32903,6 +34976,10 @@ export type UserUpdateWithoutChamaNominationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -32985,6 +35062,9 @@ export type UserUpdateWithoutChamaNominationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaNominationsInput = {
@@ -33010,6 +35090,10 @@ export type UserUncheckedUpdateWithoutChamaNominationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -33092,6 +35176,9 @@ export type UserUncheckedUpdateWithoutChamaNominationsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamaSecondsInput = {
@@ -33117,6 +35204,10 @@ export type UserCreateWithoutChamaSecondsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -33199,6 +35290,9 @@ export type UserCreateWithoutChamaSecondsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaSecondsInput = {
@@ -33224,6 +35318,10 @@ export type UserUncheckedCreateWithoutChamaSecondsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -33306,6 +35404,9 @@ export type UserUncheckedCreateWithoutChamaSecondsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaSecondsInput = {
@@ -33347,6 +35448,10 @@ export type UserUpdateWithoutChamaSecondsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -33429,6 +35534,9 @@ export type UserUpdateWithoutChamaSecondsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaSecondsInput = {
@@ -33454,6 +35562,10 @@ export type UserUncheckedUpdateWithoutChamaSecondsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -33536,6 +35648,9 @@ export type UserUncheckedUpdateWithoutChamaSecondsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChamaVotesInput = {
@@ -33561,6 +35676,10 @@ export type UserCreateWithoutChamaVotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -33643,6 +35762,9 @@ export type UserCreateWithoutChamaVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChamaVotesInput = {
@@ -33668,6 +35790,10 @@ export type UserUncheckedCreateWithoutChamaVotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -33750,6 +35876,9 @@ export type UserUncheckedCreateWithoutChamaVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChamaVotesInput = {
@@ -33791,6 +35920,10 @@ export type UserUpdateWithoutChamaVotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -33873,6 +36006,9 @@ export type UserUpdateWithoutChamaVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChamaVotesInput = {
@@ -33898,6 +36034,10 @@ export type UserUncheckedUpdateWithoutChamaVotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -33980,6 +36120,9 @@ export type UserUncheckedUpdateWithoutChamaVotesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBudgetsInput = {
@@ -34005,6 +36148,10 @@ export type UserCreateWithoutBudgetsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -34087,6 +36234,9 @@ export type UserCreateWithoutBudgetsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBudgetsInput = {
@@ -34112,6 +36262,10 @@ export type UserUncheckedCreateWithoutBudgetsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -34194,6 +36348,9 @@ export type UserUncheckedCreateWithoutBudgetsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBudgetsInput = {
@@ -34235,6 +36392,10 @@ export type UserUpdateWithoutBudgetsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -34317,6 +36478,9 @@ export type UserUpdateWithoutBudgetsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBudgetsInput = {
@@ -34342,6 +36506,10 @@ export type UserUncheckedUpdateWithoutBudgetsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -34424,6 +36592,9 @@ export type UserUncheckedUpdateWithoutBudgetsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExpensesInput = {
@@ -34449,6 +36620,10 @@ export type UserCreateWithoutExpensesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -34531,6 +36706,9 @@ export type UserCreateWithoutExpensesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExpensesInput = {
@@ -34556,6 +36734,10 @@ export type UserUncheckedCreateWithoutExpensesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -34638,6 +36820,9 @@ export type UserUncheckedCreateWithoutExpensesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExpensesInput = {
@@ -34679,6 +36864,10 @@ export type UserUpdateWithoutExpensesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -34761,6 +36950,9 @@ export type UserUpdateWithoutExpensesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExpensesInput = {
@@ -34786,6 +36978,10 @@ export type UserUncheckedUpdateWithoutExpensesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -34868,6 +37064,9 @@ export type UserUncheckedUpdateWithoutExpensesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInfluencerProfileInput = {
@@ -34893,6 +37092,10 @@ export type UserCreateWithoutInfluencerProfileInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -34975,6 +37178,9 @@ export type UserCreateWithoutInfluencerProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInfluencerProfileInput = {
@@ -35000,6 +37206,10 @@ export type UserUncheckedCreateWithoutInfluencerProfileInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -35082,6 +37292,9 @@ export type UserUncheckedCreateWithoutInfluencerProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInfluencerProfileInput = {
@@ -35123,6 +37336,10 @@ export type UserUpdateWithoutInfluencerProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -35205,6 +37422,9 @@ export type UserUpdateWithoutInfluencerProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInfluencerProfileInput = {
@@ -35230,6 +37450,10 @@ export type UserUncheckedUpdateWithoutInfluencerProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -35312,6 +37536,9 @@ export type UserUncheckedUpdateWithoutInfluencerProfileInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBrandCampaignsInput = {
@@ -35337,6 +37564,10 @@ export type UserCreateWithoutBrandCampaignsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -35419,6 +37650,9 @@ export type UserCreateWithoutBrandCampaignsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBrandCampaignsInput = {
@@ -35444,6 +37678,10 @@ export type UserUncheckedCreateWithoutBrandCampaignsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -35526,6 +37764,9 @@ export type UserUncheckedCreateWithoutBrandCampaignsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBrandCampaignsInput = {
@@ -35567,6 +37808,10 @@ export type UserUpdateWithoutBrandCampaignsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -35649,6 +37894,9 @@ export type UserUpdateWithoutBrandCampaignsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBrandCampaignsInput = {
@@ -35674,6 +37922,10 @@ export type UserUncheckedUpdateWithoutBrandCampaignsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -35756,6 +38008,9 @@ export type UserUncheckedUpdateWithoutBrandCampaignsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutContestSponsorshipsInput = {
@@ -35781,6 +38036,10 @@ export type UserCreateWithoutContestSponsorshipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -35863,6 +38122,9 @@ export type UserCreateWithoutContestSponsorshipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutContestSponsorshipsInput = {
@@ -35888,6 +38150,10 @@ export type UserUncheckedCreateWithoutContestSponsorshipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -35970,6 +38236,9 @@ export type UserUncheckedCreateWithoutContestSponsorshipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutContestSponsorshipsInput = {
@@ -36011,6 +38280,10 @@ export type UserUpdateWithoutContestSponsorshipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -36093,6 +38366,9 @@ export type UserUpdateWithoutContestSponsorshipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContestSponsorshipsInput = {
@@ -36118,6 +38394,10 @@ export type UserUncheckedUpdateWithoutContestSponsorshipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -36200,6 +38480,9 @@ export type UserUncheckedUpdateWithoutContestSponsorshipsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEngagementActionsInput = {
@@ -36225,6 +38508,10 @@ export type UserCreateWithoutEngagementActionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -36307,6 +38594,9 @@ export type UserCreateWithoutEngagementActionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEngagementActionsInput = {
@@ -36332,6 +38622,10 @@ export type UserUncheckedCreateWithoutEngagementActionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -36414,6 +38708,9 @@ export type UserUncheckedCreateWithoutEngagementActionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEngagementActionsInput = {
@@ -36455,6 +38752,10 @@ export type UserUpdateWithoutEngagementActionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -36537,6 +38838,9 @@ export type UserUpdateWithoutEngagementActionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEngagementActionsInput = {
@@ -36562,6 +38866,10 @@ export type UserUncheckedUpdateWithoutEngagementActionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -36644,6 +38952,9 @@ export type UserUncheckedUpdateWithoutEngagementActionsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPurchaseEntriesInput = {
@@ -36669,6 +38980,10 @@ export type UserCreateWithoutPurchaseEntriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -36751,6 +39066,9 @@ export type UserCreateWithoutPurchaseEntriesInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPurchaseEntriesInput = {
@@ -36776,6 +39094,10 @@ export type UserUncheckedCreateWithoutPurchaseEntriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -36858,6 +39180,9 @@ export type UserUncheckedCreateWithoutPurchaseEntriesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPurchaseEntriesInput = {
@@ -36899,6 +39224,10 @@ export type UserUpdateWithoutPurchaseEntriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -36981,6 +39310,9 @@ export type UserUpdateWithoutPurchaseEntriesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPurchaseEntriesInput = {
@@ -37006,6 +39338,10 @@ export type UserUncheckedUpdateWithoutPurchaseEntriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -37088,6 +39424,9 @@ export type UserUncheckedUpdateWithoutPurchaseEntriesInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversionCampaignsInput = {
@@ -37113,6 +39452,10 @@ export type UserCreateWithoutConversionCampaignsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -37195,6 +39538,9 @@ export type UserCreateWithoutConversionCampaignsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversionCampaignsInput = {
@@ -37220,6 +39566,10 @@ export type UserUncheckedCreateWithoutConversionCampaignsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -37302,6 +39652,9 @@ export type UserUncheckedCreateWithoutConversionCampaignsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversionCampaignsInput = {
@@ -37343,6 +39696,10 @@ export type UserUpdateWithoutConversionCampaignsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -37425,6 +39782,9 @@ export type UserUpdateWithoutConversionCampaignsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversionCampaignsInput = {
@@ -37450,6 +39810,10 @@ export type UserUncheckedUpdateWithoutConversionCampaignsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -37532,6 +39896,9 @@ export type UserUncheckedUpdateWithoutConversionCampaignsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversionRecipientsInput = {
@@ -37557,6 +39924,10 @@ export type UserCreateWithoutConversionRecipientsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -37639,6 +40010,9 @@ export type UserCreateWithoutConversionRecipientsInput = {
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversionRecipientsInput = {
@@ -37664,6 +40038,10 @@ export type UserUncheckedCreateWithoutConversionRecipientsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -37746,6 +40124,9 @@ export type UserUncheckedCreateWithoutConversionRecipientsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversionRecipientsInput = {
@@ -37787,6 +40168,10 @@ export type UserUpdateWithoutConversionRecipientsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -37869,6 +40254,9 @@ export type UserUpdateWithoutConversionRecipientsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversionRecipientsInput = {
@@ -37894,6 +40282,10 @@ export type UserUncheckedUpdateWithoutConversionRecipientsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -37976,6 +40368,9 @@ export type UserUncheckedUpdateWithoutConversionRecipientsInput = {
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFunnelEventsInput = {
@@ -38001,6 +40396,10 @@ export type UserCreateWithoutFunnelEventsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -38083,6 +40482,9 @@ export type UserCreateWithoutFunnelEventsInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFunnelEventsInput = {
@@ -38108,6 +40510,10 @@ export type UserUncheckedCreateWithoutFunnelEventsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -38190,6 +40596,9 @@ export type UserUncheckedCreateWithoutFunnelEventsInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFunnelEventsInput = {
@@ -38231,6 +40640,10 @@ export type UserUpdateWithoutFunnelEventsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -38313,6 +40726,9 @@ export type UserUpdateWithoutFunnelEventsInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFunnelEventsInput = {
@@ -38338,6 +40754,10 @@ export type UserUncheckedUpdateWithoutFunnelEventsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -38420,6 +40840,9 @@ export type UserUncheckedUpdateWithoutFunnelEventsInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGamificationPointsInput = {
@@ -38445,6 +40868,10 @@ export type UserCreateWithoutGamificationPointsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -38527,6 +40954,9 @@ export type UserCreateWithoutGamificationPointsInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutUserInput
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGamificationPointsInput = {
@@ -38552,6 +40982,10 @@ export type UserUncheckedCreateWithoutGamificationPointsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -38634,6 +41068,9 @@ export type UserUncheckedCreateWithoutGamificationPointsInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutUserInput
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGamificationPointsInput = {
@@ -38675,6 +41112,10 @@ export type UserUpdateWithoutGamificationPointsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -38757,6 +41198,9 @@ export type UserUpdateWithoutGamificationPointsInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutUserNestedInput
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGamificationPointsInput = {
@@ -38782,6 +41226,10 @@ export type UserUncheckedUpdateWithoutGamificationPointsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -38864,6 +41312,9 @@ export type UserUncheckedUpdateWithoutGamificationPointsInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutUserNestedInput
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutGamificationActivitiesInput = {
@@ -38889,6 +41340,10 @@ export type UserCreateWithoutGamificationActivitiesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
@@ -38971,6 +41426,9 @@ export type UserCreateWithoutGamificationActivitiesInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutUserInput
   funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGamificationActivitiesInput = {
@@ -38996,6 +41454,10 @@ export type UserUncheckedCreateWithoutGamificationActivitiesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
@@ -39078,6 +41540,9 @@ export type UserUncheckedCreateWithoutGamificationActivitiesInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutUserInput
   funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGamificationActivitiesInput = {
@@ -39119,6 +41584,10 @@ export type UserUpdateWithoutGamificationActivitiesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
@@ -39201,6 +41670,9 @@ export type UserUpdateWithoutGamificationActivitiesInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutUserNestedInput
   funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGamificationActivitiesInput = {
@@ -39226,6 +41698,10 @@ export type UserUncheckedUpdateWithoutGamificationActivitiesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
@@ -39308,6 +41784,1425 @@ export type UserUncheckedUpdateWithoutGamificationActivitiesInput = {
   purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutUserNestedInput
   funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
   gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAdminProfileInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
+  chamasCreated?: Prisma.ChamaCreateNestedManyWithoutCreatorInput
+  chamaMemberships?: Prisma.ChamaMemberCreateNestedManyWithoutUserInput
+  chamaContributions?: Prisma.ChamaContributionCreateNestedManyWithoutUserInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutCreateNestedManyWithoutRecipientInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalCreateNestedManyWithoutApproverInput
+  chamaTransactions?: Prisma.ChamaTransactionCreateNestedManyWithoutUserInput
+  chamaDefaults?: Prisma.ChamaDefaulterCreateNestedManyWithoutUserInput
+  chamaNominations?: Prisma.ChamaNominationCreateNestedManyWithoutNominatorInput
+  chamaNominated?: Prisma.ChamaNominationCreateNestedManyWithoutNomineeInput
+  chamaSeconds?: Prisma.ChamaSecondmentCreateNestedManyWithoutSeconderInput
+  chamaVotes?: Prisma.ChamaVoteCreateNestedManyWithoutVoterInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewCreateNestedManyWithoutUserInput
+  wishlists?: Prisma.WishlistCreateNestedManyWithoutUserInput
+  cartItems?: Prisma.CartItemCreateNestedManyWithoutUserInput
+  buyerOrders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
+  garageProfile?: Prisma.GarageProfileCreateNestedOneWithoutUserInput
+  garageBookings?: Prisma.GarageBookingCreateNestedManyWithoutUserInput
+  garageReviews?: Prisma.GarageReviewCreateNestedManyWithoutUserInput
+  importerProfile?: Prisma.ImporterProfileCreateNestedOneWithoutUserInput
+  importRequests?: Prisma.ImportRequestCreateNestedManyWithoutUserInput
+  giftsSent?: Prisma.GiftCreateNestedManyWithoutSenderInput
+  giftsReceived?: Prisma.GiftCreateNestedManyWithoutRecipientInput
+  dealAlerts?: Prisma.DealAlertCreateNestedManyWithoutUserInput
+  liveSessionsHosted?: Prisma.LiveSessionCreateNestedManyWithoutHostInput
+  groupBuyParts?: Prisma.GroupBuyParticipantCreateNestedManyWithoutUserInput
+  productShares?: Prisma.ProductShareCreateNestedManyWithoutUserInput
+  logisticsCompany?: Prisma.LogisticsCompanyCreateNestedOneWithoutUserInput
+  shippingJobs?: Prisma.ShippingJobCreateNestedManyWithoutRequesterInput
+  vehicleFavorites?: Prisma.VehicleFavoriteCreateNestedManyWithoutUserInput
+  influencerProfile?: Prisma.InfluencerProfileCreateNestedOneWithoutUserInput
+  brandCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutBrandInput
+  contestSponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutBrandInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutBrandInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientCreateNestedManyWithoutUserInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutUserInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutUserInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
+  gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
+  gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAdminProfileInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentUncheckedCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestUncheckedCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteUncheckedCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeUncheckedCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportUncheckedCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentUncheckedCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamUncheckedCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
+  chamasCreated?: Prisma.ChamaUncheckedCreateNestedManyWithoutCreatorInput
+  chamaMemberships?: Prisma.ChamaMemberUncheckedCreateNestedManyWithoutUserInput
+  chamaContributions?: Prisma.ChamaContributionUncheckedCreateNestedManyWithoutUserInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutUncheckedCreateNestedManyWithoutRecipientInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalUncheckedCreateNestedManyWithoutApproverInput
+  chamaTransactions?: Prisma.ChamaTransactionUncheckedCreateNestedManyWithoutUserInput
+  chamaDefaults?: Prisma.ChamaDefaulterUncheckedCreateNestedManyWithoutUserInput
+  chamaNominations?: Prisma.ChamaNominationUncheckedCreateNestedManyWithoutNominatorInput
+  chamaNominated?: Prisma.ChamaNominationUncheckedCreateNestedManyWithoutNomineeInput
+  chamaSeconds?: Prisma.ChamaSecondmentUncheckedCreateNestedManyWithoutSeconderInput
+  chamaVotes?: Prisma.ChamaVoteUncheckedCreateNestedManyWithoutVoterInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutUserInput
+  wishlists?: Prisma.WishlistUncheckedCreateNestedManyWithoutUserInput
+  cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutUserInput
+  buyerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
+  garageProfile?: Prisma.GarageProfileUncheckedCreateNestedOneWithoutUserInput
+  garageBookings?: Prisma.GarageBookingUncheckedCreateNestedManyWithoutUserInput
+  garageReviews?: Prisma.GarageReviewUncheckedCreateNestedManyWithoutUserInput
+  importerProfile?: Prisma.ImporterProfileUncheckedCreateNestedOneWithoutUserInput
+  importRequests?: Prisma.ImportRequestUncheckedCreateNestedManyWithoutUserInput
+  giftsSent?: Prisma.GiftUncheckedCreateNestedManyWithoutSenderInput
+  giftsReceived?: Prisma.GiftUncheckedCreateNestedManyWithoutRecipientInput
+  dealAlerts?: Prisma.DealAlertUncheckedCreateNestedManyWithoutUserInput
+  liveSessionsHosted?: Prisma.LiveSessionUncheckedCreateNestedManyWithoutHostInput
+  groupBuyParts?: Prisma.GroupBuyParticipantUncheckedCreateNestedManyWithoutUserInput
+  productShares?: Prisma.ProductShareUncheckedCreateNestedManyWithoutUserInput
+  logisticsCompany?: Prisma.LogisticsCompanyUncheckedCreateNestedOneWithoutUserInput
+  shippingJobs?: Prisma.ShippingJobUncheckedCreateNestedManyWithoutRequesterInput
+  vehicleFavorites?: Prisma.VehicleFavoriteUncheckedCreateNestedManyWithoutUserInput
+  influencerProfile?: Prisma.InfluencerProfileUncheckedCreateNestedOneWithoutUserInput
+  brandCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutBrandInput
+  contestSponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutBrandInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutBrandInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientUncheckedCreateNestedManyWithoutUserInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutUserInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutUserInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
+  gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
+  gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAdminProfileInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminProfileInput, Prisma.UserUncheckedCreateWithoutAdminProfileInput>
+}
+
+export type UserUpsertWithoutAdminProfileInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAdminProfileInput, Prisma.UserUncheckedUpdateWithoutAdminProfileInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminProfileInput, Prisma.UserUncheckedCreateWithoutAdminProfileInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAdminProfileInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAdminProfileInput, Prisma.UserUncheckedUpdateWithoutAdminProfileInput>
+}
+
+export type UserUpdateWithoutAdminProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
+  chamasCreated?: Prisma.ChamaUpdateManyWithoutCreatorNestedInput
+  chamaMemberships?: Prisma.ChamaMemberUpdateManyWithoutUserNestedInput
+  chamaContributions?: Prisma.ChamaContributionUpdateManyWithoutUserNestedInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutUpdateManyWithoutRecipientNestedInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalUpdateManyWithoutApproverNestedInput
+  chamaTransactions?: Prisma.ChamaTransactionUpdateManyWithoutUserNestedInput
+  chamaDefaults?: Prisma.ChamaDefaulterUpdateManyWithoutUserNestedInput
+  chamaNominations?: Prisma.ChamaNominationUpdateManyWithoutNominatorNestedInput
+  chamaNominated?: Prisma.ChamaNominationUpdateManyWithoutNomineeNestedInput
+  chamaSeconds?: Prisma.ChamaSecondmentUpdateManyWithoutSeconderNestedInput
+  chamaVotes?: Prisma.ChamaVoteUpdateManyWithoutVoterNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUpdateManyWithoutUserNestedInput
+  wishlists?: Prisma.WishlistUpdateManyWithoutUserNestedInput
+  cartItems?: Prisma.CartItemUpdateManyWithoutUserNestedInput
+  buyerOrders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
+  garageProfile?: Prisma.GarageProfileUpdateOneWithoutUserNestedInput
+  garageBookings?: Prisma.GarageBookingUpdateManyWithoutUserNestedInput
+  garageReviews?: Prisma.GarageReviewUpdateManyWithoutUserNestedInput
+  importerProfile?: Prisma.ImporterProfileUpdateOneWithoutUserNestedInput
+  importRequests?: Prisma.ImportRequestUpdateManyWithoutUserNestedInput
+  giftsSent?: Prisma.GiftUpdateManyWithoutSenderNestedInput
+  giftsReceived?: Prisma.GiftUpdateManyWithoutRecipientNestedInput
+  dealAlerts?: Prisma.DealAlertUpdateManyWithoutUserNestedInput
+  liveSessionsHosted?: Prisma.LiveSessionUpdateManyWithoutHostNestedInput
+  groupBuyParts?: Prisma.GroupBuyParticipantUpdateManyWithoutUserNestedInput
+  productShares?: Prisma.ProductShareUpdateManyWithoutUserNestedInput
+  logisticsCompany?: Prisma.LogisticsCompanyUpdateOneWithoutUserNestedInput
+  shippingJobs?: Prisma.ShippingJobUpdateManyWithoutRequesterNestedInput
+  vehicleFavorites?: Prisma.VehicleFavoriteUpdateManyWithoutUserNestedInput
+  influencerProfile?: Prisma.InfluencerProfileUpdateOneWithoutUserNestedInput
+  brandCampaigns?: Prisma.BrandCampaignUpdateManyWithoutBrandNestedInput
+  contestSponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutBrandNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutBrandNestedInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientUpdateManyWithoutUserNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutUserNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutUserNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
+  gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
+  gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAdminProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUncheckedUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUncheckedUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUncheckedUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUncheckedUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUncheckedUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUncheckedUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUncheckedUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUncheckedUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUncheckedUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUncheckedUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUncheckedUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
+  chamasCreated?: Prisma.ChamaUncheckedUpdateManyWithoutCreatorNestedInput
+  chamaMemberships?: Prisma.ChamaMemberUncheckedUpdateManyWithoutUserNestedInput
+  chamaContributions?: Prisma.ChamaContributionUncheckedUpdateManyWithoutUserNestedInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutUncheckedUpdateManyWithoutRecipientNestedInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  chamaTransactions?: Prisma.ChamaTransactionUncheckedUpdateManyWithoutUserNestedInput
+  chamaDefaults?: Prisma.ChamaDefaulterUncheckedUpdateManyWithoutUserNestedInput
+  chamaNominations?: Prisma.ChamaNominationUncheckedUpdateManyWithoutNominatorNestedInput
+  chamaNominated?: Prisma.ChamaNominationUncheckedUpdateManyWithoutNomineeNestedInput
+  chamaSeconds?: Prisma.ChamaSecondmentUncheckedUpdateManyWithoutSeconderNestedInput
+  chamaVotes?: Prisma.ChamaVoteUncheckedUpdateManyWithoutVoterNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+  wishlists?: Prisma.WishlistUncheckedUpdateManyWithoutUserNestedInput
+  cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutUserNestedInput
+  buyerOrders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
+  garageProfile?: Prisma.GarageProfileUncheckedUpdateOneWithoutUserNestedInput
+  garageBookings?: Prisma.GarageBookingUncheckedUpdateManyWithoutUserNestedInput
+  garageReviews?: Prisma.GarageReviewUncheckedUpdateManyWithoutUserNestedInput
+  importerProfile?: Prisma.ImporterProfileUncheckedUpdateOneWithoutUserNestedInput
+  importRequests?: Prisma.ImportRequestUncheckedUpdateManyWithoutUserNestedInput
+  giftsSent?: Prisma.GiftUncheckedUpdateManyWithoutSenderNestedInput
+  giftsReceived?: Prisma.GiftUncheckedUpdateManyWithoutRecipientNestedInput
+  dealAlerts?: Prisma.DealAlertUncheckedUpdateManyWithoutUserNestedInput
+  liveSessionsHosted?: Prisma.LiveSessionUncheckedUpdateManyWithoutHostNestedInput
+  groupBuyParts?: Prisma.GroupBuyParticipantUncheckedUpdateManyWithoutUserNestedInput
+  productShares?: Prisma.ProductShareUncheckedUpdateManyWithoutUserNestedInput
+  logisticsCompany?: Prisma.LogisticsCompanyUncheckedUpdateOneWithoutUserNestedInput
+  shippingJobs?: Prisma.ShippingJobUncheckedUpdateManyWithoutRequesterNestedInput
+  vehicleFavorites?: Prisma.VehicleFavoriteUncheckedUpdateManyWithoutUserNestedInput
+  influencerProfile?: Prisma.InfluencerProfileUncheckedUpdateOneWithoutUserNestedInput
+  brandCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutBrandNestedInput
+  contestSponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutBrandNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutBrandNestedInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientUncheckedUpdateManyWithoutUserNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutUserNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutUserNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
+  gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
+  gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutWithdrawalRequestsInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
+  chamasCreated?: Prisma.ChamaCreateNestedManyWithoutCreatorInput
+  chamaMemberships?: Prisma.ChamaMemberCreateNestedManyWithoutUserInput
+  chamaContributions?: Prisma.ChamaContributionCreateNestedManyWithoutUserInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutCreateNestedManyWithoutRecipientInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalCreateNestedManyWithoutApproverInput
+  chamaTransactions?: Prisma.ChamaTransactionCreateNestedManyWithoutUserInput
+  chamaDefaults?: Prisma.ChamaDefaulterCreateNestedManyWithoutUserInput
+  chamaNominations?: Prisma.ChamaNominationCreateNestedManyWithoutNominatorInput
+  chamaNominated?: Prisma.ChamaNominationCreateNestedManyWithoutNomineeInput
+  chamaSeconds?: Prisma.ChamaSecondmentCreateNestedManyWithoutSeconderInput
+  chamaVotes?: Prisma.ChamaVoteCreateNestedManyWithoutVoterInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewCreateNestedManyWithoutUserInput
+  wishlists?: Prisma.WishlistCreateNestedManyWithoutUserInput
+  cartItems?: Prisma.CartItemCreateNestedManyWithoutUserInput
+  buyerOrders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
+  garageProfile?: Prisma.GarageProfileCreateNestedOneWithoutUserInput
+  garageBookings?: Prisma.GarageBookingCreateNestedManyWithoutUserInput
+  garageReviews?: Prisma.GarageReviewCreateNestedManyWithoutUserInput
+  importerProfile?: Prisma.ImporterProfileCreateNestedOneWithoutUserInput
+  importRequests?: Prisma.ImportRequestCreateNestedManyWithoutUserInput
+  giftsSent?: Prisma.GiftCreateNestedManyWithoutSenderInput
+  giftsReceived?: Prisma.GiftCreateNestedManyWithoutRecipientInput
+  dealAlerts?: Prisma.DealAlertCreateNestedManyWithoutUserInput
+  liveSessionsHosted?: Prisma.LiveSessionCreateNestedManyWithoutHostInput
+  groupBuyParts?: Prisma.GroupBuyParticipantCreateNestedManyWithoutUserInput
+  productShares?: Prisma.ProductShareCreateNestedManyWithoutUserInput
+  logisticsCompany?: Prisma.LogisticsCompanyCreateNestedOneWithoutUserInput
+  shippingJobs?: Prisma.ShippingJobCreateNestedManyWithoutRequesterInput
+  vehicleFavorites?: Prisma.VehicleFavoriteCreateNestedManyWithoutUserInput
+  influencerProfile?: Prisma.InfluencerProfileCreateNestedOneWithoutUserInput
+  brandCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutBrandInput
+  contestSponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutBrandInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutBrandInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientCreateNestedManyWithoutUserInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutUserInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutUserInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
+  gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
+  gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutWithdrawalRequestsInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentUncheckedCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestUncheckedCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteUncheckedCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeUncheckedCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportUncheckedCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentUncheckedCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamUncheckedCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
+  chamasCreated?: Prisma.ChamaUncheckedCreateNestedManyWithoutCreatorInput
+  chamaMemberships?: Prisma.ChamaMemberUncheckedCreateNestedManyWithoutUserInput
+  chamaContributions?: Prisma.ChamaContributionUncheckedCreateNestedManyWithoutUserInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutUncheckedCreateNestedManyWithoutRecipientInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalUncheckedCreateNestedManyWithoutApproverInput
+  chamaTransactions?: Prisma.ChamaTransactionUncheckedCreateNestedManyWithoutUserInput
+  chamaDefaults?: Prisma.ChamaDefaulterUncheckedCreateNestedManyWithoutUserInput
+  chamaNominations?: Prisma.ChamaNominationUncheckedCreateNestedManyWithoutNominatorInput
+  chamaNominated?: Prisma.ChamaNominationUncheckedCreateNestedManyWithoutNomineeInput
+  chamaSeconds?: Prisma.ChamaSecondmentUncheckedCreateNestedManyWithoutSeconderInput
+  chamaVotes?: Prisma.ChamaVoteUncheckedCreateNestedManyWithoutVoterInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutUserInput
+  wishlists?: Prisma.WishlistUncheckedCreateNestedManyWithoutUserInput
+  cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutUserInput
+  buyerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
+  garageProfile?: Prisma.GarageProfileUncheckedCreateNestedOneWithoutUserInput
+  garageBookings?: Prisma.GarageBookingUncheckedCreateNestedManyWithoutUserInput
+  garageReviews?: Prisma.GarageReviewUncheckedCreateNestedManyWithoutUserInput
+  importerProfile?: Prisma.ImporterProfileUncheckedCreateNestedOneWithoutUserInput
+  importRequests?: Prisma.ImportRequestUncheckedCreateNestedManyWithoutUserInput
+  giftsSent?: Prisma.GiftUncheckedCreateNestedManyWithoutSenderInput
+  giftsReceived?: Prisma.GiftUncheckedCreateNestedManyWithoutRecipientInput
+  dealAlerts?: Prisma.DealAlertUncheckedCreateNestedManyWithoutUserInput
+  liveSessionsHosted?: Prisma.LiveSessionUncheckedCreateNestedManyWithoutHostInput
+  groupBuyParts?: Prisma.GroupBuyParticipantUncheckedCreateNestedManyWithoutUserInput
+  productShares?: Prisma.ProductShareUncheckedCreateNestedManyWithoutUserInput
+  logisticsCompany?: Prisma.LogisticsCompanyUncheckedCreateNestedOneWithoutUserInput
+  shippingJobs?: Prisma.ShippingJobUncheckedCreateNestedManyWithoutRequesterInput
+  vehicleFavorites?: Prisma.VehicleFavoriteUncheckedCreateNestedManyWithoutUserInput
+  influencerProfile?: Prisma.InfluencerProfileUncheckedCreateNestedOneWithoutUserInput
+  brandCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutBrandInput
+  contestSponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutBrandInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutBrandInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientUncheckedCreateNestedManyWithoutUserInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutUserInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutUserInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
+  gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
+  gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  suspensions?: Prisma.UserSuspensionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutWithdrawalRequestsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWithdrawalRequestsInput, Prisma.UserUncheckedCreateWithoutWithdrawalRequestsInput>
+}
+
+export type UserUpsertWithoutWithdrawalRequestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWithdrawalRequestsInput, Prisma.UserUncheckedUpdateWithoutWithdrawalRequestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWithdrawalRequestsInput, Prisma.UserUncheckedCreateWithoutWithdrawalRequestsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutWithdrawalRequestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWithdrawalRequestsInput, Prisma.UserUncheckedUpdateWithoutWithdrawalRequestsInput>
+}
+
+export type UserUpdateWithoutWithdrawalRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
+  chamasCreated?: Prisma.ChamaUpdateManyWithoutCreatorNestedInput
+  chamaMemberships?: Prisma.ChamaMemberUpdateManyWithoutUserNestedInput
+  chamaContributions?: Prisma.ChamaContributionUpdateManyWithoutUserNestedInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutUpdateManyWithoutRecipientNestedInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalUpdateManyWithoutApproverNestedInput
+  chamaTransactions?: Prisma.ChamaTransactionUpdateManyWithoutUserNestedInput
+  chamaDefaults?: Prisma.ChamaDefaulterUpdateManyWithoutUserNestedInput
+  chamaNominations?: Prisma.ChamaNominationUpdateManyWithoutNominatorNestedInput
+  chamaNominated?: Prisma.ChamaNominationUpdateManyWithoutNomineeNestedInput
+  chamaSeconds?: Prisma.ChamaSecondmentUpdateManyWithoutSeconderNestedInput
+  chamaVotes?: Prisma.ChamaVoteUpdateManyWithoutVoterNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUpdateManyWithoutUserNestedInput
+  wishlists?: Prisma.WishlistUpdateManyWithoutUserNestedInput
+  cartItems?: Prisma.CartItemUpdateManyWithoutUserNestedInput
+  buyerOrders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
+  garageProfile?: Prisma.GarageProfileUpdateOneWithoutUserNestedInput
+  garageBookings?: Prisma.GarageBookingUpdateManyWithoutUserNestedInput
+  garageReviews?: Prisma.GarageReviewUpdateManyWithoutUserNestedInput
+  importerProfile?: Prisma.ImporterProfileUpdateOneWithoutUserNestedInput
+  importRequests?: Prisma.ImportRequestUpdateManyWithoutUserNestedInput
+  giftsSent?: Prisma.GiftUpdateManyWithoutSenderNestedInput
+  giftsReceived?: Prisma.GiftUpdateManyWithoutRecipientNestedInput
+  dealAlerts?: Prisma.DealAlertUpdateManyWithoutUserNestedInput
+  liveSessionsHosted?: Prisma.LiveSessionUpdateManyWithoutHostNestedInput
+  groupBuyParts?: Prisma.GroupBuyParticipantUpdateManyWithoutUserNestedInput
+  productShares?: Prisma.ProductShareUpdateManyWithoutUserNestedInput
+  logisticsCompany?: Prisma.LogisticsCompanyUpdateOneWithoutUserNestedInput
+  shippingJobs?: Prisma.ShippingJobUpdateManyWithoutRequesterNestedInput
+  vehicleFavorites?: Prisma.VehicleFavoriteUpdateManyWithoutUserNestedInput
+  influencerProfile?: Prisma.InfluencerProfileUpdateOneWithoutUserNestedInput
+  brandCampaigns?: Prisma.BrandCampaignUpdateManyWithoutBrandNestedInput
+  contestSponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutBrandNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutBrandNestedInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientUpdateManyWithoutUserNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutUserNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutUserNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
+  gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
+  gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWithdrawalRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUncheckedUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUncheckedUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUncheckedUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUncheckedUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUncheckedUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUncheckedUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUncheckedUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUncheckedUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUncheckedUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUncheckedUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUncheckedUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
+  chamasCreated?: Prisma.ChamaUncheckedUpdateManyWithoutCreatorNestedInput
+  chamaMemberships?: Prisma.ChamaMemberUncheckedUpdateManyWithoutUserNestedInput
+  chamaContributions?: Prisma.ChamaContributionUncheckedUpdateManyWithoutUserNestedInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutUncheckedUpdateManyWithoutRecipientNestedInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  chamaTransactions?: Prisma.ChamaTransactionUncheckedUpdateManyWithoutUserNestedInput
+  chamaDefaults?: Prisma.ChamaDefaulterUncheckedUpdateManyWithoutUserNestedInput
+  chamaNominations?: Prisma.ChamaNominationUncheckedUpdateManyWithoutNominatorNestedInput
+  chamaNominated?: Prisma.ChamaNominationUncheckedUpdateManyWithoutNomineeNestedInput
+  chamaSeconds?: Prisma.ChamaSecondmentUncheckedUpdateManyWithoutSeconderNestedInput
+  chamaVotes?: Prisma.ChamaVoteUncheckedUpdateManyWithoutVoterNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+  wishlists?: Prisma.WishlistUncheckedUpdateManyWithoutUserNestedInput
+  cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutUserNestedInput
+  buyerOrders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
+  garageProfile?: Prisma.GarageProfileUncheckedUpdateOneWithoutUserNestedInput
+  garageBookings?: Prisma.GarageBookingUncheckedUpdateManyWithoutUserNestedInput
+  garageReviews?: Prisma.GarageReviewUncheckedUpdateManyWithoutUserNestedInput
+  importerProfile?: Prisma.ImporterProfileUncheckedUpdateOneWithoutUserNestedInput
+  importRequests?: Prisma.ImportRequestUncheckedUpdateManyWithoutUserNestedInput
+  giftsSent?: Prisma.GiftUncheckedUpdateManyWithoutSenderNestedInput
+  giftsReceived?: Prisma.GiftUncheckedUpdateManyWithoutRecipientNestedInput
+  dealAlerts?: Prisma.DealAlertUncheckedUpdateManyWithoutUserNestedInput
+  liveSessionsHosted?: Prisma.LiveSessionUncheckedUpdateManyWithoutHostNestedInput
+  groupBuyParts?: Prisma.GroupBuyParticipantUncheckedUpdateManyWithoutUserNestedInput
+  productShares?: Prisma.ProductShareUncheckedUpdateManyWithoutUserNestedInput
+  logisticsCompany?: Prisma.LogisticsCompanyUncheckedUpdateOneWithoutUserNestedInput
+  shippingJobs?: Prisma.ShippingJobUncheckedUpdateManyWithoutRequesterNestedInput
+  vehicleFavorites?: Prisma.VehicleFavoriteUncheckedUpdateManyWithoutUserNestedInput
+  influencerProfile?: Prisma.InfluencerProfileUncheckedUpdateOneWithoutUserNestedInput
+  brandCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutBrandNestedInput
+  contestSponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutBrandNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutBrandNestedInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientUncheckedUpdateManyWithoutUserNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutUserNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutUserNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
+  gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
+  gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  suspensions?: Prisma.UserSuspensionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSuspensionsInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceCreateNestedManyWithoutPreferredViewerInput
+  chamasCreated?: Prisma.ChamaCreateNestedManyWithoutCreatorInput
+  chamaMemberships?: Prisma.ChamaMemberCreateNestedManyWithoutUserInput
+  chamaContributions?: Prisma.ChamaContributionCreateNestedManyWithoutUserInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutCreateNestedManyWithoutRecipientInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalCreateNestedManyWithoutApproverInput
+  chamaTransactions?: Prisma.ChamaTransactionCreateNestedManyWithoutUserInput
+  chamaDefaults?: Prisma.ChamaDefaulterCreateNestedManyWithoutUserInput
+  chamaNominations?: Prisma.ChamaNominationCreateNestedManyWithoutNominatorInput
+  chamaNominated?: Prisma.ChamaNominationCreateNestedManyWithoutNomineeInput
+  chamaSeconds?: Prisma.ChamaSecondmentCreateNestedManyWithoutSeconderInput
+  chamaVotes?: Prisma.ChamaVoteCreateNestedManyWithoutVoterInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewCreateNestedManyWithoutUserInput
+  wishlists?: Prisma.WishlistCreateNestedManyWithoutUserInput
+  cartItems?: Prisma.CartItemCreateNestedManyWithoutUserInput
+  buyerOrders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
+  garageProfile?: Prisma.GarageProfileCreateNestedOneWithoutUserInput
+  garageBookings?: Prisma.GarageBookingCreateNestedManyWithoutUserInput
+  garageReviews?: Prisma.GarageReviewCreateNestedManyWithoutUserInput
+  importerProfile?: Prisma.ImporterProfileCreateNestedOneWithoutUserInput
+  importRequests?: Prisma.ImportRequestCreateNestedManyWithoutUserInput
+  giftsSent?: Prisma.GiftCreateNestedManyWithoutSenderInput
+  giftsReceived?: Prisma.GiftCreateNestedManyWithoutRecipientInput
+  dealAlerts?: Prisma.DealAlertCreateNestedManyWithoutUserInput
+  liveSessionsHosted?: Prisma.LiveSessionCreateNestedManyWithoutHostInput
+  groupBuyParts?: Prisma.GroupBuyParticipantCreateNestedManyWithoutUserInput
+  productShares?: Prisma.ProductShareCreateNestedManyWithoutUserInput
+  logisticsCompany?: Prisma.LogisticsCompanyCreateNestedOneWithoutUserInput
+  shippingJobs?: Prisma.ShippingJobCreateNestedManyWithoutRequesterInput
+  vehicleFavorites?: Prisma.VehicleFavoriteCreateNestedManyWithoutUserInput
+  influencerProfile?: Prisma.InfluencerProfileCreateNestedOneWithoutUserInput
+  brandCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutBrandInput
+  contestSponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutBrandInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutBrandInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientCreateNestedManyWithoutUserInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutUserInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutUserInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutUserInput
+  gamificationPoints?: Prisma.GamificationPointsCreateNestedOneWithoutUserInput
+  gamificationActivities?: Prisma.GamificationActivityCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSuspensionsInput = {
+  id?: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  displayName: string
+  avatarUrl?: string | null
+  coverPhotoUrl?: string | null
+  bio?: string | null
+  country: string
+  currency: string
+  googleId?: string | null
+  appleId?: string | null
+  accountType?: $Enums.AccountType
+  isAdmin?: boolean
+  isVerified?: boolean
+  isWalletUnlocked?: boolean
+  walletPinHash?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isRotationLocked?: boolean
+  fcmToken?: string | null
+  devicePlatform?: string | null
+  isSuspended?: boolean
+  suspendedAt?: Date | string | null
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  bioLinks?: Prisma.BioLinkUncheckedCreateNestedManyWithoutUserInput
+  admirers?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmiredInput
+  admiring?: Prisma.AdmireUncheckedCreateNestedManyWithoutAdmirerInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedCreateNestedManyWithoutCreatorInput
+  subscribedTo?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriberInput
+  subscribers?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutCreatorInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedCreateNestedManyWithoutUserInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutUserInput
+  shortLikes?: Prisma.ShortLikeUncheckedCreateNestedManyWithoutUserInput
+  shortComments?: Prisma.ShortCommentUncheckedCreateNestedManyWithoutUserInput
+  shortCollections?: Prisma.ShortCollectionUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutUserInput
+  postLikes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  postComments?: Prisma.PostCommentUncheckedCreateNestedManyWithoutUserInput
+  contestsCreated?: Prisma.ContestUncheckedCreateNestedManyWithoutCreatorInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutUserInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutUserInput
+  contestWins?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutUserInput
+  contestJudges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutUserInput
+  contestVotes?: Prisma.ContestVoteUncheckedCreateNestedManyWithoutVoterInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutUserInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerInput
+  dailyStats?: Prisma.DailyStatUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  commentLikes?: Prisma.CommentLikeUncheckedCreateNestedManyWithoutUserInput
+  commentReports?: Prisma.CommentReportUncheckedCreateNestedManyWithoutReporterInput
+  commentRepliesTo?: Prisma.CommentUncheckedCreateNestedManyWithoutReplyToUserInput
+  teamsLed?: Prisma.TeamUncheckedCreateNestedManyWithoutLeaderInput
+  teamMemberships?: Prisma.TeamMemberUncheckedCreateNestedManyWithoutUserInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviterInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedCreateNestedManyWithoutInviteeInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedCreateNestedManyWithoutVoterInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutJudgeInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedCreateNestedManyWithoutUserInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  stories?: Prisma.StoryUncheckedCreateNestedManyWithoutCreatorInput
+  storyViews?: Prisma.StoryViewUncheckedCreateNestedManyWithoutViewerInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutOwnerInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedCreateNestedManyWithoutPreferredViewerInput
+  chamasCreated?: Prisma.ChamaUncheckedCreateNestedManyWithoutCreatorInput
+  chamaMemberships?: Prisma.ChamaMemberUncheckedCreateNestedManyWithoutUserInput
+  chamaContributions?: Prisma.ChamaContributionUncheckedCreateNestedManyWithoutUserInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutUncheckedCreateNestedManyWithoutRecipientInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalUncheckedCreateNestedManyWithoutApproverInput
+  chamaTransactions?: Prisma.ChamaTransactionUncheckedCreateNestedManyWithoutUserInput
+  chamaDefaults?: Prisma.ChamaDefaulterUncheckedCreateNestedManyWithoutUserInput
+  chamaNominations?: Prisma.ChamaNominationUncheckedCreateNestedManyWithoutNominatorInput
+  chamaNominated?: Prisma.ChamaNominationUncheckedCreateNestedManyWithoutNomineeInput
+  chamaSeconds?: Prisma.ChamaSecondmentUncheckedCreateNestedManyWithoutSeconderInput
+  chamaVotes?: Prisma.ChamaVoteUncheckedCreateNestedManyWithoutVoterInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  productReviews?: Prisma.ProductReviewUncheckedCreateNestedManyWithoutUserInput
+  wishlists?: Prisma.WishlistUncheckedCreateNestedManyWithoutUserInput
+  cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutUserInput
+  buyerOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
+  garageProfile?: Prisma.GarageProfileUncheckedCreateNestedOneWithoutUserInput
+  garageBookings?: Prisma.GarageBookingUncheckedCreateNestedManyWithoutUserInput
+  garageReviews?: Prisma.GarageReviewUncheckedCreateNestedManyWithoutUserInput
+  importerProfile?: Prisma.ImporterProfileUncheckedCreateNestedOneWithoutUserInput
+  importRequests?: Prisma.ImportRequestUncheckedCreateNestedManyWithoutUserInput
+  giftsSent?: Prisma.GiftUncheckedCreateNestedManyWithoutSenderInput
+  giftsReceived?: Prisma.GiftUncheckedCreateNestedManyWithoutRecipientInput
+  dealAlerts?: Prisma.DealAlertUncheckedCreateNestedManyWithoutUserInput
+  liveSessionsHosted?: Prisma.LiveSessionUncheckedCreateNestedManyWithoutHostInput
+  groupBuyParts?: Prisma.GroupBuyParticipantUncheckedCreateNestedManyWithoutUserInput
+  productShares?: Prisma.ProductShareUncheckedCreateNestedManyWithoutUserInput
+  logisticsCompany?: Prisma.LogisticsCompanyUncheckedCreateNestedOneWithoutUserInput
+  shippingJobs?: Prisma.ShippingJobUncheckedCreateNestedManyWithoutRequesterInput
+  vehicleFavorites?: Prisma.VehicleFavoriteUncheckedCreateNestedManyWithoutUserInput
+  influencerProfile?: Prisma.InfluencerProfileUncheckedCreateNestedOneWithoutUserInput
+  brandCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutBrandInput
+  contestSponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutBrandInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutBrandInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientUncheckedCreateNestedManyWithoutUserInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutUserInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutUserInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutUserInput
+  gamificationPoints?: Prisma.GamificationPointsUncheckedCreateNestedOneWithoutUserInput
+  gamificationActivities?: Prisma.GamificationActivityUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSuspensionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsInput, Prisma.UserUncheckedCreateWithoutSuspensionsInput>
+}
+
+export type UserUpsertWithoutSuspensionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSuspensionsInput, Prisma.UserUncheckedUpdateWithoutSuspensionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsInput, Prisma.UserUncheckedCreateWithoutSuspensionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSuspensionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSuspensionsInput, Prisma.UserUncheckedUpdateWithoutSuspensionsInput>
+}
+
+export type UserUpdateWithoutSuspensionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUpdateManyWithoutPreferredViewerNestedInput
+  chamasCreated?: Prisma.ChamaUpdateManyWithoutCreatorNestedInput
+  chamaMemberships?: Prisma.ChamaMemberUpdateManyWithoutUserNestedInput
+  chamaContributions?: Prisma.ChamaContributionUpdateManyWithoutUserNestedInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutUpdateManyWithoutRecipientNestedInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalUpdateManyWithoutApproverNestedInput
+  chamaTransactions?: Prisma.ChamaTransactionUpdateManyWithoutUserNestedInput
+  chamaDefaults?: Prisma.ChamaDefaulterUpdateManyWithoutUserNestedInput
+  chamaNominations?: Prisma.ChamaNominationUpdateManyWithoutNominatorNestedInput
+  chamaNominated?: Prisma.ChamaNominationUpdateManyWithoutNomineeNestedInput
+  chamaSeconds?: Prisma.ChamaSecondmentUpdateManyWithoutSeconderNestedInput
+  chamaVotes?: Prisma.ChamaVoteUpdateManyWithoutVoterNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUpdateManyWithoutUserNestedInput
+  wishlists?: Prisma.WishlistUpdateManyWithoutUserNestedInput
+  cartItems?: Prisma.CartItemUpdateManyWithoutUserNestedInput
+  buyerOrders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
+  garageProfile?: Prisma.GarageProfileUpdateOneWithoutUserNestedInput
+  garageBookings?: Prisma.GarageBookingUpdateManyWithoutUserNestedInput
+  garageReviews?: Prisma.GarageReviewUpdateManyWithoutUserNestedInput
+  importerProfile?: Prisma.ImporterProfileUpdateOneWithoutUserNestedInput
+  importRequests?: Prisma.ImportRequestUpdateManyWithoutUserNestedInput
+  giftsSent?: Prisma.GiftUpdateManyWithoutSenderNestedInput
+  giftsReceived?: Prisma.GiftUpdateManyWithoutRecipientNestedInput
+  dealAlerts?: Prisma.DealAlertUpdateManyWithoutUserNestedInput
+  liveSessionsHosted?: Prisma.LiveSessionUpdateManyWithoutHostNestedInput
+  groupBuyParts?: Prisma.GroupBuyParticipantUpdateManyWithoutUserNestedInput
+  productShares?: Prisma.ProductShareUpdateManyWithoutUserNestedInput
+  logisticsCompany?: Prisma.LogisticsCompanyUpdateOneWithoutUserNestedInput
+  shippingJobs?: Prisma.ShippingJobUpdateManyWithoutRequesterNestedInput
+  vehicleFavorites?: Prisma.VehicleFavoriteUpdateManyWithoutUserNestedInput
+  influencerProfile?: Prisma.InfluencerProfileUpdateOneWithoutUserNestedInput
+  brandCampaigns?: Prisma.BrandCampaignUpdateManyWithoutBrandNestedInput
+  contestSponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutBrandNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutBrandNestedInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientUpdateManyWithoutUserNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutUserNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutUserNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutUserNestedInput
+  gamificationPoints?: Prisma.GamificationPointsUpdateOneWithoutUserNestedInput
+  gamificationActivities?: Prisma.GamificationActivityUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSuspensionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverPhotoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  appleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isWalletUnlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  walletPinHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isRotationLocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  fcmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  devicePlatform?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSuspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  bioLinks?: Prisma.BioLinkUncheckedUpdateManyWithoutUserNestedInput
+  admirers?: Prisma.AdmireUncheckedUpdateManyWithoutAdmiredNestedInput
+  admiring?: Prisma.AdmireUncheckedUpdateManyWithoutAdmirerNestedInput
+  subscriptionTiers?: Prisma.SubscriptionTierUncheckedUpdateManyWithoutCreatorNestedInput
+  subscribedTo?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriberNestedInput
+  subscribers?: Prisma.SubscriptionUncheckedUpdateManyWithoutCreatorNestedInput
+  milestoneCompletions?: Prisma.MilestoneCompletionUncheckedUpdateManyWithoutUserNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutUserNestedInput
+  shortLikes?: Prisma.ShortLikeUncheckedUpdateManyWithoutUserNestedInput
+  shortComments?: Prisma.ShortCommentUncheckedUpdateManyWithoutUserNestedInput
+  shortCollections?: Prisma.ShortCollectionUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutUserNestedInput
+  postLikes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  postComments?: Prisma.PostCommentUncheckedUpdateManyWithoutUserNestedInput
+  contestsCreated?: Prisma.ContestUncheckedUpdateManyWithoutCreatorNestedInput
+  contestParticipations?: Prisma.ContestParticipantUncheckedUpdateManyWithoutUserNestedInput
+  contestSubmissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  contestWins?: Prisma.ContestWinnerUncheckedUpdateManyWithoutUserNestedInput
+  contestJudges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutUserNestedInput
+  contestVotes?: Prisma.ContestVoteUncheckedUpdateManyWithoutVoterNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutUserNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerNestedInput
+  dailyStats?: Prisma.DailyStatUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  commentLikes?: Prisma.CommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  commentReports?: Prisma.CommentReportUncheckedUpdateManyWithoutReporterNestedInput
+  commentRepliesTo?: Prisma.CommentUncheckedUpdateManyWithoutReplyToUserNestedInput
+  teamsLed?: Prisma.TeamUncheckedUpdateManyWithoutLeaderNestedInput
+  teamMemberships?: Prisma.TeamMemberUncheckedUpdateManyWithoutUserNestedInput
+  teamInvitationsSent?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviterNestedInput
+  teamInvitationsReceived?: Prisma.TeamInvitationUncheckedUpdateManyWithoutInviteeNestedInput
+  teamSubmissionVotes?: Prisma.TeamSubmissionVoteUncheckedUpdateManyWithoutVoterNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutJudgeNestedInput
+  chatParticipations?: Prisma.ChatParticipantUncheckedUpdateManyWithoutUserNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  stories?: Prisma.StoryUncheckedUpdateManyWithoutCreatorNestedInput
+  storyViews?: Prisma.StoryViewUncheckedUpdateManyWithoutViewerNestedInput
+  storyViewerPreferences?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutOwnerNestedInput
+  preferredStoryViewers?: Prisma.StoryViewerPreferenceUncheckedUpdateManyWithoutPreferredViewerNestedInput
+  chamasCreated?: Prisma.ChamaUncheckedUpdateManyWithoutCreatorNestedInput
+  chamaMemberships?: Prisma.ChamaMemberUncheckedUpdateManyWithoutUserNestedInput
+  chamaContributions?: Prisma.ChamaContributionUncheckedUpdateManyWithoutUserNestedInput
+  chamaPayoutsReceived?: Prisma.ChamaPayoutUncheckedUpdateManyWithoutRecipientNestedInput
+  chamaPayoutApprovals?: Prisma.ChamaPayoutApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  chamaTransactions?: Prisma.ChamaTransactionUncheckedUpdateManyWithoutUserNestedInput
+  chamaDefaults?: Prisma.ChamaDefaulterUncheckedUpdateManyWithoutUserNestedInput
+  chamaNominations?: Prisma.ChamaNominationUncheckedUpdateManyWithoutNominatorNestedInput
+  chamaNominated?: Prisma.ChamaNominationUncheckedUpdateManyWithoutNomineeNestedInput
+  chamaSeconds?: Prisma.ChamaSecondmentUncheckedUpdateManyWithoutSeconderNestedInput
+  chamaVotes?: Prisma.ChamaVoteUncheckedUpdateManyWithoutVoterNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  productReviews?: Prisma.ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+  wishlists?: Prisma.WishlistUncheckedUpdateManyWithoutUserNestedInput
+  cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutUserNestedInput
+  buyerOrders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
+  garageProfile?: Prisma.GarageProfileUncheckedUpdateOneWithoutUserNestedInput
+  garageBookings?: Prisma.GarageBookingUncheckedUpdateManyWithoutUserNestedInput
+  garageReviews?: Prisma.GarageReviewUncheckedUpdateManyWithoutUserNestedInput
+  importerProfile?: Prisma.ImporterProfileUncheckedUpdateOneWithoutUserNestedInput
+  importRequests?: Prisma.ImportRequestUncheckedUpdateManyWithoutUserNestedInput
+  giftsSent?: Prisma.GiftUncheckedUpdateManyWithoutSenderNestedInput
+  giftsReceived?: Prisma.GiftUncheckedUpdateManyWithoutRecipientNestedInput
+  dealAlerts?: Prisma.DealAlertUncheckedUpdateManyWithoutUserNestedInput
+  liveSessionsHosted?: Prisma.LiveSessionUncheckedUpdateManyWithoutHostNestedInput
+  groupBuyParts?: Prisma.GroupBuyParticipantUncheckedUpdateManyWithoutUserNestedInput
+  productShares?: Prisma.ProductShareUncheckedUpdateManyWithoutUserNestedInput
+  logisticsCompany?: Prisma.LogisticsCompanyUncheckedUpdateOneWithoutUserNestedInput
+  shippingJobs?: Prisma.ShippingJobUncheckedUpdateManyWithoutRequesterNestedInput
+  vehicleFavorites?: Prisma.VehicleFavoriteUncheckedUpdateManyWithoutUserNestedInput
+  influencerProfile?: Prisma.InfluencerProfileUncheckedUpdateOneWithoutUserNestedInput
+  brandCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutBrandNestedInput
+  contestSponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutBrandNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutBrandNestedInput
+  conversionRecipients?: Prisma.ConversionCampaignRecipientUncheckedUpdateManyWithoutUserNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutUserNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutUserNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutUserNestedInput
+  gamificationPoints?: Prisma.GamificationPointsUncheckedUpdateOneWithoutUserNestedInput
+  gamificationActivities?: Prisma.GamificationActivityUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  withdrawalRequests?: Prisma.WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -39393,6 +43288,8 @@ export type UserCountOutputType = {
   purchaseEntries: number
   funnelEvents: number
   gamificationActivities: number
+  suspensions: number
+  withdrawalRequests: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -39473,6 +43370,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   purchaseEntries?: boolean | UserCountOutputTypeCountPurchaseEntriesArgs
   funnelEvents?: boolean | UserCountOutputTypeCountFunnelEventsArgs
   gamificationActivities?: boolean | UserCountOutputTypeCountGamificationActivitiesArgs
+  suspensions?: boolean | UserCountOutputTypeCountSuspensionsArgs
+  withdrawalRequests?: boolean | UserCountOutputTypeCountWithdrawalRequestsArgs
 }
 
 /**
@@ -40024,6 +43923,20 @@ export type UserCountOutputTypeCountGamificationActivitiesArgs<ExtArgs extends r
   where?: Prisma.GamificationActivityWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSuspensionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserSuspensionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountWithdrawalRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WithdrawalRequestWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -40048,6 +43961,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   isRotationLocked?: boolean
+  fcmToken?: boolean
+  devicePlatform?: boolean
+  isSuspended?: boolean
+  suspendedAt?: boolean
   wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   bioLinks?: boolean | Prisma.User$bioLinksArgs<ExtArgs>
@@ -40131,6 +44048,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   funnelEvents?: boolean | Prisma.User$funnelEventsArgs<ExtArgs>
   gamificationPoints?: boolean | Prisma.User$gamificationPointsArgs<ExtArgs>
   gamificationActivities?: boolean | Prisma.User$gamificationActivitiesArgs<ExtArgs>
+  adminProfile?: boolean | Prisma.User$adminProfileArgs<ExtArgs>
+  suspensions?: boolean | Prisma.User$suspensionsArgs<ExtArgs>
+  withdrawalRequests?: boolean | Prisma.User$withdrawalRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -40157,6 +44077,10 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   isRotationLocked?: boolean
+  fcmToken?: boolean
+  devicePlatform?: boolean
+  isSuspended?: boolean
+  suspendedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -40182,6 +44106,10 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   isRotationLocked?: boolean
+  fcmToken?: boolean
+  devicePlatform?: boolean
+  isSuspended?: boolean
+  suspendedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -40207,9 +44135,13 @@ export type UserSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   isRotationLocked?: boolean
+  fcmToken?: boolean
+  devicePlatform?: boolean
+  isSuspended?: boolean
+  suspendedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "firstName" | "lastName" | "displayName" | "avatarUrl" | "coverPhotoUrl" | "bio" | "country" | "currency" | "googleId" | "appleId" | "accountType" | "isAdmin" | "isVerified" | "isWalletUnlocked" | "walletPinHash" | "passwordHash" | "createdAt" | "updatedAt" | "isRotationLocked", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "firstName" | "lastName" | "displayName" | "avatarUrl" | "coverPhotoUrl" | "bio" | "country" | "currency" | "googleId" | "appleId" | "accountType" | "isAdmin" | "isVerified" | "isWalletUnlocked" | "walletPinHash" | "passwordHash" | "createdAt" | "updatedAt" | "isRotationLocked" | "fcmToken" | "devicePlatform" | "isSuspended" | "suspendedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
@@ -40294,6 +44226,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   funnelEvents?: boolean | Prisma.User$funnelEventsArgs<ExtArgs>
   gamificationPoints?: boolean | Prisma.User$gamificationPointsArgs<ExtArgs>
   gamificationActivities?: boolean | Prisma.User$gamificationActivitiesArgs<ExtArgs>
+  adminProfile?: boolean | Prisma.User$adminProfileArgs<ExtArgs>
+  suspensions?: boolean | Prisma.User$suspensionsArgs<ExtArgs>
+  withdrawalRequests?: boolean | Prisma.User$withdrawalRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -40385,6 +44320,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     funnelEvents: Prisma.$SalesFunnelEventPayload<ExtArgs>[]
     gamificationPoints: Prisma.$GamificationPointsPayload<ExtArgs> | null
     gamificationActivities: Prisma.$GamificationActivityPayload<ExtArgs>[]
+    adminProfile: Prisma.$AdminProfilePayload<ExtArgs> | null
+    suspensions: Prisma.$UserSuspensionPayload<ExtArgs>[]
+    withdrawalRequests: Prisma.$WithdrawalRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -40409,6 +44347,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdAt: Date
     updatedAt: Date
     isRotationLocked: boolean
+    fcmToken: string | null
+    devicePlatform: string | null
+    isSuspended: boolean
+    suspendedAt: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -40886,6 +44828,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   funnelEvents<T extends Prisma.User$funnelEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$funnelEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SalesFunnelEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   gamificationPoints<T extends Prisma.User$gamificationPointsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$gamificationPointsArgs<ExtArgs>>): Prisma.Prisma__GamificationPointsClient<runtime.Types.Result.GetResult<Prisma.$GamificationPointsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   gamificationActivities<T extends Prisma.User$gamificationActivitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$gamificationActivitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GamificationActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  adminProfile<T extends Prisma.User$adminProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminProfileArgs<ExtArgs>>): Prisma.Prisma__AdminProfileClient<runtime.Types.Result.GetResult<Prisma.$AdminProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  suspensions<T extends Prisma.User$suspensionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$suspensionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserSuspensionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  withdrawalRequests<T extends Prisma.User$withdrawalRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$withdrawalRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WithdrawalRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -40937,6 +44882,10 @@ export interface UserFieldRefs {
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly isRotationLocked: Prisma.FieldRef<"User", 'Boolean'>
+  readonly fcmToken: Prisma.FieldRef<"User", 'String'>
+  readonly devicePlatform: Prisma.FieldRef<"User", 'String'>
+  readonly isSuspended: Prisma.FieldRef<"User", 'Boolean'>
+  readonly suspendedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 
@@ -43289,6 +47238,73 @@ export type User$gamificationActivitiesArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.GamificationActivityScalarFieldEnum | Prisma.GamificationActivityScalarFieldEnum[]
+}
+
+/**
+ * User.adminProfile
+ */
+export type User$adminProfileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminProfile
+   */
+  select?: Prisma.AdminProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminProfile
+   */
+  omit?: Prisma.AdminProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminProfileInclude<ExtArgs> | null
+  where?: Prisma.AdminProfileWhereInput
+}
+
+/**
+ * User.suspensions
+ */
+export type User$suspensionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserSuspension
+   */
+  select?: Prisma.UserSuspensionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserSuspension
+   */
+  omit?: Prisma.UserSuspensionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserSuspensionInclude<ExtArgs> | null
+  where?: Prisma.UserSuspensionWhereInput
+  orderBy?: Prisma.UserSuspensionOrderByWithRelationInput | Prisma.UserSuspensionOrderByWithRelationInput[]
+  cursor?: Prisma.UserSuspensionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserSuspensionScalarFieldEnum | Prisma.UserSuspensionScalarFieldEnum[]
+}
+
+/**
+ * User.withdrawalRequests
+ */
+export type User$withdrawalRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WithdrawalRequest
+   */
+  select?: Prisma.WithdrawalRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WithdrawalRequest
+   */
+  omit?: Prisma.WithdrawalRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WithdrawalRequestInclude<ExtArgs> | null
+  where?: Prisma.WithdrawalRequestWhereInput
+  orderBy?: Prisma.WithdrawalRequestOrderByWithRelationInput | Prisma.WithdrawalRequestOrderByWithRelationInput[]
+  cursor?: Prisma.WithdrawalRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WithdrawalRequestScalarFieldEnum | Prisma.WithdrawalRequestScalarFieldEnum[]
 }
 
 /**

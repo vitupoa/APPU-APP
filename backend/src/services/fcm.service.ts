@@ -143,4 +143,20 @@ export class FCMService {
       },
     });
   }
+
+  async sendContentFlagged(deviceToken: string, contentType: string): Promise<void> {
+    await this.sendToDevice(deviceToken, {
+      title: '⚠️ Content Moderated',
+      body: `Your recent ${contentType} was flagged by our moderation team.`,
+      data: { type: 'content_flagged', contentType },
+    });
+  }
+
+  async sendWithdrawalApproved(deviceToken: string, amount: number): Promise<void> {
+    await this.sendToDevice(deviceToken, {
+      title: '✅ Withdrawal Approved',
+      body: `Your withdrawal of KES ${amount} has been approved and processed.`,
+      data: { type: 'withdrawal_approved', amount: amount.toString() },
+    });
+  }
 }

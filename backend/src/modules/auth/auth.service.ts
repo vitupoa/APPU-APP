@@ -65,6 +65,27 @@ export class AuthService {
     return suggestions;
   }
 
+  static async processAutoAdmire(newUserId: string) {
+    try {
+      const config = await prisma.platformConfig.findUnique({ where: { key: 'AUTO_ADMIRE_USERS' } });
+      if (config && Array.isArray(config.value)) {
+        const userIds = config.value as string[];
+        if (userIds.length > 0) {
+          const admireRecords = userIds.map(admiredId => ({
+            admirerId: newUserId,
+            admiredId
+          }));
+          await prisma.admire.createMany({
+            data: admireRecords,
+            skipDuplicates: true
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to process auto-admire:', err);
+    }
+  }
+
   static async register(data: any) {
     const existingEmail = await prisma.user.findUnique({ where: { email: data.email } });
     if (existingEmail) {
@@ -92,6 +113,8 @@ export class AuthService {
         currency: data.currency,
       }
     });
+
+    await this.processAutoAdmire(user.id);
 
     const payload: JwtPayload = {
       userId: user.id,
@@ -238,6 +261,7 @@ export class AuthService {
           // passwordHash is optional
         }
       });
+      await this.processAutoAdmire(user.id);
     }
 
     const payload: JwtPayload = {

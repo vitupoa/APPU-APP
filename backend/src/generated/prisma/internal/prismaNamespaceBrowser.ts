@@ -170,7 +170,21 @@ export const ModelName = {
   GamificationPoints: 'GamificationPoints',
   GamificationActivity: 'GamificationActivity',
   CampaignAnalytics: 'CampaignAnalytics',
-  ContestAnalytics: 'ContestAnalytics'
+  ContestAnalytics: 'ContestAnalytics',
+  SocialMediaAccount: 'SocialMediaAccount',
+  SocialMediaSyncLog: 'SocialMediaSyncLog',
+  PlatformRateLimit: 'PlatformRateLimit',
+  AdminProfile: 'AdminProfile',
+  AuditLog: 'AuditLog',
+  FeatureFlag: 'FeatureFlag',
+  ProhibitedName: 'ProhibitedName',
+  ReservedUsername: 'ReservedUsername',
+  WithdrawalRequest: 'WithdrawalRequest',
+  PlatformWallet: 'PlatformWallet',
+  UserSuspension: 'UserSuspension',
+  PlatformAnnouncement: 'PlatformAnnouncement',
+  PlatformConfig: 'PlatformConfig',
+  ContentModerationLog: 'ContentModerationLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -211,7 +225,11 @@ export const UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  isRotationLocked: 'isRotationLocked'
+  isRotationLocked: 'isRotationLocked',
+  fcmToken: 'fcmToken',
+  devicePlatform: 'devicePlatform',
+  isSuspended: 'isSuspended',
+  suspendedAt: 'suspendedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -2043,6 +2061,218 @@ export const ContestAnalyticsScalarFieldEnum = {
 export type ContestAnalyticsScalarFieldEnum = (typeof ContestAnalyticsScalarFieldEnum)[keyof typeof ContestAnalyticsScalarFieldEnum]
 
 
+export const SocialMediaAccountScalarFieldEnum = {
+  id: 'id',
+  influencerId: 'influencerId',
+  platform: 'platform',
+  username: 'username',
+  profileUrl: 'profileUrl',
+  displayName: 'displayName',
+  followerCount: 'followerCount',
+  subscriberCount: 'subscriberCount',
+  videoCount: 'videoCount',
+  totalViews: 'totalViews',
+  avgViews: 'avgViews',
+  avgLikes: 'avgLikes',
+  engagementRate: 'engagementRate',
+  isVerified: 'isVerified',
+  isPrimary: 'isPrimary',
+  lastSyncedAt: 'lastSyncedAt',
+  syncStatus: 'syncStatus',
+  syncError: 'syncError',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  tokenExpiresAt: 'tokenExpiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SocialMediaAccountScalarFieldEnum = (typeof SocialMediaAccountScalarFieldEnum)[keyof typeof SocialMediaAccountScalarFieldEnum]
+
+
+export const SocialMediaSyncLogScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  syncType: 'syncType',
+  status: 'status',
+  followersBefore: 'followersBefore',
+  followersAfter: 'followersAfter',
+  followerChange: 'followerChange',
+  errorMessage: 'errorMessage',
+  errorCode: 'errorCode',
+  durationMs: 'durationMs',
+  syncedAt: 'syncedAt'
+} as const
+
+export type SocialMediaSyncLogScalarFieldEnum = (typeof SocialMediaSyncLogScalarFieldEnum)[keyof typeof SocialMediaSyncLogScalarFieldEnum]
+
+
+export const PlatformRateLimitScalarFieldEnum = {
+  id: 'id',
+  platform: 'platform',
+  requestsPerHour: 'requestsPerHour',
+  requestsRemaining: 'requestsRemaining',
+  resetAt: 'resetAt',
+  lastRequestAt: 'lastRequestAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlatformRateLimitScalarFieldEnum = (typeof PlatformRateLimitScalarFieldEnum)[keyof typeof PlatformRateLimitScalarFieldEnum]
+
+
+export const AdminProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  role: 'role',
+  permissions: 'permissions',
+  grantedBy: 'grantedBy',
+  isActive: 'isActive',
+  lastLoginAt: 'lastLoginAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdminProfileScalarFieldEnum = (typeof AdminProfileScalarFieldEnum)[keyof typeof AdminProfileScalarFieldEnum]
+
+
+export const AuditLogScalarFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  action: 'action',
+  targetType: 'targetType',
+  targetId: 'targetId',
+  details: 'details',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt'
+} as const
+
+export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const FeatureFlagScalarFieldEnum = {
+  id: 'id',
+  featureKey: 'featureKey',
+  isEnabled: 'isEnabled',
+  scope: 'scope',
+  scopeValue: 'scopeValue',
+  priority: 'priority',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FeatureFlagScalarFieldEnum = (typeof FeatureFlagScalarFieldEnum)[keyof typeof FeatureFlagScalarFieldEnum]
+
+
+export const ProhibitedNameScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  reason: 'reason',
+  addedBy: 'addedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type ProhibitedNameScalarFieldEnum = (typeof ProhibitedNameScalarFieldEnum)[keyof typeof ProhibitedNameScalarFieldEnum]
+
+
+export const ReservedUsernameScalarFieldEnum = {
+  id: 'id',
+  username: 'username',
+  reservedFor: 'reservedFor',
+  reason: 'reason',
+  reservedBy: 'reservedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type ReservedUsernameScalarFieldEnum = (typeof ReservedUsernameScalarFieldEnum)[keyof typeof ReservedUsernameScalarFieldEnum]
+
+
+export const WithdrawalRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  amountKr: 'amountKr',
+  amountFiat: 'amountFiat',
+  currency: 'currency',
+  provider: 'provider',
+  accountName: 'accountName',
+  accountDetails: 'accountDetails',
+  nameMatchStatus: 'nameMatchStatus',
+  status: 'status',
+  reviewedBy: 'reviewedBy',
+  reviewNote: 'reviewNote',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type WithdrawalRequestScalarFieldEnum = (typeof WithdrawalRequestScalarFieldEnum)[keyof typeof WithdrawalRequestScalarFieldEnum]
+
+
+export const PlatformWalletScalarFieldEnum = {
+  id: 'id',
+  krBalance: 'krBalance',
+  label: 'label',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlatformWalletScalarFieldEnum = (typeof PlatformWalletScalarFieldEnum)[keyof typeof PlatformWalletScalarFieldEnum]
+
+
+export const UserSuspensionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  reason: 'reason',
+  suspendedBy: 'suspendedBy',
+  type: 'type',
+  expiresAt: 'expiresAt',
+  liftedAt: 'liftedAt',
+  liftedBy: 'liftedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type UserSuspensionScalarFieldEnum = (typeof UserSuspensionScalarFieldEnum)[keyof typeof UserSuspensionScalarFieldEnum]
+
+
+export const PlatformAnnouncementScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  message: 'message',
+  type: 'type',
+  targetScope: 'targetScope',
+  isActive: 'isActive',
+  createdBy: 'createdBy',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PlatformAnnouncementScalarFieldEnum = (typeof PlatformAnnouncementScalarFieldEnum)[keyof typeof PlatformAnnouncementScalarFieldEnum]
+
+
+export const PlatformConfigScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  value: 'value',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlatformConfigScalarFieldEnum = (typeof PlatformConfigScalarFieldEnum)[keyof typeof PlatformConfigScalarFieldEnum]
+
+
+export const ContentModerationLogScalarFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  contentType: 'contentType',
+  contentId: 'contentId',
+  action: 'action',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ContentModerationLogScalarFieldEnum = (typeof ContentModerationLogScalarFieldEnum)[keyof typeof ContentModerationLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2057,6 +2287,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

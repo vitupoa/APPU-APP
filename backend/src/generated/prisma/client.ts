@@ -641,3 +641,73 @@ export type CampaignAnalytics = Prisma.CampaignAnalyticsModel
  * 
  */
 export type ContestAnalytics = Prisma.ContestAnalyticsModel
+/**
+ * Model SocialMediaAccount
+ * 
+ */
+export type SocialMediaAccount = Prisma.SocialMediaAccountModel
+/**
+ * Model SocialMediaSyncLog
+ * 
+ */
+export type SocialMediaSyncLog = Prisma.SocialMediaSyncLogModel
+/**
+ * Model PlatformRateLimit
+ * 
+ */
+export type PlatformRateLimit = Prisma.PlatformRateLimitModel
+/**
+ * Model AdminProfile
+ * 
+ */
+export type AdminProfile = Prisma.AdminProfileModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model FeatureFlag
+ * 
+ */
+export type FeatureFlag = Prisma.FeatureFlagModel
+/**
+ * Model ProhibitedName
+ * 
+ */
+export type ProhibitedName = Prisma.ProhibitedNameModel
+/**
+ * Model ReservedUsername
+ * 
+ */
+export type ReservedUsername = Prisma.ReservedUsernameModel
+/**
+ * Model WithdrawalRequest
+ * 
+ */
+export type WithdrawalRequest = Prisma.WithdrawalRequestModel
+/**
+ * Model PlatformWallet
+ * 
+ */
+export type PlatformWallet = Prisma.PlatformWalletModel
+/**
+ * Model UserSuspension
+ * 
+ */
+export type UserSuspension = Prisma.UserSuspensionModel
+/**
+ * Model PlatformAnnouncement
+ * 
+ */
+export type PlatformAnnouncement = Prisma.PlatformAnnouncementModel
+/**
+ * Model PlatformConfig
+ * 
+ */
+export type PlatformConfig = Prisma.PlatformConfigModel
+/**
+ * Model ContentModerationLog
+ * 
+ */
+export type ContentModerationLog = Prisma.ContentModerationLogModel
