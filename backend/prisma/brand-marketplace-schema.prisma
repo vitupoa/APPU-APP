@@ -1,0 +1,619 @@
+// ═══════════════════════════════════════════════════════════
+// BRAND MARKETPLACE - UNIFIED INFLUENCER & CONTEST SYSTEM
+// ═══════════════════════════════════════════════════════════
+// This schema implements:
+// 1. Influencer Marketplace (discovery & recruitment)
+// 2. Brand Campaigns (influencer marketing)
+// 3. Contest Sponsorships (brand-sponsored contests)
+// 4. Sales Funnel Tracking (ROI metrics)
+// 5. Gamification Layer (shared points/rewards)
+// 6. Post-Contest Conversion (losers → customers)
+// ═══════════════════════════════════════════════════════════
+
+// ─── ENUMS ────────────────────────────────────────────────
+
+enum InfluencerTier {
+  NANO          // 1K-10K followers
+  MICRO         // 10K-100K followers
+  MID           // 100K-500K followers
+  MACRO         // 500K-1M followers
+  MEGA          // 1M+ followers
+}
+
+enum CampaignType {
+  SPONSORED_POST      // Single post promotion
+  PRODUCT_REVIEW      // Review product
+  BRAND_AMBASSADOR    // Long-term partnership
+  CONTEST_PROMOTION   // Promote existing contest
+  AFFILIATE           // Commission-based
+  EVENT_COVERAGE      // Cover brand event
+  CONTENT_CREATION    // Create branded content
+}
+
+enum CampaignStatus {
+  DRAFT
+  OPEN              // Accepting applications
+  IN_PROGRESS       // Campaign running
+  REVIEW            // Reviewing deliverables
+  COMPLETED
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum DeliverableStatus {
+  PENDING
+  SUBMITTED
+  APPROVED
+  REJECTED
+  REVISION_REQUESTED
+}
+
+enum SponsorshipType {
+  CONTEST_PRIZE       // Sponsor prize pool
+  CONTEST_BRANDING    // Logo/branding on contest
+  CONTEST_EXCLUSIVE   // Exclusive sponsor
+  CONTENT_SPONSORSHIP // Sponsor user content
+}
+
+enum ConversionCampaignType {
+  POST_CONTEST_DISCOUNT    // Losers get discount
+  WINNER_ADVOCACY          // Winners promote brand
+  PARTICIPANT_RETARGETING  // Retarget all participants
+  ENGAGEMENT_REWARD        // Reward high engagers
+}
+
+enum FunnelStage {
+  AWARENESS       // Saw contest/campaign
+  INTEREST        // Clicked/viewed
+  CONSIDERATION   // Joined/engaged
+  CONVERSION      // Made purchase
+  RETENTION       // Repeat customer
+  ADVOCACY        // Became promoter
+}
+
+// ─── INFLUENCER PROFILES ──────────────────────────────────
+
+model InfluencerProfile {
+  id                String         @id @default(uuid())
+  userId            String         @unique @map("user_id")
+  tier              InfluencerTier
+  bio               String?        @db.Text
+  categories        String[]       // Fashion, Tech, Beauty, etc.
+  
+  // Social Stats
+  instagramHandle   String?        @map("instagram_handle")
+  instagramFollowers Int           @default(0) @map("instagram_followers")
+  tiktokHandle      String?        @map("tiktok_handle")
+  tiktokFollowers   Int            @default(0) @map("tiktok_followers")
+  youtubeHandle     String?        @map("youtube_handle")
+  youtubeSubscribers Int           @default(0) @map("youtube_subscribers")
+  
+  // Engagement Metrics
+  avgEngagementRate Decimal        @default(0) @map("avg_engagement_rate") @db.Decimal(5, 2)
+  avgViews          Int            @default(0) @map("avg_views")
+  
+  // Rates & Availability
+  ratePerPost       Decimal?       @map("rate_per_post") @db.Decimal(18, 4)
+  ratePerVideo      Decimal?       @map("rate_per_video") @db.Decimal(18, 4)
+  ratePerStory      Decimal?       @map("rate_per_story") @db.Decimal(18, 4)
+  isAvailable       Boolean        @default(true) @map("is_available")
+  
+  // Verification
+  isVerified        Boolean        @default(false) @map("is_verified")
+  verifiedAt        DateTime?      @map("verified_at")
+  
+  // Stats
+  totalCampaigns    Int            @default(0) @map("total_campaigns")
+  totalEarningsKr   Decimal        @default(0) @map("total_earnings_kr") @db.Decimal(18, 4)
+  avgRating         Decimal        @default(0) @map("avg_rating") @db.Decimal(3, 2)
+  
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications      CampaignApplication[]
+  deliverables      CampaignDeliverable[]
+  reviews           InfluencerReview[]
+  portfolio         InfluencerPortfolio[]
+
+  @@index([tier, isAvailable])
+  @@index([avgEngagementRate])
+  @@map("influencer_profiles")
+}
+
+model InfluencerPortfolio {
+  id            String   @id @default(uuid())
+  influencerId  String   @map("influencer_id")
+  title         String
+  description   String?  @db.Text
+  mediaUrl      String   @map("media_url")
+  mediaType     String   @map("media_type") // image, video
+  platform      String   // instagram, tiktok, youtube
+  views         Int      @default(0)
+  likes         Int      @default(0)
+  comments      Int      @default(0)
+  shares        Int      @default(0)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  influencer    InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@index([influencerId])
+  @@map("influencer_portfolio")
+}
+
+// ─── BRAND CAMPAIGNS ──────────────────────────────────────
+
+model BrandCampaign {
+  id                String         @id @default(uuid())
+  brandId           String         @map("brand_id") // Business account
+  title             String
+  description       String         @db.Text
+  type              CampaignType
+  status            CampaignStatus @default(DRAFT)
+  
+  // Targeting
+  targetTiers       InfluencerTier[] @map("target_tiers")
+  targetCategories  String[]       @map("target_categories")
+  minFollowers      Int?           @map("min_followers")
+  minEngagementRate Decimal?       @map("min_engagement_rate") @db.Decimal(5, 2)
+  targetGeos        String[]       @map("target_geos")
+  
+  // Budget & Compensation
+  budgetKr          Decimal        @map("budget_kr") @db.Decimal(18, 4)
+  compensationPerInfluencer Decimal @map("compensation_per_influencer") @db.Decimal(18, 4)
+  maxInfluencers    Int            @map("max_influencers")
+  
+  // Deliverables
+  requiredPosts     Int            @default(0) @map("required_posts")
+  requiredVideos    Int            @default(0) @map("required_videos")
+  requiredStories   Int            @default(0) @map("required_stories")
+  contentGuidelines String?        @db.Text @map("content_guidelines")
+  hashtags          String[]
+  mentions          String[]
+  
+  // Linked Contest (if promoting contest)
+  contestId         String?        @map("contest_id")
+  
+  // Timeline
+  applicationDeadline DateTime?    @map("application_deadline")
+  campaignStartDate DateTime       @map("campaign_start_date")
+  campaignEndDate   DateTime       @map("campaign_end_date")
+  
+  // Metrics
+  totalApplications Int            @default(0) @map("total_applications")
+  acceptedInfluencers Int          @default(0) @map("accepted_influencers")
+  totalReach        Int            @default(0) @map("total_reach")
+  totalEngagement   Int            @default(0) @map("total_engagement")
+  totalConversions  Int            @default(0) @map("total_conversions")
+  totalRevenueKr    Decimal        @default(0) @map("total_revenue_kr") @db.Decimal(18, 4)
+  roi               Decimal        @default(0) @db.Decimal(10, 2) // Return on Investment %
+  
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  brand             User           @relation("BrandCampaigns", fields: [brandId], references: [id])
+  contest           Contest?       @relation(fields: [contestId], references: [id])
+  applications      CampaignApplication[]
+  deliverables      CampaignDeliverable[]
+  analytics         CampaignAnalytics[]
+
+  @@index([status, campaignStartDate])
+  @@index([brandId])
+  @@index([contestId])
+  @@map("brand_campaigns")
+}
+
+model CampaignApplication {
+  id            String            @id @default(uuid())
+  campaignId    String            @map("campaign_id")
+  influencerId  String            @map("influencer_id")
+  status        ApplicationStatus @default(PENDING)
+  
+  // Application Details
+  pitch         String            @db.Text
+  proposedRate  Decimal?          @map("proposed_rate") @db.Decimal(18, 4)
+  availability  String?
+  
+  // Response
+  responseNote  String?           @db.Text @map("response_note")
+  respondedAt   DateTime?         @map("responded_at")
+  
+  appliedAt     DateTime          @default(now()) @map("applied_at")
+
+  campaign      BrandCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  influencer    InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, influencerId])
+  @@index([influencerId, status])
+  @@map("campaign_applications")
+}
+
+model CampaignDeliverable {
+  id            String             @id @default(uuid())
+  campaignId    String             @map("campaign_id")
+  influencerId  String             @map("influencer_id")
+  
+  // Deliverable Details
+  type          String             // post, video, story
+  platform      String             // instagram, tiktok, youtube
+  contentUrl    String             @map("content_url")
+  caption       String?            @db.Text
+  
+  // Metrics
+  views         Int                @default(0)
+  likes         Int                @default(0)
+  comments      Int                @default(0)
+  shares        Int                @default(0)
+  clicks        Int                @default(0)
+  conversions   Int                @default(0)
+  
+  // Review
+  status        DeliverableStatus  @default(PENDING)
+  reviewNote    String?            @db.Text @map("review_note")
+  reviewedAt    DateTime?          @map("reviewed_at")
+  
+  submittedAt   DateTime           @default(now()) @map("submitted_at")
+
+  campaign      BrandCampaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  influencer    InfluencerProfile  @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, status])
+  @@index([influencerId])
+  @@map("campaign_deliverables")
+}
+
+model InfluencerReview {
+  id            String   @id @default(uuid())
+  campaignId    String   @map("campaign_id")
+  influencerId  String   @map("influencer_id")
+  brandId       String   @map("brand_id")
+  
+  rating        Int      // 1-5
+  review        String?  @db.Text
+  
+  // Specific Ratings
+  communicationRating Int @map("communication_rating") // 1-5
+  qualityRating       Int @map("quality_rating") // 1-5
+  timelinessRating    Int @map("timeliness_rating") // 1-5
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  influencer    InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, influencerId])
+  @@index([influencerId])
+  @@map("influencer_reviews")
+}
+
+// ─── CONTEST SPONSORSHIPS ─────────────────────────────────
+
+model ContestSponsorship {
+  id                String          @id @default(uuid())
+  contestId         String          @map("contest_id")
+  brandId           String          @map("brand_id")
+  type              SponsorshipType
+  
+  // Sponsorship Details
+  sponsorshipKr     Decimal         @map("sponsorship_kr") @db.Decimal(18, 4)
+  benefits          String[]        // Logo placement, mentions, etc.
+  
+  // Branding
+  logoUrl           String?         @map("logo_url")
+  brandMessage      String?         @db.Text @map("brand_message")
+  websiteUrl        String?         @map("website_url")
+  
+  // Metrics
+  impressions       Int             @default(0)
+  clicks            Int             @default(0)
+  conversions       Int             @default(0)
+  revenueGenerated  Decimal         @default(0) @map("revenue_generated") @db.Decimal(18, 4)
+  
+  // Status
+  isActive          Boolean         @default(true) @map("is_active")
+  startDate         DateTime        @map("start_date")
+  endDate           DateTime        @map("end_date")
+  
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  contest           Contest         @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  brand             User            @relation("ContestSponsorships", fields: [brandId], references: [id])
+
+  @@index([contestId])
+  @@index([brandId])
+  @@map("contest_sponsorships")
+}
+
+// ─── CONTEST ENGAGEMENT ACTIONS ───────────────────────────
+
+model ContestEngagementAction {
+  id            String   @id @default(uuid())
+  contestId     String   @map("contest_id")
+  userId        String   @map("user_id")
+  actionType    String   @map("action_type") // VISIT_SHOP, FOLLOW_BRAND, WATCH_VIDEO, etc.
+  
+  // Action Details
+  targetUrl     String?  @map("target_url")
+  proofUrl      String?  @map("proof_url")
+  metadata      Json?
+  
+  // Tracking
+  isCompleted   Boolean  @default(false) @map("is_completed")
+  completedAt   DateTime? @map("completed_at")
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  contest       Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user          User     @relation("ContestEngagementActions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([contestId, userId])
+  @@index([actionType, isCompleted])
+  @@map("contest_engagement_actions")
+}
+
+// ─── PURCHASE-TO-ENTER TRACKING ───────────────────────────
+
+model ContestPurchaseEntry {
+  id            String   @id @default(uuid())
+  contestId     String   @map("contest_id")
+  userId        String   @map("user_id")
+  orderId       String   @map("order_id")
+  
+  // Purchase Details
+  purchaseAmount Decimal @map("purchase_amount") @db.Decimal(18, 4)
+  productIds    String[] @map("product_ids")
+  
+  // Entry Status
+  isEligible    Boolean  @default(true) @map("is_eligible")
+  autoEntered   Boolean  @default(false) @map("auto_entered")
+  
+  purchasedAt   DateTime @default(now()) @map("purchased_at")
+
+  contest       Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user          User     @relation("ContestPurchaseEntries", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([contestId, userId])
+  @@index([orderId])
+  @@map("contest_purchase_entries")
+}
+
+// ─── POST-CONTEST CONVERSION CAMPAIGNS ────────────────────
+
+model ConversionCampaign {
+  id                String                 @id @default(uuid())
+  contestId         String                 @map("contest_id")
+  brandId           String?                @map("brand_id")
+  type              ConversionCampaignType
+  
+  // Campaign Details
+  title             String
+  description       String?                @db.Text
+  
+  // Targeting
+  targetSegment     String                 @map("target_segment") // LOSERS, WINNERS, ALL_PARTICIPANTS, HIGH_ENGAGERS
+  
+  // Offer
+  discountPercent   Decimal?               @map("discount_percent") @db.Decimal(5, 2)
+  discountCode      String?                @map("discount_code")
+  offerExpiresAt    DateTime?              @map("offer_expires_at")
+  
+  // Metrics
+  totalSent         Int                    @default(0) @map("total_sent")
+  totalOpened       Int                    @default(0) @map("total_opened")
+  totalClicked      Int                    @default(0) @map("total_clicked")
+  totalConverted    Int                    @default(0) @map("total_converted")
+  revenueGenerated  Decimal                @default(0) @map("revenue_generated") @db.Decimal(18, 4)
+  
+  // Status
+  isActive          Boolean                @default(true) @map("is_active")
+  
+  createdAt         DateTime               @default(now()) @map("created_at")
+
+  contest           Contest                @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  brand             User?                  @relation("ConversionCampaigns", fields: [brandId], references: [id])
+  recipients        ConversionCampaignRecipient[]
+
+  @@index([contestId])
+  @@index([type, isActive])
+  @@map("conversion_campaigns")
+}
+
+model ConversionCampaignRecipient {
+  id            String   @id @default(uuid())
+  campaignId    String   @map("campaign_id")
+  userId        String   @map("user_id")
+  
+  // Tracking
+  sentAt        DateTime @default(now()) @map("sent_at")
+  openedAt      DateTime? @map("opened_at")
+  clickedAt     DateTime? @map("clicked_at")
+  convertedAt   DateTime? @map("converted_at")
+  
+  // Conversion Details
+  orderId       String?  @map("order_id")
+  revenueKr     Decimal? @map("revenue_kr") @db.Decimal(18, 4)
+
+  campaign      ConversionCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user          User               @relation("ConversionRecipients", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, userId])
+  @@index([userId])
+  @@map("conversion_campaign_recipients")
+}
+
+// ─── SALES FUNNEL TRACKING ────────────────────────────────
+
+model SalesFunnelEvent {
+  id            String      @id @default(uuid())
+  userId        String      @map("user_id")
+  contestId     String?     @map("contest_id")
+  campaignId    String?     @map("campaign_id")
+  
+  // Event Details
+  stage         FunnelStage
+  eventType     String      @map("event_type") // contest_view, contest_join, product_view, purchase, etc.
+  
+  // Context
+  sourceType    String?     @map("source_type") // contest, campaign, organic
+  sourceId      String?     @map("source_id")
+  
+  // Metadata
+  metadata      Json?
+  
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  user          User        @relation("SalesFunnelEvents", fields: [userId], references: [id], onDelete: Cascade)
+  contest       Contest?    @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  campaign      BrandCampaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([userId, stage])
+  @@index([contestId, stage])
+  @@index([campaignId, stage])
+  @@index([createdAt])
+  @@map("sales_funnel_events")
+}
+
+// ─── GAMIFICATION LAYER ───────────────────────────────────
+
+model GamificationPoints {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  
+  // Point Categories
+  engagementPoints Int   @default(0) @map("engagement_points")
+  marketingPoints  Int   @default(0) @map("marketing_points")
+  salesPoints      Int   @default(0) @map("sales_points")
+  totalPoints      Int   @default(0) @map("total_points")
+  
+  // Levels
+  currentLevel  Int      @default(1) @map("current_level")
+  nextLevelAt   Int      @map("next_level_at")
+  
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@index([totalPoints])
+  @@map("gamification_points")
+}
+
+model GamificationActivity {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  
+  // Activity Details
+  activityType  String   @map("activity_type") // CONTEST_WIN, CAMPAIGN_COMPLETE, PURCHASE, REFERRAL
+  category      String   // ENGAGEMENT, MARKETING, SALES
+  pointsEarned  Int      @map("points_earned")
+  
+  // Context
+  referenceType String?  @map("reference_type") // contest, campaign, order
+  referenceId   String?  @map("reference_id")
+  
+  description   String?
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user          User     @relation("GamificationActivities", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([activityType])
+  @@map("gamification_activities")
+}
+
+// ─── CAMPAIGN ANALYTICS ───────────────────────────────────
+
+model CampaignAnalytics {
+  id            String   @id @default(uuid())
+  campaignId    String   @map("campaign_id")
+  date          DateTime @db.Date
+  
+  // Reach & Engagement
+  impressions   Int      @default(0)
+  reach         Int      @default(0)
+  engagement    Int      @default(0)
+  clicks        Int      @default(0)
+  
+  // Conversions
+  conversions   Int      @default(0)
+  revenue       Decimal  @default(0) @db.Decimal(18, 4)
+  
+  // Costs
+  spentKr       Decimal  @default(0) @map("spent_kr") @db.Decimal(18, 4)
+  
+  // Calculated Metrics
+  ctr           Decimal  @default(0) @db.Decimal(5, 4) // Click-through rate
+  conversionRate Decimal @default(0) @map("conversion_rate") @db.Decimal(5, 4)
+  cpa           Decimal  @default(0) @db.Decimal(18, 4) // Cost per acquisition
+  roas          Decimal  @default(0) @db.Decimal(10, 2) // Return on ad spend
+
+  campaign      BrandCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, date])
+  @@index([date])
+  @@map("campaign_analytics")
+}
+
+// ─── CONTEST ANALYTICS (ENHANCED) ─────────────────────────
+
+model ContestAnalytics {
+  id                String   @id @default(uuid())
+  contestId         String   @map("contest_id")
+  date              DateTime @db.Date
+  
+  // Engagement
+  views             Int      @default(0)
+  joins             Int      @default(0)
+  submissions       Int      @default(0)
+  votes             Int      @default(0)
+  shares            Int      @default(0)
+  
+  // Sales Metrics
+  shopVisits        Int      @default(0) @map("shop_visits")
+  productViews      Int      @default(0) @map("product_views")
+  addToCarts        Int      @default(0) @map("add_to_carts")
+  purchases         Int      @default(0)
+  revenue           Decimal  @default(0) @db.Decimal(18, 4)
+  
+  // Conversion Rates
+  joinRate          Decimal  @default(0) @map("join_rate") @db.Decimal(5, 4)
+  submissionRate    Decimal  @default(0) @map("submission_rate") @db.Decimal(5, 4)
+  purchaseRate      Decimal  @default(0) @map("purchase_rate") @db.Decimal(5, 4)
+  
+  contest           Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+
+  @@unique([contestId, date])
+  @@index([date])
+  @@map("contest_analytics")
+}
+
+// ─── USER RELATIONS (ADD TO EXISTING USER MODEL) ──────────
+// These relations need to be added to the User model in schema.prisma:
+//
+// influencerProfile     InfluencerProfile?
+// brandCampaigns        BrandCampaign[]        @relation("BrandCampaigns")
+// contestSponsorships   ContestSponsorship[]   @relation("ContestSponsorships")
+// conversionCampaigns   ConversionCampaign[]   @relation("ConversionCampaigns")
+// conversionRecipients  ConversionCampaignRecipient[] @relation("ConversionRecipients")
+// engagementActions     ContestEngagementAction[] @relation("ContestEngagementActions")
+// purchaseEntries       ContestPurchaseEntry[] @relation("ContestPurchaseEntries")
+// funnelEvents          SalesFunnelEvent[]     @relation("SalesFunnelEvents")
+// gamificationPoints    GamificationPoints?
+// gamificationActivities GamificationActivity[] @relation("GamificationActivities")
+
+// ─── CONTEST RELATIONS (ADD TO EXISTING CONTEST MODEL) ────
+// These relations need to be added to the Contest model in schema.prisma:
+//
+// sponsorships          ContestSponsorship[]
+// engagementActions     ContestEngagementAction[]
+// purchaseEntries       ContestPurchaseEntry[]
+// conversionCampaigns   ConversionCampaign[]
+// funnelEvents          SalesFunnelEvent[]
+// analytics             ContestAnalytics[]
+// promotingCampaigns    BrandCampaign[]

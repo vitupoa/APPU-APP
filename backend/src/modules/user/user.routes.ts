@@ -150,6 +150,18 @@ router.get('/:id/lovers', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// GET /api/v1/users/search/creators
+router.get('/search/creators', async (req: AuthRequest, res: Response) => {
+  try {
+    const minAdmirers = req.query.minAdmirers ? parseInt(String(req.query.minAdmirers)) : undefined;
+    const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
+    const result = await UserService.searchCreatorsByAdmireCount(minAdmirers, cursor);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ─── MILESTONES ───────────────────────────────────
 
 // GET /api/v1/users/me/milestones

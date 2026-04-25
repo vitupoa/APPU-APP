@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -86,6 +87,22 @@ object ExploreTab : Tab {
     @Composable
     override fun Content() {
         Navigator(ExploreScreen()) {
+            CurrentScreen()
+        }
+    }
+}
+
+// ─── MARKETPLACE TAB ──────────────────────────────────────────────
+object MarketplaceTab : Tab {
+    override val options: TabOptions
+        @Composable get() {
+            val icon = rememberVectorPainter(Icons.Default.Campaign)
+            return remember { TabOptions(index = 2u, title = "Marketplace", icon = icon) }
+        }
+
+    @Composable
+    override fun Content() {
+        Navigator(com.krieta.feature.marketplace.presentation.screen.MarketplaceHomeScreen()) {
             CurrentScreen()
         }
     }
@@ -169,7 +186,7 @@ class ExploreScreen : Screen {
                     ExploreCard(
                         emoji = "🏆",
                         title = "Contests",
-                        subtitle = "Compete, win prizes & grow your following",
+                        subtitle = "Compete, win prizes & grow",
                         gradient = listOf(KrietaColors.Warning.copy(alpha = 0.8f), KrietaColors.Warning),
                         modifier = Modifier.weight(1f),
                         onClick = { navigator.push(com.krieta.feature.contests.presentation.screen.ContestFeedScreen()) }
@@ -177,10 +194,26 @@ class ExploreScreen : Screen {
                     ExploreCard(
                         emoji = "🛍️",
                         title = "Shop",
-                        subtitle = "Browse products from Krieta creators",
+                        subtitle = "Browse creator products",
                         gradient = listOf(KrietaColors.Accent.copy(alpha = 0.8f), KrietaColors.AccentDark),
                         modifier = Modifier.weight(1f),
                         onClick = { navigator.push(ShopScreen()) }
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    ExploreCard(
+                        emoji = "🏦",
+                        title = "Chamas",
+                        subtitle = "Join savings groups & rotate payouts",
+                        gradient = listOf(androidx.compose.ui.graphics.Color(0xFFF5A623).copy(alpha = 0.8f), androidx.compose.ui.graphics.Color(0xFFD4891A)),
+                        modifier = Modifier.weight(1f),
+                        onClick = { navigator.push(com.krieta.feature.chama.presentation.ChamaListScreen()) }
                     )
                 }
             } else if (isSearching) {

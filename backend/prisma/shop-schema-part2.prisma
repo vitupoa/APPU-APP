@@ -1,0 +1,211 @@
+
+// ─── PRICING & DISCOUNTS ─────────────────────────────────
+
+model ProductDiscount {
+  id              String   @id @default(uuid())
+  productId       String   @map("product_id")
+  discountType    String   @map("discount_type") // percentage, fixed
+  discountValue   Decimal  @map("discount_value") @db.Decimal(10, 2)
+  minQuantity     Int      @default(1) @map("min_quantity")
+  startDate       DateTime @map("start_date")
+  endDate         DateTime @map("end_date")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, isActive])
+  @@map("product_discounts")
+}
+
+model FlashSale {
+  id              String          @id @default(uuid())
+  title           String
+  description     String?
+  type            FlashSaleType
+  status          FlashSaleStatus @default(SCHEDULED)
+  startTime       DateTime        @map("start_time")
+  endTime         DateTime        @map("end_time")
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  products FlashSaleProduct[]
+
+  @@index([status, startTime])
+  @@map("flash_sales")
+}
+
+model FlashSaleProduct {
+  id              String  @id @default(uuid())
+  flashSaleId     String  @map("flash_sale_id")
+  productId       String  @map("product_id")
+  salePrice       Decimal @map("sale_price") @db.Decimal(18, 4)
+  stockLimit      Int?    @map("stock_limit")
+  soldCount       Int     @default(0) @map("sold_count")
+  perUserLimit    Int?    @map("per_user_limit")
+
+  flashSale FlashSale @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([flashSaleId, productId])
+  @@map("flash_sale_products")
+}
+
+model GroupBuy {
+  id                String         @id @default(uuid())
+  productId         String         @map("product_id")
+  organizerId       String         @map("organizer_id")
+  title             String
+  description       String?
+  targetParticipants Int           @map("target_participants")
+  currentCount      Int            @default(0) @map("current_count")
+  discountPercent   Decimal        @map("discount_percent") @db.Decimal(5, 2)
+  status            GroupBuyStatus @default(OPEN)
+  expiresAt         DateTime       @map("expires_at")
+  createdAt         DateTime       @default(now()) @map("created_at")
+
+  product      Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  participants GroupBuyParticipant[]
+
+  @@index([status, expiresAt])
+  @@map("group_buys")
+}
+
+model GroupBuyParticipant {
+  id          String   @id @default(uuid())
+  groupBuyId  String   @map("group_buy_id")
+  userId      String   @map("user_id")
+  joinedAt    DateTime @default(now()) @map("joined_at")
+
+  groupBuy GroupBuy @relation(fields: [groupBuyId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupBuyId, userId])
+  @@map("group_buy_participants")
+}
+
+// ─── CART & ORDERS ───────────────────────────────────────
+
+model CartItem {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  productId     String   @map("product_id")
+  quantity      Int      @default(1)
+  bargainPrice  Decimal? @map("bargain_price") @db.Decimal(18, 4)
+  addedAt       DateTime @default(now()) @map("added_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("cart_items")
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  buyerId       String      @map("buyer_id")
+  totalKr       Decimal     @map("total_kr") @db.Decimal(18, 4)
+  platformFeeKr Decimal     @map("platform_fee_kr") @db.Decimal(18, 4)
+  status        OrderStatus @default(PENDING)
+  notes         String?
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  buyer User        @relation("BuyerOrders", fields: [buyerId], references: [id])
+  items OrderItem[]
+
+  @@index([buyerId, status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String  @id @default(uuid())
+  orderId      String  @map("order_id")
+  productId    String  @map("product_id")
+  sellerId     String  @map("seller_id")
+  quantity     Int
+  unitPriceKr  Decimal @map("unit_price_kr") @db.Decimal(18, 4)
+  totalPriceKr Decimal @map("total_price_kr") @db.Decimal(18, 4)
+  escrowStatus String  @default("held") @map("escrow_status") // held, released, refunded
+  deliveredAt  DateTime? @map("delivered_at")
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+// ─── WISHLISTS & GIFTS ──────────────────────────────────
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  isPublic  Boolean  @default(false) @map("is_public")
+  isRegistry Boolean @default(false) @map("is_registry")
+  eventType String?  @map("event_type") // wedding, birthday, baby_shower
+  eventDate DateTime? @map("event_date")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items WishlistItem[]
+
+  @@index([userId])
+  @@map("wishlists")
+}
+
+model WishlistItem {
+  id          String   @id @default(uuid())
+  wishlistId  String   @map("wishlist_id")
+  productId   String   @map("product_id")
+  quantity    Int      @default(1)
+  priority    Int      @default(0)
+  notes       String?
+  isPurchased Boolean  @default(false) @map("is_purchased")
+  addedAt     DateTime @default(now()) @map("added_at")
+
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([wishlistId, productId])
+  @@map("wishlist_items")
+}
+
+model Gift {
+  id            String   @id @default(uuid())
+  senderId      String   @map("sender_id")
+  recipientId   String   @map("recipient_id")
+  productId     String   @map("product_id")
+  message       String?
+  amountKr      Decimal  @map("amount_kr") @db.Decimal(18, 4)
+  escrowStatus  String   @default("held") @map("escrow_status")
+  status        String   @default("pending") // pending, purchased, delivered, cancelled
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  sender    User @relation("GiftSender", fields: [senderId], references: [id])
+  recipient User @relation("GiftRecipient", fields: [recipientId], references: [id])
+
+  @@map("gifts")
+}
+
+// ─── REVIEWS & RATINGS ──────────────────────────────────
+
+model ProductReview {
+  id            String   @id @default(uuid())
+  productId     String   @map("product_id")
+  userId        String   @map("user_id")
+  rating        Int      // 1-5
+  title         String?
+  text          String?  @db.Text
+  videoUrl      String?  @map("video_url")
+  imageUrls     String[] @map("image_urls")
+  isVerified    Boolean  @default(false) @map("is_verified")
+  isModerated   Boolean  @default(false) @map("is_moderated")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
+  @@index([productId, rating])
+  @@map("product_reviews")
+}

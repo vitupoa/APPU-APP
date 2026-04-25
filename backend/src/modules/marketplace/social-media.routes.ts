@@ -1,0 +1,101 @@
+import { Router } from 'express';
+import { SocialMediaService } from './social-media.service.js';
+import { authenticate } from '../../middleware/authenticate.js';
+
+const router = Router();
+const socialMediaService = new SocialMediaService();
+
+// ─── ADD SOCIAL MEDIA ACCOUNT ──────────────────────────────
+
+router.post('/social-accounts', authenticate, async (req, res) => {
+  try {
+    const { influencerId, platform, username, accessToken } = req.body;
+    
+    // Verify user owns this influencer profile
+    // TODO: Add authorization check
+    
+    const account = await socialMediaService.addSocialAccount(
+      influencerId,
+      platform,
+      username,
+      accessToken
+    );
+    
+    res.json(account);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ─── GET INFLUENCER'S SOCIAL ACCOUNTS ──────────────────────
+
+router.get('/social-accounts/:influencerId', authenticate, async (req, res) => {
+  try {
+    const { influencerId } = req.params;
+    
+    const accounts = await socialMediaService.getInfluencerSocialAccounts(influencerId);
+    
+    res.json(accounts);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ─── SYNC ACCOUNT METRICS ──────────────────────────────────
+
+router.post('/social-accounts/:accountId/sync', authenticate, async (req, res) => {
+  try {
+    const { accountId } = req.params;
+    
+    const account = await socialMediaService.syncAccountMetrics(accountId);
+    
+    res.json(account);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ─── SET PRIMARY ACCOUNT ───────────────────────────────────
+
+router.patch('/social-accounts/:accountId/primary', authenticate, async (req, res) => {
+  try {
+    const { accountId } = req.params;
+    const { influencerId } = req.body;
+    
+    const account = await socialMediaService.setPrimaryAccount(accountId, influencerId);
+    
+    res.json(account);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ─── DELETE SOCIAL ACCOUNT ─────────────────────────────────
+
+router.delete('/social-accounts/:accountId', authenticate, async (req, res) => {
+  try {
+    const { accountId } = req.params;
+    
+    await socialMediaService.deleteSocialAccount(accountId);
+    
+    res.json({ message: 'Account deleted successfully' });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ─── SYNC ALL ACCOUNTS (ADMIN/CRON) ───────────────────────
+
+router.post('/social-accounts/sync-all', authenticate, async (req, res) => {
+  try {
+    // TODO: Add admin authorization check
+    
+    const results = await socialMediaService.syncAllAccounts();
+    
+    res.json(results);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+export default router;

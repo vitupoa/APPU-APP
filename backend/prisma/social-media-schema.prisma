@@ -1,0 +1,114 @@
+// ═══════════════════════════════════════════════════════════
+// SOCIAL MEDIA INTEGRATION FOR INFLUENCER PROFILES
+// ═══════════════════════════════════════════════════════════
+// Supports: TikTok, YouTube, Instagram, Facebook, Twitter/X
+// Auto-fetches follower/subscriber counts
+// Displays with platform logos
+// ═══════════════════════════════════════════════════════════
+
+enum SocialPlatform {
+  TIKTOK
+  YOUTUBE
+  INSTAGRAM
+  FACEBOOK
+  TWITTER
+  TWITCH
+  LINKEDIN
+  SNAPCHAT
+}
+
+model SocialMediaAccount {
+  id                String         @id @default(uuid())
+  influencerId      String         @map("influencer_id")
+  platform          SocialPlatform
+  
+  // Account Details
+  username          String
+  profileUrl        String         @map("profile_url")
+  displayName       String?        @map("display_name")
+  
+  // Metrics (auto-fetched)
+  followerCount     Int            @default(0) @map("follower_count")
+  subscriberCount   Int            @default(0) @map("subscriber_count") // For YouTube
+  videoCount        Int            @default(0) @map("video_count")
+  totalViews        BigInt         @default(0) @map("total_views")
+  avgViews          Int            @default(0) @map("avg_views")
+  avgLikes          Int            @default(0) @map("avg_likes")
+  engagementRate    Decimal        @default(0) @map("engagement_rate") @db.Decimal(5, 2)
+  
+  // Verification
+  isVerified        Boolean        @default(false) @map("is_verified")
+  isPrimary         Boolean        @default(false) @map("is_primary") // Main platform
+  
+  // Sync Status
+  lastSyncedAt      DateTime?      @map("last_synced_at")
+  syncStatus        String         @default("pending") @map("sync_status") // pending, success, failed
+  syncError         String?        @map("sync_error")
+  
+  // API Credentials (encrypted)
+  accessToken       String?        @map("access_token") @db.Text
+  refreshToken      String?        @map("refresh_token") @db.Text
+  tokenExpiresAt    DateTime?      @map("token_expires_at")
+  
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  influencer        InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@unique([influencerId, platform])
+  @@index([platform, followerCount])
+  @@index([influencerId, isPrimary])
+  @@map("social_media_accounts")
+}
+
+// Add this relation to InfluencerProfile model:
+// socialAccounts    SocialMediaAccount[]
+
+// ─── SOCIAL MEDIA SYNC LOG ────────────────────────────────
+
+model SocialMediaSyncLog {
+  id                String         @id @default(uuid())
+  accountId         String         @map("account_id")
+  
+  // Sync Details
+  syncType          String         @map("sync_type") // manual, scheduled, auto
+  status            String         // success, failed, partial
+  
+  // Metrics Before/After
+  followersBefore   Int            @map("followers_before")
+  followersAfter    Int            @map("followers_after")
+  followerChange    Int            @map("follower_change")
+  
+  // Error Handling
+  errorMessage      String?        @map("error_message")
+  errorCode         String?        @map("error_code")
+  
+  // Performance
+  durationMs        Int            @map("duration_ms")
+  
+  syncedAt          DateTime       @default(now()) @map("synced_at")
+
+  @@index([accountId, syncedAt])
+  @@index([status])
+  @@map("social_media_sync_logs")
+}
+
+// ─── PLATFORM RATE LIMITS ─────────────────────────────────
+
+model PlatformRateLimit {
+  id                String         @id @default(uuid())
+  platform          SocialPlatform
+  
+  // Rate Limit Config
+  requestsPerHour   Int            @map("requests_per_hour")
+  requestsRemaining Int            @map("requests_remaining")
+  resetAt           DateTime       @map("reset_at")
+  
+  // Tracking
+  lastRequestAt     DateTime?      @map("last_request_at")
+  
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  @@unique([platform])
+  @@map("platform_rate_limits")
+}

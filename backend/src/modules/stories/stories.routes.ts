@@ -12,5 +12,6 @@ storiesRoutes.post('/', validateRequest(createStorySchema), StoriesController.cr
 storiesRoutes.get('/feed', StoriesController.getFeed);
 storiesRoutes.get('/me', StoriesController.getMyStories);
 storiesRoutes.post('/:storyId/view', StoriesController.viewStory);
+storiesRoutes.post('/:storyId/tip', StoriesController.tipStory);
 storiesRoutes.delete('/:storyId', StoriesController.deleteStory);
 storiesRoutes.post('/preferences', validateRequest(updateViewerPreferencesSchema), StoriesController.setViewerPreferences);

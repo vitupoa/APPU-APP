@@ -263,6 +263,50 @@ export class UserService {
     };
   }
 
+  /**
+   * Search creators by admire count for businesses.
+   */
+  static async searchCreatorsByAdmireCount(minAdmirers?: number, cursor?: string, limit = 20) {
+    const users = await prisma.user.findMany({
+      where: {
+        accountType: 'CREATOR',
+        admirers: minAdmirers ? { some: {} } : undefined
+      },
+      take: limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      orderBy: { admirers: { _count: 'desc' } },
+      select: {
+        id: true,
+        username: true,
+        displayName: true,
+        avatarUrl: true,
+        bio: true,
+        isVerified: true,
+        _count: { select: { admirers: true } }
+      }
+    });
+
+    const filteredUsers = minAdmirers 
+      ? users.filter(u => u._count.admirers >= minAdmirers)
+      : users;
+
+    const hasMore = filteredUsers.length > limit;
+    const items = hasMore ? filteredUsers.slice(0, limit) : filteredUsers;
+    
+    return {
+      items: items.map(u => ({
+        id: u.id,
+        username: u.username,
+        displayName: u.displayName,
+        avatarUrl: u.avatarUrl,
+        bio: u.bio,
+        isVerified: u.isVerified,
+        admirersCount: u._count.admirers
+      })),
+      nextCursor: hasMore ? items[items.length - 1].id : null
+    };
+  }
+
   // ─── BIO LINKS ─────────────────────────────────────
 
   static async updateBioLinks(userId: string, links: { label: string; url: string; icon?: string }[]) {

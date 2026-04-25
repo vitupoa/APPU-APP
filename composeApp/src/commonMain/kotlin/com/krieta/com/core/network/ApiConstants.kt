@@ -58,6 +58,14 @@ object ApiConstants {
     // Chat
     const val CHAT = "$API_VERSION/chat"
 
+    // Stories
+    const val STORIES = "$API_VERSION/stories"
+
+    // Chama
+    const val CHAMAS = "$API_VERSION/chamas"
+    const val CHAMAS_DISCOVER = "$API_VERSION/chamas/discover"
+    const val CHAMAS_DEFAULTERS = "$API_VERSION/chamas/defaulters"
+
     // Cloudinary folder paths
     object CloudinaryFolders {
         const val PROFILE_PHOTO = "Krieta/profile/Images"
@@ -71,5 +79,6 @@ object ApiConstants {
         const val CHAT_PHOTO = "Krieta/chat/Images"
         const val CHAT_VIDEO = "Krieta/chat/Videos"
         const val CHAT_AUDIO = "Krieta/chat/Audio"
+        const val CHAMA_RECEIPTS = "Krieta/chama/Receipts"
     }
 }

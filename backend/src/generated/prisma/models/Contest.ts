@@ -461,6 +461,13 @@ export type ContestWhereInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationListRelationFilter
   teamSubmissions?: Prisma.TeamSubmissionListRelationFilter
   judgeInvites?: Prisma.JudgeInviteListRelationFilter
+  sponsorships?: Prisma.ContestSponsorshipListRelationFilter
+  engagementActions?: Prisma.ContestEngagementActionListRelationFilter
+  purchaseEntries?: Prisma.ContestPurchaseEntryListRelationFilter
+  conversionCampaigns?: Prisma.ConversionCampaignListRelationFilter
+  funnelEvents?: Prisma.SalesFunnelEventListRelationFilter
+  analytics?: Prisma.ContestAnalyticsListRelationFilter
+  promotingCampaigns?: Prisma.BrandCampaignListRelationFilter
 }
 
 export type ContestOrderByWithRelationInput = {
@@ -506,6 +513,13 @@ export type ContestOrderByWithRelationInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationOrderByRelationAggregateInput
   teamSubmissions?: Prisma.TeamSubmissionOrderByRelationAggregateInput
   judgeInvites?: Prisma.JudgeInviteOrderByRelationAggregateInput
+  sponsorships?: Prisma.ContestSponsorshipOrderByRelationAggregateInput
+  engagementActions?: Prisma.ContestEngagementActionOrderByRelationAggregateInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryOrderByRelationAggregateInput
+  conversionCampaigns?: Prisma.ConversionCampaignOrderByRelationAggregateInput
+  funnelEvents?: Prisma.SalesFunnelEventOrderByRelationAggregateInput
+  analytics?: Prisma.ContestAnalyticsOrderByRelationAggregateInput
+  promotingCampaigns?: Prisma.BrandCampaignOrderByRelationAggregateInput
 }
 
 export type ContestWhereUniqueInput = Prisma.AtLeast<{
@@ -554,6 +568,13 @@ export type ContestWhereUniqueInput = Prisma.AtLeast<{
   teamRegistrations?: Prisma.TeamContestRegistrationListRelationFilter
   teamSubmissions?: Prisma.TeamSubmissionListRelationFilter
   judgeInvites?: Prisma.JudgeInviteListRelationFilter
+  sponsorships?: Prisma.ContestSponsorshipListRelationFilter
+  engagementActions?: Prisma.ContestEngagementActionListRelationFilter
+  purchaseEntries?: Prisma.ContestPurchaseEntryListRelationFilter
+  conversionCampaigns?: Prisma.ConversionCampaignListRelationFilter
+  funnelEvents?: Prisma.SalesFunnelEventListRelationFilter
+  analytics?: Prisma.ContestAnalyticsListRelationFilter
+  promotingCampaigns?: Prisma.BrandCampaignListRelationFilter
 }, "id">
 
 export type ContestOrderByWithAggregationInput = {
@@ -670,6 +691,13 @@ export type ContestCreateInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateInput = {
@@ -714,6 +742,13 @@ export type ContestUncheckedCreateInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestUpdateInput = {
@@ -758,6 +793,13 @@ export type ContestUpdateInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateInput = {
@@ -802,6 +844,13 @@ export type ContestUncheckedUpdateInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateManyInput = {
@@ -1307,6 +1356,108 @@ export type ContestUpdateOneRequiredWithoutTeamSubmissionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutTeamSubmissionsInput, Prisma.ContestUpdateWithoutTeamSubmissionsInput>, Prisma.ContestUncheckedUpdateWithoutTeamSubmissionsInput>
 }
 
+export type ContestCreateNestedOneWithoutPromotingCampaignsInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutPromotingCampaignsInput, Prisma.ContestUncheckedCreateWithoutPromotingCampaignsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutPromotingCampaignsInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneWithoutPromotingCampaignsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutPromotingCampaignsInput, Prisma.ContestUncheckedCreateWithoutPromotingCampaignsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutPromotingCampaignsInput
+  upsert?: Prisma.ContestUpsertWithoutPromotingCampaignsInput
+  disconnect?: Prisma.ContestWhereInput | boolean
+  delete?: Prisma.ContestWhereInput | boolean
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutPromotingCampaignsInput, Prisma.ContestUpdateWithoutPromotingCampaignsInput>, Prisma.ContestUncheckedUpdateWithoutPromotingCampaignsInput>
+}
+
+export type ContestCreateNestedOneWithoutSponsorshipsInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutSponsorshipsInput, Prisma.ContestUncheckedCreateWithoutSponsorshipsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutSponsorshipsInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneRequiredWithoutSponsorshipsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutSponsorshipsInput, Prisma.ContestUncheckedCreateWithoutSponsorshipsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutSponsorshipsInput
+  upsert?: Prisma.ContestUpsertWithoutSponsorshipsInput
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutSponsorshipsInput, Prisma.ContestUpdateWithoutSponsorshipsInput>, Prisma.ContestUncheckedUpdateWithoutSponsorshipsInput>
+}
+
+export type ContestCreateNestedOneWithoutEngagementActionsInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutEngagementActionsInput, Prisma.ContestUncheckedCreateWithoutEngagementActionsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutEngagementActionsInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneRequiredWithoutEngagementActionsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutEngagementActionsInput, Prisma.ContestUncheckedCreateWithoutEngagementActionsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutEngagementActionsInput
+  upsert?: Prisma.ContestUpsertWithoutEngagementActionsInput
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutEngagementActionsInput, Prisma.ContestUpdateWithoutEngagementActionsInput>, Prisma.ContestUncheckedUpdateWithoutEngagementActionsInput>
+}
+
+export type ContestCreateNestedOneWithoutPurchaseEntriesInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutPurchaseEntriesInput, Prisma.ContestUncheckedCreateWithoutPurchaseEntriesInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutPurchaseEntriesInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneRequiredWithoutPurchaseEntriesNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutPurchaseEntriesInput, Prisma.ContestUncheckedCreateWithoutPurchaseEntriesInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutPurchaseEntriesInput
+  upsert?: Prisma.ContestUpsertWithoutPurchaseEntriesInput
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutPurchaseEntriesInput, Prisma.ContestUpdateWithoutPurchaseEntriesInput>, Prisma.ContestUncheckedUpdateWithoutPurchaseEntriesInput>
+}
+
+export type ContestCreateNestedOneWithoutConversionCampaignsInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutConversionCampaignsInput, Prisma.ContestUncheckedCreateWithoutConversionCampaignsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutConversionCampaignsInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneRequiredWithoutConversionCampaignsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutConversionCampaignsInput, Prisma.ContestUncheckedCreateWithoutConversionCampaignsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutConversionCampaignsInput
+  upsert?: Prisma.ContestUpsertWithoutConversionCampaignsInput
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutConversionCampaignsInput, Prisma.ContestUpdateWithoutConversionCampaignsInput>, Prisma.ContestUncheckedUpdateWithoutConversionCampaignsInput>
+}
+
+export type ContestCreateNestedOneWithoutFunnelEventsInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutFunnelEventsInput, Prisma.ContestUncheckedCreateWithoutFunnelEventsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutFunnelEventsInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneWithoutFunnelEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutFunnelEventsInput, Prisma.ContestUncheckedCreateWithoutFunnelEventsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutFunnelEventsInput
+  upsert?: Prisma.ContestUpsertWithoutFunnelEventsInput
+  disconnect?: Prisma.ContestWhereInput | boolean
+  delete?: Prisma.ContestWhereInput | boolean
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutFunnelEventsInput, Prisma.ContestUpdateWithoutFunnelEventsInput>, Prisma.ContestUncheckedUpdateWithoutFunnelEventsInput>
+}
+
+export type ContestCreateNestedOneWithoutAnalyticsInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutAnalyticsInput, Prisma.ContestUncheckedCreateWithoutAnalyticsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutAnalyticsInput
+  connect?: Prisma.ContestWhereUniqueInput
+}
+
+export type ContestUpdateOneRequiredWithoutAnalyticsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContestCreateWithoutAnalyticsInput, Prisma.ContestUncheckedCreateWithoutAnalyticsInput>
+  connectOrCreate?: Prisma.ContestCreateOrConnectWithoutAnalyticsInput
+  upsert?: Prisma.ContestUpsertWithoutAnalyticsInput
+  connect?: Prisma.ContestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContestUpdateToOneWithWhereWithoutAnalyticsInput, Prisma.ContestUpdateWithoutAnalyticsInput>, Prisma.ContestUncheckedUpdateWithoutAnalyticsInput>
+}
+
 export type ContestCreateWithoutCreatorInput = {
   id?: string
   title: string
@@ -1348,6 +1499,13 @@ export type ContestCreateWithoutCreatorInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutCreatorInput = {
@@ -1391,6 +1549,13 @@ export type ContestUncheckedCreateWithoutCreatorInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutCreatorInput = {
@@ -1495,6 +1660,13 @@ export type ContestCreateWithoutEscrowsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutEscrowsInput = {
@@ -1538,6 +1710,13 @@ export type ContestUncheckedCreateWithoutEscrowsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutEscrowsInput = {
@@ -1597,6 +1776,13 @@ export type ContestUpdateWithoutEscrowsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutEscrowsInput = {
@@ -1640,6 +1826,13 @@ export type ContestUncheckedUpdateWithoutEscrowsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutMilestonesInput = {
@@ -1683,6 +1876,13 @@ export type ContestCreateWithoutMilestonesInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutMilestonesInput = {
@@ -1726,6 +1926,13 @@ export type ContestUncheckedCreateWithoutMilestonesInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutMilestonesInput = {
@@ -1785,6 +1992,13 @@ export type ContestUpdateWithoutMilestonesInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutMilestonesInput = {
@@ -1828,6 +2042,13 @@ export type ContestUncheckedUpdateWithoutMilestonesInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutShortsInput = {
@@ -1871,6 +2092,13 @@ export type ContestCreateWithoutShortsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutShortsInput = {
@@ -1914,6 +2142,13 @@ export type ContestUncheckedCreateWithoutShortsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutShortsInput = {
@@ -1973,6 +2208,13 @@ export type ContestUpdateWithoutShortsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutShortsInput = {
@@ -2016,6 +2258,13 @@ export type ContestUncheckedUpdateWithoutShortsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutActionsInput = {
@@ -2059,6 +2308,13 @@ export type ContestCreateWithoutActionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutActionsInput = {
@@ -2102,6 +2358,13 @@ export type ContestUncheckedCreateWithoutActionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutActionsInput = {
@@ -2161,6 +2424,13 @@ export type ContestUpdateWithoutActionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutActionsInput = {
@@ -2204,6 +2474,13 @@ export type ContestUncheckedUpdateWithoutActionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutDistributionsInput = {
@@ -2247,6 +2524,13 @@ export type ContestCreateWithoutDistributionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutDistributionsInput = {
@@ -2290,6 +2574,13 @@ export type ContestUncheckedCreateWithoutDistributionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutDistributionsInput = {
@@ -2349,6 +2640,13 @@ export type ContestUpdateWithoutDistributionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutDistributionsInput = {
@@ -2392,6 +2690,13 @@ export type ContestUncheckedUpdateWithoutDistributionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutParticipantsInput = {
@@ -2435,6 +2740,13 @@ export type ContestCreateWithoutParticipantsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutParticipantsInput = {
@@ -2478,6 +2790,13 @@ export type ContestUncheckedCreateWithoutParticipantsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutParticipantsInput = {
@@ -2537,6 +2856,13 @@ export type ContestUpdateWithoutParticipantsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutParticipantsInput = {
@@ -2580,6 +2906,13 @@ export type ContestUncheckedUpdateWithoutParticipantsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutSubmissionsInput = {
@@ -2623,6 +2956,13 @@ export type ContestCreateWithoutSubmissionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutSubmissionsInput = {
@@ -2666,6 +3006,13 @@ export type ContestUncheckedCreateWithoutSubmissionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutSubmissionsInput = {
@@ -2725,6 +3072,13 @@ export type ContestUpdateWithoutSubmissionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutSubmissionsInput = {
@@ -2768,6 +3122,13 @@ export type ContestUncheckedUpdateWithoutSubmissionsInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutWinnersInput = {
@@ -2811,6 +3172,13 @@ export type ContestCreateWithoutWinnersInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutWinnersInput = {
@@ -2854,6 +3222,13 @@ export type ContestUncheckedCreateWithoutWinnersInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutWinnersInput = {
@@ -2913,6 +3288,13 @@ export type ContestUpdateWithoutWinnersInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutWinnersInput = {
@@ -2956,6 +3338,13 @@ export type ContestUncheckedUpdateWithoutWinnersInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutJudgesInput = {
@@ -2999,6 +3388,13 @@ export type ContestCreateWithoutJudgesInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutJudgesInput = {
@@ -3042,6 +3438,13 @@ export type ContestUncheckedCreateWithoutJudgesInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutJudgesInput = {
@@ -3101,6 +3504,13 @@ export type ContestUpdateWithoutJudgesInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutJudgesInput = {
@@ -3144,6 +3554,13 @@ export type ContestUncheckedUpdateWithoutJudgesInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutJudgeInvitesInput = {
@@ -3187,6 +3604,13 @@ export type ContestCreateWithoutJudgeInvitesInput = {
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutJudgeInvitesInput = {
@@ -3230,6 +3654,13 @@ export type ContestUncheckedCreateWithoutJudgeInvitesInput = {
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutJudgeInvitesInput = {
@@ -3289,6 +3720,13 @@ export type ContestUpdateWithoutJudgeInvitesInput = {
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutJudgeInvitesInput = {
@@ -3332,6 +3770,13 @@ export type ContestUncheckedUpdateWithoutJudgeInvitesInput = {
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutTeamRegistrationsInput = {
@@ -3375,6 +3820,13 @@ export type ContestCreateWithoutTeamRegistrationsInput = {
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutTeamRegistrationsInput = {
@@ -3418,6 +3870,13 @@ export type ContestUncheckedCreateWithoutTeamRegistrationsInput = {
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutTeamRegistrationsInput = {
@@ -3477,6 +3936,13 @@ export type ContestUpdateWithoutTeamRegistrationsInput = {
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutTeamRegistrationsInput = {
@@ -3520,6 +3986,13 @@ export type ContestUncheckedUpdateWithoutTeamRegistrationsInput = {
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateWithoutTeamSubmissionsInput = {
@@ -3563,6 +4036,13 @@ export type ContestCreateWithoutTeamSubmissionsInput = {
   milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
   teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
 }
 
 export type ContestUncheckedCreateWithoutTeamSubmissionsInput = {
@@ -3606,6 +4086,13 @@ export type ContestUncheckedCreateWithoutTeamSubmissionsInput = {
   milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
   judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
 }
 
 export type ContestCreateOrConnectWithoutTeamSubmissionsInput = {
@@ -3665,6 +4152,13 @@ export type ContestUpdateWithoutTeamSubmissionsInput = {
   milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutTeamSubmissionsInput = {
@@ -3708,6 +4202,1525 @@ export type ContestUncheckedUpdateWithoutTeamSubmissionsInput = {
   milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutPromotingCampaignsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutPromotingCampaignsInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutPromotingCampaignsInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutPromotingCampaignsInput, Prisma.ContestUncheckedCreateWithoutPromotingCampaignsInput>
+}
+
+export type ContestUpsertWithoutPromotingCampaignsInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutPromotingCampaignsInput, Prisma.ContestUncheckedUpdateWithoutPromotingCampaignsInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutPromotingCampaignsInput, Prisma.ContestUncheckedCreateWithoutPromotingCampaignsInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutPromotingCampaignsInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutPromotingCampaignsInput, Prisma.ContestUncheckedUpdateWithoutPromotingCampaignsInput>
+}
+
+export type ContestUpdateWithoutPromotingCampaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutPromotingCampaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutSponsorshipsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutSponsorshipsInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutSponsorshipsInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutSponsorshipsInput, Prisma.ContestUncheckedCreateWithoutSponsorshipsInput>
+}
+
+export type ContestUpsertWithoutSponsorshipsInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutSponsorshipsInput, Prisma.ContestUncheckedUpdateWithoutSponsorshipsInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutSponsorshipsInput, Prisma.ContestUncheckedCreateWithoutSponsorshipsInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutSponsorshipsInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutSponsorshipsInput, Prisma.ContestUncheckedUpdateWithoutSponsorshipsInput>
+}
+
+export type ContestUpdateWithoutSponsorshipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutSponsorshipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutEngagementActionsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutEngagementActionsInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutEngagementActionsInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutEngagementActionsInput, Prisma.ContestUncheckedCreateWithoutEngagementActionsInput>
+}
+
+export type ContestUpsertWithoutEngagementActionsInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutEngagementActionsInput, Prisma.ContestUncheckedUpdateWithoutEngagementActionsInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutEngagementActionsInput, Prisma.ContestUncheckedCreateWithoutEngagementActionsInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutEngagementActionsInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutEngagementActionsInput, Prisma.ContestUncheckedUpdateWithoutEngagementActionsInput>
+}
+
+export type ContestUpdateWithoutEngagementActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutEngagementActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutPurchaseEntriesInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutPurchaseEntriesInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutPurchaseEntriesInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutPurchaseEntriesInput, Prisma.ContestUncheckedCreateWithoutPurchaseEntriesInput>
+}
+
+export type ContestUpsertWithoutPurchaseEntriesInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutPurchaseEntriesInput, Prisma.ContestUncheckedUpdateWithoutPurchaseEntriesInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutPurchaseEntriesInput, Prisma.ContestUncheckedCreateWithoutPurchaseEntriesInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutPurchaseEntriesInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutPurchaseEntriesInput, Prisma.ContestUncheckedUpdateWithoutPurchaseEntriesInput>
+}
+
+export type ContestUpdateWithoutPurchaseEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutPurchaseEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutConversionCampaignsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutConversionCampaignsInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutConversionCampaignsInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutConversionCampaignsInput, Prisma.ContestUncheckedCreateWithoutConversionCampaignsInput>
+}
+
+export type ContestUpsertWithoutConversionCampaignsInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutConversionCampaignsInput, Prisma.ContestUncheckedUpdateWithoutConversionCampaignsInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutConversionCampaignsInput, Prisma.ContestUncheckedCreateWithoutConversionCampaignsInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutConversionCampaignsInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutConversionCampaignsInput, Prisma.ContestUncheckedUpdateWithoutConversionCampaignsInput>
+}
+
+export type ContestUpdateWithoutConversionCampaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutConversionCampaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutFunnelEventsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutFunnelEventsInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  analytics?: Prisma.ContestAnalyticsUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutFunnelEventsInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutFunnelEventsInput, Prisma.ContestUncheckedCreateWithoutFunnelEventsInput>
+}
+
+export type ContestUpsertWithoutFunnelEventsInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutFunnelEventsInput, Prisma.ContestUncheckedUpdateWithoutFunnelEventsInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutFunnelEventsInput, Prisma.ContestUncheckedCreateWithoutFunnelEventsInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutFunnelEventsInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutFunnelEventsInput, Prisma.ContestUncheckedUpdateWithoutFunnelEventsInput>
+}
+
+export type ContestUpdateWithoutFunnelEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutFunnelEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
+}
+
+export type ContestCreateWithoutAnalyticsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  creator: Prisma.UserCreateNestedOneWithoutContestsCreatedInput
+  actions?: Prisma.ContestActionCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignCreateNestedManyWithoutContestInput
+}
+
+export type ContestUncheckedCreateWithoutAnalyticsInput = {
+  id?: string
+  creatorId: string
+  title: string
+  description?: string | null
+  mediaType: $Enums.ContestMediaType
+  category: string
+  coverMediaUrl?: string | null
+  prizeTotalKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr: runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: $Enums.ParticipationType
+  teamSize?: number | null
+  maxTeams?: number | null
+  entryFeeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: number | null
+  targetAges?: Prisma.ContestCreatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestCreatetargetGeosInput | string[]
+  airdropKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: number | null
+  allowDailyPrizes?: boolean
+  dailyPrizeKr?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners: number
+  judgingCriteria: $Enums.JudgingCriteria
+  sponsorName?: string | null
+  sponsorUrl?: string | null
+  deadline: Date | string
+  status?: $Enums.ContestStatus
+  totalParticipants?: number
+  totalSubmissions?: number
+  createdAt?: Date | string
+  actions?: Prisma.ContestActionUncheckedCreateNestedManyWithoutContestInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedCreateNestedManyWithoutContestInput
+  participants?: Prisma.ContestParticipantUncheckedCreateNestedManyWithoutContestInput
+  submissions?: Prisma.ContestSubmissionUncheckedCreateNestedManyWithoutContestInput
+  winners?: Prisma.ContestWinnerUncheckedCreateNestedManyWithoutContestInput
+  escrows?: Prisma.EscrowUncheckedCreateNestedManyWithoutContestInput
+  shorts?: Prisma.ShortUncheckedCreateNestedManyWithoutContestInput
+  judges?: Prisma.ContestJudgeUncheckedCreateNestedManyWithoutContestInput
+  milestones?: Prisma.MilestoneUncheckedCreateNestedManyWithoutContestInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedCreateNestedManyWithoutContestInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedCreateNestedManyWithoutContestInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedCreateNestedManyWithoutContestInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedCreateNestedManyWithoutContestInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedCreateNestedManyWithoutContestInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedCreateNestedManyWithoutContestInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedCreateNestedManyWithoutContestInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedCreateNestedManyWithoutContestInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedCreateNestedManyWithoutContestInput
+}
+
+export type ContestCreateOrConnectWithoutAnalyticsInput = {
+  where: Prisma.ContestWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContestCreateWithoutAnalyticsInput, Prisma.ContestUncheckedCreateWithoutAnalyticsInput>
+}
+
+export type ContestUpsertWithoutAnalyticsInput = {
+  update: Prisma.XOR<Prisma.ContestUpdateWithoutAnalyticsInput, Prisma.ContestUncheckedUpdateWithoutAnalyticsInput>
+  create: Prisma.XOR<Prisma.ContestCreateWithoutAnalyticsInput, Prisma.ContestUncheckedCreateWithoutAnalyticsInput>
+  where?: Prisma.ContestWhereInput
+}
+
+export type ContestUpdateToOneWithWhereWithoutAnalyticsInput = {
+  where?: Prisma.ContestWhereInput
+  data: Prisma.XOR<Prisma.ContestUpdateWithoutAnalyticsInput, Prisma.ContestUncheckedUpdateWithoutAnalyticsInput>
+}
+
+export type ContestUpdateWithoutAnalyticsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  creator?: Prisma.UserUpdateOneRequiredWithoutContestsCreatedNestedInput
+  actions?: Prisma.ContestActionUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
+}
+
+export type ContestUncheckedUpdateWithoutAnalyticsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mediaType?: Prisma.EnumContestMediaTypeFieldUpdateOperationsInput | $Enums.ContestMediaType
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  coverMediaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  prizeTotalKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  platformFeeKr?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  participationType?: Prisma.EnumParticipationTypeFieldUpdateOperationsInput | $Enums.ParticipationType
+  teamSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxTeams?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  entryFeeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  publicVoteWeight?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  targetAges?: Prisma.ContestUpdatetargetAgesInput | number[]
+  targetGeos?: Prisma.ContestUpdatetargetGeosInput | string[]
+  airdropKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  airdropLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  allowDailyPrizes?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dailyPrizeKr?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxWinners?: Prisma.IntFieldUpdateOperationsInput | number
+  judgingCriteria?: Prisma.EnumJudgingCriteriaFieldUpdateOperationsInput | $Enums.JudgingCriteria
+  sponsorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sponsorUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadline?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumContestStatusFieldUpdateOperationsInput | $Enums.ContestStatus
+  totalParticipants?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  actions?: Prisma.ContestActionUncheckedUpdateManyWithoutContestNestedInput
+  distributions?: Prisma.ContestPrizeDistributionUncheckedUpdateManyWithoutContestNestedInput
+  participants?: Prisma.ContestParticipantUncheckedUpdateManyWithoutContestNestedInput
+  submissions?: Prisma.ContestSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  winners?: Prisma.ContestWinnerUncheckedUpdateManyWithoutContestNestedInput
+  escrows?: Prisma.EscrowUncheckedUpdateManyWithoutContestNestedInput
+  shorts?: Prisma.ShortUncheckedUpdateManyWithoutContestNestedInput
+  judges?: Prisma.ContestJudgeUncheckedUpdateManyWithoutContestNestedInput
+  milestones?: Prisma.MilestoneUncheckedUpdateManyWithoutContestNestedInput
+  teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
+  teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
+  judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestCreateManyCreatorInput = {
@@ -3782,6 +5795,13 @@ export type ContestUpdateWithoutCreatorInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateWithoutCreatorInput = {
@@ -3825,6 +5845,13 @@ export type ContestUncheckedUpdateWithoutCreatorInput = {
   teamRegistrations?: Prisma.TeamContestRegistrationUncheckedUpdateManyWithoutContestNestedInput
   teamSubmissions?: Prisma.TeamSubmissionUncheckedUpdateManyWithoutContestNestedInput
   judgeInvites?: Prisma.JudgeInviteUncheckedUpdateManyWithoutContestNestedInput
+  sponsorships?: Prisma.ContestSponsorshipUncheckedUpdateManyWithoutContestNestedInput
+  engagementActions?: Prisma.ContestEngagementActionUncheckedUpdateManyWithoutContestNestedInput
+  purchaseEntries?: Prisma.ContestPurchaseEntryUncheckedUpdateManyWithoutContestNestedInput
+  conversionCampaigns?: Prisma.ConversionCampaignUncheckedUpdateManyWithoutContestNestedInput
+  funnelEvents?: Prisma.SalesFunnelEventUncheckedUpdateManyWithoutContestNestedInput
+  analytics?: Prisma.ContestAnalyticsUncheckedUpdateManyWithoutContestNestedInput
+  promotingCampaigns?: Prisma.BrandCampaignUncheckedUpdateManyWithoutContestNestedInput
 }
 
 export type ContestUncheckedUpdateManyWithoutCreatorInput = {
@@ -3876,6 +5903,13 @@ export type ContestCountOutputType = {
   teamRegistrations: number
   teamSubmissions: number
   judgeInvites: number
+  sponsorships: number
+  engagementActions: number
+  purchaseEntries: number
+  conversionCampaigns: number
+  funnelEvents: number
+  analytics: number
+  promotingCampaigns: number
 }
 
 export type ContestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3891,6 +5925,13 @@ export type ContestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   teamRegistrations?: boolean | ContestCountOutputTypeCountTeamRegistrationsArgs
   teamSubmissions?: boolean | ContestCountOutputTypeCountTeamSubmissionsArgs
   judgeInvites?: boolean | ContestCountOutputTypeCountJudgeInvitesArgs
+  sponsorships?: boolean | ContestCountOutputTypeCountSponsorshipsArgs
+  engagementActions?: boolean | ContestCountOutputTypeCountEngagementActionsArgs
+  purchaseEntries?: boolean | ContestCountOutputTypeCountPurchaseEntriesArgs
+  conversionCampaigns?: boolean | ContestCountOutputTypeCountConversionCampaignsArgs
+  funnelEvents?: boolean | ContestCountOutputTypeCountFunnelEventsArgs
+  analytics?: boolean | ContestCountOutputTypeCountAnalyticsArgs
+  promotingCampaigns?: boolean | ContestCountOutputTypeCountPromotingCampaignsArgs
 }
 
 /**
@@ -3987,6 +6028,55 @@ export type ContestCountOutputTypeCountJudgeInvitesArgs<ExtArgs extends runtime.
   where?: Prisma.JudgeInviteWhereInput
 }
 
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountSponsorshipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContestSponsorshipWhereInput
+}
+
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountEngagementActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContestEngagementActionWhereInput
+}
+
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountPurchaseEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContestPurchaseEntryWhereInput
+}
+
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountConversionCampaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConversionCampaignWhereInput
+}
+
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountFunnelEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SalesFunnelEventWhereInput
+}
+
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountAnalyticsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContestAnalyticsWhereInput
+}
+
+/**
+ * ContestCountOutputType without action
+ */
+export type ContestCountOutputTypeCountPromotingCampaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BrandCampaignWhereInput
+}
+
 
 export type ContestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -4031,6 +6121,13 @@ export type ContestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   teamRegistrations?: boolean | Prisma.Contest$teamRegistrationsArgs<ExtArgs>
   teamSubmissions?: boolean | Prisma.Contest$teamSubmissionsArgs<ExtArgs>
   judgeInvites?: boolean | Prisma.Contest$judgeInvitesArgs<ExtArgs>
+  sponsorships?: boolean | Prisma.Contest$sponsorshipsArgs<ExtArgs>
+  engagementActions?: boolean | Prisma.Contest$engagementActionsArgs<ExtArgs>
+  purchaseEntries?: boolean | Prisma.Contest$purchaseEntriesArgs<ExtArgs>
+  conversionCampaigns?: boolean | Prisma.Contest$conversionCampaignsArgs<ExtArgs>
+  funnelEvents?: boolean | Prisma.Contest$funnelEventsArgs<ExtArgs>
+  analytics?: boolean | Prisma.Contest$analyticsArgs<ExtArgs>
+  promotingCampaigns?: boolean | Prisma.Contest$promotingCampaignsArgs<ExtArgs>
   _count?: boolean | Prisma.ContestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contest"]>
 
@@ -4147,6 +6244,13 @@ export type ContestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   teamRegistrations?: boolean | Prisma.Contest$teamRegistrationsArgs<ExtArgs>
   teamSubmissions?: boolean | Prisma.Contest$teamSubmissionsArgs<ExtArgs>
   judgeInvites?: boolean | Prisma.Contest$judgeInvitesArgs<ExtArgs>
+  sponsorships?: boolean | Prisma.Contest$sponsorshipsArgs<ExtArgs>
+  engagementActions?: boolean | Prisma.Contest$engagementActionsArgs<ExtArgs>
+  purchaseEntries?: boolean | Prisma.Contest$purchaseEntriesArgs<ExtArgs>
+  conversionCampaigns?: boolean | Prisma.Contest$conversionCampaignsArgs<ExtArgs>
+  funnelEvents?: boolean | Prisma.Contest$funnelEventsArgs<ExtArgs>
+  analytics?: boolean | Prisma.Contest$analyticsArgs<ExtArgs>
+  promotingCampaigns?: boolean | Prisma.Contest$promotingCampaignsArgs<ExtArgs>
   _count?: boolean | Prisma.ContestCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4172,6 +6276,13 @@ export type $ContestPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     teamRegistrations: Prisma.$TeamContestRegistrationPayload<ExtArgs>[]
     teamSubmissions: Prisma.$TeamSubmissionPayload<ExtArgs>[]
     judgeInvites: Prisma.$JudgeInvitePayload<ExtArgs>[]
+    sponsorships: Prisma.$ContestSponsorshipPayload<ExtArgs>[]
+    engagementActions: Prisma.$ContestEngagementActionPayload<ExtArgs>[]
+    purchaseEntries: Prisma.$ContestPurchaseEntryPayload<ExtArgs>[]
+    conversionCampaigns: Prisma.$ConversionCampaignPayload<ExtArgs>[]
+    funnelEvents: Prisma.$SalesFunnelEventPayload<ExtArgs>[]
+    analytics: Prisma.$ContestAnalyticsPayload<ExtArgs>[]
+    promotingCampaigns: Prisma.$BrandCampaignPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4610,6 +6721,13 @@ export interface Prisma__ContestClient<T, Null = never, ExtArgs extends runtime.
   teamRegistrations<T extends Prisma.Contest$teamRegistrationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$teamRegistrationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamContestRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   teamSubmissions<T extends Prisma.Contest$teamSubmissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$teamSubmissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   judgeInvites<T extends Prisma.Contest$judgeInvitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$judgeInvitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JudgeInvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sponsorships<T extends Prisma.Contest$sponsorshipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$sponsorshipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContestSponsorshipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  engagementActions<T extends Prisma.Contest$engagementActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$engagementActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContestEngagementActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchaseEntries<T extends Prisma.Contest$purchaseEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$purchaseEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContestPurchaseEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  conversionCampaigns<T extends Prisma.Contest$conversionCampaignsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$conversionCampaignsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversionCampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  funnelEvents<T extends Prisma.Contest$funnelEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$funnelEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SalesFunnelEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  analytics<T extends Prisma.Contest$analyticsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$analyticsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContestAnalyticsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  promotingCampaigns<T extends Prisma.Contest$promotingCampaignsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contest$promotingCampaignsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BrandCampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5354,6 +7472,174 @@ export type Contest$judgeInvitesArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.JudgeInviteScalarFieldEnum | Prisma.JudgeInviteScalarFieldEnum[]
+}
+
+/**
+ * Contest.sponsorships
+ */
+export type Contest$sponsorshipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContestSponsorship
+   */
+  select?: Prisma.ContestSponsorshipSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContestSponsorship
+   */
+  omit?: Prisma.ContestSponsorshipOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContestSponsorshipInclude<ExtArgs> | null
+  where?: Prisma.ContestSponsorshipWhereInput
+  orderBy?: Prisma.ContestSponsorshipOrderByWithRelationInput | Prisma.ContestSponsorshipOrderByWithRelationInput[]
+  cursor?: Prisma.ContestSponsorshipWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContestSponsorshipScalarFieldEnum | Prisma.ContestSponsorshipScalarFieldEnum[]
+}
+
+/**
+ * Contest.engagementActions
+ */
+export type Contest$engagementActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContestEngagementAction
+   */
+  select?: Prisma.ContestEngagementActionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContestEngagementAction
+   */
+  omit?: Prisma.ContestEngagementActionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContestEngagementActionInclude<ExtArgs> | null
+  where?: Prisma.ContestEngagementActionWhereInput
+  orderBy?: Prisma.ContestEngagementActionOrderByWithRelationInput | Prisma.ContestEngagementActionOrderByWithRelationInput[]
+  cursor?: Prisma.ContestEngagementActionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContestEngagementActionScalarFieldEnum | Prisma.ContestEngagementActionScalarFieldEnum[]
+}
+
+/**
+ * Contest.purchaseEntries
+ */
+export type Contest$purchaseEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContestPurchaseEntry
+   */
+  select?: Prisma.ContestPurchaseEntrySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContestPurchaseEntry
+   */
+  omit?: Prisma.ContestPurchaseEntryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContestPurchaseEntryInclude<ExtArgs> | null
+  where?: Prisma.ContestPurchaseEntryWhereInput
+  orderBy?: Prisma.ContestPurchaseEntryOrderByWithRelationInput | Prisma.ContestPurchaseEntryOrderByWithRelationInput[]
+  cursor?: Prisma.ContestPurchaseEntryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContestPurchaseEntryScalarFieldEnum | Prisma.ContestPurchaseEntryScalarFieldEnum[]
+}
+
+/**
+ * Contest.conversionCampaigns
+ */
+export type Contest$conversionCampaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ConversionCampaign
+   */
+  select?: Prisma.ConversionCampaignSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ConversionCampaign
+   */
+  omit?: Prisma.ConversionCampaignOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConversionCampaignInclude<ExtArgs> | null
+  where?: Prisma.ConversionCampaignWhereInput
+  orderBy?: Prisma.ConversionCampaignOrderByWithRelationInput | Prisma.ConversionCampaignOrderByWithRelationInput[]
+  cursor?: Prisma.ConversionCampaignWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversionCampaignScalarFieldEnum | Prisma.ConversionCampaignScalarFieldEnum[]
+}
+
+/**
+ * Contest.funnelEvents
+ */
+export type Contest$funnelEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SalesFunnelEvent
+   */
+  select?: Prisma.SalesFunnelEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SalesFunnelEvent
+   */
+  omit?: Prisma.SalesFunnelEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SalesFunnelEventInclude<ExtArgs> | null
+  where?: Prisma.SalesFunnelEventWhereInput
+  orderBy?: Prisma.SalesFunnelEventOrderByWithRelationInput | Prisma.SalesFunnelEventOrderByWithRelationInput[]
+  cursor?: Prisma.SalesFunnelEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SalesFunnelEventScalarFieldEnum | Prisma.SalesFunnelEventScalarFieldEnum[]
+}
+
+/**
+ * Contest.analytics
+ */
+export type Contest$analyticsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContestAnalytics
+   */
+  select?: Prisma.ContestAnalyticsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContestAnalytics
+   */
+  omit?: Prisma.ContestAnalyticsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContestAnalyticsInclude<ExtArgs> | null
+  where?: Prisma.ContestAnalyticsWhereInput
+  orderBy?: Prisma.ContestAnalyticsOrderByWithRelationInput | Prisma.ContestAnalyticsOrderByWithRelationInput[]
+  cursor?: Prisma.ContestAnalyticsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContestAnalyticsScalarFieldEnum | Prisma.ContestAnalyticsScalarFieldEnum[]
+}
+
+/**
+ * Contest.promotingCampaigns
+ */
+export type Contest$promotingCampaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BrandCampaign
+   */
+  select?: Prisma.BrandCampaignSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BrandCampaign
+   */
+  omit?: Prisma.BrandCampaignOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BrandCampaignInclude<ExtArgs> | null
+  where?: Prisma.BrandCampaignWhereInput
+  orderBy?: Prisma.BrandCampaignOrderByWithRelationInput | Prisma.BrandCampaignOrderByWithRelationInput[]
+  cursor?: Prisma.BrandCampaignWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BrandCampaignScalarFieldEnum | Prisma.BrandCampaignScalarFieldEnum[]
 }
 
 /**

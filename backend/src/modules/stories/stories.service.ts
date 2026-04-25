@@ -1,6 +1,8 @@
 import { prisma } from '../../config/database.js';
 import { StoryPrivacy } from '../../generated/prisma/enums.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
+import { WalletService } from '../wallet/wallet.service.js';
+import { Prisma } from '../../generated/prisma/client.js';
 
 export class StoriesService {
   /**
@@ -142,6 +144,50 @@ export class StoriesService {
       create: { storyId, viewerId: userId },
       update: { viewedAt: new Date() },
     });
+  }
+
+  /**
+   * Tip a story creator.
+   */
+  static async tipStory(
+    viewerId: string,
+    storyId: string,
+    amountKr: number,
+    currency: string
+  ) {
+    const story = await prisma.story.findUnique({
+      where: { id: storyId },
+      include: { creator: { select: { id: true, displayName: true } } },
+    });
+
+    if (!story) throw new Error('Story not found');
+    if (story.creatorId === viewerId) throw new Error('Cannot tip your own story');
+
+    // Execute tip
+    const tipResult = await WalletService.sendTip(viewerId, story.creatorId, amountKr, currency);
+
+    // Update story view with tip info
+    await prisma.storyView.upsert({
+      where: {
+        storyId_viewerId: { storyId, viewerId },
+      },
+      create: {
+        storyId,
+        viewerId,
+        isTipped: true,
+        tipAmount: new Prisma.Decimal(amountKr),
+      },
+      update: {
+        isTipped: true,
+        tipAmount: { increment: new Prisma.Decimal(amountKr) },
+      },
+    });
+
+    return {
+      success: true,
+      tipResult,
+      creatorName: story.creator.displayName,
+    };
   }
 
   /**

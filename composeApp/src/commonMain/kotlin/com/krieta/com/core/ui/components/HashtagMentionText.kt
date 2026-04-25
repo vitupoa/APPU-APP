@@ -1,6 +1,8 @@
 package com.krieta.com.core.ui.components
 
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,7 +37,7 @@ fun HashtagMentionText(
         mentionColor = mentionColor
     )
 
-    ClickableText(
+    BasicText(
         text = annotatedString,
         modifier = modifier,
         maxLines = maxLines,
@@ -43,14 +45,7 @@ fun HashtagMentionText(
             fontSize = fontSize,
             color = color
         ),
-        onClick = { offset ->
-            annotatedString.getStringAnnotations("HASHTAG", offset, offset).firstOrNull()?.let {
-                onHashtagClick?.invoke(it.item)
-            }
-            annotatedString.getStringAnnotations("MENTION", offset, offset).firstOrNull()?.let {
-                onMentionClick?.invoke(it.item)
-            }
-        }
+        onTextLayout = {}
     )
 }
 

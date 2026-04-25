@@ -14,6 +14,8 @@ import org.koin.core.component.inject
 import com.krieta.com.core.network.CloudinaryUploader
 import com.krieta.feature.shorts.domain.repository.ShortsRepository
 import com.krieta.feature.feed.domain.repository.FeedRepository
+import com.krieta.feature.stories.domain.repository.StoryRepository
+import com.krieta.feature.stories.domain.model.StoryPrivacy
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.ApiConstants
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +29,7 @@ class UploadWorker(
     private val cloudinaryUploader: CloudinaryUploader by inject()
     private val shortsRepository: ShortsRepository by inject()
     private val feedRepository: FeedRepository by inject()
+    private val storyRepository: StoryRepository by inject()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val typeStr = inputData.getString("UPLOAD_TYPE") ?: return@withContext Result.failure()
@@ -64,10 +67,34 @@ class UploadWorker(
                     }
                 }
                 UploadType.CONTEST -> {
-                    // Contests are handled similarly. Wait for phase 5 if contest data gets too complex,
-                    // but we can at least support the image upload part here.
                     showCompletionNotification("Contest Draft Uploading...")
                     return@withContext Result.success()
+                }
+                UploadType.STORY -> {
+                    val mediaType = inputData.getString("MEDIA_TYPE") ?: "image"
+                    val privacy = inputData.getString("PRIVACY") ?: "PUBLIC"
+                    val expiresInHours = inputData.getInt("EXPIRES_IN_HOURS", 24)
+                    
+                    val isVideo = mediaType == "video"
+                    val folder = if (isVideo) ApiConstants.CloudinaryFolders.SHORTS_VIDEO else ApiConstants.CloudinaryFolders.SHORTS_PHOTO
+                    
+                    when (val result = cloudinaryUploader.uploadMedia(folder, filePath, isVideo = isVideo)) {
+                        is NetworkResult.Success -> {
+                            val storyPrivacy = try { StoryPrivacy.valueOf(privacy) } catch(e:Exception) { StoryPrivacy.PUBLIC }
+                            val createResult = storyRepository.createStory(
+                                mediaUrl = result.data,
+                                mediaType = mediaType,
+                                text = caption.takeIf { it.isNotBlank() },
+                                privacy = storyPrivacy,
+                                expiresInHours = expiresInHours
+                            )
+                            if (createResult is NetworkResult.Success) {
+                                showCompletionNotification("Story Posted Successfully!")
+                                return@withContext Result.success()
+                            }
+                        }
+                        else -> {}
+                    }
                 }
             }
             showCompletionNotification("Upload failed. Please try again.")

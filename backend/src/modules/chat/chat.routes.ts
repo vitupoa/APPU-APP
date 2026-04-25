@@ -15,5 +15,6 @@ router.post('/group', validateRequest(createGroupChatSchema), ChatController.cre
 
 router.get('/:chatId/messages', ChatController.getMessages);
 router.post('/:chatId/messages', validateRequest(sendMessageSchema), ChatController.sendMessage);
+router.post('/:chatId/tip', ChatController.sendTip);
 
 export default router;

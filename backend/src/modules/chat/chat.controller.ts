@@ -71,5 +71,25 @@ export class ChatController {
       next(error);
     }
   }
+
+  static async sendTip(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const senderId = req.userId!;
+      const chatId = String(req.params.chatId);
+      const { recipientId, amountKr, currency } = req.body;
+
+      const result = await ChatService.sendTipInChat(
+        senderId,
+        chatId,
+        recipientId,
+        Number(amountKr),
+        currency
+      );
+
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 

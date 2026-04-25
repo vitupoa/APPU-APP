@@ -12,6 +12,7 @@ import com.krieta.feature.profile.di.profileModule
 import com.krieta.feature.shop.di.shopModule
 import com.krieta.feature.analytics.di.analyticsModule
 import com.krieta.feature.comments.di.commentsModule
+import com.krieta.feature.marketplace.di.marketplaceModule
 import com.krieta.com.core.network.WebSocketService
 import io.ktor.client.HttpClient
 import org.koin.core.module.Module
@@ -41,4 +42,7 @@ val appModules: List<Module>
         analyticsModule,
         commentsModule,
         com.krieta.feature.chat.di.chatModule,
+        com.krieta.feature.stories.di.storiesModule,
+        com.krieta.feature.chama.di.chamaModule,
+        marketplaceModule,
     )

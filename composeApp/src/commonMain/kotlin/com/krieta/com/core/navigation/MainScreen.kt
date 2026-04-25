@@ -104,7 +104,7 @@ private fun KrietaBottomBar(onCreateClick: () -> Unit) {
             }
         }
         
-        TabItem(DripsTab)
+        TabItem(MarketplaceTab)
         TabItem(ChatsTab)
         TabItem(ProfileTab)
     }

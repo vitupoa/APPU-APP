@@ -187,6 +187,196 @@ export type ContestVote = Prisma.ContestVoteModel
  */
 export type Product = Prisma.ProductModel
 /**
+ * Model VehicleDetail
+ * 
+ */
+export type VehicleDetail = Prisma.VehicleDetailModel
+/**
+ * Model SparePartDetail
+ * 
+ */
+export type SparePartDetail = Prisma.SparePartDetailModel
+/**
+ * Model RealEstateDetail
+ * 
+ */
+export type RealEstateDetail = Prisma.RealEstateDetailModel
+/**
+ * Model FashionDetail
+ * 
+ */
+export type FashionDetail = Prisma.FashionDetailModel
+/**
+ * Model ShoeDetail
+ * 
+ */
+export type ShoeDetail = Prisma.ShoeDetailModel
+/**
+ * Model ElectronicsDetail
+ * 
+ */
+export type ElectronicsDetail = Prisma.ElectronicsDetailModel
+/**
+ * Model FoodDetail
+ * 
+ */
+export type FoodDetail = Prisma.FoodDetailModel
+/**
+ * Model BookDetail
+ * 
+ */
+export type BookDetail = Prisma.BookDetailModel
+/**
+ * Model DigitalProductDetail
+ * 
+ */
+export type DigitalProductDetail = Prisma.DigitalProductDetailModel
+/**
+ * Model ServiceDetail
+ * 
+ */
+export type ServiceDetail = Prisma.ServiceDetailModel
+/**
+ * Model ProductDiscount
+ * 
+ */
+export type ProductDiscount = Prisma.ProductDiscountModel
+/**
+ * Model FlashSale
+ * 
+ */
+export type FlashSale = Prisma.FlashSaleModel
+/**
+ * Model FlashSaleProduct
+ * 
+ */
+export type FlashSaleProduct = Prisma.FlashSaleProductModel
+/**
+ * Model GroupBuy
+ * 
+ */
+export type GroupBuy = Prisma.GroupBuyModel
+/**
+ * Model GroupBuyParticipant
+ * 
+ */
+export type GroupBuyParticipant = Prisma.GroupBuyParticipantModel
+/**
+ * Model CartItem
+ * 
+ */
+export type CartItem = Prisma.CartItemModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model Wishlist
+ * 
+ */
+export type Wishlist = Prisma.WishlistModel
+/**
+ * Model WishlistItem
+ * 
+ */
+export type WishlistItem = Prisma.WishlistItemModel
+/**
+ * Model Gift
+ * 
+ */
+export type Gift = Prisma.GiftModel
+/**
+ * Model ProductReview
+ * 
+ */
+export type ProductReview = Prisma.ProductReviewModel
+/**
+ * Model GarageProfile
+ * 
+ */
+export type GarageProfile = Prisma.GarageProfileModel
+/**
+ * Model GarageBooking
+ * 
+ */
+export type GarageBooking = Prisma.GarageBookingModel
+/**
+ * Model GarageReview
+ * 
+ */
+export type GarageReview = Prisma.GarageReviewModel
+/**
+ * Model ImporterProfile
+ * 
+ */
+export type ImporterProfile = Prisma.ImporterProfileModel
+/**
+ * Model ImportRequest
+ * 
+ */
+export type ImportRequest = Prisma.ImportRequestModel
+/**
+ * Model ImportQuote
+ * 
+ */
+export type ImportQuote = Prisma.ImportQuoteModel
+/**
+ * Model VehicleFavorite
+ * 
+ */
+export type VehicleFavorite = Prisma.VehicleFavoriteModel
+/**
+ * Model LogisticsCompany
+ * 
+ */
+export type LogisticsCompany = Prisma.LogisticsCompanyModel
+/**
+ * Model ShippingJob
+ * 
+ */
+export type ShippingJob = Prisma.ShippingJobModel
+/**
+ * Model LiveSession
+ * 
+ */
+export type LiveSession = Prisma.LiveSessionModel
+/**
+ * Model LiveSessionProduct
+ * 
+ */
+export type LiveSessionProduct = Prisma.LiveSessionProductModel
+/**
+ * Model PremiumListing
+ * 
+ */
+export type PremiumListing = Prisma.PremiumListingModel
+/**
+ * Model ProductShare
+ * 
+ */
+export type ProductShare = Prisma.ProductShareModel
+/**
+ * Model ProductTag
+ * 
+ */
+export type ProductTag = Prisma.ProductTagModel
+/**
+ * Model DealAlert
+ * 
+ */
+export type DealAlert = Prisma.DealAlertModel
+/**
+ * Model ProductAnalytic
+ * 
+ */
+export type ProductAnalytic = Prisma.ProductAnalyticModel
+/**
  * Model DailyStat
  * 
  */
@@ -291,3 +481,163 @@ export type StoryView = Prisma.StoryViewModel
  * 
  */
 export type StoryViewerPreference = Prisma.StoryViewerPreferenceModel
+/**
+ * Model Chama
+ * 
+ */
+export type Chama = Prisma.ChamaModel
+/**
+ * Model ChamaWallet
+ * 
+ */
+export type ChamaWallet = Prisma.ChamaWalletModel
+/**
+ * Model ChamaMember
+ * 
+ */
+export type ChamaMember = Prisma.ChamaMemberModel
+/**
+ * Model ChamaContribution
+ * 
+ */
+export type ChamaContribution = Prisma.ChamaContributionModel
+/**
+ * Model ChamaCycle
+ * 
+ */
+export type ChamaCycle = Prisma.ChamaCycleModel
+/**
+ * Model ChamaPayout
+ * 
+ */
+export type ChamaPayout = Prisma.ChamaPayoutModel
+/**
+ * Model ChamaPayoutApproval
+ * 
+ */
+export type ChamaPayoutApproval = Prisma.ChamaPayoutApprovalModel
+/**
+ * Model ChamaTransaction
+ * 
+ */
+export type ChamaTransaction = Prisma.ChamaTransactionModel
+/**
+ * Model ChamaDefaulter
+ * 
+ */
+export type ChamaDefaulter = Prisma.ChamaDefaulterModel
+/**
+ * Model ChamaElection
+ * 
+ */
+export type ChamaElection = Prisma.ChamaElectionModel
+/**
+ * Model ChamaNomination
+ * 
+ */
+export type ChamaNomination = Prisma.ChamaNominationModel
+/**
+ * Model ChamaSecondment
+ * 
+ */
+export type ChamaSecondment = Prisma.ChamaSecondmentModel
+/**
+ * Model ChamaVote
+ * 
+ */
+export type ChamaVote = Prisma.ChamaVoteModel
+/**
+ * Model Budget
+ * 
+ */
+export type Budget = Prisma.BudgetModel
+/**
+ * Model BudgetCategory
+ * 
+ */
+export type BudgetCategory = Prisma.BudgetCategoryModel
+/**
+ * Model Expense
+ * 
+ */
+export type Expense = Prisma.ExpenseModel
+/**
+ * Model InfluencerProfile
+ * 
+ */
+export type InfluencerProfile = Prisma.InfluencerProfileModel
+/**
+ * Model InfluencerPortfolio
+ * 
+ */
+export type InfluencerPortfolio = Prisma.InfluencerPortfolioModel
+/**
+ * Model BrandCampaign
+ * 
+ */
+export type BrandCampaign = Prisma.BrandCampaignModel
+/**
+ * Model CampaignApplication
+ * 
+ */
+export type CampaignApplication = Prisma.CampaignApplicationModel
+/**
+ * Model CampaignDeliverable
+ * 
+ */
+export type CampaignDeliverable = Prisma.CampaignDeliverableModel
+/**
+ * Model InfluencerReview
+ * 
+ */
+export type InfluencerReview = Prisma.InfluencerReviewModel
+/**
+ * Model ContestSponsorship
+ * 
+ */
+export type ContestSponsorship = Prisma.ContestSponsorshipModel
+/**
+ * Model ContestEngagementAction
+ * 
+ */
+export type ContestEngagementAction = Prisma.ContestEngagementActionModel
+/**
+ * Model ContestPurchaseEntry
+ * 
+ */
+export type ContestPurchaseEntry = Prisma.ContestPurchaseEntryModel
+/**
+ * Model ConversionCampaign
+ * 
+ */
+export type ConversionCampaign = Prisma.ConversionCampaignModel
+/**
+ * Model ConversionCampaignRecipient
+ * 
+ */
+export type ConversionCampaignRecipient = Prisma.ConversionCampaignRecipientModel
+/**
+ * Model SalesFunnelEvent
+ * 
+ */
+export type SalesFunnelEvent = Prisma.SalesFunnelEventModel
+/**
+ * Model GamificationPoints
+ * 
+ */
+export type GamificationPoints = Prisma.GamificationPointsModel
+/**
+ * Model GamificationActivity
+ * 
+ */
+export type GamificationActivity = Prisma.GamificationActivityModel
+/**
+ * Model CampaignAnalytics
+ * 
+ */
+export type CampaignAnalytics = Prisma.CampaignAnalyticsModel
+/**
+ * Model ContestAnalytics
+ * 
+ */
+export type ContestAnalytics = Prisma.ContestAnalyticsModel

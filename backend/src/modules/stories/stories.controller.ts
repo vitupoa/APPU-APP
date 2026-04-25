@@ -66,4 +66,16 @@ export class StoriesController {
       next(error);
     }
   }
+
+  static async tipStory(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId!;
+      const storyId = String(req.params.storyId);
+      const { amountKr, currency } = req.body;
+      const result = await StoriesService.tipStory(userId, storyId, Number(amountKr), currency);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -27,6 +27,9 @@ export const CLOUDINARY_FOLDERS = {
   CHAT_IMAGES: 'Krieta/chat/Images',
   CHAT_VIDEOS: 'Krieta/chat/Videos',
   CHAT_AUDIO: 'Krieta/chat/Audio',
+  // Stories (ephemeral)
+  STORIES_IMAGES: 'Krieta/stories/Images',
+  STORIES_VIDEOS: 'Krieta/stories/Videos',
 } as const;
 
 export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINARY_FOLDERS];
@@ -48,18 +51,27 @@ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINA
  * 
  * @param folder - The Cloudinary folder path (signed and sent to Cloudinary)
  * @param resourceType - The type of resource being uploaded ('image', 'video', or 'raw')
+ * @param expiresInHours - Optional TTL for ephemeral content (stories)
  */
 export function generateUploadSignature(
   folder: CloudinaryFolder,
-  resourceType: 'image' | 'video' | 'raw' = 'image'
+  resourceType: 'image' | 'video' | 'raw' = 'image',
+  expiresInHours?: number
 ) {
   const timestamp = Math.round(Date.now() / 1000);
 
   // Sign timestamp + folder. Do NOT include upload_preset.
-  const paramsToSign = { 
+  const paramsToSign: any = { 
     timestamp,
     folder,
   };
+  
+  // Add moderation and tags for ephemeral content
+  if (expiresInHours) {
+    const expiresAt = new Date(Date.now() + expiresInHours * 60 * 60 * 1000);
+    paramsToSign.tags = 'ephemeral,story';
+    paramsToSign.context = `expires_at=${expiresAt.toISOString()}`;
+  }
   
   const signature = cloudinary.utils.api_sign_request(
     paramsToSign,
@@ -73,6 +85,10 @@ export function generateUploadSignature(
     resourceType,
     apiKey: env.CLOUDINARY_API_KEY,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
+    ...(expiresInHours && { 
+      tags: paramsToSign.tags,
+      context: paramsToSign.context 
+    }),
   };
 }
 
@@ -85,6 +101,81 @@ export function validateUploadFolder(
   expectedFolder: CloudinaryFolder
 ): boolean {
   return publicId.startsWith(expectedFolder);
+}
+
+/**
+ * Upload a file directly to Cloudinary with optional TTL for ephemeral content.
+ * Used for server-side uploads (e.g., stories).
+ */
+export async function uploadToCloudinary(
+  fileBuffer: Buffer | string,
+  folder: CloudinaryFolder,
+  resourceType: 'image' | 'video' | 'raw' = 'image',
+  expiresInHours?: number
+) {
+  const uploadOptions: any = {
+    folder,
+    resource_type: resourceType,
+    quality: 'auto',
+    fetch_format: 'auto',
+  };
+
+  // Add tags and context for ephemeral content
+  if (expiresInHours) {
+    const expiresAt = new Date(Date.now() + expiresInHours * 60 * 60 * 1000);
+    uploadOptions.tags = ['ephemeral', 'story'];
+    uploadOptions.context = `expires_at=${expiresAt.toISOString()}`;
+  }
+
+  return cloudinary.uploader.upload(fileBuffer, uploadOptions);
+}
+
+/**
+ * Delete expired ephemeral content from Cloudinary.
+ * Called by cron worker.
+ */
+export async function deleteExpiredMedia() {
+  try {
+    const now = new Date().toISOString();
+    
+    // Search for resources with ephemeral tag and expired context
+    const result = await cloudinary.search
+      .expression('tags=ephemeral')
+      .with_field('context')
+      .max_results(500)
+      .execute();
+
+    const expiredResources = result.resources.filter((resource: any) => {
+      if (!resource.context?.custom?.expires_at) return false;
+      return new Date(resource.context.custom.expires_at) < new Date();
+    });
+
+    if (expiredResources.length === 0) {
+      return { deleted: 0, message: 'No expired resources found' };
+    }
+
+    // Delete expired resources
+    const publicIds = expiredResources.map((r: any) => r.public_id);
+    await cloudinary.api.delete_resources(publicIds, {
+      resource_type: 'image',
+      invalidate: true,
+    });
+
+    // Also delete videos
+    await cloudinary.api.delete_resources(publicIds, {
+      resource_type: 'video',
+      invalidate: true,
+    });
+
+    return { 
+      deleted: expiredResources.length, 
+      publicIds,
+      message: `Deleted ${expiredResources.length} expired resources` 
+    };
+  } catch (error: any) {
+    console.error('Error deleting expired media:', error.message);
+    throw error;
+  }
 }
 
 export { cloudinary };

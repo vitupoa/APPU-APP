@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.feature.chat.domain.model.Chat
@@ -26,13 +26,19 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+import com.krieta.feature.stories.presentation.viewmodel.StoriesViewModel
+import com.krieta.feature.stories.presentation.components.StoriesRow
+import com.krieta.feature.stories.presentation.screen.StoryViewerScreen
+
 class ChatListScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<ChatListViewModel>()
+        val viewModel = koinScreenModel<ChatListViewModel>()
+        val storiesViewModel = koinScreenModel<StoriesViewModel>()
         val state by viewModel.state.collectAsState()
+        val storiesState by storiesViewModel.state.collectAsState()
 
         Scaffold(
             topBar = {
@@ -41,22 +47,45 @@ class ChatListScreen : Screen {
                 )
             }
         ) { padding ->
-            if (state.isLoading && state.chats.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+            Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+                // Stories Row
+                if (!storiesState.isLoading || storiesState.storyGroups.isNotEmpty()) {
+                    StoriesRow(
+                        storyGroups = storiesState.storyGroups,
+                        onStoryGroupClick = { group ->
+                            val index = storiesState.storyGroups.indexOf(group)
+                            navigator.push(StoryViewerScreen(
+                                initialGroupIndex = index,
+                                storyGroups = storiesState.storyGroups,
+                                onStoryViewed = { storyId ->
+                                    storiesViewModel.markStoryAsViewed(storyId)
+                                }
+                            ))
+                        },
+                        onAddStoryClick = {
+                            navigator.push(com.krieta.feature.stories.presentation.screen.CreateStoryScreen())
+                        }
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
                 }
-            } else if (state.chats.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No chats yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(padding),
-                    contentPadding = PaddingValues(vertical = 8.dp)
-                ) {
-                    items(state.chats, key = { it.id }) { chat ->
-                        ChatItem(chat = chat) {
-                            navigator.push(ChatRoomScreen(chat.id, chat.name ?: "Chat"))
+
+                if (state.isLoading && state.chats.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else if (state.chats.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No chats yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 8.dp)
+                    ) {
+                        items(state.chats, key = { it.id }) { chat ->
+                            ChatItem(chat = chat) {
+                                navigator.push(ChatRoomScreen(chat.id, chat.name ?: chat.participants.firstOrNull()?.user?.displayName ?: "Chat"))
+                            }
                         }
                     }
                 }

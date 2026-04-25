@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { io } from '../../shared/gateway/socket.js';
+import { WalletService } from '../wallet/wallet.service.js';
 
 export class ChatService {
   /**
@@ -175,5 +176,75 @@ export class ChatService {
       skip,
       take: limit,
     });
+  }
+
+  /**
+   * Send a tip in a chat (direct or group).
+   */
+  static async sendTipInChat(
+    senderId: string,
+    chatId: string,
+    recipientId: string,
+    amountKr: number,
+    currency: string
+  ) {
+    // Verify sender is participant
+    const isParticipant = await prisma.chatParticipant.findUnique({
+      where: { chatId_userId: { chatId, userId: senderId } },
+    });
+    if (!isParticipant) {
+      throw new Error('Not authorized to send tips in this chat');
+    }
+
+    // Verify recipient is participant
+    const recipientParticipant = await prisma.chatParticipant.findUnique({
+      where: { chatId_userId: { chatId, userId: recipientId } },
+    });
+    if (!recipientParticipant) {
+      throw new Error('Recipient is not in this chat');
+    }
+
+    // Execute tip via WalletService
+    const tipResult = await WalletService.sendTip(senderId, recipientId, amountKr, currency);
+
+    // Send system message about the tip
+    const sender = await prisma.user.findUnique({
+      where: { id: senderId },
+      select: { displayName: true },
+    });
+    const recipient = await prisma.user.findUnique({
+      where: { id: recipientId },
+      select: { displayName: true },
+    });
+
+    const message = await prisma.message.create({
+      data: {
+        chatId,
+        senderId,
+        payload: `💸 ${sender?.displayName} tipped ${recipient?.displayName} ${amountKr} Kr!`,
+        isSystemEvent: true,
+        status: 'sent',
+      },
+      include: {
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+      },
+    });
+
+    // Broadcast to chat participants
+    const participants = await prisma.chatParticipant.findMany({
+      where: { chatId },
+      select: { userId: true },
+    });
+
+    participants.forEach(p => {
+      io.to(`user:${p.userId}`).emit('chat:tip_sent', {
+        message,
+        tipAmount: amountKr,
+        senderId,
+        recipientId,
+      });
+    });
+
+    return { success: true, tipResult, message };
   }
 }

@@ -1,0 +1,290 @@
+
+// ─── GARAGE SERVICES ────────────────────────────────────
+
+model GarageProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  businessName    String   @map("business_name")
+  description     String?  @db.Text
+  serviceTypes    String[] @map("service_types")
+  certifications  String[]
+  location        String?
+  latitude        Decimal? @db.Decimal(10, 7)
+  longitude       Decimal? @db.Decimal(10, 7)
+  serviceArea     String?  @map("service_area")
+  offersOnSite    Boolean  @default(false) @map("offers_on_site")
+  avgRating       Decimal  @default(0) @map("avg_rating") @db.Decimal(3, 2)
+  reviewCount     Int      @default(0) @map("review_count")
+  isVerified      Boolean  @default(false) @map("is_verified")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings GarageBooking[]
+  reviews  GarageReview[]
+
+  @@map("garage_profiles")
+}
+
+model GarageBooking {
+  id            String        @id @default(uuid())
+  garageId      String        @map("garage_id")
+  userId        String        @map("user_id")
+  serviceType   String        @map("service_type")
+  scheduledDate DateTime      @map("scheduled_date")
+  notes         String?
+  status        BookingStatus @default(PENDING)
+  priceKr       Decimal?      @map("price_kr") @db.Decimal(18, 4)
+  isOnSite      Boolean       @default(false) @map("is_on_site")
+  location      String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  garage GarageProfile @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  user   User          @relation("GarageBooker", fields: [userId], references: [id])
+
+  @@index([garageId, status])
+  @@map("garage_bookings")
+}
+
+model GarageReview {
+  id        String   @id @default(uuid())
+  garageId  String   @map("garage_id")
+  userId    String   @map("user_id")
+  rating    Int
+  text      String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  garage GarageProfile @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  user   User          @relation("GarageReviewer", fields: [userId], references: [id])
+
+  @@unique([garageId, userId])
+  @@map("garage_reviews")
+}
+
+// ─── CAR IMPORTERS & LOGISTICS ──────────────────────────
+
+model ImporterProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique @map("user_id")
+  businessName      String   @map("business_name")
+  description       String?  @db.Text
+  countriesServed   String[] @map("countries_served")
+  specialization    String?
+  yearsExperience   Int?     @map("years_experience")
+  totalImports      Int      @default(0) @map("total_imports")
+  isVerified        Boolean  @default(false) @map("is_verified")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quotes  ImportQuote[]
+
+  @@map("importer_profiles")
+}
+
+model ImportRequest {
+  id              String              @id @default(uuid())
+  userId          String              @map("user_id")
+  make            String
+  model           String
+  yearFrom        Int?                @map("year_from")
+  yearTo          Int?                @map("year_to")
+  countryOfOrigin String?             @map("country_of_origin")
+  budget          Decimal?            @db.Decimal(18, 4)
+  requirements    String?             @db.Text
+  status          ImportRequestStatus @default(PENDING)
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  user   User          @relation("ImportRequester", fields: [userId], references: [id])
+  quotes ImportQuote[]
+
+  @@index([userId, status])
+  @@map("import_requests")
+}
+
+model ImportQuote {
+  id              String   @id @default(uuid())
+  requestId       String   @map("request_id")
+  importerId      String   @map("importer_id")
+  quoteAmountKr   Decimal  @map("quote_amount_kr") @db.Decimal(18, 4)
+  estimatedDays   Int?     @map("estimated_days")
+  notes           String?  @db.Text
+  status          String   @default("pending") // pending, accepted, rejected
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  request  ImportRequest   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  importer ImporterProfile @relation(fields: [importerId], references: [id])
+  provider User            @relation("QuoteProvider", fields: [importerId], references: [id])
+
+  @@unique([requestId, importerId])
+  @@map("import_quotes")
+}
+
+model LogisticsCompany {
+  id            String   @id @default(uuid())
+  userId        String   @unique @map("user_id")
+  companyName   String   @map("company_name")
+  description   String?  @db.Text
+  serviceTypes  String[] @map("service_types") // shipping, towing, delivery
+  coverageAreas String[] @map("coverage_areas")
+  vehicleTypes  String[] @map("vehicle_types")
+  isVerified    Boolean  @default(false) @map("is_verified")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs ShippingJob[]
+
+  @@map("logistics_companies")
+}
+
+model ShippingJob {
+  id              String   @id @default(uuid())
+  requesterId     String   @map("requester_id")
+  logisticsId     String?  @map("logistics_id")
+  pickupLocation  String   @map("pickup_location")
+  deliveryLocation String  @map("delivery_location")
+  jobType         String   @map("job_type") // shipping, towing, delivery
+  vehicleDesc     String?  @map("vehicle_desc")
+  priceKr         Decimal? @map("price_kr") @db.Decimal(18, 4)
+  status          String   @default("open") // open, quoted, in_progress, completed, cancelled
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  requester User              @relation("ShippingRequester", fields: [requesterId], references: [id])
+  logistics LogisticsCompany? @relation(fields: [logisticsId], references: [id])
+
+  @@index([status])
+  @@map("shipping_jobs")
+}
+
+// ─── LIVE SHOPPING ──────────────────────────────────────
+
+model LiveSession {
+  id              String            @id @default(uuid())
+  hostId          String            @map("host_id")
+  title           String
+  description     String?
+  scheduledStart  DateTime          @map("scheduled_start")
+  actualStart     DateTime?         @map("actual_start")
+  endedAt         DateTime?         @map("ended_at")
+  status          LiveSessionStatus @default(SCHEDULED)
+  viewerCount     Int               @default(0) @map("viewer_count")
+  peakViewers     Int               @default(0) @map("peak_viewers")
+  totalSales      Int               @default(0) @map("total_sales")
+  totalRevenueKr  Decimal           @default(0) @map("total_revenue_kr") @db.Decimal(18, 4)
+  streamUrl       String?           @map("stream_url")
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  host     User                 @relation("LiveHost", fields: [hostId], references: [id])
+  products LiveSessionProduct[]
+
+  @@index([status, scheduledStart])
+  @@map("live_sessions")
+}
+
+model LiveSessionProduct {
+  id            String   @id @default(uuid())
+  sessionId     String   @map("session_id")
+  productId     String   @map("product_id")
+  salePrice     Decimal? @map("sale_price") @db.Decimal(18, 4)
+  unitsSold     Int      @default(0) @map("units_sold")
+  featuredAt    DateTime? @map("featured_at")
+  sortOrder     Int      @default(0) @map("sort_order")
+
+  session LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  product Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, productId])
+  @@map("live_session_products")
+}
+
+// ─── PREMIUM LISTINGS ───────────────────────────────────
+
+model PremiumListing {
+  id          String      @id @default(uuid())
+  productId   String      @map("product_id")
+  sellerId    String      @map("seller_id")
+  type        PremiumType
+  dailyRateKr Decimal     @map("daily_rate_kr") @db.Decimal(10, 2)
+  totalPaidKr Decimal     @map("total_paid_kr") @db.Decimal(18, 4)
+  startDate   DateTime    @map("start_date")
+  endDate     DateTime    @map("end_date")
+  isActive    Boolean     @default(true) @map("is_active")
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([isActive, endDate])
+  @@map("premium_listings")
+}
+
+// ─── SOCIAL SHOPPING ────────────────────────────────────
+
+model ProductShare {
+  id          String   @id @default(uuid())
+  productId   String   @map("product_id")
+  userId      String   @map("user_id")
+  contentId   String?  @map("content_id") // post/drip ID
+  contentType String?  @map("content_type") // POST, SHORT, STORY
+  caption     String?
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("product_shares")
+}
+
+model ProductTag {
+  id          String   @id @default(uuid())
+  productId   String   @map("product_id")
+  contentId   String   @map("content_id") // short/sip ID
+  contentType String   @map("content_type")
+  positionX   Decimal? @map("position_x") @db.Decimal(5, 2)
+  positionY   Decimal? @map("position_y") @db.Decimal(5, 2)
+  timestamp   Int?     // seconds into video
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([contentId, contentType])
+  @@map("product_tags")
+}
+
+// ─── DEAL ALERTS & ANALYTICS ────────────────────────────
+
+model DealAlert {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  productId   String?  @map("product_id")
+  category    ProductCategory?
+  maxPriceKr  Decimal? @map("max_price_kr") @db.Decimal(18, 4)
+  keywords    String[]
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+  @@map("deal_alerts")
+}
+
+model ProductAnalytic {
+  id              String   @id @default(uuid())
+  productId       String   @map("product_id")
+  date            DateTime @db.Date
+  views           Int      @default(0)
+  clicks          Int      @default(0)
+  addToCart       Int      @default(0) @map("add_to_cart")
+  purchases       Int      @default(0)
+  revenue         Decimal  @default(0) @db.Decimal(18, 4)
+  conversionRate  Decimal  @default(0) @map("conversion_rate") @db.Decimal(5, 4)
+  avgTimeOnPage   Int      @default(0) @map("avg_time_on_page")
+  bounceRate      Decimal  @default(0) @map("bounce_rate") @db.Decimal(5, 4)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, date])
+  @@map("product_analytics")
+}

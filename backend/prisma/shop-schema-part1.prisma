@@ -1,0 +1,382 @@
+// ─── SHOP (MULTI-CATEGORY MARKETPLACE) ────────────────────
+
+enum ProductCategory {
+  VEHICLES
+  SPARE_PARTS
+  REAL_ESTATE
+  FASHION
+  SHOES
+  ELECTRONICS
+  FOOD_FMCG
+  BOOKS
+  DIGITAL_PRODUCTS
+  SERVICES
+  OTHER
+}
+
+enum ProductCondition {
+  NEW
+  USED
+  REFURBISHED
+  FOR_PARTS
+}
+
+enum ContactMethod {
+  WHATSAPP
+  WEBSITE
+  PHONE
+  IN_APP_CHAT
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+  HYBRID
+  LPG
+}
+
+enum TransmissionType {
+  MANUAL
+  AUTOMATIC
+  CVT
+  DCT
+}
+
+enum VehicleBodyType {
+  SEDAN
+  COUPE
+  HATCHBACK
+  SUV
+  PICKUP
+  VAN
+  CONVERTIBLE
+  WAGON
+  MINIVAN
+  BUS
+  TRUCK
+  TRAILER
+  MOTORCYCLE
+}
+
+enum FlashSaleType {
+  FLASH
+  LIGHTNING
+  DAILY_FEATURED
+  CLEARANCE
+}
+
+enum FlashSaleStatus {
+  SCHEDULED
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ImportRequestStatus {
+  PENDING
+  QUOTED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum GroupBuyStatus {
+  OPEN
+  THRESHOLD_MET
+  CLOSED
+  CANCELLED
+}
+
+enum LiveSessionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED
+}
+
+enum PremiumType {
+  FEATURED
+  PROMOTED
+  TOP_SPOT
+}
+
+model Product {
+  id              String           @id @default(uuid())
+  sellerId        String           @map("seller_id")
+  title           String
+  description     String?          @db.Text
+  imageUrls       String[]         @map("image_urls")
+  priceKr         Decimal          @map("price_kr") @db.Decimal(18, 4)
+  currency        String?          @db.VarChar(3)
+  localPrice      Decimal?         @map("local_price") @db.Decimal(18, 4)
+  wholesalePrice  Decimal?         @map("wholesale_price") @db.Decimal(18, 4)
+  wholesaleMinQty Int?             @map("wholesale_min_qty")
+  bargainEnabled  Boolean          @default(false) @map("bargain_enabled")
+  bargainMinPrice Decimal?         @map("bargain_min_price") @db.Decimal(18, 4)
+  category        ProductCategory  @default(OTHER)
+  subcategory     String?
+  condition       ProductCondition @default(NEW)
+  brand           String?
+  tags            String[]
+  whatsappNumber  String?          @map("whatsapp_number")
+  purchaseUrl     String?          @map("purchase_url")
+  contactMethod   ContactMethod    @default(WHATSAPP)
+  location        String?
+  latitude        Decimal?         @db.Decimal(10, 7)
+  longitude       Decimal?         @db.Decimal(10, 7)
+  stock           Int              @default(1)
+  viewCount       Int              @default(0) @map("view_count")
+  salesCount      Int              @default(0) @map("sales_count")
+  avgRating       Decimal          @default(0) @map("avg_rating") @db.Decimal(3, 2)
+  reviewCount     Int              @default(0) @map("review_count")
+  isFeatured      Boolean          @default(false) @map("is_featured")
+  featuredUntil   DateTime?        @map("featured_until")
+  isPromoted      Boolean          @default(false) @map("is_promoted")
+  promotedUntil   DateTime?        @map("promoted_until")
+  isTopSpot       Boolean          @default(false) @map("is_top_spot")
+  topSpotUntil    DateTime?        @map("top_spot_until")
+  status          String           @default("active")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  seller              User                  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  linkedShorts        Short[]
+  vehicleDetail       VehicleDetail?
+  sparePartDetail     SparePartDetail?
+  realEstateDetail    RealEstateDetail?
+  fashionDetail       FashionDetail?
+  shoeDetail          ShoeDetail?
+  electronicsDetail   ElectronicsDetail?
+  foodDetail          FoodDetail?
+  bookDetail          BookDetail?
+  digitalProductDetail DigitalProductDetail?
+  serviceDetail       ServiceDetail?
+  discounts           ProductDiscount[]
+  flashSaleProducts   FlashSaleProduct[]
+  reviews             ProductReview[]
+  wishlistItems       WishlistItem[]
+  cartItems           CartItem[]
+  orderItems          OrderItem[]
+  productShares       ProductShare[]
+  productTags         ProductTag[]
+  groupBuys           GroupBuy[]
+  dealAlerts          DealAlert[]
+  liveSessionProducts LiveSessionProduct[]
+  premiumListings     PremiumListing[]
+  analytics           ProductAnalytic[]
+
+  @@index([status, createdAt])
+  @@index([category, status])
+  @@index([sellerId, status])
+  @@map("products")
+}
+
+// ─── CATEGORY DETAIL TABLES ──────────────────────────────
+
+model VehicleDetail {
+  id                String          @id @default(uuid())
+  productId         String          @unique @map("product_id")
+  vehicleType       String          @map("vehicle_type") // car, motorcycle, truck, bus
+  make              String
+  model             String
+  year              Int
+  mileage           Int?
+  fuelType          FuelType?       @map("fuel_type")
+  transmission      TransmissionType?
+  bodyType          VehicleBodyType? @map("body_type")
+  engineSize        String?         @map("engine_size")
+  color             String?
+  vin               String?
+  numberOfOwners    Int?            @map("number_of_owners")
+  logbookReady      Boolean         @default(false) @map("logbook_ready")
+  importStatus      String?         @map("import_status") // local, imported
+  importCertUrl     String?         @map("import_cert_url")
+  auctionSheetUrl   String?         @map("auction_sheet_url")
+  accidentHistory   Boolean         @default(false) @map("accident_history")
+  tradeInEnabled    Boolean         @default(false) @map("trade_in_enabled")
+  swapEnabled       Boolean         @default(false) @map("swap_enabled")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([make, model])
+  @@index([bodyType])
+  @@index([year])
+  @@map("vehicle_details")
+}
+
+model SparePartDetail {
+  id                 String   @id @default(uuid())
+  productId          String   @unique @map("product_id")
+  compatibleMakes    String[] @map("compatible_makes")
+  compatibleModels   String[] @map("compatible_models")
+  compatibleYearFrom Int?     @map("compatible_year_from")
+  compatibleYearTo   Int?     @map("compatible_year_to")
+  partType           String   @map("part_type")
+  partNumber         String?  @map("part_number")
+  oemNumber          String?  @map("oem_number")
+  isGenuine          Boolean  @default(false) @map("is_genuine")
+  fitsLeft           Boolean  @default(false) @map("fits_left")
+  fitsRight          Boolean  @default(false) @map("fits_right")
+  fitsFront          Boolean  @default(false) @map("fits_front")
+  fitsRear           Boolean  @default(false) @map("fits_rear")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([partType])
+  @@index([compatibleMakes])
+  @@map("spare_part_details")
+}
+
+model RealEstateDetail {
+  id             String  @id @default(uuid())
+  productId      String  @unique @map("product_id")
+  propertyType   String  @map("property_type") // apartment, house, land, commercial, office
+  listingType    String  @map("listing_type") // rent, sale
+  landSize       String? @map("land_size")
+  bedrooms       Int?
+  bathrooms      Int?
+  floors         Int?
+  yearBuilt      Int?    @map("year_built")
+  amenities      String[]
+  legalDocuments String[] @map("legal_documents")
+  furnished      Boolean @default(false)
+  parking        Boolean @default(false)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([propertyType, listingType])
+  @@map("real_estate_details")
+}
+
+model FashionDetail {
+  id               String  @id @default(uuid())
+  productId        String  @unique @map("product_id")
+  size             String?
+  material         String?
+  colorVariants    String[] @map("color_variants")
+  fitType          String?  @map("fit_type") // slim, regular, loose, oversized
+  pattern          String?
+  season           String?
+  gender           String? // men, women, unisex, kids
+  careInstructions String?  @map("care_instructions")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("fashion_details")
+}
+
+model ShoeDetail {
+  id              String  @id @default(uuid())
+  productId       String  @unique @map("product_id")
+  shoeSize        String  @map("shoe_size")
+  soleMaterial    String? @map("sole_material")
+  heelHeight      String? @map("heel_height")
+  closureType     String? @map("closure_type") // lace, velcro, slip-on, buckle, zipper
+  waterResistant  Boolean @default(false) @map("water_resistant")
+  gender          String?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("shoe_details")
+}
+
+model ElectronicsDetail {
+  id            String  @id @default(uuid())
+  productId     String  @unique @map("product_id")
+  processor     String?
+  ram           String?
+  storage       String?
+  screenSize    String? @map("screen_size")
+  batteryLife   String? @map("battery_life")
+  os            String?
+  connectivity  String[] // wifi, bluetooth, 5g, nfc
+  serialNumber  String?  @map("serial_number")
+  warrantyMonths Int?    @map("warranty_months")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("electronics_details")
+}
+
+model FoodDetail {
+  id              String   @id @default(uuid())
+  productId       String   @unique @map("product_id")
+  ingredients     String[]
+  nutritionalInfo Json?    @map("nutritional_info")
+  expiryDate      DateTime? @map("expiry_date")
+  allergens       String[]
+  certifications  String[]
+  isOrganic       Boolean  @default(false) @map("is_organic")
+  weightVolume    String?  @map("weight_volume")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("food_details")
+}
+
+model BookDetail {
+  id            String  @id @default(uuid())
+  productId     String  @unique @map("product_id")
+  author        String
+  isbn          String?
+  publisher     String?
+  edition       String?
+  language      String?
+  pageCount     Int?    @map("page_count")
+  genre         String?
+  downloadable  Boolean @default(false)
+  downloadUrl   String? @map("download_url")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("book_details")
+}
+
+model DigitalProductDetail {
+  id              String  @id @default(uuid())
+  productId       String  @unique @map("product_id")
+  fileFormat      String  @map("file_format")
+  fileSizeMb      Decimal? @map("file_size_mb") @db.Decimal(10, 2)
+  licenseType     String  @map("license_type") // single, multi, unlimited
+  downloadLimit   Int?    @map("download_limit")
+  drmProtected    Boolean @default(false) @map("drm_protected")
+  downloadUrl     String? @map("download_url")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("digital_product_details")
+}
+
+model ServiceDetail {
+  id              String  @id @default(uuid())
+  productId       String  @unique @map("product_id")
+  serviceType     String  @map("service_type")
+  deliveryMode    String  @map("delivery_mode") // online, onsite, both
+  durationMinutes Int?    @map("duration_minutes")
+  availability    String?
+  revisionsAllowed Int?   @map("revisions_allowed")
+  turnaroundDays  Int?    @map("turnaround_days")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("service_details")
+}

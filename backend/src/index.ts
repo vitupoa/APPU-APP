@@ -22,6 +22,17 @@ import commentsRoutes from './modules/comments/comments.routes.js';
 import teamsRoutes from './modules/teams/teams.routes.js';
 import chatRoutes from './modules/chat/chat.routes.js';
 import { storiesRoutes } from './modules/stories/stories.routes.js';
+import { chamaRoutes } from './modules/chama/chama.routes.js';
+import { budgetRoutes } from './modules/budget/budget.routes.js';
+import notificationsRoutes from './modules/notifications/notifications.routes.js';
+import marketplaceRoutes from './modules/marketplace/marketplace.routes.js';
+import { startChamaDefaultWorker } from './workers/chamaDefaultWorker.js';
+import { startStoryCleanupWorker } from './workers/storyCleanupWorker.js';
+import { startDailyPrizeWorker } from './workers/dailyPrizeWorker.js';
+import { startRecurringExpenseWorker } from './workers/recurringExpenseWorker.js';
+import { startBudgetAlertWorker } from './workers/budgetAlertWorker.js';
+import { startFlashSaleWorker } from './workers/flashSaleWorker.js';
+import { FCMService } from './services/fcm.service.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -61,6 +72,10 @@ app.use('/api/v1/comments', commentsRoutes);
 app.use('/api/v1/teams', teamsRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/stories', storiesRoutes);
+app.use('/api/v1/chamas', chamaRoutes);
+app.use('/api/v1/budgets', budgetRoutes);
+app.use('/api/v1/notifications', notificationsRoutes);
+app.use('/api/v1/marketplace', marketplaceRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
@@ -88,6 +103,14 @@ const PORT = env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.log(`Krieta API running on port ${PORT}`);
   console.log(`Environment: ${env.NODE_ENV}`);
+  
+  // Start cron workers
+  startChamaDefaultWorker();
+  startStoryCleanupWorker();
+  startDailyPrizeWorker();
+  startRecurringExpenseWorker();
+  startBudgetAlertWorker();
+  startFlashSaleWorker();
 });
 
 export { app, io };

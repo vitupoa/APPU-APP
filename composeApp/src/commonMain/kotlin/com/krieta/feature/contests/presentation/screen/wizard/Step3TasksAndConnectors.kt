@@ -136,7 +136,7 @@ private fun TaskTypeSelector(
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFFF5A623),
                     unfocusedBorderColor = Color(0xFF3A3A3F),

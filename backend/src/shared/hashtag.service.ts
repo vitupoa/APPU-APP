@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+import { prisma } from '../config/database';
 
 /**
  * Shared service for extracting and persisting hashtags and mentions

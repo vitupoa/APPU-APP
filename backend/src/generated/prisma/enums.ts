@@ -90,6 +90,167 @@ export const JudgeInviteStatus = {
 export type JudgeInviteStatus = (typeof JudgeInviteStatus)[keyof typeof JudgeInviteStatus]
 
 
+export const ProductCategory = {
+  VEHICLES: 'VEHICLES',
+  SPARE_PARTS: 'SPARE_PARTS',
+  REAL_ESTATE: 'REAL_ESTATE',
+  FASHION: 'FASHION',
+  SHOES: 'SHOES',
+  ELECTRONICS: 'ELECTRONICS',
+  FOOD_FMCG: 'FOOD_FMCG',
+  BOOKS: 'BOOKS',
+  DIGITAL_PRODUCTS: 'DIGITAL_PRODUCTS',
+  SERVICES: 'SERVICES',
+  OTHER: 'OTHER'
+} as const
+
+export type ProductCategory = (typeof ProductCategory)[keyof typeof ProductCategory]
+
+
+export const ProductCondition = {
+  NEW: 'NEW',
+  USED: 'USED',
+  REFURBISHED: 'REFURBISHED',
+  FOR_PARTS: 'FOR_PARTS'
+} as const
+
+export type ProductCondition = (typeof ProductCondition)[keyof typeof ProductCondition]
+
+
+export const ContactMethod = {
+  WHATSAPP: 'WHATSAPP',
+  WEBSITE: 'WEBSITE',
+  PHONE: 'PHONE',
+  IN_APP_CHAT: 'IN_APP_CHAT'
+} as const
+
+export type ContactMethod = (typeof ContactMethod)[keyof typeof ContactMethod]
+
+
+export const FuelType = {
+  PETROL: 'PETROL',
+  DIESEL: 'DIESEL',
+  ELECTRIC: 'ELECTRIC',
+  HYBRID: 'HYBRID',
+  LPG: 'LPG'
+} as const
+
+export type FuelType = (typeof FuelType)[keyof typeof FuelType]
+
+
+export const TransmissionType = {
+  MANUAL: 'MANUAL',
+  AUTOMATIC: 'AUTOMATIC',
+  CVT: 'CVT',
+  DCT: 'DCT'
+} as const
+
+export type TransmissionType = (typeof TransmissionType)[keyof typeof TransmissionType]
+
+
+export const VehicleBodyType = {
+  SEDAN: 'SEDAN',
+  COUPE: 'COUPE',
+  HATCHBACK: 'HATCHBACK',
+  SUV: 'SUV',
+  PICKUP: 'PICKUP',
+  VAN: 'VAN',
+  CONVERTIBLE: 'CONVERTIBLE',
+  WAGON: 'WAGON',
+  MINIVAN: 'MINIVAN',
+  BUS: 'BUS',
+  TRUCK: 'TRUCK',
+  TRAILER: 'TRAILER',
+  MOTORCYCLE: 'MOTORCYCLE'
+} as const
+
+export type VehicleBodyType = (typeof VehicleBodyType)[keyof typeof VehicleBodyType]
+
+
+export const FlashSaleType = {
+  FLASH: 'FLASH',
+  LIGHTNING: 'LIGHTNING',
+  DAILY_FEATURED: 'DAILY_FEATURED',
+  CLEARANCE: 'CLEARANCE'
+} as const
+
+export type FlashSaleType = (typeof FlashSaleType)[keyof typeof FlashSaleType]
+
+
+export const FlashSaleStatus = {
+  SCHEDULED: 'SCHEDULED',
+  ACTIVE: 'ACTIVE',
+  ENDED: 'ENDED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type FlashSaleStatus = (typeof FlashSaleStatus)[keyof typeof FlashSaleStatus]
+
+
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const BookingStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus]
+
+
+export const ImportRequestStatus = {
+  PENDING: 'PENDING',
+  QUOTED: 'QUOTED',
+  ACCEPTED: 'ACCEPTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type ImportRequestStatus = (typeof ImportRequestStatus)[keyof typeof ImportRequestStatus]
+
+
+export const GroupBuyStatus = {
+  OPEN: 'OPEN',
+  THRESHOLD_MET: 'THRESHOLD_MET',
+  CLOSED: 'CLOSED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type GroupBuyStatus = (typeof GroupBuyStatus)[keyof typeof GroupBuyStatus]
+
+
+export const LiveSessionStatus = {
+  SCHEDULED: 'SCHEDULED',
+  LIVE: 'LIVE',
+  ENDED: 'ENDED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type LiveSessionStatus = (typeof LiveSessionStatus)[keyof typeof LiveSessionStatus]
+
+
+export const PremiumType = {
+  FEATURED: 'FEATURED',
+  PROMOTED: 'PROMOTED',
+  TOP_SPOT: 'TOP_SPOT'
+} as const
+
+export type PremiumType = (typeof PremiumType)[keyof typeof PremiumType]
+
+
 export const TeamRole = {
   LEADER: 'LEADER',
   CO_LEADER: 'CO_LEADER',
@@ -125,3 +286,188 @@ export const StoryPrivacy = {
 } as const
 
 export type StoryPrivacy = (typeof StoryPrivacy)[keyof typeof StoryPrivacy]
+
+
+export const ChamaType = {
+  ROTATING: 'ROTATING',
+  INVESTMENT: 'INVESTMENT',
+  WELFARE: 'WELFARE',
+  HYBRID: 'HYBRID'
+} as const
+
+export type ChamaType = (typeof ChamaType)[keyof typeof ChamaType]
+
+
+export const ChamaStatus = {
+  SETUP: 'SETUP',
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  DISSOLVED: 'DISSOLVED'
+} as const
+
+export type ChamaStatus = (typeof ChamaStatus)[keyof typeof ChamaStatus]
+
+
+export const ChamaRole = {
+  ADMIN: 'ADMIN',
+  CHAIRPERSON: 'CHAIRPERSON',
+  TREASURER: 'TREASURER',
+  SECRETARY: 'SECRETARY',
+  MEMBER: 'MEMBER'
+} as const
+
+export type ChamaRole = (typeof ChamaRole)[keyof typeof ChamaRole]
+
+
+export const ContributionFrequency = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  BIWEEKLY: 'BIWEEKLY',
+  MONTHLY: 'MONTHLY',
+  ONE_OFF: 'ONE_OFF'
+} as const
+
+export type ContributionFrequency = (typeof ContributionFrequency)[keyof typeof ContributionFrequency]
+
+
+export const ChamaMemberStatus = {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+  LEFT: 'LEFT',
+  REMOVED: 'REMOVED',
+  DEFAULTED: 'DEFAULTED'
+} as const
+
+export type ChamaMemberStatus = (typeof ChamaMemberStatus)[keyof typeof ChamaMemberStatus]
+
+
+export const ElectionPhase = {
+  NOMINATION: 'NOMINATION',
+  SECONDING: 'SECONDING',
+  VOTING: 'VOTING',
+  COMPLETED: 'COMPLETED',
+  RERUN: 'RERUN'
+} as const
+
+export type ElectionPhase = (typeof ElectionPhase)[keyof typeof ElectionPhase]
+
+
+export const BudgetPeriod = {
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY',
+  CUSTOM: 'CUSTOM'
+} as const
+
+export type BudgetPeriod = (typeof BudgetPeriod)[keyof typeof BudgetPeriod]
+
+
+export const BudgetStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  EXCEEDED: 'EXCEEDED'
+} as const
+
+export type BudgetStatus = (typeof BudgetStatus)[keyof typeof BudgetStatus]
+
+
+export const ExpenseRecurrence = {
+  NONE: 'NONE',
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY'
+} as const
+
+export type ExpenseRecurrence = (typeof ExpenseRecurrence)[keyof typeof ExpenseRecurrence]
+
+
+export const InfluencerTier = {
+  NANO: 'NANO',
+  MICRO: 'MICRO',
+  MID: 'MID',
+  MACRO: 'MACRO',
+  MEGA: 'MEGA'
+} as const
+
+export type InfluencerTier = (typeof InfluencerTier)[keyof typeof InfluencerTier]
+
+
+export const CampaignType = {
+  SPONSORED_POST: 'SPONSORED_POST',
+  PRODUCT_REVIEW: 'PRODUCT_REVIEW',
+  BRAND_AMBASSADOR: 'BRAND_AMBASSADOR',
+  CONTEST_PROMOTION: 'CONTEST_PROMOTION',
+  AFFILIATE: 'AFFILIATE',
+  EVENT_COVERAGE: 'EVENT_COVERAGE',
+  CONTENT_CREATION: 'CONTENT_CREATION'
+} as const
+
+export type CampaignType = (typeof CampaignType)[keyof typeof CampaignType]
+
+
+export const CampaignStatus = {
+  DRAFT: 'DRAFT',
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  REVIEW: 'REVIEW',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type CampaignStatus = (typeof CampaignStatus)[keyof typeof CampaignStatus]
+
+
+export const ApplicationStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  WITHDRAWN: 'WITHDRAWN'
+} as const
+
+export type ApplicationStatus = (typeof ApplicationStatus)[keyof typeof ApplicationStatus]
+
+
+export const DeliverableStatus = {
+  PENDING: 'PENDING',
+  SUBMITTED: 'SUBMITTED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  REVISION_REQUESTED: 'REVISION_REQUESTED'
+} as const
+
+export type DeliverableStatus = (typeof DeliverableStatus)[keyof typeof DeliverableStatus]
+
+
+export const SponsorshipType = {
+  CONTEST_PRIZE: 'CONTEST_PRIZE',
+  CONTEST_BRANDING: 'CONTEST_BRANDING',
+  CONTEST_EXCLUSIVE: 'CONTEST_EXCLUSIVE',
+  CONTENT_SPONSORSHIP: 'CONTENT_SPONSORSHIP'
+} as const
+
+export type SponsorshipType = (typeof SponsorshipType)[keyof typeof SponsorshipType]
+
+
+export const ConversionCampaignType = {
+  POST_CONTEST_DISCOUNT: 'POST_CONTEST_DISCOUNT',
+  WINNER_ADVOCACY: 'WINNER_ADVOCACY',
+  PARTICIPANT_RETARGETING: 'PARTICIPANT_RETARGETING',
+  ENGAGEMENT_REWARD: 'ENGAGEMENT_REWARD'
+} as const
+
+export type ConversionCampaignType = (typeof ConversionCampaignType)[keyof typeof ConversionCampaignType]
+
+
+export const FunnelStage = {
+  AWARENESS: 'AWARENESS',
+  INTEREST: 'INTEREST',
+  CONSIDERATION: 'CONSIDERATION',
+  CONVERSION: 'CONVERSION',
+  RETENTION: 'RETENTION',
+  ADVOCACY: 'ADVOCACY'
+} as const
+
+export type FunnelStage = (typeof FunnelStage)[keyof typeof FunnelStage]

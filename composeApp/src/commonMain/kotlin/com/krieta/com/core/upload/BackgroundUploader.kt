@@ -5,7 +5,8 @@ import io.github.vinceglb.filekit.core.PlatformFile
 enum class UploadType {
     SHORT,
     CONTEST,
-    DRIP
+    DRIP,
+    STORY
 }
 
 expect object BackgroundUploader {
