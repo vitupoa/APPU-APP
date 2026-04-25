@@ -21,11 +21,12 @@ export function startBudgetAlertWorker() {
           if (analytics.shouldAlert && analytics.percentageSpent >= budget.alertAt) {
             console.log(`[BudgetAlertWorker] Alert for budget ${budget.id}: ${analytics.percentageSpent}% spent`);
             
-            if (budget.user.deviceToken) {
+            const userFcmToken = (budget.user as any).fcmToken as string | undefined;
+            if (userFcmToken) {
               if (analytics.percentageSpent >= 100) {
-                await fcmService.sendBudgetExceeded(budget.user.deviceToken, budget.name);
+                await fcmService.sendBudgetExceeded(userFcmToken, budget.name);
               } else {
-                await fcmService.sendBudgetAlert(budget.user.deviceToken, budget.name, analytics.percentageSpent);
+                await fcmService.sendBudgetAlert(userFcmToken, budget.name, analytics.percentageSpent);
               }
             }
           }
@@ -34,8 +35,9 @@ export function startBudgetAlertWorker() {
           if (daysUntilEnd <= 3 && daysUntilEnd > 0) {
             console.log(`[BudgetAlertWorker] Budget ${budget.id} ending in ${daysUntilEnd} days`);
             
-            if (budget.user.deviceToken) {
-              await fcmService.sendBudgetEnding(budget.user.deviceToken, budget.name, daysUntilEnd);
+            const userFcmToken2 = (budget.user as any).fcmToken as string | undefined;
+            if (userFcmToken2) {
+              await fcmService.sendBudgetEnding(userFcmToken2, budget.name, daysUntilEnd);
             }
           }
         } catch (error) {

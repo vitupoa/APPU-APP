@@ -114,7 +114,7 @@ router.get('/parts/compatible', async (req: AuthRequest, res: Response) => {
       partType: partType as string,
     });
     return res.json(parts);
-  } catch (e: any) { return res.status(500).json({ error: e.message }); }
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 // ═══════════════════════════════════════════════════════════

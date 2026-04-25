@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { prisma } from '../../config/database.js';
+import { Response } from 'express';
 
 const router = Router();
 
-router.post('/register-token', authMiddleware, async (req: AuthRequest, res) => {
+router.post('/register-token', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId!;
     const { deviceToken, platform } = req.body;
@@ -21,7 +22,7 @@ router.post('/register-token', authMiddleware, async (req: AuthRequest, res) => 
       data: {
         deviceToken,
         devicePlatform: platform,
-      },
+      } as any,
     });
 
     return res.json({
@@ -36,7 +37,7 @@ router.post('/register-token', authMiddleware, async (req: AuthRequest, res) => 
   }
 });
 
-router.delete('/unregister-token', authMiddleware, async (req: AuthRequest, res) => {
+router.delete('/unregister-token', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId!;
 
@@ -45,7 +46,7 @@ router.delete('/unregister-token', authMiddleware, async (req: AuthRequest, res)
       data: {
         deviceToken: null,
         devicePlatform: null,
-      },
+      } as any,
     });
 
     return res.json({
