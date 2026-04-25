@@ -361,7 +361,7 @@ export class SocialMediaService {
     });
     
     // Calculate total followers across all platforms
-    const totalFollowers = accounts.reduce((sum, acc) => sum + acc.followerCount, 0);
+    const totalFollowers = accounts.reduce((sum: number, acc) => sum + acc.followerCount, 0);
     
     // Determine tier
     let tier = 'NANO';
@@ -371,7 +371,7 @@ export class SocialMediaService {
     else if (totalFollowers >= 10000) tier = 'MICRO';
     
     // Calculate average engagement rate
-    const avgEngagement = accounts.reduce((sum, acc) => sum + Number(acc.engagementRate), 0) / accounts.length;
+    const avgEngagement = accounts.reduce((sum: number, acc) => sum + Number(acc.engagementRate), 0) / accounts.length;
     
     await prisma.influencerProfile.update({
       where: { id: influencerId },

@@ -96,6 +96,8 @@ model User {
   chamaSeconds          ChamaSecondment[] @relation("ChamaSecondments")
   chamaVotes            ChamaVote[]       @relation("ChamaVotes")
   isRotationLocked      Boolean           @default(false) @map("is_rotation_locked")
+  fcmToken              String?           @map("fcm_token")
+  devicePlatform        String?           @map("device_platform")
   budgets               Budget[]          @relation("UserBudgets")
   expenses              Expense[]         @relation("UserExpenses")
 

@@ -127,7 +127,10 @@ export async function uploadToCloudinary(
     uploadOptions.context = `expires_at=${expiresAt.toISOString()}`;
   }
 
-  return cloudinary.uploader.upload(fileBuffer, uploadOptions);
+  const uploadSource = Buffer.isBuffer(fileBuffer)
+    ? `data:image/jpeg;base64,${fileBuffer.toString('base64')}`
+    : fileBuffer;
+  return cloudinary.uploader.upload(uploadSource, uploadOptions);
 }
 
 /**
