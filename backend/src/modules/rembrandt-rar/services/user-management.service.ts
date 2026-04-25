@@ -280,7 +280,10 @@ export class UserManagementService {
     data: { bio?: string; country?: string; currency?: string; accountType?: string },
     ip?: string, ua?: string
   ) {
-    await prisma.user.update({ where: { id: targetUserId }, data });
+    const updateData: any = { ...data };
+    if (data.accountType) updateData.accountType = data.accountType;
+
+    await prisma.user.update({ where: { id: targetUserId }, data: updateData });
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_NAME_CHANGE, 'user', targetUserId, data, ip, ua);
     return { success: true, message: 'User profile updated' };
   }
