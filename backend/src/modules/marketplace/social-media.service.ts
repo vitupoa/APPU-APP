@@ -27,7 +27,7 @@ export class SocialMediaService {
     const account = await prisma.socialMediaAccount.create({
       data: {
         influencerId,
-        platform,
+        platform: platform as any,
         username,
         profileUrl,
         accessToken,
