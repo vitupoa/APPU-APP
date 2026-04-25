@@ -1,4 +1,5 @@
 import cron from 'node-cron';
+import { prisma } from '../config/database.js';
 import { BudgetService } from '../modules/budget/budget.service.js';
 
 export function startRecurringExpenseWorker() {

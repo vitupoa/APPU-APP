@@ -110,7 +110,7 @@ router.get('/parts/compatible', async (req: AuthRequest, res: Response) => {
       year: year ? parseInt(year as string) : undefined,
       partType: partType as string,
     });
-    res.json(parts);
+    return res.json(parts);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 

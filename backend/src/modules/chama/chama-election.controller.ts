@@ -78,7 +78,7 @@ export class ChamaElectionController {
       const electionId = String(req.params.eid);
       const election = await ChamaElectionService.getElectionStatus(chamaId, electionId);
       if (!election) return res.status(404).json({ success: false, error: 'Election not found' });
-      res.json({ success: true, election });
+      return res.json({ success: true, election });
     } catch (e: any) {
       res.status(400).json({ success: false, error: e.message });
     }
