@@ -20,7 +20,8 @@ export class LiveController {
 
   static async endStream(req: AuthRequest, res: Response) {
     try {
-      const stream = await LiveService.endStream(req.params.streamId, req.userId!);
+      const streamId = String(req.params.streamId);
+      const stream = await LiveService.endStream(streamId, req.userId!);
       res.json(stream);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -29,9 +30,9 @@ export class LiveController {
 
   static async getActiveStreams(req: AuthRequest, res: Response) {
     try {
-      const page = parseInt(Array.isArray(req.query.page) ? req.query.page[0] : req.query.page || '1');
-      const limit = parseInt(Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit || '20');
-      const chamaId = Array.isArray(req.query.chamaId) ? req.query.chamaId[0] : req.query.chamaId as string | undefined;
+      const page = parseInt(String(req.query.page || '1'));
+      const limit = parseInt(String(req.query.limit || '20'));
+      const chamaId = req.query.chamaId ? String(req.query.chamaId) : undefined;
       const result = await LiveService.getActiveStreams(page, limit, chamaId);
       res.json(result);
     } catch (error: any) {
@@ -41,7 +42,8 @@ export class LiveController {
 
   static async getStream(req: AuthRequest, res: Response) {
     try {
-      const stream = await LiveService.getStream(req.params.streamId);
+      const streamId = String(req.params.streamId);
+      const stream = await LiveService.getStream(streamId);
       res.json(stream);
     } catch (error: any) {
       res.status(404).json({ error: error.message });
@@ -50,13 +52,14 @@ export class LiveController {
 
   static async sendTip(req: AuthRequest, res: Response) {
     try {
+      const streamId = String(req.params.streamId);
       const data = liveTipSchema.parse(req.body);
       const user = await (await import('../../config/database.js')).prisma.user.findUnique({
         where: { id: req.userId! },
         select: { currency: true },
       });
       const result = await LiveService.sendTip(
-        req.params.streamId, req.userId!, data.recipientId,
+        streamId, req.userId!, data.recipientId,
         data.amountKr, data.giftType, data.message, user?.currency || 'USD'
       );
       res.json(result);
@@ -67,8 +70,9 @@ export class LiveController {
 
   static async sendLikes(req: AuthRequest, res: Response) {
     try {
+      const streamId = String(req.params.streamId);
       const data = likeSchema.parse(req.body);
-      const result = await LiveService.sendLikes(req.params.streamId, req.userId!, data.count);
+      const result = await LiveService.sendLikes(streamId, req.userId!, data.count);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -77,8 +81,8 @@ export class LiveController {
 
   static async getLeaderboard(req: AuthRequest, res: Response) {
     try {
-      const limit = parseInt(Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit || '5');
-      const streamId = Array.isArray(req.params.streamId) ? req.params.streamId[0] : req.params.streamId;
+      const limit = parseInt(String(req.query.limit || '5'));
+      const streamId = String(req.params.streamId);
       const leaderboard = await LiveService.getLeaderboard(streamId, limit);
       res.json(leaderboard);
     } catch (error: any) {
@@ -88,9 +92,10 @@ export class LiveController {
 
   static async pinProduct(req: AuthRequest, res: Response) {
     try {
+      const streamId = String(req.params.streamId);
       const data = pinProductSchema.parse(req.body);
       const result = await LiveService.pinProduct(
-        req.params.streamId, req.userId!, data.productId, data.salePrice
+        streamId, req.userId!, data.productId, data.salePrice
       );
       res.json(result);
     } catch (error: any) {
@@ -100,7 +105,9 @@ export class LiveController {
 
   static async unpinProduct(req: AuthRequest, res: Response) {
     try {
-      await LiveService.unpinProduct(req.params.streamId, req.userId!, req.params.productId);
+      const streamId = String(req.params.streamId);
+      const productId = String(req.params.productId);
+      await LiveService.unpinProduct(streamId, req.userId!, productId);
       res.json({ success: true });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -109,8 +116,9 @@ export class LiveController {
 
   static async setGiftGoal(req: AuthRequest, res: Response) {
     try {
+      const streamId = String(req.params.streamId);
       const data = giftGoalSchema.parse(req.body);
-      const result = await LiveService.setGiftGoal(req.params.streamId, req.userId!, data.title, data.targetKr);
+      const result = await LiveService.setGiftGoal(streamId, req.userId!, data.title, data.targetKr);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -119,8 +127,9 @@ export class LiveController {
 
   static async banViewer(req: AuthRequest, res: Response) {
     try {
+      const streamId = String(req.params.streamId);
       const data = banViewerSchema.parse(req.body);
-      const result = await LiveService.banViewer(req.params.streamId, req.userId!, data.userId, data.reason);
+      const result = await LiveService.banViewer(streamId, req.userId!, data.userId, data.reason);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -129,8 +138,9 @@ export class LiveController {
 
   static async muteViewer(req: AuthRequest, res: Response) {
     try {
+      const streamId = String(req.params.streamId);
       const data = banViewerSchema.parse(req.body);
-      const result = await LiveService.muteViewer(req.params.streamId, req.userId!, data.userId);
+      const result = await LiveService.muteViewer(streamId, req.userId!, data.userId);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -139,9 +149,10 @@ export class LiveController {
 
   static async startBattle(req: AuthRequest, res: Response) {
     try {
+      const streamId = String(req.params.streamId);
       const data = battleSchema.parse(req.body);
       const result = await LiveService.startBattle(
-        req.params.streamId, req.userId!,
+        streamId, req.userId!,
         data.opponentStreamId, data.contestId, data.durationSecs
       );
       res.json(result);
@@ -152,7 +163,8 @@ export class LiveController {
 
   static async acceptBattle(req: AuthRequest, res: Response) {
     try {
-      const result = await LiveService.acceptBattle(req.params.battleId, req.userId!);
+      const battleId = String(req.params.battleId);
+      const result = await LiveService.acceptBattle(battleId, req.userId!);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -161,8 +173,9 @@ export class LiveController {
 
   static async inviteCoHost(req: AuthRequest, res: Response) {
     try {
+      const streamId = String(req.params.streamId);
       const { userId } = req.body;
-      const result = await LiveService.inviteCoHost(req.params.streamId, req.userId!, userId);
+      const result = await LiveService.inviteCoHost(streamId, req.userId!, userId);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

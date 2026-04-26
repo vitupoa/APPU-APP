@@ -16,7 +16,8 @@ export class CallController {
 
   static async answerCall(req: AuthRequest, res: Response) {
     try {
-      const result = await CallService.answerCall(req.params.callId, req.userId!);
+      const callId = String(req.params.callId);
+      const result = await CallService.answerCall(callId, req.userId!);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -25,7 +26,8 @@ export class CallController {
 
   static async declineCall(req: AuthRequest, res: Response) {
     try {
-      const result = await CallService.declineCall(req.params.callId, req.userId!);
+      const callId = String(req.params.callId);
+      const result = await CallService.declineCall(callId, req.userId!);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -34,7 +36,8 @@ export class CallController {
 
   static async endCall(req: AuthRequest, res: Response) {
     try {
-      const result = await CallService.endCall(req.params.callId, req.userId!);
+      const callId = String(req.params.callId);
+      const result = await CallService.endCall(callId, req.userId!);
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -43,9 +46,9 @@ export class CallController {
 
   static async getCallHistory(req: AuthRequest, res: Response) {
     try {
-      const page = parseInt(Array.isArray(req.query.page) ? req.query.page[0] : req.query.page || '1');
-      const limit = parseInt(Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit || '20');
-      const chatId = Array.isArray(req.params.chatId) ? req.params.chatId[0] : req.params.chatId;
+      const page = parseInt(String(req.query.page || '1'));
+      const limit = parseInt(String(req.query.limit || '20'));
+      const chatId = String(req.params.chatId);
       const history = await CallService.getCallHistory(req.userId!, chatId, page, limit);
       res.json(history);
     } catch (error: any) {
