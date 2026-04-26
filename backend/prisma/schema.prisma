@@ -132,6 +132,8 @@ model User {
   funnelEvents          SalesFunnelEvent[]     @relation("SalesFunnelEvents")
   gamificationPoints    GamificationPoints?
   gamificationActivities GamificationActivity[] @relation("GamificationActivities")
+  liveSessions          LiveSession[]          @relation("LiveSessionHost")
+  sponsoredCampaigns    SponsoredContent[]     @relation("SponsoredContentBrand")
 
   // RembrandtRAR (Platform Governance)
   adminProfile          AdminProfile?
@@ -338,6 +340,7 @@ model Short {
   linkedProduct Product?         @relation(fields: [linkedProductId], references: [id])
   likes         ShortLike[]
   comments      ShortComment[]
+  sponsoredCampaigns SponsoredContent[] @relation("SponsoredShort")
 
   @@index([userId, createdAt])
   @@map("shorts")
@@ -399,6 +402,7 @@ model Post {
   user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   likes    PostLike[]
   comments PostComment[]
+  sponsoredCampaigns SponsoredContent[] @relation("SponsoredPost")
 
   @@index([userId, createdAt])
   @@map("posts")
@@ -871,6 +875,7 @@ model Product {
   premiumListings     PremiumListing[]
   analytics           ProductAnalytic[]
   vehicleFavorites    VehicleFavorite[]
+  liveSessionProducts LiveSessionProduct[] @relation("LiveSessionProducts")
 
   @@index([status, createdAt])
   @@index([category, status])
@@ -3370,3 +3375,126 @@ model ContentModerationLog {
   @@index([contentType, contentId])
   @@map("content_moderation_logs")
 }
+
+// ═══════════════════════════════════════════════════════════
+// LIVE SHOPPING SESSION MODELS
+// Add these models to your main schema.prisma file
+// ═══════════════════════════════════════════════════════════
+
+model LiveSession {
+  id              String   @id @default(uuid())
+  hostId          String   @map("host_id")
+  title           String
+  description     String?  @db.Text
+  scheduledStart  DateTime @map("scheduled_start")
+  actualStart     DateTime? @map("actual_start")
+  endedAt         DateTime? @map("ended_at")
+  status          String   @default("SCHEDULED") // SCHEDULED, LIVE, ENDED
+  viewerCount     Int      @default(0) @map("viewer_count")
+  peakViewers     Int      @default(0) @map("peak_viewers")
+  totalSalesKr    Decimal  @default(0) @map("total_sales_kr") @db.Decimal(18, 4)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  host     User                 @relation("LiveSessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+  products LiveSessionProduct[]
+
+  @@index([hostId, status])
+  @@index([status, scheduledStart])
+  @@map("live_sessions")
+}
+
+model LiveSessionProduct {
+  id          String   @id @default(uuid())
+  sessionId   String   @map("session_id")
+  productId   String   @map("product_id")
+  salePrice   Decimal? @map("sale_price") @db.Decimal(18, 4)
+  unitsSold   Int      @default(0) @map("units_sold")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  session LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  product Product     @relation("LiveSessionProducts", fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, productId])
+  @@map("live_session_products")
+}
+
+// ═══════════════════════════════════════════════════════════
+// SPONSORED CONTENT / NATIVE ADS MODELS
+// Add these models to your main schema.prisma file
+// ═══════════════════════════════════════════════════════════
+
+enum SponsoredContentStatus {
+  PENDING_REVIEW
+  ACTIVE
+  PAUSED
+  COMPLETED
+  REJECTED
+}
+
+enum PricingModel {
+  CPM  // Cost per 1000 impressions
+  CPV  // Cost per view (3+ seconds)
+  CPE  // Cost per engagement (like/comment/share)
+  CPC  // Cost per click
+}
+
+model SponsoredContent {
+  id            String                  @id @default(uuid())
+  brandUserId   String                  @map("brand_user_id")
+  contentType   String                  @map("content_type") // short, post
+  contentId     String                  @map("content_id")
+  campaignName  String                  @map("campaign_name")
+  
+  // Budget & Pricing
+  budget        Decimal                 @db.Decimal(18, 4)
+  spent         Decimal                 @default(0) @db.Decimal(18, 4)
+  pricingModel  PricingModel            @map("pricing_model")
+  bidAmount     Decimal                 @map("bid_amount") @db.Decimal(18, 4)
+  
+  // Targeting
+  targeting     Json?                   // { ageMin, ageMax, gender[], countries[], interests[] }
+  
+  // Schedule
+  startDate     DateTime                @map("start_date")
+  endDate       DateTime                @map("end_date")
+  
+  // Metrics
+  impressions   Int                     @default(0)
+  views         Int                     @default(0)
+  engagements   Int                     @default(0)
+  clicks        Int                     @default(0)
+  
+  // Status
+  status        SponsoredContentStatus  @default(PENDING_REVIEW)
+  escrowId      String?                 @map("escrow_id")
+  
+  createdAt     DateTime                @default(now()) @map("created_at")
+  updatedAt     DateTime                @updatedAt @map("updated_at")
+
+  brand         User                    @relation("SponsoredContentBrand", fields: [brandUserId], references: [id], onDelete: Cascade)
+  short         Short?                  @relation("SponsoredShort", fields: [contentId], references: [id], onDelete: Cascade, map: "sponsored_content_short_fkey")
+  post          Post?                   @relation("SponsoredPost", fields: [contentId], references: [id], onDelete: Cascade, map: "sponsored_content_post_fkey")
+  impressionLog SponsoredImpression[]
+
+  @@index([brandUserId, status])
+  @@index([status, startDate, endDate])
+  @@index([contentType, contentId])
+  @@map("sponsored_content")
+}
+
+model SponsoredImpression {
+  id          String   @id @default(uuid())
+  campaignId  String   @map("campaign_id")
+  userId      String   @map("user_id")
+  type        String   // impression, view, like, comment, share, click
+  cost        Decimal  @default(0) @db.Decimal(18, 4)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  campaign SponsoredContent @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, type])
+  @@index([userId, createdAt])
+  @@map("sponsored_impressions")
+}
+

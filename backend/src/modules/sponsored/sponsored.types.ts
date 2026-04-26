@@ -3,28 +3,16 @@
  * Brands create sponsored shorts that appear seamlessly in user feeds
  */
 
+// Import Prisma-generated enums
+import { SponsoredContentStatus, PricingModel } from '../../generated/prisma';
+
+// Re-export for convenience
+export { SponsoredContentStatus, PricingModel };
+
 export enum SponsoredContentType {
   SHORT = 'short',
   POST = 'post',
   STORY = 'story'
-}
-
-export enum SponsoredContentStatus {
-  DRAFT = 'draft',
-  PENDING_REVIEW = 'pending_review',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  ACTIVE = 'active',
-  PAUSED = 'paused',
-  COMPLETED = 'completed'
-}
-
-export enum PricingModel {
-  CPM = 'cpm',           // Cost per 1000 impressions
-  CPV = 'cpv',           // Cost per view (3+ seconds)
-  CPE = 'cpe',           // Cost per engagement (like/comment/share)
-  CPC = 'cpc',           // Cost per click (profile/link visit)
-  FLAT_FEE = 'flat_fee'  // Fixed campaign cost
 }
 
 export enum TargetingCriteria {
