@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class OfflineMessageSyncService(
+actual class OfflineMessageSyncService(
     private val context: Context,
     private val localMessageDao: LocalMessageDao,
     private val onSyncMessage: suspend (LocalMessageEntity) -> Result<Unit>
 ) {
     private val _isOnline = MutableStateFlow(false)
-    val isOnline: StateFlow<Boolean> = _isOnline
+    actual val isOnline: StateFlow<Boolean> = _isOnline
 
     private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -50,7 +50,7 @@ class OfflineMessageSyncService(
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    fun syncPendingMessages() {
+    actual fun syncPendingMessages() {
         scope.launch {
             if (!_isOnline.value) return@launch
 
@@ -77,14 +77,14 @@ class OfflineMessageSyncService(
         }
     }
 
-    suspend fun queueMessage(message: LocalMessageEntity) {
+    actual suspend fun queueMessage(message: LocalMessageEntity) {
         localMessageDao.insertMessage(message)
         if (_isOnline.value) {
             syncPendingMessages()
         }
     }
 
-    fun cleanup() {
+    actual fun cleanup() {
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }

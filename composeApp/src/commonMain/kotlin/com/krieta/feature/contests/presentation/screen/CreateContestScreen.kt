@@ -1,5 +1,8 @@
 package com.krieta.feature.contests.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 /**
  * CreateContestScreen - Contest Creation Wizard
  * 
@@ -26,8 +29,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -88,7 +90,7 @@ class CreateContestScreen : Screen {
                             }
                         ) {
                             Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack, 
+                                painterResource(Res.drawable.ic_arrow_back), 
                                 contentDescription = if (state.currentStep > 1) "Go to previous step" else "Close wizard",
                                 tint = Color.White
                             )
@@ -382,7 +384,7 @@ fun ErrorMessageCard(
                 modifier = Modifier.size(24.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Close,
+                    imageVector = painterResource(Res.drawable.ic_close),
                     contentDescription = "Dismiss error",
                     tint = Color(0xFFFF3B30)
                 )

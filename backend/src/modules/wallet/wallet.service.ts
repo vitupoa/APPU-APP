@@ -21,9 +21,9 @@ export class WalletService {
 
     const currencyToUse = targetCurrency || wallet.user.currency;
 
-    // Convert Kr balance to user fiat equivalent contextually
-    // 1 Kr = $0.01 USD. Apply the exchange rate to the USD base equivalent
-    const fiatRate = await ExchangeService.getRate(currencyToUse);
+    // Convert Kr balance to user fiat equivalent using display-adjusted rate
+    // 1 Kr = $0.01 USD. Apply the display rate (with silent platform adjustment)
+    const fiatRate = await ExchangeService.getDisplayRate(currencyToUse);
     const baseUsd = Number(wallet.krBalance) / 100;
     const fiatEquivalent = baseUsd * fiatRate;
 

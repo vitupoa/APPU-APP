@@ -95,9 +95,9 @@ class CloudinaryUploader(private val authenticatedClient: HttpClient) {
             level = io.ktor.client.plugins.logging.LogLevel.INFO
         }
         install(io.ktor.client.plugins.HttpTimeout) {
-            requestTimeoutMillis = 180_000L
+            requestTimeoutMillis = 600_000L
             connectTimeoutMillis = 180_000L
-            socketTimeoutMillis = 180_000L
+            socketTimeoutMillis = 600_000L
         }
     }
 

@@ -1,8 +1,10 @@
 package com.krieta.feature.shop.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,7 +12,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -50,7 +52,7 @@ class ShopScreen : Screen {
                     title = { Text("Shop") },
                     actions = {
                         IconButton(onClick = { navigator.push(CreateListingScreen()) }) {
-                            Icon(Icons.Default.Add, "List Product")
+                            Icon(painterResource(Res.drawable.ic_add), "List Product")
                         }
                     }
                 )
@@ -65,7 +67,7 @@ class ShopScreen : Screen {
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     placeholder = { Text("Search products...") },
-                    leadingIcon = { Icon(Icons.Default.Search, "Search") },
+                    leadingIcon = { Icon(painterResource(Res.drawable.ic_search), "Search") },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp)
                 )

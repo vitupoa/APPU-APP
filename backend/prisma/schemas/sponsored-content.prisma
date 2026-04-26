@@ -1,0 +1,101 @@
+// ═══════════════════════════════════════════════════════════
+// SPONSORED CONTENT SYSTEM (NATIVE AD MARKETPLACE)
+// ═══════════════════════════════════════════════════════════
+
+enum SponsoredContentType {
+  SHORT
+  POST
+  STORY
+}
+
+enum SponsoredContentStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum PricingModel {
+  CPM        // Cost per 1000 impressions
+  CPV        // Cost per view (3+ seconds)
+  CPE        // Cost per engagement
+  CPC        // Cost per click
+  FLAT_FEE   // Fixed campaign cost
+}
+
+model SponsoredContent {
+  id              String                  @id @default(uuid())
+  brandUserId     String                  @map("brand_user_id")
+  
+  contentType     SponsoredContentType    @map("content_type")
+  contentId       String                  @map("content_id")
+  
+  campaignName    String                  @map("campaign_name")
+  budget          Decimal                 @db.Decimal(18, 4)
+  spent           Decimal                 @default(0) @db.Decimal(18, 4)
+  
+  pricingModel    PricingModel            @map("pricing_model")
+  bidAmount       Decimal                 @map("bid_amount") @db.Decimal(18, 4)
+  
+  startDate       DateTime                @map("start_date")
+  endDate         DateTime                @map("end_date")
+  
+  targeting       Json?                   // Age, gender, location, interests
+  
+  status          SponsoredContentStatus  @default(PENDING_REVIEW)
+  
+  impressions     Int                     @default(0)
+  views           Int                     @default(0)
+  engagements     Int                     @default(0)
+  clicks          Int                     @default(0)
+  
+  escrowId        String?                 @map("escrow_id")
+  
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+
+  brandUser       User                    @relation("BrandSponsoredContent", fields: [brandUserId], references: [id], onDelete: Cascade)
+  short           Short?                  @relation("SponsoredShorts", fields: [contentId], references: [id], onDelete: Cascade)
+  post            Post?                   @relation("SponsoredPosts", fields: [contentId], references: [id], onDelete: Cascade)
+  escrow          Escrow?                 @relation(fields: [escrowId], references: [id])
+  impressions     SponsoredImpression[]
+
+  @@index([brandUserId, status])
+  @@index([contentType, status, startDate, endDate])
+  @@index([bidAmount])
+  @@map("sponsored_content")
+}
+
+model SponsoredImpression {
+  id          String    @id @default(uuid())
+  campaignId  String    @map("campaign_id")
+  userId      String    @map("user_id")
+  
+  type        String    // impression, view, like, comment, share, click
+  cost        Decimal   @default(0) @db.Decimal(18, 4)
+  
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  campaign    SponsoredContent @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user        User             @relation("SponsoredImpressions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, type])
+  @@index([userId, createdAt])
+  @@map("sponsored_impressions")
+}
+
+// ─── ADD TO EXISTING USER MODEL ────────────────────────────
+// sponsoredContent      SponsoredContent[]     @relation("BrandSponsoredContent")
+// sponsoredImpressions  SponsoredImpression[]  @relation("SponsoredImpressions")
+
+// ─── ADD TO EXISTING SHORT MODEL ───────────────────────────
+// sponsoredCampaigns    SponsoredContent[]     @relation("SponsoredShorts")
+
+// ─── ADD TO EXISTING POST MODEL ────────────────────────────
+// sponsoredCampaigns    SponsoredContent[]     @relation("SponsoredPosts")
+
+// ─── ADD TO EXISTING ESCROW MODEL ──────────────────────────
+// sponsoredCampaigns    SponsoredContent[]

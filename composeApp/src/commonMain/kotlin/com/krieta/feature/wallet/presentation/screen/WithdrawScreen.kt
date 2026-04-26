@@ -1,15 +1,16 @@
 package com.krieta.feature.wallet.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -41,7 +42,7 @@ class WithdrawScreen : Screen {
                     title = { Text("Withdraw") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
                         }
                     }
                 )

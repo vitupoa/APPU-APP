@@ -1,8 +1,10 @@
 package com.krieta.feature.contests.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,8 +30,7 @@ import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedState
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedViewModel
 import org.koin.compose.koinInject
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material.icons.filled.Add
 
 class ContestFeedScreen : Screen {
@@ -63,7 +64,7 @@ class ContestFeedScreen : Screen {
                     title = { Text("Contests", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), contentDescription = "Back")
                         }
                     },
                     actions = {

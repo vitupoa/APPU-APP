@@ -1,16 +1,17 @@
 package com.krieta.feature.profile.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
@@ -75,7 +76,7 @@ class EditProfileScreen : Screen {
                     title = { Text("Edit Profile") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
                         }
                     }
                 )
@@ -107,7 +108,7 @@ class EditProfileScreen : Screen {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
-                                        Icons.Default.Lock,
+                                        painterResource(Res.drawable.ic_lock),
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.error,
                                         modifier = Modifier.size(20.dp)
@@ -272,7 +273,7 @@ class EditProfileScreen : Screen {
             enabled = !isLocked,
             readOnly = isLocked,
             trailingIcon = if (isLocked) {
-                { Icon(Icons.Default.Lock, contentDescription = "Locked", modifier = Modifier.size(18.dp)) }
+                { Icon(painterResource(Res.drawable.ic_lock), contentDescription = "Locked", modifier = Modifier.size(18.dp)) }
             } else null,
             shape = RoundedCornerShape(12.dp)
         )

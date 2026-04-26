@@ -1,5 +1,8 @@
 package com.krieta.feature.chama.presentation.wizard
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -12,9 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,7 +61,7 @@ class CreateChamaScreen : Screen {
                             if (state.currentStep > 0) viewModel.previousStep()
                             else navigator.pop()
                         }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), contentDescription = "Back")
                         }
                     }
                 )
@@ -209,7 +210,7 @@ private fun StepBasicInfo(state: CreateChamaState, viewModel: CreateChamaViewMod
         val types = listOf(
             Triple("ROTATING", "Merry-Go-Round", Icons.Default.Sync),
             Triple("INVESTMENT", "Investment", Icons.AutoMirrored.Filled.TrendingUp),
-            Triple("WELFARE", "Welfare", Icons.Default.Favorite),
+            Triple("WELFARE", "Welfare", painterResource(Res.drawable.ic_favorite)),
             Triple("HYBRID", "Hybrid", Icons.Default.Dashboard)
         )
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -274,7 +275,7 @@ private fun ChamaTypeCard(label: String, icon: ImageVector, selected: Boolean, o
             )
             Spacer(Modifier.weight(1f))
             if (selected) {
-                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = ChamaGold)
+                Icon(painterResource(Res.drawable.ic_check)Circle, contentDescription = null, tint = ChamaGold)
             }
         }
     }
@@ -446,7 +447,7 @@ private fun StepRules(state: CreateChamaState, viewModel: CreateChamaViewModel) 
                 modifier = Modifier.padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(Icons.Default.Lock, contentDescription = null, tint = ChamaGreen)
+                Icon(painterResource(Res.drawable.ic_lock), contentDescription = null, tint = ChamaGreen)
                 Column {
                     Text("Wallet Lock Policy", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
                     Text(

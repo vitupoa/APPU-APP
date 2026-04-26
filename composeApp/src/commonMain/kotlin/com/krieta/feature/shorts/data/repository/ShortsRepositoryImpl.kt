@@ -24,6 +24,13 @@ class ShortsRepositoryImpl(
         }
     }
 
+    override suspend fun getShortById(shortId: String): NetworkResult<Short> {
+        return safeApiCall {
+            val dto = api.getShortById(shortId)
+            dto.toDomain()
+        }
+    }
+
     override suspend fun toggleLike(shortId: String): NetworkResult<Boolean> {
         return safeApiCall {
             val dto = api.toggleLike(shortId)

@@ -1,11 +1,13 @@
 package com.krieta.feature.marketplace.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -173,8 +175,6 @@ private fun CreatorOptions(navigator: cafe.adriel.voyager.navigator.Navigator) {
     }
 }
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MarketplaceCard(
@@ -216,7 +216,7 @@ private fun MarketplaceCard(
                     )
                 }
                 Icon(
-                    Icons.Default.ChevronRight,
+                    painterResource(Res.drawable.ic_chevron_right),
                     null,
                     tint = Color.White.copy(alpha = 0.7f)
                 )

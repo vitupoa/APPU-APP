@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.shorts.domain.model.Short
 import com.krieta.feature.shorts.domain.repository.ShortsRepository
+import com.krieta.feature.sponsored.presentation.SponsoredContentManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,11 +24,13 @@ data class ShortsState(
     val isLoadingMore: Boolean = false,
     val activeTab: ShortsTab = ShortsTab.DISCOVER,
     val nextCursor: String? = null,
-    val error: String? = null
+    val error: String? = null,
+    val sponsoredIndices: Set<Int> = emptySet()
 )
 
 class ShortsViewModel(
-    private val shortsRepository: ShortsRepository
+    private val shortsRepository: ShortsRepository,
+    private val sponsoredManager: SponsoredContentManager
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(ShortsState())
@@ -89,8 +92,9 @@ class ShortsViewModel(
             _state.value = _state.value.copy(isLoading = true, error = null)
             when (val result = shortsRepository.getFeed(_state.value.activeTab.apiValue, null)) {
                 is NetworkResult.Success -> {
+                    val items = injectSponsoredContent(result.data.items)
                     _state.value = _state.value.copy(
-                        items = result.data.items,
+                        items = items,
                         nextCursor = result.data.nextCursor,
                         isLoading = false
                     )
@@ -109,8 +113,9 @@ class ShortsViewModel(
             _state.value = _state.value.copy(isLoadingMore = true)
             when (val result = shortsRepository.getFeed(_state.value.activeTab.apiValue, cursor)) {
                 is NetworkResult.Success -> {
+                    val newItems = injectSponsoredContent(result.data.items, _state.value.items.size)
                     _state.value = _state.value.copy(
-                        items = _state.value.items + result.data.items,
+                        items = _state.value.items + newItems,
                         nextCursor = result.data.nextCursor,
                         isLoadingMore = false
                     )
@@ -120,6 +125,65 @@ class ShortsViewModel(
                 }
                 is NetworkResult.Loading -> {}
             }
+        }
+    }
+
+    private suspend fun injectSponsoredContent(items: List<Short>, startIndex: Int = 0): List<Short> {
+        if (items.isEmpty()) return items
+        
+        // Inject every 7 items (industry best practice for short-form video)
+        val result = mutableListOf<Short>()
+        val sponsoredIndices = mutableSetOf<Int>()
+        
+        items.forEachIndexed { index, short ->
+            result.add(short)
+            
+            // Inject sponsored content every 7 items
+            if ((startIndex + index + 1) % 7 == 0) {
+                sponsoredManager.fetchSponsoredContent("short")
+                val sponsored = sponsoredManager.sponsoredContent.value
+                
+                if (sponsored != null) {
+                    // Convert sponsored content to Short (assuming contentId points to a Short)
+                    try {
+                        when (val shortResult = shortsRepository.getShortById(sponsored.contentId)) {
+                            is NetworkResult.Success -> {
+                                result.add(shortResult.data)
+                                sponsoredIndices.add(result.size - 1)
+                            }
+                            else -> {}
+                        }
+                    } catch (e: Exception) {
+                        // Silent fail
+                    }
+                }
+            }
+        }
+        
+        _state.value = _state.value.copy(sponsoredIndices = _state.value.sponsoredIndices + sponsoredIndices)
+        return result
+    }
+
+    fun isSponsored(index: Int): Boolean = _state.value.sponsoredIndices.contains(index)
+
+    fun recordSponsoredImpression(index: Int) {
+        if (!isSponsored(index)) return
+        screenModelScope.launch {
+            sponsoredManager.recordImpression()
+        }
+    }
+
+    fun recordSponsoredView(index: Int, watchTimeSeconds: Int) {
+        if (!isSponsored(index)) return
+        screenModelScope.launch {
+            sponsoredManager.recordView(watchTimeSeconds)
+        }
+    }
+
+    fun recordSponsoredEngagement(index: Int, type: String) {
+        if (!isSponsored(index)) return
+        screenModelScope.launch {
+            sponsoredManager.recordEngagement(type)
         }
     }
 }

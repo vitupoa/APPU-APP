@@ -2,25 +2,24 @@ import { prisma } from '../../config/database.js';
 import { Prisma } from '../../generated/prisma/client.js';
 
 /**
- * Ads service — handles rewarded ad credit recording and ad impression tracking.
- * When a user watches a rewarded ad, we credit their wallet with a small Kr amount
- * and record it as an ad_revenue transaction.
+ * DEPRECATED: Ads service for rewarded video ads (AdMob)
+ * Replaced by SponsoredContentService for native sponsored content
+ * 
+ * Keep this for backward compatibility if needed
  */
 export class AdsService {
   /**
    * Credit user wallet for watching a rewarded ad.
-   * Atomic: creates transaction + increments wallet balance.
+   * @deprecated Use SponsoredContentService instead
    */
   static async creditRewardedAd(userId: string, rewardKr: number = 0.5) {
     const amount = new Prisma.Decimal(rewardKr);
 
     await prisma.$transaction([
-      // Credit wallet
       prisma.wallet.update({
         where: { userId },
         data: { krBalance: { increment: amount } }
       }),
-      // Record transaction
       prisma.transaction.create({
         data: {
           userId,
@@ -37,8 +36,7 @@ export class AdsService {
   }
 
   /**
-   * Record an ad impression for analytics tracking.
-   * Non-blocking, fire-and-forget.
+   * @deprecated Use SponsoredContentService.recordImpression instead
    */
   static async recordImpression(data: {
     userId?: string;
@@ -46,7 +44,6 @@ export class AdsService {
     adType: 'native' | 'interstitial' | 'rewarded';
     placement: string;
   }) {
-    // Record to daily stats for analytics
     if (data.userId && data.adType === 'rewarded') {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -65,7 +62,7 @@ export class AdsService {
         update: {
           krEarned: { increment: data.adType === 'rewarded' ? 0.5 : 0 }
         }
-      }).catch(() => {}); // Non-critical, don't fail
+      }).catch(() => {});
     }
   }
 }

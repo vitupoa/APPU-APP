@@ -4,6 +4,12 @@ import { AdsService } from './ads.service.js';
 
 const router = Router();
 
+/**
+ * DEPRECATED: AdMob rewarded ads routes
+ * Use /api/v1/sponsored/* endpoints for native sponsored content
+ * Keeping for backward compatibility
+ */
+
 // POST /api/v1/ads/rewarded — Credit user for watching rewarded ad
 router.post('/rewarded', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {

@@ -1,14 +1,15 @@
 package com.krieta.feature.chama.presentation.dashboard
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -68,7 +69,7 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
                     },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), contentDescription = "Back")
                         }
                     },
                     actions = {
@@ -86,7 +87,7 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
                         onClick = { showContributeDialog = true },
                         containerColor = ChamaGold
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Contribute", tint = Color.White)
+                        Icon(painterResource(Res.drawable.ic_add), contentDescription = "Contribute", tint = Color.White)
                     }
                 }
             }
@@ -347,7 +348,7 @@ private fun OverviewTab(state: ChamaDashboardState) {
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Icon(Icons.Default.Lock, contentDescription = null, tint = ChamaGold, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(Res.drawable.ic_lock), contentDescription = null, tint = ChamaGold, modifier = Modifier.size(20.dp))
                         Text(
                             "Wallet withdrawals are locked for all members until the rotation completes.",
                             fontSize = 13.sp,

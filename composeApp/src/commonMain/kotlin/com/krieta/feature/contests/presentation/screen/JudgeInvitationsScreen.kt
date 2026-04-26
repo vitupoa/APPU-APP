@@ -1,13 +1,15 @@
 package com.krieta.feature.contests.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -56,7 +58,7 @@ object JudgeInvitationsScreen : Screen {
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack, 
+                                painterResource(Res.drawable.ic_arrow_back), 
                                 contentDescription = "Back",
                                 tint = Color.White
                             )
@@ -257,7 +259,7 @@ private fun JudgeInvitationCard(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Default.Close,
+                            imageVector = painterResource(Res.drawable.ic_close),
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )
@@ -285,7 +287,7 @@ private fun JudgeInvitationCard(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Default.CheckCircle,
+                            imageVector = painterResource(Res.drawable.ic_check)Circle,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )

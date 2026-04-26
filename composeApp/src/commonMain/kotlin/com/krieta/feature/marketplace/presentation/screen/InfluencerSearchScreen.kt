@@ -1,11 +1,13 @@
 package com.krieta.feature.marketplace.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -197,7 +199,7 @@ fun InfluencerCard(
                     Text("${(influencer.engagementRate * 100).toInt()}% engagement • ⭐ ${influencer.rating}",
                         style = MaterialTheme.typography.bodySmall)
                 }
-                Icon(Icons.Default.ChevronRight, null)
+                Icon(painterResource(Res.drawable.ic_chevron_right), null)
             }
             
             if (socialAccounts.isNotEmpty()) {

@@ -1,5 +1,8 @@
 package com.krieta.feature.contests.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -8,9 +11,7 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.*
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -251,7 +252,7 @@ class ContestSubmissionFeedScreen : Screen {
                     onClick = onComment
                 )
                 ActionButton(
-                    icon = Icons.Default.Share,
+                    icon = painterResource(Res.drawable.ic_share),
                     count = 0,
                     onClick = onShare
                 )

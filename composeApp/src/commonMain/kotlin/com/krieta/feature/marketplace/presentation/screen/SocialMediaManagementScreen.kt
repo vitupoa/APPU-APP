@@ -1,5 +1,8 @@
 package com.krieta.feature.marketplace.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,8 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,7 +56,7 @@ class SocialMediaManagementScreen(
             },
             floatingActionButton = {
                 FloatingActionButton(onClick = { showAddDialog = true }) {
-                    Icon(Icons.Default.Add, "Add Account")
+                    Icon(painterResource(Res.drawable.ic_add), "Add Account")
                 }
             }
         ) { padding ->
@@ -231,7 +233,7 @@ private fun SocialAccountCard(
                 }
                 
                 IconButton(onClick = { showMenu = true }) {
-                    Icon(Icons.Default.MoreVert, "Options")
+                    Icon(painterResource(Res.drawable.ic_more_vert), "Options")
                 }
                 
                 DropdownMenu(
@@ -262,7 +264,7 @@ private fun SocialAccountCard(
                             onDelete()
                             showMenu = false
                         },
-                        leadingIcon = { Icon(Icons.Default.Delete, null) }
+                        leadingIcon = { Icon(painterResource(Res.drawable.ic_delete), null) }
                     )
                 }
             }
@@ -293,7 +295,7 @@ private fun SocialAccountCard(
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        Icons.Default.CheckCircle,
+                        painterResource(Res.drawable.ic_check)Circle,
                         null,
                         Modifier.size(14.dp),
                         tint = MaterialTheme.colorScheme.primary
@@ -355,6 +357,7 @@ private fun EmptyStateCard() {
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 private fun AvailablePlatformsGrid(
     connectedPlatforms: List<SocialPlatform>,
@@ -371,7 +374,7 @@ private fun AvailablePlatformsGrid(
                     val isConnected = connectedPlatforms.contains(platform)
                     
                     Card(
-                        Modifier.weight(1f).height(80.dp),
+                        modifier = Modifier.weight(1f).height(80.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = if (isConnected) 
                                 MaterialTheme.colorScheme.surfaceVariant 
@@ -394,7 +397,7 @@ private fun AvailablePlatformsGrid(
                             )
                             if (isConnected) {
                                 Icon(
-                                    Icons.Default.Check,
+                                    painterResource(Res.drawable.ic_check),
                                     null,
                                     Modifier.size(12.dp),
                                     tint = MaterialTheme.colorScheme.primary

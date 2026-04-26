@@ -1,5 +1,8 @@
 package com.krieta.feature.marketplace.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,8 +10,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -227,7 +229,7 @@ fun SocialMediaStatsCard(
                 StatColumn(
                     label = "Total Views",
                     value = formatLargeNumber(totalViews),
-                    icon = Icons.Default.Visibility
+                    icon = painterResource(Res.drawable.ic_visibility)
                 )
             }
             

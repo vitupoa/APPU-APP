@@ -1,5 +1,8 @@
 package com.krieta.feature.profile.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -12,7 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -108,7 +111,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                             if (isOwnProfile) {
                                 Box {
                                     IconButton(onClick = { menuExpanded = true }) {
-                                        Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = KrietaColors.OnBackground)
+                                        Icon(painterResource(Res.drawable.ic_more_vert), contentDescription = "Menu", tint = KrietaColors.OnBackground)
                                     }
                                     DropdownMenu(
                                         expanded = menuExpanded,
@@ -395,7 +398,7 @@ private fun BioLinkBottomSheet(
                         onClick = { showAddLinkField = true },
                         modifier = Modifier.align(Alignment.CenterEnd).background(KrietaColors.Primary.copy(alpha = 0.1f), CircleShape)
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Add", tint = KrietaColors.Primary)
+                        Icon(painterResource(Res.drawable.ic_add), contentDescription = "Add", tint = KrietaColors.Primary)
                     }
                 }
             }
@@ -449,7 +452,7 @@ private fun BioLinkBottomSheet(
                         
                         if (isOwnProfile) {
                             IconButton(onClick = { onDeleteLink(link.id) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red.copy(alpha = 0.6f))
+                                Icon(painterResource(Res.drawable.ic_delete), contentDescription = "Delete", tint = Color.Red.copy(alpha = 0.6f))
                             }
                         } else {
                             Icon(

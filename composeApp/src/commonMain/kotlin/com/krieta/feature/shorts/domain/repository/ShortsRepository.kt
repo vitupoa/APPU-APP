@@ -8,6 +8,7 @@ data class ShortsFeedResult(val items: List<Short>, val nextCursor: String?)
 
 interface ShortsRepository {
     suspend fun getFeed(tab: String, cursor: String?): NetworkResult<ShortsFeedResult>
+    suspend fun getShortById(shortId: String): NetworkResult<Short>
     suspend fun toggleLike(shortId: String): NetworkResult<Boolean>
     suspend fun getComments(shortId: String, cursor: String?): NetworkResult<List<ShortComment>>
     suspend fun addComment(shortId: String, text: String): NetworkResult<ShortComment>

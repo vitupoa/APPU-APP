@@ -1,10 +1,13 @@
 package com.krieta.feature.contests.presentation.screen.wizard
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -364,7 +367,7 @@ private fun TaskListItem(
                 )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Close,
+                    imageVector = painterResource(Res.drawable.ic_close),
                     contentDescription = "Remove task"
                 )
             }

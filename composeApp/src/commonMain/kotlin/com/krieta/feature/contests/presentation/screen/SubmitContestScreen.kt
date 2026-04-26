@@ -1,14 +1,15 @@
 package com.krieta.feature.contests.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.*
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -61,7 +62,7 @@ data class SubmitContestScreen(val contestId: String) : Screen {
                     title = { Text("Submit Entry") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
                         }
                     }
                 )
@@ -226,13 +227,13 @@ private fun RequirementItem(action: ContestAction) {
         ) {
             Icon(
                 imageVector = when (action.actionType) {
-                    "FOLLOW_KRIETA" -> Icons.Default.Person
+                    "FOLLOW_KRIETA" -> painterResource(Res.drawable.ic_person)
                     "YOUTUBE_SUB" -> Icons.Default.PlayArrow
                     "INSTAGRAM_FOLLOW" -> Icons.Default.Camera
                     "TIKTOK_FOLLOW" -> Icons.Default.MusicNote
                     "WATCH_VIDEO" -> Icons.Default.PlayCircle
                     "VISIT_SHOP" -> Icons.Default.ShoppingCart
-                    else -> Icons.Default.CheckCircle
+                    else -> painterResource(Res.drawable.ic_check)Circle
                 },
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
@@ -290,7 +291,7 @@ private fun MediaUploadSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.Add, null, modifier = Modifier.size(48.dp))
+                        Icon(painterResource(Res.drawable.ic_add), null, modifier = Modifier.size(48.dp))
                         Spacer(Modifier.height(8.dp))
                         Text("Select Photo or Video")
                     }
@@ -334,7 +335,7 @@ private fun ProofUploadSection(
                             onClick = { onProofRemoved(uri) },
                             modifier = Modifier.align(Alignment.TopEnd)
                         ) {
-                            Icon(Icons.Default.Close, "Remove", tint = Color.White)
+                            Icon(painterResource(Res.drawable.ic_close), "Remove", tint = Color.White)
                         }
                     }
                 }
@@ -347,7 +348,7 @@ private fun ProofUploadSection(
                         .clickable { /* Open image picker */ },
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.Add, "Add proof")
+                    Icon(painterResource(Res.drawable.ic_add), "Add proof")
                 }
             }
 

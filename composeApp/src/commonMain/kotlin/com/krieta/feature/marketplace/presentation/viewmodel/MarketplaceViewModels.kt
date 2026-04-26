@@ -28,6 +28,7 @@ class CampaignListViewModel(
             when (val result = repository.getMyCampaigns()) {
                 is NetworkResult.Success -> _myCampaigns.value = result.data
                 is NetworkResult.Error -> {}
+                is com.krieta.com.core.network.NetworkResult.Loading -> {}
             }
             _isLoading.value = false
         }
@@ -39,6 +40,7 @@ class CampaignListViewModel(
             when (val result = repository.getAvailableCampaigns()) {
                 is NetworkResult.Success -> _availableCampaigns.value = result.data
                 is NetworkResult.Error -> {}
+                is com.krieta.com.core.network.NetworkResult.Loading -> {}
             }
             _isLoading.value = false
         }
@@ -74,6 +76,7 @@ class CreateCampaignViewModel(
                 is NetworkResult.Error -> {
                     _createState.value = CreateCampaignState.Error(result.message)
                 }
+                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -98,6 +101,7 @@ class CampaignApplicationsViewModel(
             when (val result = repository.getMyApplications()) {
                 is NetworkResult.Success -> _applications.value = result.data
                 is NetworkResult.Error -> {}
+                is com.krieta.com.core.network.NetworkResult.Loading -> {}
             }
         }
     }
@@ -132,6 +136,7 @@ class SponsorContestViewModel(
                 is NetworkResult.Error -> {
                     _sponsorState.value = SponsorState.Error(result.message)
                 }
+                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -156,6 +161,7 @@ class GamificationViewModel(
             when (val result = repository.getGamificationStats()) {
                 is NetworkResult.Success -> _stats.value = result.data
                 is NetworkResult.Error -> {}
+                is com.krieta.com.core.network.NetworkResult.Loading -> {}
             }
         }
     }

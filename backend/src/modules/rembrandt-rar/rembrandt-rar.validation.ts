@@ -35,7 +35,7 @@ export const moderateContentSchema = z.object({
 
 export const walletTopupSchema = z.object({
   userId: z.string().uuid(),
-  amountKr: z.number().positive(),
+  amountKr: z.number().int('Amount must be a whole number').positive(),
   reason: z.string().min(3).max(500),
 });
 
@@ -45,7 +45,7 @@ export const withdrawalReviewSchema = z.object({
 });
 
 export const platformWalletActionSchema = z.object({
-  amountKr: z.number().positive(),
+  amountKr: z.number().int('Amount must be a whole number').positive(),
   action: z.enum(['topup', 'withdraw']),
   reason: z.string().min(3).max(500),
 });

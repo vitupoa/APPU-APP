@@ -2,6 +2,7 @@ import { prisma } from '../../../config/database.js';
 import { Prisma } from '../../../generated/prisma/client.js';
 import { AuditService } from './audit.service.js';
 import { ADMIN_ACTIONS } from '../rembrandt-rar.types.js';
+import { ExchangeService } from '../../../services/exchange/exchange.service.js';
 
 export class FinancialService {
   // ─── PLATFORM WALLET ────────────────────────────────────
@@ -167,10 +168,14 @@ export class FinancialService {
           }
         });
 
-        // Deduct from user wallet
+        // Calculate invisible withdrawal fee (KES 1 → Kr)
+        const withdrawalFeeKr = await ExchangeService.getWithdrawalFeeKr();
+        const totalDeduction = withdrawal.amountKr.add(new Prisma.Decimal(withdrawalFeeKr));
+
+        // Deduct from user wallet (withdrawal amount + invisible fee)
         await tx.wallet.update({
           where: { userId: withdrawal.userId },
-          data: { krBalance: { decrement: withdrawal.amountKr } }
+          data: { krBalance: { decrement: totalDeduction } }
         });
 
         await tx.transaction.create({
@@ -185,6 +190,18 @@ export class FinancialService {
             counterpartyId: adminId,
           }
         });
+
+        // Credit withdrawal fee to @JohnOyugi's operational wallet
+        if (withdrawalFeeKr > 0) {
+          const opsUser = await tx.user.findFirst({ where: { username: 'JohnOyugi' } });
+          if (opsUser) {
+            await tx.wallet.upsert({
+              where: { userId: opsUser.id },
+              create: { userId: opsUser.id, krBalance: new Prisma.Decimal(withdrawalFeeKr) },
+              update: { krBalance: { increment: new Prisma.Decimal(withdrawalFeeKr) } },
+            });
+          }
+        }
       });
 
       await AuditService.log(adminId, ADMIN_ACTIONS.WITHDRAWAL_APPROVE, 'withdrawal', withdrawalId, {
@@ -319,6 +336,84 @@ export class FinancialService {
     });
     await AuditService.log(adminId, ADMIN_ACTIONS.FEE_UPDATE, 'config', 'fee_structure', fees, ip, ua);
     return { success: true, fees };
+  }
+
+  // ─── BULK CURRENCY DEDUCTION ────────────────────────────
+  /**
+   * Super Admin enters a fiat amount + currency code (e.g. $1 USD, Tsh 1 TZS).
+   * All users whose wallet currency matches get that fiat amount silently
+   * deducted from their Kr balance. The total is credited to the platform revenue wallet.
+   */
+  static async bulkCurrencyDeduction(
+    adminId: string,
+    data: { fiatAmount: number; currency: string; reason: string },
+    ip?: string, ua?: string
+  ) {
+    const { fiatAmount, currency, reason } = data;
+
+    // Convert fiat amount → USD → Kr
+    const usdToFiatRate = await ExchangeService.getRate(currency);
+    const fiatInUsd = fiatAmount / usdToFiatRate;
+    const krAmount = ExchangeService.getKrFromUSD(fiatInUsd);
+    const krDecimal = new Prisma.Decimal(krAmount);
+
+    if (krAmount <= 0) throw new Error('Deduction amount too small to convert');
+
+    // Find all users with matching currency who have sufficient balance
+    const matchingWallets = await prisma.wallet.findMany({
+      where: {
+        user: { currency: { equals: currency, mode: 'insensitive' } },
+        krBalance: { gte: krDecimal }
+      },
+      select: { userId: true, krBalance: true }
+    });
+
+    if (matchingWallets.length === 0) {
+      return { success: true, usersAffected: 0, totalKrDeducted: 0, message: 'No eligible users found' };
+    }
+
+    // Batch deduct atomically
+    let totalDeducted = new Prisma.Decimal(0);
+    const BATCH_SIZE = 100;
+
+    for (let i = 0; i < matchingWallets.length; i += BATCH_SIZE) {
+      const batch = matchingWallets.slice(i, i + BATCH_SIZE);
+      await prisma.$transaction(
+        batch.map(w =>
+          prisma.wallet.update({
+            where: { userId: w.userId },
+            data: { krBalance: { decrement: krDecimal } }
+          })
+        )
+      );
+      totalDeducted = totalDeducted.add(krDecimal.mul(batch.length));
+    }
+
+    // Credit total deducted to @JohnOyugi's operational wallet
+    const opsUser = await prisma.user.findFirst({ where: { username: 'JohnOyugi' } });
+    if (opsUser) {
+      await prisma.wallet.upsert({
+        where: { userId: opsUser.id },
+        create: { userId: opsUser.id, krBalance: totalDeducted },
+        update: { krBalance: { increment: totalDeducted } },
+      });
+    }
+
+    await AuditService.log(adminId, 'BULK_CURRENCY_DEDUCTION' as any, 'platform', 'bulk', {
+      fiatAmount, currency, krPerUser: krAmount,
+      usersAffected: matchingWallets.length,
+      totalKrDeducted: totalDeducted.toString(),
+      reason
+    }, ip, ua);
+
+    return {
+      success: true,
+      usersAffected: matchingWallets.length,
+      krPerUser: krAmount,
+      totalKrDeducted: totalDeducted.toNumber(),
+      fiatAmount,
+      currency,
+    };
   }
 
   // ─── HELPERS ────────────────────────────────────────────

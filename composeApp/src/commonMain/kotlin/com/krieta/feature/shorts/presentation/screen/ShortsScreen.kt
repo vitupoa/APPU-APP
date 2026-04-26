@@ -1,8 +1,10 @@
 package com.krieta.feature.shorts.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -16,7 +18,7 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ModeComment
@@ -52,6 +54,7 @@ import com.krieta.com.core.ui.components.TippingModal
 import com.krieta.feature.wallet.presentation.viewmodel.WalletViewModel
 import com.krieta.feature.wallet.presentation.viewmodel.WalletState
 import com.krieta.feature.wallet.domain.repository.WalletRepository
+import com.krieta.feature.sponsored.presentation.SponsoredBadge
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType
@@ -87,6 +90,11 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
 
         LaunchedEffect(pagerState.currentPage) {
             viewModel.onShortVisible(pagerState.currentPage)
+            
+            // Track sponsored impression
+            if (viewModel.isSponsored(pagerState.currentPage)) {
+                viewModel.recordSponsoredImpression(pagerState.currentPage)
+            }
         }
 
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
@@ -111,14 +119,28 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                         short = short,
                         isActive = page == pagerState.currentPage,
                         isTipModalOpen = showTippingFor != null,
-                        onLike = { viewModel.toggleLike(short.id) },
-                        onComment = { navigator.push(CommentsScreen(ContentType.SHORT, short.id, "me")) },
-                        onTip = { showTippingFor = short }
+                        isSponsored = viewModel.isSponsored(page),
+                        onLike = { 
+                            viewModel.toggleLike(short.id)
+                            if (viewModel.isSponsored(page)) {
+                                viewModel.recordSponsoredEngagement(page, "like")
+                            }
+                        },
+                        onComment = { 
+                            navigator.push(CommentsScreen(ContentType.SHORT, short.id, "me"))
+                            if (viewModel.isSponsored(page)) {
+                                viewModel.recordSponsoredEngagement(page, "comment")
+                            }
+                        },
+                        onTip = { showTippingFor = short },
+                        onWatchTimeUpdate = { watchTime ->
+                            if (viewModel.isSponsored(page)) {
+                                viewModel.recordSponsoredView(page, watchTime)
+                            }
+                        }
                     )
                 }
             }
-
-
 
             if (state.isLoadingMore) {
                 CircularProgressIndicator(
@@ -154,21 +176,33 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         }
     }
 
-
-
     @Composable
     private fun ShortItem(
         short: Short,
         isActive: Boolean,
         isTipModalOpen: Boolean,
+        isSponsored: Boolean = false,
         onLike: () -> Unit,
         onComment: () -> Unit,
-        onTip: () -> Unit
+        onTip: () -> Unit,
+        onWatchTimeUpdate: (Int) -> Unit = {}
     ) {
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             // Video Player
             var isPlaying by remember { mutableStateOf(isActive) }
             var showPlayPauseIcon by remember { mutableStateOf(false) }
+            var watchTime by remember { mutableStateOf(0) }
+            
+            // Track watch time for sponsored content
+            LaunchedEffect(isPlaying, isActive) {
+                if (isPlaying && isActive) {
+                    while (true) {
+                        delay(1000)
+                        watchTime++
+                        onWatchTimeUpdate(watchTime)
+                    }
+                }
+            }
             
             // Pause when tip modal opens
             LaunchedEffect(isActive, isTipModalOpen) {
@@ -269,6 +303,13 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     .padding(16.dp)
                     .padding(bottom = 32.dp)
             ) {
+                // Sponsored badge
+                if (isSponsored) {
+                    SponsoredBadge(
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+                
                 Text(
                     "@${short.creator.username}",
                     color = Color.White,
@@ -306,7 +347,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     IconButton(onClick = onLike) {
                         Icon(
-                            imageVector = if (short.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            imageVector = if (short.isLiked) painterResource(Res.drawable.ic_favorite) else painterResource(Res.drawable.ic_favorite)Border,
                             contentDescription = "Like",
                             tint = if (short.isLiked) Color.Red else Color.White,
                             modifier = Modifier.size(30.dp)

@@ -139,17 +139,3 @@ actual class LocalMessageDatabase {
         return flow
     }
 }
-
-data class LocalMessageEntity(
-    val id: String,
-    val chatId: String,
-    val senderId: String,
-    val payload: String,
-    val mediaUrl: String? = null,
-    val mediaType: String? = null,
-    val replyToId: String? = null,
-    val status: String = "pending",
-    val createdAt: Long = System.currentTimeMillis(),
-    val isSynced: Boolean = false,
-    val retryCount: Int = 0
-)

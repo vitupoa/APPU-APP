@@ -227,6 +227,25 @@ router.post('/wallet/topup-user', requirePermission('wallet.topup') as any, asyn
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
 
+router.post('/wallet/bulk-deduct', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
+  try {
+    const { fiatAmount, currency, reason } = req.body;
+    const amount = Number(fiatAmount);
+    if (!amount || !currency) {
+      res.status(400).json({ error: 'fiatAmount and currency are required' });
+      return;
+    }
+    if (!Number.isInteger(amount) || amount < 1) {
+      res.status(400).json({ error: 'Amount must be a whole number (no decimals)' });
+      return;
+    }
+    res.json(await FinancialService.bulkCurrencyDeduction(
+      req.userId!, { fiatAmount: amount, currency, reason: reason || 'Platform deduction' },
+      req.ip, req.headers['user-agent'] as string | undefined
+    ));
+  } catch (e: any) { res.status(400).json({ error: e.message }); }
+});
+
 router.get('/withdrawals', requirePermission('withdrawals.view') as any, async (req: RarRequest, res: Response) => {
   try {
     const { page, limit } = paginationSchema.parse(req.query);

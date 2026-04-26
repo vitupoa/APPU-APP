@@ -1,5 +1,8 @@
 package com.krieta.feature.contests.presentation.screen.wizard
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,7 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -161,7 +164,7 @@ private fun JudgeSearchField(
             placeholder = { Text("Enter username...") },
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Default.Search,
+                    imageVector = painterResource(Res.drawable.ic_search),
                     contentDescription = "Search",
                     tint = Color(0xFFA0A0A0)
                 )
@@ -298,7 +301,7 @@ private fun UserSearchResultItem(
                     )
                     if (user.isVerified) {
                         Icon(
-                            imageVector = Icons.Default.CheckCircle,
+                            imageVector = painterResource(Res.drawable.ic_check)Circle,
                             contentDescription = "Verified",
                             tint = Color(0xFF0A84FF),
                             modifier = Modifier.size(14.dp)
@@ -319,7 +322,7 @@ private fun UserSearchResultItem(
             modifier = Modifier.size(36.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
+                imageVector = painterResource(Res.drawable.ic_add),
                 contentDescription = "Add as judge",
                 tint = Color(0xFFF5A623)
             )
@@ -471,7 +474,7 @@ private fun JudgeListItem(
                 )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Close,
+                    imageVector = painterResource(Res.drawable.ic_close),
                     contentDescription = "Remove judge"
                 )
             }

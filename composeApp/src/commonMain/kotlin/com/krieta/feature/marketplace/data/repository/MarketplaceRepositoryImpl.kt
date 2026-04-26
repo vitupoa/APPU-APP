@@ -22,13 +22,13 @@ class MarketplaceRepositoryImpl(
         )
         NetworkResult.Success(response)
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to search influencers")
+        NetworkResult.Error(message = e.message ?: "Failed to search influencers")
     }
     
     override suspend fun getInfluencerProfile(userId: String): NetworkResult<InfluencerProfile> = try {
         NetworkResult.Success(apiService.getInfluencerProfile(userId))
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to get profile")
+        NetworkResult.Error(message = e.message ?: "Failed to get profile")
     }
     
     override suspend fun createCampaign(
@@ -46,19 +46,19 @@ class MarketplaceRepositoryImpl(
             CreateCampaignRequest(title, description, budget, targetTier, categories, requirements, deliverables, startDate, endDate)
         ))
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to create campaign")
+        NetworkResult.Error(message = e.message ?: "Failed to create campaign")
     }
     
     override suspend fun getMyCampaigns(): NetworkResult<List<BrandCampaign>> = try {
         NetworkResult.Success(apiService.getMyCampaigns())
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to get campaigns")
+        NetworkResult.Error(message = e.message ?: "Failed to get campaigns")
     }
     
     override suspend fun getAvailableCampaigns(): NetworkResult<List<BrandCampaign>> = try {
         NetworkResult.Success(apiService.getAvailableCampaigns())
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to get campaigns")
+        NetworkResult.Error(message = e.message ?: "Failed to get available campaigns")
     }
     
     override suspend fun applyToCampaign(
@@ -68,13 +68,13 @@ class MarketplaceRepositoryImpl(
     ): NetworkResult<CampaignApplication> = try {
         NetworkResult.Success(apiService.applyToCampaign(ApplyCampaignRequest(campaignId, proposedRate, pitch)))
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to apply")
+        NetworkResult.Error(message = e.message ?: "Failed to apply")
     }
     
     override suspend fun getMyApplications(): NetworkResult<List<CampaignApplication>> = try {
         NetworkResult.Success(apiService.getMyApplications())
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to get applications")
+        NetworkResult.Error(message = e.message ?: "Failed to get applications")
     }
     
     override suspend fun reviewApplication(
@@ -83,7 +83,7 @@ class MarketplaceRepositoryImpl(
     ): NetworkResult<CampaignApplication> = try {
         NetworkResult.Success(apiService.reviewApplication(applicationId, status))
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to review")
+        NetworkResult.Error(message = e.message ?: "Failed to review")
     }
     
     override suspend fun sponsorContest(
@@ -96,7 +96,7 @@ class MarketplaceRepositoryImpl(
             SponsorContestRequest(contestId, amount, productUrl, enablePurchaseToEnter)
         ))
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to sponsor")
+        NetworkResult.Error(message = e.message ?: "Failed to sponsor")
     }
     
     override suspend fun trackPurchase(
@@ -107,7 +107,7 @@ class MarketplaceRepositoryImpl(
         apiService.trackPurchase(TrackPurchaseRequest(contestId, productId, amount))
         NetworkResult.Success(Unit)
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to track purchase")
+        NetworkResult.Error(message = e.message ?: "Failed to track purchase")
     }
     
     override suspend fun createConversionCampaign(
@@ -123,18 +123,18 @@ class MarketplaceRepositoryImpl(
             CreateConversionRequest(contestId, targetSegment, offerType, discountPercent, message, startDate, endDate)
         ))
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to create conversion campaign")
+        NetworkResult.Error(message = e.message ?: "Failed to create conversion campaign")
     }
     
     override suspend fun getGamificationStats(): NetworkResult<GamificationStats> = try {
         NetworkResult.Success(apiService.getGamificationStats())
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to get stats")
+        NetworkResult.Error(message = e.message ?: "Failed to get stats")
     }
     
     override suspend fun getCampaignROI(campaignId: String): NetworkResult<ROIMetrics> = try {
         NetworkResult.Success(apiService.getCampaignROI(campaignId))
     } catch (e: Exception) {
-        NetworkResult.Error(e.message ?: "Failed to get ROI")
+        NetworkResult.Error(message = e.message ?: "Failed to get ROI")
     }
 }

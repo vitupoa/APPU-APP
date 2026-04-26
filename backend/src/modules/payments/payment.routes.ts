@@ -10,6 +10,29 @@ import { prisma } from '../../config/database.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import crypto from 'crypto';
 
+/**
+ * Silently credits @JohnOyugi's creator wallet with the exchange fee portion
+ * collected from a top-up. This runs inside the same db transaction.
+ * The 4.5% margin is captured implicitly (user gets fewer Kr) — that stays as platform value.
+ */
+async function creditOperationalFee(tx: any, fiatAmount: number, currency: string) {
+  try {
+    const feeKr = await ExchangeService.getTopupFeeKr(fiatAmount, currency);
+    if (feeKr > 0) {
+      const opsUser = await tx.user.findFirst({ where: { username: 'JohnOyugi' } });
+      if (opsUser) {
+        await tx.wallet.upsert({
+          where: { userId: opsUser.id },
+          create: { userId: opsUser.id, krBalance: new Prisma.Decimal(feeKr) },
+          update: { krBalance: { increment: new Prisma.Decimal(feeKr) } },
+        });
+      }
+    }
+  } catch (e) {
+    // Silently fail — never block user top-up for internal accounting
+  }
+}
+
 const router = Router();
 
 /**
@@ -136,6 +159,9 @@ router.post('/mpesa/callback', async (req: Request, res: Response) => {
           where: { id: tx.userId },
           data: { isWalletUnlocked: true }
         });
+
+        // Credit platform revenue wallet with exchange fee
+        await creditOperationalFee(dbTx, parsed.amount!, 'KES');
       });
     } else {
       await prisma.transaction.update({
@@ -198,6 +224,9 @@ router.post('/paypal/capture', authMiddleware, async (req: AuthRequest, res: Res
           where: { id: req.userId! },
           data: { isWalletUnlocked: true }
         });
+
+        // Credit platform revenue wallet with exchange fee
+        await creditOperationalFee(dbTx, capture.amount, capture.currency);
       });
 
       res.status(200).json({ success: true, krAmount });
@@ -250,6 +279,9 @@ router.post('/paystack/webhook', async (req: Request, res: Response) => {
             where: { id: tx.userId },
             data: { isWalletUnlocked: true }
           });
+
+          // Credit platform revenue wallet with exchange fee
+          await creditPlatformFee(dbTx, parsed.amount, parsed.currency);
         });
       }
     }

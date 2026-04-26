@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.contests.domain.model.Contest
 import com.krieta.feature.contests.domain.repository.ContestsRepository
+import com.krieta.feature.sponsored.presentation.SponsoredContentManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,13 +16,15 @@ sealed class ContestFeedState {
     data class Success(
         val items: List<Contest>,
         val nextCursor: String?,
-        val activeFilter: String?
+        val activeFilter: String?,
+        val sponsoredIndices: Set<Int> = emptySet()
     ) : ContestFeedState()
     data class Error(val message: String) : ContestFeedState()
 }
 
 class ContestFeedViewModel(
-    private val repository: ContestsRepository
+    private val repository: ContestsRepository,
+    private val sponsoredManager: SponsoredContentManager
 ) : ScreenModel {
 
     private val _state = MutableStateFlow<ContestFeedState>(ContestFeedState.Loading)
@@ -46,8 +49,9 @@ class ContestFeedViewModel(
             _isLoadingMore.value = true
             when (val result = repository.listContests(current.activeFilter, cursor)) {
                 is NetworkResult.Success -> {
+                    val newItems = injectSponsoredContent(result.data.items, current.items.size)
                     _state.value = current.copy(
-                        items = current.items + result.data.items,
+                        items = current.items + newItems,
                         nextCursor = result.data.nextCursor
                     )
                 }
@@ -67,8 +71,9 @@ class ContestFeedViewModel(
         screenModelScope.launch {
             when (val result = repository.listContests(status, null)) {
                 is NetworkResult.Success -> {
+                    val items = injectSponsoredContent(result.data.items)
                     _state.value = ContestFeedState.Success(
-                        items = result.data.items,
+                        items = items,
                         nextCursor = result.data.nextCursor,
                         activeFilter = status
                     )
@@ -78,6 +83,63 @@ class ContestFeedViewModel(
                 }
                 is NetworkResult.Loading -> {}
             }
+        }
+    }
+
+    private suspend fun injectSponsoredContent(items: List<Contest>, startIndex: Int = 0): List<Contest> {
+        if (items.isEmpty()) return items
+        
+        // Inject every 6 items for contests feed
+        val result = mutableListOf<Contest>()
+        val sponsoredIndices = mutableSetOf<Int>()
+        
+        items.forEachIndexed { index, contest ->
+            result.add(contest)
+            
+            // Inject sponsored content every 6 items
+            if ((startIndex + index + 1) % 6 == 0) {
+                sponsoredManager.fetchSponsoredContent("contest")
+                val sponsored = sponsoredManager.sponsoredContent.value
+                
+                if (sponsored != null) {
+                    try {
+                        when (val contestResult = repository.getContestById(sponsored.contentId)) {
+                            is NetworkResult.Success -> {
+                                result.add(contestResult.data)
+                                sponsoredIndices.add(result.size - 1)
+                            }
+                            else -> {}
+                        }
+                    } catch (e: Exception) {
+                        // Silent fail
+                    }
+                }
+            }
+        }
+        
+        val current = _state.value as? ContestFeedState.Success
+        if (current != null) {
+            _state.value = current.copy(sponsoredIndices = current.sponsoredIndices + sponsoredIndices)
+        }
+        return result
+    }
+
+    fun isSponsored(index: Int): Boolean {
+        val current = _state.value as? ContestFeedState.Success ?: return false
+        return current.sponsoredIndices.contains(index)
+    }
+
+    fun recordSponsoredImpression(index: Int) {
+        if (!isSponsored(index)) return
+        screenModelScope.launch {
+            sponsoredManager.recordImpression()
+        }
+    }
+
+    fun recordSponsoredEngagement(index: Int, type: String) {
+        if (!isSponsored(index)) return
+        screenModelScope.launch {
+            sponsoredManager.recordEngagement(type)
         }
     }
 }

@@ -1,15 +1,18 @@
 package com.krieta.feature.chat.data.repository
 
-import com.krieta.feature.chat.data.local.LocalMessage
-import com.krieta.feature.chat.data.local.MessageStatus
+import com.krieta.com.core.network.NetworkResult
+import com.krieta.feature.chat.data.local.LocalMessageEntity
 import com.krieta.feature.chat.data.local.OfflineMessageSyncService
-import com.krieta.feature.chat.data.local.toEntity
 import com.krieta.feature.chat.data.remote.ChatApi
+import com.krieta.feature.chat.data.remote.dto.*
 import com.krieta.feature.chat.domain.model.Chat
-import com.krieta.feature.chat.domain.model.Message
+import com.krieta.feature.chat.domain.model.ChatMessage
+import com.krieta.feature.chat.domain.model.ChatParticipant
+import com.krieta.feature.chat.domain.model.ChatType
+import com.krieta.feature.chat.domain.model.UserSnippet
 import com.krieta.feature.chat.domain.repository.ChatRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
 import java.util.UUID
 
 class ChatRepositoryWithOfflineSupport(
@@ -17,39 +20,29 @@ class ChatRepositoryWithOfflineSupport(
     private val offlineSyncService: OfflineMessageSyncService
 ) : ChatRepository {
 
-    override suspend fun getChats(page: Int, limit: Int): Result<List<Chat>> {
+    override suspend fun getChats(page: Int): NetworkResult<List<Chat>> {
         return try {
             if (offlineSyncService.isOnline.value) {
-                chatApi.getChats(page, limit)
+                val response = chatApi.getChats(page)
+                NetworkResult.Success(response.chats.map { it.toDomain() })
             } else {
-                Result.failure(Exception("No internet connection"))
+                NetworkResult.Error(message = "No internet connection")
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            NetworkResult.Error(message = e.message ?: "Failed to get chats")
         }
     }
 
-    override suspend fun getChatById(chatId: String): Result<Chat> {
+    override suspend fun createDirectChat(recipientId: String): NetworkResult<Chat> {
         return try {
             if (offlineSyncService.isOnline.value) {
-                chatApi.getChatById(chatId)
+                val response = chatApi.createDirectChat(recipientId)
+                NetworkResult.Success(response.chat.toDomain())
             } else {
-                Result.failure(Exception("No internet connection"))
+                NetworkResult.Error(message = "No internet connection")
             }
         } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun createDirectChat(recipientId: String): Result<Chat> {
-        return try {
-            if (offlineSyncService.isOnline.value) {
-                chatApi.createDirectChat(recipientId)
-            } else {
-                Result.failure(Exception("No internet connection"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
+            NetworkResult.Error(message = e.message ?: "Failed to create chat")
         }
     }
 
@@ -57,27 +50,29 @@ class ChatRepositoryWithOfflineSupport(
         name: String,
         description: String?,
         participantIds: List<String>
-    ): Result<Chat> {
+    ): NetworkResult<Chat> {
         return try {
             if (offlineSyncService.isOnline.value) {
-                chatApi.createGroupChat(name, description, participantIds)
+                val response = chatApi.createGroupChat(name, description, participantIds)
+                NetworkResult.Success(response.chat.toDomain())
             } else {
-                Result.failure(Exception("No internet connection"))
+                NetworkResult.Error(message = "No internet connection")
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            NetworkResult.Error(message = e.message ?: "Failed to create group chat")
         }
     }
 
-    override suspend fun getMessages(chatId: String, page: Int, limit: Int): Result<List<Message>> {
+    override suspend fun getMessages(chatId: String, page: Int): NetworkResult<List<ChatMessage>> {
         return try {
             if (offlineSyncService.isOnline.value) {
-                chatApi.getMessages(chatId, page, limit)
+                val response = chatApi.getMessages(chatId, page)
+                NetworkResult.Success(response.messages.map { it.toDomain() })
             } else {
-                Result.failure(Exception("No internet connection"))
+                NetworkResult.Error(message = "No internet connection")
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            NetworkResult.Error(message = e.message ?: "Failed to get messages")
         }
     }
 
@@ -87,59 +82,41 @@ class ChatRepositoryWithOfflineSupport(
         mediaUrl: String?,
         mediaType: String?,
         replyToId: String?
-    ): Result<Message> {
+    ): NetworkResult<ChatMessage> {
         return try {
             if (offlineSyncService.isOnline.value) {
-                // Online: send directly
-                chatApi.sendMessage(chatId, payload, mediaUrl, mediaType, replyToId)
+                val response = chatApi.sendMessage(chatId, payload, mediaUrl, mediaType, replyToId)
+                NetworkResult.Success(response.message.toDomain())
             } else {
-                // Offline: queue message
-                val localMessage = LocalMessage(
+                val localMessage = LocalMessageEntity(
                     id = UUID.randomUUID().toString(),
                     chatId = chatId,
-                    senderId = "", // Will be set by sync service
+                    senderId = "",
                     payload = payload,
                     mediaUrl = mediaUrl,
                     mediaType = mediaType,
                     replyToId = replyToId,
-                    status = MessageStatus.PENDING
+                    status = "pending"
                 )
                 
-                offlineSyncService.queueMessage(localMessage.toEntity())
+                offlineSyncService.queueMessage(localMessage)
                 
-                // Return optimistic result
-                Result.success(
-                    Message(
+                NetworkResult.Success(
+                    ChatMessage(
                         id = localMessage.id,
                         chatId = chatId,
                         senderId = "",
+                        sender = null,
                         payload = payload,
                         mediaUrl = mediaUrl,
                         mediaType = mediaType,
                         status = "pending",
-                        createdAt = System.currentTimeMillis()
+                        createdAt = Instant.fromEpochMilliseconds(System.currentTimeMillis())
                     )
                 )
             }
         } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun sendTip(
-        chatId: String,
-        recipientId: String,
-        amountKr: Int,
-        currency: String
-    ): Result<Unit> {
-        return try {
-            if (offlineSyncService.isOnline.value) {
-                chatApi.sendTip(chatId, recipientId, amountKr, currency)
-            } else {
-                Result.failure(Exception("Tipping requires internet connection"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
+            NetworkResult.Error(message = e.message ?: "Failed to send message")
         }
     }
 
@@ -149,5 +126,60 @@ class ChatRepositoryWithOfflineSupport(
 
     fun cleanup() {
         offlineSyncService.cleanup()
+    }
+
+    private fun ChatDto.toDomain(): Chat {
+        return Chat(
+            id = id,
+            type = if (type == "GROUP") ChatType.GROUP else ChatType.DIRECT,
+            name = name,
+            description = description,
+            avatarUrl = avatarUrl,
+            participants = participants.map { it.toDomain() },
+            latestMessage = messages.firstOrNull()?.toDomain(),
+            createdAt = parseInstant(createdAt),
+            updatedAt = parseInstant(updatedAt)
+        )
+    }
+
+    private fun ChatParticipantDto.toDomain(): ChatParticipant {
+        return ChatParticipant(
+            userId = userId,
+            role = role,
+            joinedAt = parseInstant(joinedAt),
+            user = user.toDomain()
+        )
+    }
+
+    private fun MessageDto.toDomain(): ChatMessage {
+        return ChatMessage(
+            id = id,
+            chatId = chatId,
+            senderId = senderId,
+            sender = sender?.toDomain(),
+            payload = payload,
+            mediaUrl = mediaUrl,
+            mediaType = mediaType,
+            isSystemEvent = isSystemEvent,
+            status = status,
+            createdAt = parseInstant(createdAt)
+        )
+    }
+
+    private fun UserSnippetDto.toDomain(): UserSnippet {
+        return UserSnippet(
+            id = id,
+            username = username,
+            displayName = displayName,
+            avatarUrl = avatarUrl
+        )
+    }
+
+    private fun parseInstant(dateString: String): Instant {
+        return try {
+            Instant.parse(dateString)
+        } catch (_: Exception) {
+            Instant.DISTANT_PAST
+        }
     }
 }

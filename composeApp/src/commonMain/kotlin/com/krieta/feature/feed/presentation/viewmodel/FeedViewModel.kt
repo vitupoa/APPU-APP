@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.feed.domain.model.Post
 import com.krieta.feature.feed.domain.repository.FeedRepository
+import com.krieta.feature.sponsored.presentation.SponsoredContentManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,11 +17,13 @@ data class FeedState(
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val isRefreshing: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val sponsoredIndices: Set<Int> = emptySet()
 )
 
 class FeedViewModel(
-    private val repository: FeedRepository
+    private val repository: FeedRepository,
+    private val sponsoredManager: SponsoredContentManager
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(FeedState(isLoading = true))
@@ -33,8 +36,9 @@ class FeedViewModel(
         screenModelScope.launch {
             when (val result = repository.getFeed(null)) {
                 is NetworkResult.Success -> {
+                    val items = injectSponsoredContent(result.data.items)
                     _state.value = FeedState(
-                        items = result.data.items,
+                        items = items,
                         nextCursor = result.data.nextCursor
                     )
                 }
@@ -53,8 +57,9 @@ class FeedViewModel(
             _state.value = _state.value.copy(isLoadingMore = true)
             when (val result = repository.getFeed(cursor)) {
                 is NetworkResult.Success -> {
+                    val newItems = injectSponsoredContent(result.data.items, _state.value.items.size)
                     _state.value = _state.value.copy(
-                        items = _state.value.items + result.data.items,
+                        items = _state.value.items + newItems,
                         nextCursor = result.data.nextCursor,
                         isLoadingMore = false
                     )
@@ -91,8 +96,9 @@ class FeedViewModel(
             _state.value = _state.value.copy(isLoading = true)
             when (val result = repository.getFeed(null)) {
                 is NetworkResult.Success -> {
+                    val items = injectSponsoredContent(result.data.items)
                     _state.value = FeedState(
-                        items = result.data.items,
+                        items = items,
                         nextCursor = result.data.nextCursor,
                         isLoading = false
                     )
@@ -102,6 +108,57 @@ class FeedViewModel(
                 }
                 is NetworkResult.Loading -> {}
             }
+        }
+    }
+
+    private suspend fun injectSponsoredContent(items: List<Post>, startIndex: Int = 0): List<Post> {
+        if (items.isEmpty()) return items
+        
+        // Inject every 5 items (best practice for text-based feeds)
+        val result = mutableListOf<Post>()
+        val sponsoredIndices = mutableSetOf<Int>()
+        
+        items.forEachIndexed { index, post ->
+            result.add(post)
+            
+            // Inject sponsored content every 5 items
+            if ((startIndex + index + 1) % 5 == 0) {
+                sponsoredManager.fetchSponsoredContent("post")
+                val sponsored = sponsoredManager.sponsoredContent.value
+                
+                if (sponsored != null) {
+                    try {
+                        when (val postResult = repository.getPostById(sponsored.contentId)) {
+                            is NetworkResult.Success -> {
+                                result.add(postResult.data)
+                                sponsoredIndices.add(result.size - 1)
+                            }
+                            else -> {}
+                        }
+                    } catch (e: Exception) {
+                        // Silent fail
+                    }
+                }
+            }
+        }
+        
+        _state.value = _state.value.copy(sponsoredIndices = _state.value.sponsoredIndices + sponsoredIndices)
+        return result
+    }
+
+    fun isSponsored(index: Int): Boolean = _state.value.sponsoredIndices.contains(index)
+
+    fun recordSponsoredImpression(index: Int) {
+        if (!isSponsored(index)) return
+        screenModelScope.launch {
+            sponsoredManager.recordImpression()
+        }
+    }
+
+    fun recordSponsoredEngagement(index: Int, type: String) {
+        if (!isSponsored(index)) return
+        screenModelScope.launch {
+            sponsoredManager.recordEngagement(type)
         }
     }
 }

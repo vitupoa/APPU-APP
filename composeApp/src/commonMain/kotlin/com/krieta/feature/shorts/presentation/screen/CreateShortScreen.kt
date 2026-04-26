@@ -1,9 +1,12 @@
 package com.krieta.feature.shorts.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -49,7 +52,7 @@ class CreateShortScreen : Screen {
                     title = { Text("Upload Short", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.Close, contentDescription = "Close")
+                            Icon(painterResource(Res.drawable.ic_close), contentDescription = "Close")
                         }
                     },
                     actions = {

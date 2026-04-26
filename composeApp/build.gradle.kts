@@ -62,13 +62,6 @@ kotlin {
             // Security
             implementation(libs.security.crypto)
             
-            // Room Database
-            implementation("androidx.room:room-runtime:2.6.1")
-            implementation("androidx.room:room-ktx:2.6.1")
-            
-            // ML Kit Text Recognition
-            implementation("com.google.mlkit:text-recognition:16.0.0")
-
             // Location
             implementation(libs.play.services.location)
 
@@ -82,7 +75,6 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(compose.material3)
             implementation(libs.compose.ui)
-            implementation(compose.materialIconsExtended)
             implementation(libs.compose.components.resources)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
@@ -126,9 +118,6 @@ kotlin {
 
             // FileKit - Cross Platform File Picker
             implementation("io.github.vinceglb:filekit-compose:0.8.8")
-            
-            // Charts for budget analytics
-            implementation("io.github.koalaplot:koalaplot-core:0.6.3")
         }
 
         iosMain.dependencies {

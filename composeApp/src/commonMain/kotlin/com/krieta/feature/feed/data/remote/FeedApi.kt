@@ -22,6 +22,10 @@ class FeedApi(private val httpClient: HttpClient) {
         }.body()
     }
 
+    suspend fun getPostById(postId: String): com.krieta.feature.feed.data.remote.dto.PostDto {
+        return httpClient.get("${ApiConstants.FEED}/$postId").body()
+    }
+
     suspend fun toggleLike(postId: String): ToggleLikeResponseDto {
         return httpClient.post("${ApiConstants.FEED}/$postId/like").body()
     }

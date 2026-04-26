@@ -10,10 +10,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,7 +46,7 @@ import kotlinx.coroutines.launch
 object HomeTab : Tab {
     override val options: TabOptions
         @Composable get() {
-            val icon = rememberVectorPainter(Icons.Default.Home)
+            val icon = painterResource(Res.drawable.ic_home)
             return remember { TabOptions(index = 0u, title = "Home", icon = icon) }
         }
 
@@ -63,7 +62,7 @@ object HomeTab : Tab {
 object DripsTab : Tab {
     override val options: TabOptions
         @Composable get() {
-            val icon = rememberVectorPainter(Icons.Default.Favorite)
+            val icon = painterResource(Res.drawable.ic_favorite)
             return remember { TabOptions(index = 3u, title = "Drips", icon = icon) }
         }
 
@@ -79,7 +78,7 @@ object DripsTab : Tab {
 object ExploreTab : Tab {
     override val options: TabOptions
         @Composable get() {
-            val icon = rememberVectorPainter(Icons.Default.Search)
+            val icon = painterResource(Res.drawable.ic_search)
             return remember { TabOptions(index = 1u, title = "Explore", icon = icon) }
         }
 
@@ -96,7 +95,7 @@ object ExploreTab : Tab {
 object MarketplaceTab : Tab {
     override val options: TabOptions
         @Composable get() {
-            val icon = rememberVectorPainter(Icons.Default.Campaign)
+            val icon = painterResource(Res.drawable.ic_campaign)
             return remember { TabOptions(index = 2u, title = "Marketplace", icon = icon) }
         }
 
@@ -154,12 +153,12 @@ class ExploreScreen : Screen {
                     .padding(bottom = 12.dp),
                 placeholder = { Text("Search users, products, contests…") },
                 leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = null, tint = KrietaColors.OnSurfaceVariant)
+                    Icon(painterResource(Res.drawable.ic_search), contentDescription = null, tint = KrietaColors.OnSurfaceVariant)
                 },
                 trailingIcon = {
                     AnimatedVisibility(query.isNotEmpty(), enter = fadeIn(), exit = fadeOut()) {
                         IconButton(onClick = { searchViewModel.onQueryChange("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear", tint = KrietaColors.OnSurfaceVariant)
+                            Icon(painterResource(Res.drawable.ic_close), contentDescription = "Clear", tint = KrietaColors.OnSurfaceVariant)
                         }
                     }
                 },
@@ -340,7 +339,7 @@ private fun SearchResultRow(result: SearchResult, onClick: () -> Unit) {
                 )
             }
             Icon(
-                Icons.Default.ChevronRight,
+                painterResource(Res.drawable.ic_chevron_right),
                 contentDescription = null,
                 tint = KrietaColors.OnSurfaceVariant,
                 modifier = Modifier.size(18.dp)
@@ -356,7 +355,7 @@ private fun SearchResultRow(result: SearchResult, onClick: () -> Unit) {
 object ProfileTab : Tab {
     override val options: TabOptions
         @Composable get() {
-            val icon = rememberVectorPainter(Icons.Default.Person)
+            val icon = painterResource(Res.drawable.ic_person)
             return remember { TabOptions(index = 4u, title = "Profile", icon = icon) }
         }
 

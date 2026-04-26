@@ -16,6 +16,7 @@ import userRoutes from './modules/user/user.routes.js';
 import shopRoutes from './modules/shop/shop.routes.js';
 import analyticsRoutes from './modules/analytics/analytics.routes.js';
 import adsRoutes from './modules/ads/ads.routes.js';
+import sponsoredRoutes from './modules/sponsored/sponsored.routes.js';
 import cacheRoutes from './modules/cache/cache.routes.js';
 import mediaRoutes from './modules/media/media.routes.js';
 import commentsRoutes from './modules/comments/comments.routes.js';
@@ -27,6 +28,8 @@ import { budgetRoutes } from './modules/budget/budget.routes.js';
 import notificationsRoutes from './modules/notifications/notifications.routes.js';
 import marketplaceRoutes from './modules/marketplace/marketplace.routes.js';
 import { rembrandtRarRoutes } from './modules/rembrandt-rar/rembrandt-rar.routes.js';
+import liveRoutes from './modules/live/live.routes.js';
+import callsRoutes from './modules/calls/calls.routes.js';
 import { startChamaDefaultWorker } from './workers/chamaDefaultWorker.js';
 import { startStoryCleanupWorker } from './workers/storyCleanupWorker.js';
 import { startDailyPrizeWorker } from './workers/dailyPrizeWorker.js';
@@ -34,6 +37,8 @@ import { startRecurringExpenseWorker } from './workers/recurringExpenseWorker.js
 import { startBudgetAlertWorker } from './workers/budgetAlertWorker.js';
 import { startFlashSaleWorker } from './workers/flashSaleWorker.js';
 import { FCMService } from './services/fcm.service.js';
+import { initializeLiveSocket } from './shared/gateway/live-socket.js';
+import { initializeCallSocket } from './shared/gateway/call-socket.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -43,6 +48,10 @@ app.set('trust proxy', true);
 
 // Socket.io Redis Clustered Gateway for real-time features (milestones, contests, notifications)
 const io = initializeGateway(httpServer);
+
+// Initialize Live Streaming and Call socket handlers
+initializeLiveSocket(io);
+initializeCallSocket(io);
 
 // Global middleware
 app.use(helmet());
@@ -67,6 +76,7 @@ app.use('/api/v1/contests', contestsRoutes);
 app.use('/api/v1/shop', shopRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/ads', adsRoutes);
+app.use('/api/v1/sponsored', sponsoredRoutes);
 app.use('/api/v1/cache', cacheRoutes);
 app.use('/api/v1/media', mediaRoutes);
 app.use('/api/v1/comments', commentsRoutes);
@@ -78,6 +88,8 @@ app.use('/api/v1/budgets', budgetRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
 app.use('/api/v1/marketplace', marketplaceRoutes);
 app.use('/api/v1/rar', rembrandtRarRoutes);
+app.use('/api/v1/live', liveRoutes);
+app.use('/api/v1/calls', callsRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

@@ -1,11 +1,14 @@
 package com.krieta.feature.chama.presentation.payout
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+
+import androidx.compose.material.painterResource(Res.drawable.ic_arrow_back)
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -105,10 +108,10 @@ private fun PayoutCard(payout: String) {
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     IconButton(onClick = { /* Approve */ }) {
-                        Icon(Icons.Default.Check, "Approve", tint = KrietaColors.Success)
+                        Icon(painterResource(Res.drawable.ic_check), "Approve", tint = KrietaColors.Success)
                     }
                     IconButton(onClick = { /* Reject */ }) {
-                        Icon(Icons.Default.Close, "Reject", tint = KrietaColors.Error)
+                        Icon(painterResource(Res.drawable.ic_close), "Reject", tint = KrietaColors.Error)
                     }
                 }
             }

@@ -6,7 +6,7 @@ import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.chama.data.remote.dto.ChamaElectionDto
 import com.krieta.feature.chama.data.remote.dto.NominateRequest
 import com.krieta.feature.chama.data.remote.dto.StartElectionRequest
-import com.krieta.feature.chama.data.remote.dto.VoteRequest
+import com.krieta.feature.chama.data.remote.dto.CastVoteRequest as VoteRequest
 import com.krieta.feature.chama.domain.repository.ChamaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

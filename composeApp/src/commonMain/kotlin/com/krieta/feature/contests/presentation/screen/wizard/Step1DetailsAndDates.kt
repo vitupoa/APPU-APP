@@ -1,5 +1,8 @@
 package com.krieta.feature.contests.presentation.screen.wizard
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,7 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -467,7 +470,7 @@ private fun CoverImageUpload(
                         .background(Color.Black.copy(alpha = 0.6f), CircleShape)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Close,
+                        imageVector = painterResource(Res.drawable.ic_close),
                         contentDescription = "Remove image",
                         tint = Color.White,
                         modifier = Modifier.size(20.dp)
@@ -495,7 +498,7 @@ private fun CoverImageUpload(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.AddPhotoAlternate,
+                        imageVector = painterResource(Res.drawable.ic_add)PhotoAlternate,
                         contentDescription = "Add cover image",
                         tint = Color(0xFFF5A623),
                         modifier = Modifier.size(48.dp)

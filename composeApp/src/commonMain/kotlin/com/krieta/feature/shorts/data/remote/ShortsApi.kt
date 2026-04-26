@@ -25,6 +25,10 @@ class ShortsApi(private val httpClient: HttpClient) {
         }.body()
     }
 
+    suspend fun getShortById(shortId: String): ShortDto {
+        return httpClient.get("${ApiConstants.SHORTS}/$shortId").body()
+    }
+
     suspend fun createShort(request: CreateShortRequestDto): ShortDto {
         return httpClient.post(ApiConstants.SHORTS) {
             setBody(request)

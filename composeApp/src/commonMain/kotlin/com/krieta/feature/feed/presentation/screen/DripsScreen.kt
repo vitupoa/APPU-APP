@@ -1,5 +1,8 @@
 package com.krieta.feature.feed.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 
@@ -14,8 +17,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ModeComment
@@ -257,7 +259,7 @@ class DripsScreen : Screen {
                 )
                 IconButton(onClick = onLike) {
                     Icon(
-                        imageVector = if (post.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        painter = if (post.isLiked) painterResource(Res.drawable.ic_favorite) else painterResource(Res.drawable.ic_favorite),
                         contentDescription = "Like",
                         tint = likeColor
                     )

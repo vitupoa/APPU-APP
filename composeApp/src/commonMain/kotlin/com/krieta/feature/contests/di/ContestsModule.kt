@@ -12,7 +12,7 @@ val contestsModule = module {
     single { ContestsApi(get()) }
     single<ContestsRepository> { ContestsRepositoryImpl(get()) }
 
-    factory { ContestFeedViewModel(get()) }
+    factory { ContestFeedViewModel(get(), get()) }
     factory { (contestId: String?) -> com.krieta.feature.contests.presentation.viewmodel.ContestSubmissionFeedViewModel(get(), contestId) }
     factory { (contestId: String) -> ContestDetailViewModel(contestId, get()) }
     factory { (contestId: String) -> SubmitContestViewModel(contestId, get()) }

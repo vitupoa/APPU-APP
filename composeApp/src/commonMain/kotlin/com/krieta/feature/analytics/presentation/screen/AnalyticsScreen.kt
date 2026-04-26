@@ -1,15 +1,16 @@
 package com.krieta.feature.analytics.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.Favorite
@@ -46,7 +47,7 @@ class AnalyticsScreen : Screen {
                     title = { Text("Analytics") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
                         }
                     }
                 )
@@ -164,19 +165,19 @@ class AnalyticsScreen : Screen {
         ) {
             StatCard(
                 modifier = Modifier.weight(1f),
-                icon = { Icon(Icons.Default.Visibility, null, modifier = Modifier.size(20.dp)) },
+                icon = { Icon(painterResource(Res.drawable.ic_visibility), null, modifier = Modifier.size(20.dp)) },
                 value = "${totals.views}",
                 label = "Views"
             )
             StatCard(
                 modifier = Modifier.weight(1f),
-                icon = { Icon(Icons.Default.Favorite, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.error) },
+                icon = { Icon(painterResource(Res.drawable.ic_favorite), null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.error) },
                 value = "${totals.likes}",
                 label = "Likes"
             )
             StatCard(
                 modifier = Modifier.weight(1f),
-                icon = { Icon(Icons.Default.PersonAdd, null, modifier = Modifier.size(20.dp)) },
+                icon = { Icon(painterResource(Res.drawable.ic_person)Add, null, modifier = Modifier.size(20.dp)) },
                 value = "+${totals.newAdmirers}",
                 label = "New Admirers"
             )

@@ -23,6 +23,13 @@ class FeedRepositoryImpl(
         }
     }
 
+    override suspend fun getPostById(postId: String): NetworkResult<Post> {
+        return safeApiCall {
+            val dto = api.getPostById(postId)
+            dto.toDomain()
+        }
+    }
+
     override suspend fun toggleLike(postId: String): NetworkResult<Boolean> {
         return safeApiCall { api.toggleLike(postId).liked }
     }

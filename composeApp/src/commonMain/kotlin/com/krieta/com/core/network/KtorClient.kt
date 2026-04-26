@@ -2,6 +2,7 @@ package com.krieta.com.core.network
 
 
 import com.krieta.com.core.security.TokenManager
+import com.krieta.com.core.security.DeviceSecurity
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
@@ -35,7 +36,7 @@ object KtorClientFactory {
         explicitNulls = false
     }
 
-    fun create(tokenManager: TokenManager): HttpClient {
+    fun create(tokenManager: TokenManager, deviceSecurity: DeviceSecurity? = null): HttpClient {
         return HttpClient {
             install(ContentNegotiation) {
                 json(json)
@@ -57,9 +58,7 @@ object KtorClientFactory {
                     }
                     refreshTokens {
                         val refresh = tokenManager.getRefreshToken() ?: return@refreshTokens null
-                        // We must fetch deviceId, but since KtorClientFactory is an object/factory, we should ideally inject DeviceSecurity.
-                        // Assuming deviceId is accessible or we hardcode a fallback for testing temporarily if DI isn't available right here
-                        val deviceId = "TEMP_DEVICE_ID" // In production, this should be injected
+                        val deviceId = deviceSecurity?.getDeviceId() ?: "UNKNOWN_DEVICE"
                         
                         try {
                             val response = client.post(ApiConstants.AUTH_REFRESH) {

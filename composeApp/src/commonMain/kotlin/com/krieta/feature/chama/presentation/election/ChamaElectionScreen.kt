@@ -1,12 +1,14 @@
 package com.krieta.feature.chama.presentation.election
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -51,7 +53,7 @@ class ChamaElectionScreen(
                     title = { Text("Election Details", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), contentDescription = "Back")
                         }
                     }
                 )
@@ -161,7 +163,7 @@ class ChamaElectionScreen(
                         if (phase == "VOTING" || phase == "COMPLETED") {
                             Column {
                                 Text("Votes", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Text("${nomination.votesCount}", fontWeight = FontWeight.Bold, color = Color(0xFF2ECC71))
+                                Text("${nomination._count?.votes ?: 0}", fontWeight = FontWeight.Bold, color = Color(0xFF2ECC71))
                             }
                         }
                     }

@@ -1,5 +1,8 @@
 package com.krieta.feature.wallet.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 
@@ -8,7 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
+
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -121,7 +124,7 @@ class WalletScreen : Screen {
                                                 modifier = Modifier.size(24.dp)
                                             ) {
                                                 Icon(
-                                                    imageVector = if (isBalanceHidden) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                                    imageVector = if (isBalanceHidden) painterResource(Res.drawable.ic_visibility_off) else painterResource(Res.drawable.ic_visibility),
                                                     contentDescription = "Toggle Balance",
                                                     tint = Color.White.copy(alpha = 0.6f)
                                                 )
@@ -156,7 +159,7 @@ class WalletScreen : Screen {
                                             horizontalArrangement = Arrangement.SpaceEvenly
                                         ) {
                                             WalletActionButton(
-                                                icon = Icons.Default.Add, 
+                                                icon = painterResource(Res.drawable.ic_add), 
                                                 label = "Top Up", 
                                                 onClick = { navigator.push(TopupScreen()) }
                                             )

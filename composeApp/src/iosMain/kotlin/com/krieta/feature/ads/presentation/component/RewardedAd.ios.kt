@@ -1,25 +1,14 @@
 package com.krieta.feature.ads.presentation.component
 
 /**
- * iOS AdMob rewarded ad implementation.
- * TODO: Wire Google Mobile Ads SDK for iOS when ad unit IDs are provisioned.
+ * DEPRECATED: AdMob removed
+ * Use SponsoredContentManager for native sponsored content
  */
+@Deprecated("Use SponsoredContentManager")
 actual class RewardedAdManager {
-    private var isAdLoaded = false
-
-    actual fun load(adUnitId: String) {
-        // TODO: Implement with GADRewardedAd
-        isAdLoaded = false
-    }
-
+    actual fun load(adUnitId: String) {}
     actual fun show(onRewarded: (rewardAmount: Int) -> Unit, onDismissed: () -> Unit, onFailed: (String) -> Unit) {
-        if (!isAdLoaded) {
-            onFailed("Ad not loaded")
-            return
-        }
-        onRewarded(1)
-        onDismissed()
+        onFailed("AdMob removed")
     }
-
-    actual fun isLoaded(): Boolean = isAdLoaded
+    actual fun isLoaded(): Boolean = false
 }

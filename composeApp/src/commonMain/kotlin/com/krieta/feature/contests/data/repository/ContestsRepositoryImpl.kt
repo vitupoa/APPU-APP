@@ -39,6 +39,10 @@ class ContestsRepositoryImpl(
         return safeApiCall { api.getContest(contestId).toDomain() }
     }
 
+    override suspend fun getContestById(contestId: String): NetworkResult<Contest> {
+        return getContest(contestId)
+    }
+
     override suspend fun joinContest(contestId: String): NetworkResult<Unit> {
         // Task 14.1: Validate individual registration against contest participation type
         // First, get the contest details to check participation type

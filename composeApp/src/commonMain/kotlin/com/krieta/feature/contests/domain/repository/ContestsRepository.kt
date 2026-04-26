@@ -11,6 +11,7 @@ data class SubmissionsResult(val items: List<ContestSubmission>, val nextCursor:
 interface ContestsRepository {
     suspend fun listContests(status: String?, cursor: String?): NetworkResult<ContestListResult>
     suspend fun getContest(contestId: String): NetworkResult<Contest>
+    suspend fun getContestById(contestId: String): NetworkResult<Contest>
     suspend fun joinContest(contestId: String): NetworkResult<Unit>
     suspend fun getSubmissions(contestId: String, cursor: String?): NetworkResult<SubmissionsResult>
     suspend fun getLeaderboard(contestId: String): NetworkResult<List<ContestSubmission>>

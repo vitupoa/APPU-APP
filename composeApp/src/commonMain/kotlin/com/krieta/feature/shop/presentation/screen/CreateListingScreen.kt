@@ -1,16 +1,17 @@
 package com.krieta.feature.shop.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -65,7 +66,7 @@ class CreateListingScreen : Screen {
                     title = { Text("List a Product") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
                         }
                     }
                 )
@@ -97,7 +98,7 @@ class CreateListingScreen : Screen {
                                 onClick = { viewModel.removeImageUrl(index) },
                                 modifier = Modifier.align(Alignment.TopEnd).size(20.dp)
                             ) {
-                                Icon(Icons.Default.Close, "Remove", modifier = Modifier.size(14.dp))
+                                Icon(painterResource(Res.drawable.ic_close), "Remove", modifier = Modifier.size(14.dp))
                             }
                         }
                     }
@@ -109,7 +110,7 @@ class CreateListingScreen : Screen {
                             if (state.isSaving && state.imageUrls.isEmpty()) {
                                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
                             } else {
-                                Icon(Icons.Default.AddPhotoAlternate, "Add Image")
+                                Icon(painterResource(Res.drawable.ic_add)PhotoAlternate, "Add Image")
                             }
                         }
                     }

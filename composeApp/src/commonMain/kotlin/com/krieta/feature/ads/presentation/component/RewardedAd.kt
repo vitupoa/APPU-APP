@@ -1,11 +1,12 @@
 package com.krieta.feature.ads.presentation.component
 
 /**
- * Rewarded ad — user watches a video ad to earn Kr reward.
- * Uses expect/actual for platform-specific AdMob rewarded ad.
+ * DEPRECATED: Replaced by SponsoredContentManager
+ * AdMob rewarded ads removed in favor of native sponsored content
  */
-expect class RewardedAdManager {
+@Deprecated("Use SponsoredContentManager instead", ReplaceWith("SponsoredContentManager"))
+expect class RewardedAdManager() {
     fun load(adUnitId: String)
-    fun show(onRewarded: (rewardAmount: Int) -> Unit, onDismissed: () -> Unit, onFailed: (String) -> Unit)
+    fun show(onRewarded: (Int) -> Unit, onDismissed: () -> Unit, onFailed: (String) -> Unit)
     fun isLoaded(): Boolean
 }

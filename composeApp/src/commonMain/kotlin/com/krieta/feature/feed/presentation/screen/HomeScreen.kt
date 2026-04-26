@@ -15,14 +15,15 @@ import cafe.adriel.voyager.core.screen.Screen
 class HomeScreen : Screen {
     @Composable
     override fun Content() {
-        var selectedTab by remember { mutableStateOf(1) }
+        var selectedTab by remember { mutableStateOf(2) } // Default to Discover
 
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             // Content based on selected tab - full immersive experience
             when (selectedTab) {
-                0 -> com.krieta.feature.contests.presentation.screen.ContestSubmissionFeedScreen().Content()
-                1 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.DISCOVER).Content()
-                2 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.ADMIRING).Content()
+                0 -> com.krieta.feature.live.presentation.screen.LiveFeedScreen().Content()
+                1 -> com.krieta.feature.contests.presentation.screen.ContestSubmissionFeedScreen().Content()
+                2 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.DISCOVER).Content()
+                3 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.ADMIRING).Content()
             }
 
             // Tab bar positioned absolutely at top (55px)
@@ -47,7 +48,7 @@ class HomeScreen : Screen {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            listOf("Contests", "Discover", "Admiring").forEachIndexed { index, label ->
+            listOf("Live", "Contests", "Discover", "Admiring").forEachIndexed { index, label ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(horizontal = 16.dp)

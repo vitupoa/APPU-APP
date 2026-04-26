@@ -1,5 +1,8 @@
 package com.krieta.feature.comments.presentation.screen
 
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -13,9 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.*
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -87,7 +88,7 @@ data class CommentsScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
                         }
                     },
                     actions = {
@@ -107,7 +108,7 @@ data class CommentsScreen(
                                     },
                                     leadingIcon = {
                                         if (state.sortType == sortType) {
-                                            Icon(Icons.Default.Check, null, tint = KrietaColors.Primary)
+                                            Icon(painterResource(Res.drawable.ic_check), null, tint = KrietaColors.Primary)
                                         }
                                     }
                                 )
@@ -355,7 +356,7 @@ private fun CommentItem(
                         modifier = Modifier.clickable { onLike(comment) }
                     ) {
                         Icon(
-                            if (comment.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            if (comment.isLiked) painterResource(Res.drawable.ic_favorite) else painterResource(Res.drawable.ic_favorite)Border,
                             contentDescription = "Like",
                             modifier = Modifier.size(18.dp),
                             tint = if (comment.isLiked) Color.Red else Color.Gray
@@ -399,7 +400,7 @@ private fun CommentItem(
                             modifier = Modifier.size(24.dp)
                         ) {
                             Icon(
-                                Icons.Default.MoreVert,
+                                painterResource(Res.drawable.ic_more_vert),
                                 contentDescription = "More",
                                 modifier = Modifier.size(18.dp),
                                 tint = Color.Gray
@@ -417,7 +418,7 @@ private fun CommentItem(
                                         onEdit(comment)
                                         showMenu = false
                                     },
-                                    leadingIcon = { Icon(Icons.Default.Edit, null) }
+                                    leadingIcon = { Icon(painterResource(Res.drawable.ic_edit), null) }
                                 )
                             }
                             if (comment.canDelete) {
@@ -427,7 +428,7 @@ private fun CommentItem(
                                         onDelete(comment)
                                         showMenu = false
                                     },
-                                    leadingIcon = { Icon(Icons.Default.Delete, null) }
+                                    leadingIcon = { Icon(painterResource(Res.drawable.ic_delete), null) }
                                 )
                             }
                             if (comment.canPin) {
@@ -551,7 +552,7 @@ private fun CommentInputBar(
                     )
                 }
                 IconButton(onClick = onCancelReply, modifier = Modifier.size(24.dp)) {
-                    Icon(Icons.Default.Close, "Cancel", tint = Color.Gray)
+                    Icon(painterResource(Res.drawable.ic_close), "Cancel", tint = Color.Gray)
                 }
             }
         }
@@ -567,7 +568,7 @@ private fun CommentInputBar(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        Icons.Default.Edit,
+                        painterResource(Res.drawable.ic_edit),
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = Color.Gray
@@ -580,7 +581,7 @@ private fun CommentInputBar(
                     )
                 }
                 IconButton(onClick = onCancelEdit, modifier = Modifier.size(24.dp)) {
-                    Icon(Icons.Default.Close, "Cancel", tint = Color.Gray)
+                    Icon(painterResource(Res.drawable.ic_close), "Cancel", tint = Color.Gray)
                 }
             }
         }

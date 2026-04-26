@@ -20,3 +20,13 @@ node_modules/
 .env
 .env.*
 backend/.env
+
+# TypeScript compiled output
+backend/prisma/generated/
+backend/src/generated/
+*.js
+*.js.map
+*.d.ts
+!*.config.js
+!*.config.cjs
+!gradlew.bat
