@@ -64,7 +64,8 @@ router.post('/engagement', authMiddleware, async (req: AuthRequest, res: Respons
 // GET /api/v1/sponsored/campaigns/:id/analytics — Get campaign analytics
 router.get('/campaigns/:id/analytics', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const analytics = await SponsoredContentService.getCampaignAnalytics(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const analytics = await SponsoredContentService.getCampaignAnalytics(id);
     res.json(analytics);
   } catch (error: any) {
     res.status(404).json({ error: error.message });
@@ -74,7 +75,8 @@ router.get('/campaigns/:id/analytics', authMiddleware, async (req: AuthRequest, 
 // PATCH /api/v1/sponsored/campaigns/:id/toggle — Pause/Resume campaign
 router.patch('/campaigns/:id/toggle', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const campaign = await SponsoredContentService.toggleCampaign(req.params.id, req.userId!);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const campaign = await SponsoredContentService.toggleCampaign(id, req.userId!);
     res.json(campaign);
   } catch (error: any) {
     res.status(403).json({ error: error.message });
@@ -104,7 +106,8 @@ router.get('/campaigns/pending', authMiddleware, async (req: AuthRequest, res: R
 // PATCH /api/v1/sponsored/campaigns/:id/approve — Approve campaign (admin)
 router.patch('/campaigns/:id/approve', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const campaign = await SponsoredContentService.approveCampaign(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const campaign = await SponsoredContentService.approveCampaign(id);
     res.json(campaign);
   } catch (error: any) {
     res.status(403).json({ error: error.message });
@@ -114,7 +117,8 @@ router.patch('/campaigns/:id/approve', authMiddleware, async (req: AuthRequest, 
 // PATCH /api/v1/sponsored/campaigns/:id/reject — Reject campaign (admin)
 router.patch('/campaigns/:id/reject', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const campaign = await SponsoredContentService.rejectCampaign(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const campaign = await SponsoredContentService.rejectCampaign(id);
     res.json(campaign);
   } catch (error: any) {
     res.status(403).json({ error: error.message });

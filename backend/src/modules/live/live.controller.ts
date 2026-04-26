@@ -29,9 +29,9 @@ export class LiveController {
 
   static async getActiveStreams(req: AuthRequest, res: Response) {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
-      const chamaId = req.query.chamaId as string | undefined;
+      const page = parseInt(Array.isArray(req.query.page) ? req.query.page[0] : req.query.page || '1');
+      const limit = parseInt(Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit || '20');
+      const chamaId = Array.isArray(req.query.chamaId) ? req.query.chamaId[0] : req.query.chamaId as string | undefined;
       const result = await LiveService.getActiveStreams(page, limit, chamaId);
       res.json(result);
     } catch (error: any) {
@@ -77,8 +77,9 @@ export class LiveController {
 
   static async getLeaderboard(req: AuthRequest, res: Response) {
     try {
-      const limit = parseInt(req.query.limit as string) || 5;
-      const leaderboard = await LiveService.getLeaderboard(req.params.streamId, limit);
+      const limit = parseInt(Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit || '5');
+      const streamId = Array.isArray(req.params.streamId) ? req.params.streamId[0] : req.params.streamId;
+      const leaderboard = await LiveService.getLeaderboard(streamId, limit);
       res.json(leaderboard);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

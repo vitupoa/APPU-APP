@@ -281,7 +281,7 @@ router.post('/paystack/webhook', async (req: Request, res: Response) => {
           });
 
           // Credit platform revenue wallet with exchange fee
-          await creditPlatformFee(dbTx, parsed.amount, parsed.currency);
+          await creditOperationalFee(dbTx, parsed.amount, parsed.currency);
         });
       }
     }

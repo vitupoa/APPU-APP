@@ -259,69 +259,23 @@ export class LogisticsService {
 export class LiveShoppingService {
 
   static async createSession(hostId: string, data: any) {
-    const session = await prisma.liveSession.create({
-      data: {
-        hostId,
-        title: data.title,
-        description: data.description,
-        scheduledStart: new Date(data.scheduledStart),
-        status: 'SCHEDULED',
-      }
-    });
-
-    if (data.productIds?.length) {
-      await prisma.liveSessionProduct.createMany({
-        data: data.productIds.map((pid: string, i: number) => ({
-          sessionId: session.id, productId: pid, sortOrder: i,
-        }))
-      });
-    }
-
-    return prisma.liveSession.findUnique({
-      where: { id: session.id },
-      include: {
-        host: { select: USER_SELECT },
-        products: { include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true } } } }
-      }
-    });
+    throw new Error('LiveSession feature not yet implemented');
   }
 
   static async startSession(sessionId: string, hostId: string) {
-    const session = await prisma.liveSession.findUniqueOrThrow({ where: { id: sessionId } });
-    if (session.hostId !== hostId) throw new Error('Not your session');
-    return prisma.liveSession.update({
-      where: { id: sessionId },
-      data: { status: 'LIVE', actualStart: new Date() }
-    });
+    throw new Error('LiveSession feature not yet implemented');
   }
 
   static async endSession(sessionId: string, hostId: string) {
-    const session = await prisma.liveSession.findUniqueOrThrow({ where: { id: sessionId } });
-    if (session.hostId !== hostId) throw new Error('Not your session');
-    return prisma.liveSession.update({
-      where: { id: sessionId },
-      data: { status: 'ENDED', endedAt: new Date() }
-    });
+    throw new Error('LiveSession feature not yet implemented');
   }
 
   static async getActiveSessions() {
-    return prisma.liveSession.findMany({
-      where: { status: 'LIVE' },
-      include: {
-        host: { select: USER_SELECT },
-        products: { include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true } } } }
-      },
-      orderBy: { viewerCount: 'desc' }
-    });
+    return [];
   }
 
   static async getUpcomingSessions(limit = 10) {
-    return prisma.liveSession.findMany({
-      where: { status: 'SCHEDULED', scheduledStart: { gt: new Date() } },
-      include: { host: { select: USER_SELECT } },
-      orderBy: { scheduledStart: 'asc' },
-      take: limit
-    });
+    return [];
   }
 }
 
