@@ -69,10 +69,11 @@ export function isSuperAdmin(role: string): boolean {
 // All platform features that can be toggled
 export const PLATFORM_FEATURES = [
   'shorts', 'contests', 'wallet', 'shop', 'stories',
-  'chamas', 'marketplace', 'ads', 'chat', 'tips',
+  'chamas', 'chama', 'marketplace', 'ads', 'chat', 'tips',
   'subscriptions', 'teams', 'comments', 'notifications',
-  'budgets', 'live_sessions', 'group_buys', 'flash_sales',
+  'budgets', 'live_sessions', 'live_streaming', 'group_buys', 'flash_sales',
   'garage', 'imports', 'gifts', 'deal_alerts',
+  'teams_contests', 'individual_contests', 'brand_marketplace', 'feed', 'garage_services', 'car_imports'
 ] as const;
 
 export type PlatformFeature = typeof PLATFORM_FEATURES[number];
