@@ -1,4 +1,9 @@
 package com.krieta.feature.profile.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -12,8 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -191,7 +194,7 @@ class EditProfileScreen : Screen {
                                     onClick = { avatarPicker.launch() },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Icon(Icons.Default.PhotoCamera, "Upload")
+                                    Icon(painterResource(Res.drawable.ic_photo_camera), "Upload")
                                     Spacer(Modifier.width(8.dp))
                                     Text("Upload from Device")
                                 }
@@ -221,7 +224,7 @@ class EditProfileScreen : Screen {
                                 onClick = { bannerPicker.launch() },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Icon(Icons.Default.PhotoCamera, "Upload")
+                                Icon(painterResource(Res.drawable.ic_photo_camera), "Upload")
                                 Spacer(Modifier.width(8.dp))
                                 Text("Upload from Device")
                             }

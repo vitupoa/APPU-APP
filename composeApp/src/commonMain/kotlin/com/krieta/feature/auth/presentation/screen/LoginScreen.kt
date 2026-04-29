@@ -1,4 +1,6 @@
 package com.krieta.feature.auth.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
@@ -38,7 +40,12 @@ class LoginScreen : Screen {
         LaunchedEffect(authState) {
             if (authState is AuthState.Success) {
                 // Navigate to main feed/wallet seamlessly
-                navigator.replaceAll(com.krieta.com.core.navigation.MainScreen()) 
+                try {
+                    navigator.replaceAll(com.krieta.com.core.navigation.MainScreen())
+                } catch (e: Exception) {
+                    println("Navigation error: ${e.message}")
+                    e.printStackTrace()
+                }
             }
         }
 

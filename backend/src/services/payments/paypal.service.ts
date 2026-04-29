@@ -104,4 +104,64 @@ export class PaypalService {
       currency: capture.amount.currency_code
     };
   }
+
+  /**
+   * Creates a PayPal payout for withdrawal.
+   */
+  static async createPayout(params: {
+    email: string;
+    amount: number;
+    currency: string;
+    reference: string;
+    note: string;
+  }): Promise<{ payoutBatchId: string; payoutItemId: string }> {
+    const token = await this.getAccessToken();
+
+    const response = await axios.post(
+      `${PAYPAL_BASE}/v1/payments/payouts`,
+      {
+        sender_batch_header: {
+          sender_batch_id: params.reference,
+          email_subject: 'Krieta Withdrawal',
+          email_message: params.note
+        },
+        items: [{
+          recipient_type: 'EMAIL',
+          amount: {
+            value: params.amount.toFixed(2),
+            currency: params.currency.toUpperCase()
+          },
+          receiver: params.email,
+          note: params.note,
+          sender_item_id: params.reference
+        }]
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return {
+      payoutBatchId: response.data.batch_header.payout_batch_id,
+      payoutItemId: response.data.items[0].payout_item_id
+    };
+  }
+
+  /**
+   * Verifies PayPal account email.
+   */
+  static async verifyEmail(email: string): Promise<{
+    accountName: string;
+    verified: boolean;
+  }> {
+    // PayPal doesn't provide direct email verification API
+    // This would require user to link their PayPal account
+    return {
+      accountName: email,
+      verified: false
+    };
+  }
 }

@@ -12,6 +12,7 @@ const envSchema = z.object({
 
   // Security
   REQUEST_SIGNING_KEY: z.string().min(16, 'REQUEST_SIGNING_KEY must be at least 16 characters'),
+  ENCRYPTION_KEY: z.string().min(32, 'ENCRYPTION_KEY must be at least 32 characters'),
 
   // Database
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),

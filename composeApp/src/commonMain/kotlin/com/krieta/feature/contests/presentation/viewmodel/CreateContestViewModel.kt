@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.CloudinaryUploader
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.ApiConstants
+import com.krieta.com.core.util.SafeConversion
 import com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto
 import com.krieta.feature.contests.data.remote.dto.PrizeDistributionDto
 import com.krieta.feature.contests.data.remote.dto.RequiredActionDto
@@ -17,6 +18,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.plus
+import kotlin.time.ExperimentalTime
 
 // Enums for wizard configuration
 enum class ParticipationType {
@@ -210,6 +212,7 @@ data class CreateContestState(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 class CreateContestViewModel(
     private val repository: ContestsRepository,
     private val cloudinaryUploader: CloudinaryUploader,
@@ -758,7 +761,8 @@ class CreateContestViewModel(
                     isSearchingJudges = false
                 )
             }
-            is NetworkResult.Error -> {
+            is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
                 _state.value = _state.value.copy(
                     judgeSearchResults = emptyList(),
                     isSearchingJudges = false
@@ -814,9 +818,14 @@ class CreateContestViewModel(
 
     fun post() {
         val currentState = _state.value
-        val prize = currentState.prizeKr.toDoubleOrNull()
+        val prize = SafeConversion.toDoubleOrDefaultWithValidation(
+            value = currentState.prizeKr,
+            fieldName = "contestPrize",
+            min = 0.0,
+            defaultValue = 0.0
+        )
         
-        if (currentState.title.isBlank() || currentState.description.isBlank() || prize == null || prize <= 0) {
+        if (currentState.title.isBlank() || currentState.description.isBlank() || prize <= 0) {
             _state.value = currentState.copy(error = "Please fill all required fields correctly")
             return
         }
@@ -959,7 +968,8 @@ class CreateContestViewModel(
                                         error = null
                                     )
                                 }
-                                is NetworkResult.Error -> {
+                                is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
                                     // Contest created but judge invites failed
                                     // Still mark as success since contest was created
                                     _state.value = _state.value.copy(
@@ -986,7 +996,8 @@ class CreateContestViewModel(
                         // Note: The UI layer should observe the success state and close the wizard
                     }
                     // Task 12.2: Implement error response handling with error display (Requirement 13.7)
-                    is NetworkResult.Error -> {
+                    is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
                         _state.value = _state.value.copy(
                             isPublishing = false,
                             success = false,

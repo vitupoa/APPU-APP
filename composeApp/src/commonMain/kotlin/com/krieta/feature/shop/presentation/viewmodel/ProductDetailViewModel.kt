@@ -32,6 +32,7 @@ class ProductDetailViewModel(
                 is NetworkResult.Success -> {
                     _state.value = ProductDetailState(product = result.data, isLoading = false)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = ProductDetailState(isLoading = false, error = result.message)
                 }

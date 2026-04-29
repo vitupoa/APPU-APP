@@ -3,6 +3,7 @@ package com.krieta.feature.contests.presentation.screen.wizard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.krieta.com.core.util.SafeConversion
 import com.krieta.feature.contests.presentation.viewmodel.CreateContestState
 import com.krieta.feature.contests.presentation.viewmodel.CreateContestViewModel
 import com.krieta.feature.contests.presentation.viewmodel.ParticipationType
@@ -403,7 +405,7 @@ private fun ParticipationTypeOption(
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) Color(0xFF2A2416) else Color(0xFF1A1A1F)
         ),
-        border = androidx.compose.foundation.BorderStroke(
+        border = BorderStroke(
             width = 2.dp,
             color = if (isSelected) Color(0xFFF5A623) else Color(0xFF3A3A3F)
         ),
@@ -586,7 +588,13 @@ private fun EntryFeeInputField(
     OutlinedTextField(
         value = if (value > 0.0) value.toString() else "",
         onValueChange = { 
-            onValueChange(it.toDoubleOrNull() ?: 0.0)
+            onValueChange(
+                SafeConversion.toDoubleOrDefault(
+                    value = it,
+                    fieldName = "entryFee",
+                    defaultValue = 0.0
+                )
+            )
         },
         label = { Text("Participation Fee") },
         placeholder = { Text("0.00") },
@@ -667,3 +675,4 @@ private fun KrConversionDisplay(
         }
     }
 }
+

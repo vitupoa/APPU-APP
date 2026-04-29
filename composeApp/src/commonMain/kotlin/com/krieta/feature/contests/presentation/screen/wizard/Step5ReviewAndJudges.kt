@@ -1,9 +1,9 @@
 package com.krieta.feature.contests.presentation.screen.wizard
+import com.krieta.com.core.util.formatString
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,10 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +27,7 @@ import coil3.compose.AsyncImage
 import com.krieta.feature.contests.presentation.viewmodel.*
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import androidx.compose.foundation.BorderStroke
 
 /**
  * Step 5: Review and Judge Assignment
@@ -164,7 +161,7 @@ private fun JudgeSearchField(
             placeholder = { Text("Enter username...") },
             leadingIcon = {
                 Icon(
-                    imageVector = painterResource(Res.drawable.ic_search),
+                    painter = painterResource(Res.drawable.ic_search),
                     contentDescription = "Search",
                     tint = Color(0xFFA0A0A0)
                 )
@@ -301,7 +298,7 @@ private fun UserSearchResultItem(
                     )
                     if (user.isVerified) {
                         Icon(
-                            imageVector = painterResource(Res.drawable.ic_check)Circle,
+                            painter = painterResource(Res.drawable.ic_check),
                             contentDescription = "Verified",
                             tint = Color(0xFF0A84FF),
                             modifier = Modifier.size(14.dp)
@@ -322,7 +319,7 @@ private fun UserSearchResultItem(
             modifier = Modifier.size(36.dp)
         ) {
             Icon(
-                imageVector = painterResource(Res.drawable.ic_add),
+                painter = painterResource(Res.drawable.ic_add),
                 contentDescription = "Add as judge",
                 tint = Color(0xFFF5A623)
             )
@@ -474,7 +471,7 @@ private fun JudgeListItem(
                 )
             ) {
                 Icon(
-                    imageVector = painterResource(Res.drawable.ic_close),
+                    painter = painterResource(Res.drawable.ic_close),
                     contentDescription = "Remove judge"
                 )
             }
@@ -642,7 +639,7 @@ private fun EntryFeeReviewCard(
             val krDisplay = viewModel.getEntryFeeKrDisplay()
             ReviewItem(
                 label = "Entry Fee",
-                value = "$currencyCode ${String.format("%.2f", state.entryFee)} (≈ $krDisplay)"
+                value = "$currencyCode ${formatString("%.2f", state.entryFee)} (≈ $krDisplay)"
             )
         } else {
             ReviewItem(label = "Entry Fee", value = "Free")
@@ -699,7 +696,7 @@ private fun PrizesReviewCard(
                 val krDisplay = viewModel.getPrizeKrDisplay(amount)
                 ReviewItem(
                     label = prizeLabels[index],
-                    value = "$currencyCode ${String.format("%.2f", amount)} (≈ $krDisplay)"
+                    value = "$currencyCode ${formatString("%.2f", amount)} (≈ $krDisplay)"
                 )
             }
         }
@@ -708,7 +705,7 @@ private fun PrizesReviewCard(
         val totalKrDisplay = viewModel.getTotalPrizePoolKrDisplay()
         ReviewItem(
             label = "Total Prize Pool",
-            value = "$currencyCode ${String.format("%.2f", state.totalPrizePool)} (≈ $totalKrDisplay)",
+            value = "$currencyCode ${formatString("%.2f", state.totalPrizePool)} (≈ $totalKrDisplay)",
             highlighted = true
         )
         
@@ -850,3 +847,6 @@ private fun getTaskTypeLabel(type: TaskType): String {
         TaskType.CUSTOM_TASK -> "Custom Task"
     }
 }
+
+
+

@@ -13,14 +13,10 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/**
- * Universal Glassmorphic Component!
- * Enforces the Premium "Frosted Glass" architectural rule set securely across Mobile rendering engines!
- */
 @Composable
 fun GlassmorphicContainer(
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(24.dp), // 24dp for massive luxury Pill-shaped rounding rules natively!
+    shape: Shape = RoundedCornerShape(24.dp),
     alpha: Float = 0.15f,
     borderWidth: Dp = 1.dp,
     content: @Composable BoxScope.() -> Unit
@@ -28,9 +24,7 @@ fun GlassmorphicContainer(
     Box(
         modifier = modifier
             .clip(shape)
-            // Beautiful Frosted Background tint extracting native UI layouts seamlessly under darker surfaces!
             .background(Color.White.copy(alpha = alpha))
-            // The "Glass Edge" highlight mapping light structures perfectly
             .border(
                 width = borderWidth,
                 color = Color.White.copy(alpha = 0.2f),

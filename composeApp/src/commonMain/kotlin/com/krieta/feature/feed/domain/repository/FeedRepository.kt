@@ -2,8 +2,15 @@ package com.krieta.feature.feed.domain.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.feed.domain.model.Post
+import com.krieta.feature.feed.presentation.viewmodel.ContentItem
+import com.krieta.feature.feed.presentation.viewmodel.FeedComposition
 
 data class FeedResult(val items: List<Post>, val nextCursor: String?)
+data class DiscoverFeedResult(
+    val content: List<ContentItem>,
+    val nextCursor: String?,
+    val composition: FeedComposition
+)
 
 interface FeedRepository {
     suspend fun getFeed(cursor: String?): NetworkResult<FeedResult>
@@ -11,4 +18,15 @@ interface FeedRepository {
     suspend fun toggleLike(postId: String): NetworkResult<Boolean>
     suspend fun addComment(postId: String, text: String): NetworkResult<Unit>
     suspend fun createPost(caption: String, imageUrls: List<String>): NetworkResult<Unit>
+    
+    // Recommendation system endpoints
+    suspend fun getDiscoverFeed(limit: Int, cursor: String?): NetworkResult<DiscoverFeedResult>
+    suspend fun getAdmiringFeed(limit: Int, cursor: String?): NetworkResult<DiscoverFeedResult>
+    suspend fun trackInteraction(
+        contentId: String,
+        contentType: String,
+        signalType: String,
+        watchDuration: Long,
+        totalDuration: Long
+    ): NetworkResult<Unit>
 }

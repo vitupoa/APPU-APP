@@ -1,4 +1,6 @@
 package com.krieta.feature.wallet.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -6,12 +8,10 @@ import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +27,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.util.KrCurrencyFormatter
 import com.krieta.feature.wallet.presentation.viewmodel.WithdrawProvider
 import com.krieta.feature.wallet.presentation.viewmodel.WithdrawViewModel
+import androidx.compose.foundation.BorderStroke
 
 class WithdrawScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -202,8 +203,7 @@ class WithdrawScreen : Screen {
                 if (state.krCost > 0 && !viewModel.hasSufficientBalance()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Default.Warning,
+                        Icon(painterResource(Res.drawable.ic_warning),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(16.dp)
@@ -254,4 +254,5 @@ class WithdrawScreen : Screen {
         }
     }
 }
+
 

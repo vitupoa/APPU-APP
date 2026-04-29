@@ -3,6 +3,7 @@ package com.krieta.feature.chama.presentation.wizard
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
+import com.krieta.com.core.util.SafeConversion
 import com.krieta.feature.chama.data.remote.dto.ChamaDto
 import com.krieta.feature.chama.data.remote.dto.CreateChamaRequest
 import com.krieta.feature.chama.domain.repository.ChamaRepository
@@ -70,7 +71,14 @@ class CreateChamaViewModel(
         val s = _state.value
         return when (s.currentStep) {
             0 -> s.name.length >= 2
-            1 -> s.contributionAmountKr.toDoubleOrNull() != null && s.contributionAmountKr.toDouble() > 0
+            1 -> {
+                val amount = SafeConversion.toDoubleOrDefault(
+                    s.contributionAmountKr,
+                    "contributionAmount",
+                    0.0
+                )
+                amount > 0
+            }
             2 -> true // Optional settings
             3 -> true // Confirmation
             else -> false
@@ -93,8 +101,12 @@ class CreateChamaViewModel(
                 autoLockOnFull = s.autoLockOnFull,
                 contributionAmountKr = s.contributionAmountKr.toDouble(),
                 contributionFrequency = s.contributionFrequency,
-                membershipFeeKr = s.membershipFeeKr.toDoubleOrNull(),
-                penaltyAmountKr = s.penaltyAmountKr.toDoubleOrNull(),
+                membershipFeeKr = if (s.membershipFeeKr.isNotEmpty()) {
+                    SafeConversion.toDoubleOrDefault(s.membershipFeeKr, "membershipFee", 0.0)
+                } else null,
+                penaltyAmountKr = if (s.penaltyAmountKr.isNotEmpty()) {
+                    SafeConversion.toDoubleOrDefault(s.penaltyAmountKr, "penaltyAmount", 0.0)
+                } else null,
                 gracePeriodDays = s.gracePeriodDays.toIntOrNull() ?: 3,
                 minApprovals = s.minApprovals.toIntOrNull() ?: 2,
                 allowMidTermVoteOut = s.allowMidTermVoteOut
@@ -104,6 +116,7 @@ class CreateChamaViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(isLoading = false, createdChama = result.data) }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }

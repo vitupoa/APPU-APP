@@ -12,8 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 
-import androidx.compose.material.icons.filled.AddPhotoAlternate
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -470,7 +468,7 @@ private fun CoverImageUpload(
                         .background(Color.Black.copy(alpha = 0.6f), CircleShape)
                 ) {
                     Icon(
-                        imageVector = painterResource(Res.drawable.ic_close),
+                        painter = painterResource(Res.drawable.ic_close),
                         contentDescription = "Remove image",
                         tint = Color.White,
                         modifier = Modifier.size(20.dp)
@@ -498,7 +496,7 @@ private fun CoverImageUpload(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
-                        imageVector = painterResource(Res.drawable.ic_add)PhotoAlternate,
+                        painter = painterResource(Res.drawable.ic_add),
                         contentDescription = "Add cover image",
                         tint = Color(0xFFF5A623),
                         modifier = Modifier.size(48.dp)
@@ -513,4 +511,5 @@ private fun CoverImageUpload(
         }
     }
 }
+
 

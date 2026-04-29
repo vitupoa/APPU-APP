@@ -36,6 +36,7 @@ class InfluencerSearchViewModel(
                         result.data.second
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _uiState.value = InfluencerSearchState.Error(result.message)
                 }

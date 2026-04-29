@@ -1,5 +1,9 @@
 package com.krieta.feature.analytics.presentation.screen
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
@@ -11,10 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -177,7 +177,7 @@ class AnalyticsScreen : Screen {
             )
             StatCard(
                 modifier = Modifier.weight(1f),
-                icon = { Icon(painterResource(Res.drawable.ic_person)Add, null, modifier = Modifier.size(20.dp)) },
+                icon = { Icon(painterResource(Res.drawable.ic_person_add), null, modifier = Modifier.size(20.dp)) },
                 value = "+${totals.newAdmirers}",
                 label = "New Admirers"
             )

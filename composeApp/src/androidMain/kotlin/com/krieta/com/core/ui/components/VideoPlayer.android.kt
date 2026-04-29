@@ -28,7 +28,9 @@ actual fun VideoPlayer(
     url: String,
     isPlaying: Boolean,
     modifier: Modifier,
-    onPlaybackStateChanged: (Boolean) -> Unit
+    onPlaybackStateChanged: (Boolean) -> Unit,
+    onProgressUpdate: (currentPosition: Long, duration: Long) -> Unit,
+    seekToPosition: Long?
 ) {
     val context = LocalContext.current
     var isBuffering by remember { mutableStateOf(false) }
@@ -64,6 +66,19 @@ actual fun VideoPlayer(
     LaunchedEffect(isPlaying) {
         if (!hasError) {
             exoPlayer.playWhenReady = isPlaying
+        }
+    }
+    
+    LaunchedEffect(seekToPosition) {
+        seekToPosition?.let {
+            exoPlayer.seekTo(it)
+        }
+    }
+    
+    LaunchedEffect(exoPlayer) {
+        while (true) {
+            kotlinx.coroutines.delay(100)
+            onProgressUpdate(exoPlayer.currentPosition, exoPlayer.duration.coerceAtLeast(0))
         }
     }
     

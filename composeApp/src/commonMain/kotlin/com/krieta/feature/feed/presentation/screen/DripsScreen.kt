@@ -1,4 +1,9 @@
 package com.krieta.feature.feed.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -18,10 +23,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.ModeComment
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -71,6 +72,8 @@ class DripsScreen : Screen {
         var showTippingFor by remember { mutableStateOf<Post?>(null) }
         
         LaunchedEffect(Unit) {
+            currencyProvider.start()
+            kotlinx.coroutines.delay(500)
             walletViewModel.fetchWalletData(currencyProvider.countryCode)
         }
 
@@ -271,7 +274,7 @@ class DripsScreen : Screen {
                 )
 
                 IconButton(onClick = onComment) {
-                    Icon(Icons.Default.ModeComment, contentDescription = "Comment")
+                    Icon(painterResource(Res.drawable.ic_comment), contentDescription = "Comment")
                 }
                 Text(
                     "${post.commentsCount}",
@@ -282,7 +285,7 @@ class DripsScreen : Screen {
                 // Tip only on unlocked posts
                 if (!post.isLocked) {
                     IconButton(onClick = onTip) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Tip")
+                        Icon(painterResource(Res.drawable.ic_send), contentDescription = "Tip")
                     }
                 }
             }

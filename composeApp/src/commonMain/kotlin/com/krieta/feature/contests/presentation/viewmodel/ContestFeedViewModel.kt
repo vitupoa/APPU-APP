@@ -78,6 +78,7 @@ class ContestFeedViewModel(
                         activeFilter = status
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = ContestFeedState.Error(result.message)
                 }

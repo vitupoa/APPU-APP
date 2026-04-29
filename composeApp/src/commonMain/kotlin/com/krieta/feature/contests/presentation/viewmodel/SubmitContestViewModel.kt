@@ -44,6 +44,7 @@ class SubmitContestViewModel(
                     state = state.copy(contest = result.data)
                     loadRequirements()
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     state = state.copy(error = result.message)
                 }
@@ -62,6 +63,7 @@ class SubmitContestViewModel(
                         canSubmit = result.data.canSubmit
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     state = state.copy(error = result.message)
                 }
@@ -124,6 +126,7 @@ class SubmitContestViewModel(
                 is NetworkResult.Success -> {
                     state = state.copy(submitting = false, success = true)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     state = state.copy(submitting = false, error = result.message)
                 }

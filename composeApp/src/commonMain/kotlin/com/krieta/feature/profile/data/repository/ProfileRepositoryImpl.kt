@@ -87,23 +87,23 @@ class ProfileRepositoryImpl(
     // ─── MAPPERS ──────────────────────────────────
 
     private fun UserProfileDto.toDomain() = UserProfile(
-        id = id,
-        username = username,
-        firstName = firstName,
-        lastName = lastName,
-        displayName = displayName,
+        id = id ?: "",
+        username = username ?: "unknown",
+        firstName = firstName ?: "",
+        lastName = lastName ?: "",
+        displayName = displayName ?: "Unknown User",
         avatarUrl = avatarUrl,
         coverPhotoUrl = coverPhotoUrl,
         bio = bio,
-        country = country,
-        currency = currency,
-        accountType = parseAccountType(accountType),
+        country = country ?: "US",
+        currency = currency ?: "USD",
+        accountType = parseAccountType(accountType ?: "CREATOR"),
         isVerified = isVerified,
         isWalletUnlocked = isWalletUnlocked,
         bioLinks = bioLinks.map { it.toBioLink() },
         stats = ProfileStats(stats.admirers, stats.admiring, stats.lovers, stats.contestsWon),
         relationshipStatus = parseRelationship(relationshipStatus),
-        createdAt = createdAt
+        createdAt = createdAt ?: ""
     )
 
     private fun BioLinkDto.toBioLink() = BioLink(id, label, url, icon, sortOrder)

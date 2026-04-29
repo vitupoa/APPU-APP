@@ -52,6 +52,7 @@ class ContestSubmissionFeedViewModel(
                         isLoading = false
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
@@ -84,6 +85,7 @@ class ContestSubmissionFeedViewModel(
                         isLoadingMore = false
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isLoadingMore = false)
                 }

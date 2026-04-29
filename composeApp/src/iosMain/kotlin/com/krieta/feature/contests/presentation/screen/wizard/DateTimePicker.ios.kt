@@ -15,13 +15,14 @@ import platform.Foundation.NSDate
 import platform.Foundation.timeIntervalSince1970
 import platform.UIKit.UIDatePicker
 import platform.UIKit.UIDatePickerMode
+import kotlin.time.ExperimentalTime
 
 /**
  * iOS implementation of DateTimePicker using UIDatePicker
  * 
  * Requirements: 2.4, 2.5
  */
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, ExperimentalTime::class)
 @Composable
 actual fun DateTimePicker(
     currentDate: Instant?,
@@ -75,7 +76,7 @@ actual fun DateTimePicker(
                     update = { picker ->
                         // Update selected date when picker changes
                         val nsDate = picker.date
-                        val timeInterval = nsDate.timeIntervalSince1970
+                        val timeInterval = nsDate.timeIntervalSince1970()
                         selectedDate = Instant.fromEpochSeconds(timeInterval.toLong())
                     },
                     modifier = Modifier.fillMaxSize()

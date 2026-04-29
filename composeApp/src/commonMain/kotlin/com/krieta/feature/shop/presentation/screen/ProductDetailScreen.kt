@@ -1,4 +1,9 @@
 package com.krieta.feature.shop.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -14,8 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 
-import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -161,8 +164,7 @@ class ProductDetailScreen(private val productId: String) : Screen {
                                         Text(product.seller.displayName, fontWeight = FontWeight.SemiBold)
                                         if (product.seller.isVerified) {
                                             Spacer(Modifier.width(4.dp))
-                                            Icon(
-                                                Icons.Default.Verified,
+                                            Icon(painterResource(Res.drawable.ic_verified),
                                                 contentDescription = "Verified",
                                                 tint = MaterialTheme.colorScheme.primary,
                                                 modifier = Modifier.size(16.dp)
@@ -199,7 +201,7 @@ class ProductDetailScreen(private val productId: String) : Screen {
                                     containerColor = MaterialTheme.colorScheme.primary
                                 )
                             ) {
-                                Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null, modifier = Modifier.size(20.dp))
+                                Icon(painterResource(Res.drawable.ic_chat), contentDescription = null, modifier = Modifier.size(20.dp))
                                 Spacer(Modifier.width(8.dp))
                                 Text("Buy via WhatsApp", fontWeight = FontWeight.Bold)
                             }

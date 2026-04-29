@@ -79,7 +79,8 @@ class ProfileViewModel(
                                 )
                             )
                         }
-                        is NetworkResult.Error -> {
+                        is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
                             _state.value = _state.value.copy(isRelationshipLoading = false, error = result.message)
                         }
                         is NetworkResult.Loading -> {}
@@ -97,7 +98,8 @@ class ProfileViewModel(
                                 )
                             )
                         }
-                        is NetworkResult.Error -> {
+                        is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
                             _state.value = _state.value.copy(isRelationshipLoading = false)
                         }
                         is NetworkResult.Loading -> {}
@@ -112,6 +114,7 @@ class ProfileViewModel(
         screenModelScope.launch {
             when (repository.subscribe(profile.id, tier)) {
                 is NetworkResult.Success -> loadProfile() // Refresh to show updated state
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {}
                 is NetworkResult.Loading -> {}
             }
@@ -145,6 +148,7 @@ class ProfileViewModel(
                         isLoading = false
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = ProfileState(isLoading = false, error = profileResult.message)
                 }

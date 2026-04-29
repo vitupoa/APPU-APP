@@ -1,4 +1,10 @@
 package com.krieta.feature.sponsored.presentation.screen
+import com.krieta.com.core.util.formatString
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -96,11 +102,11 @@ class CampaignAnalyticsScreen(private val campaignId: String) : Screen {
                     }
                     
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        MetricCard("CPM", String.format("%.2f KR", analytics!!.cpm), Modifier.weight(1f))
-                        MetricCard("CTR", String.format("%.2f%%", analytics!!.ctr), Modifier.weight(1f))
+                        MetricCard("CPM", formatString("%.2f KR", analytics!!.cpm), Modifier.weight(1f))
+                        MetricCard("CTR", formatString("%.2f%%", analytics!!.ctr), Modifier.weight(1f))
                     }
                     
-                    MetricCard("Engagement Rate", String.format("%.2f%%", analytics!!.engagementRate), Modifier.fillMaxWidth())
+                    MetricCard("Engagement Rate", formatString("%.2f%%", analytics!!.engagementRate), Modifier.fillMaxWidth())
                 }
             }
         }
@@ -123,3 +129,4 @@ class CampaignAnalyticsScreen(private val campaignId: String) : Screen {
         }
     }
 }
+

@@ -38,6 +38,7 @@ class StoriesViewModel(
                         error = null
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,

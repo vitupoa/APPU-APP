@@ -1,4 +1,9 @@
 package com.krieta.feature.feed.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,12 +23,14 @@ class HomeScreen : Screen {
         var selectedTab by remember { mutableStateOf(2) } // Default to Discover
 
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-            // Content based on selected tab - full immersive experience
-            when (selectedTab) {
-                0 -> com.krieta.feature.live.presentation.screen.LiveFeedScreen().Content()
-                1 -> com.krieta.feature.contests.presentation.screen.ContestSubmissionFeedScreen().Content()
-                2 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.DISCOVER).Content()
-                3 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.ADMIRING).Content()
+            // Content based on selected tab - render only the selected screen
+            key(selectedTab) {
+                when (selectedTab) {
+                    0 -> com.krieta.feature.live.presentation.screen.LiveFeedScreen().Content()
+                    1 -> com.krieta.feature.contests.presentation.screen.ContestSubmissionFeedScreen().Content()
+                    2 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.DISCOVER).Content()
+                    3 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.ADMIRING).Content()
+                }
             }
 
             // Tab bar positioned absolutely at top (55px)

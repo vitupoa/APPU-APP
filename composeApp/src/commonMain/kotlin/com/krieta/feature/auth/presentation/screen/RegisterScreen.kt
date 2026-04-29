@@ -1,5 +1,7 @@
 package com.krieta.feature.auth.presentation.screen
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
@@ -12,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -79,7 +80,7 @@ class RegisterScreen : Screen {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Default.Warning, contentDescription = "Warning", tint = MaterialTheme.colorScheme.onErrorContainer)
+                        Icon(painter = painterResource(Res.drawable.ic_warning), contentDescription = "Warning", tint = MaterialTheme.colorScheme.onErrorContainer)
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = "Account Type, Name, and Username are permanently locked once your wallet is activated.",
@@ -210,4 +211,5 @@ class RegisterScreen : Screen {
         }
     }
 }
+
 

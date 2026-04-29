@@ -41,6 +41,7 @@ class JudgeInvitationsViewModel(
                         error = null
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
@@ -69,6 +70,7 @@ class JudgeInvitationsViewModel(
                         processingInviteId = null
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(
                         processingInviteId = null,
@@ -97,6 +99,7 @@ class JudgeInvitationsViewModel(
                         processingInviteId = null
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(
                         processingInviteId = null,

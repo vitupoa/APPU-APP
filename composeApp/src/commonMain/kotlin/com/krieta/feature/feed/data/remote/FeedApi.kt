@@ -45,4 +45,73 @@ class FeedApi(private val httpClient: HttpClient) {
             setBody(CreatePostRequest(caption, imageUrls))
         }
     }
+
+    // Recommendation system endpoints
+    suspend fun getDiscoverFeed(limit: Int, cursor: String?): DiscoverFeedResponse {
+        return httpClient.get("${ApiConstants.BASE_URL}/recommendation/feed/discover") {
+            parameter("limit", limit)
+            cursor?.let { parameter("cursor", it) }
+        }.body()
+    }
+
+    suspend fun getAdmiringFeed(limit: Int, cursor: String?): DiscoverFeedResponse {
+        return httpClient.get("${ApiConstants.BASE_URL}/recommendation/feed/admiring") {
+            parameter("limit", limit)
+            cursor?.let { parameter("cursor", it) }
+        }.body()
+    }
+
+    suspend fun trackInteraction(
+        contentId: String,
+        contentType: String,
+        signalType: String,
+        watchDuration: Long,
+        totalDuration: Long
+    ) {
+        @Serializable
+        data class TrackInteractionRequest(
+            val contentId: String,
+            val contentType: String,
+            val signalType: String,
+            val watchDuration: Long,
+            val totalDuration: Long
+        )
+        httpClient.post("${ApiConstants.BASE_URL}/recommendation/interactions/track") {
+            setBody(TrackInteractionRequest(contentId, contentType, signalType, watchDuration, totalDuration))
+        }
+    }
 }
+
+@Serializable
+data class DiscoverFeedResponse(
+    val content: List<DiscoverFeedItem>,
+    val nextCursor: String?,
+    val composition: CompositionDto
+)
+
+@Serializable
+data class DiscoverFeedItem(
+    val id: String,
+    val type: String,
+    val videoUrl: String? = null,
+    val thumbnailUrl: String? = null,
+    val caption: String,
+    val userName: String,
+    val userAvatar: String? = null,
+    val userId: String,
+    val isAdmired: Boolean = false,
+    val likesCount: Int = 0,
+    val commentsCount: Int = 0,
+    val isLiked: Boolean = false,
+    val isLocked: Boolean = false,
+    val isContest: Boolean = false,
+    val isAd: Boolean = false
+)
+
+@Serializable
+data class CompositionDto(
+    val personalized: Int,
+    val admiring: Int,
+    val trending: Int,
+    val discovery: Int
+)

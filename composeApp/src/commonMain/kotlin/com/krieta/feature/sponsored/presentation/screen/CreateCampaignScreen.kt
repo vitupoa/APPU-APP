@@ -1,12 +1,15 @@
 package com.krieta.feature.sponsored.presentation.screen
-
+import com.krieta.com.core.util.SafeConversion
+import com.krieta.com.core.util.currentTimeMillis
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.shape.CircleShape
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -153,11 +156,11 @@ class CreateCampaignScreen : Screen {
                                     contentType = com.krieta.feature.sponsored.domain.model.SponsoredContentType.valueOf(contentType.uppercase()),
                                     contentId = contentId,
                                     campaignName = campaignName,
-                                    budget = budget.toDoubleOrNull() ?: 0.0,
+                                    budget = SafeConversion.toDoubleOrDefaultWithValidation(budget, "campaignBudget", 0.0, defaultValue = 0.0),
                                     pricingModel = com.krieta.feature.sponsored.domain.model.PricingModel.valueOf(pricingModel),
-                                    bidAmount = bidAmount.toDoubleOrNull() ?: 0.0,
-                                    startDate = System.currentTimeMillis().toString(),
-                                    endDate = (System.currentTimeMillis() + 30L * 24 * 60 * 60 * 1000).toString(),
+                                    bidAmount = SafeConversion.toDoubleOrDefaultWithValidation(bidAmount, "bidAmount", 0.0, defaultValue = 0.0),
+                                    startDate = currentTimeMillis().toString(),
+                                    endDate = (currentTimeMillis() + 30L * 24 * 60 * 60 * 1000).toString(),
                                     targeting = SponsoredTargeting(
                                         ageMin = ageMin.toIntOrNull(),
                                         ageMax = ageMax.toIntOrNull()

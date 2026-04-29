@@ -1,4 +1,9 @@
 package com.krieta.feature.chama.presentation
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -116,7 +121,7 @@ class ChamaListScreen : Screen {
 private fun DefaultersTab(defaulters: List<ChamaDefaulterDto>) {
     if (defaulters.isEmpty()) {
         EmptyState(
-            icon = painterResource(Res.drawable.ic_check)Circle,
+            icon = painterResource(Res.drawable.ic_check),
             title = "Clean Slate",
             subtitle = "No members are currently listed as defaulters across any Chama."
         )
@@ -134,7 +139,7 @@ private fun DefaultersTab(defaulters: List<ChamaDefaulterDto>) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFE74C3C))
+                    Icon(painterResource(Res.drawable.ic_warning), contentDescription = null, tint = Color(0xFFE74C3C))
                     Text(
                         "List of Shame: These members have defaulted on their Chama obligations and are banned from joining new Chamas until cleared.",
                         fontSize = 13.sp,
@@ -221,7 +226,7 @@ private fun DefaulterCard(defaulter: ChamaDefaulterDto) {
 private fun MyChamasTab(chamas: List<ChamaDto>, onChamaClick: (ChamaDto) -> Unit) {
     if (chamas.isEmpty()) {
         EmptyState(
-            icon = Icons.Default.Groups,
+            icon = painterResource(Res.drawable.ic_groups),
             title = "No Chamas Yet",
             subtitle = "Create a Chama or join one from the Discover tab."
         )
@@ -247,7 +252,7 @@ private fun DiscoverTab(
 ) {
     if (chamas.isEmpty()) {
         EmptyState(
-            icon = Icons.Default.Explore,
+            icon = painterResource(Res.drawable.ic_explore),
             title = "No Chamas to Discover",
             subtitle = "Check back later for open Chamas."
         )
@@ -447,10 +452,10 @@ private fun StatusChip(status: String) {
 }
 
 @Composable
-private fun EmptyState(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, subtitle: String) {
+private fun EmptyState(icon: androidx.compose.ui.graphics.painter.Painter, title: String, subtitle: String) {
     Box(Modifier.fillMaxSize().padding(40.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(icon, contentDescription = null, tint = ChamaGold, modifier = Modifier.size(56.dp))
+            Icon(painter = icon, contentDescription = null, tint = ChamaGold, modifier = Modifier.size(56.dp))
             Spacer(Modifier.height(16.dp))
             Text(title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(subtitle, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))

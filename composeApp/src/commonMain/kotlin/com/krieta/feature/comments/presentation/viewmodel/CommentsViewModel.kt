@@ -3,6 +3,7 @@ package com.krieta.feature.comments.presentation.viewmodel
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
+import com.krieta.com.core.util.currentTimeMillis
 import com.krieta.feature.comments.domain.model.Comment
 import com.krieta.feature.comments.domain.model.CommentSettings
 import com.krieta.feature.comments.domain.model.CommentSortType
@@ -71,6 +72,7 @@ class CommentsViewModel(
                     }
                     loadSettings()
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = result.message, isLoading = false) }
                 }
@@ -103,6 +105,7 @@ class CommentsViewModel(
                         )
                     }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoadingMore = false) }
                 }
@@ -125,6 +128,7 @@ class CommentsViewModel(
                     repliesCache[commentId] = replies to nextCursor
                     updateCommentReplies(commentId, replies)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {}
                 is NetworkResult.Loading -> {}
             }
@@ -155,6 +159,7 @@ class CommentsViewModel(
                 is NetworkResult.Success -> {
                     replaceOptimisticComment(tempComment.id, result.data)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     removeOptimisticComment(tempComment.id)
                     _state.update { it.copy(error = result.message) }
@@ -175,6 +180,7 @@ class CommentsViewModel(
                     updateCommentInList(result.data)
                     _state.update { it.copy(editingComment = null, commentText = "") }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = result.message) }
                 }
@@ -192,6 +198,7 @@ class CommentsViewModel(
                 is NetworkResult.Success -> {
                     // Already removed
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     loadComments(refresh = true)
                     _state.update { it.copy(error = result.message) }
@@ -220,6 +227,7 @@ class CommentsViewModel(
                 is NetworkResult.Success -> {
                     updateCommentInList(result.data)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     updateCommentInList(comment)
                 }
@@ -240,6 +248,7 @@ class CommentsViewModel(
                 is NetworkResult.Success -> {
                     updateCommentInList(result.data)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = result.message) }
                 }
@@ -254,6 +263,7 @@ class CommentsViewModel(
                 is NetworkResult.Success -> {
                     // Show success message
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = "Failed to report comment") }
                 }
@@ -308,6 +318,7 @@ class CommentsViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(settings = result.data) }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {}
                 is NetworkResult.Loading -> {}
             }
@@ -321,7 +332,7 @@ class CommentsViewModel(
 
     private fun createTempComment(text: String, parentId: String?, replyToUserId: String?): Comment {
         return Comment(
-            id = "temp_${System.currentTimeMillis()}",
+            id = "temp_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}",
             contentId = contentId,
             contentType = contentType,
             author = com.krieta.feature.comments.domain.model.CommentAuthor(

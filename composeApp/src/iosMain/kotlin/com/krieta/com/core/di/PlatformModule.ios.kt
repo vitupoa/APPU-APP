@@ -1,6 +1,8 @@
 package com.krieta.com.core.di
 
 import com.krieta.com.core.location.LocationProvider
+import com.krieta.com.core.oauth.IOSOAuthBrowser
+import com.krieta.com.core.oauth.OAuthBrowser
 import com.krieta.com.core.security.DeviceSecurity
 import com.krieta.com.core.security.IosDeviceSecurity
 import com.krieta.com.core.security.IosTokenManager
@@ -12,4 +14,5 @@ actual fun platformModule(): Module = module {
     single<TokenManager> { IosTokenManager() }
     single<DeviceSecurity> { IosDeviceSecurity() }
     single { LocationProvider() }
+    single<OAuthBrowser> { IOSOAuthBrowser() }
 }

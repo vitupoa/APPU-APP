@@ -47,6 +47,7 @@ class ChatListViewModel(
                 is NetworkResult.Success -> {
                     _state.value = ChatListState(chats = result.data, isLoading = false)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = ChatListState(isLoading = false, error = result.message)
                 }

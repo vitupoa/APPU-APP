@@ -11,6 +11,10 @@ object KrietaColors {
     val OnPrimary = Color(0xFF000000) // Black text on Yellow buttons looks insanely sharp
     val OnPrimaryContainer = Color(0xFFFFE680)
 
+    // Secondary Colors
+    val SecondaryContainer = Color(0xFF2A2A2A)
+    val OnSecondaryContainer = Color(0xFFE0E0E0)
+
     // Accent — Aggressive Red (For important actions / notifications)
     val Accent = Color(0xFFE60000) // Racing Red
     val AccentDark = Color(0xFF990000)

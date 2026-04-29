@@ -1,5 +1,9 @@
 package com.krieta.feature.calls.presentation.screen
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
@@ -10,11 +14,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.filled.CallEnd
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material.icons.filled.VideocamOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -123,8 +122,7 @@ class ActiveCallScreen(val callId: String, val isVideo: Boolean = true) : Screen
                         .background(if (isMicMuted) Color.White else Color.DarkGray, CircleShape)
                         .size(56.dp)
                 ) {
-                    Icon(
-                        imageVector = if (isMicMuted) Icons.Default.MicOff else Icons.Default.Mic,
+                    Icon(painter = if (isMicMuted) painterResource(Res.drawable.ic_mic_off) else painterResource(Res.drawable.ic_mic),
                         contentDescription = "Toggle Mic",
                         tint = if (isMicMuted) Color.Black else Color.White
                     )
@@ -137,8 +135,7 @@ class ActiveCallScreen(val callId: String, val isVideo: Boolean = true) : Screen
                         .background(if (isCameraOff) Color.White else Color.DarkGray, CircleShape)
                         .size(56.dp)
                 ) {
-                    Icon(
-                        imageVector = if (isCameraOff) painterResource(Res.drawable.ic_videocam)Off else painterResource(Res.drawable.ic_videocam),
+                    Icon(painter = if (isCameraOff) painterResource(Res.drawable.ic_videocam_off) else painterResource(Res.drawable.ic_videocam),
                         contentDescription = "Toggle Video",
                         tint = if (isCameraOff) Color.Black else Color.White
                     )
@@ -152,7 +149,7 @@ class ActiveCallScreen(val callId: String, val isVideo: Boolean = true) : Screen
                         .size(64.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.CallEnd,
+                        painter = painterResource(Res.drawable.ic_call_end),
                         contentDescription = "End Call",
                         tint = Color.White,
                         modifier = Modifier.size(32.dp)

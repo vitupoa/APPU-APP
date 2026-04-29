@@ -1,4 +1,9 @@
 package com.krieta.feature.wallet.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -8,7 +13,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -108,7 +112,7 @@ class WalletPinScreen(private val isSetup: Boolean = false) : Screen {
                                                 .background(Color.White.copy(alpha = 0.05f), CircleShape)
                                         ) {
                                             if (key == "DEL") {
-                                                Icon(Icons.AutoMirrored.Filled.Backspace, contentDescription = "Delete", tint = Color.White)
+                                                Icon(painterResource(Res.drawable.ic_backspace), contentDescription = "Delete", tint = Color.White)
                                             } else {
                                                 Text(key, color = Color.White, style = MaterialTheme.typography.headlineLarge)
                                             }

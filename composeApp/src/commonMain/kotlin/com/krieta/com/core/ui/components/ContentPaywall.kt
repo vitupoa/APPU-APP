@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -72,7 +71,7 @@ fun ContentPaywall(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                imageVector = painterResource(Res.drawable.ic_lock),
+                painter = painterResource(Res.drawable.ic_lock),
                 contentDescription = "Locked",
                 tint = KrietaColors.KrGold,
                 modifier = Modifier.size(40.dp)

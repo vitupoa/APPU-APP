@@ -1,4 +1,11 @@
 package com.krieta.feature.marketplace.presentation.screen
+import com.krieta.com.core.util.parseColor
+import com.krieta.com.core.util.formatString
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -49,7 +56,7 @@ class SocialMediaManagementScreen(
                     title = { Text("Social Media Accounts") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
                         }
                     }
                 )
@@ -155,7 +162,7 @@ private fun TotalReachCard(accounts: List<SocialMediaAccount>) {
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Avg. Engagement: ${String.format("%.2f", avgEngagement)}%",
+                "Avg. Engagement: ${formatString("%.2f", avgEngagement)}%",
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -185,7 +192,7 @@ private fun SocialAccountCard(
                         Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(Color(android.graphics.Color.parseColor(platformInfo.color)).copy(alpha = 0.15f)),
+                            .background(Color(parseColor(platformInfo.color)).copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(platformInfo.icon, fontSize = 24.sp)
@@ -203,7 +210,7 @@ private fun SocialAccountCard(
                             if (account.isVerified) {
                                 Spacer(Modifier.width(4.dp))
                                 Icon(
-                                    Icons.Default.Verified,
+                                    painterResource(Res.drawable.ic_verified),
                                     "Verified",
                                     Modifier.size(16.dp),
                                     tint = MaterialTheme.colorScheme.primary
@@ -246,7 +253,7 @@ private fun SocialAccountCard(
                             onSync()
                             showMenu = false
                         },
-                        leadingIcon = { Icon(Icons.Default.Sync, null) }
+                        leadingIcon = { Icon(painterResource(Res.drawable.ic_sync), null) }
                     )
                     if (!account.isPrimary) {
                         DropdownMenuItem(
@@ -255,7 +262,7 @@ private fun SocialAccountCard(
                                 onSetPrimary()
                                 showMenu = false
                             },
-                            leadingIcon = { Icon(Icons.Default.Star, null) }
+                            leadingIcon = { Icon(painterResource(Res.drawable.ic_star), null) }
                         )
                     }
                     DropdownMenuItem(
@@ -282,7 +289,7 @@ private fun SocialAccountCard(
                 )
                 MetricItem(
                     label = "Engagement",
-                    value = "${String.format("%.1f", account.engagementRate)}%"
+                    value = "${formatString("%.1f", account.engagementRate)}%"
                 )
                 MetricItem(
                     label = "Avg Views",
@@ -295,7 +302,7 @@ private fun SocialAccountCard(
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        painterResource(Res.drawable.ic_check)Circle,
+                        painterResource(Res.drawable.ic_check),
                         null,
                         Modifier.size(14.dp),
                         tint = MaterialTheme.colorScheme.primary
@@ -497,3 +504,5 @@ private fun formatNumber(num: Int): String {
         else -> num.toString()
     }
 }
+
+

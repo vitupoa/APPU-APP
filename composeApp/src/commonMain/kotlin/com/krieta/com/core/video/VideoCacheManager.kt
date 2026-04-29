@@ -1,5 +1,6 @@
 package com.krieta.com.core.video
 
+import com.krieta.com.core.util.currentTimeMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -18,7 +19,7 @@ class VideoCacheManager {
     
     data class CacheEntry(
         val url: String,
-        val lastAccessed: Long = System.currentTimeMillis(),
+        val lastAccessed: Long = currentTimeMillis(),
         val isPreloaded: Boolean = false
     )
     
@@ -64,7 +65,7 @@ class VideoCacheManager {
     
     suspend fun markAccessed(url: String) {
         mutex.withLock {
-            cache[url] = CacheEntry(url, lastAccessed = System.currentTimeMillis(), isPreloaded = true)
+            cache[url] = CacheEntry(url, lastAccessed = currentTimeMillis(), isPreloaded = true)
         }
     }
     

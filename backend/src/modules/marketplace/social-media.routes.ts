@@ -1,18 +1,16 @@
 import { Router } from 'express';
 import { SocialMediaService } from './social-media.service.js';
-import { authMiddleware } from '../../middleware/auth.js';
+import { authMiddleware, adminAuth } from '../../middleware/auth.js';
+import { verifyInfluencerOwnership, verifySocialAccountOwnership } from '../../middleware/ownership.js';
 
 const router = Router();
 const socialMediaService = new SocialMediaService();
 
 // ─── ADD SOCIAL MEDIA ACCOUNT ──────────────────────────────
 
-router.post('/social-accounts', authMiddleware, async (req, res) => {
+router.post('/social-accounts', authMiddleware, verifyInfluencerOwnership, async (req, res) => {
   try {
     const { influencerId, platform, username, accessToken } = req.body;
-    
-    // Verify user owns this influencer profile
-    // TODO: Add authorization check
     
     const account = await socialMediaService.addSocialAccount(
       influencerId,
@@ -43,7 +41,7 @@ router.get('/social-accounts/:influencerId', authMiddleware, async (req, res) =>
 
 // ─── SYNC ACCOUNT METRICS ──────────────────────────────────
 
-router.post('/social-accounts/:accountId/sync', authMiddleware, async (req, res) => {
+router.post('/social-accounts/:accountId/sync', authMiddleware, verifySocialAccountOwnership, async (req, res) => {
   try {
     const accountId = Array.isArray(req.params.accountId) ? req.params.accountId[0] : req.params.accountId;
     
@@ -57,7 +55,7 @@ router.post('/social-accounts/:accountId/sync', authMiddleware, async (req, res)
 
 // ─── SET PRIMARY ACCOUNT ───────────────────────────────────
 
-router.patch('/social-accounts/:accountId/primary', authMiddleware, async (req, res) => {
+router.patch('/social-accounts/:accountId/primary', authMiddleware, verifySocialAccountOwnership, async (req, res) => {
   try {
     const accountId = Array.isArray(req.params.accountId) ? req.params.accountId[0] : req.params.accountId;
     const { influencerId } = req.body;
@@ -72,7 +70,7 @@ router.patch('/social-accounts/:accountId/primary', authMiddleware, async (req, 
 
 // ─── DELETE SOCIAL ACCOUNT ─────────────────────────────────
 
-router.delete('/social-accounts/:accountId', authMiddleware, async (req, res) => {
+router.delete('/social-accounts/:accountId', authMiddleware, verifySocialAccountOwnership, async (req, res) => {
   try {
     const accountId = Array.isArray(req.params.accountId) ? req.params.accountId[0] : req.params.accountId;
     
@@ -86,10 +84,8 @@ router.delete('/social-accounts/:accountId', authMiddleware, async (req, res) =>
 
 // ─── SYNC ALL ACCOUNTS (ADMIN/CRON) ───────────────────────
 
-router.post('/social-accounts/sync-all', authMiddleware, async (req, res) => {
+router.post('/social-accounts/sync-all', authMiddleware, adminAuth, async (req, res) => {
   try {
-    // TODO: Add admin authorization check
-    
     const results = await socialMediaService.syncAllAccounts();
     
     res.json(results);

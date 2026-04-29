@@ -1,7 +1,6 @@
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
-  
 }
 
 datasource db {
@@ -16,132 +15,137 @@ enum AccountType {
 }
 
 model User {
-  id              String      @id @default(uuid())
-  email           String      @unique
-  username        String      @unique
-  firstName       String      @map("first_name")
-  lastName        String      @map("last_name")
-  displayName     String      @map("display_name")
-  avatarUrl       String?     @map("avatar_url")
-  coverPhotoUrl   String?     @map("cover_photo_url")
-  bio             String?
-  country         String      @db.VarChar(2) // ISO country code
-  currency        String      @db.VarChar(3) // ISO currency code
-  googleId        String?     @unique @map("google_id")
-  appleId         String?     @unique @map("apple_id")
-  accountType     AccountType @default(CREATOR) @map("account_type")
-  isAdmin         Boolean     @default(false) @map("is_admin") 
-  isVerified      Boolean     @default(false) @map("is_verified")
-  
+  id            String      @id @default(uuid())
+  email         String      @unique
+  username      String      @unique
+  firstName     String      @map("first_name")
+  lastName      String      @map("last_name")
+  displayName   String      @map("display_name")
+  avatarUrl     String?     @map("avatar_url")
+  coverPhotoUrl String?     @map("cover_photo_url")
+  bio           String?
+  country       String      @db.VarChar(2) // ISO country code
+  currency      String      @db.VarChar(3) // ISO currency code
+  googleId      String?     @unique @map("google_id")
+  appleId       String?     @unique @map("apple_id")
+  accountType   AccountType @default(CREATOR) @map("account_type")
+  isAdmin       Boolean     @default(false) @map("is_admin")
+  isVerified    Boolean     @default(false) @map("is_verified")
+
   // Wallet Security 
-  isWalletUnlocked Boolean    @default(false) @map("is_wallet_unlocked")
-  walletPinHash   String?     @map("wallet_pin_hash")
-  
-  passwordHash    String?     @map("password_hash")
-  createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
+  isWalletUnlocked Boolean @default(false) @map("is_wallet_unlocked")
+  walletPinHash    String? @map("wallet_pin_hash")
+
+  // KYC Status
+  kycStatus KYCStatus @default(NOT_STARTED) @map("kyc_status")
+
+  passwordHash String?  @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   // Relations
-  wallet              Wallet?
-  refreshTokens       RefreshToken[]
-  bioLinks            BioLink[]
-  admirers            Admire[]          @relation("AdmiredBy")
-  admiring            Admire[]          @relation("Admirer")
-  subscriptionTiers   SubscriptionTier[]
-  subscribedTo        Subscription[]    @relation("Subscriber")
-  subscribers         Subscription[]    @relation("Creator")
-  milestoneCompletions MilestoneCompletion[]
-  shorts              Short[]
-  shortLikes          ShortLike[]
-  shortComments       ShortComment[]
-  shortCollections    ShortCollection[]
-  posts               Post[]
-  postLikes           PostLike[]
-  postComments        PostComment[]
-  contestsCreated     Contest[]
-  contestParticipations ContestParticipant[]
-  contestSubmissions  ContestSubmission[]
-  contestWins         ContestWinner[]
-  contestJudges       ContestJudge[]
-  contestVotes        ContestVote[]
-  transactions        Transaction[]
-  escrows             Escrow[]
-  products            Product[]
-  dailyStats          DailyStat[]
-  comments            Comment[]         @relation("CommentAuthor")
-  commentLikes        CommentLike[]     @relation("CommentLikes")
-  commentReports      CommentReport[]   @relation("CommentReports")
-  commentRepliesTo    Comment[]         @relation("CommentReplyTo")
-  teamsLed            Team[]            @relation("TeamLeader")
-  teamMemberships     TeamMember[]      @relation("TeamMemberships")
-  teamInvitationsSent TeamInvitation[]  @relation("TeamInvitationsSent")
-  teamInvitationsReceived TeamInvitation[] @relation("TeamInvitationsReceived")
-  teamSubmissionVotes TeamSubmissionVote[] @relation("TeamSubmissionVotes")
-  judgeInvites        JudgeInvite[]     @relation("JudgeInvites")
-  chatParticipations  ChatParticipant[] @relation("ChatParticipations")
-  sentMessages        Message[]         @relation("SentMessages")
-  stories             Story[]
-  storyViews          StoryView[]
-  storyViewerPreferences StoryViewerPreference[] @relation("ViewerPreferences")
-  preferredStoryViewers  StoryViewerPreference[] @relation("PreferredViewers")
-  chamasCreated         Chama[]           @relation("ChamaCreator")
-  chamaMemberships      ChamaMember[]     @relation("ChamaMemberships")
-  chamaContributions    ChamaContribution[] @relation("ChamaContributions")
-  chamaPayoutsReceived  ChamaPayout[]     @relation("ChamaPayoutRecipient")
-  chamaPayoutApprovals  ChamaPayoutApproval[] @relation("ChamaPayoutApprovals")
-  chamaTransactions     ChamaTransaction[] @relation("ChamaTransactions")
-  chamaDefaults         ChamaDefaulter[]  @relation("ChamaDefaults")
-  chamaNominations      ChamaNomination[] @relation("ChamaNominations")
-  chamaNominated        ChamaNomination[] @relation("ChamaNominees")
-  chamaSeconds          ChamaSecondment[] @relation("ChamaSecondments")
-  chamaVotes            ChamaVote[]       @relation("ChamaVotes")
-  isRotationLocked      Boolean           @default(false) @map("is_rotation_locked")
-  fcmToken              String?           @map("fcm_token")
-  devicePlatform        String?           @map("device_platform")
-
+  wallet                  Wallet?
+  refreshTokens           RefreshToken[]
+  bioLinks                BioLink[]
+  admirers                Admire[]                @relation("AdmiredBy")
+  admiring                Admire[]                @relation("Admirer")
+  admirersCount           Int                     @default(0) @map("admirers_count") // For creator tier calculation
+  subscriptionTiers       SubscriptionTier[]
+  subscribedTo            Subscription[]          @relation("Subscriber")
+  subscribers             Subscription[]          @relation("Creator")
+  milestoneCompletions    MilestoneCompletion[]
+  shorts                  Short[]
+  shortLikes              ShortLike[]
+  shortComments           ShortComment[]
+  shortCollections        ShortCollection[]
+  posts                   Post[]
+  postLikes               PostLike[]
+  postComments            PostComment[]
+  contestsCreated         Contest[]
+  contestParticipations   ContestParticipant[]
+  contestSubmissions      ContestSubmission[]
+  contestWins             ContestWinner[]
+  contestJudges           ContestJudge[]
+  contestVotes            ContestVote[]
+  transactions            Transaction[]
+  escrows                 Escrow[]
+  products                Product[]
+  dailyStats              DailyStat[]
+  comments                Comment[]               @relation("CommentAuthor")
+  commentLikes            CommentLike[]           @relation("CommentLikes")
+  commentReports          CommentReport[]         @relation("CommentReports")
+  commentRepliesTo        Comment[]               @relation("CommentReplyTo")
+  teamsLed                Team[]                  @relation("TeamLeader")
+  teamMemberships         TeamMember[]            @relation("TeamMemberships")
+  teamInvitationsSent     TeamInvitation[]        @relation("TeamInvitationsSent")
+  teamInvitationsReceived TeamInvitation[]        @relation("TeamInvitationsReceived")
+  teamSubmissionVotes     TeamSubmissionVote[]    @relation("TeamSubmissionVotes")
+  judgeInvites            JudgeInvite[]           @relation("JudgeInvites")
+  chatParticipations      ChatParticipant[]       @relation("ChatParticipations")
+  sentMessages            Message[]               @relation("SentMessages")
+  stories                 Story[]
+  storyViews              StoryView[]
+  storyViewerPreferences  StoryViewerPreference[] @relation("ViewerPreferences")
+  preferredStoryViewers   StoryViewerPreference[] @relation("PreferredViewers")
+  chamasCreated           Chama[]                 @relation("ChamaCreator")
+  chamaMemberships        ChamaMember[]           @relation("ChamaMemberships")
+  chamaContributions      ChamaContribution[]     @relation("ChamaContributions")
+  chamaPayoutsReceived    ChamaPayout[]           @relation("ChamaPayoutRecipient")
+  chamaPayoutApprovals    ChamaPayoutApproval[]   @relation("ChamaPayoutApprovals")
+  chamaTransactions       ChamaTransaction[]      @relation("ChamaTransactions")
+  chamaDefaults           ChamaDefaulter[]        @relation("ChamaDefaults")
+  chamaNominations        ChamaNomination[]       @relation("ChamaNominations")
+  chamaNominated          ChamaNomination[]       @relation("ChamaNominees")
+  chamaSeconds            ChamaSecondment[]       @relation("ChamaSecondments")
+  chamaVotes              ChamaVote[]             @relation("ChamaVotes")
+  isRotationLocked        Boolean                 @default(false) @map("is_rotation_locked")
+  fcmToken                String?                 @map("fcm_token")
+  devicePlatform          String?                 @map("device_platform")
 
   // Shop Marketplace
-  productReviews        ProductReview[]
-  wishlists             Wishlist[]
-  cartItems             CartItem[]
-  buyerOrders           Order[]           @relation("BuyerOrders")
-  garageProfile         GarageProfile?
-  garageBookings        GarageBooking[]   @relation("GarageBooker")
-  garageReviews         GarageReview[]    @relation("GarageReviewer")
-  importerProfile       ImporterProfile?
-  importRequests        ImportRequest[]   @relation("ImportRequester")
-  giftsSent             Gift[]            @relation("GiftSender")
-  giftsReceived         Gift[]            @relation("GiftRecipient")
-  dealAlerts            DealAlert[]
-  liveStreamsHosted      LiveStream[]      @relation("LiveHost")
-  groupBuyParts         GroupBuyParticipant[]
-  productShares         ProductShare[]
-  logisticsCompany      LogisticsCompany?
-  calls                 Call[]
-  shippingJobs          ShippingJob[]     @relation("ShippingRequester")
-  vehicleFavorites      VehicleFavorite[]
+  productReviews    ProductReview[]
+  wishlists         Wishlist[]
+  cartItems         CartItem[]
+  buyerOrders       Order[]               @relation("BuyerOrders")
+  garageProfile     GarageProfile?
+  garageBookings    GarageBooking[]       @relation("GarageBooker")
+  garageReviews     GarageReview[]        @relation("GarageReviewer")
+  importerProfile   ImporterProfile?
+  importRequests    ImportRequest[]       @relation("ImportRequester")
+  giftsSent         Gift[]                @relation("GiftSender")
+  giftsReceived     Gift[]                @relation("GiftRecipient")
+  dealAlerts        DealAlert[]
+  liveStreamsHosted LiveStream[]          @relation("LiveHost")
+  groupBuyParts     GroupBuyParticipant[]
+  productShares     ProductShare[]
+  logisticsCompany  LogisticsCompany?
+  calls             Call[]
+  shippingJobs      ShippingJob[]         @relation("ShippingRequester")
+  vehicleFavorites  VehicleFavorite[]
 
   // Brand Marketplace Relations
-  influencerProfile     InfluencerProfile?
-  brandCampaigns        BrandCampaign[]        @relation("BrandCampaigns")
-  contestSponsorships   ContestSponsorship[]   @relation("ContestSponsorships")
-  conversionCampaigns   ConversionCampaign[]   @relation("ConversionCampaigns")
-  conversionRecipients  ConversionCampaignRecipient[] @relation("ConversionRecipients")
-  engagementActions     ContestEngagementAction[] @relation("ContestEngagementActions")
-  purchaseEntries       ContestPurchaseEntry[] @relation("ContestPurchaseEntries")
-  funnelEvents          SalesFunnelEvent[]     @relation("SalesFunnelEvents")
-  gamificationPoints    GamificationPoints?
-  gamificationActivities GamificationActivity[] @relation("GamificationActivities")
-  liveSessions          LiveSession[]          @relation("LiveSessionHost")
-  sponsoredCampaigns    SponsoredContent[]     @relation("SponsoredContentBrand")
+  influencerProfile      InfluencerProfile?
+  brandCampaigns         BrandCampaign[]               @relation("BrandCampaigns")
+  contestSponsorships    ContestSponsorship[]          @relation("ContestSponsorships")
+  conversionCampaigns    ConversionCampaign[]          @relation("ConversionCampaigns")
+  conversionRecipients   ConversionCampaignRecipient[] @relation("ConversionRecipients")
+  engagementActions      ContestEngagementAction[]     @relation("ContestEngagementActions")
+  purchaseEntries        ContestPurchaseEntry[]        @relation("ContestPurchaseEntries")
+  funnelEvents           SalesFunnelEvent[]            @relation("SalesFunnelEvents")
+  gamificationPoints     GamificationPoints?
+  gamificationActivities GamificationActivity[]        @relation("GamificationActivities")
+  liveSessions           LiveSession[]                 @relation("LiveSessionHost")
+  sponsoredCampaigns     SponsoredContent[]            @relation("SponsoredContentBrand")
 
   // RembrandtRAR (Platform Governance)
-  adminProfile          AdminProfile?
-  suspensions           UserSuspension[]
-  withdrawalRequests    WithdrawalRequest[]
-  isSuspended           Boolean           @default(false) @map("is_suspended")
-  suspendedAt           DateTime?         @map("suspended_at")
+  adminProfile       AdminProfile?
+  suspensions        UserSuspension[]
+  withdrawalRequests WithdrawalRequest[]
+  kycDocuments       KYCDocument[]
+  isSuspended        Boolean             @default(false) @map("is_suspended")
+  suspendedAt        DateTime?           @map("suspended_at")
 
+  @@index([admirersCount])
   @@map("users")
 }
 
@@ -171,17 +175,18 @@ model Wallet {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([krBalance], map: "wallets_balance_idx")
   @@map("wallets")
 }
 
 model Transaction {
   id             String   @id @default(uuid())
   userId         String   @map("user_id")
-  type           String   // topup, withdraw, tip_sent, tip_received, contest_escrow, contest_prize, subscription_earned, subscription_paid, shop_sale, ad_revenue, platform_fee
+  type           String // topup, withdraw, tip_sent, tip_received, contest_escrow, contest_prize, subscription_earned, subscription_paid, shop_sale, ad_revenue, platform_fee
   amountKr       Decimal  @map("amount_kr") @db.Decimal(18, 4)
   amountFiat     Decimal? @map("amount_fiat") @db.Decimal(18, 4)
   currency       String?  @db.VarChar(3)
-  provider       String?  // paypal, paystack, mpesa, payoneer, platform
+  provider       String? // paypal, paystack, mpesa, payoneer, platform
   status         String   @default("pending") // pending, completed, failed, cancelled
   reference      String?
   counterpartyId String?  @map("counterparty_id")
@@ -191,6 +196,8 @@ model Transaction {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([userId, type, createdAt], map: "transactions_user_type_created_idx")
+  @@index([status, createdAt], map: "transactions_status_created_idx")
   @@map("transactions")
 }
 
@@ -226,12 +233,12 @@ model Admire {
 }
 
 model BioLink {
-  id        String @id @default(uuid())
-  userId    String @map("user_id")
+  id        String  @id @default(uuid())
+  userId    String  @map("user_id")
   label     String
   url       String
   icon      String?
-  sortOrder Int    @default(0) @map("sort_order")
+  sortOrder Int     @default(0) @map("sort_order")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -275,8 +282,8 @@ model Subscription {
   nextBillingAt DateTime?            @map("next_billing_at")
   cancelledAt   DateTime?            @map("cancelled_at")
 
-  subscriber     User             @relation("Subscriber", fields: [subscriberId], references: [id], onDelete: Cascade)
-  creator        User             @relation("Creator", fields: [creatorId], references: [id], onDelete: Cascade)
+  subscriber       User             @relation("Subscriber", fields: [subscriberId], references: [id], onDelete: Cascade)
+  creator          User             @relation("Creator", fields: [creatorId], references: [id], onDelete: Cascade)
   subscriptionTier SubscriptionTier @relation(fields: [tierId], references: [id])
 
   @@unique([subscriberId, creatorId])
@@ -317,32 +324,39 @@ model MilestoneCompletion {
 // ─── SHORTS ───────────────────────────────────────────────
 
 model Short {
-  id              String   @id @default(uuid())
-  userId          String   @map("user_id")
-  videoUrl        String   @map("video_url")
-  thumbnailUrl    String?  @map("thumbnail_url")
+  id              String                @id @default(uuid())
+  userId          String                @map("user_id")
+  videoUrl        String                @map("video_url")
+  thumbnailUrl    String?               @map("thumbnail_url")
+  mediaType       String                @default("VIDEO") @map("media_type") // VIDEO, PHOTO, CAROUSEL
+  aspectRatio     Float?                @map("aspect_ratio") // width/height (e.g., 0.5625 for 9:16, 1.7778 for 16:9)
+  mediaUrls       String[]              @default([]) @map("media_urls") // For photo carousels
   caption         String?
-  musicTitle      String?  @map("music_title")
-  musicArtist     String?  @map("music_artist")
-  isLocked        Boolean  @default(false) @map("is_locked")
+  musicTitle      String?               @map("music_title")
+  musicArtist     String?               @map("music_artist")
+  isLocked        Boolean               @default(false) @map("is_locked")
   requiredTier    SubscriptionTierType? @map("required_tier")
-  contestId       String?  @map("contest_id")
-  collectionId    String?  @map("collection_id")
-  linkedProductId String?  @map("linked_product_id") // Shop product shown briefly during playback
-  views           Int      @default(0)
-  likesCount      Int      @default(0) @map("likes_count")
-  commentsCount   Int      @default(0) @map("comments_count")
-  createdAt       DateTime @default(now()) @map("created_at")
+  contestId       String?               @map("contest_id")
+  collectionId    String?               @map("collection_id")
+  linkedProductId String?               @map("linked_product_id") // Shop product shown briefly during playback
+  views           Int                   @default(0)
+  likesCount      Int                   @default(0) @map("likes_count")
+  commentsCount   Int                   @default(0) @map("comments_count")
+  createdAt       DateTime              @default(now()) @map("created_at")
 
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  contest       Contest?         @relation(fields: [contestId], references: [id])
-  collection    ShortCollection? @relation(fields: [collectionId], references: [id])
-  linkedProduct Product?         @relation(fields: [linkedProductId], references: [id])
-  likes         ShortLike[]
-  comments      ShortComment[]
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contest            Contest?           @relation(fields: [contestId], references: [id])
+  collection         ShortCollection?   @relation(fields: [collectionId], references: [id])
+  linkedProduct      Product?           @relation(fields: [linkedProductId], references: [id])
+  likes              ShortLike[]
+  comments           ShortComment[]
   sponsoredCampaigns SponsoredContent[] @relation("SponsoredShort")
 
   @@index([userId, createdAt])
+  @@index([userId, createdAt, isLocked], map: "shorts_user_created_locked_idx")
+  @@index([contestId, createdAt], map: "shorts_contest_created_idx")
+  @@index([views], map: "shorts_views_idx")
+  @@index([likesCount], map: "shorts_likes_idx")
   @@map("shorts")
 }
 
@@ -389,22 +403,24 @@ model ShortComment {
 // ─── FEED POSTS ───────────────────────────────────────────
 
 model Post {
-  id            String               @id @default(uuid())
-  userId        String               @map("user_id")
+  id            String                @id @default(uuid())
+  userId        String                @map("user_id")
   caption       String?
-  imageUrls     String[]             @map("image_urls")
-  isLocked      Boolean              @default(false) @map("is_locked")
+  imageUrls     String[]              @map("image_urls")
+  isLocked      Boolean               @default(false) @map("is_locked")
   requiredTier  SubscriptionTierType? @map("required_tier")
-  likesCount    Int                  @default(0) @map("likes_count")
-  commentsCount Int                  @default(0) @map("comments_count")
-  createdAt     DateTime             @default(now()) @map("created_at")
+  likesCount    Int                   @default(0) @map("likes_count")
+  commentsCount Int                   @default(0) @map("comments_count")
+  createdAt     DateTime              @default(now()) @map("created_at")
 
-  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  likes    PostLike[]
-  comments PostComment[]
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes              PostLike[]
+  comments           PostComment[]
   sponsoredCampaigns SponsoredContent[] @relation("SponsoredPost")
 
   @@index([userId, createdAt])
+  @@index([userId, createdAt, isLocked], map: "posts_user_created_locked_idx")
+  @@index([likesCount], map: "posts_likes_idx")
   @@map("posts")
 }
 
@@ -461,7 +477,7 @@ enum JudgingCriteria {
   CREATOR_PICKS
   COMMUNITY_VOTE
   MOST_ENGAGEMENT
-  COMBINATION     // Blends Leaderboard Votes and Judge decisions natively
+  COMBINATION // Blends Leaderboard Votes and Judge decisions natively
 }
 
 enum RequirementType {
@@ -476,29 +492,29 @@ enum RequirementType {
 }
 
 model Contest {
-  id                String          @id @default(uuid())
-  creatorId         String          @map("creator_id")
-  title             String
-  description       String?
-  mediaType         ContestMediaType @map("media_type")
-  category          String
-  coverMediaUrl     String?         @map("cover_media_url")
-  prizeTotalKr      Decimal         @map("prize_total_kr") @db.Decimal(18, 4)
-  platformFeeKr     Decimal         @map("platform_fee_kr") @db.Decimal(18, 4)
-  
+  id            String           @id @default(uuid())
+  creatorId     String           @map("creator_id")
+  title         String
+  description   String?
+  mediaType     ContestMediaType @map("media_type")
+  category      String
+  coverMediaUrl String?          @map("cover_media_url")
+  prizeTotalKr  Decimal          @map("prize_total_kr") @db.Decimal(18, 4)
+  platformFeeKr Decimal          @map("platform_fee_kr") @db.Decimal(18, 4)
+
   participationType ParticipationType @default(INDIVIDUAL_ONLY) @map("participation_type")
-  teamSize          Int?            @map("team_size")
-  maxTeams          Int?            @map("max_teams")
-  
-  entryFeeKr        Decimal?        @map("entry_fee_kr") @db.Decimal(18, 4)
-  publicVoteWeight  Int?            @map("public_vote_weight")
-  targetAges        Int[]           @map("target_ages")
-  targetGeos        String[]        @map("target_geos")
-  airdropKr         Decimal?        @map("airdrop_kr") @db.Decimal(18, 4)
-  airdropLimit      Int?            @map("airdrop_limit")
-  allowDailyPrizes  Boolean         @default(false) @map("allow_daily_prizes")
-  dailyPrizeKr      Decimal?        @map("daily_prize_kr") @db.Decimal(18, 4)
-  
+  teamSize          Int?              @map("team_size")
+  maxTeams          Int?              @map("max_teams")
+
+  entryFeeKr       Decimal? @map("entry_fee_kr") @db.Decimal(18, 4)
+  publicVoteWeight Int?     @map("public_vote_weight")
+  targetAges       Int[]    @map("target_ages")
+  targetGeos       String[] @map("target_geos")
+  airdropKr        Decimal? @map("airdrop_kr") @db.Decimal(18, 4)
+  airdropLimit     Int?     @map("airdrop_limit")
+  allowDailyPrizes Boolean  @default(false) @map("allow_daily_prizes")
+  dailyPrizeKr     Decimal? @map("daily_prize_kr") @db.Decimal(18, 4)
+
   maxWinners        Int             @map("max_winners") @db.SmallInt
   judgingCriteria   JudgingCriteria @map("judging_criteria")
   sponsorName       String?         @map("sponsor_name")
@@ -509,42 +525,42 @@ model Contest {
   totalSubmissions  Int             @default(0) @map("total_submissions")
   createdAt         DateTime        @default(now()) @map("created_at")
 
-  creator        User                     @relation(fields: [creatorId], references: [id])
-  actions        ContestAction[]
-  distributions  ContestPrizeDistribution[]
-  participants   ContestParticipant[]
-  submissions    ContestSubmission[]
-  winners        ContestWinner[]
-  escrows        Escrow[]
-  shorts         Short[]
-  judges         ContestJudge[]
-  milestones     Milestone[]
+  creator           User                       @relation(fields: [creatorId], references: [id])
+  actions           ContestAction[]
+  distributions     ContestPrizeDistribution[]
+  participants      ContestParticipant[]
+  submissions       ContestSubmission[]
+  winners           ContestWinner[]
+  escrows           Escrow[]
+  shorts            Short[]
+  judges            ContestJudge[]
+  milestones        Milestone[]
   teamRegistrations TeamContestRegistration[]
   teamSubmissions   TeamSubmission[]
-  judgeInvites      JudgeInvite[]     @relation("JudgeInvites")
+  judgeInvites      JudgeInvite[]              @relation("JudgeInvites")
 
   // Brand Marketplace Relations
-  sponsorships          ContestSponsorship[]
-  engagementActions     ContestEngagementAction[]
-  purchaseEntries       ContestPurchaseEntry[]
-  conversionCampaigns   ConversionCampaign[]
-  funnelEvents          SalesFunnelEvent[]
-  analytics             ContestAnalytics[]
-  promotingCampaigns    BrandCampaign[]
+  sponsorships        ContestSponsorship[]
+  engagementActions   ContestEngagementAction[]
+  purchaseEntries     ContestPurchaseEntry[]
+  conversionCampaigns ConversionCampaign[]
+  funnelEvents        SalesFunnelEvent[]
+  analytics           ContestAnalytics[]
+  promotingCampaigns  BrandCampaign[]
 
   @@index([status, deadline])
   @@map("contests")
 }
 
 model ContestAction {
-  id               String          @id @default(uuid())
-  contestId        String          @map("contest_id")
-  actionType       RequirementType @map("action_type") // Tied correctly to the robust 8 Requirement Templates natively
-  targetUrl        String?         @map("target_url")
-  label            String
-  isVerifiable     Boolean         @default(false) @map("is_verifiable")
-  requiresUpload   Boolean         @default(false) @map("requires_upload") // True for Instagram/TikTok proof screenshots!
-  sortOrder        Int             @default(0) @map("sort_order")
+  id             String          @id @default(uuid())
+  contestId      String          @map("contest_id")
+  actionType     RequirementType @map("action_type") // Tied correctly to the robust 8 Requirement Templates natively
+  targetUrl      String?         @map("target_url")
+  label          String
+  isVerifiable   Boolean         @default(false) @map("is_verifiable")
+  requiresUpload Boolean         @default(false) @map("requires_upload") // True for Instagram/TikTok proof screenshots!
+  sortOrder      Int             @default(0) @map("sort_order")
 
   contest     Contest                   @relation(fields: [contestId], references: [id], onDelete: Cascade)
   completions ContestActionCompletion[]
@@ -582,6 +598,8 @@ model ContestSubmission {
   userId      String   @map("user_id")
   mediaUrl    String   @map("media_url")
   mediaType   String   @map("media_type") // photo or video
+  aspectRatio Float?   @map("aspect_ratio") // width/height for adaptive display
+  mediaUrls   String[] @default([]) @map("media_urls") // For photo carousels
   proofUrls   String[] @map("proof_urls")
   votesCount  Int      @default(0) @map("votes_count")
   judgeScore  Decimal? @default(0) @map("judge_score") @db.Decimal(5, 2) // Explicit score storing algorithm logic combining Combos
@@ -595,6 +613,9 @@ model ContestSubmission {
   votes             ContestVote[]
 
   @@unique([contestId, userId]) // One submission per user per contest
+  @@index([contestId, finalScore], map: "contest_submissions_contest_score_idx")
+  @@index([contestId, votesCount], map: "contest_submissions_contest_votes_idx")
+  @@index([contestId, rank], map: "contest_submissions_contest_rank_idx")
   @@map("contest_submissions")
 }
 
@@ -669,14 +690,16 @@ model ContestVote {
   id           String   @id @default(uuid())
   submissionId String   @map("submission_id")
   voterId      String   @map("voter_id")
-  ipAddress    String?  @map("ip_address") // Protection mapping explicitly against Clickbots!
-  fingerprint  String?  @map("fingerprint") // Cross-ref device footprint logic locking abuse loops
+  ipAddress    String   @map("ip_address") // Required for bot detection
+  fingerprint  String   @map("fingerprint") // Required for device tracking
   createdAt    DateTime @default(now()) @map("created_at")
 
   submission ContestSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
   voter      User              @relation(fields: [voterId], references: [id], onDelete: Cascade)
 
   @@unique([submissionId, voterId])
+  @@index([ipAddress])
+  @@index([fingerprint])
   @@map("contest_votes")
 }
 
@@ -849,33 +872,33 @@ model Product {
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @default(now()) @updatedAt @map("updated_at")
 
-  seller              User                  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  linkedShorts        Short[]
-  vehicleDetail       VehicleDetail?
-  sparePartDetail     SparePartDetail?
-  realEstateDetail    RealEstateDetail?
-  fashionDetail       FashionDetail?
-  shoeDetail          ShoeDetail?
-  electronicsDetail   ElectronicsDetail?
-  foodDetail          FoodDetail?
-  bookDetail          BookDetail?
+  seller               User                  @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  linkedShorts         Short[]
+  vehicleDetail        VehicleDetail?
+  sparePartDetail      SparePartDetail?
+  realEstateDetail     RealEstateDetail?
+  fashionDetail        FashionDetail?
+  shoeDetail           ShoeDetail?
+  electronicsDetail    ElectronicsDetail?
+  foodDetail           FoodDetail?
+  bookDetail           BookDetail?
   digitalProductDetail DigitalProductDetail?
-  serviceDetail       ServiceDetail?
-  discounts           ProductDiscount[]
-  flashSaleProducts   FlashSaleProduct[]
-  reviews             ProductReview[]
-  wishlistItems       WishlistItem[]
-  cartItems           CartItem[]
-  orderItems          OrderItem[]
-  productShares       ProductShare[]
-  productTags         ProductTag[]
-  groupBuys           GroupBuy[]
-  dealAlerts          DealAlert[]
-  livePinnedProducts  LivePinnedProduct[]
-  premiumListings     PremiumListing[]
-  analytics           ProductAnalytic[]
-  vehicleFavorites    VehicleFavorite[]
-  liveSessionProducts LiveSessionProduct[] @relation("LiveSessionProducts")
+  serviceDetail        ServiceDetail?
+  discounts            ProductDiscount[]
+  flashSaleProducts    FlashSaleProduct[]
+  reviews              ProductReview[]
+  wishlistItems        WishlistItem[]
+  cartItems            CartItem[]
+  orderItems           OrderItem[]
+  productShares        ProductShare[]
+  productTags          ProductTag[]
+  groupBuys            GroupBuy[]
+  dealAlerts           DealAlert[]
+  livePinnedProducts   LivePinnedProduct[]
+  premiumListings      PremiumListing[]
+  analytics            ProductAnalytic[]
+  vehicleFavorites     VehicleFavorite[]
+  liveSessionProducts  LiveSessionProduct[]  @relation("LiveSessionProducts")
 
   @@index([status, createdAt])
   @@index([category, status])
@@ -886,27 +909,27 @@ model Product {
 // ─── CATEGORY DETAIL TABLES ──────────────────────────────
 
 model VehicleDetail {
-  id                String          @id @default(uuid())
-  productId         String          @unique @map("product_id")
-  vehicleType       String          @map("vehicle_type") // car, motorcycle, truck, bus
-  make              String
-  model             String
-  year              Int
-  mileage           Int?
-  fuelType          FuelType?       @map("fuel_type")
-  transmission      TransmissionType?
-  bodyType          VehicleBodyType? @map("body_type")
-  engineSize        String?         @map("engine_size")
-  color             String?
-  vin               String?
-  numberOfOwners    Int?            @map("number_of_owners")
-  logbookReady      Boolean         @default(false) @map("logbook_ready")
-  importStatus      String?         @map("import_status") // local, imported
-  importCertUrl     String?         @map("import_cert_url")
-  auctionSheetUrl   String?         @map("auction_sheet_url")
-  accidentHistory   Boolean         @default(false) @map("accident_history")
-  tradeInEnabled    Boolean         @default(false) @map("trade_in_enabled")
-  swapEnabled       Boolean         @default(false) @map("swap_enabled")
+  id              String            @id @default(uuid())
+  productId       String            @unique @map("product_id")
+  vehicleType     String            @map("vehicle_type") // car, motorcycle, truck, bus
+  make            String
+  model           String
+  year            Int
+  mileage         Int?
+  fuelType        FuelType?         @map("fuel_type")
+  transmission    TransmissionType?
+  bodyType        VehicleBodyType?  @map("body_type")
+  engineSize      String?           @map("engine_size")
+  color           String?
+  vin             String?
+  numberOfOwners  Int?              @map("number_of_owners")
+  logbookReady    Boolean           @default(false) @map("logbook_ready")
+  importStatus    String?           @map("import_status") // local, imported
+  importCertUrl   String?           @map("import_cert_url")
+  auctionSheetUrl String?           @map("auction_sheet_url")
+  accidentHistory Boolean           @default(false) @map("accident_history")
+  tradeInEnabled  Boolean           @default(false) @map("trade_in_enabled")
+  swapEnabled     Boolean           @default(false) @map("swap_enabled")
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -940,19 +963,19 @@ model SparePartDetail {
 }
 
 model RealEstateDetail {
-  id             String  @id @default(uuid())
-  productId      String  @unique @map("product_id")
-  propertyType   String  @map("property_type") // apartment, house, land, commercial, office
-  listingType    String  @map("listing_type") // rent, sale
-  landSize       String? @map("land_size")
+  id             String   @id @default(uuid())
+  productId      String   @unique @map("product_id")
+  propertyType   String   @map("property_type") // apartment, house, land, commercial, office
+  listingType    String   @map("listing_type") // rent, sale
+  landSize       String?  @map("land_size")
   bedrooms       Int?
   bathrooms      Int?
   floors         Int?
-  yearBuilt      Int?    @map("year_built")
+  yearBuilt      Int?     @map("year_built")
   amenities      String[]
   legalDocuments String[] @map("legal_documents")
-  furnished      Boolean @default(false)
-  parking        Boolean @default(false)
+  furnished      Boolean  @default(false)
+  parking        Boolean  @default(false)
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -961,8 +984,8 @@ model RealEstateDetail {
 }
 
 model FashionDetail {
-  id               String  @id @default(uuid())
-  productId        String  @unique @map("product_id")
+  id               String   @id @default(uuid())
+  productId        String   @unique @map("product_id")
   size             String?
   material         String?
   colorVariants    String[] @map("color_variants")
@@ -978,14 +1001,14 @@ model FashionDetail {
 }
 
 model ShoeDetail {
-  id              String  @id @default(uuid())
-  productId       String  @unique @map("product_id")
-  shoeSize        String  @map("shoe_size")
-  soleMaterial    String? @map("sole_material")
-  heelHeight      String? @map("heel_height")
-  closureType     String? @map("closure_type") // lace, velcro, slip-on, buckle, zipper
-  waterResistant  Boolean @default(false) @map("water_resistant")
-  gender          String?
+  id             String  @id @default(uuid())
+  productId      String  @unique @map("product_id")
+  shoeSize       String  @map("shoe_size")
+  soleMaterial   String? @map("sole_material")
+  heelHeight     String? @map("heel_height")
+  closureType    String? @map("closure_type") // lace, velcro, slip-on, buckle, zipper
+  waterResistant Boolean @default(false) @map("water_resistant")
+  gender         String?
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -993,17 +1016,17 @@ model ShoeDetail {
 }
 
 model ElectronicsDetail {
-  id            String  @id @default(uuid())
-  productId     String  @unique @map("product_id")
-  processor     String?
-  ram           String?
-  storage       String?
-  screenSize    String? @map("screen_size")
-  batteryLife   String? @map("battery_life")
-  os            String?
-  connectivity  String[] // wifi, bluetooth, 5g, nfc
-  serialNumber  String?  @map("serial_number")
-  warrantyMonths Int?    @map("warranty_months")
+  id             String   @id @default(uuid())
+  productId      String   @unique @map("product_id")
+  processor      String?
+  ram            String?
+  storage        String?
+  screenSize     String?  @map("screen_size")
+  batteryLife    String?  @map("battery_life")
+  os             String?
+  connectivity   String[] // wifi, bluetooth, 5g, nfc
+  serialNumber   String?  @map("serial_number")
+  warrantyMonths Int?     @map("warranty_months")
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -1011,15 +1034,15 @@ model ElectronicsDetail {
 }
 
 model FoodDetail {
-  id              String   @id @default(uuid())
-  productId       String   @unique @map("product_id")
+  id              String    @id @default(uuid())
+  productId       String    @unique @map("product_id")
   ingredients     String[]
-  nutritionalInfo Json?    @map("nutritional_info")
+  nutritionalInfo Json?     @map("nutritional_info")
   expiryDate      DateTime? @map("expiry_date")
   allergens       String[]
   certifications  String[]
-  isOrganic       Boolean  @default(false) @map("is_organic")
-  weightVolume    String?  @map("weight_volume")
+  isOrganic       Boolean   @default(false) @map("is_organic")
+  weightVolume    String?   @map("weight_volume")
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -1027,17 +1050,17 @@ model FoodDetail {
 }
 
 model BookDetail {
-  id            String  @id @default(uuid())
-  productId     String  @unique @map("product_id")
-  author        String
-  isbn          String?
-  publisher     String?
-  edition       String?
-  language      String?
-  pageCount     Int?    @map("page_count")
-  genre         String?
-  downloadable  Boolean @default(false)
-  downloadUrl   String? @map("download_url")
+  id           String  @id @default(uuid())
+  productId    String  @unique @map("product_id")
+  author       String
+  isbn         String?
+  publisher    String?
+  edition      String?
+  language     String?
+  pageCount    Int?    @map("page_count")
+  genre        String?
+  downloadable Boolean @default(false)
+  downloadUrl  String? @map("download_url")
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -1045,14 +1068,14 @@ model BookDetail {
 }
 
 model DigitalProductDetail {
-  id              String  @id @default(uuid())
-  productId       String  @unique @map("product_id")
-  fileFormat      String  @map("file_format")
-  fileSizeMb      Decimal? @map("file_size_mb") @db.Decimal(10, 2)
-  licenseType     String  @map("license_type") // single, multi, unlimited
-  downloadLimit   Int?    @map("download_limit")
-  drmProtected    Boolean @default(false) @map("drm_protected")
-  downloadUrl     String? @map("download_url")
+  id            String   @id @default(uuid())
+  productId     String   @unique @map("product_id")
+  fileFormat    String   @map("file_format")
+  fileSizeMb    Decimal? @map("file_size_mb") @db.Decimal(10, 2)
+  licenseType   String   @map("license_type") // single, multi, unlimited
+  downloadLimit Int?     @map("download_limit")
+  drmProtected  Boolean  @default(false) @map("drm_protected")
+  downloadUrl   String?  @map("download_url")
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -1060,14 +1083,14 @@ model DigitalProductDetail {
 }
 
 model ServiceDetail {
-  id              String  @id @default(uuid())
-  productId       String  @unique @map("product_id")
-  serviceType     String  @map("service_type")
-  deliveryMode    String  @map("delivery_mode") // online, onsite, both
-  durationMinutes Int?    @map("duration_minutes")
-  availability    String?
-  revisionsAllowed Int?   @map("revisions_allowed")
-  turnaroundDays  Int?    @map("turnaround_days")
+  id               String  @id @default(uuid())
+  productId        String  @unique @map("product_id")
+  serviceType      String  @map("service_type")
+  deliveryMode     String  @map("delivery_mode") // online, onsite, both
+  durationMinutes  Int?    @map("duration_minutes")
+  availability     String?
+  revisionsAllowed Int?    @map("revisions_allowed")
+  turnaroundDays   Int?    @map("turnaround_days")
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -1077,15 +1100,15 @@ model ServiceDetail {
 // ─── PRICING & DISCOUNTS ─────────────────────────────────
 
 model ProductDiscount {
-  id              String   @id @default(uuid())
-  productId       String   @map("product_id")
-  discountType    String   @map("discount_type") // percentage, fixed
-  discountValue   Decimal  @map("discount_value") @db.Decimal(10, 2)
-  minQuantity     Int      @default(1) @map("min_quantity")
-  startDate       DateTime @map("start_date")
-  endDate         DateTime @map("end_date")
-  isActive        Boolean  @default(true) @map("is_active")
-  createdAt       DateTime @default(now()) @map("created_at")
+  id            String   @id @default(uuid())
+  productId     String   @map("product_id")
+  discountType  String   @map("discount_type") // percentage, fixed
+  discountValue Decimal  @map("discount_value") @db.Decimal(10, 2)
+  minQuantity   Int      @default(1) @map("min_quantity")
+  startDate     DateTime @map("start_date")
+  endDate       DateTime @map("end_date")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
@@ -1094,14 +1117,14 @@ model ProductDiscount {
 }
 
 model FlashSale {
-  id              String          @id @default(uuid())
-  title           String
-  description     String?
-  type            FlashSaleType
-  status          FlashSaleStatus @default(SCHEDULED)
-  startTime       DateTime        @map("start_time")
-  endTime         DateTime        @map("end_time")
-  createdAt       DateTime        @default(now()) @map("created_at")
+  id          String          @id @default(uuid())
+  title       String
+  description String?
+  type        FlashSaleType
+  status      FlashSaleStatus @default(SCHEDULED)
+  startTime   DateTime        @map("start_time")
+  endTime     DateTime        @map("end_time")
+  createdAt   DateTime        @default(now()) @map("created_at")
 
   products FlashSaleProduct[]
 
@@ -1110,13 +1133,13 @@ model FlashSale {
 }
 
 model FlashSaleProduct {
-  id              String  @id @default(uuid())
-  flashSaleId     String  @map("flash_sale_id")
-  productId       String  @map("product_id")
-  salePrice       Decimal @map("sale_price") @db.Decimal(18, 4)
-  stockLimit      Int?    @map("stock_limit")
-  soldCount       Int     @default(0) @map("sold_count")
-  perUserLimit    Int?    @map("per_user_limit")
+  id           String  @id @default(uuid())
+  flashSaleId  String  @map("flash_sale_id")
+  productId    String  @map("product_id")
+  salePrice    Decimal @map("sale_price") @db.Decimal(18, 4)
+  stockLimit   Int?    @map("stock_limit")
+  soldCount    Int     @default(0) @map("sold_count")
+  perUserLimit Int?    @map("per_user_limit")
 
   flashSale FlashSale @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
   product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -1126,19 +1149,19 @@ model FlashSaleProduct {
 }
 
 model GroupBuy {
-  id                String         @id @default(uuid())
-  productId         String         @map("product_id")
-  organizerId       String         @map("organizer_id")
-  title             String
-  description       String?
-  targetParticipants Int           @map("target_participants")
-  currentCount      Int            @default(0) @map("current_count")
-  discountPercent   Decimal        @map("discount_percent") @db.Decimal(5, 2)
-  status            GroupBuyStatus @default(OPEN)
-  expiresAt         DateTime       @map("expires_at")
-  createdAt         DateTime       @default(now()) @map("created_at")
+  id                 String         @id @default(uuid())
+  productId          String         @map("product_id")
+  organizerId        String         @map("organizer_id")
+  title              String
+  description        String?
+  targetParticipants Int            @map("target_participants")
+  currentCount       Int            @default(0) @map("current_count")
+  discountPercent    Decimal        @map("discount_percent") @db.Decimal(5, 2)
+  status             GroupBuyStatus @default(OPEN)
+  expiresAt          DateTime       @map("expires_at")
+  createdAt          DateTime       @default(now()) @map("created_at")
 
-  product      Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product      Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
   participants GroupBuyParticipant[]
 
   @@index([status, expiresAt])
@@ -1146,10 +1169,10 @@ model GroupBuy {
 }
 
 model GroupBuyParticipant {
-  id          String   @id @default(uuid())
-  groupBuyId  String   @map("group_buy_id")
-  userId      String   @map("user_id")
-  joinedAt    DateTime @default(now()) @map("joined_at")
+  id         String   @id @default(uuid())
+  groupBuyId String   @map("group_buy_id")
+  userId     String   @map("user_id")
+  joinedAt   DateTime @default(now()) @map("joined_at")
 
   groupBuy GroupBuy @relation(fields: [groupBuyId], references: [id], onDelete: Cascade)
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1161,12 +1184,12 @@ model GroupBuyParticipant {
 // ─── CART & ORDERS ───────────────────────────────────────
 
 model CartItem {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  productId     String   @map("product_id")
-  quantity      Int      @default(1)
-  bargainPrice  Decimal? @map("bargain_price") @db.Decimal(18, 4)
-  addedAt       DateTime @default(now()) @map("added_at")
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  productId    String   @map("product_id")
+  quantity     Int      @default(1)
+  bargainPrice Decimal? @map("bargain_price") @db.Decimal(18, 4)
+  addedAt      DateTime @default(now()) @map("added_at")
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -1189,18 +1212,20 @@ model Order {
   items OrderItem[]
 
   @@index([buyerId, status])
+  @@index([buyerId, createdAt], map: "orders_buyer_created_idx")
+  @@index([status, createdAt], map: "orders_status_created_idx")
   @@map("orders")
 }
 
 model OrderItem {
-  id           String  @id @default(uuid())
-  orderId      String  @map("order_id")
-  productId    String  @map("product_id")
-  sellerId     String  @map("seller_id")
+  id           String    @id @default(uuid())
+  orderId      String    @map("order_id")
+  productId    String    @map("product_id")
+  sellerId     String    @map("seller_id")
   quantity     Int
-  unitPriceKr  Decimal @map("unit_price_kr") @db.Decimal(18, 4)
-  totalPriceKr Decimal @map("total_price_kr") @db.Decimal(18, 4)
-  escrowStatus String  @default("held") @map("escrow_status") // held, released, refunded
+  unitPriceKr  Decimal   @map("unit_price_kr") @db.Decimal(18, 4)
+  totalPriceKr Decimal   @map("total_price_kr") @db.Decimal(18, 4)
+  escrowStatus String    @default("held") @map("escrow_status") // held, released, refunded
   deliveredAt  DateTime? @map("delivered_at")
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -1212,14 +1237,14 @@ model OrderItem {
 // ─── WISHLISTS & GIFTS ──────────────────────────────────
 
 model Wishlist {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  name      String
-  isPublic  Boolean  @default(false) @map("is_public")
-  isRegistry Boolean @default(false) @map("is_registry")
-  eventType String?  @map("event_type") // wedding, birthday, baby_shower
-  eventDate DateTime? @map("event_date")
-  createdAt DateTime @default(now()) @map("created_at")
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  name       String
+  isPublic   Boolean   @default(false) @map("is_public")
+  isRegistry Boolean   @default(false) @map("is_registry")
+  eventType  String?   @map("event_type") // wedding, birthday, baby_shower
+  eventDate  DateTime? @map("event_date")
+  createdAt  DateTime  @default(now()) @map("created_at")
 
   user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   items WishlistItem[]
@@ -1246,15 +1271,15 @@ model WishlistItem {
 }
 
 model Gift {
-  id            String   @id @default(uuid())
-  senderId      String   @map("sender_id")
-  recipientId   String   @map("recipient_id")
-  productId     String   @map("product_id")
-  message       String?
-  amountKr      Decimal  @map("amount_kr") @db.Decimal(18, 4)
-  escrowStatus  String   @default("held") @map("escrow_status")
-  status        String   @default("pending") // pending, purchased, delivered, cancelled
-  createdAt     DateTime @default(now()) @map("created_at")
+  id           String   @id @default(uuid())
+  senderId     String   @map("sender_id")
+  recipientId  String   @map("recipient_id")
+  productId    String   @map("product_id")
+  message      String?
+  amountKr     Decimal  @map("amount_kr") @db.Decimal(18, 4)
+  escrowStatus String   @default("held") @map("escrow_status")
+  status       String   @default("pending") // pending, purchased, delivered, cancelled
+  createdAt    DateTime @default(now()) @map("created_at")
 
   sender    User @relation("GiftSender", fields: [senderId], references: [id])
   recipient User @relation("GiftRecipient", fields: [recipientId], references: [id])
@@ -1265,17 +1290,17 @@ model Gift {
 // ─── REVIEWS & RATINGS ──────────────────────────────────
 
 model ProductReview {
-  id            String   @id @default(uuid())
-  productId     String   @map("product_id")
-  userId        String   @map("user_id")
-  rating        Int      // 1-5
-  title         String?
-  text          String?  @db.Text
-  videoUrl      String?  @map("video_url")
-  imageUrls     String[] @map("image_urls")
-  isVerified    Boolean  @default(false) @map("is_verified")
-  isModerated   Boolean  @default(false) @map("is_moderated")
-  createdAt     DateTime @default(now()) @map("created_at")
+  id          String   @id @default(uuid())
+  productId   String   @map("product_id")
+  userId      String   @map("user_id")
+  rating      Int // 1-5
+  title       String?
+  text        String?  @db.Text
+  videoUrl    String?  @map("video_url")
+  imageUrls   String[] @map("image_urls")
+  isVerified  Boolean  @default(false) @map("is_verified")
+  isModerated Boolean  @default(false) @map("is_moderated")
+  createdAt   DateTime @default(now()) @map("created_at")
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1288,23 +1313,23 @@ model ProductReview {
 // ─── GARAGE SERVICES ────────────────────────────────────
 
 model GarageProfile {
-  id              String   @id @default(uuid())
-  userId          String   @unique @map("user_id")
-  businessName    String   @map("business_name")
-  description     String?  @db.Text
-  serviceTypes    String[] @map("service_types")
-  certifications  String[]
-  location        String?
-  latitude        Decimal? @db.Decimal(10, 7)
-  longitude       Decimal? @db.Decimal(10, 7)
-  serviceArea     String?  @map("service_area")
-  offersOnSite    Boolean  @default(false) @map("offers_on_site")
-  avgRating       Decimal  @default(0) @map("avg_rating") @db.Decimal(3, 2)
-  reviewCount     Int      @default(0) @map("review_count")
-  isVerified      Boolean  @default(false) @map("is_verified")
-  createdAt       DateTime @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  userId         String   @unique @map("user_id")
+  businessName   String   @map("business_name")
+  description    String?  @db.Text
+  serviceTypes   String[] @map("service_types")
+  certifications String[]
+  location       String?
+  latitude       Decimal? @db.Decimal(10, 7)
+  longitude      Decimal? @db.Decimal(10, 7)
+  serviceArea    String?  @map("service_area")
+  offersOnSite   Boolean  @default(false) @map("offers_on_site")
+  avgRating      Decimal  @default(0) @map("avg_rating") @db.Decimal(3, 2)
+  reviewCount    Int      @default(0) @map("review_count")
+  isVerified     Boolean  @default(false) @map("is_verified")
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   bookings GarageBooking[]
   reviews  GarageReview[]
 
@@ -1349,19 +1374,19 @@ model GarageReview {
 // ─── CAR IMPORTERS & LOGISTICS ──────────────────────────
 
 model ImporterProfile {
-  id                String   @id @default(uuid())
-  userId            String   @unique @map("user_id")
-  businessName      String   @map("business_name")
-  description       String?  @db.Text
-  countriesServed   String[] @map("countries_served")
-  specialization    String?
-  yearsExperience   Int?     @map("years_experience")
-  totalImports      Int      @default(0) @map("total_imports")
-  isVerified        Boolean  @default(false) @map("is_verified")
-  createdAt         DateTime @default(now()) @map("created_at")
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  businessName    String   @map("business_name")
+  description     String?  @db.Text
+  countriesServed String[] @map("countries_served")
+  specialization  String?
+  yearsExperience Int?     @map("years_experience")
+  totalImports    Int      @default(0) @map("total_imports")
+  isVerified      Boolean  @default(false) @map("is_verified")
+  createdAt       DateTime @default(now()) @map("created_at")
 
-  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quotes  ImportQuote[]
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quotes ImportQuote[]
 
   @@map("importer_profiles")
 }
@@ -1387,14 +1412,14 @@ model ImportRequest {
 }
 
 model ImportQuote {
-  id              String   @id @default(uuid())
-  requestId       String   @map("request_id")
-  importerId      String   @map("importer_id")
-  quoteAmountKr   Decimal  @map("quote_amount_kr") @db.Decimal(18, 4)
-  estimatedDays   Int?     @map("estimated_days")
-  notes           String?  @db.Text
-  status          String   @default("pending") // pending, accepted, rejected
-  createdAt       DateTime @default(now()) @map("created_at")
+  id            String   @id @default(uuid())
+  requestId     String   @map("request_id")
+  importerId    String   @map("importer_id")
+  quoteAmountKr Decimal  @map("quote_amount_kr") @db.Decimal(18, 4)
+  estimatedDays Int?     @map("estimated_days")
+  notes         String?  @db.Text
+  status        String   @default("pending") // pending, accepted, rejected
+  createdAt     DateTime @default(now()) @map("created_at")
 
   request  ImportRequest   @relation(fields: [requestId], references: [id], onDelete: Cascade)
   importer ImporterProfile @relation(fields: [importerId], references: [id])
@@ -1437,16 +1462,16 @@ model LogisticsCompany {
 }
 
 model ShippingJob {
-  id              String   @id @default(uuid())
-  requesterId     String   @map("requester_id")
-  logisticsId     String?  @map("logistics_id")
-  pickupLocation  String   @map("pickup_location")
-  deliveryLocation String  @map("delivery_location")
-  jobType         String   @map("job_type") // shipping, towing, delivery
-  vehicleDesc     String?  @map("vehicle_desc")
-  priceKr         Decimal? @map("price_kr") @db.Decimal(18, 4)
-  status          String   @default("open") // open, quoted, in_progress, completed, cancelled
-  createdAt       DateTime @default(now()) @map("created_at")
+  id               String   @id @default(uuid())
+  requesterId      String   @map("requester_id")
+  logisticsId      String?  @map("logistics_id")
+  pickupLocation   String   @map("pickup_location")
+  deliveryLocation String   @map("delivery_location")
+  jobType          String   @map("job_type") // shipping, towing, delivery
+  vehicleDesc      String?  @map("vehicle_desc")
+  priceKr          Decimal? @map("price_kr") @db.Decimal(18, 4)
+  status           String   @default("open") // open, quoted, in_progress, completed, cancelled
+  createdAt        DateTime @default(now()) @map("created_at")
 
   requester User              @relation("ShippingRequester", fields: [requesterId], references: [id])
   logistics LogisticsCompany? @relation(fields: [logisticsId], references: [id])
@@ -1458,72 +1483,76 @@ model ShippingJob {
 // ─── LIVE STREAMING (FULL) ──────────────────────────────
 
 model LiveStream {
-  id              String           @id @default(uuid())
-  hostId          String           @map("host_id")
-  title           String
-  description     String?          @db.Text
-  thumbnailUrl    String?          @map("thumbnail_url")
-  type            LiveStreamType   @default(NORMAL)
-  status          LiveStreamStatus @default(SCHEDULED)
+  id           String           @id @default(uuid())
+  hostId       String           @map("host_id")
+  title        String
+  description  String?          @db.Text
+  category     String?          @default("Chat") @db.VarChar(50)
+  thumbnailUrl String?          @map("thumbnail_url")
+  type         LiveStreamType   @default(NORMAL)
+  status       LiveStreamStatus @default(SCHEDULED)
 
   // Stream tech
-  streamKey       String           @unique @map("stream_key")
-  streamUrl       String?          @map("stream_url")
-  playbackUrl     String?          @map("playback_url")
+  streamKey   String  @unique @map("stream_key")
+  streamUrl   String? @map("stream_url")
+  playbackUrl String? @map("playback_url")
 
   // Stats
-  viewerCount     Int              @default(0) @map("viewer_count")
-  peakViewers     Int              @default(0) @map("peak_viewers")
-  likesCount      Int              @default(0) @map("likes_count")
-  totalTipsKr     Decimal          @default(0) @map("total_tips_kr") @db.Decimal(18, 4)
-  totalSalesKr    Decimal          @default(0) @map("total_sales_kr") @db.Decimal(18, 4)
+  viewerCount  Int     @default(0) @map("viewer_count")
+  peakViewers  Int     @default(0) @map("peak_viewers")
+  likesCount   Int     @default(0) @map("likes_count")
+  totalTipsKr  Decimal @default(0) @map("total_tips_kr") @db.Decimal(18, 4)
+  totalSalesKr Decimal @default(0) @map("total_sales_kr") @db.Decimal(18, 4)
 
   // Gift Goals
-  giftGoalTitle   String?          @map("gift_goal_title")
-  giftGoalTarget  Decimal?         @map("gift_goal_target") @db.Decimal(18, 4)
-  giftGoalCurrent Decimal          @default(0) @map("gift_goal_current") @db.Decimal(18, 4)
+  giftGoalTitle   String?  @map("gift_goal_title")
+  giftGoalTarget  Decimal? @map("gift_goal_target") @db.Decimal(18, 4)
+  giftGoalCurrent Decimal  @default(0) @map("gift_goal_current") @db.Decimal(18, 4)
 
   // Chama-exclusive
-  chamaId         String?          @map("chama_id")
+  chamaId String? @map("chama_id")
 
   // Contest Battle
-  contestId       String?          @map("contest_id")
+  contestId String? @map("contest_id")
 
   // Proof of Task
-  orderId         String?          @map("order_id")
+  orderId String? @map("order_id")
 
   // Duet / Co-host
-  isCoHostEnabled Boolean          @default(false) @map("is_co_host_enabled")
-  maxCoHosts      Int              @default(1) @map("max_co_hosts")
+  isCoHostEnabled Boolean @default(false) @map("is_co_host_enabled")
+  maxCoHosts      Int     @default(1) @map("max_co_hosts")
 
   // Timestamps
-  scheduledStart  DateTime?        @map("scheduled_start")
-  actualStart     DateTime?        @map("actual_start")
-  endedAt         DateTime?        @map("ended_at")
-  createdAt       DateTime         @default(now()) @map("created_at")
+  scheduledStart DateTime? @map("scheduled_start")
+  actualStart    DateTime? @map("actual_start")
+  endedAt        DateTime? @map("ended_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
 
-  host            User             @relation("LiveHost", fields: [hostId], references: [id])
-  coHosts         LiveCoHost[]
-  viewers         LiveViewer[]
-  messages        LiveMessage[]
-  tips            LiveTip[]
-  pinnedProducts  LivePinnedProduct[]
-  bannedViewers   LiveBannedViewer[]
-  battles         LiveBattle[]     @relation("LiveBattleStream")
-  battleOpponent  LiveBattle[]     @relation("LiveBattleOpponent")
+  host           User                @relation("LiveHost", fields: [hostId], references: [id])
+  coHosts        LiveCoHost[]
+  viewers        LiveViewer[]
+  messages       LiveMessage[]
+  tips           LiveTip[]
+  pinnedProducts LivePinnedProduct[]
+  bannedViewers  LiveBannedViewer[]
+  battles        LiveBattle[]        @relation("LiveBattleStream")
+  battleOpponent LiveBattle[]        @relation("LiveBattleOpponent")
 
   @@index([status, createdAt])
   @@index([hostId, status])
   @@index([chamaId])
+  @@index([category])
+  @@index([status, viewerCount], map: "live_streams_status_viewers_idx")
+  @@index([category, status], map: "live_streams_category_status_idx")
   @@map("live_streams")
 }
 
 model LiveCoHost {
-  id           String    @id @default(uuid())
-  streamId     String    @map("stream_id")
-  userId       String    @map("user_id")
-  joinedAt     DateTime  @default(now()) @map("joined_at")
-  leftAt       DateTime? @map("left_at")
+  id       String    @id @default(uuid())
+  streamId String    @map("stream_id")
+  userId   String    @map("user_id")
+  joinedAt DateTime  @default(now()) @map("joined_at")
+  leftAt   DateTime? @map("left_at")
 
   stream LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
@@ -1532,13 +1561,13 @@ model LiveCoHost {
 }
 
 model LiveViewer {
-  id           String    @id @default(uuid())
-  streamId     String    @map("stream_id")
-  userId       String    @map("user_id")
-  joinedAt     DateTime  @default(now()) @map("joined_at")
-  leftAt       DateTime? @map("left_at")
-  totalTipsKr  Decimal   @default(0) @map("total_tips_kr") @db.Decimal(18, 4)
-  likesGiven   Int       @default(0) @map("likes_given")
+  id          String    @id @default(uuid())
+  streamId    String    @map("stream_id")
+  userId      String    @map("user_id")
+  joinedAt    DateTime  @default(now()) @map("joined_at")
+  leftAt      DateTime? @map("left_at")
+  totalTipsKr Decimal   @default(0) @map("total_tips_kr") @db.Decimal(18, 4)
+  likesGiven  Int       @default(0) @map("likes_given")
 
   stream LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
@@ -1548,13 +1577,13 @@ model LiveViewer {
 }
 
 model LiveMessage {
-  id           String   @id @default(uuid())
-  streamId     String   @map("stream_id")
-  userId       String   @map("user_id")
-  text         String
-  isSystem     Boolean  @default(false) @map("is_system")
-  isPinned     Boolean  @default(false) @map("is_pinned")
-  createdAt    DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  streamId  String   @map("stream_id")
+  userId    String   @map("user_id")
+  text      String
+  isSystem  Boolean  @default(false) @map("is_system")
+  isPinned  Boolean  @default(false) @map("is_pinned")
+  createdAt DateTime @default(now()) @map("created_at")
 
   stream LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
@@ -1563,14 +1592,14 @@ model LiveMessage {
 }
 
 model LiveTip {
-  id           String   @id @default(uuid())
-  streamId     String   @map("stream_id")
-  senderId     String   @map("sender_id")
-  recipientId  String   @map("recipient_id")
-  amountKr     Decimal  @map("amount_kr") @db.Decimal(18, 4)
-  giftType     String?  @map("gift_type")
-  message      String?
-  createdAt    DateTime @default(now()) @map("created_at")
+  id          String   @id @default(uuid())
+  streamId    String   @map("stream_id")
+  senderId    String   @map("sender_id")
+  recipientId String   @map("recipient_id")
+  amountKr    Decimal  @map("amount_kr") @db.Decimal(18, 4)
+  giftType    String?  @map("gift_type")
+  message     String?
+  createdAt   DateTime @default(now()) @map("created_at")
 
   stream LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
@@ -1580,14 +1609,14 @@ model LiveTip {
 }
 
 model LivePinnedProduct {
-  id           String    @id @default(uuid())
-  streamId     String    @map("stream_id")
-  productId    String    @map("product_id")
-  salePrice    Decimal?  @map("sale_price") @db.Decimal(18, 4)
-  isPinned     Boolean   @default(false) @map("is_pinned")
-  pinnedAt     DateTime? @map("pinned_at")
-  unitsSold    Int       @default(0) @map("units_sold")
-  sortOrder    Int       @default(0) @map("sort_order")
+  id        String    @id @default(uuid())
+  streamId  String    @map("stream_id")
+  productId String    @map("product_id")
+  salePrice Decimal?  @map("sale_price") @db.Decimal(18, 4)
+  isPinned  Boolean   @default(false) @map("is_pinned")
+  pinnedAt  DateTime? @map("pinned_at")
+  unitsSold Int       @default(0) @map("units_sold")
+  sortOrder Int       @default(0) @map("sort_order")
 
   stream  LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
   product Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -1597,11 +1626,11 @@ model LivePinnedProduct {
 }
 
 model LiveBannedViewer {
-  id           String   @id @default(uuid())
-  streamId     String   @map("stream_id")
-  userId       String   @map("user_id")
-  reason       String?
-  bannedAt     DateTime @default(now()) @map("banned_at")
+  id       String   @id @default(uuid())
+  streamId String   @map("stream_id")
+  userId   String   @map("user_id")
+  reason   String?
+  bannedAt DateTime @default(now()) @map("banned_at")
 
   stream LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
@@ -1663,7 +1692,7 @@ model Call {
   durationSecs Int?       @map("duration_secs")
   createdAt    DateTime   @default(now()) @map("created_at")
 
-  caller       User       @relation(fields: [callerId], references: [id])
+  caller       User              @relation(fields: [callerId], references: [id])
   participants CallParticipant[]
 
   @@index([chatId, createdAt])
@@ -1672,12 +1701,12 @@ model Call {
 }
 
 model CallParticipant {
-  id        String    @id @default(uuid())
-  callId    String    @map("call_id")
-  userId    String    @map("user_id")
-  joinedAt  DateTime? @map("joined_at")
-  leftAt    DateTime? @map("left_at")
-  status    String    @default("invited") // invited, joined, declined, missed
+  id       String    @id @default(uuid())
+  callId   String    @map("call_id")
+  userId   String    @map("user_id")
+  joinedAt DateTime? @map("joined_at")
+  leftAt   DateTime? @map("left_at")
+  status   String    @default("invited") // invited, joined, declined, missed
 
   call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
 
@@ -1731,7 +1760,7 @@ model ProductTag {
   contentType String   @map("content_type")
   positionX   Decimal? @map("position_x") @db.Decimal(5, 2)
   positionY   Decimal? @map("position_y") @db.Decimal(5, 2)
-  timestamp   Int?     // seconds into video
+  timestamp   Int? // seconds into video
   clicks      Int      @default(0)
   createdAt   DateTime @default(now()) @map("created_at")
 
@@ -1744,14 +1773,14 @@ model ProductTag {
 // ─── DEAL ALERTS & ANALYTICS ────────────────────────────
 
 model DealAlert {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  productId   String?  @map("product_id")
-  category    ProductCategory?
-  maxPriceKr  Decimal? @map("max_price_kr") @db.Decimal(18, 4)
-  keywords    String[]
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id         String           @id @default(uuid())
+  userId     String           @map("user_id")
+  productId  String?          @map("product_id")
+  category   ProductCategory?
+  maxPriceKr Decimal?         @map("max_price_kr") @db.Decimal(18, 4)
+  keywords   String[]
+  isActive   Boolean          @default(true) @map("is_active")
+  createdAt  DateTime         @default(now()) @map("created_at")
 
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -1761,23 +1790,24 @@ model DealAlert {
 }
 
 model ProductAnalytic {
-  id              String   @id @default(uuid())
-  productId       String   @map("product_id")
-  date            DateTime @db.Date
-  views           Int      @default(0)
-  clicks          Int      @default(0)
-  addToCart       Int      @default(0) @map("add_to_cart")
-  purchases       Int      @default(0)
-  revenue         Decimal  @default(0) @db.Decimal(18, 4)
-  conversionRate  Decimal  @default(0) @map("conversion_rate") @db.Decimal(5, 4)
-  avgTimeOnPage   Int      @default(0) @map("avg_time_on_page")
-  bounceRate      Decimal  @default(0) @map("bounce_rate") @db.Decimal(5, 4)
+  id             String   @id @default(uuid())
+  productId      String   @map("product_id")
+  date           DateTime @db.Date
+  views          Int      @default(0)
+  clicks         Int      @default(0)
+  addToCart      Int      @default(0) @map("add_to_cart")
+  purchases      Int      @default(0)
+  revenue        Decimal  @default(0) @db.Decimal(18, 4)
+  conversionRate Decimal  @default(0) @map("conversion_rate") @db.Decimal(5, 4)
+  avgTimeOnPage  Int      @default(0) @map("avg_time_on_page")
+  bounceRate     Decimal  @default(0) @map("bounce_rate") @db.Decimal(5, 4)
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([productId, date])
   @@map("product_analytics")
 }
+
 // ─── ANALYTICS ────────────────────────────────────────────
 
 model DailyStat {
@@ -1813,12 +1843,12 @@ model Comment {
   createdAt     DateTime  @default(now()) @map("created_at")
   editedAt      DateTime? @map("edited_at")
 
-  author       User           @relation("CommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
-  parent       Comment?       @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies      Comment[]      @relation("CommentReplies")
-  replyToUser  User?          @relation("CommentReplyTo", fields: [replyToUserId], references: [id], onDelete: SetNull)
-  likes        CommentLike[]
-  reports      CommentReport[]
+  author      User            @relation("CommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  parent      Comment?        @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Comment[]       @relation("CommentReplies")
+  replyToUser User?           @relation("CommentReplyTo", fields: [replyToUserId], references: [id], onDelete: SetNull)
+  likes       CommentLike[]
+  reports     CommentReport[]
 
   @@index([contentType, contentId, createdAt])
   @@index([parentId])
@@ -1904,11 +1934,11 @@ model Team {
 }
 
 model TeamMember {
-  id        String   @id @default(uuid())
-  teamId    String   @map("team_id")
-  userId    String   @map("user_id")
-  role      TeamRole @default(MEMBER)
-  joinedAt  DateTime @default(now()) @map("joined_at")
+  id       String   @id @default(uuid())
+  teamId   String   @map("team_id")
+  userId   String   @map("user_id")
+  role     TeamRole @default(MEMBER)
+  joinedAt DateTime @default(now()) @map("joined_at")
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user User @relation("TeamMemberships", fields: [userId], references: [id], onDelete: Cascade)
@@ -1920,17 +1950,17 @@ model TeamMember {
 }
 
 model TeamInvitation {
-  id         String           @id @default(uuid())
-  teamId     String           @map("team_id")
-  inviterId  String           @map("inviter_id")
-  inviteeId  String           @map("invitee_id")
-  status     InvitationStatus @default(PENDING)
-  expiresAt  DateTime         @map("expires_at")
-  createdAt  DateTime         @default(now()) @map("created_at")
+  id        String           @id @default(uuid())
+  teamId    String           @map("team_id")
+  inviterId String           @map("inviter_id")
+  inviteeId String           @map("invitee_id")
+  status    InvitationStatus @default(PENDING)
+  expiresAt DateTime         @map("expires_at")
+  createdAt DateTime         @default(now()) @map("created_at")
 
-  team     Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  inviter  User @relation("TeamInvitationsSent", fields: [inviterId], references: [id], onDelete: Cascade)
-  invitee  User @relation("TeamInvitationsReceived", fields: [inviteeId], references: [id], onDelete: Cascade)
+  team    Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  inviter User @relation("TeamInvitationsSent", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee User @relation("TeamInvitationsReceived", fields: [inviteeId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, inviteeId, status])
   @@index([inviteeId, status])
@@ -2004,10 +2034,10 @@ model TeamChat {
 // ─── HASHTAGS & MENTIONS ──────────────────────────────────
 
 model Hashtag {
-  id          String   @id @default(uuid())
-  tag         String   @unique // normalized lowercase, no #
-  usageCount  Int      @default(1) @map("usage_count")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id         String   @id @default(uuid())
+  tag        String   @unique // normalized lowercase, no #
+  usageCount Int      @default(1) @map("usage_count")
+  createdAt  DateTime @default(now()) @map("created_at")
 
   contentTags ContentHashtag[]
 
@@ -2053,7 +2083,7 @@ enum ChatType {
 model Chat {
   id          String   @id @default(uuid())
   type        ChatType
-  name        String?  // Null for DIRECT
+  name        String? // Null for DIRECT
   description String?
   avatarUrl   String?
   createdAt   DateTime @default(now()) @map("created_at")
@@ -2067,12 +2097,12 @@ model Chat {
 }
 
 model ChatParticipant {
-  id        String   @id @default(uuid())
-  chatId    String   @map("chat_id")
-  userId    String   @map("user_id")
-  role      String   @default("member") // admin, member
-  joinedAt  DateTime @default(now()) @map("joined_at")
-  lastRead  DateTime @default(now()) @map("last_read")
+  id       String   @id @default(uuid())
+  chatId   String   @map("chat_id")
+  userId   String   @map("user_id")
+  role     String   @default("member") // admin, member
+  joinedAt DateTime @default(now()) @map("joined_at")
+  lastRead DateTime @default(now()) @map("last_read")
 
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
   user User @relation("ChatParticipations", fields: [userId], references: [id], onDelete: Cascade)
@@ -2082,16 +2112,16 @@ model ChatParticipant {
 }
 
 model Message {
-  id             String   @id @default(uuid())
-  chatId         String   @map("chat_id")
-  senderId       String   @map("sender_id")
-  payload        String   @db.Text // Encrypted payload or plain text
-  mediaUrl       String?  @map("media_url")
-  mediaType      String?  @map("media_type") // image, video, document, voice
-  isSystemEvent  Boolean  @default(false) @map("is_system_event")
-  status         String   @default("sent") // sent, delivered, read
-  replyToId      String?  @map("reply_to_id")
-  createdAt      DateTime @default(now()) @map("created_at")
+  id            String   @id @default(uuid())
+  chatId        String   @map("chat_id")
+  senderId      String   @map("sender_id")
+  payload       String   @db.Text // Encrypted payload or plain text
+  mediaUrl      String?  @map("media_url")
+  mediaType     String?  @map("media_type") // image, video, document, voice
+  isSystemEvent Boolean  @default(false) @map("is_system_event")
+  status        String   @default("sent") // sent, delivered, read
+  replyToId     String?  @map("reply_to_id")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   chat    Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender  User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
@@ -2112,14 +2142,14 @@ enum StoryPrivacy {
 }
 
 model Story {
-  id          String       @id @default(uuid())
-  creatorId   String       @map("creator_id")
-  mediaUrl    String       @map("media_url")
-  mediaType   String       @map("media_type") // image, video, text
-  text        String?      @db.Text
-  privacy     StoryPrivacy @default(PUBLIC)
-  expiresAt   DateTime     @map("expires_at")
-  createdAt   DateTime     @default(now()) @map("created_at")
+  id        String       @id @default(uuid())
+  creatorId String       @map("creator_id")
+  mediaUrl  String       @map("media_url")
+  mediaType String       @map("media_type") // image, video, text
+  text      String?      @db.Text
+  privacy   StoryPrivacy @default(PUBLIC)
+  expiresAt DateTime     @map("expires_at")
+  createdAt DateTime     @default(now()) @map("created_at")
 
   creator User        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   views   StoryView[]
@@ -2134,7 +2164,7 @@ model StoryView {
   viewerId  String   @map("viewer_id")
   viewedAt  DateTime @default(now()) @map("viewed_at")
   isTipped  Boolean  @default(false) @map("is_tipped")
-  tipAmount Decimal? @db.Decimal(10, 2) @map("tip_amount")
+  tipAmount Decimal? @map("tip_amount") @db.Decimal(10, 2)
 
   story  Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
   viewer User  @relation(fields: [viewerId], references: [id], onDelete: Cascade)
@@ -2144,9 +2174,9 @@ model StoryView {
 }
 
 model StoryViewerPreference {
-  id               String   @id @default(uuid())
-  ownerId          String   @map("owner_id")
-  preferredViewerId String  @map("preferred_viewer_id")
+  id                String @id @default(uuid())
+  ownerId           String @map("owner_id")
+  preferredViewerId String @map("preferred_viewer_id")
 
   owner           User @relation("ViewerPreferences", fields: [ownerId], references: [id], onDelete: Cascade)
   preferredViewer User @relation("PreferredViewers", fields: [preferredViewerId], references: [id], onDelete: Cascade)
@@ -2205,36 +2235,36 @@ enum ElectionPhase {
 }
 
 model Chama {
-  id                    String                @id @default(uuid())
-  name                  String                @db.VarChar(100)
-  type                  ChamaType
-  description           String?               @db.Text
-  reason                String?               @db.Text
-  avatarUrl             String?               @map("avatar_url")
-  chatId                String                @unique @map("chat_id")
-  creatorId             String                @map("creator_id")
+  id          String    @id @default(uuid())
+  name        String    @db.VarChar(100)
+  type        ChamaType
+  description String?   @db.Text
+  reason      String?   @db.Text
+  avatarUrl   String?   @map("avatar_url")
+  chatId      String    @unique @map("chat_id")
+  creatorId   String    @map("creator_id")
 
-  maxMembers            Int?                  @map("max_members")
-  isLocked              Boolean               @default(false) @map("is_locked")
-  autoLockOnFull        Boolean               @default(false) @map("auto_lock_on_full")
+  maxMembers     Int?    @map("max_members")
+  isLocked       Boolean @default(false) @map("is_locked")
+  autoLockOnFull Boolean @default(false) @map("auto_lock_on_full")
 
   contributionAmountKr  Decimal               @map("contribution_amount_kr") @db.Decimal(18, 4)
   contributionFrequency ContributionFrequency @map("contribution_frequency")
   membershipFeeKr       Decimal?              @map("membership_fee_kr") @db.Decimal(18, 4)
 
-  lockPeriodDays        Int?                  @map("lock_period_days")
-  penaltyAmountKr       Decimal?              @map("penalty_amount_kr") @db.Decimal(18, 4)
-  gracePeriodDays       Int                   @default(3) @map("grace_period_days")
+  lockPeriodDays  Int?     @map("lock_period_days")
+  penaltyAmountKr Decimal? @map("penalty_amount_kr") @db.Decimal(18, 4)
+  gracePeriodDays Int      @default(3) @map("grace_period_days")
 
-  currentCycleNumber    Int                   @default(0) @map("current_cycle_number")
-  totalCycles           Int?                  @map("total_cycles")
+  currentCycleNumber Int  @default(0) @map("current_cycle_number")
+  totalCycles        Int? @map("total_cycles")
 
-  minApprovals          Int                   @default(2) @map("min_approvals")
-  allowMidTermVoteOut   Boolean               @default(true) @map("allow_mid_term_vote_out")
+  minApprovals        Int     @default(2) @map("min_approvals")
+  allowMidTermVoteOut Boolean @default(true) @map("allow_mid_term_vote_out")
 
-  status                ChamaStatus           @default(SETUP)
-  createdAt             DateTime              @default(now()) @map("created_at")
-  updatedAt             DateTime              @updatedAt @map("updated_at")
+  status    ChamaStatus @default(SETUP)
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
 
   creator       User                @relation("ChamaCreator", fields: [creatorId], references: [id])
   chat          Chat                @relation(fields: [chatId], references: [id])
@@ -2249,6 +2279,7 @@ model Chama {
 
   @@index([status])
   @@index([creatorId])
+  @@index([status, createdAt], map: "chamas_status_created_idx")
   @@map("chamas")
 }
 
@@ -2265,17 +2296,17 @@ model ChamaWallet {
 }
 
 model ChamaMember {
-  id               String             @id @default(uuid())
-  chamaId          String             @map("chama_id")
-  userId           String             @map("user_id")
-  role             ChamaRole          @default(MEMBER)
-  rotationNumber   Int?               @map("rotation_number")
-  status           ChamaMemberStatus  @default(ACTIVE)
-  totalContributed Decimal            @default(0) @map("total_contributed") @db.Decimal(18, 4)
-  totalReceived    Decimal            @default(0) @map("total_received") @db.Decimal(18, 4)
-  isDefaulter      Boolean            @default(false) @map("is_defaulter")
-  joinedAt         DateTime           @default(now()) @map("joined_at")
-  leftAt           DateTime?          @map("left_at")
+  id               String            @id @default(uuid())
+  chamaId          String            @map("chama_id")
+  userId           String            @map("user_id")
+  role             ChamaRole         @default(MEMBER)
+  rotationNumber   Int?              @map("rotation_number")
+  status           ChamaMemberStatus @default(ACTIVE)
+  totalContributed Decimal           @default(0) @map("total_contributed") @db.Decimal(18, 4)
+  totalReceived    Decimal           @default(0) @map("total_received") @db.Decimal(18, 4)
+  isDefaulter      Boolean           @default(false) @map("is_defaulter")
+  joinedAt         DateTime          @default(now()) @map("joined_at")
+  leftAt           DateTime?         @map("left_at")
 
   chama         Chama               @relation(fields: [chamaId], references: [id], onDelete: Cascade)
   user          User                @relation("ChamaMemberships", fields: [userId], references: [id], onDelete: Cascade)
@@ -2285,6 +2316,8 @@ model ChamaMember {
   @@unique([chamaId, userId])
   @@index([chamaId, role])
   @@index([userId])
+  @@index([chamaId, rotationNumber], map: "chama_members_chama_rotation_idx")
+  @@index([chamaId, status], map: "chama_members_chama_status_idx")
   @@map("chama_members")
 }
 
@@ -2317,7 +2350,7 @@ model ChamaCycle {
   endDate           DateTime @map("end_date")
   status            String   @default("OPEN") // OPEN, COLLECTING, DISBURSING, COMPLETED
 
-  chama   Chama        @relation(fields: [chamaId], references: [id], onDelete: Cascade)
+  chama   Chama         @relation(fields: [chamaId], references: [id], onDelete: Cascade)
   payouts ChamaPayout[]
 
   @@unique([chamaId, cycleNumber])
@@ -2326,15 +2359,15 @@ model ChamaCycle {
 }
 
 model ChamaPayout {
-  id           String   @id @default(uuid())
-  chamaId      String   @map("chama_id")
-  recipientId  String   @map("recipient_id")
-  memberId     String   @map("member_id")
-  cycleId      String?  @map("cycle_id")
-  amountKr     Decimal  @map("amount_kr") @db.Decimal(18, 4)
-  status       String   @default("PENDING_APPROVAL") // PENDING_APPROVAL, APPROVED, DISBURSED, REJECTED
-  requestedAt  DateTime @default(now()) @map("requested_at")
-  disbursedAt  DateTime? @map("disbursed_at")
+  id          String    @id @default(uuid())
+  chamaId     String    @map("chama_id")
+  recipientId String    @map("recipient_id")
+  memberId    String    @map("member_id")
+  cycleId     String?   @map("cycle_id")
+  amountKr    Decimal   @map("amount_kr") @db.Decimal(18, 4)
+  status      String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, APPROVED, DISBURSED, REJECTED
+  requestedAt DateTime  @default(now()) @map("requested_at")
+  disbursedAt DateTime? @map("disbursed_at")
 
   chama     Chama                 @relation(fields: [chamaId], references: [id], onDelete: Cascade)
   recipient User                  @relation("ChamaPayoutRecipient", fields: [recipientId], references: [id])
@@ -2350,7 +2383,7 @@ model ChamaPayoutApproval {
   id         String   @id @default(uuid())
   payoutId   String   @map("payout_id")
   approverId String   @map("approver_id")
-  decision   String   // APPROVED, REJECTED
+  decision   String // APPROVED, REJECTED
   reason     String?
   decidedAt  DateTime @default(now()) @map("decided_at")
 
@@ -2365,7 +2398,7 @@ model ChamaTransaction {
   id          String   @id @default(uuid())
   chamaId     String   @map("chama_id")
   userId      String?  @map("user_id")
-  type        String   // CONTRIBUTION, PAYOUT, MEMBERSHIP_FEE, PENALTY, EXTERNAL
+  type        String // CONTRIBUTION, PAYOUT, MEMBERSHIP_FEE, PENALTY, EXTERNAL
   amountKr    Decimal  @map("amount_kr") @db.Decimal(18, 4)
   description String?
   receiptUrl  String?  @map("receipt_url")
@@ -2379,15 +2412,15 @@ model ChamaTransaction {
 }
 
 model ChamaDefaulter {
-  id            String    @id @default(uuid())
-  userId        String    @map("user_id")
-  chamaId       String    @map("chama_id")
-  chamaName     String    @map("chama_name")
-  amountOwedKr  Decimal   @map("amount_owed_kr") @db.Decimal(18, 4)
-  fineAmountKr  Decimal   @default(0) @map("fine_amount_kr") @db.Decimal(18, 4)
-  isResolved    Boolean   @default(false) @map("is_resolved")
-  resolvedAt    DateTime? @map("resolved_at")
-  createdAt     DateTime  @default(now()) @map("created_at")
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  chamaId      String    @map("chama_id")
+  chamaName    String    @map("chama_name")
+  amountOwedKr Decimal   @map("amount_owed_kr") @db.Decimal(18, 4)
+  fineAmountKr Decimal   @default(0) @map("fine_amount_kr") @db.Decimal(18, 4)
+  isResolved   Boolean   @default(false) @map("is_resolved")
+  resolvedAt   DateTime? @map("resolved_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
 
   user  User  @relation("ChamaDefaults", fields: [userId], references: [id], onDelete: Cascade)
   chama Chama @relation(fields: [chamaId], references: [id], onDelete: Cascade)
@@ -2402,7 +2435,7 @@ model ChamaDefaulter {
 model ChamaElection {
   id          String        @id @default(uuid())
   chamaId     String        @map("chama_id")
-  position    ChamaRole     // CHAIRPERSON, TREASURER, or SECRETARY
+  position    ChamaRole // CHAIRPERSON, TREASURER, or SECRETARY
   phase       ElectionPhase @default(NOMINATION)
   isMidTerm   Boolean       @default(false) @map("is_mid_term")
   createdAt   DateTime      @default(now()) @map("created_at")
@@ -2424,11 +2457,11 @@ model ChamaNomination {
   secondsCount Int      @default(0) @map("seconds_count")
   createdAt    DateTime @default(now()) @map("created_at")
 
-  election   ChamaElection     @relation(fields: [electionId], references: [id], onDelete: Cascade)
-  nominee    User              @relation("ChamaNominees", fields: [nomineeId], references: [id])
-  nominator  User              @relation("ChamaNominations", fields: [nominatorId], references: [id])
-  seconds    ChamaSecondment[]
-  votes      ChamaVote[]
+  election  ChamaElection     @relation(fields: [electionId], references: [id], onDelete: Cascade)
+  nominee   User              @relation("ChamaNominees", fields: [nomineeId], references: [id])
+  nominator User              @relation("ChamaNominations", fields: [nominatorId], references: [id])
+  seconds   ChamaSecondment[]
+  votes     ChamaVote[]
 
   @@unique([electionId, nomineeId])
   @@map("chama_nominations")
@@ -2462,8 +2495,6 @@ model ChamaVote {
   @@map("chama_votes")
 }
 
-
-
 // ═══════════════════════════════════════════════════════════
 // BRAND MARKETPLACE - UNIFIED INFLUENCER & CONTEST SYSTEM
 // ═══════════════════════════════════════════════════════════
@@ -2479,28 +2510,28 @@ model ChamaVote {
 // ─── ENUMS ────────────────────────────────────────────────
 
 enum InfluencerTier {
-  NANO          // 1K-10K followers
-  MICRO         // 10K-100K followers
-  MID           // 100K-500K followers
-  MACRO         // 500K-1M followers
-  MEGA          // 1M+ followers
+  NANO // 1K-10K followers
+  MICRO // 10K-100K followers
+  MID // 100K-500K followers
+  MACRO // 500K-1M followers
+  MEGA // 1M+ followers
 }
 
 enum CampaignType {
-  SPONSORED_POST      // Single post promotion
-  PRODUCT_REVIEW      // Review product
-  BRAND_AMBASSADOR    // Long-term partnership
-  CONTEST_PROMOTION   // Promote existing contest
-  AFFILIATE           // Commission-based
-  EVENT_COVERAGE      // Cover brand event
-  CONTENT_CREATION    // Create branded content
+  SPONSORED_POST // Single post promotion
+  PRODUCT_REVIEW // Review product
+  BRAND_AMBASSADOR // Long-term partnership
+  CONTEST_PROMOTION // Promote existing contest
+  AFFILIATE // Commission-based
+  EVENT_COVERAGE // Cover brand event
+  CONTENT_CREATION // Create branded content
 }
 
 enum CampaignStatus {
   DRAFT
-  OPEN              // Accepting applications
-  IN_PROGRESS       // Campaign running
-  REVIEW            // Reviewing deliverables
+  OPEN // Accepting applications
+  IN_PROGRESS // Campaign running
+  REVIEW // Reviewing deliverables
   COMPLETED
   CANCELLED
 }
@@ -2521,73 +2552,73 @@ enum DeliverableStatus {
 }
 
 enum SponsorshipType {
-  CONTEST_PRIZE       // Sponsor prize pool
-  CONTEST_BRANDING    // Logo/branding on contest
-  CONTEST_EXCLUSIVE   // Exclusive sponsor
+  CONTEST_PRIZE // Sponsor prize pool
+  CONTEST_BRANDING // Logo/branding on contest
+  CONTEST_EXCLUSIVE // Exclusive sponsor
   CONTENT_SPONSORSHIP // Sponsor user content
 }
 
 enum ConversionCampaignType {
-  POST_CONTEST_DISCOUNT    // Losers get discount
-  WINNER_ADVOCACY          // Winners promote brand
-  PARTICIPANT_RETARGETING  // Retarget all participants
-  ENGAGEMENT_REWARD        // Reward high engagers
+  POST_CONTEST_DISCOUNT // Losers get discount
+  WINNER_ADVOCACY // Winners promote brand
+  PARTICIPANT_RETARGETING // Retarget all participants
+  ENGAGEMENT_REWARD // Reward high engagers
 }
 
 enum FunnelStage {
-  AWARENESS       // Saw contest/campaign
-  INTEREST        // Clicked/viewed
-  CONSIDERATION   // Joined/engaged
-  CONVERSION      // Made purchase
-  RETENTION       // Repeat customer
-  ADVOCACY        // Became promoter
+  AWARENESS // Saw contest/campaign
+  INTEREST // Clicked/viewed
+  CONSIDERATION // Joined/engaged
+  CONVERSION // Made purchase
+  RETENTION // Repeat customer
+  ADVOCACY // Became promoter
 }
 
 // ─── INFLUENCER PROFILES ──────────────────────────────────
 
 model InfluencerProfile {
-  id                String         @id @default(uuid())
-  userId            String         @unique @map("user_id")
-  tier              InfluencerTier
-  bio               String?        @db.Text
-  categories        String[]       // Fashion, Tech, Beauty, etc.
-  
-  // Social Stats
-  instagramHandle   String?        @map("instagram_handle")
-  instagramFollowers Int           @default(0) @map("instagram_followers")
-  tiktokHandle      String?        @map("tiktok_handle")
-  tiktokFollowers   Int            @default(0) @map("tiktok_followers")
-  youtubeHandle     String?        @map("youtube_handle")
-  youtubeSubscribers Int           @default(0) @map("youtube_subscribers")
-  
-  // Engagement Metrics
-  avgEngagementRate Decimal        @default(0) @map("avg_engagement_rate") @db.Decimal(5, 2)
-  avgViews          Int            @default(0) @map("avg_views")
-  
-  // Rates & Availability
-  ratePerPost       Decimal?       @map("rate_per_post") @db.Decimal(18, 4)
-  ratePerVideo      Decimal?       @map("rate_per_video") @db.Decimal(18, 4)
-  ratePerStory      Decimal?       @map("rate_per_story") @db.Decimal(18, 4)
-  isAvailable       Boolean        @default(true) @map("is_available")
-  
-  // Verification
-  isVerified        Boolean        @default(false) @map("is_verified")
-  verifiedAt        DateTime?      @map("verified_at")
-  
-  // Stats
-  totalCampaigns    Int            @default(0) @map("total_campaigns")
-  totalEarningsKr   Decimal        @default(0) @map("total_earnings_kr") @db.Decimal(18, 4)
-  avgRating         Decimal        @default(0) @map("avg_rating") @db.Decimal(3, 2)
-  
-  createdAt         DateTime       @default(now()) @map("created_at")
-  updatedAt         DateTime       @updatedAt @map("updated_at")
+  id         String         @id @default(uuid())
+  userId     String         @unique @map("user_id")
+  tier       InfluencerTier
+  bio        String?        @db.Text
+  categories String[] // Fashion, Tech, Beauty, etc.
 
-  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  applications      CampaignApplication[]
-  deliverables      CampaignDeliverable[]
-  reviews           InfluencerReview[]
-  portfolio         InfluencerPortfolio[]
-  socialAccounts    SocialMediaAccount[]
+  // Social Stats
+  instagramHandle    String? @map("instagram_handle")
+  instagramFollowers Int     @default(0) @map("instagram_followers")
+  tiktokHandle       String? @map("tiktok_handle")
+  tiktokFollowers    Int     @default(0) @map("tiktok_followers")
+  youtubeHandle      String? @map("youtube_handle")
+  youtubeSubscribers Int     @default(0) @map("youtube_subscribers")
+
+  // Engagement Metrics
+  avgEngagementRate Decimal @default(0) @map("avg_engagement_rate") @db.Decimal(5, 2)
+  avgViews          Int     @default(0) @map("avg_views")
+
+  // Rates & Availability
+  ratePerPost  Decimal? @map("rate_per_post") @db.Decimal(18, 4)
+  ratePerVideo Decimal? @map("rate_per_video") @db.Decimal(18, 4)
+  ratePerStory Decimal? @map("rate_per_story") @db.Decimal(18, 4)
+  isAvailable  Boolean  @default(true) @map("is_available")
+
+  // Verification
+  isVerified Boolean   @default(false) @map("is_verified")
+  verifiedAt DateTime? @map("verified_at")
+
+  // Stats
+  totalCampaigns  Int     @default(0) @map("total_campaigns")
+  totalEarningsKr Decimal @default(0) @map("total_earnings_kr") @db.Decimal(18, 4)
+  avgRating       Decimal @default(0) @map("avg_rating") @db.Decimal(3, 2)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications   CampaignApplication[]
+  deliverables   CampaignDeliverable[]
+  reviews        InfluencerReview[]
+  portfolio      InfluencerPortfolio[]
+  socialAccounts SocialMediaAccount[]
 
   @@index([tier, isAvailable])
   @@index([avgEngagementRate])
@@ -2595,20 +2626,20 @@ model InfluencerProfile {
 }
 
 model InfluencerPortfolio {
-  id            String   @id @default(uuid())
-  influencerId  String   @map("influencer_id")
-  title         String
-  description   String?  @db.Text
-  mediaUrl      String   @map("media_url")
-  mediaType     String   @map("media_type") // image, video
-  platform      String   // instagram, tiktok, youtube
-  views         Int      @default(0)
-  likes         Int      @default(0)
-  comments      Int      @default(0)
-  shares        Int      @default(0)
-  createdAt     DateTime @default(now()) @map("created_at")
+  id           String   @id @default(uuid())
+  influencerId String   @map("influencer_id")
+  title        String
+  description  String?  @db.Text
+  mediaUrl     String   @map("media_url")
+  mediaType    String   @map("media_type") // image, video
+  platform     String // instagram, tiktok, youtube
+  views        Int      @default(0)
+  likes        Int      @default(0)
+  comments     Int      @default(0)
+  shares       Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  influencer    InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  influencer InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
 
   @@index([influencerId])
   @@map("influencer_portfolio")
@@ -2617,59 +2648,59 @@ model InfluencerPortfolio {
 // ─── BRAND CAMPAIGNS ──────────────────────────────────────
 
 model BrandCampaign {
-  id                String         @id @default(uuid())
-  brandId           String         @map("brand_id") // Business account
-  title             String
-  description       String         @db.Text
-  type              CampaignType
-  status            CampaignStatus @default(DRAFT)
-  
+  id          String         @id @default(uuid())
+  brandId     String         @map("brand_id") // Business account
+  title       String
+  description String         @db.Text
+  type        CampaignType
+  status      CampaignStatus @default(DRAFT)
+
   // Targeting
   targetTiers       InfluencerTier[] @map("target_tiers")
-  targetCategories  String[]       @map("target_categories")
-  minFollowers      Int?           @map("min_followers")
-  minEngagementRate Decimal?       @map("min_engagement_rate") @db.Decimal(5, 2)
-  targetGeos        String[]       @map("target_geos")
-  
+  targetCategories  String[]         @map("target_categories")
+  minFollowers      Int?             @map("min_followers")
+  minEngagementRate Decimal?         @map("min_engagement_rate") @db.Decimal(5, 2)
+  targetGeos        String[]         @map("target_geos")
+
   // Budget & Compensation
-  budgetKr          Decimal        @map("budget_kr") @db.Decimal(18, 4)
+  budgetKr                  Decimal @map("budget_kr") @db.Decimal(18, 4)
   compensationPerInfluencer Decimal @map("compensation_per_influencer") @db.Decimal(18, 4)
-  maxInfluencers    Int            @map("max_influencers")
-  
+  maxInfluencers            Int     @map("max_influencers")
+
   // Deliverables
-  requiredPosts     Int            @default(0) @map("required_posts")
-  requiredVideos    Int            @default(0) @map("required_videos")
-  requiredStories   Int            @default(0) @map("required_stories")
-  contentGuidelines String?        @db.Text @map("content_guidelines")
+  requiredPosts     Int      @default(0) @map("required_posts")
+  requiredVideos    Int      @default(0) @map("required_videos")
+  requiredStories   Int      @default(0) @map("required_stories")
+  contentGuidelines String?  @map("content_guidelines") @db.Text
   hashtags          String[]
   mentions          String[]
-  
-  // Linked Contest (if promoting contest)
-  contestId         String?        @map("contest_id")
-  
-  // Timeline
-  applicationDeadline DateTime?    @map("application_deadline")
-  campaignStartDate DateTime       @map("campaign_start_date")
-  campaignEndDate   DateTime       @map("campaign_end_date")
-  
-  // Metrics
-  totalApplications Int            @default(0) @map("total_applications")
-  acceptedInfluencers Int          @default(0) @map("accepted_influencers")
-  totalReach        Int            @default(0) @map("total_reach")
-  totalEngagement   Int            @default(0) @map("total_engagement")
-  totalConversions  Int            @default(0) @map("total_conversions")
-  totalRevenueKr    Decimal        @default(0) @map("total_revenue_kr") @db.Decimal(18, 4)
-  roi               Decimal        @default(0) @db.Decimal(10, 2) // Return on Investment %
-  
-  createdAt         DateTime       @default(now()) @map("created_at")
-  updatedAt         DateTime       @updatedAt @map("updated_at")
 
-  brand             User           @relation("BrandCampaigns", fields: [brandId], references: [id])
-  contest           Contest?       @relation(fields: [contestId], references: [id])
-  applications      CampaignApplication[]
-  deliverables      CampaignDeliverable[]
-  analytics         CampaignAnalytics[]
-  funnelEvents      SalesFunnelEvent[]
+  // Linked Contest (if promoting contest)
+  contestId String? @map("contest_id")
+
+  // Timeline
+  applicationDeadline DateTime? @map("application_deadline")
+  campaignStartDate   DateTime  @map("campaign_start_date")
+  campaignEndDate     DateTime  @map("campaign_end_date")
+
+  // Metrics
+  totalApplications   Int     @default(0) @map("total_applications")
+  acceptedInfluencers Int     @default(0) @map("accepted_influencers")
+  totalReach          Int     @default(0) @map("total_reach")
+  totalEngagement     Int     @default(0) @map("total_engagement")
+  totalConversions    Int     @default(0) @map("total_conversions")
+  totalRevenueKr      Decimal @default(0) @map("total_revenue_kr") @db.Decimal(18, 4)
+  roi                 Decimal @default(0) @db.Decimal(10, 2) // Return on Investment %
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  brand        User                  @relation("BrandCampaigns", fields: [brandId], references: [id])
+  contest      Contest?              @relation(fields: [contestId], references: [id])
+  applications CampaignApplication[]
+  deliverables CampaignDeliverable[]
+  analytics    CampaignAnalytics[]
+  funnelEvents SalesFunnelEvent[]
 
   @@index([status, campaignStartDate])
   @@index([brandId])
@@ -2678,24 +2709,24 @@ model BrandCampaign {
 }
 
 model CampaignApplication {
-  id            String            @id @default(uuid())
-  campaignId    String            @map("campaign_id")
-  influencerId  String            @map("influencer_id")
-  status        ApplicationStatus @default(PENDING)
-  
-  // Application Details
-  pitch         String            @db.Text
-  proposedRate  Decimal?          @map("proposed_rate") @db.Decimal(18, 4)
-  availability  String?
-  
-  // Response
-  responseNote  String?           @db.Text @map("response_note")
-  respondedAt   DateTime?         @map("responded_at")
-  
-  appliedAt     DateTime          @default(now()) @map("applied_at")
+  id           String            @id @default(uuid())
+  campaignId   String            @map("campaign_id")
+  influencerId String            @map("influencer_id")
+  status       ApplicationStatus @default(PENDING)
 
-  campaign      BrandCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  influencer    InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  // Application Details
+  pitch        String   @db.Text
+  proposedRate Decimal? @map("proposed_rate") @db.Decimal(18, 4)
+  availability String?
+
+  // Response
+  responseNote String?   @map("response_note") @db.Text
+  respondedAt  DateTime? @map("responded_at")
+
+  appliedAt DateTime @default(now()) @map("applied_at")
+
+  campaign   BrandCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  influencer InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
 
   @@unique([campaignId, influencerId])
   @@index([influencerId, status])
@@ -2703,33 +2734,33 @@ model CampaignApplication {
 }
 
 model CampaignDeliverable {
-  id            String             @id @default(uuid())
-  campaignId    String             @map("campaign_id")
-  influencerId  String             @map("influencer_id")
-  
-  // Deliverable Details
-  type          String             // post, video, story
-  platform      String             // instagram, tiktok, youtube
-  contentUrl    String             @map("content_url")
-  caption       String?            @db.Text
-  
-  // Metrics
-  views         Int                @default(0)
-  likes         Int                @default(0)
-  comments      Int                @default(0)
-  shares        Int                @default(0)
-  clicks        Int                @default(0)
-  conversions   Int                @default(0)
-  
-  // Review
-  status        DeliverableStatus  @default(PENDING)
-  reviewNote    String?            @db.Text @map("review_note")
-  reviewedAt    DateTime?          @map("reviewed_at")
-  
-  submittedAt   DateTime           @default(now()) @map("submitted_at")
+  id           String @id @default(uuid())
+  campaignId   String @map("campaign_id")
+  influencerId String @map("influencer_id")
 
-  campaign      BrandCampaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  influencer    InfluencerProfile  @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  // Deliverable Details
+  type       String // post, video, story
+  platform   String // instagram, tiktok, youtube
+  contentUrl String  @map("content_url")
+  caption    String? @db.Text
+
+  // Metrics
+  views       Int @default(0)
+  likes       Int @default(0)
+  comments    Int @default(0)
+  shares      Int @default(0)
+  clicks      Int @default(0)
+  conversions Int @default(0)
+
+  // Review
+  status     DeliverableStatus @default(PENDING)
+  reviewNote String?           @map("review_note") @db.Text
+  reviewedAt DateTime?         @map("reviewed_at")
+
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  campaign   BrandCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  influencer InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
 
   @@index([campaignId, status])
   @@index([influencerId])
@@ -2737,22 +2768,22 @@ model CampaignDeliverable {
 }
 
 model InfluencerReview {
-  id            String   @id @default(uuid())
-  campaignId    String   @map("campaign_id")
-  influencerId  String   @map("influencer_id")
-  brandId       String   @map("brand_id")
-  
-  rating        Int      // 1-5
-  review        String?  @db.Text
-  
+  id           String @id @default(uuid())
+  campaignId   String @map("campaign_id")
+  influencerId String @map("influencer_id")
+  brandId      String @map("brand_id")
+
+  rating Int // 1-5
+  review String? @db.Text
+
   // Specific Ratings
   communicationRating Int @map("communication_rating") // 1-5
   qualityRating       Int @map("quality_rating") // 1-5
   timelinessRating    Int @map("timeliness_rating") // 1-5
-  
-  createdAt     DateTime @default(now()) @map("created_at")
 
-  influencer    InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  influencer InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
 
   @@unique([campaignId, influencerId])
   @@index([influencerId])
@@ -2762,35 +2793,35 @@ model InfluencerReview {
 // ─── CONTEST SPONSORSHIPS ─────────────────────────────────
 
 model ContestSponsorship {
-  id                String          @id @default(uuid())
-  contestId         String          @map("contest_id")
-  brandId           String          @map("brand_id")
-  type              SponsorshipType
-  
-  // Sponsorship Details
-  sponsorshipKr     Decimal         @map("sponsorship_kr") @db.Decimal(18, 4)
-  benefits          String[]        // Logo placement, mentions, etc.
-  
-  // Branding
-  logoUrl           String?         @map("logo_url")
-  brandMessage      String?         @db.Text @map("brand_message")
-  websiteUrl        String?         @map("website_url")
-  
-  // Metrics
-  impressions       Int             @default(0)
-  clicks            Int             @default(0)
-  conversions       Int             @default(0)
-  revenueGenerated  Decimal         @default(0) @map("revenue_generated") @db.Decimal(18, 4)
-  
-  // Status
-  isActive          Boolean         @default(true) @map("is_active")
-  startDate         DateTime        @map("start_date")
-  endDate           DateTime        @map("end_date")
-  
-  createdAt         DateTime        @default(now()) @map("created_at")
+  id        String          @id @default(uuid())
+  contestId String          @map("contest_id")
+  brandId   String          @map("brand_id")
+  type      SponsorshipType
 
-  contest           Contest         @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  brand             User            @relation("ContestSponsorships", fields: [brandId], references: [id])
+  // Sponsorship Details
+  sponsorshipKr Decimal  @map("sponsorship_kr") @db.Decimal(18, 4)
+  benefits      String[] // Logo placement, mentions, etc.
+
+  // Branding
+  logoUrl      String? @map("logo_url")
+  brandMessage String? @map("brand_message") @db.Text
+  websiteUrl   String? @map("website_url")
+
+  // Metrics
+  impressions      Int     @default(0)
+  clicks           Int     @default(0)
+  conversions      Int     @default(0)
+  revenueGenerated Decimal @default(0) @map("revenue_generated") @db.Decimal(18, 4)
+
+  // Status
+  isActive  Boolean  @default(true) @map("is_active")
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  brand   User    @relation("ContestSponsorships", fields: [brandId], references: [id])
 
   @@index([contestId])
   @@index([brandId])
@@ -2800,24 +2831,24 @@ model ContestSponsorship {
 // ─── CONTEST ENGAGEMENT ACTIONS ───────────────────────────
 
 model ContestEngagementAction {
-  id            String   @id @default(uuid())
-  contestId     String   @map("contest_id")
-  userId        String   @map("user_id")
-  actionType    String   @map("action_type") // VISIT_SHOP, FOLLOW_BRAND, WATCH_VIDEO, etc.
-  
-  // Action Details
-  targetUrl     String?  @map("target_url")
-  proofUrl      String?  @map("proof_url")
-  metadata      Json?
-  
-  // Tracking
-  isCompleted   Boolean  @default(false) @map("is_completed")
-  completedAt   DateTime? @map("completed_at")
-  
-  createdAt     DateTime @default(now()) @map("created_at")
+  id         String @id @default(uuid())
+  contestId  String @map("contest_id")
+  userId     String @map("user_id")
+  actionType String @map("action_type") // VISIT_SHOP, FOLLOW_BRAND, WATCH_VIDEO, etc.
 
-  contest       Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  user          User     @relation("ContestEngagementActions", fields: [userId], references: [id], onDelete: Cascade)
+  // Action Details
+  targetUrl String? @map("target_url")
+  proofUrl  String? @map("proof_url")
+  metadata  Json?
+
+  // Tracking
+  isCompleted Boolean   @default(false) @map("is_completed")
+  completedAt DateTime? @map("completed_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user    User    @relation("ContestEngagementActions", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([contestId, userId])
   @@index([actionType, isCompleted])
@@ -2827,23 +2858,23 @@ model ContestEngagementAction {
 // ─── PURCHASE-TO-ENTER TRACKING ───────────────────────────
 
 model ContestPurchaseEntry {
-  id            String   @id @default(uuid())
-  contestId     String   @map("contest_id")
-  userId        String   @map("user_id")
-  orderId       String   @map("order_id")
-  
-  // Purchase Details
-  purchaseAmount Decimal @map("purchase_amount") @db.Decimal(18, 4)
-  productIds    String[] @map("product_ids")
-  
-  // Entry Status
-  isEligible    Boolean  @default(true) @map("is_eligible")
-  autoEntered   Boolean  @default(false) @map("auto_entered")
-  
-  purchasedAt   DateTime @default(now()) @map("purchased_at")
+  id        String @id @default(uuid())
+  contestId String @map("contest_id")
+  userId    String @map("user_id")
+  orderId   String @map("order_id")
 
-  contest       Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  user          User     @relation("ContestPurchaseEntries", fields: [userId], references: [id], onDelete: Cascade)
+  // Purchase Details
+  purchaseAmount Decimal  @map("purchase_amount") @db.Decimal(18, 4)
+  productIds     String[] @map("product_ids")
+
+  // Entry Status
+  isEligible  Boolean @default(true) @map("is_eligible")
+  autoEntered Boolean @default(false) @map("auto_entered")
+
+  purchasedAt DateTime @default(now()) @map("purchased_at")
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user    User    @relation("ContestPurchaseEntries", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([contestId, userId])
   @@index([orderId])
@@ -2853,38 +2884,38 @@ model ContestPurchaseEntry {
 // ─── POST-CONTEST CONVERSION CAMPAIGNS ────────────────────
 
 model ConversionCampaign {
-  id                String                 @id @default(uuid())
-  contestId         String                 @map("contest_id")
-  brandId           String?                @map("brand_id")
-  type              ConversionCampaignType
-  
-  // Campaign Details
-  title             String
-  description       String?                @db.Text
-  
-  // Targeting
-  targetSegment     String                 @map("target_segment") // LOSERS, WINNERS, ALL_PARTICIPANTS, HIGH_ENGAGERS
-  
-  // Offer
-  discountPercent   Decimal?               @map("discount_percent") @db.Decimal(5, 2)
-  discountCode      String?                @map("discount_code")
-  offerExpiresAt    DateTime?              @map("offer_expires_at")
-  
-  // Metrics
-  totalSent         Int                    @default(0) @map("total_sent")
-  totalOpened       Int                    @default(0) @map("total_opened")
-  totalClicked      Int                    @default(0) @map("total_clicked")
-  totalConverted    Int                    @default(0) @map("total_converted")
-  revenueGenerated  Decimal                @default(0) @map("revenue_generated") @db.Decimal(18, 4)
-  
-  // Status
-  isActive          Boolean                @default(true) @map("is_active")
-  
-  createdAt         DateTime               @default(now()) @map("created_at")
+  id        String                 @id @default(uuid())
+  contestId String                 @map("contest_id")
+  brandId   String?                @map("brand_id")
+  type      ConversionCampaignType
 
-  contest           Contest                @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  brand             User?                  @relation("ConversionCampaigns", fields: [brandId], references: [id])
-  recipients        ConversionCampaignRecipient[]
+  // Campaign Details
+  title       String
+  description String? @db.Text
+
+  // Targeting
+  targetSegment String @map("target_segment") // LOSERS, WINNERS, ALL_PARTICIPANTS, HIGH_ENGAGERS
+
+  // Offer
+  discountPercent Decimal?  @map("discount_percent") @db.Decimal(5, 2)
+  discountCode    String?   @map("discount_code")
+  offerExpiresAt  DateTime? @map("offer_expires_at")
+
+  // Metrics
+  totalSent        Int     @default(0) @map("total_sent")
+  totalOpened      Int     @default(0) @map("total_opened")
+  totalClicked     Int     @default(0) @map("total_clicked")
+  totalConverted   Int     @default(0) @map("total_converted")
+  revenueGenerated Decimal @default(0) @map("revenue_generated") @db.Decimal(18, 4)
+
+  // Status
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  contest    Contest                       @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  brand      User?                         @relation("ConversionCampaigns", fields: [brandId], references: [id])
+  recipients ConversionCampaignRecipient[]
 
   @@index([contestId])
   @@index([type, isActive])
@@ -2892,22 +2923,22 @@ model ConversionCampaign {
 }
 
 model ConversionCampaignRecipient {
-  id            String   @id @default(uuid())
-  campaignId    String   @map("campaign_id")
-  userId        String   @map("user_id")
-  
-  // Tracking
-  sentAt        DateTime @default(now()) @map("sent_at")
-  openedAt      DateTime? @map("opened_at")
-  clickedAt     DateTime? @map("clicked_at")
-  convertedAt   DateTime? @map("converted_at")
-  
-  // Conversion Details
-  orderId       String?  @map("order_id")
-  revenueKr     Decimal? @map("revenue_kr") @db.Decimal(18, 4)
+  id         String @id @default(uuid())
+  campaignId String @map("campaign_id")
+  userId     String @map("user_id")
 
-  campaign      ConversionCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  user          User               @relation("ConversionRecipients", fields: [userId], references: [id], onDelete: Cascade)
+  // Tracking
+  sentAt      DateTime  @default(now()) @map("sent_at")
+  openedAt    DateTime? @map("opened_at")
+  clickedAt   DateTime? @map("clicked_at")
+  convertedAt DateTime? @map("converted_at")
+
+  // Conversion Details
+  orderId   String?  @map("order_id")
+  revenueKr Decimal? @map("revenue_kr") @db.Decimal(18, 4)
+
+  campaign ConversionCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user     User               @relation("ConversionRecipients", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([campaignId, userId])
   @@index([userId])
@@ -2917,27 +2948,27 @@ model ConversionCampaignRecipient {
 // ─── SALES FUNNEL TRACKING ────────────────────────────────
 
 model SalesFunnelEvent {
-  id            String      @id @default(uuid())
-  userId        String      @map("user_id")
-  contestId     String?     @map("contest_id")
-  campaignId    String?     @map("campaign_id")
-  
-  // Event Details
-  stage         FunnelStage
-  eventType     String      @map("event_type") // contest_view, contest_join, product_view, purchase, etc.
-  
-  // Context
-  sourceType    String?     @map("source_type") // contest, campaign, organic
-  sourceId      String?     @map("source_id")
-  
-  // Metadata
-  metadata      Json?
-  
-  createdAt     DateTime    @default(now()) @map("created_at")
+  id         String  @id @default(uuid())
+  userId     String  @map("user_id")
+  contestId  String? @map("contest_id")
+  campaignId String? @map("campaign_id")
 
-  user          User        @relation("SalesFunnelEvents", fields: [userId], references: [id], onDelete: Cascade)
-  contest       Contest?    @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  campaign      BrandCampaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  // Event Details
+  stage     FunnelStage
+  eventType String      @map("event_type") // contest_view, contest_join, product_view, purchase, etc.
+
+  // Context
+  sourceType String? @map("source_type") // contest, campaign, organic
+  sourceId   String? @map("source_id")
+
+  // Metadata
+  metadata Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user     User           @relation("SalesFunnelEvents", fields: [userId], references: [id], onDelete: Cascade)
+  contest  Contest?       @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  campaign BrandCampaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   @@index([userId, stage])
   @@index([contestId, stage])
@@ -2949,22 +2980,22 @@ model SalesFunnelEvent {
 // ─── GAMIFICATION LAYER ───────────────────────────────────
 
 model GamificationPoints {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  
-  // Point Categories
-  engagementPoints Int   @default(0) @map("engagement_points")
-  marketingPoints  Int   @default(0) @map("marketing_points")
-  salesPoints      Int   @default(0) @map("sales_points")
-  totalPoints      Int   @default(0) @map("total_points")
-  
-  // Levels
-  currentLevel  Int      @default(1) @map("current_level")
-  nextLevelAt   Int      @map("next_level_at")
-  
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id     String @id @default(uuid())
+  userId String @map("user_id")
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Point Categories
+  engagementPoints Int @default(0) @map("engagement_points")
+  marketingPoints  Int @default(0) @map("marketing_points")
+  salesPoints      Int @default(0) @map("sales_points")
+  totalPoints      Int @default(0) @map("total_points")
+
+  // Levels
+  currentLevel Int @default(1) @map("current_level")
+  nextLevelAt  Int @map("next_level_at")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
   @@index([totalPoints])
@@ -2972,23 +3003,23 @@ model GamificationPoints {
 }
 
 model GamificationActivity {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  
-  // Activity Details
-  activityType  String   @map("activity_type") // CONTEST_WIN, CAMPAIGN_COMPLETE, PURCHASE, REFERRAL
-  category      String   // ENGAGEMENT, MARKETING, SALES
-  pointsEarned  Int      @map("points_earned")
-  
-  // Context
-  referenceType String?  @map("reference_type") // contest, campaign, order
-  referenceId   String?  @map("reference_id")
-  
-  description   String?
-  
-  createdAt     DateTime @default(now()) @map("created_at")
+  id     String @id @default(uuid())
+  userId String @map("user_id")
 
-  user          User     @relation("GamificationActivities", fields: [userId], references: [id], onDelete: Cascade)
+  // Activity Details
+  activityType String @map("activity_type") // CONTEST_WIN, CAMPAIGN_COMPLETE, PURCHASE, REFERRAL
+  category     String // ENGAGEMENT, MARKETING, SALES
+  pointsEarned Int    @map("points_earned")
+
+  // Context
+  referenceType String? @map("reference_type") // contest, campaign, order
+  referenceId   String? @map("reference_id")
+
+  description String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation("GamificationActivities", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([activityType])
@@ -2998,30 +3029,30 @@ model GamificationActivity {
 // ─── CAMPAIGN ANALYTICS ───────────────────────────────────
 
 model CampaignAnalytics {
-  id            String   @id @default(uuid())
-  campaignId    String   @map("campaign_id")
-  date          DateTime @db.Date
-  
-  // Reach & Engagement
-  impressions   Int      @default(0)
-  reach         Int      @default(0)
-  engagement    Int      @default(0)
-  clicks        Int      @default(0)
-  
-  // Conversions
-  conversions   Int      @default(0)
-  revenue       Decimal  @default(0) @db.Decimal(18, 4)
-  
-  // Costs
-  spentKr       Decimal  @default(0) @map("spent_kr") @db.Decimal(18, 4)
-  
-  // Calculated Metrics
-  ctr           Decimal  @default(0) @db.Decimal(5, 4) // Click-through rate
-  conversionRate Decimal @default(0) @map("conversion_rate") @db.Decimal(5, 4)
-  cpa           Decimal  @default(0) @db.Decimal(18, 4) // Cost per acquisition
-  roas          Decimal  @default(0) @db.Decimal(10, 2) // Return on ad spend
+  id         String   @id @default(uuid())
+  campaignId String   @map("campaign_id")
+  date       DateTime @db.Date
 
-  campaign      BrandCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  // Reach & Engagement
+  impressions Int @default(0)
+  reach       Int @default(0)
+  engagement  Int @default(0)
+  clicks      Int @default(0)
+
+  // Conversions
+  conversions Int     @default(0)
+  revenue     Decimal @default(0) @db.Decimal(18, 4)
+
+  // Costs
+  spentKr Decimal @default(0) @map("spent_kr") @db.Decimal(18, 4)
+
+  // Calculated Metrics
+  ctr            Decimal @default(0) @db.Decimal(5, 4) // Click-through rate
+  conversionRate Decimal @default(0) @map("conversion_rate") @db.Decimal(5, 4)
+  cpa            Decimal @default(0) @db.Decimal(18, 4) // Cost per acquisition
+  roas           Decimal @default(0) @db.Decimal(10, 2) // Return on ad spend
+
+  campaign BrandCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   @@unique([campaignId, date])
   @@index([date])
@@ -3031,30 +3062,30 @@ model CampaignAnalytics {
 // ─── CONTEST ANALYTICS (ENHANCED) ─────────────────────────
 
 model ContestAnalytics {
-  id                String   @id @default(uuid())
-  contestId         String   @map("contest_id")
-  date              DateTime @db.Date
-  
+  id        String   @id @default(uuid())
+  contestId String   @map("contest_id")
+  date      DateTime @db.Date
+
   // Engagement
-  views             Int      @default(0)
-  joins             Int      @default(0)
-  submissions       Int      @default(0)
-  votes             Int      @default(0)
-  shares            Int      @default(0)
-  
+  views       Int @default(0)
+  joins       Int @default(0)
+  submissions Int @default(0)
+  votes       Int @default(0)
+  shares      Int @default(0)
+
   // Sales Metrics
-  shopVisits        Int      @default(0) @map("shop_visits")
-  productViews      Int      @default(0) @map("product_views")
-  addToCarts        Int      @default(0) @map("add_to_carts")
-  purchases         Int      @default(0)
-  revenue           Decimal  @default(0) @db.Decimal(18, 4)
-  
+  shopVisits   Int     @default(0) @map("shop_visits")
+  productViews Int     @default(0) @map("product_views")
+  addToCarts   Int     @default(0) @map("add_to_carts")
+  purchases    Int     @default(0)
+  revenue      Decimal @default(0) @db.Decimal(18, 4)
+
   // Conversion Rates
-  joinRate          Decimal  @default(0) @map("join_rate") @db.Decimal(5, 4)
-  submissionRate    Decimal  @default(0) @map("submission_rate") @db.Decimal(5, 4)
-  purchaseRate      Decimal  @default(0) @map("purchase_rate") @db.Decimal(5, 4)
-  
-  contest           Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  joinRate       Decimal @default(0) @map("join_rate") @db.Decimal(5, 4)
+  submissionRate Decimal @default(0) @map("submission_rate") @db.Decimal(5, 4)
+  purchaseRate   Decimal @default(0) @map("purchase_rate") @db.Decimal(5, 4)
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
 
   @@unique([contestId, date])
   @@index([date])
@@ -3086,7 +3117,6 @@ model ContestAnalytics {
 // analytics             ContestAnalytics[]
 // promotingCampaigns    BrandCampaign[]
 
-
 // ═══════════════════════════════════════════════════════════
 // SOCIAL MEDIA INTEGRATION FOR INFLUENCER PROFILES
 // ═══════════════════════════════════════════════════════════
@@ -3099,41 +3129,40 @@ enum SocialPlatform {
   TWITTER
   TWITCH
   LINKEDIN
-  SNAPCHAT
 }
 
 model SocialMediaAccount {
-  id                String         @id @default(uuid())
-  influencerId      String         @map("influencer_id")
-  platform          SocialPlatform
-  
-  username          String
-  profileUrl        String         @map("profile_url")
-  displayName       String?        @map("display_name")
-  
-  followerCount     Int            @default(0) @map("follower_count")
-  subscriberCount   Int            @default(0) @map("subscriber_count")
-  videoCount        Int            @default(0) @map("video_count")
-  totalViews        BigInt         @default(0) @map("total_views")
-  avgViews          Int            @default(0) @map("avg_views")
-  avgLikes          Int            @default(0) @map("avg_likes")
-  engagementRate    Decimal        @default(0) @map("engagement_rate") @db.Decimal(5, 2)
-  
-  isVerified        Boolean        @default(false) @map("is_verified")
-  isPrimary         Boolean        @default(false) @map("is_primary")
-  
-  lastSyncedAt      DateTime?      @map("last_synced_at")
-  syncStatus        String         @default("pending") @map("sync_status")
-  syncError         String?        @map("sync_error")
-  
-  accessToken       String?        @map("access_token") @db.Text
-  refreshToken      String?        @map("refresh_token") @db.Text
-  tokenExpiresAt    DateTime?      @map("token_expires_at")
-  
-  createdAt         DateTime       @default(now()) @map("created_at")
-  updatedAt         DateTime       @updatedAt @map("updated_at")
+  id           String         @id @default(uuid())
+  influencerId String         @map("influencer_id")
+  platform     SocialPlatform
 
-  influencer        InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  username    String
+  profileUrl  String  @map("profile_url")
+  displayName String? @map("display_name")
+
+  followerCount   Int     @default(0) @map("follower_count")
+  subscriberCount Int     @default(0) @map("subscriber_count")
+  videoCount      Int     @default(0) @map("video_count")
+  totalViews      BigInt  @default(0) @map("total_views")
+  avgViews        Int     @default(0) @map("avg_views")
+  avgLikes        Int     @default(0) @map("avg_likes")
+  engagementRate  Decimal @default(0) @map("engagement_rate") @db.Decimal(5, 2)
+
+  isVerified Boolean @default(false) @map("is_verified")
+  isPrimary  Boolean @default(false) @map("is_primary")
+
+  lastSyncedAt DateTime? @map("last_synced_at")
+  syncStatus   String    @default("pending") @map("sync_status")
+  syncError    String?   @map("sync_error")
+
+  accessToken    String?   @map("access_token") @db.Text // Encrypted with AES-256
+  refreshToken   String?   @map("refresh_token") @db.Text // Encrypted with AES-256
+  tokenExpiresAt DateTime? @map("token_expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  influencer InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
 
   @@unique([influencerId, platform])
   @@index([platform, followerCount])
@@ -3142,22 +3171,22 @@ model SocialMediaAccount {
 }
 
 model SocialMediaSyncLog {
-  id                String         @id @default(uuid())
-  accountId         String         @map("account_id")
-  
-  syncType          String         @map("sync_type")
-  status            String
-  
-  followersBefore   Int            @map("followers_before")
-  followersAfter    Int            @map("followers_after")
-  followerChange    Int            @map("follower_change")
-  
-  errorMessage      String?        @map("error_message")
-  errorCode         String?        @map("error_code")
-  
-  durationMs        Int            @map("duration_ms")
-  
-  syncedAt          DateTime       @default(now()) @map("synced_at")
+  id        String @id @default(uuid())
+  accountId String @map("account_id")
+
+  syncType String @map("sync_type")
+  status   String
+
+  followersBefore Int @map("followers_before")
+  followersAfter  Int @map("followers_after")
+  followerChange  Int @map("follower_change")
+
+  errorMessage String? @map("error_message")
+  errorCode    String? @map("error_code")
+
+  durationMs Int @map("duration_ms")
+
+  syncedAt DateTime @default(now()) @map("synced_at")
 
   @@index([accountId, syncedAt])
   @@index([status])
@@ -3165,16 +3194,16 @@ model SocialMediaSyncLog {
 }
 
 model PlatformRateLimit {
-  id                String         @id @default(uuid())
-  platform          SocialPlatform
-  
-  requestsPerHour   Int            @map("requests_per_hour")
-  requestsRemaining Int            @map("requests_remaining")
-  resetAt           DateTime       @map("reset_at")
-  
-  lastRequestAt     DateTime?      @map("last_request_at")
-  
-  updatedAt         DateTime       @updatedAt @map("updated_at")
+  id       String         @id @default(uuid())
+  platform SocialPlatform
+
+  requestsPerHour   Int      @map("requests_per_hour")
+  requestsRemaining Int      @map("requests_remaining")
+  resetAt           DateTime @map("reset_at")
+
+  lastRequestAt DateTime? @map("last_request_at")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([platform])
   @@map("platform_rate_limits")
@@ -3204,12 +3233,29 @@ enum FeatureFlagScope {
 
 enum WithdrawalStatus {
   PENDING
+  KYC_REQUIRED
+  KYC_SUBMITTED
+  UNDER_REVIEW
   FLAGGED
   APPROVED
   REJECTED
   PROCESSING
   COMPLETED
   FAILED
+}
+
+enum KYCStatus {
+  NOT_STARTED
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum DocumentType {
+  NATIONAL_ID
+  DRIVING_LICENSE
+  PASSPORT
 }
 
 enum SuspensionType {
@@ -3269,7 +3315,7 @@ model FeatureFlag {
 model ProhibitedName {
   id        String   @id @default(uuid())
   name      String   @unique
-  type      String   // "username", "display_name", "both"
+  type      String // "username", "display_name", "both"
   reason    String?
   addedBy   String?  @map("added_by")
   createdAt DateTime @default(now()) @map("created_at")
@@ -3294,21 +3340,104 @@ model WithdrawalRequest {
   amountKr        Decimal          @map("amount_kr") @db.Decimal(18, 4)
   amountFiat      Decimal?         @map("amount_fiat") @db.Decimal(18, 4)
   currency        String           @db.VarChar(3)
-  provider        String           // "mpesa", "bank", "paypal", "payoneer"
+  provider        String // "mpesa", "bank", "paypal", "payoneer"
   accountName     String           @map("account_name")
   accountDetails  Json             @map("account_details")
   nameMatchStatus String           @default("pending") @map("name_match_status") // "match", "mismatch", "pending"
   status          WithdrawalStatus @default(PENDING)
+  
+  // KYC Requirements
+  requiresKyc     Boolean          @default(true) @map("requires_kyc")
+  kycDocumentIds  String[]         @default([]) @map("kyc_document_ids")
+  
+  // Manual Review
   reviewedBy      String?          @map("reviewed_by")
   reviewNote      String?          @map("review_note")
   reviewedAt      DateTime?        @map("reviewed_at")
+  flagReason      String?          @map("flag_reason")
+  flaggedAt       DateTime?        @map("flagged_at")
+  
+  // Suspicious Pattern Detection
+  suspiciousFlags Json?            @map("suspicious_flags") // {rapidWithdrawals, unusualAmount, newAccount, etc}
+  riskScore       Decimal          @default(0) @map("risk_score") @db.Decimal(5, 2)
+  
   createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id])
 
   @@index([userId, createdAt])
   @@index([status])
+  @@index([requiresKyc])
+  @@index([riskScore])
   @@map("withdrawal_requests")
+}
+
+model KYCDocument {
+  id              String       @id @default(uuid())
+  userId          String       @map("user_id")
+  documentType    DocumentType @map("document_type")
+  frontImageUrl   String       @map("front_image_url")
+  backImageUrl    String?      @map("back_image_url")
+  selfieUrl       String       @map("selfie_url")
+  
+  // Extracted Information
+  fullName        String?      @map("full_name")
+  documentNumber  String?      @map("document_number")
+  dateOfBirth     DateTime?    @map("date_of_birth") @db.Date
+  expiryDate      DateTime?    @map("expiry_date") @db.Date
+  
+  // Verification Status
+  status          KYCStatus    @default(PENDING)
+  verifiedBy      String?      @map("verified_by")
+  verificationNote String?     @map("verification_note") @db.Text
+  verifiedAt      DateTime?    @map("verified_at")
+  rejectionReason String?      @map("rejection_reason") @db.Text
+  
+  // Name Matching
+  nameMatchScore  Decimal?     @map("name_match_score") @db.Decimal(5, 2)
+  nameMatches     Boolean      @default(false) @map("name_matches")
+  
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([status])
+  @@index([documentType])
+  @@map("kyc_documents")
+}
+
+model WithdrawalLimit {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  dailyLimitKr    Decimal  @map("daily_limit_kr") @db.Decimal(18, 4)
+  withdrawnTodayKr Decimal @default(0) @map("withdrawn_today_kr") @db.Decimal(18, 4)
+  lastResetDate   DateTime @default(now()) @map("last_reset_date") @db.Date
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("withdrawal_limits")
+}
+
+model SuspiciousActivity {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  activityType    String   @map("activity_type") // rapid_withdrawals, unusual_amount, new_account, etc
+  description     String   @db.Text
+  severity        String // low, medium, high, critical
+  metadata        Json?
+  isResolved      Boolean  @default(false) @map("is_resolved")
+  resolvedBy      String?  @map("resolved_by")
+  resolvedAt      DateTime? @map("resolved_at")
+  resolutionNote  String?  @map("resolution_note") @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([userId, isResolved])
+  @@index([severity])
+  @@index([activityType])
+  @@map("suspicious_activities")
 }
 
 model PlatformWallet {
@@ -3342,7 +3471,7 @@ model PlatformAnnouncement {
   id          String    @id @default(uuid())
   title       String
   message     String    @db.Text
-  type        String    // "banner", "push", "email", "in_app"
+  type        String // "banner", "push", "email", "in_app"
   targetScope String    @default("all") @map("target_scope")
   isActive    Boolean   @default(true) @map("is_active")
   createdBy   String    @map("created_by")
@@ -3367,7 +3496,7 @@ model ContentModerationLog {
   adminId     String   @map("admin_id")
   contentType String   @map("content_type") // "short", "post", "contest", "comment", "product", "story"
   contentId   String   @map("content_id")
-  action      String   // "hide", "delete", "approve", "flag", "restore"
+  action      String // "hide", "delete", "approve", "flag", "restore"
   reason      String?
   createdAt   DateTime @default(now()) @map("created_at")
 
@@ -3382,18 +3511,18 @@ model ContentModerationLog {
 // ═══════════════════════════════════════════════════════════
 
 model LiveSession {
-  id              String   @id @default(uuid())
-  hostId          String   @map("host_id")
-  title           String
-  description     String?  @db.Text
-  scheduledStart  DateTime @map("scheduled_start")
-  actualStart     DateTime? @map("actual_start")
-  endedAt         DateTime? @map("ended_at")
-  status          String   @default("SCHEDULED") // SCHEDULED, LIVE, ENDED
-  viewerCount     Int      @default(0) @map("viewer_count")
-  peakViewers     Int      @default(0) @map("peak_viewers")
-  totalSalesKr    Decimal  @default(0) @map("total_sales_kr") @db.Decimal(18, 4)
-  createdAt       DateTime @default(now()) @map("created_at")
+  id             String    @id @default(uuid())
+  hostId         String    @map("host_id")
+  title          String
+  description    String?   @db.Text
+  scheduledStart DateTime  @map("scheduled_start")
+  actualStart    DateTime? @map("actual_start")
+  endedAt        DateTime? @map("ended_at")
+  status         String    @default("SCHEDULED") // SCHEDULED, LIVE, ENDED
+  viewerCount    Int       @default(0) @map("viewer_count")
+  peakViewers    Int       @default(0) @map("peak_viewers")
+  totalSalesKr   Decimal   @default(0) @map("total_sales_kr") @db.Decimal(18, 4)
+  createdAt      DateTime  @default(now()) @map("created_at")
 
   host     User                 @relation("LiveSessionHost", fields: [hostId], references: [id], onDelete: Cascade)
   products LiveSessionProduct[]
@@ -3404,13 +3533,13 @@ model LiveSession {
 }
 
 model LiveSessionProduct {
-  id          String   @id @default(uuid())
-  sessionId   String   @map("session_id")
-  productId   String   @map("product_id")
-  salePrice   Decimal? @map("sale_price") @db.Decimal(18, 4)
-  unitsSold   Int      @default(0) @map("units_sold")
-  sortOrder   Int      @default(0) @map("sort_order")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  sessionId String   @map("session_id")
+  productId String   @map("product_id")
+  salePrice Decimal? @map("sale_price") @db.Decimal(18, 4)
+  unitsSold Int      @default(0) @map("units_sold")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
 
   session LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   product Product     @relation("LiveSessionProducts", fields: [productId], references: [id], onDelete: Cascade)
@@ -3433,48 +3562,48 @@ enum SponsoredContentStatus {
 }
 
 enum PricingModel {
-  CPM  // Cost per 1000 impressions
-  CPV  // Cost per view (3+ seconds)
-  CPE  // Cost per engagement (like/comment/share)
-  CPC  // Cost per click
+  CPM // Cost per 1000 impressions
+  CPV // Cost per view (3+ seconds)
+  CPE // Cost per engagement (like/comment/share)
+  CPC // Cost per click
 }
 
 model SponsoredContent {
-  id            String                  @id @default(uuid())
-  brandUserId   String                  @map("brand_user_id")
-  contentType   String                  @map("content_type") // short, post
-  contentId     String                  @map("content_id")
-  campaignName  String                  @map("campaign_name")
-  
-  // Budget & Pricing
-  budget        Decimal                 @db.Decimal(18, 4)
-  spent         Decimal                 @default(0) @db.Decimal(18, 4)
-  pricingModel  PricingModel            @map("pricing_model")
-  bidAmount     Decimal                 @map("bid_amount") @db.Decimal(18, 4)
-  
-  // Targeting
-  targeting     Json?                   // { ageMin, ageMax, gender[], countries[], interests[] }
-  
-  // Schedule
-  startDate     DateTime                @map("start_date")
-  endDate       DateTime                @map("end_date")
-  
-  // Metrics
-  impressions   Int                     @default(0)
-  views         Int                     @default(0)
-  engagements   Int                     @default(0)
-  clicks        Int                     @default(0)
-  
-  // Status
-  status        SponsoredContentStatus  @default(PENDING_REVIEW)
-  escrowId      String?                 @map("escrow_id")
-  
-  createdAt     DateTime                @default(now()) @map("created_at")
-  updatedAt     DateTime                @updatedAt @map("updated_at")
+  id           String @id @default(uuid())
+  brandUserId  String @map("brand_user_id")
+  contentType  String @map("content_type") // short, post
+  contentId    String @map("content_id")
+  campaignName String @map("campaign_name")
 
-  brand         User                    @relation("SponsoredContentBrand", fields: [brandUserId], references: [id], onDelete: Cascade)
-  short         Short?                  @relation("SponsoredShort", fields: [contentId], references: [id], onDelete: Cascade, map: "sponsored_content_short_fkey")
-  post          Post?                   @relation("SponsoredPost", fields: [contentId], references: [id], onDelete: Cascade, map: "sponsored_content_post_fkey")
+  // Budget & Pricing
+  budget       Decimal      @db.Decimal(18, 4)
+  spent        Decimal      @default(0) @db.Decimal(18, 4)
+  pricingModel PricingModel @map("pricing_model")
+  bidAmount    Decimal      @map("bid_amount") @db.Decimal(18, 4)
+
+  // Targeting
+  targeting Json? // { ageMin, ageMax, gender[], countries[], interests[] }
+
+  // Schedule
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+
+  // Metrics
+  impressions Int @default(0)
+  views       Int @default(0)
+  engagements Int @default(0)
+  clicks      Int @default(0)
+
+  // Status
+  status   SponsoredContentStatus @default(PENDING_REVIEW)
+  escrowId String?                @map("escrow_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  brand         User                  @relation("SponsoredContentBrand", fields: [brandUserId], references: [id], onDelete: Cascade)
+  short         Short?                @relation("SponsoredShort", fields: [contentId], references: [id], onDelete: Cascade, map: "sponsored_content_short_fkey")
+  post          Post?                 @relation("SponsoredPost", fields: [contentId], references: [id], onDelete: Cascade, map: "sponsored_content_post_fkey")
   impressionLog SponsoredImpression[]
 
   @@index([brandUserId, status])
@@ -3484,12 +3613,12 @@ model SponsoredContent {
 }
 
 model SponsoredImpression {
-  id          String   @id @default(uuid())
-  campaignId  String   @map("campaign_id")
-  userId      String   @map("user_id")
-  type        String   // impression, view, like, comment, share, click
-  cost        Decimal  @default(0) @db.Decimal(18, 4)
-  createdAt   DateTime @default(now()) @map("created_at")
+  id         String   @id @default(uuid())
+  campaignId String   @map("campaign_id")
+  userId     String   @map("user_id")
+  type       String // impression, view, like, comment, share, click
+  cost       Decimal  @default(0) @db.Decimal(18, 4)
+  createdAt  DateTime @default(now()) @map("created_at")
 
   campaign SponsoredContent @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
@@ -3498,3 +3627,133 @@ model SponsoredImpression {
   @@map("sponsored_impressions")
 }
 
+// ═══════════════════════════════════════════════════════════
+// RECOMMENDATION SYSTEM - MATCHING ALGORITHM
+// ═══════════════════════════════════════════════════════════
+
+enum ContentDistributionTier {
+  TEST // 0 - Initial 2K test audience
+  TIER_1 // 1 - 5K users
+  TIER_2 // 2 - 50K users
+  TIER_3 // 3 - 500K users
+  VIRAL // 4 - Millions
+}
+
+// Track content distribution and amplification
+model ContentDistribution {
+  id                  String                  @id @default(uuid())
+  contentId           String                  @map("content_id")
+  contentType         String                  @map("content_type") // SHORT or POST
+  distributionTier    ContentDistributionTier @default(TEST) @map("distribution_tier")
+  currentAudienceSize Int                     @default(0) @map("current_audience_size")
+  targetAudienceSize  Int                     @default(2000) @map("target_audience_size")
+
+  // Engagement metrics
+  completionRate  Decimal @default(0) @map("completion_rate") @db.Decimal(5, 4)
+  likeRate        Decimal @default(0) @map("like_rate") @db.Decimal(5, 4)
+  shareRate       Decimal @default(0) @map("share_rate") @db.Decimal(5, 4)
+  commentRate     Decimal @default(0) @map("comment_rate") @db.Decimal(5, 4)
+  rewatchRate     Decimal @default(0) @map("rewatch_rate") @db.Decimal(5, 4)
+  engagementScore Decimal @default(0) @map("engagement_score") @db.Decimal(5, 4)
+
+  shouldAmplify   Boolean   @default(false) @map("should_amplify")
+  lastEvaluatedAt DateTime? @map("last_evaluated_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@unique([contentId, contentType])
+  @@index([distributionTier])
+  @@index([shouldAmplify])
+  @@index([contentType, createdAt])
+  @@map("content_distribution")
+}
+
+// Track which users have been delivered which content (prevents duplicates)
+model UserContentDelivery {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  contentId   String   @map("content_id")
+  contentType String   @map("content_type") // SHORT or POST
+  deliveredAt DateTime @default(now()) @map("delivered_at")
+
+  // Engagement tracking
+  viewed         Boolean @default(false)
+  viewDuration   Int     @default(0) @map("view_duration") // milliseconds
+  completed      Boolean @default(false)
+  liked          Boolean @default(false)
+  shared         Boolean @default(false)
+  commented      Boolean @default(false)
+  rewatchedCount Int     @default(0) @map("rewatched_count")
+
+  @@unique([userId, contentId, contentType])
+  @@index([userId, deliveredAt])
+  @@index([contentId, contentType])
+  @@index([viewed])
+  @@map("user_content_delivery")
+}
+
+// Track user interaction signals for algorithm learning
+model UserInteractionSignal {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  contentId     String   @map("content_id")
+  contentType   String   @map("content_type") // SHORT or POST
+  signalType    String   @map("signal_type") // VIEW, LIKE, SHARE, COMMENT, REWATCH, SKIP, NOT_INTERESTED, HIDE, ADMIRE, UNADMIRE
+  watchDuration Int      @default(0) @map("watch_duration") // milliseconds
+  totalDuration Int      @default(0) @map("total_duration") // milliseconds
+  weight        Decimal  @default(1.0) @db.Decimal(3, 2) // Signal importance weight
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([contentId, contentType])
+  @@index([signalType])
+  @@map("user_interaction_signals")
+}
+
+// Track user's micro-interests for precise matching
+model UserMicroInterest {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  category      String   @db.VarChar(100)
+  subcategory   String?  @db.VarChar(100)
+  keywords      String[] // Related keywords
+  affinity      Decimal  @default(0.5) @db.Decimal(3, 2) // 0.0 to 1.0
+  lastEngagedAt DateTime @default(now()) @map("last_engaged_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([category])
+  @@index([affinity])
+  @@map("user_micro_interests")
+}
+
+// Track trending topics for content resurfacing
+model TrendingTopic {
+  id              String    @id @default(uuid())
+  topic           String    @unique @db.VarChar(100)
+  engagementCount Int       @default(0) @map("engagement_count")
+  trendingScore   Decimal   @default(0) @map("trending_score") @db.Decimal(10, 2)
+  isActive        Boolean   @default(true) @map("is_active")
+  startedAt       DateTime  @default(now()) @map("started_at")
+  expiresAt       DateTime? @map("expires_at")
+
+  @@index([trendingScore])
+  @@index([isActive])
+  @@map("trending_topics")
+}
+
+// Add admirersCount to User model for creator tier calculation
+// This should already exist in User model, but ensure it's indexed
+// @@index([admirersCount]) on User model
+
+model TransactionNonce {
+  id        String   @id @default(uuid())
+  nonce     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@index([userId])
+  @@map("transaction_nonces")
+}

@@ -1,4 +1,9 @@
 package com.krieta.feature.chama.presentation.dashboard
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -25,6 +30,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.krieta.com.core.util.SafeConversion
 import com.krieta.feature.chama.data.remote.dto.ChamaMemberDto
 import com.krieta.feature.chama.data.remote.dto.ChamaTransactionDto
 import com.krieta.feature.chama.presentation.election.ChamaElectionScreen
@@ -178,13 +184,21 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
                 confirmButton = {
                     Button(
                         onClick = {
-                            contributeAmount.toDoubleOrNull()?.let {
-                                viewModel.contribute(it)
+                            val amount = SafeConversion.toDoubleOrDefaultWithValidation(
+                                value = contributeAmount,
+                                fieldName = "chamaContribution",
+                                min = 0.0,
+                                defaultValue = 0.0
+                            )
+                            if (amount > 0) {
+                                viewModel.contribute(amount)
                                 showContributeDialog = false
                                 contributeAmount = ""
                             }
                         },
-                        enabled = contributeAmount.toDoubleOrNull() != null && !state.isContributing,
+                        enabled = contributeAmount.isNotEmpty() && 
+                            SafeConversion.toDoubleOrDefault(contributeAmount, "chamaContribution", 0.0) > 0 && 
+                            !state.isContributing,
                         colors = ButtonDefaults.buttonColors(containerColor = ChamaGold)
                     ) {
                         if (state.isContributing) {
@@ -457,7 +471,7 @@ private fun MemberCard(member: ChamaMemberDto) {
             }
 
             if (member.isDefaulter) {
-                Icon(Icons.Default.Warning, contentDescription = "Defaulter", tint = ChamaRed, modifier = Modifier.size(18.dp))
+                Icon(painterResource(Res.drawable.ic_warning), contentDescription = "Defaulter", tint = ChamaRed, modifier = Modifier.size(18.dp))
             }
         }
     }
@@ -485,12 +499,12 @@ private fun TransactionsTab(state: ChamaDashboardState) {
 @Composable
 private fun TransactionCard(tx: ChamaTransactionDto) {
     val (icon, color) = when (tx.type) {
-        "CONTRIBUTION" -> Icons.Default.ArrowDownward to ChamaGreen
-        "PAYOUT" -> Icons.Default.ArrowUpward to ChamaGold
-        "MEMBERSHIP_FEE" -> Icons.Default.CardMembership to Color(0xFF3498DB)
-        "PENALTY" -> Icons.Default.Warning to ChamaRed
-        "EXTERNAL" -> Icons.Default.Receipt to Color(0xFF9B59B6)
-        else -> Icons.Default.SwapHoriz to Color.Gray
+        "CONTRIBUTION" -> painterResource(Res.drawable.ic_arrow_downward) to ChamaGreen
+        "PAYOUT" -> painterResource(Res.drawable.ic_arrow_upward) to ChamaGold
+        "MEMBERSHIP_FEE" -> painterResource(Res.drawable.ic_card_membership) to Color(0xFF3498DB)
+        "PENALTY" -> painterResource(Res.drawable.ic_warning) to ChamaRed
+        "EXTERNAL" -> painterResource(Res.drawable.ic_receipt) to Color(0xFF9B59B6)
+        else -> painterResource(Res.drawable.ic_swap_horiz) to Color.Gray
     }
 
     Card(
@@ -543,7 +557,7 @@ private fun ElectionsTab(state: ChamaDashboardState, onNavigateToElection: (Stri
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
-                    Icons.Default.HowToVote,
+                    painterResource(Res.drawable.ic_how_to_vote),
                     contentDescription = null,
                     tint = ChamaGold,
                     modifier = Modifier.size(48.dp)
@@ -671,7 +685,7 @@ private fun CyclesTab(state: ChamaDashboardState) {
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
-                    Icons.Default.Autorenew,
+                    painterResource(Res.drawable.ic_autorenew),
                     contentDescription = null,
                     tint = ChamaGold,
                     modifier = Modifier.size(48.dp)
@@ -760,8 +774,16 @@ private fun CycleCard(cycle: com.krieta.feature.chama.data.remote.dto.ChamaCycle
             Spacer(Modifier.height(12.dp))
 
             val progress = try {
-                val collected = cycle.collectedAmountKr.toDoubleOrNull() ?: 0.0
-                val target = cycle.targetAmountKr.toDoubleOrNull() ?: 1.0
+                val collected = SafeConversion.toDoubleOrDefault(
+                    value = cycle.collectedAmountKr,
+                    fieldName = "collectedAmount",
+                    defaultValue = 0.0
+                )
+                val target = SafeConversion.toDoubleOrDefault(
+                    value = cycle.targetAmountKr,
+                    fieldName = "targetAmount",
+                    defaultValue = 1.0
+                )
                 (collected / target).toFloat().coerceIn(0f, 1f)
             } catch (e: Exception) {
                 0f

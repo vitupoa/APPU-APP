@@ -1,4 +1,9 @@
 package com.krieta.feature.profile.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -11,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -89,7 +93,7 @@ class MilestonesScreen : Screen {
                     }
                     if (milestone.isCompleted) {
                         Icon(
-                            painterResource(Res.drawable.ic_check)Circle,
+                            painterResource(Res.drawable.ic_check),
                             contentDescription = "Completed",
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(28.dp)

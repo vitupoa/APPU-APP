@@ -20,6 +20,12 @@ import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.ApiConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import io.ktor.client.HttpClient
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import kotlinx.serialization.Serializable
 
 class UploadWorker(
     private val appContext: Context,
@@ -30,6 +36,7 @@ class UploadWorker(
     private val shortsRepository: ShortsRepository by inject()
     private val feedRepository: FeedRepository by inject()
     private val storyRepository: StoryRepository by inject()
+    private val httpClient: HttpClient by inject()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val typeStr = inputData.getString("UPLOAD_TYPE") ?: return@withContext Result.failure()
@@ -47,6 +54,13 @@ class UploadWorker(
                         is NetworkResult.Success -> {
                             val createResult = shortsRepository.createShort(result.data, caption)
                             if (createResult is NetworkResult.Success) {
+                                // Initialize content distribution
+                                try {
+                                    val shortId = (createResult.data as? String) ?: ""
+                                    initializeDistribution(shortId, "SHORT", caption)
+                                } catch (e: Exception) {
+                                    println("Failed to initialize distribution: ${e.message}")
+                                }
                                 showCompletionNotification("Short Uploaded Successfully!")
                                 return@withContext Result.success()
                             }
@@ -138,5 +152,34 @@ class UploadWorker(
             
         val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(1002, notification)
+    }
+
+    @Serializable
+    private data class InitializeDistributionRequest(
+        val contentId: String,
+        val contentType: String,
+        val hashtags: List<String>,
+        val location: String?
+    )
+
+    private suspend fun initializeDistribution(contentId: String, contentType: String, caption: String) {
+        try {
+            // Extract hashtags from caption
+            val hashtags = caption.split(" ")
+                .filter { it.startsWith("#") }
+                .map { it.substring(1) }
+
+            httpClient.post("${ApiConstants.BASE_URL}/recommendation/distribution/initialize") {
+                contentType(ContentType.Application.Json)
+                setBody(InitializeDistributionRequest(
+                    contentId = contentId,
+                    contentType = contentType,
+                    hashtags = hashtags,
+                    location = null // Can be added later if location is available
+                ))
+            }
+        } catch (e: Exception) {
+            println("Distribution initialization error: ${e.message}")
+        }
     }
 }

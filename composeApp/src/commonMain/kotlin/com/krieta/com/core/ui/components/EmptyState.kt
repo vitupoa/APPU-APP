@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,7 +34,7 @@ fun EmptyState(
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = painterResource(Res.drawable.ic_search),
+            painter = painterResource(Res.drawable.ic_search),
             contentDescription = null,
             tint = KrietaColors.OnSurfaceVariant,
             modifier = Modifier.size(56.dp)

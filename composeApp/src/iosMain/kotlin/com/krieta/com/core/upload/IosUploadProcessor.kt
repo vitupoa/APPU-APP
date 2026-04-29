@@ -53,6 +53,10 @@ object IosUploadProcessor : KoinComponent {
                     println("IosUploadProcessor: Contest draft queued.")
                     return@withContext true
                 }
+                UploadType.STORY -> {
+                    println("IosUploadProcessor: Story upload not yet implemented.")
+                    return@withContext false
+                }
             }
             return@withContext false
         } catch (e: Exception) {

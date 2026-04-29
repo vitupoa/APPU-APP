@@ -86,6 +86,7 @@ class EditProfileViewModel(
                 is NetworkResult.Success -> {
                     _state.value = s.copy(isSaving = false, saveSuccess = true, profile = result.data)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = s.copy(isSaving = false, error = result.message)
                 }
@@ -111,6 +112,7 @@ class EditProfileViewModel(
                         isLoading = false
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = EditProfileState(isLoading = false, error = result.message)
                 }

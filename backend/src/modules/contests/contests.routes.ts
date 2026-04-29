@@ -2,6 +2,8 @@ import { Router, Response } from 'express';
 import { authMiddleware, optionalAuth, adminAuth, AuthRequest } from '../../middleware/auth.js';
 import { ContestService } from './contests.service.js';
 import { z } from 'zod';
+import { richXssProtection, strictXssProtection } from '../../middleware/xssProtection.js';
+import { csrfProtection } from '../../middleware/csrfProtection.js';
 
 const router = Router();
 
@@ -68,7 +70,11 @@ router.get('/', optionalAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/v1/contests
-router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/', 
+  authMiddleware, 
+  csrfProtection,
+  richXssProtection(['title', 'description', 'sponsorName']),
+  async (req: AuthRequest, res: Response) => {
   try {
     const data = createContestSchema.parse(req.body);
     const contest = await ContestService.createContest({
@@ -108,7 +114,7 @@ router.get('/:id', optionalAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/v1/contests/:id/join
-router.post('/:id/join', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/:id/join', authMiddleware, csrfProtection, async (req: AuthRequest, res: Response) => {
   try {
     const result = await ContestService.joinContest(req.userId!, String(req.params.id));
     res.status(200).json(result);
@@ -128,7 +134,10 @@ router.get('/:id/requirements', authMiddleware, async (req: AuthRequest, res: Re
 });
 
 // POST /api/v1/contests/:id/submit
-router.post('/:id/submit', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/:id/submit', 
+  authMiddleware, 
+  csrfProtection,
+  async (req: AuthRequest, res: Response) => {
   try {
     const data = submitEntrySchema.parse(req.body);
     const submission = await ContestService.submitEntry({
@@ -171,7 +180,10 @@ router.get('/submissions/feed', optionalAuth, async (req: AuthRequest, res: Resp
 });
 
 // POST /api/v1/contests/submissions/:submissionId/vote
-router.post('/submissions/:submissionId/vote', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/submissions/:submissionId/vote', 
+  authMiddleware, 
+  csrfProtection,
+  async (req: AuthRequest, res: Response) => {
   try {
     const { voteType } = z.object({ voteType: z.enum(['UPVOTE', 'DOWNVOTE']) }).parse(req.body);
     const result = await ContestService.voteOnSubmission(req.userId!, String(req.params.submissionId), voteType);
@@ -196,7 +208,11 @@ router.get('/:id/leaderboard', async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/v1/contests/:id/distribute — Admin only
-router.post('/:id/distribute', authMiddleware, adminAuth, async (req: AuthRequest, res: Response) => {
+router.post('/:id/distribute', 
+  authMiddleware, 
+  adminAuth, 
+  csrfProtection,
+  async (req: AuthRequest, res: Response) => {
   try {
     const { winnerIds } = distributeSchema.parse(req.body);
     await ContestService.distributeContestPrizes(String(req.params.id), winnerIds);
@@ -217,7 +233,10 @@ const inviteJudgesSchema = z.object({
 });
 
 // POST /api/v1/contests/:id/judges/invite
-router.post('/:id/judges/invite', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/:id/judges/invite', 
+  authMiddleware, 
+  csrfProtection,
+  async (req: AuthRequest, res: Response) => {
   try {
     const { judgeIds } = inviteJudgesSchema.parse(req.body);
     const result = await ContestService.inviteJudges(String(req.params.id), judgeIds);
@@ -242,7 +261,10 @@ router.get('/judge/invitations', authMiddleware, async (req: AuthRequest, res: R
 });
 
 // POST /api/v1/contests/judge/invitations/:inviteId/accept
-router.post('/judge/invitations/:inviteId/accept', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/judge/invitations/:inviteId/accept', 
+  authMiddleware, 
+  csrfProtection,
+  async (req: AuthRequest, res: Response) => {
   try {
     const result = await ContestService.acceptJudgeInvite(String(req.params.inviteId), req.userId!);
     res.status(200).json(result);
@@ -252,7 +274,10 @@ router.post('/judge/invitations/:inviteId/accept', authMiddleware, async (req: A
 });
 
 // POST /api/v1/contests/judge/invitations/:inviteId/decline
-router.post('/judge/invitations/:inviteId/decline', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/judge/invitations/:inviteId/decline', 
+  authMiddleware, 
+  csrfProtection,
+  async (req: AuthRequest, res: Response) => {
   try {
     const result = await ContestService.declineJudgeInvite(String(req.params.inviteId), req.userId!);
     res.status(200).json(result);

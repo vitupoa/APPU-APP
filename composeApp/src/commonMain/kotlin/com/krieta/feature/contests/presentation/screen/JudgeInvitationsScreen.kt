@@ -1,4 +1,7 @@
 package com.krieta.feature.contests.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -10,8 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +28,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.krieta.com.core.util.formatString
 import com.krieta.feature.contests.presentation.viewmodel.JudgeInvitationsViewModel
 
 /**
@@ -205,7 +207,7 @@ private fun JudgeInvitationCard(
                             color = Color(0xFFA0A0A0)
                         )
                         Text(
-                            text = "Prize: Kr.${"%2f".format(contest.prizeKr)}",
+                            text = "Prize: Kr.${formatString("%.2f", contest.prizeKr)}",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFFF5A623)
@@ -259,7 +261,7 @@ private fun JudgeInvitationCard(
                         )
                     } else {
                         Icon(
-                            imageVector = painterResource(Res.drawable.ic_close),
+                            painter = painterResource(Res.drawable.ic_close),
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )
@@ -287,7 +289,7 @@ private fun JudgeInvitationCard(
                         )
                     } else {
                         Icon(
-                            imageVector = painterResource(Res.drawable.ic_check)Circle,
+                            painter = painterResource(Res.drawable.ic_check),
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )
@@ -299,3 +301,4 @@ private fun JudgeInvitationCard(
         }
     }
 }
+

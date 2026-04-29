@@ -1,4 +1,9 @@
 package com.krieta.feature.contests.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -30,8 +35,6 @@ import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedState
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedViewModel
 import org.koin.compose.koinInject
-
-import androidx.compose.material.icons.filled.Add
 
 class ContestFeedScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)

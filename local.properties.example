@@ -1,0 +1,18 @@
+## This file must *NOT* be checked into Version Control Systems,
+# as it contains information specific to your local configuration.
+#
+# Location of the SDK. This is only used by Gradle.
+# For customization when using a Version Control System, please read the
+# header note.
+
+sdk.dir=/path/to/your/Android/Sdk
+
+RAILWAY_BASE_URL=your-backend-url.railway.app
+GOOGLE_CLIENT_ID=your_google_client_id_here
+APPLE_CLIENT_ID=your_apple_client_id_here
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_UPLOAD_PRESET=your_upload_preset
+
+# Transaction Signing Secret - MUST match backend TRANSACTION_SIGNING_SECRET
+# Get this from your backend .env file
+TRANSACTION_SIGNING_SECRET=your-secret-key-here

@@ -2,6 +2,7 @@ package com.krieta.feature.contests.presentation.screen.wizard
 
 import androidx.compose.runtime.Composable
 import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
 
 /**
  * Platform-specific date/time picker interface
@@ -12,6 +13,7 @@ import kotlinx.datetime.Instant
  * 
  * Requirements: 2.4, 2.5
  */
+@OptIn(ExperimentalTime::class)
 @Composable
 expect fun DateTimePicker(
     currentDate: Instant?,

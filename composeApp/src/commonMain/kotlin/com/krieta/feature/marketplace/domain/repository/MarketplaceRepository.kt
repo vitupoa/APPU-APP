@@ -1,6 +1,8 @@
 package com.krieta.feature.marketplace.domain.repository
 
 import com.krieta.com.core.network.NetworkResult
+import com.krieta.feature.marketplace.data.remote.ConnectedAccountsResponse
+import com.krieta.feature.marketplace.data.remote.OAuthUrlResponse
 import com.krieta.feature.marketplace.domain.model.*
 
 interface MarketplaceRepository {
@@ -70,4 +72,9 @@ interface MarketplaceRepository {
     suspend fun getGamificationStats(): NetworkResult<GamificationStats>
     
     suspend fun getCampaignROI(campaignId: String): NetworkResult<ROIMetrics>
+    
+    suspend fun getOAuthUrl(platform: String): NetworkResult<OAuthUrlResponse>
+    suspend fun handleOAuthCallback(platform: String, code: String, state: String): NetworkResult<Unit>
+    suspend fun getConnectedAccounts(): NetworkResult<ConnectedAccountsResponse>
+    suspend fun disconnectAccount(platform: String): NetworkResult<Unit>
 }

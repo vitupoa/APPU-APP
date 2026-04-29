@@ -1,5 +1,5 @@
 package com.krieta.feature.shop.presentation.viewmodel
-
+import com.krieta.com.core.util.SafeConversion
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
@@ -51,7 +51,7 @@ class CreateListingViewModel(
                     is NetworkResult.Error -> {
                         _state.value = _state.value.copy(isSaving = false, error = "Failed to upload image: ${result.message}")
                     }
-                    else -> {}
+                    is NetworkResult.Loading -> {}
                 }
             }
         }
@@ -71,7 +71,7 @@ class CreateListingViewModel(
             _state.value = s.copy(error = "Title, at least 1 image, price, and WhatsApp number are required")
             return
         }
-        val price = s.priceKr.toDoubleOrNull()
+        val price = if (s.priceKr.isNotEmpty()) SafeConversion.toDoubleOrDefaultWithValidation(s.priceKr, "productPrice", 0.0, defaultValue = 0.0) else null
         if (price == null || price <= 0) {
             _state.value = s.copy(error = "Invalid price")
             return

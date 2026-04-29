@@ -1,4 +1,6 @@
 package com.krieta.feature.contests.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -30,7 +32,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -384,7 +385,7 @@ fun ErrorMessageCard(
                 modifier = Modifier.size(24.dp)
             ) {
                 Icon(
-                    imageVector = painterResource(Res.drawable.ic_close),
+                    painter = painterResource(Res.drawable.ic_close),
                     contentDescription = "Dismiss error",
                     tint = Color(0xFFFF3B30)
                 )
@@ -392,3 +393,4 @@ fun ErrorMessageCard(
         }
     }
 }
+

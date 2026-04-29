@@ -11,11 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitView
 import com.krieta.com.core.theme.KrietaColors
-import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.*
 import platform.AVFoundation.*
 import platform.AVKit.AVPlayerViewController
-import platform.Foundation.NSURL
+import platform.CoreMedia.*
+import platform.Foundation.*
 import platform.UIKit.UIView
+import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
@@ -23,17 +25,32 @@ actual fun VideoPlayer(
     url: String,
     isPlaying: Boolean,
     modifier: Modifier,
-    onPlaybackStateChanged: (Boolean) -> Unit
+    onPlaybackStateChanged: (Boolean) -> Unit,
+    onProgressUpdate: (currentPosition: Long, duration: Long) -> Unit,
+    seekToPosition: Long?
 ) {
     var isBuffering by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
     
     val player = remember(url) {
         AVPlayer(uRL = NSURL.URLWithString(url)!!).apply {
+            // Loop video
             actionAtItemEnd = AVPlayerActionAtItemEndNone
+            
+            // Observe when video ends to loop
+            NSNotificationCenter.defaultCenter.addObserverForName(
+                name = AVPlayerItemDidPlayToEndTimeNotification,
+                `object` = currentItem,
+                queue = null
+            ) { _ ->
+                seekToTime(kCMTimeZero.readValue())
+                if (isPlaying) play()
+            }
         }
     }
 
+    // Handle play/pause
     LaunchedEffect(isPlaying) {
         if (!hasError) {
             if (isPlaying) {
@@ -46,43 +63,92 @@ actual fun VideoPlayer(
         }
     }
     
+    // Handle seek
+    LaunchedEffect(seekToPosition) {
+        seekToPosition?.let { position ->
+            val time = CMTimeMakeWithSeconds(position.toDouble() / 1000.0, 600)
+            player.seekToTime(time.readValue(), toleranceBefore = kCMTimeZero.readValue(), toleranceAfter = kCMTimeZero.readValue())
+        }
+    }
+    
+    // Reset state on URL change
     LaunchedEffect(url) {
         hasError = false
+        errorMessage = ""
         isBuffering = true
     }
 
     DisposableEffect(url) {
-        val statusObserver = player.currentItem?.addObserver(
+        // Observe player item status
+        val statusObserver = object : NSObject() {
+            @Suppress("UNUSED_PARAMETER")
+            fun observeValueForKeyPath(
+                keyPath: String?,
+                ofObject: Any?,
+                change: Map<Any?, *>?,
+                context: COpaquePointer?
+            ) {
+                if (keyPath == "status") {
+                    val status = player.currentItem?.status ?: AVPlayerItemStatusUnknown
+                    when (status) {
+                        AVPlayerItemStatusReadyToPlay -> {
+                            isBuffering = false
+                            hasError = false
+                        }
+                        AVPlayerItemStatusFailed -> {
+                            isBuffering = false
+                            hasError = true
+                            errorMessage = player.currentItem?.error?.localizedDescription ?: "Unknown error"
+                            println("AVPlayer Error: $errorMessage")
+                        }
+                        else -> {
+                            isBuffering = true
+                        }
+                    }
+                }
+            }
+        }
+        
+        player.currentItem?.addObserver(
+            statusObserver,
             forKeyPath = "status",
-            options = 0u,
+            options = NSKeyValueObservingOptionNew,
             context = null
         )
         
-        val observer = player.addPeriodicTimeObserverForInterval(
-            interval = CMTimeMake(1, 1),
+        // Periodic time observer for progress updates
+        val timeObserver = player.addPeriodicTimeObserverForInterval(
+            interval = CMTimeMakeWithSeconds(0.1, 600), // Update every 100ms
             queue = null
-        ) { _ ->
-            val status = player.currentItem?.status ?: AVPlayerItemStatusUnknown
-            when (status) {
-                AVPlayerItemStatusReadyToPlay -> {
-                    isBuffering = false
-                    hasError = false
-                }
-                AVPlayerItemStatusFailed -> {
-                    isBuffering = false
-                    hasError = true
-                }
-                else -> {
-                    isBuffering = true
-                }
+        ) { time ->
+            // Update playback state
+            onPlaybackStateChanged(player.rate > 0.0)
+            
+            // Update progress
+            val currentSeconds = CMTimeGetSeconds(time)
+            val currentMs = if (currentSeconds.isFinite()) {
+                (currentSeconds * 1000).toLong()
+            } else {
+                0L
             }
-            onPlaybackStateChanged(player.rate > 0)
+            
+            val duration = player.currentItem?.duration
+            val durationSeconds = duration?.let { CMTimeGetSeconds(it) } ?: 0.0
+            val durationMs = if (durationSeconds.isFinite()) {
+                (durationSeconds * 1000).toLong()
+            } else {
+                0L
+            }
+            
+            onProgressUpdate(currentMs, durationMs)
         }
         
         onDispose {
             platform.UIKit.UIApplication.sharedApplication.idleTimerDisabled = false
-            player.removeTimeObserver(observer)
+            player.currentItem?.removeObserver(statusObserver, forKeyPath = "status")
+            player.removeTimeObserver(timeObserver)
             player.pause()
+            player.replaceCurrentItemWithPlayerItem(null)
         }
     }
 
@@ -92,9 +158,16 @@ actual fun VideoPlayer(
                 val playerViewController = AVPlayerViewController()
                 playerViewController.player = player
                 playerViewController.showsPlaybackControls = false
+                playerViewController.videoGravity = AVLayerVideoGravityResizeAspectFill
+                playerViewController.view.apply {
+                    backgroundColor = platform.UIKit.UIColor.blackColor
+                }
                 playerViewController.view
             },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            update = { view ->
+                // Update player if needed
+            }
         )
         
         // Buffering indicator
@@ -105,7 +178,7 @@ actual fun VideoPlayer(
                     .background(Color.Black.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = KrietaColors.primary)
+                CircularProgressIndicator(color = KrietaColors.Primary)
             }
         }
         

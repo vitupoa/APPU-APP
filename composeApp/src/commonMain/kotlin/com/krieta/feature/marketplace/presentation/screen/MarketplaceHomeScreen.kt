@@ -1,4 +1,9 @@
 package com.krieta.feature.marketplace.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -37,7 +42,7 @@ class MarketplaceHomeScreen : Screen {
                         IconButton(onClick = { 
                             navigator.push(GamificationScreenNav())
                         }) {
-                            Icon(Icons.Default.EmojiEvents, "Gamification")
+                            Icon(painterResource(Res.drawable.ic_emoji_events), "Gamification")
                         }
                     }
                 )

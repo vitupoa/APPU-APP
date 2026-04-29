@@ -80,6 +80,7 @@ class ShopListViewModel(
                         isLoading = false
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isLoading = false, error = result.message)
                 }

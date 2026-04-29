@@ -21,23 +21,23 @@ data class BioLinkDto(
 
 @Serializable
 data class UserProfileDto(
-    val id: String,
-    val username: String,
-    val firstName: String,
-    val lastName: String,
-    val displayName: String,
+    val id: String? = null,
+    val username: String? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val displayName: String? = null,
     val avatarUrl: String? = null,
     val coverPhotoUrl: String? = null,
     val bio: String? = null,
-    val country: String,
-    val currency: String,
-    val accountType: String,
+    val country: String? = null,
+    val currency: String? = null,
+    val accountType: String? = null,
     val isVerified: Boolean = false,
     val isWalletUnlocked: Boolean = false,
     val bioLinks: List<BioLinkDto> = emptyList(),
     val stats: ProfileStatsDto = ProfileStatsDto(),
     val relationshipStatus: String = "NONE",
-    val createdAt: String
+    val createdAt: String? = null
 )
 
 @Serializable

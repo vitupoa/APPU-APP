@@ -1,12 +1,13 @@
 package com.krieta.feature.profile.presentation.screen
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,12 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -45,6 +40,7 @@ import com.krieta.feature.wallet.presentation.screen.WalletScreen
 import com.krieta.com.core.theme.KrietaColors
 import androidx.compose.ui.platform.LocalUriHandler
 import com.krieta.feature.auth.presentation.screen.LoginScreen
+import androidx.compose.foundation.BorderStroke
 
 class ProfileScreen(val userId: String? = null) : Screen {
     override val key: cafe.adriel.voyager.core.screen.ScreenKey = "ProfileScreen_${userId ?: "me"}"
@@ -456,7 +452,7 @@ private fun BioLinkBottomSheet(
                             }
                         } else {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.List, // Placeholder for external link icon
+                                painter = painterResource(Res.drawable.ic_list),
                                 contentDescription = "Visit",
                                 tint = KrietaColors.OnSurfaceVariant,
                                 modifier = Modifier.size(20.dp)

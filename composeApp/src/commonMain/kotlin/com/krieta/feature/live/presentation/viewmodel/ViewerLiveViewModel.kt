@@ -2,6 +2,8 @@ package com.krieta.feature.live.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.krieta.feature.live.data.socket.LiveSocketEvent
+import com.krieta.feature.live.data.socket.LiveSocketManager
 import com.krieta.feature.live.domain.model.LiveMessage
 import com.krieta.feature.live.domain.model.LiveStream
 import com.krieta.feature.live.domain.repository.LiveRepository
@@ -18,12 +20,20 @@ data class ViewerLiveState(
     val viewerCount: Int = 0,
     val likesCount: Int = 0,
     val currentGiftGoal: Double = 0.0,
+    val showTipAnimation: Boolean = false,
+    val lastTipAmount: Double = 0.0,
+    val lastTipSender: String = "",
     val error: String? = null
 )
 
 class ViewerLiveViewModel(
     private val liveRepository: LiveRepository,
-    private val streamId: String
+    private val socketManager: LiveSocketManager,
+    private val streamId: String,
+    private val authToken: String,
+    private val currentUserId: String,
+    private val currentUsername: String,
+    private val currentUserAvatar: String?
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ViewerLiveState())
@@ -32,6 +42,7 @@ class ViewerLiveViewModel(
     init {
         loadStreamDetails()
         connectToSocket()
+        observeSocketEvents()
     }
 
     private fun loadStreamDetails() {
@@ -55,41 +66,96 @@ class ViewerLiveViewModel(
     }
 
     private fun connectToSocket() {
-        // TODO: Implement actual Socket.io connection here.
-        // Listen to:
-        // - live:new_message -> add to messages list
-        // - live:viewer_joined -> update viewerCount
-        // - live:viewer_left -> update viewerCount
-        // - live:like_burst -> update likesCount
-        // - live:tip_received -> show animation, update gift goal
+        viewModelScope.launch {
+            socketManager.connect(streamId, authToken)
+        }
+    }
+
+    private fun observeSocketEvents() {
+        viewModelScope.launch {
+            socketManager.events.collect { event ->
+                when (event) {
+                    is LiveSocketEvent.Connected -> {
+                        // Connection successful
+                    }
+                    is LiveSocketEvent.MessageReceived -> {
+                        val message = LiveMessage(
+                            id = event.message.id,
+                            streamId = streamId,
+                            userId = event.message.userId,
+                            text = event.message.text,
+                            isSystem = event.message.isSystem,
+                            isPinned = event.message.isPinned
+                        )
+                        _state.update { it.copy(messages = it.messages + message) }
+                    }
+                    is LiveSocketEvent.ViewerUpdate -> {
+                        _state.update { it.copy(viewerCount = event.data.viewerCount) }
+                    }
+                    is LiveSocketEvent.TipReceived -> {
+                        _state.update { 
+                            it.copy(
+                                currentGiftGoal = it.currentGiftGoal + event.tip.amountKr,
+                                showTipAnimation = true,
+                                lastTipAmount = event.tip.amountKr,
+                                lastTipSender = event.tip.senderName
+                            )
+                        }
+                        // Hide animation after 3 seconds
+                        viewModelScope.launch {
+                            kotlinx.coroutines.delay(3000)
+                            _state.update { it.copy(showTipAnimation = false) }
+                        }
+                    }
+                    is LiveSocketEvent.LikeReceived -> {
+                        _state.update { it.copy(likesCount = it.likesCount + event.like.count) }
+                    }
+                    is LiveSocketEvent.StreamEnded -> {
+                        _state.update { it.copy(error = "Stream has ended") }
+                    }
+                    is LiveSocketEvent.Disconnected -> {
+                        _state.update { it.copy(error = "Disconnected: ${event.reason}") }
+                    }
+                    is LiveSocketEvent.Error -> {
+                        _state.update { it.copy(error = event.message) }
+                    }
+                }
+            }
+        }
     }
 
     fun sendMessage(text: String) {
-        // TODO: Emit live:message via socket
         viewModelScope.launch {
-            val newMessage = LiveMessage(
-                id = "temp_${System.currentTimeMillis()}",
-                streamId = streamId,
-                userId = "currentUserId", // Provide from auth state
-                text = text,
-                isSystem = false,
-                isPinned = false
-            )
-            _state.update { it.copy(messages = it.messages + newMessage) }
+            socketManager.sendMessage(text, currentUserId, currentUsername, currentUserAvatar)
         }
     }
 
     fun sendLike() {
-        // TODO: Emit live:like via socket
-        _state.update { it.copy(likesCount = it.likesCount + 1) }
+        viewModelScope.launch {
+            socketManager.sendLike(currentUserId, currentUsername)
+            _state.update { it.copy(likesCount = it.likesCount + 1) }
+        }
     }
 
-    fun sendTip(amountKr: Double) {
-        // TODO: Emit live:tip via socket
+    fun sendTip(amountKr: Double, message: String?, giftType: String?) {
+        viewModelScope.launch {
+            val stream = _state.value.stream ?: return@launch
+            socketManager.sendTip(
+                senderId = currentUserId,
+                senderName = currentUsername,
+                senderAvatar = currentUserAvatar,
+                recipientId = stream.hostId,
+                amountKr = amountKr,
+                message = message,
+                giftType = giftType
+            )
+        }
     }
 
     override fun onCleared() {
         super.onCleared()
-        // TODO: Disconnect socket
+        viewModelScope.launch {
+            socketManager.disconnect()
+        }
     }
 }

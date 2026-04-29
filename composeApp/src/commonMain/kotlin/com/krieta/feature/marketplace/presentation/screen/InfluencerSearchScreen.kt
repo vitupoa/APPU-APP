@@ -1,4 +1,9 @@
 package com.krieta.feature.marketplace.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -44,7 +49,7 @@ fun InfluencerSearchScreen(
                 title = { Text("Find Creators") },
                 actions = {
                     IconButton(onClick = { showFilters = !showFilters }) {
-                        Icon(Icons.Default.FilterList, "Filters")
+                        Icon(painterResource(Res.drawable.ic_filter_list), "Filters")
                     }
                 }
             )
@@ -186,7 +191,7 @@ fun InfluencerCard(
                         Text(influencer.username, style = MaterialTheme.typography.titleMedium)
                         if (influencer.isVerified) {
                             Icon(
-                                Icons.Default.Verified,
+                                painterResource(Res.drawable.ic_verified),
                                 "Verified",
                                 Modifier.size(16.dp).padding(start = 4.dp),
                                 tint = MaterialTheme.colorScheme.primary

@@ -1,5 +1,5 @@
 package com.krieta.feature.profile.presentation.viewmodel
-
+import com.krieta.com.core.util.SafeConversion
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
@@ -68,7 +68,7 @@ class SubscriptionTierSetupViewModel(
                     SubscriptionTier(
                         id = "",
                         tier = it.tier,
-                        krAmount = it.krAmount.toDoubleOrNull() ?: 0.0,
+                        krAmount = SafeConversion.toDoubleOrDefaultWithValidation(it.krAmount, "subscriptionAmount", 0.0, defaultValue = 0.0),
                         benefits = it.benefits,
                         isEnabled = it.isEnabled
                     )

@@ -1,4 +1,9 @@
 package com.krieta.feature.live.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -11,10 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -89,7 +90,7 @@ class ViewerLiveScreen(private val streamId: String) : Screen {
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = painterResource(Res.drawable.ic_add),
+                                painter = painterResource(Res.drawable.ic_add),
                                 contentDescription = "Admire",
                                 tint = Color.Black,
                                 modifier = Modifier.size(10.dp)
@@ -117,7 +118,7 @@ class ViewerLiveScreen(private val streamId: String) : Screen {
                 // Close Button
                 IconButton(onClick = { navigator.pop() }) {
                     Icon(
-                        imageVector = painterResource(Res.drawable.ic_close),
+                        painter = painterResource(Res.drawable.ic_close),
                         contentDescription = "Close",
                         tint = Color.White,
                         modifier = Modifier
@@ -210,9 +211,7 @@ class ViewerLiveScreen(private val streamId: String) : Screen {
                             unfocusedContainerColor = Color.Black.copy(alpha = 0.4f),
                             focusedContainerColor = Color.Black.copy(alpha = 0.6f),
                             unfocusedIndicatorColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedTextColor = Color.White,
-                            focusedTextColor = Color.White
+                            focusedIndicatorColor = Color.Transparent
                         ),
                         trailingIcon = {
                             IconButton(onClick = {
@@ -230,7 +229,7 @@ class ViewerLiveScreen(private val streamId: String) : Screen {
 
                     // Gift Button
                     IconButton(
-                        onClick = { viewModel.sendTip(10.0) },
+                        onClick = { viewModel.sendTip(10.0, null, null) },
                         modifier = Modifier
                             .background(Color(0xFFFF1493), CircleShape)
                             .size(48.dp)

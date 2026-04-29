@@ -1,4 +1,9 @@
 package com.krieta.feature.chama.presentation.defaulters
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+import cafe.adriel.voyager.koin.koinScreenModel
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -8,8 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 
-import androidx.compose.material.painterResource(Res.drawable.ic_arrow_back)
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +31,14 @@ class DefaultersListScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val viewModel = koinScreenModel<DefaultersViewModel>()
+        val state by viewModel.state.collectAsState()
+
+        LaunchedEffect(state.error) {
+            state.error?.let {
+                viewModel.clearError()
+            }
+        }
 
         Scaffold(
             topBar = {
@@ -35,7 +46,12 @@ class DefaultersListScreen : Screen {
                     title = { Text("List of Shame") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { viewModel.refresh() }) {
+                            Icon(Icons.Filled.Refresh, "Refresh")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -44,76 +60,86 @@ class DefaultersListScreen : Screen {
                 )
             }
         ) { padding ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = KrietaColors.Error.copy(alpha = 0.1f)
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = KrietaColors.Error
+            if (state.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = KrietaColors.Error.copy(alpha = 0.1f)
                             )
-                            Column {
-                                Text(
-                                    "Public Defaulter Registry",
-                                    fontWeight = FontWeight.Bold,
-                                    color = KrietaColors.Error
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(painterResource(Res.drawable.ic_warning),
+                                    contentDescription = null,
+                                    tint = KrietaColors.Error
                                 )
-                                Text(
-                                    "Members who failed to meet their Chama obligations",
-                                    fontSize = 12.sp,
-                                    color = KrietaColors.OnSurfaceVariant
-                                )
+                                Column {
+                                    Text(
+                                        "Public Defaulter Registry",
+                                        fontWeight = FontWeight.Bold,
+                                        color = KrietaColors.Error
+                                    )
+                                    Text(
+                                        "Members who failed to meet their Chama obligations",
+                                        fontSize = 12.sp,
+                                        color = KrietaColors.OnSurfaceVariant
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                // TODO: Load actual defaulters from API
-                items(emptyList<String>()) { defaulter ->
-                    DefaulterCard(defaulter)
-                }
-
-                item {
-                    if (true) { // Empty state
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 48.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    "🎉",
-                                    fontSize = 48.sp
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    "No defaulters found!",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    "All members are in good standing",
-                                    fontSize = 14.sp,
-                                    color = KrietaColors.OnSurfaceVariant
-                                )
+                    if (state.defaulters.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        "🎉",
+                                        fontSize = 48.sp
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        "No defaulters found!",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        "All members are in good standing",
+                                        fontSize = 14.sp,
+                                        color = KrietaColors.OnSurfaceVariant
+                                    )
+                                }
                             }
+                        }
+                    } else {
+                        items(state.defaulters) { defaulter ->
+                            DefaulterCard(
+                                defaulter = defaulter,
+                                onResolve = { viewModel.resolveDefault(defaulter.id) }
+                            )
                         }
                     }
                 }
@@ -123,7 +149,12 @@ class DefaultersListScreen : Screen {
 }
 
 @Composable
-private fun DefaulterCard(defaulter: String) {
+private fun DefaulterCard(
+    defaulter: com.krieta.feature.chama.data.remote.dto.ChamaDefaulterDto,
+    onResolve: () -> Unit
+) {
+    var showResolveDialog by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -137,7 +168,6 @@ private fun DefaulterCard(defaulter: String) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Avatar placeholder
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -146,25 +176,65 @@ private fun DefaulterCard(defaulter: String) {
             )
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("User Name", fontWeight = FontWeight.Bold)
+                Text(defaulter.user?.displayName ?: "Unknown User", fontWeight = FontWeight.Bold)
                 Text(
-                    "Chama Name",
+                    defaulter.chamaName,
                     fontSize = 12.sp,
                     color = KrietaColors.OnSurfaceVariant
                 )
                 Text(
-                    "Owes: 1000 Kr",
+                    "Owes: ${defaulter.amountOwedKr} Kr",
                     fontSize = 14.sp,
                     color = KrietaColors.Error,
                     fontWeight = FontWeight.Bold
                 )
+                if (defaulter.fineAmountKr.toDoubleOrNull() ?: 0.0 > 0) {
+                    Text(
+                        "Fine: ${defaulter.fineAmountKr} Kr",
+                        fontSize = 12.sp,
+                        color = KrietaColors.Error
+                    )
+                }
             }
 
-            Icon(
-                Icons.Default.Warning,
-                contentDescription = null,
-                tint = KrietaColors.Error
-            )
+            if (!defaulter.isResolved) {
+                IconButton(onClick = { showResolveDialog = true }) {
+                    Icon(
+                        painterResource(Res.drawable.ic_check),
+                        contentDescription = "Resolve",
+                        tint = KrietaColors.Primary
+                    )
+                }
+            } else {
+                Icon(
+                    painterResource(Res.drawable.ic_check),
+                    contentDescription = "Resolved",
+                    tint = KrietaColors.Success
+                )
+            }
         }
+    }
+
+    if (showResolveDialog) {
+        AlertDialog(
+            onDismissRequest = { showResolveDialog = false },
+            title = { Text("Resolve Default") },
+            text = { Text("Mark this default as resolved? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onResolve()
+                        showResolveDialog = false
+                    }
+                ) {
+                    Text("Resolve")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResolveDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.krieta.com.core.theme.KrietaColors
 import com.krieta.com.core.util.KrCurrencyFormatter
+import com.krieta.com.core.util.SafeConversion
 
 /**
  * Input field for entering amounts in the user's local fiat currency with
@@ -42,7 +43,13 @@ fun KrAmountInput(
     var inputText by remember { mutableStateOf("") }
 
     val fiatAmount by remember(inputText) {
-        derivedStateOf { inputText.toDoubleOrNull() ?: 0.0 }
+        derivedStateOf { 
+            SafeConversion.toDoubleOrDefault(
+                value = inputText.ifEmpty { "0" },
+                fieldName = "fiatAmount",
+                defaultValue = 0.0
+            )
+        }
     }
 
     val krAmount by remember(fiatAmount, exchangeRate) {

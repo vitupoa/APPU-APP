@@ -1,5 +1,7 @@
 package com.krieta.feature.wallet.presentation.screen
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
@@ -12,12 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -56,10 +52,18 @@ class WalletScreen : Screen {
         
         var isBalanceHidden by remember { mutableStateOf(false) }
         
-        // Use LocationProvider for real country detection (SIM-based)
         val countryCode = remember { locationProvider.getCurrentCountry() }
         LaunchedEffect(countryCode) {
+            currencyProvider.start()
+            kotlinx.coroutines.delay(500)
             viewModel.fetchWalletData(countryCode)
+        }
+        
+        LaunchedEffect(exchangeRate) {
+            if (exchangeRate != null) {
+                kotlinx.coroutines.delay(500)
+                viewModel.fetchWalletData(countryCode)
+            }
         }
 
         Scaffold(
@@ -123,8 +127,7 @@ class WalletScreen : Screen {
                                                 onClick = { isBalanceHidden = !isBalanceHidden },
                                                 modifier = Modifier.size(24.dp)
                                             ) {
-                                                Icon(
-                                                    imageVector = if (isBalanceHidden) painterResource(Res.drawable.ic_visibility_off) else painterResource(Res.drawable.ic_visibility),
+                                                Icon(painter = if (isBalanceHidden) painterResource(Res.drawable.ic_visibility_off) else painterResource(Res.drawable.ic_visibility),
                                                     contentDescription = "Toggle Balance",
                                                     tint = Color.White.copy(alpha = 0.6f)
                                                 )
@@ -164,7 +167,7 @@ class WalletScreen : Screen {
                                                 onClick = { navigator.push(TopupScreen()) }
                                             )
                                             WalletActionButton(
-                                                icon = Icons.Default.ArrowDownward, 
+                                                icon = painterResource(Res.drawable.ic_arrow_downward), 
                                                 label = "Withdraw", 
                                                 onClick = { navigator.push(WithdrawScreen()) }
                                             )
@@ -206,7 +209,7 @@ class WalletScreen : Screen {
 
     @Composable
     private fun WalletActionButton(
-        icon: androidx.compose.ui.graphics.vector.ImageVector,
+        icon: androidx.compose.ui.graphics.painter.Painter,
         label: String,
         onClick: () -> Unit
     ) {
@@ -221,7 +224,7 @@ class WalletScreen : Screen {
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                 Icon(imageVector = icon, contentDescription = label, tint = Color.White)
+                 Icon(painter = icon, contentDescription = label, tint = Color.White)
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(label, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.8f))
@@ -255,7 +258,7 @@ class WalletScreen : Screen {
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = if (isPositive) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                    painter = if (isPositive) painterResource(Res.drawable.ic_arrow_downward) else painterResource(Res.drawable.ic_arrow_upward),
                     contentDescription = null,
                     tint = if (isPositive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                 )
@@ -295,3 +298,4 @@ class WalletScreen : Screen {
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     }
 }
+

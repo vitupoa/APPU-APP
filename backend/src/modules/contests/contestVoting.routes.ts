@@ -1,64 +1,56 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../../config/database.js';
-import { rateLimit } from 'express-rate-limit';
 import { z } from 'zod';
 import { validateRequest } from '../../middleware/validate.js';
-// import { authenticate } from '../../middleware/auth.js'; // Ensure you have authentication logic securely checking token headers
+import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
+import { votingRateLimiter } from '../../middleware/rateLimiter.js';
+import { csrfProtection } from '../../middleware/csrfProtection.js';
 
 const router = Router();
 
 /**
- * ClickBot Anti-Spam Middleware
- * Strictly limits voting attempts mitigating explicit spam algorithms.
- */
-const voteThrottler = rateLimit({
-    windowMs: 5 * 60 * 1000, // 5 minutes
-    max: 10, // Limit each IP or Device Token strictly to 10 votes per 5 minutes guaranteeing humans
-    message: { error: 'Too many voting attempts across this network. Please try again later.' },
-    standardHeaders: true,
-    legacyHeaders: false
-});
-
-/**
- * Zod Mapping explicitly catching biometric or explicit payment parameters structurally.
+ * Zod schema for vote validation with required fingerprint and IP tracking
  */
 const VoteSchema = z.object({
     submissionId: z.string().uuid(),
-    fingerprint: z.string().optional() // Optional mobile device footprint natively verifying uniqueness natively
+    fingerprint: z.string().min(1, 'Device fingerprint is required')
 });
 
 /**
  * POST /contests/vote
  * Gamified Swiper Action - Integrates the Tinder logic natively securely bypassing sweepstakes by ensuring FREE entries safely.
  */
-router.post('/vote', voteThrottler, validateRequest(VoteSchema), async (req: Request, res: Response): Promise<void> => {
+router.post('/vote', 
+  authMiddleware, 
+  csrfProtection,
+  votingRateLimiter, 
+  validateRequest(VoteSchema), 
+  async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { submissionId, fingerprint } = req.body;
-        
-        // In reality you would extract the `userId` cleanly out of the JWT Authentication middleware explicitly!
-        // const voterId = req.user.id; 
-        const voterId = 'TEMPORARY_STUB_REPLACE_WITH_JWT'; 
-
+        const voterId = req.userId!;
         const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
 
-        // 1. Verify if user already voted on this exact submission to prevent bot inflation entirely natively.
-        const existingVote = await prisma.contestVote.findUnique({
+        // 1. Check for duplicate votes by IP or fingerprint to prevent bot abuse
+        const duplicateVote = await prisma.contestVote.findFirst({
             where: {
-                submissionId_voterId: {
-                    submissionId,
-                    voterId,
-                }
+                submissionId,
+                OR: [
+                    { voterId },
+                    { ipAddress },
+                    { fingerprint }
+                ]
             }
         });
 
-        if (existingVote) {
-             res.status(403).json({ error: 'You have already voted on this specific submission.' });
+        if (duplicateVote) {
+             res.status(403).json({ error: 'Duplicate vote detected. You have already voted on this submission.' });
              return;
         }
 
-        // 2. Transact safely natively mapping constraints implicitly without inflating cash
+        // 2. Register vote with required IP and fingerprint tracking
         await prisma.$transaction(async (tx: any) => {
-            // Log vote safely preventing clickbots natively
+            // Log vote with required tracking fields
             await tx.contestVote.create({
                 data: {
                     submissionId,
@@ -79,11 +71,11 @@ router.post('/vote', voteThrottler, validateRequest(VoteSchema), async (req: Req
             });
         });
 
-        res.status(200).json({ success: true, message: "Vote registered successfully natively!" });
+        res.status(200).json({ success: true, message: "Vote registered successfully" });
 
     } catch (e: any) {
         console.error('[Voting Service] Error:', e);
-        res.status(500).json({ error: 'Internal Gamification Service Error' });
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 

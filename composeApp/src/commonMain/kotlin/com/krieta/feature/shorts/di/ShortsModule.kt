@@ -9,6 +9,6 @@ import org.koin.dsl.module
 val shortsModule = module {
     single { ShortsApi(get()) }
     single<ShortsRepository> { ShortsRepositoryImpl(get()) }
-    factory { ShortsViewModel(get(), get()) }
+    factory { ShortsViewModel(get(), get(), get()) }  // shortsRepository, feedRepository, sponsoredManager
     factory { com.krieta.feature.shorts.presentation.viewmodel.CreateShortViewModel(get(), get()) }
 }

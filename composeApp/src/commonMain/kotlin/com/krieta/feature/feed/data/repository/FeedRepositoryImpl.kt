@@ -2,16 +2,24 @@ package com.krieta.feature.feed.data.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.safeApiCall
+import com.krieta.com.core.util.currentTimeMillis
 import com.krieta.feature.feed.data.remote.FeedApi
 import com.krieta.feature.feed.data.remote.dto.PostDto
 import com.krieta.feature.feed.domain.model.Post
 import com.krieta.feature.feed.domain.model.PostCreator
 import com.krieta.feature.feed.domain.repository.FeedRepository
 import com.krieta.feature.feed.domain.repository.FeedResult
+import com.krieta.feature.feed.domain.repository.DiscoverFeedResult
+import com.krieta.feature.feed.presentation.viewmodel.ContentItem
+import com.krieta.feature.feed.presentation.viewmodel.FeedComposition
 
 class FeedRepositoryImpl(
     private val api: FeedApi
 ) : FeedRepository {
+
+    // Client-side cache for feeds (5 minutes TTL)
+    private val feedCache = mutableMapOf<String, Pair<DiscoverFeedResult, Long>>()
+    private val CACHE_DURATION = 5 * 60 * 1000L // 5 minutes
 
     override suspend fun getFeed(cursor: String?): NetworkResult<FeedResult> {
         return safeApiCall {
@@ -42,6 +50,86 @@ class FeedRepositoryImpl(
         return safeApiCall { api.createPost(caption, imageUrls); Unit }
     }
 
+    // Recommendation system methods
+    override suspend fun getDiscoverFeed(limit: Int, cursor: String?): NetworkResult<DiscoverFeedResult> {
+        // Check client-side cache
+        val cacheKey = "discover_${limit}_${cursor ?: "initial"}"
+        val cached = feedCache[cacheKey]
+        
+        if (cached != null && currentTimeMillis() - cached.second < CACHE_DURATION) {
+            return NetworkResult.Success(cached.first)
+        }
+        
+        return safeApiCall {
+            val response = api.getDiscoverFeed(limit, cursor)
+            val result = DiscoverFeedResult(
+                content = response.content.map { it.toContentItem() },
+                nextCursor = response.nextCursor,
+                composition = FeedComposition(
+                    personalized = response.composition.personalized,
+                    admiring = response.composition.admiring,
+                    trending = response.composition.trending,
+                    discovery = response.composition.discovery
+                )
+            )
+            // Cache the result
+            feedCache[cacheKey] = result to currentTimeMillis()
+            result
+        }
+    }
+
+    override suspend fun getAdmiringFeed(limit: Int, cursor: String?): NetworkResult<DiscoverFeedResult> {
+        // Check client-side cache
+        val cacheKey = "admiring_${limit}_${cursor ?: "initial"}"
+        val cached = feedCache[cacheKey]
+        
+        if (cached != null && currentTimeMillis() - cached.second < CACHE_DURATION) {
+            return NetworkResult.Success(cached.first)
+        }
+        
+        return safeApiCall {
+            val response = api.getAdmiringFeed(limit, cursor)
+            val result = DiscoverFeedResult(
+                content = response.content.map { it.toContentItem() },
+                nextCursor = response.nextCursor,
+                composition = FeedComposition(
+                    personalized = 0,
+                    admiring = response.content.size,
+                    trending = 0,
+                    discovery = 0
+                )
+            )
+            // Cache the result
+            feedCache[cacheKey] = result to currentTimeMillis()
+            result
+        }
+    }
+
+    override suspend fun trackInteraction(
+        contentId: String,
+        contentType: String,
+        signalType: String,
+        watchDuration: Long,
+        totalDuration: Long
+    ): NetworkResult<Unit> {
+        return safeApiCall {
+            api.trackInteraction(
+                contentId = contentId,
+                contentType = contentType,
+                signalType = signalType,
+                watchDuration = watchDuration,
+                totalDuration = totalDuration
+            )
+            
+            // Invalidate cache on interaction to get fresh recommendations
+            if (signalType in listOf("LIKE", "UNLIKE", "SHARE", "COMMENT")) {
+                feedCache.clear()
+            }
+            
+            Unit
+        }
+    }
+
     private fun PostDto.toDomain() = Post(
         id = id,
         creator = PostCreator(
@@ -61,4 +149,28 @@ class FeedRepositoryImpl(
         isLiked = isLiked,
         createdAt = createdAt
     )
+
+    private fun Any.toContentItem(): ContentItem {
+        // Map API response to ContentItem
+        val map = this as Map<*, *>
+        return ContentItem(
+            id = map["id"] as String,
+            type = map["type"] as String,
+            videoUrl = map["videoUrl"] as? String,
+            imageUrls = (map["imageUrls"] as? List<*>)?.map { it as String },
+            thumbnailUrl = map["thumbnailUrl"] as? String,
+            caption = map["caption"] as? String,
+            userId = map["userId"] as String,
+            userName = map["userName"] as String,
+            userAvatar = map["userAvatar"] as? String,
+            isAdmired = map["isAdmired"] as? Boolean ?: false,
+            likesCount = (map["likesCount"] as? Number)?.toInt() ?: 0,
+            commentsCount = (map["commentsCount"] as? Number)?.toInt() ?: 0,
+            isLiked = map["isLiked"] as? Boolean ?: false,
+            isLocked = map["isLocked"] as? Boolean ?: false,
+            isContest = map["isContest"] as? Boolean ?: false,
+            isAd = map["isAd"] as? Boolean ?: false,
+            createdAt = map["createdAt"] as String
+        )
+    }
 }

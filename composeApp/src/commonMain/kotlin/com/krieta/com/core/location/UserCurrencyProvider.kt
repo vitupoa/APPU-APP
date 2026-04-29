@@ -36,8 +36,13 @@ class UserCurrencyProvider(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    init {
-        startAutoRefresh()
+    private var isStarted = false
+
+    fun start() {
+        if (!isStarted) {
+            isStarted = true
+            startAutoRefresh()
+        }
     }
 
     fun fetchExchangeRate() {

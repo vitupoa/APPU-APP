@@ -26,3 +26,11 @@ export const paymentRateLimiter = rateLimit({
   message: { error: 'Too many payment requests' },
   validate: { trustProxy: false },
 });
+
+// Stricter limits for voting endpoints
+export const votingRateLimiter = rateLimit({
+  windowMs: 60 * 1000,       // 1 minute
+  max: 10,
+  message: { error: 'Too many voting requests' },
+  validate: { trustProxy: false },
+});

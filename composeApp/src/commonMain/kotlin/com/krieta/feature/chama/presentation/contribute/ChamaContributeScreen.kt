@@ -1,12 +1,15 @@
 package com.krieta.feature.chama.presentation.contribute
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-
-import androidx.compose.material.painterResource(Res.drawable.ic_arrow_back)
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,7 +36,7 @@ data class ChamaContributeScreen(val chamaId: String, val chamaName: String) : S
                     title = { Text("Contribute to $chamaName") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

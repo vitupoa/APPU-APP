@@ -40,4 +40,18 @@ class WalletApi(
             parameter("offset", offset)
         }.body()
     }
+
+    suspend fun withdraw(
+        request: Map<String, Any>,
+        signature: String,
+        timestamp: Long,
+        nonce: String
+    ) {
+        httpClient.post("${ApiConstants.API_VERSION}/kyc/withdraw") {
+            parameter("signature", signature)
+            parameter("timestamp", timestamp)
+            parameter("nonce", nonce)
+            setBody(request)
+        }
+    }
 }

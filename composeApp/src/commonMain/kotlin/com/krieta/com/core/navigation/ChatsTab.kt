@@ -3,7 +3,6 @@ package com.krieta.com.core.navigation
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
-import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 
@@ -17,7 +16,7 @@ object ChatsTab : Tab {
         @Composable
         get() {
             val title = "Chats"
-            val icon = rememberVectorPainter(Icons.Default.ChatBubbleOutline)
+            val icon = painterResource(Res.drawable.ic_chat)
 
             return remember {
                 TabOptions(

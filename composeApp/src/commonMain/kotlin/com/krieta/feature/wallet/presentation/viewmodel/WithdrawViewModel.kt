@@ -3,6 +3,7 @@ package com.krieta.feature.wallet.presentation.viewmodel
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
+import com.krieta.com.core.util.SafeConversion
 import com.krieta.feature.wallet.domain.model.ExchangeRate
 import com.krieta.feature.wallet.domain.repository.WalletRepository
 import kotlinx.coroutines.Job
@@ -63,10 +64,15 @@ class WithdrawViewModel(
     }
 
     private fun calculateKrCost(input: String) {
-        val fiatAmount = input.toDoubleOrNull()
+        val fiatAmount = SafeConversion.toDoubleOrDefaultWithValidation(
+            value = input,
+            fieldName = "withdrawAmount",
+            min = 0.0,
+            defaultValue = 0.0
+        )
         val rate = _state.value.exchangeRate
 
-        if (fiatAmount == null || fiatAmount <= 0 || rate == null) {
+        if (fiatAmount <= 0 || rate == null) {
             _state.value = _state.value.copy(krCost = 0.0)
             return
         }
@@ -85,6 +91,7 @@ class WithdrawViewModel(
                 is NetworkResult.Success -> {
                     _state.value = _state.value.copy(krBalance = balanceResult.data.krBalance)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(error = "Failed to load balance")
                 }
@@ -99,6 +106,7 @@ class WithdrawViewModel(
                         isLoadingRate = false
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(
                         error = "Failed to load exchange rate",

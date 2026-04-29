@@ -1,4 +1,7 @@
 package com.krieta.feature.wallet.presentation.screen
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -6,7 +9,6 @@ import krieta.composeapp.generated.resources.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -226,4 +228,5 @@ class TopupScreen : Screen {
         }
     }
 }
+
 

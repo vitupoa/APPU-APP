@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
+import { jwtSecretManager } from '../utils/jwtRotation.js';
 
 export interface AuthRequest extends Request {
   userId?: string;
@@ -36,7 +37,8 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayload;
+    // Use JWT rotation manager for verification
+    const decoded = jwtSecretManager.verifyToken(token) as JwtPayload;
     req.userId = decoded.userId;
     req.deviceId = decoded.deviceId;
     req.isAdmin = decoded.isAdmin;
@@ -78,7 +80,8 @@ export function optionalAuth(req: AuthRequest, res: Response, next: NextFunction
   if (authHeader?.startsWith('Bearer ')) {
     try {
       const token = authHeader.split(' ')[1];
-      const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayload;
+      // Use JWT rotation manager for verification
+      const decoded = jwtSecretManager.verifyToken(token) as JwtPayload;
       req.userId = decoded.userId;
       req.deviceId = decoded.deviceId;
     } catch (error) {

@@ -137,4 +137,30 @@ class MarketplaceRepositoryImpl(
     } catch (e: Exception) {
         NetworkResult.Error(message = e.message ?: "Failed to get ROI")
     }
+    
+    override suspend fun getOAuthUrl(platform: String): NetworkResult<OAuthUrlResponse> = try {
+        NetworkResult.Success(apiService.getOAuthUrl(platform))
+    } catch (e: Exception) {
+        NetworkResult.Error(message = e.message ?: "Failed to get OAuth URL")
+    }
+    
+    override suspend fun handleOAuthCallback(platform: String, code: String, state: String): NetworkResult<Unit> = try {
+        apiService.handleOAuthCallback(platform, code, state)
+        NetworkResult.Success(Unit)
+    } catch (e: Exception) {
+        NetworkResult.Error(message = e.message ?: "Failed to handle callback")
+    }
+    
+    override suspend fun getConnectedAccounts(): NetworkResult<ConnectedAccountsResponse> = try {
+        NetworkResult.Success(apiService.getConnectedAccounts())
+    } catch (e: Exception) {
+        NetworkResult.Error(message = e.message ?: "Failed to get accounts")
+    }
+    
+    override suspend fun disconnectAccount(platform: String): NetworkResult<Unit> = try {
+        apiService.disconnectAccount(platform)
+        NetworkResult.Success(Unit)
+    } catch (e: Exception) {
+        NetworkResult.Error(message = e.message ?: "Failed to disconnect")
+    }
 }

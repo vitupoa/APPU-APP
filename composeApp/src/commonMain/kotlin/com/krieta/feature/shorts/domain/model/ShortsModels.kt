@@ -21,6 +21,9 @@ data class Short(
     val creator: ShortCreator,
     val videoUrl: String,
     val thumbnailUrl: String?,
+    val mediaType: String = "VIDEO", // VIDEO, PHOTO, CAROUSEL
+    val aspectRatio: Float? = null, // width/height
+    val mediaUrls: List<String> = emptyList(), // For photo carousels
     val caption: String,
     val musicTrack: String?,
     val contestId: String?,

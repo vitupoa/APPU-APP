@@ -49,6 +49,7 @@ class ChatRoomViewModel(
                 is NetworkResult.Success -> {
                     _state.value = _state.value.copy(messages = result.data, isLoading = false)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isLoading = false, error = result.message)
                 }
@@ -71,6 +72,7 @@ class ChatRoomViewModel(
                         _state.value = _state.value.copy(messages = currentMessages)
                     }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     // Handle error (e.g. show toast)
                     _state.value = _state.value.copy(error = "Failed to send message")

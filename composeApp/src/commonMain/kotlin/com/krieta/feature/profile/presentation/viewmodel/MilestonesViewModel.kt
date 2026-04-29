@@ -66,6 +66,7 @@ class MilestonesViewModel(
                 is NetworkResult.Success -> {
                     _state.value = MilestonesState(milestones = result.data, isLoading = false)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = MilestonesState(isLoading = false, error = result.message)
                 }

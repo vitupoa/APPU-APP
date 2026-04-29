@@ -1,4 +1,9 @@
 package com.krieta.feature.chama.presentation.settings
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -6,9 +11,6 @@ import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 
-import androidx.compose.material.painterResource(Res.drawable.ic_arrow_back)
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,7 +38,7 @@ data class ChamaSettingsScreen(val chamaId: String, val chamaName: String) : Scr
                     title = { Text("Settings - $chamaName") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.ArrowBack, "Back")
+                            Icon(painterResource(Res.drawable.ic_arrow_back), "Back")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

@@ -3,12 +3,10 @@ package com.krieta.feature.contests.presentation.screen.wizard
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +20,7 @@ import com.krieta.feature.contests.presentation.viewmodel.CreateContestState
 import com.krieta.feature.contests.presentation.viewmodel.CreateContestViewModel
 import com.krieta.feature.contests.presentation.viewmodel.TaskConfiguration
 import com.krieta.feature.contests.presentation.viewmodel.TaskType
+import androidx.compose.foundation.BorderStroke
 
 /**
  * Step 3: Tasks and Connectors
@@ -367,7 +366,7 @@ private fun TaskListItem(
                 )
             ) {
                 Icon(
-                    imageVector = painterResource(Res.drawable.ic_close),
+                    painter = painterResource(Res.drawable.ic_close),
                     contentDescription = "Remove task"
                 )
             }
@@ -390,3 +389,4 @@ private fun getTaskTypeLabel(taskType: TaskType): String {
         TaskType.CUSTOM_TASK -> "Custom Task"
     }
 }
+

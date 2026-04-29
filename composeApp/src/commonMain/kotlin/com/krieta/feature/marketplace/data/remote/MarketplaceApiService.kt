@@ -91,6 +91,25 @@ class MarketplaceApiService(private val client: HttpClient) {
     suspend fun getCampaignROI(campaignId: String): ROIMetrics {
         return client.get("/api/v1/marketplace/sales-funnel/roi/$campaignId").body()
     }
+    
+    suspend fun getOAuthUrl(platform: String): OAuthUrlResponse {
+        return client.get("/api/v1/marketplace/oauth/$platform/authorize").body()
+    }
+    
+    suspend fun handleOAuthCallback(platform: String, code: String, state: String) {
+        client.post("/api/v1/marketplace/oauth/$platform/callback") {
+            contentType(ContentType.Application.Json)
+            setBody(mapOf("code" to code, "state" to state))
+        }
+    }
+    
+    suspend fun getConnectedAccounts(): ConnectedAccountsResponse {
+        return client.get("/api/v1/marketplace/oauth/accounts").body()
+    }
+    
+    suspend fun disconnectAccount(platform: String) {
+        client.delete("/api/v1/marketplace/oauth/$platform/disconnect")
+    }
 }
 
 @kotlinx.serialization.Serializable
@@ -137,4 +156,26 @@ data class CreateConversionRequest(
     val message: String,
     val startDate: String,
     val endDate: String
+)
+
+@kotlinx.serialization.Serializable
+data class OAuthUrlResponse(
+    val authUrl: String,
+    val state: String
+)
+
+@kotlinx.serialization.Serializable
+data class ConnectedAccountsResponse(
+    val accounts: List<ConnectedAccount>
+)
+
+@kotlinx.serialization.Serializable
+data class ConnectedAccount(
+    val id: String,
+    val platform: String,
+    val username: String,
+    val displayName: String,
+    val followerCount: Int,
+    val isVerified: Boolean,
+    val lastSyncedAt: String?
 )

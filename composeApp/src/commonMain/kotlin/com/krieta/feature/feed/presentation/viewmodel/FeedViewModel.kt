@@ -42,6 +42,7 @@ class FeedViewModel(
                         nextCursor = result.data.nextCursor
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isRefreshing = false, error = result.message)
                 }
@@ -64,6 +65,7 @@ class FeedViewModel(
                         isLoadingMore = false
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isLoadingMore = false)
                 }
@@ -103,6 +105,7 @@ class FeedViewModel(
                         isLoading = false
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = FeedState(isLoading = false, error = result.message)
                 }

@@ -2,6 +2,7 @@ import { prisma } from '../../config/database.js';
 import { Prisma, SubscriptionTierType } from '../../generated/prisma/client.js';
 import { emitLikeUpdate } from '../../shared/gateway/events.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
+import { contentDistributionService } from '../recommendation/services/contentDistribution.service.js';
 
 export class ShortsService {
   /**
@@ -96,6 +97,10 @@ export class ShortsService {
         id: s.id,
         creator: s.user,
         videoUrl: s.videoUrl,
+        thumbnailUrl: s.thumbnailUrl,
+        mediaType: s.mediaType,
+        aspectRatio: s.aspectRatio,
+        mediaUrls: s.mediaUrls,
         caption: s.caption || '',
         musicTrack: s.musicTitle ? `${s.musicTitle}${s.musicArtist ? ' - ' + s.musicArtist : ''}` : null,
         likesCount: s.likesCount,
@@ -121,6 +126,10 @@ export class ShortsService {
   static async createShort(data: {
     creatorId: string;
     videoUrl: string;
+    thumbnailUrl?: string;
+    mediaType?: string;
+    aspectRatio?: number;
+    mediaUrls?: string[];
     caption?: string;
     musicTrack?: string;
     linkedProductId?: string;
@@ -140,6 +149,10 @@ export class ShortsService {
       data: {
         userId: data.creatorId,
         videoUrl: data.videoUrl,
+        thumbnailUrl: data.thumbnailUrl,
+        mediaType: data.mediaType || 'VIDEO',
+        aspectRatio: data.aspectRatio,
+        mediaUrls: data.mediaUrls || [],
         caption: data.caption,
         musicTitle,
         musicArtist,
@@ -153,20 +166,35 @@ export class ShortsService {
             id: true,
             username: true,
             displayName: true,
-            avatarUrl: true
+            avatarUrl: true,
+            country: true
           }
         }
       }
     });
+    
     // Process hashtags and mentions from caption (fire-and-forget)
     if (short.caption) {
       HashtagService.processContent(short.id, 'SHORT', short.caption).catch(() => {});
     }
 
+    // Initialize content distribution (fire-and-forget)
+    const hashtags = short.caption ? extractHashtags(short.caption) : [];
+    contentDistributionService.initializeDistribution(
+      short.id,
+      'SHORT',
+      data.creatorId,
+      { hashtags, location: short.user.country }
+    ).catch(err => console.error('Failed to initialize distribution:', err));
+
     return {
       id: short.id,
       creator: short.user,
       videoUrl: short.videoUrl,
+      thumbnailUrl: short.thumbnailUrl,
+      mediaType: short.mediaType,
+      aspectRatio: short.aspectRatio,
+      mediaUrls: short.mediaUrls,
       caption: short.caption,
       musicTrack: short.musicTitle ? `${short.musicTitle}${short.musicArtist ? ' - ' + short.musicArtist : ''}` : null,
       likesCount: 0,
@@ -176,6 +204,15 @@ export class ShortsService {
       requiredTier: short.requiredTier,
       createdAt: short.createdAt.toISOString()
     };
+  }
+
+  /**
+   * Extract hashtags from text
+   */
+  private static extractHashtags(text: string): string[] {
+    const hashtagRegex = /#[\w]+/g;
+    const matches = text.match(hashtagRegex);
+    return matches ? matches.map(tag => tag.substring(1).toLowerCase()) : [];
   }
 
   /**

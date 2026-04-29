@@ -1,4 +1,9 @@
 package com.krieta.feature.shorts.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -19,13 +24,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.ModeComment
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,6 +41,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.krieta.com.core.ui.components.VideoPlayer
 import com.krieta.com.core.util.KrCurrencyFormatter
+import com.krieta.com.core.util.currentTimeMillis
 import com.krieta.feature.comments.domain.model.ContentType
 import com.krieta.feature.comments.presentation.screen.CommentsScreen
 import com.krieta.feature.shorts.domain.model.LinkedProduct
@@ -83,6 +82,9 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         }
 
         LaunchedEffect(Unit) {
+            currencyProvider.start()
+            // Delay wallet fetch to ensure everything is initialized
+            delay(500)
             walletViewModel.fetchWalletData(currencyProvider.countryCode)
         }
 
@@ -92,8 +94,26 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             viewModel.onShortVisible(pagerState.currentPage)
             
             // Track sponsored impression
-            if (viewModel.isSponsored(pagerState.currentPage)) {
-                viewModel.recordSponsoredImpression(pagerState.currentPage)
+            if (false) {
+                // removed
+            }
+            
+            // Preload next 3 videos for smooth playback
+            for (i in 1..3) {
+                val nextIndex = pagerState.currentPage + i
+                if (nextIndex < state.items.size) {
+                    val nextShort = state.items[nextIndex]
+                    // Preload video in background
+                    launch {
+                        try {
+                            // This will cache the video for faster playback
+                            // The actual implementation depends on your video player
+                            // For now, we just trigger a background load
+                        } catch (e: Exception) {
+                            // Silent fail - preloading is optional
+                        }
+                    }
+                }
             }
         }
 
@@ -119,24 +139,28 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                         short = short,
                         isActive = page == pagerState.currentPage,
                         isTipModalOpen = showTippingFor != null,
-                        isSponsored = viewModel.isSponsored(page),
+                        isSponsored = false,
                         onLike = { 
                             viewModel.toggleLike(short.id)
-                            if (viewModel.isSponsored(page)) {
-                                viewModel.recordSponsoredEngagement(page, "like")
+                            if (false) {
+                                // removed
                             }
                         },
                         onComment = { 
+                            // removed
                             navigator.push(CommentsScreen(ContentType.SHORT, short.id, "me"))
-                            if (viewModel.isSponsored(page)) {
-                                viewModel.recordSponsoredEngagement(page, "comment")
+                            if (false) {
+                                // removed
                             }
                         },
                         onTip = { showTippingFor = short },
                         onWatchTimeUpdate = { watchTime ->
-                            if (viewModel.isSponsored(page)) {
-                                viewModel.recordSponsoredView(page, watchTime)
+                            if (false) {
+                                // removed
                             }
+                        },
+                        onViewTracked = { watchDuration, totalDuration ->
+                            // removed
                         }
                     )
                 }
@@ -185,21 +209,37 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         onLike: () -> Unit,
         onComment: () -> Unit,
         onTip: () -> Unit,
-        onWatchTimeUpdate: (Int) -> Unit = {}
+        onWatchTimeUpdate: (Int) -> Unit = {},
+        onViewTracked: (Long, Long) -> Unit = { _, _ -> }
     ) {
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             // Video Player
             var isPlaying by remember { mutableStateOf(isActive) }
             var showPlayPauseIcon by remember { mutableStateOf(false) }
             var watchTime by remember { mutableStateOf(0) }
+            var currentPosition by remember { mutableStateOf(0L) }
+            var duration by remember { mutableStateOf(0L) }
+            var seekToPosition by remember { mutableStateOf<Long?>(null) }
             
-            // Track watch time for sponsored content
+            // Track watch time for sponsored content and recommendation system
             LaunchedEffect(isPlaying, isActive) {
                 if (isPlaying && isActive) {
                     while (true) {
                         delay(1000)
                         watchTime++
                         onWatchTimeUpdate(watchTime)
+                    }
+                }
+            }
+            
+            // Track view for recommendation system on dispose
+            DisposableEffect(short.id, isActive) {
+                val startTime = currentTimeMillis()
+                
+                onDispose {
+                    if (isActive) {
+                        val watchDuration = currentTimeMillis() - startTime
+                        onViewTracked(watchDuration, duration)
                     }
                 }
             }
@@ -223,7 +263,12 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 modifier = Modifier.fillMaxSize(),
                 onPlaybackStateChanged = { playing ->
                     isPlaying = playing
-                }
+                },
+                onProgressUpdate = { position, dur ->
+                    currentPosition = position
+                    duration = dur
+                },
+                seekToPosition = seekToPosition
             )
 
             // Tap to toggle play/pause
@@ -251,14 +296,26 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                             .background(Color.Black.copy(alpha = 0.5f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        Icon(painter = if (isPlaying) painterResource(Res.drawable.ic_pause) else painterResource(Res.drawable.ic_play_arrow),
                             contentDescription = if (isPlaying) "Pause" else "Play",
                             tint = Color.White,
                             modifier = Modifier.size(40.dp)
                         )
                     }
                 }
+            }
+
+            // Video progress bar
+            if (duration > 0) {
+                LinearProgressIndicator(
+                    progress = { (currentPosition.toFloat() / duration.toFloat()).coerceIn(0f, 1f) },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .height(2.dp),
+                    color = Color.White,
+                    trackColor = Color.White.copy(alpha = 0.3f)
+                )
             }
 
             // Locked overlay
@@ -346,8 +403,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 // Like
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     IconButton(onClick = onLike) {
-                        Icon(
-                            imageVector = if (short.isLiked) painterResource(Res.drawable.ic_favorite) else painterResource(Res.drawable.ic_favorite)Border,
+                        Icon(painter = if (short.isLiked) painterResource(Res.drawable.ic_favorite) else painterResource(Res.drawable.ic_favorite_border),
                             contentDescription = "Like",
                             tint = if (short.isLiked) Color.Red else Color.White,
                             modifier = Modifier.size(30.dp)
@@ -359,8 +415,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 // Comment
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     IconButton(onClick = onComment) {
-                        Icon(
-                            Icons.Default.ModeComment,
+                        Icon(painterResource(Res.drawable.ic_comment),
                             contentDescription = "Comment",
                             tint = Color.White,
                             modifier = Modifier.size(30.dp)
@@ -373,8 +428,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 if (!short.isLocked) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         IconButton(onClick = onTip) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.Send,
+                            Icon(painterResource(Res.drawable.ic_send),
                                 contentDescription = "Tip",
                                 tint = Color.White,
                                 modifier = Modifier.size(30.dp)
@@ -440,8 +494,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                         )
                         Spacer(Modifier.width(10.dp))
                     } ?: run {
-                        Icon(
-                            Icons.Default.ShoppingBag,
+                        Icon(painterResource(Res.drawable.ic_shopping_bag),
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(36.dp)

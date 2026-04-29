@@ -1,6 +1,7 @@
 package com.krieta.com.core.network
 
 import com.krieta.com.core.security.TokenManager
+import com.krieta.com.core.util.currentTimeMillis
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.websocket.Frame
@@ -137,7 +138,7 @@ class WebSocketService(
                     println("[WebSocket] Authentication message sent")
                     
                     _connectionState.value = WebSocketConnectionState.CONNECTED
-                    lastSuccessfulConnection = System.currentTimeMillis()
+                    lastSuccessfulConnection = currentTimeMillis()
                     reconnectAttempts = 0
                     retryDelay = 1000L // Reset backoff on successful connection
                     
@@ -148,7 +149,7 @@ class WebSocketService(
                     for (frame in session?.incoming!!) {
                         if (frame is Frame.Text) {
                             val text = frame.readText()
-                            lastMessageReceived = System.currentTimeMillis()
+                            lastMessageReceived = currentTimeMillis()
                             handleIncomingPayload(text)
                         }
                     }
@@ -189,7 +190,7 @@ class WebSocketService(
             while (isActive && session != null) {
                 delay(30000L) // Check every 30 seconds
                 
-                val timeSinceLastMessage = System.currentTimeMillis() - lastMessageReceived
+                val timeSinceLastMessage = currentTimeMillis() - lastMessageReceived
                 if (timeSinceLastMessage > 60000L) { // 60 seconds timeout
                     println("[WebSocket] No messages received for 60s, connection may be stale")
                     // Force reconnection
@@ -268,7 +269,7 @@ class WebSocketService(
             "reconnectAttempts" to reconnectAttempts,
             "lastSuccessfulConnection" to lastSuccessfulConnection,
             "lastMessageReceived" to lastMessageReceived,
-            "timeSinceLastMessage" to (System.currentTimeMillis() - lastMessageReceived),
+            "timeSinceLastMessage" to (currentTimeMillis() - lastMessageReceived),
             "isConnected" to (_connectionState.value == WebSocketConnectionState.CONNECTED)
         )
     }

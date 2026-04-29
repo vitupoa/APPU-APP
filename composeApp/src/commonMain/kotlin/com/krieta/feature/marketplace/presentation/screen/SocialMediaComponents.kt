@@ -1,4 +1,6 @@
 package com.krieta.feature.marketplace.presentation.screen
+import com.krieta.com.core.util.parseColor
+import com.krieta.com.core.util.formatString
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -80,7 +82,7 @@ private fun SocialMediaAccountChip(
                     Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(Color(android.graphics.Color.parseColor(platformInfo.color)).copy(alpha = 0.15f)),
+                        .background(Color(parseColor(platformInfo.color)).copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(platformInfo.icon, fontSize = 16.sp)
@@ -89,7 +91,7 @@ private fun SocialMediaAccountChip(
                 // Verified Badge
                 if (account.isVerified) {
                     Icon(
-                        Icons.Default.Verified,
+                        painterResource(Res.drawable.ic_verified),
                         "Verified",
                         Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.primary
@@ -123,14 +125,14 @@ private fun SocialMediaAccountChip(
             // Engagement Rate
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    Icons.Default.TrendingUp,
+                    painterResource(Res.drawable.ic_trending_up),
                     null,
                     Modifier.size(14.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    "${String.format("%.1f", account.engagementRate)}% engagement",
+                    "${formatString("%.1f", account.engagementRate)}% engagement",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -158,7 +160,7 @@ fun SocialMediaAccountsInline(
             val platformInfo = PLATFORM_INFO[account.platform]!!
             
             Surface(
-                color = Color(android.graphics.Color.parseColor(platformInfo.color)).copy(alpha = 0.15f),
+                color = Color(parseColor(platformInfo.color)).copy(alpha = 0.15f),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Row(
@@ -217,13 +219,13 @@ fun SocialMediaStatsCard(
                 StatColumn(
                     label = "Total Followers",
                     value = formatNumber(totalFollowers),
-                    icon = Icons.Default.People
+                    icon = painterResource(Res.drawable.ic_people)
                 )
                 
                 StatColumn(
                     label = "Avg Engagement",
-                    value = "${String.format("%.1f", avgEngagement)}%",
-                    icon = Icons.Default.TrendingUp
+                    value = "${formatString("%.1f", avgEngagement)}%",
+                    icon = painterResource(Res.drawable.ic_trending_up)
                 )
                 
                 StatColumn(
@@ -268,11 +270,11 @@ fun SocialMediaStatsCard(
 private fun StatColumn(
     label: String,
     value: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector
+    icon: androidx.compose.ui.graphics.painter.Painter
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
-            icon,
+            painter = icon,
             null,
             Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.primary
@@ -307,3 +309,5 @@ private fun formatLargeNumber(num: Long): String {
         else -> num.toString()
     }
 }
+
+

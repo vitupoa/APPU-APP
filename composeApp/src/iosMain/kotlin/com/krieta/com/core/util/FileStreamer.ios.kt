@@ -8,9 +8,12 @@ import platform.Foundation.dataWithBytesNoCopy
 import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.getBytes
 import platform.Foundation.length
+import platform.Foundation.fileHandleForReadingFromURL
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.ExperimentalForeignApi
 
+@OptIn(ExperimentalForeignApi::class)
 actual object FileStreamer {
 
     actual fun getFileSize(filePath: String): Long {
@@ -22,7 +25,8 @@ actual object FileStreamer {
     actual suspend fun readChunk(filePath: String, startByte: Long, length: Int): ByteArray {
         if (filePath.isEmpty()) return ByteArray(0)
         
-        val fileHandle = NSFileHandle.fileHandleForReadingAtPath(filePath) ?: return ByteArray(0)
+        val url = NSURL.fileURLWithPath(filePath)
+        val fileHandle = NSFileHandle.fileHandleForReadingFromURL(url, null) ?: return ByteArray(0)
         
         try {
             fileHandle.seekToFileOffset(startByte.toULong())

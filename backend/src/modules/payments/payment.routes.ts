@@ -293,4 +293,223 @@ router.post('/paystack/webhook', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * POST /api/v1/payments/withdraw
+ * Initiates a withdrawal to user's chosen provider.
+ */
+router.post('/withdraw', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const data = withdrawInitiateSchema.parse(req.body);
+    const userId = req.userId!;
+    const reference = `withdraw_${userId}_${Date.now()}`;
+
+    // Check wallet balance
+    const wallet = await prisma.wallet.findUnique({ where: { userId } });
+    if (!wallet || wallet.krBalance.lessThan(data.krAmount)) {
+      res.status(400).json({ error: 'Insufficient balance' });
+      return;
+    }
+
+    // Convert Kr to fiat
+    const rate = await ExchangeService.getTransactionRate(data.currency, 'sell');
+    const fiatAmount = Number(data.krAmount) * rate;
+
+    let result: any;
+
+    switch (data.provider) {
+      case 'mpesa': {
+        if (!data.phoneNumber) {
+          res.status(400).json({ error: 'Phone number required for M-Pesa' });
+          return;
+        }
+        result = await MpesaService.initiateWithdrawal({
+          phoneNumber: data.phoneNumber,
+          amount: fiatAmount,
+          reference,
+          remarks: 'Krieta Withdrawal'
+        });
+        break;
+      }
+      case 'paypal': {
+        if (!data.email) {
+          res.status(400).json({ error: 'Email required for PayPal' });
+          return;
+        }
+        result = await PaypalService.createPayout({
+          email: data.email,
+          amount: fiatAmount,
+          currency: data.currency,
+          reference,
+          note: 'Krieta Withdrawal'
+        });
+        break;
+      }
+      case 'paystack': {
+        if (!data.accountNumber || !data.bankCode) {
+          res.status(400).json({ error: 'Account details required for Paystack' });
+          return;
+        }
+        result = await PaystackService.initiateTransfer({
+          accountNumber: data.accountNumber,
+          bankCode: data.bankCode,
+          amount: fiatAmount,
+          currency: data.currency,
+          reference,
+          reason: 'Krieta Withdrawal',
+          recipientName: data.accountName || 'User',
+          country: data.country // Pass country code (NG, GH, ZA, KE)
+        });
+        break;
+      }
+    }
+
+    // Create withdrawal request
+    await prisma.withdrawalRequest.create({
+      data: {
+        userId,
+        amountKr: new Prisma.Decimal(data.krAmount),
+        amountFiat: fiatAmount,
+        currency: data.currency,
+        provider: data.provider,
+        accountName: data.accountName || '',
+        accountDetails: data,
+        status: 'PENDING'
+      }
+    });
+
+    // Deduct from wallet
+    await prisma.wallet.update({
+      where: { userId },
+      data: { krBalance: { decrement: new Prisma.Decimal(data.krAmount) } }
+    });
+
+    res.status(200).json({ reference, ...result });
+  } catch (error: any) {
+    if (error.name === 'ZodError') {
+      res.status(400).json({ error: 'Validation failed', details: error.errors });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+
+/**
+ * POST /api/v1/payments/verify-account
+ * Verifies account name for withdrawal.
+ */
+router.post('/verify-account', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const { provider, phoneNumber, email, accountNumber, bankCode, country } = req.body;
+
+    let result: any;
+
+    switch (provider) {
+      case 'mpesa':
+        if (!phoneNumber) {
+          res.status(400).json({ error: 'Phone number required' });
+          return;
+        }
+        result = await MpesaService.verifyAccountName(phoneNumber);
+        break;
+      case 'paypal':
+        if (!email) {
+          res.status(400).json({ error: 'Email required' });
+          return;
+        }
+        result = await PaypalService.verifyEmail(email);
+        break;
+      case 'paystack':
+        if (!accountNumber || !bankCode) {
+          res.status(400).json({ error: 'Account details required' });
+          return;
+        }
+        result = await PaystackService.verifyAccountName({ 
+          accountNumber, 
+          bankCode,
+          country // Pass country code for proper verification
+        });
+        break;
+      default:
+        res.status(400).json({ error: 'Invalid provider' });
+        return;
+    }
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/v1/payments/banks
+ * Lists supported banks for Paystack.
+ */
+router.get('/banks', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const country = (req.query.country as string) || 'NG';
+    const banks = await PaystackService.listBanks(country);
+    res.status(200).json({ banks });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/v1/payments/paystack/countries
+ * Lists supported countries for Paystack transfers.
+ */
+router.get('/paystack/countries', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const countries = PaystackService.getSupportedCountries();
+    res.status(200).json({ countries });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/v1/payments/mpesa/b2c/result
+ * M-Pesa B2C result callback.
+ */
+router.post('/mpesa/b2c/result', async (req: Request, res: Response) => {
+  try {
+    const result = req.body?.Result;
+    if (!result) {
+      res.status(200).json({ ResultCode: 0, ResultDesc: 'Accepted' });
+      return;
+    }
+
+    const reference = result.TransactionID;
+    const resultCode = result.ResultCode;
+
+    const withdrawal = await prisma.withdrawalRequest.findFirst({
+      where: { provider: 'mpesa', status: 'PENDING' },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    if (withdrawal) {
+      await prisma.withdrawalRequest.update({
+        where: { id: withdrawal.id },
+        data: {
+          status: resultCode === 0 ? 'COMPLETED' : 'FAILED',
+          reference
+        }
+      });
+
+      // If failed, refund to wallet
+      if (resultCode !== 0) {
+        await prisma.wallet.update({
+          where: { userId: withdrawal.userId },
+          data: { krBalance: { increment: withdrawal.amountKr } }
+        });
+      }
+    }
+
+    res.status(200).json({ ResultCode: 0, ResultDesc: 'Accepted' });
+  } catch (error: any) {
+    console.error('M-Pesa B2C result error:', error.message);
+    res.status(200).json({ ResultCode: 0, ResultDesc: 'Accepted' });
+  }
+});
+
 export default router;

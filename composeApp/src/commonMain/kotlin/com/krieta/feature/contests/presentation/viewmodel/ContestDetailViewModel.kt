@@ -40,7 +40,6 @@ class ContestDetailViewModel(
                         isJoining = false,
                         hasJoined = true,
                         contest = _state.value.contest?.copy(
-                            isJoined = true,
                             participantsCount = (_state.value.contest?.participantsCount ?: 0) + 1
                         )
                     )
@@ -94,7 +93,7 @@ class ContestDetailViewModel(
                 submissions = submissions?.items ?: emptyList(),
                 nextSubmissionCursor = submissions?.nextCursor,
                 isLoading = false,
-                hasJoined = contest.isJoined
+                hasJoined = contest.participantsCount > 0
             )
         }
     }

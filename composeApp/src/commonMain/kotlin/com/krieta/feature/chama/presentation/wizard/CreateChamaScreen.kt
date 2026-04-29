@@ -1,5 +1,8 @@
 package com.krieta.feature.chama.presentation.wizard
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.shape.CircleShape
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
@@ -7,15 +10,14 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,13 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -72,10 +73,8 @@ class CreateChamaScreen : Screen {
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                // Progress indicator
                 StepIndicator(current = state.currentStep, total = viewModel.totalSteps)
 
-                // Step content
                 AnimatedContent(
                     targetState = state.currentStep,
                     transitionSpec = {
@@ -95,7 +94,6 @@ class CreateChamaScreen : Screen {
                     }
                 }
 
-                // Error
                 if (state.error != null) {
                     Text(
                         state.error!!,
@@ -105,7 +103,6 @@ class CreateChamaScreen : Screen {
                     )
                 }
 
-                // Bottom actions
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -208,10 +205,10 @@ private fun StepBasicInfo(state: CreateChamaState, viewModel: CreateChamaViewMod
 
         Text("Chama Type", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
         val types = listOf(
-            Triple("ROTATING", "Merry-Go-Round", Icons.Default.Sync),
-            Triple("INVESTMENT", "Investment", Icons.AutoMirrored.Filled.TrendingUp),
+            Triple("ROTATING", "Merry-Go-Round", painterResource(Res.drawable.ic_sync)),
+            Triple("INVESTMENT", "Investment", painterResource(Res.drawable.ic_trending_up)),
             Triple("WELFARE", "Welfare", painterResource(Res.drawable.ic_favorite)),
-            Triple("HYBRID", "Hybrid", Icons.Default.Dashboard)
+            Triple("HYBRID", "Hybrid", painterResource(Res.drawable.ic_dashboard))
         )
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             types.forEach { (value, label, icon) ->
@@ -247,16 +244,15 @@ private fun StepBasicInfo(state: CreateChamaState, viewModel: CreateChamaViewMod
 }
 
 @Composable
-private fun ChamaTypeCard(label: String, icon: ImageVector, selected: Boolean, onClick: () -> Unit) {
+private fun ChamaTypeCard(label: String, icon: Painter, selected: Boolean, onClick: () -> Unit) {
     val containerColor = if (selected) ChamaGold.copy(alpha = 0.12f)
     else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
     val borderColor = if (selected) ChamaGold else Color.Transparent
 
     Surface(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).border(1.5.dp, borderColor, RoundedCornerShape(14.dp)),
         shape = RoundedCornerShape(14.dp),
-        color = containerColor,
-        border = BorderStroke(1.5.dp, borderColor)
+        color = containerColor
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -275,7 +271,7 @@ private fun ChamaTypeCard(label: String, icon: ImageVector, selected: Boolean, o
             )
             Spacer(Modifier.weight(1f))
             if (selected) {
-                Icon(painterResource(Res.drawable.ic_check)Circle, contentDescription = null, tint = ChamaGold)
+                Icon(painterResource(Res.drawable.ic_check_circle), contentDescription = null, tint = ChamaGold)
             }
         }
     }
@@ -435,7 +431,6 @@ private fun StepRules(state: CreateChamaState, viewModel: CreateChamaViewModel) 
             )
         }
 
-        // Wallet lock info card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -502,13 +497,12 @@ private fun StepConfirmation(state: CreateChamaState) {
 
         if (state.type == "ROTATING") {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().border(1.dp, ChamaGold.copy(alpha = 0.3f), RoundedCornerShape(14.dp)),
                 colors = CardDefaults.cardColors(containerColor = ChamaGold.copy(alpha = 0.08f)),
-                shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.dp, ChamaGold.copy(alpha = 0.3f))
+                shape = RoundedCornerShape(14.dp)
             ) {
                 Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Icon(Icons.Default.Info, contentDescription = null, tint = ChamaGold)
+                    Icon(painterResource(Res.drawable.ic_info), contentDescription = null, tint = ChamaGold)
                     Text(
                         "Merry-Go-Round: Each member's personal wallet withdrawals will be locked until the full rotation completes.",
                         fontSize = 13.sp,

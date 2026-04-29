@@ -41,6 +41,8 @@ import com.krieta.feature.profile.presentation.viewmodel.SearchResultType
 import com.krieta.feature.profile.domain.model.SocialUser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.krieta.feature.explore.presentation.screen.HashtagFeedScreen
+import com.krieta.feature.live.presentation.screen.LiveDiscoveryScreen
 
 // ─── HOME TAB ─────────────────────────────────────────────────────
 object HomeTab : Tab {
@@ -107,14 +109,17 @@ object MarketplaceTab : Tab {
     }
 }
 
-// ─── EXPLORE SCREEN (with real-time search) ───────────────────────
+// ─── EXPLORE SCREEN (with trending content) ───────────────────────
 class ExploreScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val searchViewModel = koinScreenModel<SearchViewModel>()
+        val exploreViewModel = koinScreenModel<com.krieta.feature.explore.presentation.viewmodel.ExploreViewModel>()
+        
         val searchState by searchViewModel.state.collectAsState()
+        val exploreState by exploreViewModel.state.collectAsState()
         
         val query = searchState.query
         val results = searchState.results
@@ -173,47 +178,181 @@ class ExploreScreen : Screen {
                 )
             )
 
-            // Content: search results OR cards
+            // Content: search results OR trending content + cards
             if (query.isBlank()) {
-                // Default Explore Cards
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
-                    ExploreCard(
-                        emoji = "🏆",
-                        title = "Contests",
-                        subtitle = "Compete, win prizes & grow",
-                        gradient = listOf(KrietaColors.Warning.copy(alpha = 0.8f), KrietaColors.Warning),
-                        modifier = Modifier.weight(1f),
-                        onClick = { navigator.push(com.krieta.feature.contests.presentation.screen.ContestFeedScreen()) }
-                    )
-                    ExploreCard(
-                        emoji = "🛍️",
-                        title = "Shop",
-                        subtitle = "Browse creator products",
-                        gradient = listOf(KrietaColors.Accent.copy(alpha = 0.8f), KrietaColors.AccentDark),
-                        modifier = Modifier.weight(1f),
-                        onClick = { navigator.push(ShopScreen()) }
-                    )
-                }
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    ExploreCard(
-                        emoji = "🏦",
-                        title = "Chamas",
-                        subtitle = "Join savings groups & rotate payouts",
-                        gradient = listOf(androidx.compose.ui.graphics.Color(0xFFF5A623).copy(alpha = 0.8f), androidx.compose.ui.graphics.Color(0xFFD4891A)),
-                        modifier = Modifier.weight(1f),
-                        onClick = { navigator.push(com.krieta.feature.chama.presentation.ChamaListScreen()) }
-                    )
+                    // Trending Hashtags
+                    item {
+                        if (exploreState.trendingHashtags.isNotEmpty()) {
+                            SectionHeader("🔥 Trending Hashtags")
+                            androidx.compose.foundation.lazy.LazyRow(
+                                contentPadding = PaddingValues(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(exploreState.trendingHashtags) { hashtag ->
+                                    HashtagChip(hashtag, onClick = { tag ->
+                                        // Navigate to hashtag feed screen
+                                        navigator.push(HashtagFeedScreen(tag))
+                                    })
+                                }
+                            }
+                            Spacer(Modifier.height(16.dp))
+                        }
+                    }
+
+                    // Category Pills
+                    item {
+                        SectionHeader("📱 Categories")
+                        androidx.compose.foundation.lazy.LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(com.krieta.feature.explore.domain.model.ContentCategory.values()) { category ->
+                                CategoryPill(
+                                    category = category,
+                                    isSelected = category == exploreState.selectedCategory,
+                                    onClick = { exploreViewModel.selectCategory(category) }
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                    }
+
+                    // Trending Live Streams
+                    item {
+                        if (exploreState.liveStreams.isNotEmpty()) {
+                            SectionHeader("🔴 Trending Live")
+                            androidx.compose.foundation.lazy.LazyRow(
+                                contentPadding = PaddingValues(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(exploreState.liveStreams) { live ->
+                                    LiveStreamCard(live, onClick = {
+                                        navigator.push(com.krieta.feature.live.presentation.screen.ViewerLiveScreen(live.id))
+                                    })
+                                }
+                            }
+                            Spacer(Modifier.height(16.dp))
+                        }
+                    }
+
+                    // Trending Shorts
+                    item {
+                        if (exploreState.trendingShorts.isNotEmpty()) {
+                            SectionHeader("🎬 Trending Shorts")
+                            androidx.compose.foundation.lazy.LazyRow(
+                                contentPadding = PaddingValues(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(exploreState.trendingShorts) { short ->
+                                    ShortThumbnail(short, onClick = {
+                                        // Navigate to shorts feed
+                                        navigator.push(com.krieta.feature.shorts.presentation.screen.ShortsScreen())
+                                    })
+                                }
+                            }
+                            Spacer(Modifier.height(16.dp))
+                        }
+                    }
+
+                    // Trending Contests
+                    item {
+                        if (exploreState.trendingContests.isNotEmpty()) {
+                            SectionHeader("🏆 Trending Contests")
+                            Spacer(Modifier.height(8.dp))
+                        }
+                    }
+                    if (exploreState.trendingContests.isNotEmpty()) {
+                        items(exploreState.trendingContests) { contest ->
+                            ContestCard(
+                                contest = contest,
+                                onClick = {
+                                    // Navigate to contest submissions feed to watch entries
+                                    navigator.push(com.krieta.feature.contests.presentation.screen.ContestSubmissionFeedScreen())
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                            )
+                        }
+                        item { Spacer(Modifier.height(16.dp)) }
+                    }
+
+                    // Trending Creators
+                    item {
+                        if (exploreState.trendingCreators.isNotEmpty()) {
+                            SectionHeader("⭐ Trending Creators")
+                            Spacer(Modifier.height(8.dp))
+                        }
+                    }
+                    if (exploreState.trendingCreators.isNotEmpty()) {
+                        items(exploreState.trendingCreators) { creator ->
+                            CreatorCard(
+                                creator = creator,
+                                onClick = {
+                                    // Navigate to creator's profile
+                                    navigator.push(ProfileScreen(creator.id))
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                            )
+                        }
+                        item { Spacer(Modifier.height(16.dp)) }
+                    }
+
+                    // Original Explore Cards
+                    item {
+                        SectionHeader("📍 Quick Access")
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            ExploreCard(
+                                emoji = "🔴",
+                                title = "Live",
+                                subtitle = "Watch live streams now",
+                                gradient = listOf(androidx.compose.ui.graphics.Color(0xFFE53935).copy(alpha = 0.8f), androidx.compose.ui.graphics.Color(0xFFC62828)),
+                                modifier = Modifier.weight(1f),
+                                onClick = { 
+                                    navigator.push(LiveDiscoveryScreen())
+                                }
+                            )
+                            ExploreCard(
+                                emoji = "🏆",
+                                title = "Contests",
+                                subtitle = "Compete, win prizes & grow",
+                                gradient = listOf(KrietaColors.Warning.copy(alpha = 0.8f), KrietaColors.Warning),
+                                modifier = Modifier.weight(1f),
+                                onClick = { navigator.push(com.krieta.feature.contests.presentation.screen.ContestFeedScreen()) }
+                            )
+                        }
+                        Spacer(Modifier.height(16.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            ExploreCard(
+                                emoji = "🛍️",
+                                title = "Shop",
+                                subtitle = "Browse creator products",
+                                gradient = listOf(KrietaColors.Accent.copy(alpha = 0.8f), KrietaColors.AccentDark),
+                                modifier = Modifier.weight(1f),
+                                onClick = { navigator.push(ShopScreen()) }
+                            )
+                            ExploreCard(
+                                emoji = "🏦",
+                                title = "Chamas",
+                                subtitle = "Join savings groups & rotate payouts",
+                                gradient = listOf(androidx.compose.ui.graphics.Color(0xFFF5A623).copy(alpha = 0.8f), androidx.compose.ui.graphics.Color(0xFFD4891A)),
+                                modifier = Modifier.weight(1f),
+                                onClick = { navigator.push(com.krieta.feature.chama.presentation.ChamaListScreen()) }
+                            )
+                        }
+                    }
                 }
             } else if (isSearching) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -280,6 +419,340 @@ private fun ExploreCard(
                 }
             }
         }
+    }
+}
+
+// ─── TRENDING COMPONENTS ─────────────────────────────────────────
+@Composable
+private fun SectionHeader(title: String) {
+    Text(
+        title,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
+        color = KrietaColors.OnBackground
+    )
+}
+
+@Composable
+private fun HashtagChip(hashtag: com.krieta.feature.explore.domain.model.TrendingHashtag, onClick: (String) -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = KrietaColors.PrimaryContainer,
+        modifier = Modifier.clickable { onClick(hashtag.tag) }
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                hashtag.tag,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = KrietaColors.OnPrimaryContainer
+            )
+            Text(
+                "${formatCount(hashtag.viewCount)} views",
+                fontSize = 11.sp,
+                color = KrietaColors.OnPrimaryContainer.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryPill(
+    category: com.krieta.feature.explore.domain.model.ContentCategory,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    FilterChip(
+        selected = isSelected,
+        onClick = onClick,
+        label = {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(category.emoji)
+                Text(category.displayName)
+            }
+        },
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = KrietaColors.Primary,
+            selectedLabelColor = androidx.compose.ui.graphics.Color.White
+        )
+    )
+}
+
+@Composable
+private fun LiveStreamCard(
+    live: com.krieta.feature.explore.domain.model.LiveStream,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.width(160.dp).height(220.dp),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            coil3.compose.AsyncImage(
+                model = live.thumbnailUrl,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            )
+            
+            // Live badge
+            Surface(
+                modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
+                color = androidx.compose.ui.graphics.Color.Red,
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Text(
+                    "🔴 LIVE",
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    color = androidx.compose.ui.graphics.Color.White,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            
+            // Viewer count
+            Surface(
+                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
+                color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f),
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Text(
+                    "${formatCount(live.viewerCount.toLong())}",
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                    color = androidx.compose.ui.graphics.Color.White,
+                    fontSize = 10.sp
+                )
+            }
+            
+            // Creator info
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(androidx.compose.ui.graphics.Color.Transparent, androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.7f))
+                        )
+                    )
+                    .padding(8.dp)
+            ) {
+                Text(
+                    live.title,
+                    color = androidx.compose.ui.graphics.Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "@${live.creatorUsername}",
+                    color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f),
+                    fontSize = 11.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShortThumbnail(
+    short: com.krieta.feature.explore.domain.model.TrendingShort,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.width(120.dp).height(180.dp),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            coil3.compose.AsyncImage(
+                model = short.thumbnailUrl,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            )
+            
+            // View count
+            Surface(
+                modifier = Modifier.align(Alignment.BottomStart).padding(8.dp),
+                color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f),
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                ) {
+                    Icon(
+                        painterResource(Res.drawable.ic_visibility),
+                        contentDescription = null,
+                        tint = androidx.compose.ui.graphics.Color.White,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Text(
+                        formatCount(short.viewCount),
+                        color = androidx.compose.ui.graphics.Color.White,
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ContestCard(
+    contest: com.krieta.feature.explore.domain.model.TrendingContest,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            contest.thumbnailUrl?.let { url ->
+                coil3.compose.AsyncImage(
+                    model = url,
+                    contentDescription = null,
+                    modifier = Modifier.size(80.dp).clip(RoundedCornerShape(12.dp)),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                )
+            } ?: Box(
+                modifier = Modifier.size(80.dp).clip(RoundedCornerShape(12.dp))
+                    .background(KrietaColors.PrimaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("🏆", fontSize = 32.sp)
+            }
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    contest.title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        "💰 ${com.krieta.com.core.util.KrCurrencyFormatter.formatKr(contest.prizeKr)}",
+                        fontSize = 12.sp,
+                        color = KrietaColors.Primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "👥 ${contest.participantsCount}",
+                        fontSize = 12.sp,
+                        color = KrietaColors.OnSurfaceVariant
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = KrietaColors.SecondaryContainer
+                ) {
+                    Text(
+                        contest.category,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        fontSize = 11.sp,
+                        color = KrietaColors.OnSecondaryContainer
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CreatorCard(
+    creator: com.krieta.feature.explore.domain.model.TrendingCreator,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Box {
+                coil3.compose.AsyncImage(
+                    model = creator.avatarUrl,
+                    contentDescription = null,
+                    modifier = Modifier.size(56.dp).clip(CircleShape),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                )
+                if (creator.isVerified) {
+                    Icon(
+                        painterResource(Res.drawable.ic_verified),
+                        contentDescription = "Verified",
+                        tint = KrietaColors.Primary,
+                        modifier = Modifier.size(20.dp).align(Alignment.BottomEnd)
+                            .background(KrietaColors.Background, CircleShape)
+                            .padding(2.dp)
+                    )
+                }
+            }
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    creator.displayName,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
+                Text(
+                    "@${creator.username}",
+                    fontSize = 13.sp,
+                    color = KrietaColors.OnSurfaceVariant
+                )
+                creator.bio?.let {
+                    Text(
+                        it,
+                        fontSize = 12.sp,
+                        color = KrietaColors.OnSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+            
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    formatCount(creator.followerCount.toLong()),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+                Text(
+                    "followers",
+                    fontSize = 11.sp,
+                    color = KrietaColors.OnSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+private fun formatCount(count: Long): String {
+    return when {
+        count >= 1_000_000 -> "${count / 1_000_000}M"
+        count >= 1_000 -> "${count / 1_000}K"
+        else -> count.toString()
     }
 }
 

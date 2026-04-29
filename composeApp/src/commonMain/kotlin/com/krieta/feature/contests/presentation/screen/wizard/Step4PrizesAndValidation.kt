@@ -1,6 +1,8 @@
 package com.krieta.feature.contests.presentation.screen.wizard
 
-import androidx.compose.foundation.BorderStroke
+import com.krieta.com.core.util.SafeConversion
+import com.krieta.com.core.util.formatString
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.krieta.feature.contests.presentation.viewmodel.CreateContestState
 import com.krieta.feature.contests.presentation.viewmodel.CreateContestViewModel
 import com.krieta.feature.contests.presentation.viewmodel.SelectionMethod
+import androidx.compose.foundation.BorderStroke
 
 /**
  * Step 4: Prizes and Selection Method
@@ -218,7 +221,7 @@ private fun PrizeInputField(
         OutlinedTextField(
             value = if (amount == 0.0) "" else amount.toString(),
             onValueChange = { 
-                val newAmount = it.toDoubleOrNull() ?: 0.0
+                val newAmount = com.krieta.com.core.util.SafeConversion.toDoubleOrDefaultWithValidation(it, "prizeAmount", 0.0, defaultValue = 0.0)
                 onAmountChange(newAmount)
             },
             label = { Text("Prize Amount ($currencyCode)") },
@@ -293,7 +296,7 @@ private fun TotalPrizePoolDisplay(
                     color = Color(0xFFA0A0A0)
                 )
                 Text(
-                    text = "${viewModel.getCurrencyCode()} ${String.format("%.2f", state.totalPrizePool)}",
+                    text = "${viewModel.getCurrencyCode()} ${formatString("%.2f", state.totalPrizePool)}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -659,7 +662,7 @@ private fun AirdropAmountInput(
         OutlinedTextField(
             value = if (amount == 0.0) "" else amount.toString(),
             onValueChange = { 
-                val newAmount = it.toDoubleOrNull() ?: 0.0
+                val newAmount = com.krieta.com.core.util.SafeConversion.toDoubleOrDefaultWithValidation(it, "prizeAmount", 0.0, defaultValue = 0.0)
                 onAmountChange(newAmount)
             },
             label = { Text("Kr Amount") },
@@ -686,7 +689,7 @@ private fun AirdropAmountInput(
             val currencyCode = viewModel.getCurrencyCode()
             val fiatAmount = viewModel.convertToFiat(amount, applyMargin = false)
             Text(
-                text = "≈ $currencyCode ${String.format("%.2f", fiatAmount)}",
+                text = "≈ $currencyCode ${formatString("%.2f", fiatAmount)}",
                 fontSize = 12.sp,
                 color = Color(0xFFF5A623),
                 modifier = Modifier.padding(start = 4.dp)
@@ -783,3 +786,6 @@ private fun getSelectionMethodDescription(method: SelectionMethod): String {
         SelectionMethod.COMBINATION -> "Judges + voting combined"
     }
 }
+
+
+

@@ -1,12 +1,11 @@
 package com.krieta.feature.marketplace.presentation.screen
-
+import com.krieta.com.core.util.SafeConversion
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -67,7 +66,7 @@ fun SponsorContestScreen(
                     onValueChange = { productUrl = it },
                     label = { Text("Product URL (Optional)") },
                     modifier = Modifier.fillMaxWidth(),
-                    leadingIcon = { Icon(Icons.Default.Link, null) }
+                    leadingIcon = { Icon(painterResource(Res.drawable.ic_link), null) }
                 )
             }
             
@@ -99,7 +98,7 @@ fun SponsorContestScreen(
                 )) {
                     Column(Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.primary)
+                            Icon(painterResource(Res.drawable.ic_info), null, tint = MaterialTheme.colorScheme.primary)
                             Spacer(Modifier.width(8.dp))
                             Text("Legal Compliance", style = MaterialTheme.typography.titleSmall)
                         }
@@ -120,7 +119,7 @@ fun SponsorContestScreen(
                     onClick = {
                         viewModel.sponsorContest(
                             contestId,
-                            amount.toDoubleOrNull() ?: 0.0,
+                            SafeConversion.toDoubleOrDefaultWithValidation(amount, "sponsorAmount", 0.0, defaultValue = 0.0),
                             productUrl.ifBlank { null },
                             enablePurchaseToEnter
                         )
@@ -197,7 +196,7 @@ fun GamificationScreen(
                             )
                         ) {
                             Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.EmojiEvents, null, Modifier.size(48.dp))
+                                Icon(painterResource(Res.drawable.ic_emoji_events), null, Modifier.size(48.dp))
                                 Spacer(Modifier.width(16.dp))
                                 Column {
                                     Text("Almost There!", style = MaterialTheme.typography.titleMedium)

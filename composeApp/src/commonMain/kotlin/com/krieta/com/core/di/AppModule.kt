@@ -3,6 +3,7 @@ package com.krieta.com.core.di
 import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.com.core.network.KtorClientFactory
 import com.krieta.com.core.security.TokenManager
+import com.krieta.com.core.security.DeviceSecurity
 import com.krieta.feature.auth.di.authModule
 import com.krieta.feature.contests.di.contestsModule
 import com.krieta.feature.feed.di.feedModule
@@ -14,6 +15,7 @@ import com.krieta.feature.live.di.liveModule
 import com.krieta.feature.analytics.di.analyticsModule
 import com.krieta.feature.comments.di.commentsModule
 import com.krieta.feature.marketplace.di.marketplaceModule
+import com.krieta.feature.explore.di.exploreModule
 import com.krieta.com.core.network.WebSocketService
 import io.ktor.client.HttpClient
 import org.koin.core.module.Module
@@ -42,9 +44,11 @@ val appModules: List<Module>
         shopModule,
         analyticsModule,
         commentsModule,
+        exploreModule,
         com.krieta.feature.chat.di.chatModule,
         com.krieta.feature.stories.di.storiesModule,
         com.krieta.feature.chama.di.chamaModule,
+        com.krieta.feature.sponsored.di.sponsoredModule,
         marketplaceModule,
         liveModule,
     )

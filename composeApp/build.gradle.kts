@@ -37,6 +37,7 @@ kotlin {
     // Enable expect/actual classes feature
     sourceSets.all {
         languageSettings.optIn("kotlin.ExperimentalMultiplatform")
+        languageSettings.optIn("kotlin.time.ExperimentalTime")
     }
 
     sourceSets {
@@ -62,6 +63,9 @@ kotlin {
             // Security
             implementation(libs.security.crypto)
             
+            // Browser (for OAuth)
+            implementation("androidx.browser:browser:1.8.0")
+            
             // Location
             implementation(libs.play.services.location)
 
@@ -74,6 +78,7 @@ kotlin {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.compose.uiToolingPreview)
@@ -116,6 +121,9 @@ kotlin {
             // DataStore
             implementation(libs.datastore.preferences)
 
+            // Kermit Logger
+            implementation("co.touchlab:kermit:2.0.2")
+
             // FileKit - Cross Platform File Picker
             implementation("io.github.vinceglb:filekit-compose:0.8.8")
         }
@@ -157,6 +165,7 @@ buildConfig {
     buildConfigField("String", "RAILWAY_URL", "\"${localProps.getProperty("RAILWAY_BASE_URL", "10.0.2.2:3000")}\"")
     buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${localProps.getProperty("GOOGLE_CLIENT_ID", "")}\"")
     buildConfigField("String", "APPLE_CLIENT_ID", "\"${localProps.getProperty("APPLE_CLIENT_ID", "")}\"")
+    buildConfigField("String", "TRANSACTION_SIGNING_SECRET", "\"${localProps.getProperty("TRANSACTION_SIGNING_SECRET", "dev-secret-key")}\"")
 }
 
 android {

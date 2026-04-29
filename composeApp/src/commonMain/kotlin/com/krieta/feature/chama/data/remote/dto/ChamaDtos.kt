@@ -151,6 +151,7 @@ data class UpdateChamaRequest(
     val maxMembers: Int? = null,
     val isLocked: Boolean? = null,
     val autoLockOnFull: Boolean? = null,
+    val contributionAmountKr: Double? = null,
     val penaltyAmountKr: Double? = null,
     val gracePeriodDays: Int? = null,
     val minApprovals: Int? = null,
@@ -280,4 +281,42 @@ data class ChamaCycleListResponseDto(
 data class DefaultSuccessResponseDto(
     val success: Boolean,
     val message: String? = null
+)
+
+@Serializable
+data class ChamaBalanceDto(
+    val krBalance: String,
+    val totalContributions: String,
+    val totalPayouts: String,
+    val pendingPayouts: String
+)
+
+@Serializable
+data class ChamaPayoutDto(
+    val id: String,
+    val chamaId: String,
+    val recipientUserId: String,
+    val amountKr: String,
+    val status: String,
+    val requestedAt: String,
+    val approvedAt: String? = null,
+    val recipient: UserSnippetDto? = null,
+    val approvals: List<PayoutApprovalDto> = emptyList()
+)
+
+@Serializable
+data class PayoutApprovalDto(
+    val id: String,
+    val payoutId: String,
+    val approverId: String,
+    val decision: String,
+    val reason: String? = null,
+    val createdAt: String,
+    val approver: UserSnippetDto? = null
+)
+
+@Serializable
+data class ChamaPayoutListResponseDto(
+    val success: Boolean,
+    val payouts: List<ChamaPayoutDto>
 )

@@ -32,9 +32,14 @@ class WalletViewModel(
     private val _state = MutableStateFlow<WalletState>(WalletState.Loading)
     val state: StateFlow<WalletState> = _state.asStateFlow()
 
-    init {
-        webSocketService.connect()
-        listenForWalletUpdates()
+    private var isInitialized = false
+
+    private fun ensureInitialized() {
+        if (!isInitialized) {
+            isInitialized = true
+            webSocketService.connect()
+            listenForWalletUpdates()
+        }
     }
 
     private fun listenForWalletUpdates() {
@@ -62,6 +67,7 @@ class WalletViewModel(
     }
 
     fun fetchWalletData(countryCode: String) {
+        ensureInitialized()
         val targetCurrency = CurrencyMapper.getCurrencyForCountry(countryCode)
         screenModelScope.launch {
             _state.value = WalletState.Loading

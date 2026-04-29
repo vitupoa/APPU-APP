@@ -6,9 +6,11 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.periodUntil
+import kotlin.time.ExperimentalTime
 
 expect fun platformNowMillis(): Long
 
+@OptIn(ExperimentalTime::class)
 object DateTimeUtil {
 
 

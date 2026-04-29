@@ -38,12 +38,17 @@ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINA
  * Generate signed upload params for client-side direct upload.
  * Enforces folder routing — client cannot choose arbitrary folders.
  * 
- * Direct signed upload (no upload_preset):
+ * SECURITY: Uses signed uploads only (no upload_preset)
+ * - Upload preset "Krieta" should be disabled in Cloudinary dashboard
+ * - All uploads must go through this signed endpoint
+ * - Folder is validated and signed
+ * - Webhook validates uploads and deletes unauthorized ones
+ * 
+ * Direct signed upload:
  * - Sign: timestamp + folder
  * - Send: api_key, timestamp, signature, folder, file
  * 
- * NOTE: upload_preset is NOT used because sending it causes Cloudinary
- * to treat the request as unsigned regardless of signature presence.
+ * NOTE: upload_preset is NOT used because it allows unsigned uploads.
  * Instead, folder is sent directly as a signed parameter.
  * 
  * Cloudinary excludes from signature: file, cloud_name, resource_type, type, api_key.

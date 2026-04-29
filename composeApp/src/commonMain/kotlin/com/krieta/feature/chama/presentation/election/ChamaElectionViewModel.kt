@@ -41,6 +41,7 @@ class ChamaElectionViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(isLoading = false, election = result.data) }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
@@ -57,6 +58,7 @@ class ChamaElectionViewModel(
                     _state.update { it.copy(isActionLoading = false, successMessage = "Nomination successful") }
                     loadElection()
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isActionLoading = false, error = result.message) }
                 }
@@ -73,6 +75,7 @@ class ChamaElectionViewModel(
                     _state.update { it.copy(isActionLoading = false, successMessage = "Seconded successfully") }
                     loadElection()
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isActionLoading = false, error = result.message) }
                 }
@@ -89,6 +92,7 @@ class ChamaElectionViewModel(
                     _state.update { it.copy(isActionLoading = false, successMessage = "Vote cast successfully") }
                     loadElection()
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isActionLoading = false, error = result.message) }
                 }

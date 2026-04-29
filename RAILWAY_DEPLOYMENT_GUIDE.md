@@ -1,349 +1,391 @@
-# 🚂 Railway Deployment Guide - Prisma 7.8.0
+# RAILWAY DEPLOYMENT GUIDE
 
-## 🚨 Issue Fixed
-
-**Problem**: `P3006 - Migration failed to apply cleanly to the shadow database`  
-**Cause**: Railway databases don't support shadow databases by default  
-**Solution**: Use `prisma db push` for Railway or configure shadow database
+## Overview
+This guide covers deploying the updated Krieta backend with logging, analytics, and database optimizations to Railway.
 
 ---
 
-## ✅ Solution 1: Use `prisma db push` (Recommended for Railway)
+## Prerequisites
 
-For production databases like Railway, use `db push` instead of `migrate dev`:
+- Railway CLI installed: `npm install -g @railway/cli`
+- Railway project connected
+- Database URL from Railway dashboard
+
+---
+
+## Step 1: Verify Backend Changes
+
+All backend changes are already in the codebase:
+- ✅ Logger integrated in `src/index.ts`
+- ✅ Database monitoring in `src/config/database.ts`
+- ✅ AnalyticsService created in `src/services/analytics.service.ts`
+
+**No code deployment needed - changes are already live!**
+
+---
+
+## Step 2: Database Migration (REQUIRED)
+
+### Option A: Using Railway CLI (Recommended)
 
 ```bash
-# Clean install dependencies
-cd backend
-rm -rf node_modules package-lock.json
-npm install
+# 1. Login to Railway
+railway login
 
-# Generate Prisma Client 7.8.0
-npx prisma generate
+# 2. Link to your project
+railway link
 
-# Push schema to Railway database (no shadow database needed)
-npx prisma db push
+# 3. Get database connection string
+railway variables
 
-# Start server
-npm run dev
+# 4. Connect to database and run migration
+railway run psql $DATABASE_URL < add_performance_indexes.sql
+
+# 5. Verify indexes were created
+railway run psql $DATABASE_URL -c "SELECT schemaname, tablename, indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname LIKE '%_idx' ORDER BY tablename;"
 ```
 
-### Why `db push`?
-- ✅ No shadow database required
-- ✅ Works with Railway, Heroku, Vercel
-- ✅ Directly syncs schema to database
-- ✅ Perfect for development/staging
+### Option B: Using Railway Dashboard
 
----
+1. Go to Railway Dashboard: https://railway.app
+2. Select your project: `appu-app-production`
+3. Click on PostgreSQL service
+4. Click "Connect" tab
+5. Copy the connection string
+6. Use any PostgreSQL client to connect
+7. Run the SQL from `add_performance_indexes.sql`
 
-## ✅ Solution 2: Configure Shadow Database (For Migrations)
+### Option C: Using Prisma (Alternative)
 
-If you need proper migrations, add a shadow database URL to `.env`:
-
-### Step 1: Add Shadow Database URL
-
-Create a second database in Railway or use a local PostgreSQL:
-
-```env
-# .env
-DATABASE_URL="postgresql://user:pass@maglev.proxy.rlwy.net:47013/railway"
-SHADOW_DATABASE_URL="postgresql://user:pass@localhost:5432/krieta_shadow"
-```
-
-### Step 2: Run Migrations
-
-```bash
-npx prisma migrate dev --name add_shop_features
-```
-
----
-
-## 🔧 Quick Fix Commands
-
-### For Railway (Production):
 ```bash
 cd backend
 
-# 1. Clean install
-rm -rf node_modules package-lock.json
-npm install
+# 1. Update schema.prisma with additional indexes
+# (See DATABASE_OPTIMIZATION.md for index definitions)
 
-# 2. Generate Prisma Client 7.8.0
+# 2. Generate Prisma client
 npx prisma generate
 
-# 3. Push schema (no migrations)
+# 3. Push changes to database
 npx prisma db push
 
-# 4. Verify
-npx prisma db pull
-```
-
-### For Local Development:
-```bash
-cd backend
-
-# 1. Clean install
-rm -rf node_modules package-lock.json
-npm install
-
-# 2. Generate Prisma Client 7.8.0
-npx prisma generate
-
-# 3. Run migrations
-npx prisma migrate dev
-
-# 4. Start server
-npm run dev
-```
-
----
-
-## 📝 What Changed
-
-### 1. package.json Updates
-```json
-{
-  "dependencies": {
-    "@prisma/adapter-pg": "^7.8.0",  // Updated from 7.0.0
-    "@prisma/client": "^7.8.0"       // Already at 7.8.0
-  },
-  "devDependencies": {
-    "prisma": "^7.8.0"                // Updated from 6.19.3
-  }
-}
-```
-
-### 2. schema.prisma Updates
-```prisma
-datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")  // Added
-}
-```
-
-### 3. Removed Dependencies
-- ❌ `bullmq@0.0.1` (unused, caused node-uuid deprecation)
-
----
-
-## 🎯 Railway Deployment Steps
-
-### Step 1: Update Dependencies Locally
-```bash
-cd backend
-rm -rf node_modules package-lock.json
-npm install
-npx prisma generate
-```
-
-### Step 2: Push to Git
-```bash
-git add .
-git commit -m "Update Prisma to 7.8.0 and fix Railway deployment"
-git push origin main
-```
-
-### Step 3: Deploy to Railway
-
-Railway will automatically:
-1. Install dependencies (Prisma 7.8.0)
-2. Run `npm run postinstall` (prisma generate)
-3. Start the server
-
-### Step 4: Push Schema to Railway Database
-
-After deployment, run this command locally (connected to Railway DB):
-
-```bash
-npx prisma db push
-```
-
-Or add to Railway's build command:
-```json
-{
-  "scripts": {
-    "build": "prisma generate && prisma db push && tsc --noEmit"
-  }
-}
-```
-
----
-
-## 🔍 Verify Prisma Version
-
-After installation, verify the version:
-
-```bash
-npx prisma --version
-```
-
-Expected output:
-```
-prisma                  : 7.8.0
-@prisma/client          : 7.8.0
-Computed binaryTarget   : windows
-Operating System        : windows
-Architecture            : x64
-Node.js                 : v22.x.x
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Issue: Still showing Prisma 6.19.3
-
-**Solution**:
-```bash
-# Clear Prisma cache
-rm -rf node_modules/.prisma
-rm -rf src/generated/prisma
-
-# Reinstall
-npm install
-npx prisma generate
-```
-
-### Issue: Cannot reach database server
-
-**Solution**:
-1. Check Railway database is running
-2. Verify `DATABASE_URL` in `.env`
-3. Check Railway network connectivity
-4. Try `npx prisma db pull` to test connection
-
-### Issue: Shadow database error persists
-
-**Solution**: Use `prisma db push` instead of `migrate dev`
-```bash
-npx prisma db push
-```
-
-### Issue: node-uuid deprecation warning
-
-**Solution**: Already fixed by removing `bullmq@0.0.1`
-```bash
-npm list node-uuid
-# Should return empty
-```
-
----
-
-## 📊 Comparison: migrate dev vs db push
-
-| Feature | `migrate dev` | `db push` |
-|---------|---------------|-----------|
-| **Shadow DB Required** | ✅ Yes | ❌ No |
-| **Migration History** | ✅ Yes | ❌ No |
-| **Railway Compatible** | ⚠️ Needs config | ✅ Yes |
-| **Production Use** | ✅ Recommended | ⚠️ Dev/Staging |
-| **Speed** | Slower | ✅ Faster |
-| **Rollback** | ✅ Yes | ❌ No |
-
----
-
-## 🎯 Recommended Workflow
-
-### For Railway (Production):
-```bash
-# Use db push for quick schema sync
-npx prisma db push
-```
-
-### For Local Development:
-```bash
-# Use migrations for version control
-npx prisma migrate dev
-```
-
-### For CI/CD:
-```bash
-# Use migrate deploy for production migrations
+# OR create a migration
+npx prisma migrate dev --name add_performance_indexes
 npx prisma migrate deploy
 ```
 
 ---
 
-## 📝 Environment Variables
+## Step 3: Verify Deployment
 
-### Required for Railway:
-```env
-DATABASE_URL="postgresql://user:pass@maglev.proxy.rlwy.net:47013/railway"
-```
-
-### Optional (for migrations):
-```env
-SHADOW_DATABASE_URL="postgresql://user:pass@localhost:5432/krieta_shadow"
-```
-
----
-
-## ✅ Success Checklist
-
-After deployment, verify:
-
-- [ ] `npm install` completes without errors
-- [ ] No `node-uuid` deprecation warnings
-- [ ] `npx prisma --version` shows 7.8.0
-- [ ] `npx prisma generate` succeeds
-- [ ] `npx prisma db push` succeeds (Railway)
-- [ ] Server starts without errors
-- [ ] Database queries work
-- [ ] Shop endpoints respond
-
----
-
-## 🚀 Quick Commands Reference
+### Check Logs
 
 ```bash
-# Clean install
-rm -rf node_modules package-lock.json && npm install
+# View real-time logs
+railway logs
 
-# Generate Prisma Client
-npx prisma generate
+# Look for:
+# - "JWT Secret Manager initialized"
+# - "Krieta API running on port 3000"
+# - "Database connection initialized"
+# - "All workers started successfully"
+# - Request/response logs with duration
+```
 
-# Push schema (Railway)
-npx prisma db push
+### Test API
 
-# Run migrations (Local)
-npx prisma migrate dev
+```bash
+# Health check
+curl https://appu-app-production.up.railway.app/health
 
-# Deploy migrations (Production)
-npx prisma migrate deploy
+# Expected response:
+# {"status":"ok","service":"krieta-api","version":"1.0.0"}
+```
 
-# Check version
-npx prisma --version
+### Monitor Performance
 
-# Test connection
-npx prisma db pull
+```bash
+# Watch for slow queries in logs
+railway logs --filter "Slow query"
 
-# View database
-npx prisma studio
+# Watch for slow requests
+railway logs --filter "Slow request"
 ```
 
 ---
 
-## 📞 Need Help?
+## Step 4: Environment Variables
 
-### Railway Database Issues:
-1. Check Railway dashboard for database status
-2. Verify connection string in Railway variables
-3. Test connection: `npx prisma db pull`
+Verify these are set in Railway dashboard:
 
-### Prisma Version Issues:
-1. Clear cache: `rm -rf node_modules/.prisma`
-2. Reinstall: `npm install`
-3. Regenerate: `npx prisma generate`
+```bash
+# Required
+DATABASE_URL=postgresql://...
+NODE_ENV=production
+PORT=3000
+JWT_SECRET=...
+ENCRYPTION_KEY=121c93c9d296c455e4f478852e06c9d417bbd156f41ebf264b6eb94b58c2411e
+CSRF_SECRET=fb785d40cbd522c8d394ca4ea81352fe0bb98c740321ba22e2903192ad2d1e42
 
-### Migration Issues:
-1. Use `db push` for Railway
-2. Use `migrate dev` for local
-3. Use `migrate deploy` for production
+# Optional (for logging)
+LOG_LEVEL=INFO  # DEBUG, INFO, WARN, ERROR, FATAL
+```
 
 ---
 
-**Updated**: December 2024  
-**Prisma Version**: 7.8.0  
-**Railway Compatible**: ✅ YES  
-**Status**: Ready to Deploy 🚀
+## Step 5: Performance Monitoring
+
+### Check Database Performance
+
+```sql
+-- Connect to Railway database
+railway run psql $DATABASE_URL
+
+-- Check slow queries
+SELECT 
+  query,
+  calls,
+  total_time,
+  mean_time,
+  max_time
+FROM pg_stat_statements
+WHERE mean_time > 100
+ORDER BY mean_time DESC
+LIMIT 20;
+
+-- Check index usage
+SELECT 
+  schemaname,
+  tablename,
+  indexname,
+  idx_scan,
+  idx_tup_read
+FROM pg_stat_user_indexes
+WHERE idx_scan > 0
+ORDER BY idx_scan DESC
+LIMIT 20;
+
+-- Check connection count
+SELECT 
+  count(*) as connections,
+  state
+FROM pg_stat_activity
+GROUP BY state;
+```
+
+### Monitor API Performance
+
+```bash
+# Watch request logs
+railway logs --filter "INFO.*GET\|POST\|PUT\|DELETE"
+
+# Watch for errors
+railway logs --filter "ERROR"
+
+# Watch for warnings
+railway logs --filter "WARN"
+```
+
+---
+
+## Step 6: Rollback Plan (If Needed)
+
+If issues occur:
+
+```bash
+# 1. Check logs for errors
+railway logs --tail 100
+
+# 2. Rollback database migration (if needed)
+railway run psql $DATABASE_URL
+
+# Then run:
+DROP INDEX IF EXISTS transactions_user_type_created_idx;
+DROP INDEX IF EXISTS transactions_status_created_idx;
+DROP INDEX IF EXISTS shorts_user_created_locked_idx;
+DROP INDEX IF EXISTS shorts_contest_created_idx;
+DROP INDEX IF EXISTS shorts_views_idx;
+DROP INDEX IF EXISTS shorts_likes_idx;
+DROP INDEX IF EXISTS posts_user_created_locked_idx;
+DROP INDEX IF EXISTS posts_likes_idx;
+DROP INDEX IF EXISTS wallets_balance_idx;
+DROP INDEX IF EXISTS contest_submissions_contest_score_idx;
+DROP INDEX IF EXISTS contest_submissions_contest_votes_idx;
+DROP INDEX IF EXISTS contest_submissions_contest_rank_idx;
+DROP INDEX IF EXISTS orders_buyer_created_idx;
+DROP INDEX IF EXISTS orders_status_created_idx;
+DROP INDEX IF EXISTS live_streams_status_viewers_idx;
+DROP INDEX IF EXISTS live_streams_category_status_idx;
+DROP INDEX IF EXISTS chamas_status_created_idx;
+DROP INDEX IF EXISTS chama_members_chama_rotation_idx;
+DROP INDEX IF EXISTS chama_members_chama_status_idx;
+
+# 3. Restart service
+railway restart
+```
+
+---
+
+## Step 7: Post-Deployment Verification
+
+### Checklist
+
+- [ ] Health endpoint responds: `curl https://appu-app-production.up.railway.app/health`
+- [ ] Logs show request/response logging
+- [ ] Logs show database query monitoring
+- [ ] No error spikes in logs
+- [ ] API response times < 500ms
+- [ ] Database query times < 200ms
+- [ ] All indexes created successfully
+
+### Test Critical Endpoints
+
+```bash
+# Test feed endpoint
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  https://appu-app-production.up.railway.app/api/v1/feed/discover?limit=20
+
+# Test contest endpoint
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  https://appu-app-production.up.railway.app/api/v1/contests
+
+# Test shop endpoint
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  https://appu-app-production.up.railway.app/api/v1/shop/products?limit=20
+```
+
+---
+
+## Step 8: Monitoring Setup
+
+### Railway Dashboard
+
+1. Go to Metrics tab
+2. Monitor:
+   - CPU usage
+   - Memory usage
+   - Network traffic
+   - Response times
+
+### Database Monitoring
+
+```sql
+-- Enable pg_stat_statements (if not already enabled)
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+
+-- Reset statistics
+SELECT pg_stat_statements_reset();
+
+-- Check after 1 hour of traffic
+SELECT 
+  query,
+  calls,
+  total_time,
+  mean_time,
+  max_time
+FROM pg_stat_statements
+ORDER BY mean_time DESC
+LIMIT 20;
+```
+
+---
+
+## Troubleshooting
+
+### Issue: Logs not showing
+
+**Solution:**
+```bash
+# Check LOG_LEVEL environment variable
+railway variables
+
+# Set to DEBUG for more verbose logging
+railway variables set LOG_LEVEL=DEBUG
+
+# Restart service
+railway restart
+```
+
+### Issue: Slow queries detected
+
+**Solution:**
+```bash
+# Check if indexes were created
+railway run psql $DATABASE_URL -c "SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname LIKE '%_idx';"
+
+# If missing, re-run migration
+railway run psql $DATABASE_URL < add_performance_indexes.sql
+```
+
+### Issue: High memory usage
+
+**Solution:**
+```bash
+# Check connection pool settings
+# Update DATABASE_URL with connection limits
+# Example: postgresql://user:pass@host:5432/db?connection_limit=20&pool_timeout=10
+
+railway variables set DATABASE_URL="postgresql://...?connection_limit=20&pool_timeout=10"
+railway restart
+```
+
+---
+
+## Success Criteria
+
+✅ **Deployment Successful When:**
+1. Health endpoint responds with 200 OK
+2. Logs show structured logging format
+3. Request/response logging active
+4. Database query monitoring active
+5. All indexes created successfully
+6. No error spikes
+7. API response times < 500ms (p95)
+8. Database query times < 200ms (p95)
+
+---
+
+## Next Steps After Deployment
+
+1. **Monitor for 24 hours**
+   - Watch logs for errors
+   - Monitor performance metrics
+   - Check slow query logs
+
+2. **Tune if needed**
+   - Adjust LOG_LEVEL
+   - Tune connection pool
+   - Add more indexes if needed
+
+3. **Integrate Analytics**
+   - Add AnalyticsService to routes
+   - Track user interactions
+   - Monitor conversion funnels
+
+4. **Set up alerts**
+   - Slow query alerts
+   - Error rate alerts
+   - Performance degradation alerts
+
+---
+
+## Support
+
+**Documentation:**
+- `FINAL_IMPLEMENTATION_SUMMARY.md` - Complete implementation details
+- `DATABASE_OPTIMIZATION.md` - Database optimization guide
+- `ERROR_HANDLING_LOGGING_ANALYTICS_SUMMARY.md` - Full technical details
+
+**Railway Dashboard:**
+- https://railway.app/project/appu-app-production
+
+**Database Connection:**
+- Host: Provided by Railway
+- Database: krieta
+- User: postgres
+- Connection string in Railway variables
+
+---
+
+**Last Updated:** 2026-01-15
+**Status:** READY FOR DEPLOYMENT ✅

@@ -1,4 +1,9 @@
 package com.krieta.feature.contests.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -137,6 +142,9 @@ class ContestSubmissionFeedScreen : Screen {
             // Media layer
             if (submission.mediaType == "VIDEO") {
                 var isPlaying by remember { mutableStateOf(isActive) }
+                var currentPosition by remember { mutableStateOf(0L) }
+                var duration by remember { mutableStateOf(0L) }
+                var seekToPosition by remember { mutableStateOf<Long?>(null) }
                 
                 LaunchedEffect(isActive) {
                     isPlaying = isActive
@@ -148,7 +156,24 @@ class ContestSubmissionFeedScreen : Screen {
                     modifier = Modifier.fillMaxSize(),
                     onPlaybackStateChanged = { playing ->
                         isPlaying = playing
-                    }
+                    },
+                    onProgressUpdate = { position, dur ->
+                        currentPosition = position
+                        duration = dur
+                    },
+                    seekToPosition = seekToPosition
+                )
+                
+                // Video progress bar
+                com.krieta.com.core.ui.components.VideoProgressBar(
+                    currentPosition = currentPosition,
+                    duration = duration,
+                    onSeek = { position ->
+                        seekToPosition = position
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 100.dp, start = 16.dp, end = 72.dp)
                 )
             } else {
                 AsyncImage(
@@ -174,7 +199,7 @@ class ContestSubmissionFeedScreen : Screen {
                     .background(Color.Red.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.ThumbDown, null, tint = Color.White, modifier = Modifier.size(80.dp))
+                Icon(painterResource(Res.drawable.ic_thumb_down), null, tint = Color.White, modifier = Modifier.size(80.dp))
             }
 
             Box(
@@ -184,7 +209,7 @@ class ContestSubmissionFeedScreen : Screen {
                     .background(Color.Green.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.ThumbUp, null, tint = Color.White, modifier = Modifier.size(80.dp))
+                Icon(painterResource(Res.drawable.ic_thumb_up), null, tint = Color.White, modifier = Modifier.size(80.dp))
             }
 
             // Contest banner
@@ -242,12 +267,12 @@ class ContestSubmissionFeedScreen : Screen {
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 ActionButton(
-                    icon = Icons.Default.ThumbUp,
+                    icon = painterResource(Res.drawable.ic_thumb_up),
                     count = submission.votes,
                     onClick = onUpvote
                 )
                 ActionButton(
-                    icon = Icons.AutoMirrored.Filled.Comment,
+                    icon = painterResource(Res.drawable.ic_comment),
                     count = 0,
                     onClick = onComment
                 )
@@ -319,7 +344,7 @@ class ContestSubmissionFeedScreen : Screen {
 
     @Composable
     private fun ActionButton(
-        icon: androidx.compose.ui.graphics.vector.ImageVector,
+        icon: androidx.compose.ui.graphics.painter.Painter,
         count: Int?,
         onClick: () -> Unit,
         label: String? = null

@@ -39,6 +39,7 @@ class ChamaListViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(myChamas = result.data, isLoading = false) }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
@@ -54,6 +55,7 @@ class ChamaListViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(discoverChamas = result.data, isLoading = false) }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
@@ -71,6 +73,7 @@ class ChamaListViewModel(
                     loadMyChamas()
                     loadDiscover()
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(joiningId = null, error = it.error) }
                 }
@@ -86,6 +89,7 @@ class ChamaListViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(defaulters = result.data, isLoading = false) }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }

@@ -7,7 +7,7 @@ Because the admin dashboard requires high security, separate physical infrastruc
 ## 1. Technology Stack Recommendation
 
 We recommend building the RembrandtRAR dashboard as a **Next.js (App Router)** web application.
-* **Framework:** Next.js 14+ (React)
+* **Framework:** Next.js 16+ (React)
 * **Styling:** Tailwind CSS + Shadcn UI (for clean, accessible, enterprise-grade admin components)
 * **State Management:** Zustand (for global admin session and RBAC claims)
 * **Data Fetching:** TanStack Query (React Query) + Axios

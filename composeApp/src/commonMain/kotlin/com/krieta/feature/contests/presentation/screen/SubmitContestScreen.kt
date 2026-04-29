@@ -1,4 +1,9 @@
 package com.krieta.feature.contests.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -94,7 +99,7 @@ data class SubmitContestScreen(val contestId: String) : Screen {
                                 modifier = Modifier.padding(16.dp),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.error)
+                                Icon(painterResource(Res.drawable.ic_info), null, tint = MaterialTheme.colorScheme.error)
                                 Text(
                                     "You have already submitted an entry to this contest",
                                     color = MaterialTheme.colorScheme.onErrorContainer
@@ -225,15 +230,14 @@ private fun RequirementItem(action: ContestAction) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = when (action.actionType) {
+            Icon(painter = when (action.actionType) {
                     "FOLLOW_KRIETA" -> painterResource(Res.drawable.ic_person)
-                    "YOUTUBE_SUB" -> Icons.Default.PlayArrow
-                    "INSTAGRAM_FOLLOW" -> Icons.Default.Camera
-                    "TIKTOK_FOLLOW" -> Icons.Default.MusicNote
-                    "WATCH_VIDEO" -> Icons.Default.PlayCircle
-                    "VISIT_SHOP" -> Icons.Default.ShoppingCart
-                    else -> painterResource(Res.drawable.ic_check)Circle
+                    "YOUTUBE_SUB" -> painterResource(Res.drawable.ic_play_arrow)
+                    "INSTAGRAM_FOLLOW" -> painterResource(Res.drawable.ic_camera)
+                    "TIKTOK_FOLLOW" -> painterResource(Res.drawable.ic_music_note)
+                    "WATCH_VIDEO" -> painterResource(Res.drawable.ic_play_circle)
+                    "VISIT_SHOP" -> painterResource(Res.drawable.ic_shopping_cart)
+                    else -> painterResource(Res.drawable.ic_check)
                 },
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
@@ -249,7 +253,7 @@ private fun RequirementItem(action: ContestAction) {
                 }
             }
             if (action.targetUrl != null) {
-                Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open", tint = MaterialTheme.colorScheme.primary)
+                Icon(painterResource(Res.drawable.ic_open_in_new), "Open", tint = MaterialTheme.colorScheme.primary)
             }
         }
     }

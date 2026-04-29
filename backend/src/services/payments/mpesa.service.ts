@@ -141,4 +141,64 @@ export class MpesaService {
       phoneNumber: getValue('PhoneNumber')?.toString()
     };
   }
+
+  /**
+   * Initiates B2C (Business to Customer) withdrawal to M-Pesa.
+   */
+  static async initiateWithdrawal(params: {
+    phoneNumber: string;
+    amount: number;
+    reference: string;
+    remarks: string;
+  }): Promise<{ conversationId: string; originatorConversationId: string }> {
+    const token = await this.getAccessToken();
+    const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').substring(0, 14);
+    const securityCredential = Buffer.from(
+      `${env.MPESA_INITIATOR_PASSWORD}`
+    ).toString('base64');
+
+    const response = await axios.post(
+      env.MPESA_ENV === 'production'
+        ? 'https://api.safaricom.co.ke/mpesa/b2c/v1/paymentrequest'
+        : 'https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest',
+      {
+        InitiatorName: env.MPESA_INITIATOR_NAME,
+        SecurityCredential: securityCredential,
+        CommandID: 'BusinessPayment',
+        Amount: Math.ceil(params.amount),
+        PartyA: env.MPESA_SHORTCODE,
+        PartyB: params.phoneNumber,
+        Remarks: params.remarks,
+        QueueTimeOutURL: `${env.MPESA_CALLBACK_URL}/api/v1/payments/mpesa/b2c/timeout`,
+        ResultURL: `${env.MPESA_CALLBACK_URL}/api/v1/payments/mpesa/b2c/result`,
+        Occasion: params.reference
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (response.data.ResponseCode !== '0') {
+      throw new Error(`M-Pesa B2C failed: ${response.data.ResponseDescription}`);
+    }
+
+    return {
+      conversationId: response.data.ConversationID,
+      originatorConversationId: response.data.OriginatorConversationID
+    };
+  }
+
+  /**
+   * Verifies M-Pesa account name for withdrawal.
+   */
+  static async verifyAccountName(phoneNumber: string): Promise<{
+    accountName: string;
+    verified: boolean;
+  }> {
+    // M-Pesa doesn't provide direct name verification API
+    // This would require integration with third-party KYC services
+    // For now, return a placeholder
+    return {
+      accountName: 'M-Pesa User',
+      verified: false
+    };
+  }
 }

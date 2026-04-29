@@ -29,7 +29,8 @@ fun App() {
                 var startScreen by remember { mutableStateOf<Screen?>(null) }
 
                 LaunchedEffect(Unit) {
-                    startScreen = if (tokenManager.isLoggedIn()) {
+                    val isLoggedIn = tokenManager.isLoggedIn()
+                    startScreen = if (isLoggedIn) {
                         MainScreen()
                     } else {
                         LoginScreen()

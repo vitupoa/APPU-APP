@@ -2,6 +2,7 @@ package com.krieta.feature.wallet.data.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.safeApiCall
+import com.krieta.com.core.security.TransactionSigner
 import com.krieta.feature.wallet.data.remote.WalletApi
 import com.krieta.feature.wallet.data.remote.dto.TipRequestDto
 import com.krieta.feature.wallet.domain.model.ExchangeRate
@@ -96,6 +97,26 @@ class WalletRepositoryImpl(
             TransactionStatus.valueOf(status.uppercase())
         } catch (e: Exception) {
             TransactionStatus.UNKNOWN
+        }
+    }
+
+    override suspend fun withdraw(request: Map<String, Any>): NetworkResult<Unit> {
+        return safeApiCall {
+            val krAmount = request["krAmount"] as? Double ?: throw IllegalArgumentException("krAmount required")
+            val provider = request["provider"] as? String ?: throw IllegalArgumentException("provider required")
+            val currency = request["currency"] as? String ?: throw IllegalArgumentException("currency required")
+            
+            val nonce = TransactionSigner.generateNonce()
+            val timestamp = TransactionSigner.generateTimestamp()
+            val signature = TransactionSigner.signWithdrawal(
+                krAmount = krAmount,
+                provider = provider,
+                currency = currency,
+                timestamp = timestamp,
+                nonce = nonce
+            )
+            
+            api.withdraw(request, signature, timestamp, nonce)
         }
     }
 }

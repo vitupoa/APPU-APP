@@ -3,6 +3,7 @@ package com.krieta.feature.profile.presentation.viewmodel
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
+import com.krieta.com.core.util.currentTimeMillis
 import com.krieta.feature.profile.domain.model.BioLink
 import com.krieta.feature.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,7 @@ class BioLinksViewModel(
                         isLoading = false
                     )
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isLoading = false, error = result.message)
                 }
@@ -46,7 +48,7 @@ class BioLinksViewModel(
 
     fun addLink(label: String, url: String) {
         val newLink = BioLink(
-            id = "temp_${System.currentTimeMillis()}",
+            id = "temp_${currentTimeMillis()}",
             label = label,
             url = url,
             icon = null,
@@ -70,6 +72,7 @@ class BioLinksViewModel(
                 is NetworkResult.Success -> {
                     _state.value = _state.value.copy(links = result.data, isSaving = false)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isSaving = false, error = result.message)
                 }

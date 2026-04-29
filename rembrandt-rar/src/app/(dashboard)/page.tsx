@@ -3,9 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { formatNumber, formatCurrency } from '@/lib/utils';
 import { LoadingState } from '@/components/shared';
+import { useAdminStore } from '@/store/adminStore';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Users, DollarSign, Film, TrendingUp, ArrowUpRight,
-  ArrowDownRight, ShieldAlert, Clock
+  ArrowDownRight, ShieldAlert, Clock, Settings, LogOut, UserPlus
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -55,6 +58,10 @@ const chartTooltipStyle = {
 };
 
 export default function DashboardPage() {
+  const { logout, isSuperAdmin } = useAdminStore();
+  const router = useRouter();
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+
   const { data: overview, isLoading } = useQuery({
     queryKey: ['dashboard-overview'],
     queryFn: () => api.get('/dashboard').then(r => r.data),
@@ -80,18 +87,129 @@ export default function DashboardPage() {
     queryFn: () => api.get('/dashboard/top-creators?limit=5').then(r => r.data),
   });
 
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
+  const handleAddAdmin = () => {
+    router.push('/team?action=add');
+    setShowSettingsMenu(false);
+  };
+
   if (isLoading) return <LoadingState message="Loading dashboard..." />;
 
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em' }}>
-          Dashboard
-        </h1>
-        <p style={{ margin: '4px 0 0', fontSize: 14, color: 'var(--rar-text-muted)' }}>
-          Krieta platform overview and real-time analytics
-        </p>
+      <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em' }}>
+            Dashboard
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: 14, color: 'var(--rar-text-muted)' }}>
+            Krieta platform overview and real-time analytics
+          </p>
+        </div>
+        
+        {/* Settings Menu */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              background: 'var(--rar-surface)',
+              border: '1px solid var(--rar-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--rar-surface-active)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--rar-surface)'}
+          >
+            <Settings size={20} color="var(--rar-text)" />
+          </button>
+
+          {showSettingsMenu && (
+            <>
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 999,
+                }}
+                onClick={() => setShowSettingsMenu(false)}
+              />
+              <div style={{
+                position: 'absolute',
+                top: 48,
+                right: 0,
+                width: 220,
+                background: 'var(--rar-surface)',
+                border: '1px solid var(--rar-border)',
+                borderRadius: 12,
+                boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+                zIndex: 1000,
+                overflow: 'hidden',
+              }}>
+                {isSuperAdmin() && (
+                  <button
+                    onClick={handleAddAdmin}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      background: 'transparent',
+                      border: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      cursor: 'pointer',
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: 'var(--rar-text)',
+                      transition: 'background 0.2s',
+                      borderBottom: '1px solid var(--rar-border)',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--rar-surface-active)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <UserPlus size={18} />
+                    Add Admin
+                  </button>
+                )}
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'transparent',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    cursor: 'pointer',
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color: '#ef4444',
+                    transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#ef444410'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Stat Cards */}

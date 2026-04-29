@@ -476,4 +476,126 @@ router.get('/team', requireSuperAdmin as any, async (_req: RarRequest, res: Resp
   catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
+router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
+  try {
+    const { email, username, firstName, lastName, password, role } = req.body;
+
+    // Validate required fields
+    if (!email || !username || !firstName || !lastName || !password || !role) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    // Validate role
+    const validRoles = ['SUPER_ADMIN', 'MODERATOR', 'FINANCE_MANAGER', 'SUPPORT_AGENT'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ error: 'Invalid role' });
+    }
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: email.toLowerCase() },
+          { username: username.toLowerCase() },
+        ],
+      },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'User with this email or username already exists' });
+    }
+
+    // Hash password
+    const bcrypt = await import('bcrypt');
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Create user and admin profile in transaction
+    const newAdmin = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: email.toLowerCase(),
+          username: username.toLowerCase(),
+          firstName,
+          lastName,
+          displayName: `${firstName} ${lastName}`,
+          passwordHash,
+          country: 'KE',
+          currency: 'KES',
+          isAdmin: true,
+        },
+      });
+
+      const adminProfile = await tx.adminProfile.create({
+        data: {
+          userId: user.id,
+          role,
+          grantedBy: req.userId!,
+          isActive: true,
+        },
+      });
+
+      // Create wallet
+      await tx.wallet.create({
+        data: {
+          userId: user.id,
+          krBalance: 0,
+        },
+      });
+
+      return { ...user, adminProfile };
+    });
+
+    // Log audit
+    await AuditService.log(
+      req.userId!,
+      'admin.create',
+      'user',
+      newAdmin.id,
+      { email, username, role },
+      req.ip,
+      req.headers['user-agent'] as string | undefined
+    );
+
+    res.status(201).json({
+      success: true,
+      admin: {
+        id: newAdmin.id,
+        email: newAdmin.email,
+        username: newAdmin.username,
+        displayName: newAdmin.displayName,
+        role: newAdmin.adminProfile.role,
+      },
+    });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// DATABASE MONITORING (SUPER ADMIN ONLY)
+// ═══════════════════════════════════════════════════════════
+
+router.get('/database/stats', requireSuperAdmin as any, async (_req: RarRequest, res: Response) => {
+  try {
+    const [connections, slowQueries, indexUsage, tableStats] = await Promise.all([
+      prisma.$queryRaw`SELECT count(*) as connections, state FROM pg_stat_activity GROUP BY state`,
+      prisma.$queryRaw`SELECT query, calls, total_time, mean_time, max_time FROM pg_stat_statements WHERE mean_time > 100 ORDER BY mean_time DESC LIMIT 20`,
+      prisma.$queryRaw`SELECT schemaname, tablename, indexname, idx_scan, idx_tup_read FROM pg_stat_user_indexes WHERE idx_scan > 0 ORDER BY idx_scan DESC LIMIT 20`,
+      prisma.$queryRaw`SELECT schemaname, tablename, n_live_tup as row_count, pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as total_size FROM pg_stat_user_tables ORDER BY n_live_tup DESC LIMIT 20`
+    ]);
+    res.json({ connections, slowQueries, indexUsage, tableStats });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/database/performance', requireSuperAdmin as any, async (_req: RarRequest, res: Response) => {
+  try {
+    const [cacheHitRatio, indexHitRatio, locks] = await Promise.all([
+      prisma.$queryRaw`SELECT sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as cache_hit_ratio FROM pg_statio_user_tables`,
+      prisma.$queryRaw`SELECT sum(idx_blks_hit) / nullif(sum(idx_blks_hit) + sum(idx_blks_read), 0) as index_hit_ratio FROM pg_statio_user_indexes`,
+      prisma.$queryRaw`SELECT locktype, mode, count(*) FROM pg_locks GROUP BY locktype, mode ORDER BY count DESC`
+    ]);
+    res.json({ cacheHitRatio, indexHitRatio, locks });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
 export { router as rembrandtRarRoutes };

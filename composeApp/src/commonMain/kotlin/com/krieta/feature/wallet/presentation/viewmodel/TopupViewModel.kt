@@ -3,6 +3,7 @@ package com.krieta.feature.wallet.presentation.viewmodel
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
+import com.krieta.com.core.util.SafeConversion
 import com.krieta.feature.wallet.domain.model.ExchangeRate
 import com.krieta.feature.wallet.domain.repository.WalletRepository
 import kotlinx.coroutines.Job
@@ -59,10 +60,15 @@ class TopupViewModel(
     }
 
     private fun calculateKrPreview(input: String) {
-        val fiatAmount = input.toDoubleOrNull()
+        val fiatAmount = SafeConversion.toDoubleOrDefaultWithValidation(
+            value = input,
+            fieldName = "topupAmount",
+            min = 0.0,
+            defaultValue = 0.0
+        )
         val rate = _state.value.exchangeRate
 
-        if (fiatAmount == null || fiatAmount <= 0 || rate == null) {
+        if (fiatAmount <= 0 || rate == null) {
             _state.value = _state.value.copy(krPreview = 0.0)
             return
         }
@@ -84,6 +90,7 @@ class TopupViewModel(
                     // Recalculate if user already typed something
                     calculateKrPreview(_state.value.fiatInput)
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(
                         error = "Failed to load exchange rate",

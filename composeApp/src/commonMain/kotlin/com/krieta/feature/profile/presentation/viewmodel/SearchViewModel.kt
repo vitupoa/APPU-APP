@@ -55,7 +55,8 @@ class SearchViewModel(
                         }
                         _state.value = _state.value.copy(results = mapped, isLoading = false)
                     }
-                    is NetworkResult.Error -> {
+                    is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
                         _state.value = _state.value.copy(error = result.message, isLoading = false)
                     }
                     else -> {}

@@ -1,6 +1,7 @@
 package com.krieta.com.core.performance
 
 import androidx.compose.runtime.*
+import com.krieta.com.core.util.currentTimeMillis
 import kotlinx.coroutines.delay
 
 class PerformanceMonitor {
@@ -40,10 +41,10 @@ fun rememberPerformanceMonitor(): PerformanceMonitor {
     
     LaunchedEffect(Unit) {
         while (true) {
-            val startTime = System.nanoTime()
+            val startTime = currentTimeMillis()
             delay(16)
-            val frameTime = System.nanoTime() - startTime
-            monitor.recordFrame(frameTime)
+            val frameTime = currentTimeMillis() - startTime
+            monitor.recordFrame(frameTime * 1_000_000) // Convert ms to ns
         }
     }
     

@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import axios from 'axios';
+import { encrypt, decrypt } from '../../utils/encryption.js';
 
 interface SocialMetrics {
   followerCount: number;
@@ -24,13 +25,16 @@ export class SocialMediaService {
   ) {
     const profileUrl = this.buildProfileUrl(platform, username);
     
+    // Encrypt access token before storing
+    const encryptedToken = accessToken ? encrypt(accessToken) : null;
+    
     const account = await prisma.socialMediaAccount.create({
       data: {
         influencerId,
         platform: platform as any,
         username,
         profileUrl,
-        accessToken,
+        accessToken: encryptedToken,
         syncStatus: 'pending',
       },
     });
@@ -55,7 +59,9 @@ export class SocialMediaService {
     const followersBefore = account.followerCount;
     
     try {
-      const metrics = await this.fetchMetrics(account.platform, account.username, account.accessToken);
+      // Decrypt access token before use
+      const decryptedToken = account.accessToken ? decrypt(account.accessToken) : null;
+      const metrics = await this.fetchMetrics(account.platform, account.username, decryptedToken);
       
       const updatedAccount = await prisma.socialMediaAccount.update({
         where: { id: accountId },

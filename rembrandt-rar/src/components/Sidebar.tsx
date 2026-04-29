@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useAdminStore } from '@/store/adminStore';
 import {
   LayoutDashboard, Users, Film, Wallet, Flag, Settings,
-  ScrollText, Shield, Megaphone, FileWarning, LogOut, ChevronLeft, Store, ShieldAlert, ShieldBan, TrendingDown
+  ScrollText, Shield, Megaphone, FileWarning, LogOut, ChevronLeft, Store, ShieldAlert, ShieldBan, TrendingDown, Database, FileCheck, CreditCard
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn, getInitials } from '@/lib/utils';
@@ -14,6 +14,8 @@ const navItems = [
   { href: '/users', label: 'Users', icon: Users, perm: 'users.view' },
   { href: '/content', label: 'Content', icon: Film, perm: 'content.view' },
   { href: '/financials', label: 'Financials', icon: Wallet, perm: 'withdrawals.view' },
+  { href: '/kyc', label: 'KYC Verification', icon: FileCheck, financialOnly: true },
+  { href: '/withdrawals', label: 'Withdrawals', icon: CreditCard, financialOnly: true },
   { href: '/bulk-deduction', label: 'Bulk Deduction', icon: TrendingDown, superOnly: true },
   { href: '/feature-flags', label: 'Feature Flags', icon: Flag, superOnly: true },
   { href: '/auto-admire', label: 'Auto-Admire', icon: Users, superOnly: true },
@@ -21,6 +23,7 @@ const navItems = [
   { href: '/shops', label: 'Shop Moderation', icon: Store, perm: 'shops.view' },
   { href: '/chamas', label: 'Chama Moderation', icon: ShieldAlert, perm: 'chamas.view' },
   { href: '/names', label: 'Name Rules', icon: ShieldBan, perm: 'names.manage' },
+  { href: '/database', label: 'Database Monitor', icon: Database, superOnly: true },
   { href: '/settings', label: 'Settings', icon: Settings, superOnly: true },
   { href: '/audit-logs', label: 'Audit Logs', icon: ScrollText, perm: 'audit_logs.view' },
   { href: '/team', label: 'Admin Team', icon: Shield, superOnly: true },
@@ -33,6 +36,7 @@ export function Sidebar() {
 
   const visibleItems = navItems.filter(item => {
     if (item.superOnly) return isSuperAdmin();
+    if (item.financialOnly) return isSuperAdmin() || hasPermission('financial_management');
     if (item.perm) return hasPermission(item.perm);
     return true;
   });

@@ -2,6 +2,7 @@ import { prisma } from '../../config/database.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { emitVoteUpdate, emitContestUpdate } from '../../shared/gateway/events.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
+import { NotificationService } from '../../shared/services/notification.service.js';
 
 const PLATFORM_FEE_RATE = 0.15; // 15%
 
@@ -238,8 +239,10 @@ export class ContestService {
           }
         });
 
-        // TODO: Send notification to judge
-        // await NotificationService.sendJudgeInvite(judgeId, contestId);
+        // Send notification to judge
+        NotificationService.sendJudgeInvite(judgeId, contestId, invite.id).catch(err => {
+          console.error('Failed to send judge invite notification:', err);
+        });
       } catch (error) {
         results.failed.push(judgeId);
       }
@@ -324,8 +327,10 @@ export class ContestService {
       }
     });
 
-    // TODO: Send notification to contest creator
-    // await NotificationService.notifyJudgeAccepted(invite.contestId, userId);
+    // Send notification to contest creator
+    NotificationService.notifyJudgeAccepted(invite.contestId, userId).catch(err => {
+      console.error('Failed to send judge accepted notification:', err);
+    });
 
     return { success: true };
   }
@@ -354,8 +359,10 @@ export class ContestService {
       }
     });
 
-    // TODO: Send notification to contest creator
-    // await NotificationService.notifyJudgeDeclined(invite.contestId, userId);
+    // Send notification to contest creator
+    NotificationService.notifyJudgeDeclined(invite.contestId, userId).catch(err => {
+      console.error('Failed to send judge declined notification:', err);
+    });
 
     return { success: true };
   }
@@ -572,6 +579,8 @@ export class ContestService {
     contestId: string;
     mediaUrl: string;
     mediaType: string;
+    aspectRatio?: number;
+    mediaUrls?: string[];
     proofUrls?: string[];
   }) {
     const contest = await prisma.contest.findUniqueOrThrow({ where: { id: data.contestId } });
@@ -590,6 +599,8 @@ export class ContestService {
           contestId: data.contestId,
           mediaUrl: data.mediaUrl,
           mediaType: data.mediaType,
+          aspectRatio: data.aspectRatio,
+          mediaUrls: data.mediaUrls || [],
           proofUrls: data.proofUrls || []
         },
         include: {
@@ -601,6 +612,8 @@ export class ContestService {
 
     return {
       ...submission,
+      aspectRatio: submission.aspectRatio,
+      mediaUrls: submission.mediaUrls,
       votes: submission.votesCount,
       proofScreenshots: submission.proofUrls,
       createdAt: submission.submittedAt.toISOString()
@@ -627,6 +640,8 @@ export class ContestService {
         contestId: s.contestId,
         mediaUrl: s.mediaUrl,
         mediaType: s.mediaType,
+        aspectRatio: s.aspectRatio,
+        mediaUrls: s.mediaUrls,
         proofScreenshots: s.proofUrls,
         votes: s.votesCount,
         rank: s.rank,
@@ -652,6 +667,8 @@ export class ContestService {
       contestId: s.contestId,
       mediaUrl: s.mediaUrl,
       mediaType: s.mediaType,
+      aspectRatio: s.aspectRatio,
+      mediaUrls: s.mediaUrls,
       proofScreenshots: s.proofUrls,
       votes: s.votesCount,
       rank: s.rank,
@@ -699,6 +716,8 @@ export class ContestService {
         },
         mediaUrl: s.mediaUrl,
         mediaType: s.mediaType,
+        aspectRatio: s.aspectRatio,
+        mediaUrls: s.mediaUrls,
         caption: '', // Add caption field if needed
         proofScreenshots: s.proofUrls,
         votes: s.votesCount,

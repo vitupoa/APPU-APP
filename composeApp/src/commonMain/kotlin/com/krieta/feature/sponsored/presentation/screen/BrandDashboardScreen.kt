@@ -1,4 +1,9 @@
 package com.krieta.feature.sponsored.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -8,9 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -134,7 +136,7 @@ class BrandDashboardScreen : Screen {
                     if (campaign.status.name == "ACTIVE" || campaign.status.name == "PAUSED") {
                         IconButton(onClick = onToggle) {
                             Icon(
-                                if (campaign.status.name == "ACTIVE") Icons.Default.Pause else Icons.Default.PlayArrow,
+                                if (campaign.status.name == "ACTIVE") painterResource(Res.drawable.ic_pause) else painterResource(Res.drawable.ic_play_arrow),
                                 contentDescription = if (campaign.status.name == "ACTIVE") "Pause" else "Resume"
                             )
                         }

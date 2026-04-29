@@ -1,4 +1,9 @@
 package com.krieta.feature.live.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -86,7 +91,7 @@ class HostLiveScreen : Screen {
                 // End Stream Button
                 IconButton(onClick = { navigator.pop() }) {
                     Icon(
-                        imageVector = painterResource(Res.drawable.ic_close),
+                        painter = painterResource(Res.drawable.ic_close),
                         contentDescription = "End Live",
                         tint = Color.White,
                         modifier = Modifier
@@ -157,16 +162,16 @@ class HostLiveScreen : Screen {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Settings/Beauty Filter
-                    HostToolButton(Icons.Default.Face, "Beauty")
+                    HostToolButton(painterResource(Res.drawable.ic_face), "Beauty")
                     
                     // Pin Product
-                    HostToolButton(Icons.Default.ShoppingCart, "Shop")
+                    HostToolButton(painterResource(Res.drawable.ic_shopping_cart), "Shop")
                     
                     // PK Battle / Duet
-                    HostToolButton(Icons.Default.People, "Battle")
+                    HostToolButton(painterResource(Res.drawable.ic_people), "Battle")
 
                     // Moderation
-                    HostToolButton(Icons.Default.Warning, "Mod")
+                    HostToolButton(painterResource(Res.drawable.ic_warning), "Mod")
 
                     if (!isLive) {
                         Button(
@@ -189,7 +194,7 @@ class HostLiveScreen : Screen {
     }
 
     @Composable
-    private fun HostToolButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String) {
+    private fun HostToolButton(icon: androidx.compose.ui.graphics.painter.Painter, label: String) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             IconButton(
                 onClick = { /* Open Tool */ },
@@ -197,7 +202,7 @@ class HostLiveScreen : Screen {
                     .background(Color.White.copy(alpha = 0.2f), CircleShape)
                     .size(40.dp)
             ) {
-                Icon(icon, contentDescription = label, tint = Color.White, modifier = Modifier.size(20.dp))
+                Icon(painter = icon, contentDescription = label, tint = Color.White, modifier = Modifier.size(20.dp))
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text(label, color = Color.White, fontSize = 10.sp)

@@ -1,4 +1,9 @@
 package com.krieta.feature.comments.presentation.screen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -93,7 +98,7 @@ data class CommentsScreen(
                     },
                     actions = {
                         IconButton(onClick = { showSortMenu = true }) {
-                            Icon(Icons.AutoMirrored.Filled.Sort, "Sort")
+                            Icon(painterResource(Res.drawable.ic_sort), "Sort")
                         }
                         DropdownMenu(
                             expanded = showSortMenu,
@@ -285,7 +290,7 @@ private fun CommentItem(
                     )
                     if (comment.author.isVerified) {
                         Icon(
-                            Icons.Default.Verified,
+                            painterResource(Res.drawable.ic_verified),
                             contentDescription = "Verified",
                             modifier = Modifier.size(16.dp),
                             tint = Color(0xFF1DA1F2)
@@ -303,7 +308,7 @@ private fun CommentItem(
                     }
                     if (comment.isPinned) {
                         Icon(
-                            Icons.Default.PushPin,
+                            painterResource(Res.drawable.ic_push_pin),
                             contentDescription = "Pinned",
                             modifier = Modifier.size(14.dp),
                             tint = KrietaColors.Primary
@@ -356,7 +361,7 @@ private fun CommentItem(
                         modifier = Modifier.clickable { onLike(comment) }
                     ) {
                         Icon(
-                            if (comment.isLiked) painterResource(Res.drawable.ic_favorite) else painterResource(Res.drawable.ic_favorite)Border,
+                            if (comment.isLiked) painterResource(Res.drawable.ic_favorite) else painterResource(Res.drawable.ic_favorite_border),
                             contentDescription = "Like",
                             modifier = Modifier.size(18.dp),
                             tint = if (comment.isLiked) Color.Red else Color.Gray
@@ -378,7 +383,7 @@ private fun CommentItem(
                             modifier = Modifier.clickable { onReply(comment) }
                         ) {
                             Icon(
-                                Icons.AutoMirrored.Filled.Reply,
+                                painterResource(Res.drawable.ic_reply),
                                 contentDescription = "Reply",
                                 modifier = Modifier.size(18.dp),
                                 tint = Color.Gray
@@ -438,7 +443,7 @@ private fun CommentItem(
                                         onPin(comment)
                                         showMenu = false
                                     },
-                                    leadingIcon = { Icon(Icons.Default.PushPin, null) }
+                                    leadingIcon = { Icon(painterResource(Res.drawable.ic_push_pin), null) }
                                 )
                             }
                             DropdownMenuItem(
@@ -447,7 +452,7 @@ private fun CommentItem(
                                     onReport(comment)
                                     showMenu = false
                                 },
-                                leadingIcon = { Icon(Icons.Default.Flag, null) }
+                                leadingIcon = { Icon(painterResource(Res.drawable.ic_flag), null) }
                             )
                             DropdownMenuItem(
                                 text = { Text("Copy text") },
@@ -455,7 +460,7 @@ private fun CommentItem(
                                     // TODO: Copy to clipboard
                                     showMenu = false
                                 },
-                                leadingIcon = { Icon(Icons.Default.ContentCopy, null) }
+                                leadingIcon = { Icon(painterResource(Res.drawable.ic_content_copy), null) }
                             )
                         }
                     }
@@ -468,7 +473,7 @@ private fun CommentItem(
                         modifier = Modifier.padding(top = 4.dp)
                     ) {
                         Icon(
-                            if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            if (isExpanded) painterResource(Res.drawable.ic_expand_less) else painterResource(Res.drawable.ic_expand_more),
                             contentDescription = null,
                             modifier = Modifier.size(16.dp)
                         )
@@ -539,7 +544,7 @@ private fun CommentInputBar(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        Icons.AutoMirrored.Filled.Reply,
+                        painterResource(Res.drawable.ic_reply),
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = Color.Gray
@@ -623,7 +628,7 @@ private fun CommentInputBar(
                 enabled = enabled && text.trim().isNotEmpty()
             ) {
                 Icon(
-                    Icons.AutoMirrored.Filled.Send,
+                    painterResource(Res.drawable.ic_send),
                     contentDescription = "Send",
                     tint = if (text.trim().isNotEmpty()) KrietaColors.Primary else Color.Gray
                 )
@@ -643,7 +648,7 @@ private fun EmptyCommentsState(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Icon(
-            Icons.Default.ChatBubbleOutline,
+            painterResource(Res.drawable.ic_chat_bubble_outline),
             contentDescription = null,
             modifier = Modifier.size(64.dp),
             tint = Color.Gray

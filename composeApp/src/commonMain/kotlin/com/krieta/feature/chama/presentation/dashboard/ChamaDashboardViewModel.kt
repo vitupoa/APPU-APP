@@ -48,6 +48,7 @@ class ChamaDashboardViewModel(
                         )
                     }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
@@ -62,6 +63,7 @@ class ChamaDashboardViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(transactions = result.data.transactions) }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = result.message) }
                 }
@@ -76,6 +78,7 @@ class ChamaDashboardViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(cycles = result.data) }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = result.message) }
                 }
@@ -93,6 +96,7 @@ class ChamaDashboardViewModel(
                     loadCycles()
                     loadChama()
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
@@ -110,6 +114,7 @@ class ChamaDashboardViewModel(
                     loadCycles()
                     loadChama()
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
@@ -124,6 +129,7 @@ class ChamaDashboardViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(activeElections = result.data) }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = result.message) }
                 }
@@ -145,6 +151,7 @@ class ChamaDashboardViewModel(
                     }
                     loadChama()
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isContributing = false, error = result.message) }
                 }
@@ -160,6 +167,7 @@ class ChamaDashboardViewModel(
                 is NetworkResult.Success -> {
                     _state.update { it.copy(isLoading = false, successMessage = "You have left the Chama") }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
@@ -177,6 +185,7 @@ class ChamaDashboardViewModel(
                         it.copy(isLoading = false, chama = result.data, successMessage = "Chama activated!")
                     }
                 }
+                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }

@@ -106,7 +106,7 @@ object KtorClientFactory {
                         println("KtorHttp: $message")
                     }
                 }
-                level = LogLevel.HEADERS
+                level = LogLevel.ALL
             }
 
             defaultRequest {
