@@ -13,7 +13,6 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 actual fun platformModule(): Module = module {
-    single<Context> { androidContext() }
     single<TokenManager> { AndroidTokenManager(androidContext()) }
     single<DeviceSecurity> { AndroidDeviceSecurity(androidContext()) }
     single { LocationProvider(androidContext()) }
