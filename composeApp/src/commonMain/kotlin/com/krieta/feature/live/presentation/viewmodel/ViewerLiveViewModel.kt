@@ -30,7 +30,7 @@ class ViewerLiveViewModel(
     private val liveRepository: LiveRepository,
     private val socketManager: LiveSocketManager,
     private val streamId: String,
-    private val authToken: String,
+    private val tokenManager: com.krieta.com.core.security.TokenManager,
     private val currentUserId: String,
     private val currentUsername: String,
     private val currentUserAvatar: String?
@@ -67,6 +67,7 @@ class ViewerLiveViewModel(
 
     private fun connectToSocket() {
         viewModelScope.launch {
+            val authToken = tokenManager.getAccessToken() ?: ""
             socketManager.connect(streamId, authToken)
         }
     }

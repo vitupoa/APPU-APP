@@ -17,11 +17,12 @@ val liveModule = module {
     }
     
     factory { (streamId: String) ->
+        val tokenManager = get<com.krieta.com.core.security.TokenManager>()
         ViewerLiveViewModel(
             liveRepository = get(),
             socketManager = get(),
             streamId = streamId,
-            authToken = get<com.krieta.com.core.security.TokenManager>().getAccessToken() ?: "",
+            tokenManager = tokenManager,
             currentUserId = "current-user", // TODO: Get from auth state
             currentUsername = "user", // TODO: Get from auth state
             currentUserAvatar = null // TODO: Get from auth state
