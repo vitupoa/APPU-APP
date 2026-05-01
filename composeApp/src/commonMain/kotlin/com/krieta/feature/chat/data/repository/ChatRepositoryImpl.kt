@@ -52,10 +52,23 @@ class ChatRepositoryImpl(
         payload: String,
         mediaUrl: String?,
         mediaType: String?,
-        replyToId: String?
+        replyToId: String?,
+        forwardedFromId: String?
     ): NetworkResult<ChatMessage> {
         return safeApiCall {
-            api.sendMessage(chatId, payload, mediaUrl, mediaType, replyToId).message.toDomain()
+            api.sendMessage(chatId, payload, mediaUrl, mediaType, replyToId, forwardedFromId).message.toDomain()
+        }
+    }
+
+    override suspend fun deleteMessage(messageId: String): NetworkResult<Boolean> {
+        return safeApiCall {
+            api.deleteMessage(messageId).success
+        }
+    }
+
+    override suspend fun forwardMessage(messageId: String, targetChatId: String): NetworkResult<ChatMessage> {
+        return safeApiCall {
+            api.forwardMessage(messageId, targetChatId).message.toDomain()
         }
     }
 
@@ -135,6 +148,8 @@ class ChatRepositoryImpl(
             mediaType = mediaType,
             isSystemEvent = isSystemEvent,
             status = status,
+            replyTo = replyTo?.toDomain(),
+            forwardedFrom = forwardedFrom?.toDomain(),
             createdAt = parseInstant(createdAt)
         )
     }

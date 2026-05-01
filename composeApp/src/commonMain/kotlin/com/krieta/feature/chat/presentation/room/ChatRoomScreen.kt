@@ -1,4 +1,5 @@
 package com.krieta.feature.chat.presentation.room
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.foundation.BorderStroke
@@ -52,14 +53,52 @@ class ChatRoomScreen(private val chatId: String, private val chatTitle: String) 
                 )
             },
             bottomBar = {
-                ChatInputBar(
-                    text = messageText,
-                    onTextChange = { messageText = it },
-                    onSend = { 
-                        viewModel.sendMessage(messageText)
-                        messageText = "" 
+                Column {
+                    // Reply bar
+                    if (state.replyingTo != null) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            tonalElevation = 1.dp
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Default.Reply,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Replying to ${state.replyingTo.sender?.displayName ?: "Unknown"}",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = state.replyingTo.payload,
+                                        fontSize = 11.sp,
+                                        maxLines = 1,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    )
+                                }
+                                IconButton(onClick = { viewModel.setReplyTo(null) }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Cancel reply")
+                                }
+                            }
+                        }
                     }
-                )
+                    
+                    ChatInputBar(
+                        text = messageText,
+                        onTextChange = { messageText = it },
+                        onSend = { 
+                            viewModel.sendMessage(messageText)
+                            messageText = "" 
+                        }
+                    )
+                }
             }
         ) { padding ->
             if (state.isLoading && state.messages.isEmpty()) {
@@ -73,10 +112,14 @@ class ChatRoomScreen(private val chatId: String, private val chatTitle: String) 
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ) {
                     items(state.messages, key = { it.id }) { message ->
-                        // Determine if mine. Since we didn't inject current user ID yet, we assume optimistically sent messages are mine.
-                        // Or if senderId matches a known ID. For phase 1, we just mock "isMine" for layout testing or use logic if we had currentUserId
-                        val isMine = message.status == "sent" // Simple mock assumption for the UI
-                        ChatBubble(text = message.payload, isMine = isMine)
+                        val isMine = message.senderId == state.currentUserId
+                        ChatBubble(
+                            message = message,
+                            isMine = isMine,
+                            onReply = { viewModel.setReplyTo(message) },
+                            onDelete = { viewModel.deleteMessage(message.id) },
+                            onForward = { /* Show chat selector dialog */ }
+                        )
                     }
                 }
             }
@@ -85,9 +128,17 @@ class ChatRoomScreen(private val chatId: String, private val chatTitle: String) 
 }
 
 @Composable
-fun ChatBubble(text: String, isMine: Boolean) {
-    val backgroundColor = if (isMine) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-    val textColor = if (isMine) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+fun ChatBubble(
+    message: com.krieta.feature.chat.domain.model.ChatMessage,
+    isMine: Boolean,
+    onReply: () -> Unit,
+    onDelete: () -> Unit,
+    onForward: () -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+    
+    val backgroundColor = if (isMine) Color(0xFF4CAF50) else MaterialTheme.colorScheme.surfaceVariant
+    val textColor = if (isMine) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
     val alignment = if (isMine) Alignment.CenterEnd else Alignment.CenterStart
     val shape = if (isMine) {
         RoundedCornerShape(16.dp, 16.dp, 0.dp, 16.dp)
@@ -99,14 +150,92 @@ fun ChatBubble(text: String, isMine: Boolean) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         contentAlignment = alignment
     ) {
-        Box(
-            modifier = Modifier
-                .widthIn(max = 280.dp)
-                .clip(shape)
-                .background(backgroundColor)
-                .padding(12.dp)
+        Column(
+            modifier = Modifier.widthIn(max = 280.dp)
         ) {
-            Text(text = text, color = textColor, fontSize = 15.sp)
+            // Reply indicator
+            if (message.replyTo != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 4.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.Black.copy(alpha = 0.1f))
+                        .padding(8.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = message.replyTo.sender?.displayName ?: "Unknown",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = textColor.copy(alpha = 0.7f)
+                        )
+                        Text(
+                            text = message.replyTo.payload,
+                            fontSize = 11.sp,
+                            maxLines = 2,
+                            color = textColor.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+            }
+            
+            // Forwarded indicator
+            if (message.forwardedFrom != null) {
+                Text(
+                    text = "Forwarded from ${message.forwardedFrom.displayName}",
+                    fontSize = 11.sp,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    color = textColor.copy(alpha = 0.7f),
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
+            
+            Box(
+                modifier = Modifier
+                    .clip(shape)
+                    .background(backgroundColor)
+                    .padding(12.dp)
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = { showMenu = true }
+                    )
+            ) {
+                Text(text = message.payload, color = textColor, fontSize = 15.sp)
+            }
+            
+            // Context menu
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Reply") },
+                    onClick = {
+                        onReply()
+                        showMenu = false
+                    },
+                    leadingIcon = { Icon(Icons.Default.Reply, contentDescription = null) }
+                )
+                if (isMine) {
+                    DropdownMenuItem(
+                        text = { Text("Delete") },
+                        onClick = {
+                            onDelete()
+                            showMenu = false
+                        },
+                        leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) }
+                    )
+                }
+                DropdownMenuItem(
+                    text = { Text("Forward") },
+                    onClick = {
+                        onForward()
+                        showMenu = false
+                    },
+                    leadingIcon = { Icon(Icons.Default.Forward, contentDescription = null) }
+                )
+            }
         }
     }
 }

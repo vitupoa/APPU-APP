@@ -32,8 +32,11 @@ data class MessageDto(
     val isSystemEvent: Boolean = false,
     val status: String = "sent",
     val replyToId: String? = null,
+    val forwardedFromId: String? = null,
     val createdAt: String,
-    val sender: UserSnippetDto? = null
+    val sender: UserSnippetDto? = null,
+    val replyTo: MessageDto? = null,
+    val forwardedFrom: UserSnippetDto? = null
 )
 
 @Serializable
@@ -90,7 +93,13 @@ data class SendMessageRequest(
     val payload: String,
     val mediaUrl: String? = null,
     val mediaType: String? = null,
-    val replyToId: String? = null
+    val replyToId: String? = null,
+    val forwardedFromId: String? = null
+)
+
+@Serializable
+data class ForwardMessageRequest(
+    val targetChatId: String
 )
 
 @Serializable

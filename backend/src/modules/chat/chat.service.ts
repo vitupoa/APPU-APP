@@ -30,7 +30,7 @@ export class ChatService {
     if (existingChat) return existingChat;
 
     // Create new direct chat
-    return prisma.chat.create({
+    const newChat = await prisma.chat.create({
       data: {
         type: 'DIRECT',
         participants: {
@@ -45,6 +45,12 @@ export class ChatService {
         messages: { orderBy: { createdAt: 'desc' }, take: 1 },
       },
     });
+
+    // Broadcast new chat to both users in real-time
+    io.to(`user:${userId}`).emit('chat:new_chat', newChat);
+    io.to(`user:${recipientId}`).emit('chat:new_chat', newChat);
+
+    return newChat;
   }
 
   /**
@@ -105,7 +111,8 @@ export class ChatService {
     payload: string,
     mediaUrl?: string,
     mediaType?: string,
-    replyToId?: string
+    replyToId?: string,
+    forwardedFromId?: string
   ) {
     // Ensure sender is participant
     const isParticipant = await prisma.chatParticipant.findUnique({
@@ -124,17 +131,28 @@ export class ChatService {
         mediaUrl,
         mediaType,
         replyToId,
+        forwardedFromId,
         status: 'sent',
       },
       include: {
         sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        replyTo: {
+          include: {
+            sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+          },
+        },
+        forwardedFrom: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
       },
     });
 
-    // Update chat's updatedAt for sorting
-    await prisma.chat.update({
+    // Update chat's updatedAt for sorting and fetch updated chat with latest message
+    const updatedChat = await prisma.chat.update({
       where: { id: chatId },
       data: { updatedAt: new Date() },
+      include: {
+        participants: { include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } },
+        messages: { orderBy: { createdAt: 'desc' }, take: 1 },
+      },
     });
 
     // Find all participants to broadcast message via WebSocket
@@ -144,11 +162,114 @@ export class ChatService {
     });
 
     participants.forEach((p: any) => {
-      // Emit to each user's secure channel
+      // Emit new message to each user's secure channel
       io.to(`user:${p.userId}`).emit('chat:new_message', message);
+      
+      // Emit updated chat to refresh chat list in real-time
+      io.to(`user:${p.userId}`).emit('chat:updated', updatedChat);
     });
 
     return message;
+  }
+
+  /**
+   * Delete a message (only sender can delete)
+   */
+  static async deleteMessage(userId: string, messageId: string) {
+    const message = await prisma.message.findUnique({
+      where: { id: messageId },
+      include: { chat: { include: { participants: true } } },
+    });
+
+    if (!message) {
+      throw new Error('Message not found');
+    }
+
+    if (message.senderId !== userId) {
+      throw new Error('Only the sender can delete this message');
+    }
+
+    await prisma.message.delete({ where: { id: messageId } });
+
+    // Broadcast deletion to all participants
+    message.chat.participants.forEach((p: any) => {
+      io.to(`user:${p.userId}`).emit('chat:message_deleted', {
+        chatId: message.chatId,
+        messageId,
+      });
+    });
+
+    return { success: true, message: 'Message deleted' };
+  }
+
+  /**
+   * Forward a message to another chat
+   */
+  static async forwardMessage(
+    userId: string,
+    messageId: string,
+    targetChatId: string
+  ) {
+    // Get original message
+    const originalMessage = await prisma.message.findUnique({
+      where: { id: messageId },
+      include: {
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+      },
+    });
+
+    if (!originalMessage) {
+      throw new Error('Message not found');
+    }
+
+    // Verify user is participant in target chat
+    const isParticipant = await prisma.chatParticipant.findUnique({
+      where: { chatId_userId: { chatId: targetChatId, userId } },
+    });
+
+    if (!isParticipant) {
+      throw new Error('Not authorized to send message in this chat');
+    }
+
+    // Create forwarded message
+    const forwardedMessage = await prisma.message.create({
+      data: {
+        chatId: targetChatId,
+        senderId: userId,
+        payload: originalMessage.payload,
+        mediaUrl: originalMessage.mediaUrl,
+        mediaType: originalMessage.mediaType,
+        forwardedFromId: originalMessage.senderId,
+        status: 'sent',
+      },
+      include: {
+        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        forwardedFrom: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+      },
+    });
+
+    // Update chat's updatedAt
+    const updatedChat = await prisma.chat.update({
+      where: { id: targetChatId },
+      data: { updatedAt: new Date() },
+      include: {
+        participants: { include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } },
+        messages: { orderBy: { createdAt: 'desc' }, take: 1 },
+      },
+    });
+
+    // Broadcast to target chat participants
+    const participants = await prisma.chatParticipant.findMany({
+      where: { chatId: targetChatId },
+      select: { userId: true },
+    });
+
+    participants.forEach((p: any) => {
+      io.to(`user:${p.userId}`).emit('chat:new_message', forwardedMessage);
+      io.to(`user:${p.userId}`).emit('chat:updated', updatedChat);
+    });
+
+    return forwardedMessage;
   }
 
   /**
@@ -170,7 +291,12 @@ export class ChatService {
       where: { chatId },
       include: {
         sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-        replyTo: true,
+        replyTo: {
+          include: {
+            sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+          },
+        },
+        forwardedFrom: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
       },
       orderBy: { createdAt: 'desc' },
       skip,

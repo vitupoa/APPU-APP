@@ -19,6 +19,8 @@ import kotlinx.serialization.json.Json
 data class ChatRoomState(
     val messages: List<ChatMessage> = emptyList(),
     val currentUserId: String = "",
+    val replyingTo: ChatMessage? = null,
+    val selectedMessage: ChatMessage? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )
@@ -36,10 +38,28 @@ class ChatRoomViewModel(
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     init {
-        // Simple way to get the current user ID - decode from JWT in production or fetch from profile cache
-        // For now, we'll leave it empty and let the UI check senderId
+        loadCurrentUserId()
         loadMessages()
         observeWebSocketEvents()
+    }
+
+    private fun loadCurrentUserId() {
+        screenModelScope.launch {
+            val token = tokenManager.getAccessToken()
+            if (token != null) {
+                try {
+                    val parts = token.split(".")
+                    if (parts.size == 3) {
+                        val payload = parts[1]
+                        val decodedJson = payload.decodeBase64()?.decodeToString() ?: ""
+                        val userId = decodedJson.substringAfter("\"userId\":\"").substringBefore("\"")
+                        _state.value = _state.value.copy(currentUserId = userId)
+                    }
+                } catch (e: Exception) {
+                    println("Error decoding token: ${e.message}")
+                }
+            }
+        }
     }
 
     private fun loadMessages() {
@@ -61,23 +81,55 @@ class ChatRoomViewModel(
     fun sendMessage(payload: String) {
         if (payload.isBlank()) return
         
+        val replyToId = _state.value.replyingTo?.id
+        
         screenModelScope.launch {
-            when (val result = repository.sendMessage(chatId, payload)) {
+            when (val result = repository.sendMessage(chatId, payload, replyToId = replyToId)) {
                 is NetworkResult.Success -> {
-                    // Message will also come via WebSocket, but we can optimistically add it here
                     val currentMessages = _state.value.messages.toMutableList()
-                    // Check if it's already there to avoid duplicates
                     if (currentMessages.none { it.id == result.data.id }) {
                         currentMessages.add(0, result.data)
-                        _state.value = _state.value.copy(messages = currentMessages)
+                        _state.value = _state.value.copy(messages = currentMessages, replyingTo = null)
                     }
                 }
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
-                    // Handle error (e.g. show toast)
                     _state.value = _state.value.copy(error = "Failed to send message")
                 }
+            }
+        }
+    }
+
+    fun setReplyTo(message: ChatMessage?) {
+        _state.value = _state.value.copy(replyingTo = message)
+    }
+
+    fun deleteMessage(messageId: String) {
+        screenModelScope.launch {
+            when (repository.deleteMessage(messageId)) {
+                is NetworkResult.Success -> {
+                    val currentMessages = _state.value.messages.toMutableList()
+                    currentMessages.removeAll { it.id == messageId }
+                    _state.value = _state.value.copy(messages = currentMessages)
+                }
                 is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
+                    _state.value = _state.value.copy(error = "Failed to delete message")
+                }
+            }
+        }
+    }
+
+    fun forwardMessage(messageId: String, targetChatId: String) {
+        screenModelScope.launch {
+            when (repository.forwardMessage(messageId, targetChatId)) {
+                is NetworkResult.Success -> {
+                    // Success feedback
+                }
+                is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
+                    _state.value = _state.value.copy(error = "Failed to forward message")
+                }
             }
         }
     }

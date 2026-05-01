@@ -15,6 +15,8 @@ router.post('/group', validateRequest(createGroupChatSchema), ChatController.cre
 
 router.get('/:chatId/messages', ChatController.getMessages);
 router.post('/:chatId/messages', validateRequest(sendMessageSchema), ChatController.sendMessage);
+router.delete('/messages/:messageId', ChatController.deleteMessage);
+router.post('/messages/:messageId/forward', ChatController.forwardMessage);
 router.post('/:chatId/tip', ChatController.sendTip);
 router.put('/:chatId', validateRequest(updateGroupChatSchema), ChatController.updateGroupChat);
 router.post('/:chatId/manage-member', validateRequest(manageMemberSchema), ChatController.manageMember);

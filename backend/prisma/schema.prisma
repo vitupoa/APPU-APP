@@ -87,6 +87,7 @@ model User {
   judgeInvites            JudgeInvite[]           @relation("JudgeInvites")
   chatParticipations      ChatParticipant[]       @relation("ChatParticipations")
   sentMessages            Message[]               @relation("SentMessages")
+  forwardedMessages       Message[]               @relation("ForwardedMessages")
   stories                 Story[]
   storyViews              StoryView[]
   storyViewerPreferences  StoryViewerPreference[] @relation("ViewerPreferences")
@@ -2117,21 +2118,23 @@ model ChatParticipant {
 }
 
 model Message {
-  id            String   @id @default(uuid())
-  chatId        String   @map("chat_id")
-  senderId      String   @map("sender_id")
-  payload       String   @db.Text // Encrypted payload or plain text
-  mediaUrl      String?  @map("media_url")
-  mediaType     String?  @map("media_type") // image, video, document, voice
-  isSystemEvent Boolean  @default(false) @map("is_system_event")
-  status        String   @default("sent") // sent, delivered, read
-  replyToId     String?  @map("reply_to_id")
-  createdAt     DateTime @default(now()) @map("created_at")
+  id              String   @id @default(uuid())
+  chatId          String   @map("chat_id")
+  senderId        String   @map("sender_id")
+  payload         String   @db.Text // Encrypted payload or plain text
+  mediaUrl        String?  @map("media_url")
+  mediaType       String?  @map("media_type") // image, video, document, voice
+  isSystemEvent   Boolean  @default(false) @map("is_system_event")
+  status          String   @default("sent") // sent, delivered, read
+  replyToId       String?  @map("reply_to_id")
+  forwardedFromId String?  @map("forwarded_from_id")
+  createdAt       DateTime @default(now()) @map("created_at")
 
-  chat    Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender  User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  replyTo Message?  @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
-  replies Message[] @relation("MessageReplies")
+  chat          Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender        User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  replyTo       Message?  @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies       Message[] @relation("MessageReplies")
+  forwardedFrom User?     @relation("ForwardedMessages", fields: [forwardedFromId], references: [id], onDelete: SetNull)
 
   @@index([chatId, createdAt])
   @@map("messages")

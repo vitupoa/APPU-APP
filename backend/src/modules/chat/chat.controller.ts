@@ -41,7 +41,7 @@ export class ChatController {
     try {
       const senderId = req.userId!;
       const chatId = String(req.params.chatId);
-      const { payload, mediaUrl, mediaType, replyToId } = req.body;
+      const { payload, mediaUrl, mediaType, replyToId, forwardedFromId } = req.body;
 
       const message = await ChatService.sendMessage(
         senderId,
@@ -49,7 +49,8 @@ export class ChatController {
         payload,
         mediaUrl,
         mediaType,
-        replyToId
+        replyToId,
+        forwardedFromId
       );
 
       res.status(201).json({ success: true, message });
@@ -143,6 +144,31 @@ export class ChatController {
 
       const result = await ChatService.leaveGroup(userId, chatId);
       res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteMessage(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId!;
+      const messageId = String(req.params.messageId);
+
+      const result = await ChatService.deleteMessage(userId, messageId);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async forwardMessage(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId!;
+      const messageId = String(req.params.messageId);
+      const { targetChatId } = req.body;
+
+      const message = await ChatService.forwardMessage(userId, messageId, targetChatId);
+      res.json({ success: true, message });
     } catch (error) {
       next(error);
     }

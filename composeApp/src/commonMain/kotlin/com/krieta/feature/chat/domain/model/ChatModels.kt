@@ -23,6 +23,8 @@ data class ChatMessage(
     val mediaType: String? = null,
     val isSystemEvent: Boolean = false,
     val status: String = "sent",
+    val replyTo: ChatMessage? = null,
+    val forwardedFrom: UserSnippet? = null,
     val createdAt: Instant
 )
 
