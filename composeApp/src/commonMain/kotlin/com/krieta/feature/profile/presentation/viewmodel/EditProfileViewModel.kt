@@ -20,6 +20,8 @@ data class EditProfileState(
     val bio: String = "",
     val avatarUrl: String = "",
     val coverPhotoUrl: String = "",
+    val selectedNiches: List<String> = emptyList(),
+    val customNiches: List<String> = emptyList(),
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val isUploadingAvatar: Boolean = false,
@@ -43,6 +45,27 @@ class EditProfileViewModel(
     fun onDisplayNameChange(v: String) { _state.value = _state.value.copy(displayName = v) }
     fun onUsernameChange(v: String) { _state.value = _state.value.copy(username = v) }
     fun onBioChange(v: String) { _state.value = _state.value.copy(bio = v) }
+    
+    fun addNiche(niche: String) {
+        val current = _state.value.selectedNiches
+        if (!current.contains(niche)) {
+            _state.value = _state.value.copy(selectedNiches = current + niche)
+        }
+    }
+    
+    fun removeNiche(niche: String) {
+        _state.value = _state.value.copy(
+            selectedNiches = _state.value.selectedNiches.filter { it != niche },
+            customNiches = _state.value.customNiches.filter { it != niche }
+        )
+    }
+    
+    fun addCustomNiche(niche: String) {
+        val current = _state.value.customNiches
+        if (!current.contains(niche) && niche.isNotBlank()) {
+            _state.value = _state.value.copy(customNiches = current + niche)
+        }
+    }
 
     fun uploadAvatar(filePath: String) {
         screenModelScope.launch {
@@ -109,6 +132,8 @@ class EditProfileViewModel(
                         bio = p.bio ?: "",
                         avatarUrl = p.avatarUrl ?: "",
                         coverPhotoUrl = p.coverPhotoUrl ?: "",
+                        selectedNiches = p.selectedNiches,
+                        customNiches = p.customNiches,
                         isLoading = false
                     )
                 }

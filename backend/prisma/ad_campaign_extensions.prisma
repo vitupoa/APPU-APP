@@ -1,0 +1,336 @@
+// ═══════════════════════════════════════════════════════════
+// KRIETA ADS MANAGER - LOCATION-BASED TARGETING EXTENSIONS
+// Add these models to your main schema.prisma file
+// ═══════════════════════════════════════════════════════════
+
+enum TargetingScope {
+  GLOBAL
+  CONTINENT
+  COUNTRY
+  REGION
+  CITY
+  TOWN
+  ROAD
+  LANDMARK
+  SHOPPING_CENTER
+}
+
+enum PlacementType {
+  LIVE_STREAMS
+  CONTESTS
+  DISCOVER_SHORTS
+  ADMIRING_SHORTS
+  DRIPS_FEED
+  STORIES
+  GROUP_CHATS
+  CHAMA_CHATS
+}
+
+enum ChatNiche {
+  DOCTORS
+  REAL_ESTATE_INVESTMENT
+  FINANCE
+  TECH
+  FASHION
+  AUTOMOTIVE
+  FOOD_BEVERAGE
+  HEALTH_FITNESS
+  EDUCATION
+  ENTERTAINMENT
+  GENERAL
+}
+
+enum BudgetType {
+  DAILY
+  LIFETIME
+}
+
+enum BiddingStrategy {
+  LOWEST_COST
+  TARGET_CPM
+  COST_CAP
+}
+
+// Super admin controls for platform-wide or location-based settings
+model AdPlatformSettings {
+  id                    String          @id @default(uuid())
+  scope                 TargetingScope
+  scopeValue            String?         @map("scope_value") // e.g., "KE", "Nairobi", "Westlands"
+  
+  // Minimum budget controls
+  minDailyBudgetKes     Decimal         @map("min_daily_budget_kes") @db.Decimal(18, 4)
+  minLifetimeBudgetKes  Decimal         @map("min_lifetime_budget_kes") @db.Decimal(18, 4)
+  
+  // CPM range controls per placement
+  liveStreamMinCpm      Decimal         @map("live_stream_min_cpm") @db.Decimal(10, 2)
+  liveStreamMaxCpm      Decimal         @map("live_stream_max_cpm") @db.Decimal(10, 2)
+  
+  contestMinCpm         Decimal         @map("contest_min_cpm") @db.Decimal(10, 2)
+  contestMaxCpm         Decimal         @map("contest_max_cpm") @db.Decimal(10, 2)
+  
+  discoverMinCpm        Decimal         @map("discover_min_cpm") @db.Decimal(10, 2)
+  discoverMaxCpm        Decimal         @map("discover_max_cpm") @db.Decimal(10, 2)
+  
+  admiringMinCpm        Decimal         @map("admiring_min_cpm") @db.Decimal(10, 2)
+  admiringMaxCpm        Decimal         @map("admiring_max_cpm") @db.Decimal(10, 2)
+  
+  dripsMinCpm           Decimal         @map("drips_min_cpm") @db.Decimal(10, 2)
+  dripsMaxCpm           Decimal         @map("drips_max_cpm") @db.Decimal(10, 2)
+  
+  storiesMinCpm         Decimal         @map("stories_min_cpm") @db.Decimal(10, 2)
+  storiesMaxCpm         Decimal         @map("stories_max_cpm") @db.Decimal(10, 2)
+  
+  groupChatMinCpm       Decimal         @map("group_chat_min_cpm") @db.Decimal(10, 2)
+  groupChatMaxCpm       Decimal         @map("group_chat_max_cpm") @db.Decimal(10, 2)
+  
+  chamaChatMinCpm       Decimal         @map("chama_chat_min_cpm") @db.Decimal(10, 2)
+  chamaChatMaxCpm       Decimal         @map("chama_chat_max_cpm") @db.Decimal(10, 2)
+  
+  // Targeting multipliers
+  targetingMultiplier   Decimal         @default(1.0) @map("targeting_multiplier") @db.Decimal(3, 2)
+  
+  priority              Int             @default(0) // Higher priority = more specific location
+  isActive              Boolean         @default(true) @map("is_active")
+  
+  createdBy             String?         @map("created_by")
+  updatedBy             String?         @map("updated_by")
+  createdAt             DateTime        @default(now()) @map("created_at")
+  updatedAt             DateTime        @updatedAt @map("updated_at")
+
+  @@unique([scope, scopeValue])
+  @@index([scope, priority])
+  @@map("ad_platform_settings")
+}
+
+// Enhanced ad campaign with granular location targeting
+model DisplayAdCampaign {
+  id                    String            @id @default(uuid())
+  brandId               String            @map("brand_id")
+  campaignName          String            @map("campaign_name")
+  campaignObjective     String            @map("campaign_objective") // AWARENESS, TRAFFIC, CONVERSIONS, APP_INSTALLS
+  
+  // Creative assets
+  adTitle               String            @map("ad_title")
+  adDescription         String?           @map("ad_description") @db.Text
+  primaryImageUrl       String            @map("primary_image_url")
+  secondaryImageUrls    String[]          @default([]) @map("secondary_image_urls")
+  videoUrl              String?           @map("video_url")
+  ctaText               String            @map("cta_text")
+  ctaUrl                String            @map("cta_url")
+  
+  // Budget & Bidding
+  budgetType            BudgetType        @map("budget_type")
+  dailyBudgetKes        Decimal?          @map("daily_budget_kes") @db.Decimal(18, 4)
+  lifetimeBudgetKes     Decimal?          @map("lifetime_budget_kes") @db.Decimal(18, 4)
+  totalSpentKes         Decimal           @default(0) @map("total_spent_kes") @db.Decimal(18, 4)
+  
+  biddingStrategy       BiddingStrategy   @map("bidding_strategy")
+  targetCpm             Decimal?          @map("target_cpm") @db.Decimal(10, 2)
+  costCap               Decimal?          @map("cost_cap") @db.Decimal(10, 2)
+  
+  // Audience Targeting - Demographics
+  targetAgeMin          Int?              @map("target_age_min")
+  targetAgeMax          Int?              @map("target_age_max")
+  targetGenders         String[]          @default([]) @map("target_genders")
+  targetLanguages       String[]          @default([]) @map("target_languages")
+  
+  // Audience Targeting - Interests & Behaviors
+  targetInterests       String[]          @default([]) @map("target_interests")
+  targetBehaviors       String[]          @default([]) @map("target_behaviors")
+  
+  // Audience Targeting - Creator Tiers
+  targetCreatorTiers    String[]          @default([]) @map("target_creator_tiers") // NANO, MICRO, MID, MACRO, MEGA
+  
+  // Ad Placement
+  placements            PlacementType[]   @default([])
+  chatNiches            ChatNiche[]       @default([]) @map("chat_niches")
+  
+  // Conversion Tracking
+  pixelId               String?           @map("pixel_id")
+  conversionEvents      String[]          @default([]) @map("conversion_events")
+  
+  // Schedule
+  startDate             DateTime          @map("start_date")
+  endDate               DateTime?         @map("end_date")
+  
+  // Status & Approval
+  status                AdCampaignStatus  @default(PENDING)
+  rejectionReason       String?           @map("rejection_reason") @db.Text
+  approvedBy            String?           @map("approved_by")
+  approvedAt            DateTime?         @map("approved_at")
+  
+  // Performance Metrics
+  impressions           Int               @default(0)
+  clicks                Int               @default(0)
+  conversions           Int               @default(0)
+  reach                 Int               @default(0)
+  frequency             Decimal           @default(0) @db.Decimal(5, 2)
+  ctr                   Decimal           @default(0) @db.Decimal(5, 4)
+  conversionRate        Decimal           @default(0) @map("conversion_rate") @db.Decimal(5, 4)
+  avgCpm                Decimal           @default(0) @map("avg_cpm") @db.Decimal(10, 2)
+  
+  // Payment & Escrow
+  escrowId              String?           @map("escrow_id")
+  paymentStatus         String            @default("PENDING") @map("payment_status")
+  
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+
+  locations             AdCampaignLocation[]
+  analytics             DisplayAdAnalytics[]
+
+  @@index([brandId, status])
+  @@index([status, startDate])
+  @@map("display_ad_campaigns")
+}
+
+// Granular location targeting for campaigns
+model AdCampaignLocation {
+  id                    String          @id @default(uuid())
+  campaignId            String          @map("campaign_id")
+  
+  scope                 TargetingScope
+  scopeValue            String          @map("scope_value")
+  scopeDisplayName      String          @map("scope_display_name")
+  
+  // Hierarchical location data
+  continent             String?
+  country               String?
+  region                String?
+  city                  String?
+  town                  String?
+  road                  String?
+  landmark              String?
+  shoppingCenter        String?         @map("shopping_center")
+  
+  // Geo coordinates for radius targeting
+  latitude              Decimal?        @db.Decimal(10, 7)
+  longitude             Decimal?        @db.Decimal(10, 7)
+  radiusKm              Decimal?        @map("radius_km") @db.Decimal(6, 2)
+  
+  // Inclusion/Exclusion
+  isExcluded            Boolean         @default(false) @map("is_excluded")
+  
+  createdAt             DateTime        @default(now()) @map("created_at")
+
+  campaign              DisplayAdCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@index([scope, scopeValue])
+  @@map("ad_campaign_locations")
+}
+
+// Daily analytics per campaign
+model DisplayAdAnalytics {
+  id                    String          @id @default(uuid())
+  campaignId            String          @map("campaign_id")
+  date                  DateTime        @db.Date
+  
+  // Placement breakdown
+  liveStreamImpressions Int             @default(0) @map("live_stream_impressions")
+  liveStreamClicks      Int             @default(0) @map("live_stream_clicks")
+  
+  contestImpressions    Int             @default(0) @map("contest_impressions")
+  contestClicks         Int             @default(0) @map("contest_clicks")
+  
+  discoverImpressions   Int             @default(0) @map("discover_impressions")
+  discoverClicks        Int             @default(0) @map("discover_clicks")
+  
+  admiringImpressions   Int             @default(0) @map("admiring_impressions")
+  admiringClicks        Int             @default(0) @map("admiring_clicks")
+  
+  dripsImpressions      Int             @default(0) @map("drips_impressions")
+  dripsClicks           Int             @default(0) @map("drips_clicks")
+  
+  storiesImpressions    Int             @default(0) @map("stories_impressions")
+  storiesClicks         Int             @default(0) @map("stories_clicks")
+  
+  groupChatImpressions  Int             @default(0) @map("group_chat_impressions")
+  groupChatClicks       Int             @default(0) @map("group_chat_clicks")
+  
+  chamaChatImpressions  Int             @default(0) @map("chama_chat_impressions")
+  chamaChatClicks       Int             @default(0) @map("chama_chat_clicks")
+  
+  // Totals
+  totalImpressions      Int             @default(0) @map("total_impressions")
+  totalClicks           Int             @default(0) @map("total_clicks")
+  totalConversions      Int             @default(0) @map("total_conversions")
+  totalSpentKes         Decimal         @default(0) @map("total_spent_kes") @db.Decimal(18, 4)
+  
+  // Calculated metrics
+  ctr                   Decimal         @default(0) @db.Decimal(5, 4)
+  avgCpm                Decimal         @default(0) @map("avg_cpm") @db.Decimal(10, 2)
+  costPerClick          Decimal         @default(0) @map("cost_per_click") @db.Decimal(10, 2)
+  
+  createdAt             DateTime        @default(now()) @map("created_at")
+
+  campaign              DisplayAdCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, date])
+  @@index([date])
+  @@map("display_ad_analytics")
+}
+
+// Track ad impressions for frequency capping
+model AdImpression {
+  id                    String          @id @default(uuid())
+  campaignId            String          @map("campaign_id")
+  userId                String          @map("user_id")
+  placement             PlacementType
+  
+  // Context
+  contentId             String?         @map("content_id")
+  contentType           String?         @map("content_type")
+  chatId                String?         @map("chat_id")
+  chatNiche             ChatNiche?      @map("chat_niche")
+  
+  // Engagement
+  wasClicked            Boolean         @default(false) @map("was_clicked")
+  wasConverted          Boolean         @default(false) @map("was_converted")
+  viewDurationMs        Int             @default(0) @map("view_duration_ms")
+  
+  // Cost
+  costKes               Decimal         @map("cost_kes") @db.Decimal(10, 4)
+  
+  // Location
+  userCountry           String?         @map("user_country")
+  userCity              String?         @map("user_city")
+  
+  createdAt             DateTime        @default(now()) @map("created_at")
+
+  @@index([campaignId, userId])
+  @@index([userId, createdAt])
+  @@index([placement, createdAt])
+  @@map("ad_impressions")
+}
+
+// Location master data for targeting UI
+model LocationMaster {
+  id                    String          @id @default(uuid())
+  scope                 TargetingScope
+  scopeValue            String          @map("scope_value")
+  displayName           String          @map("display_name")
+  
+  // Hierarchical relationships
+  parentId              String?         @map("parent_id")
+  continent             String?
+  country               String?
+  countryCode           String?         @map("country_code") @db.VarChar(2)
+  region                String?
+  city                  String?
+  
+  // Geo data
+  latitude              Decimal?        @db.Decimal(10, 7)
+  longitude             Decimal?        @db.Decimal(10, 7)
+  
+  // Population for reach estimation
+  population            Int?
+  
+  isActive              Boolean         @default(true) @map("is_active")
+  createdAt             DateTime        @default(now()) @map("created_at")
+
+  @@unique([scope, scopeValue])
+  @@index([parentId])
+  @@index([countryCode])
+  @@map("location_master")
+}

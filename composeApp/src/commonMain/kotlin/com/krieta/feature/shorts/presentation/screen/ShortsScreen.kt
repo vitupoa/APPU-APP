@@ -68,13 +68,20 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         val walletViewModel = koinScreenModel<WalletViewModel>()
         val walletRepository = koinInject<WalletRepository>()
         val currencyProvider = koinInject<UserCurrencyProvider>()
+        val tokenManager = koinInject<com.krieta.com.core.security.TokenManager>()
         val scope = rememberCoroutineScope()
         
         val state by viewModel.state.collectAsState()
         val walletState by walletViewModel.state.collectAsState()
         val currentBalance = (walletState as? WalletState.Success)?.balance?.krBalance ?: 0.0
-
+        
+        var currentUserId by remember { mutableStateOf<String?>(null) }
         var showTippingFor by remember { mutableStateOf<Short?>(null) }
+        
+        // Get current user ID
+        LaunchedEffect(Unit) {
+            currentUserId = tokenManager.getUserId()
+        }
 
         // Set feed type in viewModel
         LaunchedEffect(feedType) {
@@ -147,8 +154,10 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                             }
                         },
                         onComment = { 
-                            // removed
-                            navigator.push(CommentsScreen(ContentType.SHORT, short.id, "me"))
+                            // Only allow comments if user is authenticated
+                            currentUserId?.let { userId ->
+                                navigator.push(CommentsScreen(ContentType.SHORT, short.id, userId))
+                            }
                             if (false) {
                                 // removed
                             }

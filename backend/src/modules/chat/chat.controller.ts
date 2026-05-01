@@ -91,5 +91,61 @@ export class ChatController {
       next(error);
     }
   }
+
+  static async updateGroupChat(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId!;
+      const chatId = String(req.params.chatId);
+      const { name, description, avatarUrl } = req.body;
+
+      const chat = await ChatService.updateGroupChat(userId, chatId, {
+        name,
+        description,
+        avatarUrl,
+      });
+
+      res.json({ success: true, chat });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async manageMember(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId!;
+      const chatId = String(req.params.chatId);
+      const { userId: targetUserId, action } = req.body;
+
+      const result = await ChatService.manageMember(userId, chatId, targetUserId, action);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async transferOwnership(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId!;
+      const chatId = String(req.params.chatId);
+      const { newOwnerId } = req.body;
+
+      const result = await ChatService.transferOwnership(userId, chatId, newOwnerId);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async leaveGroup(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId!;
+      const chatId = String(req.params.chatId);
+
+      const result = await ChatService.leaveGroup(userId, chatId);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 

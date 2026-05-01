@@ -13,6 +13,9 @@
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "seed": "tsx prisma/seeds/seed-all.ts",
+    "seed:admin": "tsx prisma/seeds/seed-super-admin.ts",
+    "seed:niches": "tsx prisma/seeds/seed-niches.ts",
     "db:migrate:run": "tsx scripts/run-migrations.ts",
     "test": "jest --coverage",
     "lint": "eslint src/ --ext .ts"

@@ -27,6 +27,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.krieta.feature.ads.presentation.components.LiveStreamOverlayAd
 import com.krieta.feature.live.domain.model.LiveStream
 import com.krieta.feature.live.domain.repository.LiveRepository
 import org.koin.compose.koinInject
@@ -91,6 +92,8 @@ class LiveFeedScreen : Screen {
                         modifier = Modifier.fillMaxSize()
                     ) { page ->
                         val stream = streams[page]
+                        val showAd = page > 0 && page % 5 == 0 // Show ad every 5 streams
+                        
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -167,6 +170,17 @@ class LiveFeedScreen : Screen {
                                     .padding(16.dp)
                             ) {
                                 Text("Tap to enter Live Room", color = Color.White)
+                            }
+                            
+                            // Ad overlay every 5 streams
+                            if (showAd) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .padding(bottom = 200.dp)
+                                ) {
+                                    LiveStreamOverlayAd(onAdClick = { /* Track ad click */ })
+                                }
                             }
                         }
                     }

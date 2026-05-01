@@ -27,6 +27,7 @@ val coreModule = module {
     single<HttpClient> { KtorClientFactory.create(get<TokenManager>(), get<DeviceSecurity>()) }
     single { WebSocketService(get(), get()) }
     single { com.krieta.com.core.network.CloudinaryUploader(get()) }
+    single<com.krieta.com.core.upload.UploadApi> { com.krieta.com.core.upload.UploadApiImpl(get()) }
     // UserCurrencyProvider depends on LocationProvider (from platformModule) + WalletRepository (from walletModule)
     single { UserCurrencyProvider(get(), get()) }
 }

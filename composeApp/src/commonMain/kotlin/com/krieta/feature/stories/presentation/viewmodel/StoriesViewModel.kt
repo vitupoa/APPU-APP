@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 data class StoriesState(
     val storyGroups: List<StoryGroup> = emptyList(),
+    val myStories: StoryGroup? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )
@@ -25,6 +26,7 @@ class StoriesViewModel(
 
     init {
         loadFeed()
+        loadMyStories()
     }
 
     fun loadFeed() {
@@ -64,6 +66,48 @@ class StoriesViewModel(
 
             // Send to backend
             repository.viewStory(storyId)
+        }
+    }
+    
+    fun loadMyStories() {
+        screenModelScope.launch {
+            when (val result = repository.getMyStories()) {
+                is NetworkResult.Success -> {
+                    _state.value = _state.value.copy(
+                        myStories = result.data.firstOrNull()
+                    )
+                }
+                is NetworkResult.Error -> {
+                    // Silently fail for my stories
+                }
+                is NetworkResult.Loading -> {}
+            }
+        }
+    }
+    
+    fun deleteStory(storyId: String) {
+        screenModelScope.launch {
+            when (val result = repository.deleteStory(storyId)) {
+                is NetworkResult.Success -> {
+                    // Remove from my stories
+                    val updatedMyStories = _state.value.myStories?.copy(
+                        stories = _state.value.myStories!!.stories.filter { it.id != storyId }
+                    )
+                    _state.value = _state.value.copy(
+                        myStories = if (updatedMyStories?.stories?.isEmpty() == true) null else updatedMyStories
+                    )
+                    
+                    // Also remove from feed if present
+                    val updatedGroups = _state.value.storyGroups.map { group ->
+                        group.copy(stories = group.stories.filter { it.id != storyId })
+                    }.filter { it.stories.isNotEmpty() }
+                    _state.value = _state.value.copy(storyGroups = updatedGroups)
+                }
+                is NetworkResult.Error -> {
+                    _state.value = _state.value.copy(error = result.message)
+                }
+                is NetworkResult.Loading -> {}
+            }
         }
     }
 }

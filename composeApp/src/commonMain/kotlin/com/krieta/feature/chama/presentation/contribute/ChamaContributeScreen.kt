@@ -18,19 +18,37 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.theme.KrietaColors
+import org.koin.core.parameter.parametersOf
 
 data class ChamaContributeScreen(val chamaId: String, val chamaName: String) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val viewModel = koinScreenModel<ChamaContributeViewModel> { parametersOf(chamaId) }
+        val state by viewModel.state.collectAsState()
         var amount by remember { mutableStateOf("") }
-        var isLoading by remember { mutableStateOf(false) }
+
+        val snackbarHostState = remember { SnackbarHostState() }
+        
+        LaunchedEffect(state.error, state.successMessage) {
+            val msg = state.successMessage ?: state.error
+            if (msg != null) {
+                snackbarHostState.showSnackbar(msg)
+                if (state.successMessage != null) {
+                    kotlinx.coroutines.delay(1500)
+                    navigator.pop()
+                }
+                viewModel.clearMessages()
+            }
+        }
 
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 TopAppBar(
                     title = { Text("Contribute to $chamaName") },
@@ -60,12 +78,12 @@ data class ChamaContributeScreen(val chamaId: String, val chamaName: String) : S
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            "Required Contribution",
+                            "Current Balance",
                             fontSize = 14.sp,
                             color = KrietaColors.OnSurfaceVariant
                         )
                         Text(
-                            "Amount Kr",
+                            "${state.chamaBalance} Kr",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = KrietaColors.Primary
@@ -87,17 +105,30 @@ data class ChamaContributeScreen(val chamaId: String, val chamaName: String) : S
                 Spacer(modifier = Modifier.weight(1f))
 
                 Button(
-                    onClick = { /* TODO: Implement contribution */ },
+                    onClick = {
+                        val amountValue = amount.toDoubleOrNull()
+                        if (amountValue != null && amountValue > 0) {
+                            viewModel.contribute(amountValue)
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    enabled = !isLoading && amount.toIntOrNull() != null,
+                    enabled = !state.isLoading && amount.toDoubleOrNull() != null && amount.toDoubleOrNull()!! > 0,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = KrietaColors.Primary
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Contribute", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = KrietaColors.OnPrimary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Contribute", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }

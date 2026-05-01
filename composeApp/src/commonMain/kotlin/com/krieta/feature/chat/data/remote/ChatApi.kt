@@ -7,6 +7,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
 class ChatApi(private val httpClient: HttpClient) {
@@ -52,4 +53,46 @@ class ChatApi(private val httpClient: HttpClient) {
             setBody(SendMessageRequest(payload, mediaUrl, mediaType, replyToId))
         }.body()
     }
+
+    suspend fun updateGroupChat(
+        chatId: String,
+        name: String? = null,
+        description: String? = null,
+        avatarUrl: String? = null
+    ): ChatResponseDto {
+        return httpClient.put("${ApiConstants.CHAT}/$chatId") {
+            setBody(UpdateGroupChatRequest(name, description, avatarUrl))
+        }.body()
+    }
+
+    suspend fun manageMember(
+        chatId: String,
+        userId: String,
+        action: String
+    ): ActionResponse {
+        return httpClient.post("${ApiConstants.CHAT}/$chatId/manage-member") {
+            setBody(ManageMemberRequest(userId, action))
+        }.body()
+    }
+
+    suspend fun transferOwnership(
+        chatId: String,
+        newOwnerId: String
+    ): ActionResponse {
+        return httpClient.post("${ApiConstants.CHAT}/$chatId/transfer-ownership") {
+            setBody(TransferOwnershipRequest(newOwnerId))
+        }.body()
+    }
+
+    suspend fun leaveGroup(chatId: String): ActionResponse {
+        return httpClient.post("${ApiConstants.CHAT}/$chatId/leave").body()
+    }
+
+    suspend fun searchGroups(query: String): ChatListResponseDto {
+        return httpClient.get("${ApiConstants.CHAT}/search") {
+            parameter("query", query)
+            parameter("type", "GROUP")
+        }.body()
+    }
 }
+

@@ -22,7 +22,7 @@ class LiveRepositoryImpl(
         isCoHostEnabled: Boolean
     ): Result<LiveStream> {
         return try {
-            val response: LiveStreamDto = client.post("live/start") {
+            val response: LiveStreamDto = client.post("/api/v1/live/start") {
                 setBody(
                     mapOf(
                         "title" to title,
@@ -40,7 +40,7 @@ class LiveRepositoryImpl(
 
     override suspend fun endStream(streamId: String): Result<Unit> {
         return try {
-            client.post("live/$streamId/end")
+            client.post("/api/v1/live/$streamId/end")
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -53,7 +53,7 @@ class LiveRepositoryImpl(
         chamaId: String?
     ): Result<List<LiveStream>> {
         return try {
-            val response: ActiveStreamsResponseDto = client.get("live/active") {
+            val response: ActiveStreamsResponseDto = client.get("/api/v1/live/active") {
                 parameter("page", page)
                 parameter("limit", limit)
                 if (chamaId != null) parameter("chamaId", chamaId)
@@ -66,7 +66,7 @@ class LiveRepositoryImpl(
 
     override suspend fun getStreamDetails(streamId: String): Result<LiveStream> {
         return try {
-            val response: LiveStreamDto = client.get("live/$streamId").body()
+            val response: LiveStreamDto = client.get("/api/v1/live/$streamId").body()
             Result.success(response.toDomain())
         } catch (e: Exception) {
             Result.failure(e)
@@ -75,7 +75,7 @@ class LiveRepositoryImpl(
 
     override suspend fun setGiftGoal(streamId: String, title: String, targetKr: Double): Result<Unit> {
         return try {
-            client.post("live/$streamId/gift-goal") {
+            client.post("/api/v1/live/$streamId/gift-goal") {
                 setBody(
                     mapOf(
                         "title" to title,

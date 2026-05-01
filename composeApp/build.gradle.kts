@@ -63,6 +63,12 @@ kotlin {
             // Security
             implementation(libs.security.crypto)
             
+            // Biometric Authentication
+            implementation("androidx.biometric:biometric:1.2.0-alpha05")
+            
+            // Fragment (required for BiometricPrompt)
+            implementation("androidx.fragment:fragment-ktx:1.6.2")
+            
             // Browser (for OAuth)
             implementation("androidx.browser:browser:1.8.0")
             
@@ -126,6 +132,9 @@ kotlin {
 
             // FileKit - Cross Platform File Picker
             implementation("io.github.vinceglb:filekit-compose:0.8.8")
+            
+            // Image Cropper
+            implementation("io.github.mr0xf00:easycrop:0.1.1")
         }
 
         iosMain.dependencies {

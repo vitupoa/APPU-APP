@@ -47,4 +47,20 @@ actual object FileStreamer {
     actual fun getFilePathOrUri(file: PlatformFile): String {
         return file.path ?: ""
     }
+    
+    actual fun saveTempFile(bytes: ByteArray, fileName: String): String {
+        val tempDir = platform.Foundation.NSTemporaryDirectory()
+        val filePath = "$tempDir$fileName"
+        
+        bytes.usePinned { pinned ->
+            val data = NSData.dataWithBytesNoCopy(
+                bytes = pinned.addressOf(0),
+                length = bytes.size.toULong(),
+                freeWhenDone = false
+            )
+            data.writeToFile(filePath, atomically = true)
+        }
+        
+        return filePath
+    }
 }

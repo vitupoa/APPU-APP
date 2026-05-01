@@ -11,25 +11,32 @@ cloudinary.config({
 // Folder structure for organizing uploads by module
 export const CLOUDINARY_FOLDERS = {
   // Profiles
-  PROFILE_IMAGES: 'Krieta/profile/Images',
-  PROFILE_VIDEOS: 'Krieta/profile/Videos',
-  // Shorts
-  SHORTS_VIDEOS: 'Krieta/shorts/Videos',
-  SHORTS_IMAGES: 'Krieta/shorts/Images',
+  PROFILE_IMAGES: 'Krieta/Profile/Images',
+  PROFILE_VIDEOS: 'Krieta/Profile/Videos',
+  // Shorts (TikTok-like - permanent)
+  SHORTS_VIDEOS: 'Krieta/Shorts/Videos',
+  SHORTS_IMAGES: 'Krieta/Shorts/Images',
   // Contests
-  CONTESTS_IMAGES: 'Krieta/contests/Images',
-  CONTESTS_VIDEOS: 'Krieta/contests/Videos',
+  CONTESTS_IMAGES: 'Krieta/Contests/Images',
+  CONTESTS_VIDEOS: 'Krieta/Contests/Videos',
   // Feed
-  DRIPS_IMAGES: 'Krieta/drips/Images',
+  DRIPS_IMAGES: 'Krieta/Drips/Images',
   // Shop
-  SHOP_IMAGES: 'Krieta/shop/Images',
-  // Chat
-  CHAT_IMAGES: 'Krieta/chat/Images',
-  CHAT_VIDEOS: 'Krieta/chat/Videos',
-  CHAT_AUDIO: 'Krieta/chat/Audio',
-  // Stories (ephemeral)
-  STORIES_IMAGES: 'Krieta/stories/Images',
-  STORIES_VIDEOS: 'Krieta/stories/Videos',
+  SHOP_IMAGES: 'Krieta/Shop/Images',
+  // Chat - Direct
+  CHAT_DIRECT_IMAGES: 'Krieta/Chats/Direct/Images',
+  CHAT_DIRECT_VIDEOS: 'Krieta/Chats/Direct/Videos',
+  // Chat - Normal Groups
+  CHAT_GROUP_IMAGES: 'Krieta/Chats/Group/Images',
+  CHAT_GROUP_VIDEOS: 'Krieta/Chats/Group/Videos',
+  // Chat - Chama Groups
+  CHAT_CHAMA_IMAGES: 'Krieta/Chats/Chama/Images',
+  CHAT_CHAMA_VIDEOS: 'Krieta/Chats/Chama/Videos',
+  // Chat - Group Avatars (both normal and chama)
+  CHAT_GROUP_AVATAR_IMAGES: 'Krieta/Chats/GroupAvatar/Images',
+  // Stories (WhatsApp-like status - 24h ephemeral)
+  STORIES_IMAGES: 'Krieta/Stories/Images',
+  STORIES_VIDEOS: 'Krieta/Stories/Videos',
 } as const;
 
 export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINARY_FOLDERS];

@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.wallet.domain.repository.WalletRepository
+import com.krieta.com.security.DeviceSecurityChecker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,7 +44,8 @@ data class Country(
 )
 
 class WithdrawViewModel(
-    private val repository: WalletRepository
+    private val repository: WalletRepository,
+    private val deviceSecurityChecker: DeviceSecurityChecker
 ) : ScreenModel {
     
     private val _state = MutableStateFlow(WithdrawState())
@@ -146,6 +148,25 @@ class WithdrawViewModel(
     
     fun withdraw() {
         screenModelScope.launch {
+            // Step 1: Check device security
+            val securityStatus = deviceSecurityChecker.checkDeviceSecurity()
+            
+            if (securityStatus.isRooted) {
+                _state.value = _state.value.copy(
+                    isSubmitting = false,
+                    error = "Security Error: Withdrawals are not allowed from rooted or jailbroken devices for your protection."
+                )
+                return@launch
+            }
+            
+            if (securityStatus.securityScore < 50) {
+                _state.value = _state.value.copy(
+                    isSubmitting = false,
+                    error = "Security Error: Device security score too low. Please secure your device and try again."
+                )
+                return@launch
+            }
+            
             val amount = if (_state.value.amount.isNotEmpty()) SafeConversion.toDoubleOrDefaultWithValidation(_state.value.amount, "withdrawAmount", 0.0, defaultValue = 0.0) else null
             if (amount == null || amount <= 0) {
                 _state.value = _state.value.copy(error = "Invalid amount")
@@ -166,7 +187,11 @@ class WithdrawViewModel(
                     "mpesa" -> "KES"
                     "paystack" -> _state.value.countries.find { it.code == _state.value.country }?.currency ?: "NGN"
                     else -> "USD"
-                }
+                },
+                // Add security metadata
+                "deviceSecurityScore" to securityStatus.securityScore,
+                "isRooted" to securityStatus.isRooted,
+                "isEmulator" to securityStatus.isEmulator
             )
             
             when (_state.value.provider) {

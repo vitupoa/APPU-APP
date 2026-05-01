@@ -5,6 +5,9 @@ import com.krieta.feature.chat.data.repository.ChatRepositoryImpl
 import com.krieta.feature.chat.domain.repository.ChatRepository
 import com.krieta.feature.chat.presentation.list.ChatListViewModel
 import com.krieta.feature.chat.presentation.room.ChatRoomViewModel
+import com.krieta.feature.chat.presentation.settings.GroupSettingsViewModel
+import com.krieta.feature.chat.presentation.screen.UserSearchViewModel
+import com.krieta.feature.chat.presentation.screen.CreateGroupViewModel
 import org.koin.dsl.module
 
 val chatModule = module {
@@ -13,4 +16,7 @@ val chatModule = module {
     
     factory { ChatListViewModel(get(), get()) }
     factory { (chatId: String) -> ChatRoomViewModel(chatId, get(), get(), get()) }
+    factory { (chatId: String) -> GroupSettingsViewModel(chatId, get(), get(), get()) }
+    factory { UserSearchViewModel(get()) }
+    factory { CreateGroupViewModel(get(), get()) }
 }

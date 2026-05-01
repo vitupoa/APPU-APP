@@ -15,4 +15,5 @@ val marketplaceModule = module {
     factory { CampaignApplicationsViewModel(get()) }
     factory { SponsorContestViewModel(get()) }
     factory { GamificationViewModel(get()) }
+    factory { (influencerId: String) -> SocialMediaManagementViewModel(influencerId, get()) }
 }

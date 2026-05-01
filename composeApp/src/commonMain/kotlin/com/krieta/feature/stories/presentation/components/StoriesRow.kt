@@ -26,6 +26,7 @@ import com.krieta.feature.stories.domain.model.StoryGroup
 @Composable
 fun StoriesRow(
     storyGroups: List<StoryGroup>,
+    myStories: StoryGroup?,
     onStoryGroupClick: (StoryGroup) -> Unit,
     onAddStoryClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -35,9 +36,16 @@ fun StoriesRow(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // "My Story" / Add Story Button Placeholder
+        // "My Story" / Add Story Button
         item {
-            AddStoryItem(onClick = onAddStoryClick)
+            if (myStories != null && myStories.stories.isNotEmpty()) {
+                MyStoryItem(
+                    myStories = myStories,
+                    onClick = { onStoryGroupClick(myStories) }
+                )
+            } else {
+                AddStoryItem(onClick = onAddStoryClick)
+            }
         }
 
         items(storyGroups, key = { it.creator.id }) { group ->
@@ -46,6 +54,54 @@ fun StoriesRow(
                 onClick = { onStoryGroupClick(group) }
             )
         }
+    }
+}
+
+@Composable
+fun MyStoryItem(
+    myStories: StoryGroup,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(64.dp).clickable(onClick = onClick)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .border(2.dp, Color(0xFFFFCC00), CircleShape)
+                .padding(4.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            AsyncImage(
+                model = myStories.creator.avatarUrl ?: "https://api.dicebear.com/7.x/avataaars/svg?seed=${myStories.creator.username}",
+                contentDescription = "My Avatar",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            
+            // Add story indicator
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .size(20.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFFCC00)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("+", fontSize = 14.sp, color = Color.Black)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = "My Story",
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -107,6 +163,8 @@ fun AddStoryItem(onClick: () -> Unit) {
         Box(
             modifier = Modifier
                 .size(64.dp)
+                .border(2.dp, Color.LightGray, CircleShape)
+                .padding(4.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center

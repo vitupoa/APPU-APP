@@ -43,7 +43,7 @@ import com.krieta.feature.auth.presentation.screen.LoginScreen
 import androidx.compose.foundation.BorderStroke
 
 class ProfileScreen(val userId: String? = null) : Screen {
-    override val key: cafe.adriel.voyager.core.screen.ScreenKey = "ProfileScreen_${userId ?: "me"}"
+    override val key: cafe.adriel.voyager.core.screen.ScreenKey = "ProfileScreen:${userId ?: "me"}"
     
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -69,9 +69,22 @@ class ProfileScreen(val userId: String? = null) : Screen {
             }
         } else if (error != null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Error: $error", color = Color.Red)
-                    Button(onClick = { /* TODO: Retry logic */ }) { Text("Retry") }
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
+                    Text("😕", fontSize = 48.sp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        error, 
+                        color = KrietaColors.Error,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = { profileViewModel.refreshProfile() },
+                        colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.Primary)
+                    ) { 
+                        Text("Retry", color = KrietaColors.OnPrimary) 
+                    }
                 }
             }
         } else if (profile != null) {
@@ -198,6 +211,38 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
+                    
+                    // Niches
+                    if (profile.selectedNiches.isNotEmpty() || profile.customNiches.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            androidx.compose.foundation.layout.FlowRow(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                (profile.selectedNiches + profile.customNiches).forEach { niche ->
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(horizontal = 4.dp)
+                                            .background(KrietaColors.Primary.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                            .border(1.dp, KrietaColors.Primary.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Text(
+                                            niche,
+                                            fontSize = 12.sp,
+                                            color = KrietaColors.Primary,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     // Social Stats (Admirers, Admiring)
                     Spacer(modifier = Modifier.height(20.dp))

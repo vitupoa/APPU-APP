@@ -4,8 +4,13 @@ import kotlinx.cinterop.*
 import platform.CoreFoundation.*
 import platform.Foundation.*
 import platform.Security.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 
 class IosTokenManager : TokenManager {
+    
+    private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun saveAccessToken(token: String) {
         saveToKeychain(KEY_ACCESS_TOKEN, token)
@@ -26,10 +31,32 @@ class IosTokenManager : TokenManager {
     override suspend fun clearTokens() {
         deleteFromKeychain(KEY_ACCESS_TOKEN)
         deleteFromKeychain(KEY_REFRESH_TOKEN)
+        deleteFromKeychain(KEY_USER_SESSION)
     }
 
     override suspend fun isLoggedIn(): Boolean {
         return getAccessToken() != null
+    }
+    
+    override suspend fun saveUserSession(session: UserSession) {
+        val sessionJson = json.encodeToString(session)
+        saveToKeychain(KEY_USER_SESSION, sessionJson)
+    }
+    
+    override suspend fun getUserSession(): UserSession? {
+        val sessionJson = getFromKeychain(KEY_USER_SESSION) ?: return null
+        return try {
+            json.decodeFromString<UserSession>(sessionJson)
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
+    override suspend fun getUserId(): String? {
+        return getUserSession()?.userId ?: run {
+            val token = getAccessToken() ?: return null
+            JwtDecoder.getUserId(token)
+        }
     }
 
     @OptIn(ExperimentalForeignApi::class)
@@ -125,5 +152,6 @@ class IosTokenManager : TokenManager {
     companion object {
         private const val KEY_ACCESS_TOKEN = "krieta_access_token"
         private const val KEY_REFRESH_TOKEN = "krieta_refresh_token"
+        private const val KEY_USER_SESSION = "krieta_user_session"
     }
 }

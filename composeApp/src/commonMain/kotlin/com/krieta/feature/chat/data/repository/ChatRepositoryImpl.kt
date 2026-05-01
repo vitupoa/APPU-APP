@@ -59,6 +59,48 @@ class ChatRepositoryImpl(
         }
     }
 
+    override suspend fun updateGroupChat(
+        chatId: String,
+        name: String?,
+        description: String?,
+        avatarUrl: String?
+    ): NetworkResult<Chat> {
+        return safeApiCall {
+            api.updateGroupChat(chatId, name, description, avatarUrl).chat.toDomain()
+        }
+    }
+
+    override suspend fun manageMember(
+        chatId: String,
+        userId: String,
+        action: String
+    ): NetworkResult<Boolean> {
+        return safeApiCall {
+            api.manageMember(chatId, userId, action).success
+        }
+    }
+
+    override suspend fun transferOwnership(
+        chatId: String,
+        newOwnerId: String
+    ): NetworkResult<Boolean> {
+        return safeApiCall {
+            api.transferOwnership(chatId, newOwnerId).success
+        }
+    }
+
+    override suspend fun leaveGroup(chatId: String): NetworkResult<Boolean> {
+        return safeApiCall {
+            api.leaveGroup(chatId).success
+        }
+    }
+
+    override suspend fun searchGroups(query: String): NetworkResult<List<Chat>> {
+        return safeApiCall {
+            api.searchGroups(query).chats.map { it.toDomain() }
+        }
+    }
+
     private fun ChatDto.toDomain(): Chat {
         return Chat(
             id = id,

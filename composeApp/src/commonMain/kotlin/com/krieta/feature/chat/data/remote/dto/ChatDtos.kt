@@ -92,3 +92,27 @@ data class SendMessageRequest(
     val mediaType: String? = null,
     val replyToId: String? = null
 )
+
+@Serializable
+data class UpdateGroupChatRequest(
+    val name: String? = null,
+    val description: String? = null,
+    val avatarUrl: String? = null
+)
+
+@Serializable
+data class ManageMemberRequest(
+    val userId: String,
+    val action: String // promote, demote, kick
+)
+
+@Serializable
+data class TransferOwnershipRequest(
+    val newOwnerId: String
+)
+
+@Serializable
+data class ActionResponse(
+    val success: Boolean,
+    val message: String? = null
+)

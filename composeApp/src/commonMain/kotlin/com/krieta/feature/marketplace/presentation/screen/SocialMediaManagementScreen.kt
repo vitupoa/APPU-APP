@@ -28,10 +28,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.feature.marketplace.domain.model.*
+import com.krieta.feature.marketplace.presentation.viewmodel.SocialMediaManagementViewModel
 import com.krieta.com.core.theme.KrietaColors
+import org.koin.core.parameter.parametersOf
 
 class SocialMediaManagementScreen(
     private val influencerId: String
@@ -40,17 +43,22 @@ class SocialMediaManagementScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        var accounts by remember { mutableStateOf<List<SocialMediaAccount>>(emptyList()) }
+        val viewModel = koinScreenModel<SocialMediaManagementViewModel> { parametersOf(influencerId) }
+        val state by viewModel.state.collectAsState()
         var showAddDialog by remember { mutableStateOf(false) }
-        var isLoading by remember { mutableStateOf(true) }
         
-        // TODO: Load accounts from API
-        LaunchedEffect(influencerId) {
-            // accounts = viewModel.loadSocialAccounts(influencerId)
-            isLoading = false
+        val snackbarHostState = remember { SnackbarHostState() }
+        
+        LaunchedEffect(state.error, state.successMessage) {
+            val msg = state.successMessage ?: state.error
+            if (msg != null) {
+                snackbarHostState.showSnackbar(msg)
+                viewModel.clearMessages()
+            }
         }
         
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 TopAppBar(
                     title = { Text("Social Media Accounts") },
@@ -67,7 +75,7 @@ class SocialMediaManagementScreen(
                 }
             }
         ) { padding ->
-            if (isLoading) {
+            if (state.isLoading) {
                 Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -78,7 +86,7 @@ class SocialMediaManagementScreen(
                 ) {
                     // Total Reach Card
                     item {
-                        TotalReachCard(accounts)
+                        TotalReachCard(state.accounts)
                     }
                     
                     // Connected Accounts
@@ -90,17 +98,17 @@ class SocialMediaManagementScreen(
                         )
                     }
                     
-                    if (accounts.isEmpty()) {
+                    if (state.accounts.isEmpty()) {
                         item {
                             EmptyStateCard()
                         }
                     } else {
-                        items(accounts) { account ->
+                        items(state.accounts) { account ->
                             SocialAccountCard(
                                 account = account,
-                                onSync = { /* TODO: Sync account */ },
-                                onSetPrimary = { /* TODO: Set primary */ },
-                                onDelete = { /* TODO: Delete account */ }
+                                onSync = { viewModel.syncAccount(account.platform) },
+                                onSetPrimary = { viewModel.setPrimaryAccount(account.platform) },
+                                onDelete = { viewModel.deleteAccount(account.platform) }
                             )
                         }
                     }
@@ -117,7 +125,7 @@ class SocialMediaManagementScreen(
                     
                     item {
                         AvailablePlatformsGrid(
-                            connectedPlatforms = accounts.map { it.platform },
+                            connectedPlatforms = state.accounts.map { it.platform },
                             onPlatformClick = { platform ->
                                 showAddDialog = true
                             }
@@ -131,7 +139,7 @@ class SocialMediaManagementScreen(
             AddSocialAccountDialog(
                 onDismiss = { showAddDialog = false },
                 onAdd = { platform, username ->
-                    // TODO: Add account
+                    viewModel.addAccount(platform, username)
                     showAddDialog = false
                 }
             )

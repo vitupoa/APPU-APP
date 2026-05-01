@@ -247,4 +247,206 @@ export class ChatService {
 
     return { success: true, tipResult, message };
   }
+
+  /**
+   * Update group chat details (name, description, avatarUrl)
+   * Only admins can update
+   */
+  static async updateGroupChat(
+    userId: string,
+    chatId: string,
+    updates: { name?: string; description?: string; avatarUrl?: string | null }
+  ) {
+    // Verify chat exists and is a group
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+      include: { participants: true },
+    });
+
+    if (!chat) {
+      throw new Error('Chat not found');
+    }
+
+    if (chat.type !== 'GROUP') {
+      throw new Error('Can only update group chats');
+    }
+
+    // Verify user is admin
+    const participant = chat.participants.find(p => p.userId === userId);
+    if (!participant || participant.role !== 'admin') {
+      throw new Error('Only admins can update group details');
+    }
+
+    // Update chat
+    const updatedChat = await prisma.chat.update({
+      where: { id: chatId },
+      data: updates,
+      include: {
+        participants: { include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } },
+      },
+    });
+
+    // Broadcast update to all participants
+    chat.participants.forEach(p => {
+      io.to(`user:${p.userId}`).emit('chat:updated', updatedChat);
+    });
+
+    return updatedChat;
+  }
+
+  /**
+   * Manage group member (promote, demote, kick)
+   * Only admins can manage members
+   */
+  static async manageMember(
+    userId: string,
+    chatId: string,
+    targetUserId: string,
+    action: 'promote' | 'demote' | 'kick'
+  ) {
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+      include: { participants: true },
+    });
+
+    if (!chat || chat.type !== 'GROUP') {
+      throw new Error('Group not found');
+    }
+
+    const requester = chat.participants.find(p => p.userId === userId);
+    if (!requester || requester.role !== 'admin') {
+      throw new Error('Only admins can manage members');
+    }
+
+    const target = chat.participants.find(p => p.userId === targetUserId);
+    if (!target) {
+      throw new Error('User is not a member of this group');
+    }
+
+    if (action === 'kick') {
+      await prisma.chatParticipant.delete({
+        where: { chatId_userId: { chatId, userId: targetUserId } },
+      });
+
+      // Broadcast member removed
+      chat.participants.forEach(p => {
+        io.to(`user:${p.userId}`).emit('chat:member_removed', {
+          chatId,
+          userId: targetUserId,
+        });
+      });
+
+      return { success: true, message: 'Member removed' };
+    }
+
+    const newRole = action === 'promote' ? 'admin' : 'member';
+    await prisma.chatParticipant.update({
+      where: { chatId_userId: { chatId, userId: targetUserId } },
+      data: { role: newRole },
+    });
+
+    // Broadcast role change
+    chat.participants.forEach(p => {
+      io.to(`user:${p.userId}`).emit('chat:member_role_changed', {
+        chatId,
+        userId: targetUserId,
+        newRole,
+      });
+    });
+
+    return { success: true, message: `Member ${action}d successfully` };
+  }
+
+  /**
+   * Transfer group ownership
+   * Only current admin can transfer
+   */
+  static async transferOwnership(
+    userId: string,
+    chatId: string,
+    newOwnerId: string
+  ) {
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+      include: { participants: true },
+    });
+
+    if (!chat || chat.type !== 'GROUP') {
+      throw new Error('Group not found');
+    }
+
+    const currentOwner = chat.participants.find(p => p.userId === userId);
+    if (!currentOwner || currentOwner.role !== 'admin') {
+      throw new Error('Only the owner can transfer ownership');
+    }
+
+    const newOwner = chat.participants.find(p => p.userId === newOwnerId);
+    if (!newOwner) {
+      throw new Error('New owner is not a member of this group');
+    }
+
+    // Demote current owner to member
+    await prisma.chatParticipant.update({
+      where: { chatId_userId: { chatId, userId } },
+      data: { role: 'member' },
+    });
+
+    // Promote new owner to admin
+    await prisma.chatParticipant.update({
+      where: { chatId_userId: { chatId, userId: newOwnerId } },
+      data: { role: 'admin' },
+    });
+
+    // Broadcast ownership transfer
+    chat.participants.forEach(p => {
+      io.to(`user:${p.userId}`).emit('chat:ownership_transferred', {
+        chatId,
+        oldOwnerId: userId,
+        newOwnerId,
+      });
+    });
+
+    return { success: true, message: 'Ownership transferred successfully' };
+  }
+
+  /**
+   * Leave group
+   */
+  static async leaveGroup(userId: string, chatId: string) {
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+      include: { participants: true },
+    });
+
+    if (!chat || chat.type !== 'GROUP') {
+      throw new Error('Group not found');
+    }
+
+    const participant = chat.participants.find(p => p.userId === userId);
+    if (!participant) {
+      throw new Error('You are not a member of this group');
+    }
+
+    // If user is the only admin, prevent leaving
+    const admins = chat.participants.filter(p => p.role === 'admin');
+    if (admins.length === 1 && participant.role === 'admin') {
+      throw new Error('Transfer ownership before leaving the group');
+    }
+
+    await prisma.chatParticipant.delete({
+      where: { chatId_userId: { chatId, userId } },
+    });
+
+    // Broadcast member left
+    chat.participants.forEach(p => {
+      if (p.userId !== userId) {
+        io.to(`user:${p.userId}`).emit('chat:member_left', {
+          chatId,
+          userId,
+        });
+      }
+    });
+
+    return { success: true, message: 'You have left the group' };
+  }
 }

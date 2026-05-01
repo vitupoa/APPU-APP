@@ -17,6 +17,8 @@ import com.krieta.feature.auth.domain.repository.AuthRepository
 data class ProfileState(
     val profile: UserProfile? = null,
     val tiers: List<SubscriptionTier> = emptyList(),
+    val selectedNiches: List<String> = emptyList(),
+    val customNiches: List<String> = emptyList(),
     val isLoading: Boolean = true,
     val isRelationshipLoading: Boolean = false,
     val error: String? = null
@@ -34,6 +36,7 @@ class ProfileViewModel(
     val isOwnProfile: Boolean get() = userId == null
 
     init { 
+        _state.value = ProfileState()
         refreshProfile() 
         observeProfileUpdates()
     }
@@ -129,6 +132,18 @@ class ProfileViewModel(
         screenModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
 
+            // If loading own profile, verify we have a valid token
+            if (isOwnProfile) {
+                val isAuthenticated = authRepository.isAuthenticated()
+                if (!isAuthenticated) {
+                    _state.value = ProfileState(
+                        isLoading = false, 
+                        error = "Not authenticated. Please log in again."
+                    )
+                    return@launch
+                }
+            }
+
             val profileResult = if (isOwnProfile) repository.getMyProfile() else repository.getProfile(userId!!)
 
             when (profileResult) {
@@ -150,9 +165,11 @@ class ProfileViewModel(
                 }
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
-                    _state.value = ProfileState(isLoading = false, error = profileResult.message)
+                    _state.value = ProfileState(
+                        isLoading = false, 
+                        error = profileResult.message ?: "Failed to load profile"
+                    )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

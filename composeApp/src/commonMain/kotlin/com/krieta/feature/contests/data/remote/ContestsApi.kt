@@ -77,4 +77,14 @@ class ContestsApi(private val httpClient: HttpClient) {
     suspend fun declineJudgeInvite(inviteId: String) {
         httpClient.post("${ApiConstants.CONTESTS}/judge/invitations/$inviteId/decline")
     }
+    
+    // Voting Endpoint
+    suspend fun voteSubmission(submissionId: String, fingerprint: String) {
+        httpClient.post("${ApiConstants.CONTESTS}/vote") {
+            setBody(mapOf(
+                "submissionId" to submissionId,
+                "fingerprint" to fingerprint
+            ))
+        }
+    }
 }

@@ -45,14 +45,21 @@ class CreateShortViewModel(
         screenModelScope.launch {
             _state.value = currentState.copy(isPosting = true, error = null)
 
-            val filePath = com.krieta.com.core.util.FileStreamer.getFilePathOrUri(currentState.videoFile!!)
-            com.krieta.com.core.upload.BackgroundUploader.enqueueUpload(
-                type = com.krieta.com.core.upload.UploadType.SHORT,
-                filePath = filePath,
-                caption = currentState.caption
-            )
-            
-            _state.value = _state.value.copy(isPosting = false, success = true)
+            try {
+                val filePath = com.krieta.com.core.util.FileStreamer.getFilePathOrUri(currentState.videoFile!!)
+                com.krieta.com.core.upload.BackgroundUploader.enqueueUpload(
+                    type = com.krieta.com.core.upload.UploadType.SHORT,
+                    filePath = filePath,
+                    caption = currentState.caption
+                )
+                
+                _state.value = _state.value.copy(isPosting = false, success = true)
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isPosting = false, 
+                    error = "Failed to queue upload: ${e.message}"
+                )
+            }
         }
     }
 }

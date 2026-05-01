@@ -40,7 +40,9 @@ import kotlinx.coroutines.launch
 class StoryViewerScreen(
     private val initialGroupIndex: Int,
     private val storyGroups: List<StoryGroup>,
-    private val onStoryViewed: (String) -> Unit
+    private val onStoryViewed: (String) -> Unit,
+    private val onStoryDeleted: ((String) -> Unit)? = null,
+    private val currentUserId: String? = null
 ) : Screen {
 
     @Composable
@@ -254,6 +256,29 @@ class StoryViewerScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.weight(1f))
+                    
+                    // Delete button for own stories
+                    if (currentUserId != null && currentGroup.creator.id == currentUserId) {
+                        IconButton(
+                            onClick = {
+                                onStoryDeleted?.invoke(currentStory.id)
+                                // Navigate to next story or close
+                                coroutineScope.launch {
+                                    if (currentStoryIndex < currentGroup.stories.size - 1) {
+                                        currentStoryIndex++
+                                    } else if (currentGroupIndex < storyGroups.size - 1) {
+                                        currentGroupIndex++
+                                        currentStoryIndex = 0
+                                    } else {
+                                        navigator.pop()
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(painterResource(Res.drawable.ic_delete), contentDescription = "Delete", tint = Color.White)
+                        }
+                    }
+                    
                     IconButton(onClick = { navigator.pop() }) {
                         Icon(painterResource(Res.drawable.ic_close), contentDescription = "Close", tint = Color.White)
                     }

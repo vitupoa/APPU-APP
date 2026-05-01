@@ -9,6 +9,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 data class ChamaDashboardState(
     val chama: ChamaDto? = null,
@@ -16,6 +20,7 @@ data class ChamaDashboardState(
     val activeElections: List<ChamaElectionDto> = emptyList(),
     val cycles: List<ChamaCycleDto> = emptyList(),
     val walletBalance: String = "0",
+    val currentUserId: String? = null,
     val isLoading: Boolean = true,
     val isContributing: Boolean = false,
     val error: String? = null,
@@ -25,14 +30,37 @@ data class ChamaDashboardState(
 
 class ChamaDashboardViewModel(
     private val chamaId: String,
-    private val repository: ChamaRepository
+    private val repository: ChamaRepository,
+    private val tokenManager: com.krieta.com.core.security.TokenManager,
+    private val uploadApi: com.krieta.com.core.upload.UploadApi
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(ChamaDashboardState())
     val state = _state.asStateFlow()
 
     init {
+        loadCurrentUser()
         loadChama()
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun loadCurrentUser() {
+        screenModelScope.launch {
+            // Decode JWT to get user ID
+            val token = tokenManager.getAccessToken()
+            if (token != null) {
+                try {
+                    val payload = token.split(".")[1]
+                    val decoded = Json.decodeFromString<JsonObject>(
+                        String(Base64.decode(payload))
+                    )
+                    val userId = decoded["userId"]?.toString()?.removeSurrounding("\"")
+                    _state.update { it.copy(currentUserId = userId) }
+                } catch (e: Exception) {
+                    println("Error decoding token: ${e.message}")
+                }
+            }
+        }
     }
 
     fun loadChama() {
@@ -204,4 +232,129 @@ class ChamaDashboardViewModel(
     }
 
     fun clearMessages() = _state.update { it.copy(error = null, successMessage = null) }
+
+    fun uploadAndUpdateGroupPhoto(imageBytes: ByteArray) {
+        screenModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            
+            // Save to temp file
+            val tempFile = com.krieta.com.core.util.FileStreamer.saveTempFile(imageBytes, "group_photo.jpg")
+            
+            // Upload to Cloudinary using signed upload
+            val uploadResult = uploadApi.uploadImage(
+                tempFile,
+                com.krieta.com.core.upload.CloudinaryFolders.CHAT_GROUP_AVATAR_IMAGES
+            )
+            
+            when (uploadResult) {
+                is com.krieta.com.core.network.NetworkResult.Success -> {
+                    // Update chama with new photo URL
+                    when (val result = repository.updateChama(
+                        chamaId,
+                        com.krieta.feature.chama.data.remote.dto.UpdateChamaRequest(avatarUrl = uploadResult.data)
+                    )) {
+                        is NetworkResult.Success -> {
+                            _state.update { 
+                                it.copy(
+                                    isLoading = false, 
+                                    chama = result.data,
+                                    successMessage = "Photo updated successfully"
+                                ) 
+                            }
+                        }
+                        is NetworkResult.Loading -> {}
+                        is NetworkResult.Error -> {
+                            _state.update { it.copy(isLoading = false, error = result.message) }
+                        }
+                    }
+                }
+                is com.krieta.com.core.network.NetworkResult.Error -> {
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            error = uploadResult.message
+                        )
+                    }
+                }
+                is com.krieta.com.core.network.NetworkResult.Loading -> {}
+            }
+        }
+    }
+
+    fun updateGroupPhoto(photoUrl: String) {
+        screenModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            
+            when (val result = repository.updateChama(
+                chamaId,
+                com.krieta.feature.chama.data.remote.dto.UpdateChamaRequest(avatarUrl = photoUrl)
+            )) {
+                is NetworkResult.Success -> {
+                    _state.update { 
+                        it.copy(
+                            isLoading = false, 
+                            chama = result.data,
+                            successMessage = "Photo updated successfully"
+                        ) 
+                    }
+                }
+                is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
+                    _state.update { it.copy(isLoading = false, error = result.message) }
+                }
+            }
+        }
+    }
+
+    fun deleteGroupPhoto() {
+        screenModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            when (val result = repository.updateChama(
+                chamaId,
+                com.krieta.feature.chama.data.remote.dto.UpdateChamaRequest(avatarUrl = null)
+            )) {
+                is NetworkResult.Success -> {
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            chama = result.data,
+                            successMessage = "Photo deleted successfully"
+                        ) 
+                    }
+                }
+                is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
+                    _state.update { it.copy(isLoading = false, error = result.message) }
+                }
+            }
+        }
+    }
+
+    fun updateChamaDetails(name: String, description: String?, avatarUrl: String?) {
+        screenModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            when (val result = repository.updateChama(
+                chamaId,
+                com.krieta.feature.chama.data.remote.dto.UpdateChamaRequest(
+                    name = name,
+                    description = description,
+                    avatarUrl = avatarUrl
+                )
+            )) {
+                is NetworkResult.Success -> {
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            chama = result.data,
+                            successMessage = "Group details updated successfully"
+                        ) 
+                    }
+                }
+                is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
+                    _state.update { it.copy(isLoading = false, error = result.message) }
+                }
+            }
+        }
+    }
 }

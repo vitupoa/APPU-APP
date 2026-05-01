@@ -1,0 +1,183 @@
+import { Router } from 'express';
+import { authenticate } from '../../middleware/auth.js';
+import { DisplayAdCampaignService } from './displayAds.service.js';
+
+const router = Router();
+const displayAdService = new DisplayAdCampaignService();
+
+router.post('/campaigns', authenticate, async (req, res) => {
+  try {
+    const brandId = req.user!.id;
+    const campaign = await displayAdService.createCampaign(brandId, req.body);
+    res.status(201).json(campaign);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.get('/campaigns', authenticate, async (req, res) => {
+  try {
+    const brandId = req.user!.id;
+    const campaigns = await displayAdService.getBrandCampaigns(brandId);
+    res.json(campaigns);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/campaigns/:id', authenticate, async (req, res) => {
+  try {
+    const campaign = await displayAdService.getCampaignById(req.params.id);
+    res.json(campaign);
+  } catch (error: any) {
+    res.status(404).json({ error: error.message });
+  }
+});
+
+router.patch('/campaigns/:id', authenticate, async (req, res) => {
+  try {
+    const campaign = await displayAdService.updateCampaign(req.params.id, req.body);
+    res.json(campaign);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.patch('/campaigns/:id/toggle', authenticate, async (req, res) => {
+  try {
+    const campaign = await displayAdService.toggleCampaign(req.params.id);
+    res.json(campaign);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.get('/campaigns/:id/analytics', authenticate, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const analytics = await displayAdService.getCampaignAnalytics(
+      req.params.id,
+      startDate as string,
+      endDate as string
+    );
+    res.json(analytics);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/locations/search', authenticate, async (req, res) => {
+  try {
+    const { query, scope } = req.query;
+    const locations = await displayAdService.searchLocations(
+      query as string,
+      scope as string
+    );
+    res.json(locations);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/cpm-ranges', authenticate, async (req, res) => {
+  try {
+    const { locations, placements } = req.query;
+    const ranges = await displayAdService.getCpmRanges(
+      JSON.parse(locations as string),
+      JSON.parse(placements as string)
+    );
+    res.json(ranges);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/min-budget', authenticate, async (req, res) => {
+  try {
+    const { locations, budgetType } = req.query;
+    const minBudget = await displayAdService.getMinimumBudget(
+      JSON.parse(locations as string),
+      budgetType as string
+    );
+    res.json(minBudget);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/admin/campaigns/pending', authenticate, async (req, res) => {
+  try {
+    if (!req.user!.isAdmin) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    const campaigns = await displayAdService.getPendingCampaigns();
+    res.json(campaigns);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.patch('/admin/campaigns/:id/approve', authenticate, async (req, res) => {
+  try {
+    if (!req.user!.isAdmin) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    const campaign = await displayAdService.approveCampaign(
+      req.params.id,
+      req.user!.id
+    );
+    res.json(campaign);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.patch('/admin/campaigns/:id/reject', authenticate, async (req, res) => {
+  try {
+    if (!req.user!.isAdmin) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    const { reason } = req.body;
+    const campaign = await displayAdService.rejectCampaign(
+      req.params.id,
+      req.user!.id,
+      reason
+    );
+    res.json(campaign);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.get('/admin/settings', authenticate, async (req, res) => {
+  try {
+    if (!req.user!.isAdmin) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    const { scope, scopeValue } = req.query;
+    const settings = await displayAdService.getPlatformSettings(
+      scope as string,
+      scopeValue as string
+    );
+    res.json(settings);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/admin/settings', authenticate, async (req, res) => {
+  try {
+    if (!req.user!.isAdmin) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    const settings = await displayAdService.updatePlatformSettings(
+      req.body,
+      req.user!.id
+    );
+    res.json(settings);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+export default router;

@@ -7,6 +7,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.delete
 import io.ktor.client.request.setBody
 
 class StoryApi(private val client: HttpClient) {
@@ -23,5 +24,13 @@ class StoryApi(private val client: HttpClient) {
 
     suspend fun viewStory(storyId: String) {
         client.post("${ApiConstants.STORIES}/$storyId/view")
+    }
+    
+    suspend fun getMyStories(): FeedResponseDto {
+        return client.get("${ApiConstants.STORIES}/me").body()
+    }
+    
+    suspend fun deleteStory(storyId: String) {
+        client.delete("${ApiConstants.STORIES}/$storyId")
     }
 }

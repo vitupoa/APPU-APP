@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticateToken } from '../../middleware/auth';
 import { kycService } from './kyc.service';
 import { withdrawalService } from './withdrawal.service';
+import type { WithdrawalSecurityMetadata } from './withdrawal.types';
 
 const router = Router();
 
@@ -49,11 +50,48 @@ router.get('/status', authenticateToken, async (req, res) => {
 router.post('/withdrawal/request', authenticateToken, async (req, res) => {
   try {
     const userId = req.user!.userId;
-    const { amountKr, provider, accountName, accountDetails, currency, signature, timestamp, nonce } = req.body;
+    const { 
+      amountKr, 
+      provider, 
+      accountName, 
+      accountDetails, 
+      currency, 
+      signature, 
+      timestamp, 
+      nonce,
+      // NEW: Enhanced security parameters
+      hardwareSignature,
+      deviceId,
+      biometricVerified,
+      biometricTimestamp,
+      multiSigSignatures,
+      multiSigApprovers,
+      rateLimitToken,
+      deviceSecurityScore,
+      isRooted,
+      isEmulator
+    } = req.body;
 
     if (!amountKr || !provider || !accountName || !accountDetails || !signature || !timestamp || !nonce) {
       return res.status(400).json({ error: 'Missing required fields. Signature, timestamp, and nonce are required.' });
     }
+
+    // Build security metadata
+    const securityMetadata = {
+      hardwareSecurityUsed: !!hardwareSignature,
+      hardwareSignature,
+      deviceId,
+      biometricVerified: !!biometricVerified,
+      biometricTimestamp,
+      multiSigRequired: !!multiSigSignatures,
+      multiSigSignatures,
+      multiSigApprovers,
+      rateLimitChecked: !!rateLimitToken,
+      rateLimitToken,
+      deviceSecurityScore: deviceSecurityScore || 50,
+      isRooted,
+      isEmulator
+    };
 
     const withdrawal = await withdrawalService.requestWithdrawal(
       userId,
@@ -64,7 +102,8 @@ router.post('/withdrawal/request', authenticateToken, async (req, res) => {
       currency,
       signature,
       timestamp,
-      nonce
+      nonce,
+      securityMetadata
     );
 
     res.json({
@@ -76,6 +115,12 @@ router.post('/withdrawal/request', authenticateToken, async (req, res) => {
       return res.status(403).json({ 
         error: error.message,
         requiresKyc: true
+      });
+    }
+    if (error.message.startsWith('SECURITY_ERROR')) {
+      return res.status(403).json({ 
+        error: error.message,
+        code: 'SECURITY_VIOLATION'
       });
     }
     if (error.message.includes('signature') || error.message.includes('nonce') || error.message.includes('replay')) {

@@ -72,4 +72,41 @@ class StoryRepositoryImpl(
             api.viewStory(storyId)
         }
     }
+    
+    override suspend fun getMyStories(): NetworkResult<List<StoryGroup>> {
+        return safeApiCall {
+            val response = api.getMyStories()
+            if (response.success) {
+                response.feed.map { groupDto ->
+                    StoryGroup(
+                        creator = StoryCreator(
+                            id = groupDto.creator.id,
+                            username = groupDto.creator.username,
+                            displayName = groupDto.creator.displayName,
+                            avatarUrl = groupDto.creator.avatarUrl
+                        ),
+                        stories = groupDto.stories.map { storyDto ->
+                            Story(
+                                id = storyDto.id,
+                                mediaUrl = storyDto.mediaUrl,
+                                mediaType = storyDto.mediaType,
+                                text = storyDto.text,
+                                createdAt = try { Instant.parse(storyDto.createdAt) } catch (e: Exception) { Instant.DISTANT_PAST },
+                                expiresAt = try { Instant.parse(storyDto.expiresAt) } catch (e: Exception) { Instant.DISTANT_FUTURE },
+                                isViewed = storyDto.isViewed
+                            )
+                        }
+                    )
+                }
+            } else {
+                throw Exception("Failed to fetch my stories")
+            }
+        }
+    }
+    
+    override suspend fun deleteStory(storyId: String): NetworkResult<Unit> {
+        return safeApiCall {
+            api.deleteStory(storyId)
+        }
+    }
 }

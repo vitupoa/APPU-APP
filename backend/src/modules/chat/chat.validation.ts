@@ -22,3 +22,24 @@ export const sendMessageSchema = z.object({
     replyToId: z.string().uuid().optional(),
   }),
 });
+
+export const updateGroupChatSchema = z.object({
+  body: z.object({
+    name: z.string().min(1).max(100).optional(),
+    description: z.string().optional(),
+    avatarUrl: z.string().url().optional().nullable(),
+  }),
+});
+
+export const manageMemberSchema = z.object({
+  body: z.object({
+    userId: z.string().uuid('Invalid user ID'),
+    action: z.enum(['promote', 'demote', 'kick']),
+  }),
+});
+
+export const transferOwnershipSchema = z.object({
+  body: z.object({
+    newOwnerId: z.string().uuid('Invalid user ID'),
+  }),
+});

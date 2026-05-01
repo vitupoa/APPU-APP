@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -63,6 +64,7 @@ class DripsScreen : Screen {
         val walletViewModel = koinScreenModel<WalletViewModel>()
         val walletRepository = koinInject<WalletRepository>()
         val currencyProvider = koinInject<UserCurrencyProvider>()
+        val tokenManager = koinInject<com.krieta.com.core.security.TokenManager>()
         val scope = rememberCoroutineScope()
         
         val state by viewModel.state.collectAsState()
@@ -70,8 +72,11 @@ class DripsScreen : Screen {
         val currentBalance = (walletState as? WalletState.Success)?.balance?.krBalance ?: 0.0
 
         var showTippingFor by remember { mutableStateOf<Post?>(null) }
+        var currentUserId by remember { mutableStateOf<String?>(null) }
         
+        // Get current user ID
         LaunchedEffect(Unit) {
+            currentUserId = tokenManager.getUserId()
             currencyProvider.start()
             kotlinx.coroutines.delay(500)
             walletViewModel.fetchWalletData(currencyProvider.countryCode)
@@ -134,14 +139,71 @@ class DripsScreen : Screen {
                     modifier = Modifier.fillMaxSize().padding(padding),
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    items(state.items, key = { it.id }) { post ->
-                        PostCard(
-                            post = post,
-                            onLike = { viewModel.toggleLike(post.id) },
-                            onComment = { navigator.push(CommentsScreen(ContentType.POST, post.id, "me")) },
-                            onTip = { showTippingFor = post }
-                        )
-                        HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                    // Smart ad insertion: native ads every 6 posts, banner every 15, story-style every 20
+                    val postsWithAds = mutableListOf<Any>()
+                    state.items.forEachIndexed { index, post ->
+                        postsWithAds.add(post)
+                        
+                        // Native feed ad every 6 posts
+                        if ((index + 1) % 6 == 0 && index < state.items.size - 1) {
+                            postsWithAds.add("NATIVE_AD_$index")
+                        }
+                        // Banner ad every 15 posts
+                        else if ((index + 1) % 15 == 0 && index < state.items.size - 1) {
+                            postsWithAds.add("BANNER_AD_$index")
+                        }
+                        // Story-style full-screen ad every 20 posts
+                        else if ((index + 1) % 20 == 0 && index < state.items.size - 1) {
+                            postsWithAds.add("STORY_AD_$index")
+                        }
+                    }
+
+                    items(postsWithAds.size, key = { index ->
+                        val item = postsWithAds[index]
+                        if (item is Post) item.id else "ad_$index"
+                    }) { index ->
+                        val item = postsWithAds[index]
+                        when {
+                            item is Post -> {
+                                // Check if post is sponsored
+                                if (item.isSponsored == true) {
+                                    SponsoredPostCard(
+                                        post = item,
+                                        onLike = { viewModel.toggleLike(item.id) },
+                                        onComment = { 
+                                            currentUserId?.let { userId ->
+                                                navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
+                                            }
+                                        },
+                                        onTip = { showTippingFor = item }
+                                    )
+                                } else {
+                                    PostCard(
+                                        post = item,
+                                        onLike = { viewModel.toggleLike(item.id) },
+                                        onComment = { 
+                                            currentUserId?.let { userId ->
+                                                navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
+                                            }
+                                        },
+                                        onTip = { showTippingFor = item }
+                                    )
+                                }
+                                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                            }
+                            item is String && item.startsWith("NATIVE_AD") -> {
+                                NativeAdCard()
+                                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                            }
+                            item is String && item.startsWith("BANNER_AD") -> {
+                                BannerAdCard()
+                                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                            }
+                            item is String && item.startsWith("STORY_AD") -> {
+                                StoryStyleAdCard()
+                                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                            }
+                        }
                     }
 
                     if (state.isLoadingMore) {
@@ -239,8 +301,9 @@ class DripsScreen : Screen {
                                     modifier = Modifier
                                         .size(if (isActive) 8.dp else 6.dp)
                                         .clip(CircleShape)
-                                        .then(
-                                            Modifier
+                                        .background(
+                                            if (isActive) androidx.compose.ui.graphics.Color.White 
+                                            else androidx.compose.ui.graphics.Color.White.copy(alpha = 0.5f)
                                         )
                                 )
                             }
@@ -304,6 +367,269 @@ class DripsScreen : Screen {
                         // Navigate to user profile (future implementation)
                     }
                 )
+            }
+        }
+    }
+
+    @Composable
+    private fun SponsoredPostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Sponsored badge at top
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                com.krieta.feature.sponsored.presentation.SponsoredBadge()
+                Spacer(Modifier.weight(1f))
+                Text(
+                    "Promoted",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            // Regular post content
+            PostCard(post, onLike, onComment, onTip)
+        }
+    }
+
+    @Composable
+    private fun NativeAdCard() {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                com.krieta.feature.sponsored.presentation.SponsoredBadge()
+                
+                Spacer(Modifier.height(12.dp))
+                
+                // Ad content area
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Ad image
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surface),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("📸", fontSize = 32.sp)
+                    }
+                    
+                    // Ad text
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Your Brand Here",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "Reach 200k+ engaged users in Kenya. Start from KES 500.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2
+                        )
+                    }
+                }
+                
+                Spacer(Modifier.height(12.dp))
+                
+                Button(
+                    onClick = { /* Navigate to advertiser portal */ },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = androidx.compose.ui.graphics.Color(0xFFFFCC00)
+                    )
+                ) {
+                    Text("Learn More", color = androidx.compose.ui.graphics.Color.Black)
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun BannerAdCard() {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text("🎯", fontSize = 40.sp)
+                    Column {
+                        Text(
+                            "Banner Ad Space",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "KES 500/day • High visibility",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Spacer(Modifier.weight(1f))
+                    com.krieta.feature.sponsored.presentation.SponsoredBadge()
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun StoryStyleAdCard() {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp)
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Full-screen ad content
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                listOf(
+                                    Color(0xFFFFCC00).copy(alpha = 0.3f),
+                                    Color(0xFFFF6B00).copy(alpha = 0.3f)
+                                )
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text("🎬", fontSize = 64.sp)
+                        Text(
+                            "Story-Style Ad",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "Full-screen immersive experience",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Button(
+                            onClick = { /* CTA action */ },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = androidx.compose.ui.graphics.Color(0xFFFFCC00)
+                            )
+                        ) {
+                            Text("Swipe Up", color = androidx.compose.ui.graphics.Color.Black, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+                
+                // Sponsored badge at top
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                ) {
+                    com.krieta.feature.sponsored.presentation.SponsoredBadge()
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun AdSlotCard() {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Sponsored badge
+                com.krieta.feature.sponsored.presentation.SponsoredBadge()
+                
+                Spacer(Modifier.height(12.dp))
+                
+                // Ad placeholder content
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surface),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            "📸",
+                            fontSize = 48.sp
+                        )
+                        Text(
+                            "Advertisement",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                        Text(
+                            "Your ad could be here",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                
+                Spacer(Modifier.height(12.dp))
+                
+                // CTA button
+                Button(
+                    onClick = { /* Navigate to ad creation or external link */ },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("Learn More")
+                }
             }
         }
     }

@@ -95,7 +95,6 @@ class ContestSubmissionFeedViewModel(
     }
 
     fun upvoteSubmission(submissionId: String) {
-        // TODO: Implement upvote API call
         screenModelScope.launch {
             // Update local state optimistically
             val updated = _state.value.submissions.map { submission ->
@@ -106,15 +105,31 @@ class ContestSubmissionFeedViewModel(
                 }
             }
             _state.value = _state.value.copy(submissions = updated)
+            
+            // Call API
+            when (val result = repository.voteSubmission(submissionId)) {
+                is NetworkResult.Error -> {
+                    // Revert optimistic update on error
+                    val reverted = _state.value.submissions.map { submission ->
+                        if (submission.id == submissionId) {
+                            submission.copy(votes = submission.votes - 1)
+                        } else {
+                            submission
+                        }
+                    }
+                    _state.value = _state.value.copy(
+                        submissions = reverted,
+                        error = result.message ?: "Failed to vote"
+                    )
+                }
+                else -> {}
+            }
         }
     }
 
     fun downvoteSubmission(submissionId: String) {
-        // TODO: Implement downvote API call (if needed)
-        // Note: Downvotes are not displayed to users, but may be tracked internally
-        screenModelScope.launch {
-            // Just track internally, don't update UI
-        }
+        // Downvotes are tracked internally by backend but not exposed to users
+        // No action needed on client side
     }
 
     fun refresh() {

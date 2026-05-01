@@ -1,391 +1,270 @@
-# RAILWAY DEPLOYMENT GUIDE
-
-## Overview
-This guide covers deploying the updated Krieta backend with logging, analytics, and database optimizations to Railway.
-
----
+# Railway Deployment Guide - Ad System
 
 ## Prerequisites
+- Railway CLI installed
+- Backend already deployed on Railway
+- Database connection configured
 
-- Railway CLI installed: `npm install -g @railway/cli`
-- Railway project connected
-- Database URL from Railway dashboard
+## Deployment Steps
 
----
+### 1. Add Ad Tables to Prisma Schema
 
-## Step 1: Verify Backend Changes
+The ad tables have been added to `backend/prisma/schema.prisma`:
+- AdConfig
+- AdCampaign
+- SponsoredPostRequest
+- AdAnalytics
 
-All backend changes are already in the codebase:
-- ✅ Logger integrated in `src/index.ts`
-- ✅ Database monitoring in `src/config/database.ts`
-- ✅ AnalyticsService created in `src/services/analytics.service.ts`
-
-**No code deployment needed - changes are already live!**
-
----
-
-## Step 2: Database Migration (REQUIRED)
-
-### Option A: Using Railway CLI (Recommended)
-
-```bash
-# 1. Login to Railway
-railway login
-
-# 2. Link to your project
-railway link
-
-# 3. Get database connection string
-railway variables
-
-# 4. Connect to database and run migration
-railway run psql $DATABASE_URL < add_performance_indexes.sql
-
-# 5. Verify indexes were created
-railway run psql $DATABASE_URL -c "SELECT schemaname, tablename, indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname LIKE '%_idx' ORDER BY tablename;"
-```
-
-### Option B: Using Railway Dashboard
-
-1. Go to Railway Dashboard: https://railway.app
-2. Select your project: `appu-app-production`
-3. Click on PostgreSQL service
-4. Click "Connect" tab
-5. Copy the connection string
-6. Use any PostgreSQL client to connect
-7. Run the SQL from `add_performance_indexes.sql`
-
-### Option C: Using Prisma (Alternative)
+### 2. Generate Prisma Migration
 
 ```bash
 cd backend
+npx prisma migrate dev --name add_ad_system
+```
 
-# 1. Update schema.prisma with additional indexes
-# (See DATABASE_OPTIMIZATION.md for index definitions)
+This creates a new migration file in `prisma/migrations/`.
 
-# 2. Generate Prisma client
-npx prisma generate
+### 3. Deploy to Railway
 
-# 3. Push changes to database
-npx prisma db push
+**Option A: Automatic Deployment (Recommended)**
 
-# OR create a migration
-npx prisma migrate dev --name add_performance_indexes
+Railway will automatically detect the new migration and run it on next deployment:
+
+```bash
+git add .
+git commit -m "Add comprehensive ad system with super admin controls"
+git push origin main
+```
+
+Railway will:
+1. Detect changes in `prisma/schema.prisma`
+2. Run `npx prisma migrate deploy` automatically
+3. Restart the service
+
+**Option B: Manual Migration**
+
+If you need to run the migration manually:
+
+```bash
+# Connect to Railway database
+railway run npx prisma migrate deploy
+
+# Or use Railway CLI
+railway connect
 npx prisma migrate deploy
 ```
 
----
+### 4. Verify Migration
 
-## Step 3: Verify Deployment
-
-### Check Logs
+Check that tables were created:
 
 ```bash
-# View real-time logs
-railway logs
-
-# Look for:
-# - "JWT Secret Manager initialized"
-# - "Krieta API running on port 3000"
-# - "Database connection initialized"
-# - "All workers started successfully"
-# - Request/response logs with duration
+railway run npx prisma studio
 ```
 
-### Test API
+Or connect to PostgreSQL directly:
 
 ```bash
-# Health check
-curl https://appu-app-production.up.railway.app/health
-
-# Expected response:
-# {"status":"ok","service":"krieta-api","version":"1.0.0"}
+railway connect postgres
+\dt  # List all tables
+\d ad_config  # Describe ad_config table
 ```
 
-### Monitor Performance
+### 5. Seed Default Ad Config
 
-```bash
-# Watch for slow queries in logs
-railway logs --filter "Slow query"
+The ad_config table should have one row with default values:
 
-# Watch for slow requests
-railway logs --filter "Slow request"
+```sql
+INSERT INTO ad_config (id) VALUES ('00000000-0000-0000-0000-000000000001')
+ON CONFLICT (id) DO NOTHING;
 ```
 
----
+This is automatically created by the migration.
 
-## Step 4: Environment Variables
+### 6. Update Environment Variables (if needed)
 
-Verify these are set in Railway dashboard:
+No new environment variables required. The ad system uses existing:
+- `DATABASE_URL` - PostgreSQL connection
+- `JWT_SECRET` - For authentication
 
-```bash
-# Required
-DATABASE_URL=postgresql://...
-NODE_ENV=production
-PORT=3000
-JWT_SECRET=...
-ENCRYPTION_KEY=121c93c9d296c455e4f478852e06c9d417bbd156f41ebf264b6eb94b58c2411e
-CSRF_SECRET=fb785d40cbd522c8d394ca4ea81352fe0bb98c740321ba22e2903192ad2d1e42
+### 7. Test Super Admin Access
 
-# Optional (for logging)
-LOG_LEVEL=INFO  # DEBUG, INFO, WARN, ERROR, FATAL
-```
-
----
-
-## Step 5: Performance Monitoring
-
-### Check Database Performance
+1. **Create Super Admin User** (if not exists):
 
 ```sql
 -- Connect to Railway database
-railway run psql $DATABASE_URL
+UPDATE users 
+SET is_admin = true 
+WHERE email = 'admin@krieta.com';
 
--- Check slow queries
-SELECT 
-  query,
-  calls,
-  total_time,
-  mean_time,
-  max_time
-FROM pg_stat_statements
-WHERE mean_time > 100
-ORDER BY mean_time DESC
-LIMIT 20;
-
--- Check index usage
-SELECT 
-  schemaname,
-  tablename,
-  indexname,
-  idx_scan,
-  idx_tup_read
-FROM pg_stat_user_indexes
-WHERE idx_scan > 0
-ORDER BY idx_scan DESC
-LIMIT 20;
-
--- Check connection count
-SELECT 
-  count(*) as connections,
-  state
-FROM pg_stat_activity
-GROUP BY state;
+-- Add admin profile
+INSERT INTO admin_profiles (user_id, role, is_active)
+SELECT id, 'SUPER_ADMIN', true
+FROM users
+WHERE email = 'admin@krieta.com'
+ON CONFLICT (user_id) DO UPDATE SET role = 'SUPER_ADMIN';
 ```
 
-### Monitor API Performance
+2. **Test API Endpoints**:
 
 ```bash
-# Watch request logs
-railway logs --filter "INFO.*GET\|POST\|PUT\|DELETE"
+# Get ad config
+curl -X GET https://your-railway-app.up.railway.app/api/v1/admin/ads/config \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
 
-# Watch for errors
-railway logs --filter "ERROR"
-
-# Watch for warnings
-railway logs --filter "WARN"
+# Update platform cut
+curl -X PUT https://your-railway-app.up.railway.app/api/v1/admin/ads/config/platform-cut \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"platformCutPercentage": 15.0}'
 ```
 
----
+### 8. Monitor Deployment
 
-## Step 6: Rollback Plan (If Needed)
-
-If issues occur:
+Check Railway logs:
 
 ```bash
-# 1. Check logs for errors
-railway logs --tail 100
-
-# 2. Rollback database migration (if needed)
-railway run psql $DATABASE_URL
-
-# Then run:
-DROP INDEX IF EXISTS transactions_user_type_created_idx;
-DROP INDEX IF EXISTS transactions_status_created_idx;
-DROP INDEX IF EXISTS shorts_user_created_locked_idx;
-DROP INDEX IF EXISTS shorts_contest_created_idx;
-DROP INDEX IF EXISTS shorts_views_idx;
-DROP INDEX IF EXISTS shorts_likes_idx;
-DROP INDEX IF EXISTS posts_user_created_locked_idx;
-DROP INDEX IF EXISTS posts_likes_idx;
-DROP INDEX IF EXISTS wallets_balance_idx;
-DROP INDEX IF EXISTS contest_submissions_contest_score_idx;
-DROP INDEX IF EXISTS contest_submissions_contest_votes_idx;
-DROP INDEX IF EXISTS contest_submissions_contest_rank_idx;
-DROP INDEX IF EXISTS orders_buyer_created_idx;
-DROP INDEX IF EXISTS orders_status_created_idx;
-DROP INDEX IF EXISTS live_streams_status_viewers_idx;
-DROP INDEX IF EXISTS live_streams_category_status_idx;
-DROP INDEX IF EXISTS chamas_status_created_idx;
-DROP INDEX IF EXISTS chama_members_chama_rotation_idx;
-DROP INDEX IF EXISTS chama_members_chama_status_idx;
-
-# 3. Restart service
-railway restart
+railway logs
 ```
 
----
+Look for:
+- ✅ Migration completed successfully
+- ✅ Server started
+- ✅ Database connection established
 
-## Step 7: Post-Deployment Verification
+## Rollback (if needed)
 
-### Checklist
-
-- [ ] Health endpoint responds: `curl https://appu-app-production.up.railway.app/health`
-- [ ] Logs show request/response logging
-- [ ] Logs show database query monitoring
-- [ ] No error spikes in logs
-- [ ] API response times < 500ms
-- [ ] Database query times < 200ms
-- [ ] All indexes created successfully
-
-### Test Critical Endpoints
+If something goes wrong:
 
 ```bash
-# Test feed endpoint
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  https://appu-app-production.up.railway.app/api/v1/feed/discover?limit=20
+# Rollback last migration
+railway run npx prisma migrate resolve --rolled-back MIGRATION_NAME
 
-# Test contest endpoint
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  https://appu-app-production.up.railway.app/api/v1/contests
-
-# Test shop endpoint
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  https://appu-app-production.up.railway.app/api/v1/shop/products?limit=20
+# Or drop ad tables manually
+railway connect postgres
+DROP TABLE IF EXISTS ad_analytics CASCADE;
+DROP TABLE IF EXISTS sponsored_post_requests CASCADE;
+DROP TABLE IF EXISTS ad_campaigns CASCADE;
+DROP TABLE IF EXISTS ad_config CASCADE;
 ```
 
----
+## Post-Deployment Checklist
 
-## Step 8: Monitoring Setup
-
-### Railway Dashboard
-
-1. Go to Metrics tab
-2. Monitor:
-   - CPU usage
-   - Memory usage
-   - Network traffic
-   - Response times
-
-### Database Monitoring
-
-```sql
--- Enable pg_stat_statements (if not already enabled)
-CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
-
--- Reset statistics
-SELECT pg_stat_statements_reset();
-
--- Check after 1 hour of traffic
-SELECT 
-  query,
-  calls,
-  total_time,
-  mean_time,
-  max_time
-FROM pg_stat_statements
-ORDER BY mean_time DESC
-LIMIT 20;
-```
-
----
+- [ ] Ad tables created in database
+- [ ] Default ad_config row inserted
+- [ ] Super admin user configured
+- [ ] API endpoints responding
+- [ ] Admin dashboard accessible (SUPER_ADMIN only)
+- [ ] Ad components rendering in app
 
 ## Troubleshooting
 
-### Issue: Logs not showing
+### Migration Failed
 
-**Solution:**
+**Error**: `Migration failed to apply`
+
+**Solution**:
 ```bash
-# Check LOG_LEVEL environment variable
-railway variables
+# Reset migration state
+railway run npx prisma migrate resolve --applied MIGRATION_NAME
 
-# Set to DEBUG for more verbose logging
-railway variables set LOG_LEVEL=DEBUG
-
-# Restart service
-railway restart
+# Or force reset (CAUTION: loses data)
+railway run npx prisma migrate reset
 ```
 
-### Issue: Slow queries detected
+### Tables Not Created
 
-**Solution:**
+**Error**: `Table 'ad_config' doesn't exist`
+
+**Solution**:
 ```bash
-# Check if indexes were created
-railway run psql $DATABASE_URL -c "SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname LIKE '%_idx';"
-
-# If missing, re-run migration
-railway run psql $DATABASE_URL < add_performance_indexes.sql
+# Manually run migration SQL
+railway connect postgres
+# Copy contents of backend/prisma/migrations/add_ad_config.sql
+# Paste and execute
 ```
 
-### Issue: High memory usage
+### Super Admin Access Denied
 
-**Solution:**
-```bash
-# Check connection pool settings
-# Update DATABASE_URL with connection limits
-# Example: postgresql://user:pass@host:5432/db?connection_limit=20&pool_timeout=10
+**Error**: `Access Denied - Only Super Admins can access Ad Management`
 
-railway variables set DATABASE_URL="postgresql://...?connection_limit=20&pool_timeout=10"
-railway restart
+**Solution**:
+```sql
+-- Verify admin profile exists
+SELECT u.email, ap.role 
+FROM users u
+LEFT JOIN admin_profiles ap ON u.id = ap.user_id
+WHERE u.is_admin = true;
+
+-- If missing, create admin profile
+INSERT INTO admin_profiles (user_id, role, is_active)
+SELECT id, 'SUPER_ADMIN', true
+FROM users
+WHERE email = 'YOUR_ADMIN_EMAIL'
+ON CONFLICT (user_id) DO UPDATE SET role = 'SUPER_ADMIN';
 ```
 
----
+### JWT Token Missing adminRole
 
-## Success Criteria
+**Error**: `userRole is null`
 
-✅ **Deployment Successful When:**
-1. Health endpoint responds with 200 OK
-2. Logs show structured logging format
-3. Request/response logging active
-4. Database query monitoring active
-5. All indexes created successfully
-6. No error spikes
-7. API response times < 500ms (p95)
-8. Database query times < 200ms (p95)
+**Solution**:
+Update backend auth service to include adminRole in JWT payload:
 
----
+```typescript
+// backend/src/modules/auth/auth.service.ts
+const payload = {
+  userId: user.id,
+  email: user.email,
+  adminRole: adminProfile?.role || null
+};
+```
 
-## Next Steps After Deployment
+Then re-login to get new token with adminRole.
 
-1. **Monitor for 24 hours**
-   - Watch logs for errors
-   - Monitor performance metrics
-   - Check slow query logs
+## Performance Considerations
 
-2. **Tune if needed**
-   - Adjust LOG_LEVEL
-   - Tune connection pool
-   - Add more indexes if needed
+### Database Indexes
 
-3. **Integrate Analytics**
-   - Add AnalyticsService to routes
-   - Track user interactions
-   - Monitor conversion funnels
+The migration includes indexes for:
+- `ad_campaigns(brand_id, status, start_date, end_date)`
+- `sponsored_post_requests(brand_id, creator_id, status)`
+- `ad_analytics(date)`
 
-4. **Set up alerts**
-   - Slow query alerts
-   - Error rate alerts
-   - Performance degradation alerts
+### Query Optimization
 
----
+Ad config is cached in memory for 5 minutes to reduce database load:
+
+```typescript
+// backend/src/modules/ads/adManagement.service.ts
+private configCache: { data: AdConfig; timestamp: number } | null = null;
+
+async getAdConfig() {
+  const now = Date.now();
+  if (this.configCache && now - this.configCache.timestamp < 300000) {
+    return this.configCache.data;
+  }
+  
+  const config = await this.prisma.adConfig.findUnique({
+    where: { id: '00000000-0000-0000-0000-000000000001' }
+  });
+  
+  this.configCache = { data: config, timestamp: now };
+  return config;
+}
+```
+
+## Monitoring & Alerts
+
+Set up Railway alerts for:
+- Database connection errors
+- Migration failures
+- High API error rates
+- Slow query performance
 
 ## Support
 
-**Documentation:**
-- `FINAL_IMPLEMENTATION_SUMMARY.md` - Complete implementation details
-- `DATABASE_OPTIMIZATION.md` - Database optimization guide
-- `ERROR_HANDLING_LOGGING_ANALYTICS_SUMMARY.md` - Full technical details
-
-**Railway Dashboard:**
-- https://railway.app/project/appu-app-production
-
-**Database Connection:**
-- Host: Provided by Railway
-- Database: krieta
-- User: postgres
-- Connection string in Railway variables
-
----
-
-**Last Updated:** 2026-01-15
-**Status:** READY FOR DEPLOYMENT ✅
+For deployment issues:
+- Railway Docs: https://docs.railway.app
+- Prisma Docs: https://www.prisma.io/docs
+- Krieta Support: dev@krieta.com

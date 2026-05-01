@@ -85,6 +85,44 @@
 -keep class com.krieta.feature.wallet.data.remote.dto.** { *; }
 -keep class com.krieta.feature.auth.data.remote.dto.** { *; }
 
+# ─── ANTI-REVERSE ENGINEERING ────────────────────────────
+# Obfuscate all security-related classes
+-repackageclasses 'o'
+-allowaccessmodification
+-overloadaggressively
+
+# Remove source file names and line numbers
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+
+# Optimize aggressively
+-optimizationpasses 5
+-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+
+# String encryption (obfuscate string constants)
+-adaptclassstrings
+
+# Keep security checker but obfuscate internals
+-keep class com.krieta.com.security.DeviceSecurityChecker { *; }
+-keep class com.krieta.com.security.DeviceSecurityStatus { *; }
+
+# Keep biometric classes
+-keep class com.krieta.com.security.BiometricAuthenticator { *; }
+-keep class com.krieta.com.security.BiometricResult { *; }
+
+# Keep hardware security classes
+-keep class com.krieta.com.security.SecureKeyStorage { *; }
+
+# Obfuscate transaction signing (keep interface only)
+-keep interface com.krieta.com.security.TransactionSigner { *; }
+
+# Remove debug info
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+    public static void checkParameterIsNotNull(...);
+    public static void checkNotNullParameter(...);
+    public static void checkExpressionValueIsNotNull(...);
+}
+
 # ─── RELEASE: REMOVE LOGGING ─────────────────────────────
 -assumenosideeffects class android.util.Log {
     public static int v(...);

@@ -54,7 +54,7 @@ class CreatePostScreen : Screen {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("New Post", fontWeight = FontWeight.Bold) },
+                    title = { Text("New Drip", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(painterResource(Res.drawable.ic_arrow_back), contentDescription = "Back")

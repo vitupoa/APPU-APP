@@ -216,4 +216,11 @@ class ContestsRepositoryImpl(
             api.declineJudgeInvite(inviteId)
         }
     }
+    
+    override suspend fun voteSubmission(submissionId: String): NetworkResult<Unit> {
+        return safeApiCall {
+            val fingerprint = com.krieta.com.core.util.DeviceFingerprint.getFingerprint()
+            api.voteSubmission(submissionId, fingerprint)
+        }
+    }
 }

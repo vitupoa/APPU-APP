@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.clickable
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,8 +34,10 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.util.SafeConversion
 import com.krieta.feature.chama.data.remote.dto.ChamaMemberDto
 import com.krieta.feature.chama.data.remote.dto.ChamaTransactionDto
+import com.krieta.feature.chama.data.remote.dto.ChamaDto
 import com.krieta.feature.chama.presentation.election.ChamaElectionScreen
 import org.koin.core.parameter.parametersOf
+import com.krieta.com.core.util.ImagePicker
 
 private val ChamaGold = Color(0xFFF5A623)
 private val ChamaGreen = Color(0xFF2ECC71)
@@ -50,6 +53,7 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
 
         var showContributeDialog by remember { mutableStateOf(false) }
         var contributeAmount by remember { mutableStateOf("") }
+        var showEditDialog by remember { mutableStateOf(false) }
 
         // Snackbar host
         val snackbarHostState = remember { SnackbarHostState() }
@@ -79,6 +83,11 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
                         }
                     },
                     actions = {
+                        if (state.chama?.creatorId == state.currentUserId) {
+                            IconButton(onClick = { showEditDialog = true }) {
+                                Icon(painterResource(Res.drawable.ic_edit), contentDescription = "Edit")
+                            }
+                        }
                         if (state.chama?.status == "SETUP") {
                             TextButton(onClick = { viewModel.activateChama() }) {
                                 Text("Activate", color = ChamaGreen, fontWeight = FontWeight.Bold)
@@ -108,6 +117,15 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
                         .fillMaxSize()
                         .padding(padding)
                 ) {
+                    // Group Profile Photo Section
+                    GroupProfilePhotoSection(
+                        chamaId = chamaId,
+                        photoUrl = state.chama?.avatarUrl,
+                        isOwner = state.chama?.creatorId == state.currentUserId,
+                        onPhotoChange = { imageBytes -> viewModel.uploadAndUpdateGroupPhoto(imageBytes) },
+                        onPhotoDelete = { viewModel.deleteGroupPhoto() }
+                    )
+
                     // Wallet Hero Card
                     WalletHeroCard(
                         balance = state.walletBalance,
@@ -210,6 +228,18 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
                 },
                 dismissButton = {
                     TextButton(onClick = { showContributeDialog = false }) { Text("Cancel") }
+                }
+            )
+        }
+
+        // Edit Chama Dialog
+        if (showEditDialog && state.chama != null) {
+            EditChamaDialog(
+                chama = state.chama!!,
+                onDismiss = { showEditDialog = false },
+                onSave = { name, description, avatarUrl ->
+                    viewModel.updateChamaDetails(name, description, avatarUrl)
+                    showEditDialog = false
                 }
             )
         }
@@ -815,4 +845,210 @@ private fun CycleCard(cycle: com.krieta.feature.chama.data.remote.dto.ChamaCycle
             )
         }
     }
+}
+
+@Composable
+private fun GroupProfilePhotoSection(
+    chamaId: String,
+    photoUrl: String?,
+    isOwner: Boolean,
+    onPhotoChange: (ByteArray) -> Unit,
+    onPhotoDelete: () -> Unit
+) {
+    var showPhotoOptions by remember { mutableStateOf(false) }
+    var isUploading by remember { mutableStateOf(false) }
+    
+    val imagePicker = ImagePicker()
+    
+    imagePicker.registerPicker { imageBytes ->
+        isUploading = true
+        onPhotoChange(imageBytes)
+        isUploading = false
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .clip(CircleShape)
+                .background(ChamaGold.copy(alpha = 0.2f))
+                .then(
+                    if (isOwner) Modifier.clickable { showPhotoOptions = true }
+                    else Modifier
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (photoUrl != null) {
+                coil3.compose.AsyncImage(
+                    model = photoUrl,
+                    contentDescription = "Group Photo",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                )
+            } else {
+                Text("🏦", fontSize = 48.sp)
+            }
+
+            if (isUploading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            }
+
+            if (isOwner && !isUploading) {
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .size(36.dp),
+                    shape = CircleShape,
+                    color = ChamaGold
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painterResource(Res.drawable.ic_photo_camera),
+                            contentDescription = "Edit Photo",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    if (showPhotoOptions) {
+        AlertDialog(
+            onDismissRequest = { showPhotoOptions = false },
+            title = { Text("Group Photo") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(
+                        onClick = {
+                            showPhotoOptions = false
+                            imagePicker.pickImage()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(painterResource(Res.drawable.ic_image), null)
+                            Spacer(Modifier.width(12.dp))
+                            Text(if (photoUrl == null) "Add Photo" else "Change Photo")
+                        }
+                    }
+
+                    if (photoUrl != null) {
+                        TextButton(
+                            onClick = {
+                                onPhotoDelete()
+                                showPhotoOptions = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painterResource(Res.drawable.ic_delete),
+                                    null,
+                                    tint = ChamaRed
+                                )
+                                Spacer(Modifier.width(12.dp))
+                                Text("Delete Photo", color = ChamaRed)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showPhotoOptions = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun EditChamaDialog(
+    chama: ChamaDto,
+    onDismiss: () -> Unit,
+    onSave: (name: String, description: String?, avatarUrl: String?) -> Unit
+) {
+    var name by remember { mutableStateOf(chama.name) }
+    var description by remember { mutableStateOf(chama.description ?: "") }
+    var avatarUrl by remember { mutableStateOf(chama.avatarUrl ?: "") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit Group Details") },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Group Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    minLines = 3,
+                    maxLines = 5,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = avatarUrl,
+                    onValueChange = { avatarUrl = it },
+                    label = { Text("Photo URL (optional)") },
+                    placeholder = { Text("https://example.com/photo.jpg") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onSave(
+                        name,
+                        description.ifBlank { null },
+                        avatarUrl.ifBlank { null }
+                    )
+                },
+                enabled = name.isNotBlank()
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

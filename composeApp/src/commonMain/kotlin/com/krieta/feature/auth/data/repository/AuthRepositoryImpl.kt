@@ -4,6 +4,7 @@ import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.safeApiCall
 import com.krieta.com.core.security.DeviceSecurity
 import com.krieta.com.core.security.TokenManager
+import com.krieta.com.core.security.UserSession
 import com.krieta.feature.auth.data.remote.AuthApi
 import com.krieta.feature.auth.data.remote.dto.LoginRequestDto
 import com.krieta.feature.auth.data.remote.dto.OauthLoginRequestDto
@@ -75,6 +76,16 @@ class AuthRepositoryImpl(
             val user = response.user?.let { mapUser(it) }
                 ?: throw IllegalStateException("Login failed: Invalid server response")
             
+            // Save user session for quick access
+            tokenManager.saveUserSession(
+                UserSession(
+                    userId = user.id,
+                    username = user.username,
+                    displayName = user.displayName,
+                    avatarUrl = user.avatarUrl
+                )
+            )
+            
             _currentUser.value = user
             user
         }
@@ -96,6 +107,16 @@ class AuthRepositoryImpl(
             val user = response.user?.let { mapUser(it) }
                 ?: throw IllegalStateException("Login failed: Invalid server response")
             
+            // Save user session for quick access
+            tokenManager.saveUserSession(
+                UserSession(
+                    userId = user.id,
+                    username = user.username,
+                    displayName = user.displayName,
+                    avatarUrl = user.avatarUrl
+                )
+            )
+            
             _currentUser.value = user
             user
         }
@@ -116,6 +137,17 @@ class AuthRepositoryImpl(
             invalidateBearerCache()
 
             val user = mapUser(response.user)
+            
+            // Save user session for quick access
+            tokenManager.saveUserSession(
+                UserSession(
+                    userId = user.id,
+                    username = user.username,
+                    displayName = user.displayName,
+                    avatarUrl = user.avatarUrl
+                )
+            )
+            
             _currentUser.value = user
             user
         }

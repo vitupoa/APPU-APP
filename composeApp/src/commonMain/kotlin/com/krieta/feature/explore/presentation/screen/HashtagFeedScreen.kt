@@ -122,6 +122,49 @@ class HashtagFeedScreen(private val hashtag: String) : Screen {
                     .padding(padding)
                     .background(KrietaColors.Background)
             ) {
+                // Ads Manager Card
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .clickable { navigator.push(com.krieta.feature.ads.presentation.screen.KrietaAdsManagerScreen()) },
+                    colors = CardDefaults.cardColors(
+                        containerColor = KrietaColors.Primary.copy(alpha = 0.1f)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Campaign,
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp),
+                            tint = KrietaColors.Primary
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "Krieta Ads Manager",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                            Text(
+                                "Create ads, sponsor content, boost posts",
+                                fontSize = 12.sp,
+                                color = KrietaColors.OnSurfaceVariant
+                            )
+                        }
+                        Icon(
+                            Icons.Default.ChevronRight,
+                            contentDescription = null,
+                            tint = KrietaColors.OnSurfaceVariant
+                        )
+                    }
+                }
+                
                 TabRow(
                     selectedTabIndex = selectedTab,
                     containerColor = KrietaColors.BackgroundElevated

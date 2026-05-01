@@ -7,4 +7,10 @@ interface TokenManager {
     suspend fun getRefreshToken(): String?
     suspend fun clearTokens()
     suspend fun isLoggedIn(): Boolean
+    
+    // User session management
+    suspend fun saveUserSession(session: UserSession)
+    suspend fun getUserSession(): UserSession?
+    suspend fun getUserId(): String?
+    suspend fun getAdminRole(): String?
 }

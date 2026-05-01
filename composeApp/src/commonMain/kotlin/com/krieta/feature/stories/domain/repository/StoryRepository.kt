@@ -7,6 +7,8 @@ import com.krieta.feature.stories.domain.model.StoryPrivacy
 interface StoryRepository {
     suspend fun getFeed(): NetworkResult<List<StoryGroup>>
     
+    suspend fun getMyStories(): NetworkResult<List<StoryGroup>>
+    
     suspend fun createStory(
         mediaUrl: String,
         mediaType: String,
@@ -16,4 +18,6 @@ interface StoryRepository {
     ): NetworkResult<Unit>
     
     suspend fun viewStory(storyId: String): NetworkResult<Unit>
+    
+    suspend fun deleteStory(storyId: String): NetworkResult<Unit>
 }

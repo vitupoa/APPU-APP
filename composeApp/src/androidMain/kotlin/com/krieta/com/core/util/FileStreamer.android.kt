@@ -40,6 +40,12 @@ actual object FileStreamer : KoinComponent {
     actual fun getFilePathOrUri(file: PlatformFile): String {
         return getUri(file)?.toString() ?: ""
     }
+    
+    actual fun saveTempFile(bytes: ByteArray, fileName: String): String {
+        val tempFile = java.io.File(context.cacheDir, fileName)
+        tempFile.writeBytes(bytes)
+        return tempFile.absolutePath
+    }
 
     private fun getUri(file: PlatformFile): Uri? {
         return try {

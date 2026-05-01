@@ -4,6 +4,23 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	
+	<!-- Face ID / Touch ID Usage Description -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>Krieta uses Face ID or Touch ID to securely authenticate withdrawals and protect your wallet.</string>
+	
+	<!-- Camera Permission (if needed for other features) -->
+	<key>NSCameraUsageDescription</key>
+	<string>Krieta needs camera access to capture photos and videos for posts.</string>
+	
+	<!-- Photo Library Permission -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Krieta needs access to your photo library to share photos and videos.</string>
+	
+	<!-- Location Permission (if needed) -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Krieta uses your location to show nearby content and services.</string>
+	
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.krieta.upload</string>

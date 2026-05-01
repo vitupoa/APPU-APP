@@ -20,6 +20,18 @@ val walletModule = module {
     }
     factory {
         val locationProvider = get<LocationProvider>()
-        WithdrawViewModel(get(), locationProvider.getCurrentCurrency())
+        val tokenManager = get<com.krieta.com.core.security.TokenManager>()
+        val biometricAuth = get<com.krieta.com.core.security.BiometricAuthenticator>()
+        val secureStorage = get<com.krieta.com.core.security.SecureKeyStorage>()
+        val userId = kotlinx.coroutines.runBlocking { tokenManager.getUserId() } ?: ""
+        val deviceId = com.krieta.com.core.util.DeviceFingerprint.getFingerprint()
+        WithdrawViewModel(
+            walletRepository = get(),
+            userCurrency = locationProvider.getCurrentCurrency(),
+            biometricAuthenticator = biometricAuth,
+            secureKeyStorage = secureStorage,
+            userId = userId,
+            deviceId = deviceId
+        )
     }
 }

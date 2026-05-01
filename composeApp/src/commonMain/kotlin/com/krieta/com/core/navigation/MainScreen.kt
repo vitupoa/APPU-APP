@@ -49,6 +49,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import androidx.activity.compose.BackHandler
+import com.krieta.com.core.util.exitApp
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainScreen : Screen {
@@ -56,17 +60,62 @@ class MainScreen : Screen {
     @Composable
     override fun Content() {
         var showCreateSheet by remember { mutableStateOf(false) }
+        var backPressedOnce by remember { mutableStateOf(false) }
+        var homeRefreshKey by remember { mutableStateOf(0) }
+        var showFAB by remember { mutableStateOf(true) }
+        val scope = rememberCoroutineScope()
 
         TabNavigator(HomeTab) {
+            val tabNavigator = LocalTabNavigator.current
+            val currentTab = tabNavigator.current
+            
+            // Smart FAB visibility: hide on Home (immersive videos), show on others
+            LaunchedEffect(currentTab) {
+                showFAB = currentTab != HomeTab
+            }
+            
+            BackHandler {
+                when (currentTab) {
+                    HomeTab -> {
+                        if (backPressedOnce) {
+                            exitApp()
+                        } else {
+                            backPressedOnce = true
+                            homeRefreshKey++
+                            scope.launch {
+                                delay(2000)
+                                backPressedOnce = false
+                            }
+                        }
+                    }
+                    ProfileTab, ChatsTab, ExploreTab -> {
+                        tabNavigator.current = HomeTab
+                    }
+                    else -> {
+                        tabNavigator.current = HomeTab
+                    }
+                }
+            }
+            
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 containerColor = MaterialTheme.colorScheme.background,
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 bottomBar = { 
-                    KrietaBottomBar(onCreateClick = { showCreateSheet = true }) 
+                    KrietaBottomBar(
+                        onCreateClick = { showCreateSheet = true },
+                        showFAB = showFAB
+                    ) 
                 },
                 content = { innerPadding ->
-                    Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                        CurrentTab()
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    ) {
+                        key(if (currentTab == HomeTab) homeRefreshKey else 0) {
+                            CurrentTab()
+                        }
                     }
                 }
             )
@@ -79,39 +128,44 @@ class MainScreen : Screen {
 }
 
 @Composable
-private fun KrietaBottomBar(onCreateClick: () -> Unit) {
+private fun KrietaBottomBar(onCreateClick: () -> Unit, showFAB: Boolean) {
     NavigationBar(
         containerColor = KrietaColors.BackgroundElevated,
         contentColor = KrietaColors.OnSurface,
     ) {
         TabItem(HomeTab)
+        TabItem(DripsTab)
         TabItem(ExploreTab)
         
-        // TikTok Style Custom Center Action Button
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .padding(vertical = 12.dp),
-            contentAlignment = Alignment.Center
-        ) {
+        // Smart FAB: appears/disappears based on context
+        if (showFAB) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(KrietaColors.Primary)
-                    .clickable { onCreateClick() },
+                    .weight(1f)
+                    .padding(vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_add),
-                    contentDescription = "Create",
-                    tint = KrietaColors.Background,
-                    modifier = Modifier.size(28.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(KrietaColors.Primary)
+                        .clickable { onCreateClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_add),
+                        contentDescription = "Create",
+                        tint = KrietaColors.Background,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
             }
+        } else {
+            // Empty space to maintain layout balance
+            Spacer(Modifier.weight(1f))
         }
         
-        TabItem(MarketplaceTab)
         TabItem(ChatsTab)
         TabItem(ProfileTab)
     }
@@ -140,7 +194,7 @@ private fun CreateBottomSheet(onDismiss: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                CreateOption("Post", "📸", KrietaColors.Primary) {
+                CreateOption("Drip", "📸", KrietaColors.Primary) {
                     navigator.push(com.krieta.feature.feed.presentation.screen.CreatePostScreen())
                     onDismiss()
                 }

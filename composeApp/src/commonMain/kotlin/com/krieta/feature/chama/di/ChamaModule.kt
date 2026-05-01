@@ -10,7 +10,7 @@ import com.krieta.feature.chama.presentation.election.ChamaElectionViewModel
 import com.krieta.feature.chama.presentation.defaulters.DefaultersViewModel
 import com.krieta.feature.chama.presentation.payout.PayoutViewModel
 import com.krieta.feature.chama.presentation.settings.SettingsViewModel
-import com.krieta.feature.chama.presentation.contribute.ContributeViewModel
+import com.krieta.feature.chama.presentation.contribute.ChamaContributeViewModel
 import org.koin.dsl.module
 
 val chamaModule = module {
@@ -19,11 +19,11 @@ val chamaModule = module {
 
     factory { ChamaListViewModel(get()) }
     factory { CreateChamaViewModel(get()) }
-    factory { (chamaId: String) -> ChamaDashboardViewModel(chamaId, get()) }
+    factory { (chamaId: String) -> ChamaDashboardViewModel(chamaId, get(), get(), get()) }
     factory { (chamaId: String, electionId: String) -> ChamaElectionViewModel(chamaId, electionId, get()) }
     factory { DefaultersViewModel(get()) }
     factory { (chamaId: String) -> PayoutViewModel(get(), chamaId) }
     factory { (chamaId: String) -> SettingsViewModel(get(), chamaId) }
-    factory { (chamaId: String) -> ContributeViewModel(get(), chamaId) }
+    factory { (chamaId: String) -> ChamaContributeViewModel(chamaId, get()) }
 }
 

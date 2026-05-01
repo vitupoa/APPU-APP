@@ -35,6 +35,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.krieta.feature.ads.presentation.components.ContestSponsorBanner
 import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.com.core.ui.components.TippingModal
 import com.krieta.com.core.ui.components.VideoPlayer
@@ -53,6 +54,14 @@ class ContestSubmissionFeedScreen : Screen {
         val viewModel = koinScreenModel<ContestSubmissionFeedViewModel> { parametersOf(null) }
         val state by viewModel.state.collectAsState()
         val currencyProvider = koinInject<UserCurrencyProvider>()
+        val tokenManager = koinInject<com.krieta.com.core.security.TokenManager>()
+        
+        var currentUserId by remember { mutableStateOf<String?>(null) }
+        
+        // Get current user ID
+        LaunchedEffect(Unit) {
+            currentUserId = tokenManager.getUserId()
+        }
         
         val pagerState = rememberPagerState(pageCount = { state.submissions.size })
 
@@ -91,16 +100,38 @@ class ContestSubmissionFeedScreen : Screen {
                         modifier = Modifier.fillMaxSize()
                     ) { page ->
                         val submission = state.submissions[page]
-                        SubmissionItem(
-                            submission = submission,
-                            isActive = page == pagerState.currentPage,
-                            onUpvote = { viewModel.upvoteSubmission(submission.id) },
-                            onDownvote = { viewModel.downvoteSubmission(submission.id) },
-                            onComment = { navigator.push(CommentsScreen(ContentType.CONTEST_SUBMISSION, submission.id, "me")) },
-                            onShare = { /* Handle share */ },
-                            onContestClick = { navigator.push(ContestDetailScreen(submission.contestId)) },
-                            currencyProvider = currencyProvider
-                        )
+                        val showSponsorBanner = page > 0 && page % 7 == 0 // Show sponsor every 7 submissions
+                        
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            SubmissionItem(
+                                submission = submission,
+                                isActive = page == pagerState.currentPage,
+                                onUpvote = { viewModel.upvoteSubmission(submission.id) },
+                                onDownvote = { viewModel.downvoteSubmission(submission.id) },
+                                onComment = { 
+                                    currentUserId?.let { userId ->
+                                        navigator.push(CommentsScreen(ContentType.CONTEST_SUBMISSION, submission.id, userId))
+                                    }
+                                },
+                                onShare = { /* Handle share */ },
+                                onContestClick = { navigator.push(ContestDetailScreen(submission.contestId)) },
+                                currencyProvider = currencyProvider
+                            )
+                            
+                            // Sponsor banner overlay
+                            if (showSponsorBanner) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopCenter)
+                                        .padding(top = 120.dp)
+                                ) {
+                                    ContestSponsorBanner(
+                                        sponsorName = "Safaricom",
+                                        onSponsorClick = { /* Track sponsor click */ }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

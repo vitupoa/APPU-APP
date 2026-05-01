@@ -65,7 +65,7 @@ object DripsTab : Tab {
     override val options: TabOptions
         @Composable get() {
             val icon = painterResource(Res.drawable.ic_favorite)
-            return remember { TabOptions(index = 3u, title = "Drips", icon = icon) }
+            return remember { TabOptions(index = 1u, title = "Drips", icon = icon) }
         }
 
     @Composable
@@ -81,7 +81,7 @@ object ExploreTab : Tab {
     override val options: TabOptions
         @Composable get() {
             val icon = painterResource(Res.drawable.ic_search)
-            return remember { TabOptions(index = 1u, title = "Explore", icon = icon) }
+            return remember { TabOptions(index = 2u, title = "Explore", icon = icon) }
         }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -149,14 +149,14 @@ class ExploreScreen : Screen {
             }
 
             // Search Bar
-            OutlinedTextField(
+                OutlinedTextField(
                 value = query,
                 onValueChange = { searchViewModel.onQueryChange(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 12.dp),
-                placeholder = { Text("Search users, products, contests…") },
+                placeholder = { Text("Search users, groups, products, contests…") },
                 leadingIcon = {
                     Icon(painterResource(Res.drawable.ic_search), contentDescription = null, tint = KrietaColors.OnSurfaceVariant)
                 },
@@ -336,6 +336,14 @@ class ExploreScreen : Screen {
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             ExploreCard(
+                                emoji = "🛒",
+                                title = "Marketplace",
+                                subtitle = "Brand partnerships & deals",
+                                gradient = listOf(androidx.compose.ui.graphics.Color(0xFF9C27B0).copy(alpha = 0.8f), androidx.compose.ui.graphics.Color(0xFF7B1FA2)),
+                                modifier = Modifier.weight(1f),
+                                onClick = { navigator.push(com.krieta.feature.marketplace.presentation.screen.MarketplaceHomeScreen()) }
+                            )
+                            ExploreCard(
                                 emoji = "🛍️",
                                 title = "Shop",
                                 subtitle = "Browse creator products",
@@ -343,6 +351,14 @@ class ExploreScreen : Screen {
                                 modifier = Modifier.weight(1f),
                                 onClick = { navigator.push(ShopScreen()) }
                             )
+                        }
+                        Spacer(Modifier.height(16.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
                             ExploreCard(
                                 emoji = "🏦",
                                 title = "Chamas",
@@ -351,6 +367,7 @@ class ExploreScreen : Screen {
                                 modifier = Modifier.weight(1f),
                                 onClick = { navigator.push(com.krieta.feature.chama.presentation.ChamaListScreen()) }
                             )
+                            Spacer(Modifier.weight(1f))
                         }
                     }
                 }
@@ -376,6 +393,7 @@ class ExploreScreen : Screen {
                         SearchResultRow(result = result, onClick = {
                             when (result.type) {
                                 SearchResultType.USER -> navigator.push(ProfileScreen(result.id))
+                                SearchResultType.GROUP -> navigator.push(com.krieta.feature.chat.presentation.room.ChatRoomScreen(result.id, result.title))
                                 SearchResultType.PRODUCT -> navigator.push(ShopScreen())
                                 SearchResultType.CONTEST -> navigator.push(com.krieta.feature.contests.presentation.screen.ContestFeedScreen())
                                 SearchResultType.SHORT -> navigator.push(com.krieta.feature.shorts.presentation.screen.ShortsScreen())
@@ -409,14 +427,27 @@ private fun ExploreCard(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Brush.horizontalGradient(gradient))
-                .padding(20.dp)
+                .padding(20.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxSize()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
                 Text(emoji, fontSize = 32.sp)
-                Column {
-                    Text(title, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = androidx.compose.ui.graphics.Color.White)
-                    Text(subtitle, fontSize = 12.sp, color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f))
-                }
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    title,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 20.sp,
+                    color = androidx.compose.ui.graphics.Color.White
+                )
+                Text(
+                    subtitle,
+                    fontSize = 12.sp,
+                    color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
             }
         }
     }
@@ -759,6 +790,7 @@ private fun formatCount(count: Long): String {
 // ─── SEARCH RESULT UTILS ──────────────────────────────────────────
 private val SearchResultType.emoji: String get() = when(this) {
     SearchResultType.USER -> "👤"
+    SearchResultType.GROUP -> "👥"
     SearchResultType.PRODUCT -> "🛍️"
     SearchResultType.CONTEST -> "🏆"
     SearchResultType.SHORT -> "🎬"
@@ -766,6 +798,7 @@ private val SearchResultType.emoji: String get() = when(this) {
 
 private val SearchResultType.color: androidx.compose.ui.graphics.Color get() = when(this) {
     SearchResultType.USER -> KrietaColors.Primary
+    SearchResultType.GROUP -> androidx.compose.ui.graphics.Color(0xFF43A047)
     SearchResultType.PRODUCT -> KrietaColors.Accent
     SearchResultType.CONTEST -> KrietaColors.Warning
     SearchResultType.SHORT -> KrietaColors.Info

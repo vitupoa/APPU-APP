@@ -38,6 +38,8 @@ data class UserProfile(
     val bioLinks: List<BioLink>,
     val stats: ProfileStats,
     val relationshipStatus: RelationshipStatus,
+    val selectedNiches: List<String> = emptyList(),
+    val customNiches: List<String> = emptyList(),
     val createdAt: String
 )
 

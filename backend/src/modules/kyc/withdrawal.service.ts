@@ -2,6 +2,7 @@ import { PrismaClient, WithdrawalStatus } from '../../generated/prisma';
 import { kycService } from '../kyc/kyc.service';
 import { transactionSigner, TransactionPayload } from '../../utils/transactionSigner';
 import { nonceService } from '../../services/nonce.service';
+import { WithdrawalSecurityMetadata } from './withdrawal.types';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,9 @@ export class WithdrawalService {
     currency: string = 'KES',
     signature: string,
     timestamp: number,
-    nonce: string
+    nonce: string,
+    // NEW: Enhanced security parameters
+    securityMetadata?: WithdrawalSecurityMetadata
   ) {
     // Step 1: Verify transaction signature
     const payload: TransactionPayload = {
@@ -48,6 +51,11 @@ export class WithdrawalService {
 
     // Step 3: Mark nonce as used
     await nonceService.markNonceUsed(nonce, userId);
+
+    // Step 4: Validate security metadata (if provided)
+    if (securityMetadata) {
+      this.validateSecurityMetadata(securityMetadata);
+    }
     // Get user
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -127,7 +135,7 @@ export class WithdrawalService {
 
     // Detect suspicious patterns
     const suspiciousFlags = await this.detectSuspiciousPatterns(userId, amountKr);
-    const riskScore = this.calculateRiskScore(suspiciousFlags, user.createdAt, amountKr);
+    const riskScore = this.calculateRiskScore(suspiciousFlags, user.createdAt, amountKr, securityMetadata);
 
     // Determine initial status
     let status: WithdrawalStatus = 'PENDING';
@@ -141,10 +149,10 @@ export class WithdrawalService {
     const kycDocumentIds = (await prisma.kYCDocument.findMany({
       where: { userId, status: 'APPROVED' },
       select: { id: true }
-    })).map(doc => doc.id);
+    })).map((doc: { id: string }) => doc.id);
 
     // Create withdrawal request
-    const withdrawalRequest = await prisma.$transaction(async (tx) => {
+    const withdrawalRequest = await prisma.$transaction(async (tx: any) => {
       // Deduct from wallet
       await tx.wallet.update({
         where: { userId },
@@ -174,7 +182,12 @@ export class WithdrawalService {
           requiresKyc: true,
           kycDocumentIds,
           suspiciousFlags,
-          riskScore
+          riskScore,
+          // Store security metadata in metadata field
+          metadata: securityMetadata ? {
+            security: securityMetadata,
+            timestamp: new Date().toISOString()
+          } : undefined
         }
       });
 
@@ -276,8 +289,34 @@ export class WithdrawalService {
     return flags;
   }
 
+  // Validate security metadata
+  private validateSecurityMetadata(metadata: WithdrawalSecurityMetadata) {
+    // Check for rooted/jailbroken devices
+    if (metadata.isRooted === true) {
+      throw new Error('SECURITY_ERROR: Withdrawals are not allowed from rooted or jailbroken devices');
+    }
+
+    // Verify biometric timestamp is recent (within 5 minutes)
+    if (metadata.biometricVerified && metadata.biometricTimestamp) {
+      const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+      if (metadata.biometricTimestamp < fiveMinutesAgo) {
+        throw new Error('SECURITY_ERROR: Biometric verification expired. Please authenticate again.');
+      }
+    }
+
+    // Validate device security score
+    if (metadata.deviceSecurityScore < 50) {
+      throw new Error('SECURITY_ERROR: Device security score too low. Please secure your device.');
+    }
+  }
+
   // Calculate risk score
-  private calculateRiskScore(flags: any, accountCreatedAt: Date, amountKr: number): number {
+  private calculateRiskScore(
+    flags: any, 
+    accountCreatedAt: Date, 
+    amountKr: number,
+    securityMetadata?: WithdrawalSecurityMetadata
+  ): number {
     let score = 0;
 
     if (flags.rapidWithdrawals) score += 30;
@@ -291,7 +330,15 @@ export class WithdrawalService {
       score += 20;
     }
 
-    return Math.min(score, 100);
+    // REDUCE risk score if enhanced security is used
+    if (securityMetadata) {
+      if (securityMetadata.hardwareSecurityUsed) score -= 15;
+      if (securityMetadata.biometricVerified) score -= 10;
+      if (securityMetadata.multiSigRequired && securityMetadata.multiSigSignatures?.length) score -= 20;
+      if (securityMetadata.deviceSecurityScore >= 80) score -= 10;
+    }
+
+    return Math.max(0, Math.min(score, 100));
   }
 
   // Log suspicious activity
@@ -339,7 +386,7 @@ export class WithdrawalService {
 
     // Fetch KYC documents for each request
     const requestsWithKYC = await Promise.all(
-      requests.map(async (request) => {
+      requests.map(async (request: any) => {
         const kycDocuments = request.kycDocumentIds.length > 0 ?
           await prisma.kYCDocument.findMany({
             where: { id: { in: request.kycDocumentIds } }
@@ -376,7 +423,7 @@ export class WithdrawalService {
 
     const newStatus: WithdrawalStatus = approved ? 'APPROVED' : flagReason ? 'FLAGGED' : 'REJECTED';
 
-    const updatedRequest = await prisma.$transaction(async (tx) => {
+    const updatedRequest = await prisma.$transaction(async (tx: any) => {
       // Update withdrawal request
       const updated = await tx.withdrawalRequest.update({
         where: { id: requestId },

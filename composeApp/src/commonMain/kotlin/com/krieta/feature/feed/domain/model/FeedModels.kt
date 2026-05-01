@@ -19,5 +19,8 @@ data class Post(
     val likesCount: Int,
     val commentsCount: Int,
     val isLiked: Boolean,
-    val createdAt: String
+    val createdAt: String,
+    val isSponsored: Boolean? = false,
+    val sponsorName: String? = null,
+    val sponsorLogoUrl: String? = null
 )

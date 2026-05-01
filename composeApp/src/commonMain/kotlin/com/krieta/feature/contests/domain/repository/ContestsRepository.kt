@@ -24,4 +24,7 @@ interface ContestsRepository {
     suspend fun getJudgeInvitations(): NetworkResult<List<com.krieta.feature.contests.domain.model.JudgeInvite>>
     suspend fun acceptJudgeInvite(inviteId: String): NetworkResult<Unit>
     suspend fun declineJudgeInvite(inviteId: String): NetworkResult<Unit>
+    
+    // Voting
+    suspend fun voteSubmission(submissionId: String): NetworkResult<Unit>
 }
