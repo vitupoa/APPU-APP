@@ -71,7 +71,7 @@ export class AuthService {
       if (config && Array.isArray(config.value)) {
         const userIds = config.value as string[];
         if (userIds.length > 0) {
-          const admireRecords = userIds.map(admiredId => ({
+          const admireRecords = userIds.map((admiredId: any) => ({
             admirerId: newUserId,
             admiredId
           }));

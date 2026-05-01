@@ -1,7 +1,5 @@
-import { PrismaClient } from '../generated/prisma/client';
-import { contentDistributionService } from '../modules/recommendation/services/contentDistribution.service';
-
-const prisma = new PrismaClient();
+import { prisma } from '../config/database.js';
+import { contentDistributionService } from '../modules/recommendation/services/contentDistribution.service.js';
 
 export function startContentDistributionWorker() {
   console.log('Starting Content Distribution Worker (runs every 5 minutes)');

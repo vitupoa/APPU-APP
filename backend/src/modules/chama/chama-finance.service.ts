@@ -247,7 +247,7 @@ export class ChamaFinanceService {
       }
 
       // Count approvals
-      const totalApprovals = payout.approvals.filter(a => a.decision === 'APPROVED').length + 1;
+      const totalApprovals = payout.approvals.filter((a: any) => a.decision === 'APPROVED').length + 1;
 
       if (totalApprovals >= chama.minApprovals) {
         // Auto-disburse

@@ -99,3 +99,8 @@ export function optionalAuth(req: AuthRequest, res: Response, next: NextFunction
 
   next();
 }
+
+// Export aliases for compatibility
+export const authenticate = authMiddleware;
+export const authenticateToken = authMiddleware;
+export const requireAdmin = adminAuth;

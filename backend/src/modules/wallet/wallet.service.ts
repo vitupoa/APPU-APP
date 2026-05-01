@@ -164,7 +164,7 @@ export class WalletService {
       }
     });
 
-    return users.map(u => ({
+    return users.map((u: any) => ({
       ...u,
       isLovers: false // Adjust if necessary
     }));

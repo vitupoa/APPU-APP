@@ -17,7 +17,7 @@ export class ContestService {
     description: string;
     mediaType: string;
     category: string;
-    prizeKr: number;
+    prizeTotalKr: number;
     requiredActions: { type: string; targetUrl?: string; label: string }[];
     maxWinners: number;
     prizeDistribution: { rank: number; percentage: number }[];
@@ -38,7 +38,7 @@ export class ContestService {
     airdropLimit?: number;
     judges?: string[]; // Array of judge userIds explicitly defined in step 5 mapping to the combination algorithm
   }) {
-    const platformFeeKr = data.prizeKr * PLATFORM_FEE_RATE;
+    const platformFeeKr = data.prizeTotalKr * PLATFORM_FEE_RATE;
     
     // Calculate total duration in days dynamically locking the daily prize pool Escrow natively
     const durationMs = data.deadline.getTime() - new Date().getTime();
@@ -48,8 +48,8 @@ export class ContestService {
     const airdropTotalPool = (data.airdropKr && data.airdropLimit) ? (data.airdropKr * data.airdropLimit) : 0;
     
     // Massive Escrow Calculation blocking fraudulent contest creations natively 
-    const totalChargedKr = new Prisma.Decimal(data.prizeKr + platformFeeKr + totalDailyPrizePool + airdropTotalPool);
-    const prizeKr = new Prisma.Decimal(data.prizeKr);
+    const totalChargedKr = new Prisma.Decimal(data.prizeTotalKr + platformFeeKr + totalDailyPrizePool + airdropTotalPool);
+    const prizeKr = new Prisma.Decimal(data.prizeTotalKr);
     const feeKr = new Prisma.Decimal(platformFeeKr);
 
     return prisma.$transaction(async (tx) => {
@@ -89,7 +89,7 @@ export class ContestService {
           entryFeeKr: data.entryFeeKr ? new Prisma.Decimal(data.entryFeeKr) : null,
           publicVoteWeight: data.publicVoteWeight,
           allowDailyPrizes: data.allowDailyPrizes ?? false,
-          dailyPrizeKr: data.dailyPrizeKr ? new Prisma.Decimal(data.dailyPrizeKr) : null,
+          dailyprizeTotalKr: data.dailyPrizeKr ? new Prisma.Decimal(data.dailyPrizeKr) : null,
           targetAges: data.targetAges,
           targetGeos: data.targetGeos,
           airdropKr: data.airdropKr ? new Prisma.Decimal(data.airdropKr) : null,
@@ -147,10 +147,10 @@ export class ContestService {
       return {
         contestId: contest.id,
         ...contest,
-        prizeKr: contest.prizeTotalKr,
+        prizeTotalKr: contest.prizeTotalKr,
         platformFeeKr: contest.platformFeeKr,
         totalChargedKr: totalChargedKr,
-        participantsCount: 0,
+        totalParticipants: 0,
         submissionsCount: 0,
         createdAt: contest.createdAt.toISOString()
       };
@@ -213,7 +213,8 @@ export class ContestService {
                   select: {
                     username: true,
                     displayName: true
-                  }
+                  },
+      include: { user: true }
                 }
               }
             }
@@ -235,7 +236,7 @@ export class ContestService {
             creatorUsername: invite.contest.creator.username,
             creatorDisplayName: invite.contest.creator.displayName,
             deadline: invite.contest.deadline.toISOString(),
-            prizeKr: Number(invite.contest.prizeTotalKr)
+            prizeTotalKr: Number(invite.contest.prizeTotalKr)
           }
         });
 
@@ -274,7 +275,8 @@ export class ContestService {
               select: {
                 username: true,
                 displayName: true
-              }
+              },
+      include: { user: true }
             }
           }
         }
@@ -297,7 +299,7 @@ export class ContestService {
         creatorUsername: invite.contest.creator.username,
         creatorDisplayName: invite.contest.creator.displayName,
         deadline: invite.contest.deadline.toISOString(),
-        prizeKr: Number(invite.contest.prizeTotalKr)
+        prizeTotalKr: Number(invite.contest.prizeTotalKr)
       }
     }));
   }
@@ -401,7 +403,7 @@ export class ContestService {
       description: invite.contest.description,
       mediaType: invite.contest.mediaType,
       contestCategory: invite.contest.category,
-      prizeKr: Number(invite.contest.prizeTotalKr),
+      prizeTotalKr: Number(invite.contest.prizeTotalKr),
       platformFeeKr: Number(invite.contest.platformFeeKr),
       totalChargedKr: Number(invite.contest.prizeTotalKr) + Number(invite.contest.platformFeeKr),
       maxWinners: invite.contest.maxWinners,
@@ -411,7 +413,7 @@ export class ContestService {
       deadline: invite.contest.deadline.toISOString(),
       coverMediaUrl: invite.contest.coverMediaUrl,
       status: invite.contest.status,
-      participantsCount: invite.contest.totalParticipants,
+      totalParticipants: invite.contest.totalParticipants,
       submissionsCount: invite.contest.totalSubmissions,
       createdAt: invite.contest.createdAt.toISOString()
     }));
@@ -457,7 +459,7 @@ export class ContestService {
         description: c.description,
         mediaType: c.mediaType,
         contestCategory: c.category,
-        prizeKr: Number(c.prizeTotalKr),
+        prizeTotalKr: Number(c.prizeTotalKr),
         platformFeeKr: Number(c.platformFeeKr),
         totalChargedKr: Number(c.prizeTotalKr) + Number(c.platformFeeKr),
         maxWinners: c.maxWinners,
@@ -467,7 +469,7 @@ export class ContestService {
         deadline: c.deadline.toISOString(),
         coverMediaUrl: c.coverMediaUrl,
         status: c.status,
-        participantsCount: c.totalParticipants,
+        totalParticipants: c.totalParticipants,
         submissionsCount: c.totalSubmissions,
         isJoined: joinedIds.has(c.id),
         createdAt: c.createdAt.toISOString()
@@ -499,7 +501,7 @@ export class ContestService {
       description: contest.description,
       mediaType: contest.mediaType,
       contestCategory: contest.category,
-      prizeKr: Number(contest.prizeTotalKr),
+      prizeTotalKr: Number(contest.prizeTotalKr),
       platformFeeKr: Number(contest.platformFeeKr),
       totalChargedKr: Number(contest.prizeTotalKr) + Number(contest.platformFeeKr),
       rules: contest.actions.map((a: any) => a.label),
@@ -515,7 +517,7 @@ export class ContestService {
       deadline: contest.deadline.toISOString(),
       coverMediaUrl: contest.coverMediaUrl,
       status: contest.status,
-      participantsCount: contest.totalParticipants,
+      totalParticipants: contest.totalParticipants,
       submissionsCount: contest.totalSubmissions,
       isJoined,
       createdAt: contest.createdAt.toISOString()
@@ -711,7 +713,7 @@ export class ContestService {
         contest: {
           id: s.contest.id,
           title: s.contest.title,
-          prizeKr: Number(s.contest.prizeTotalKr),
+          prizeTotalKr: Number(s.contest.prizeTotalKr),
           status: s.contest.status
         },
         mediaUrl: s.mediaUrl,
@@ -831,7 +833,7 @@ export class ContestService {
             contestId,
             userId: winnerId,
             rank: index + 1,
-            prizeKr: prizeAmount
+            prizeTotalKr: prizeAmount
           }
         });
 

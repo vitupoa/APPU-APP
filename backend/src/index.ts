@@ -183,43 +183,45 @@ process.on('SIGINT', gracefulShutdown);
 // Start server
 const PORT = env.PORT || 3000;
 
-// Initialize JWT rotation manager
-await jwtSecretManager.initialize();
-logger.info('JWT Secret Manager initialized');
+// Initialize JWT rotation manager and start server
+(async () => {
+  await jwtSecretManager.initialize();
+  logger.info('JWT Secret Manager initialized');
 
-httpServer.listen(PORT, () => {
-  logger.info(`Krieta API running on port ${PORT}`);
-  logger.info(`Environment: ${env.NODE_ENV}`);
-  logger.info(`CORS Origin: ${env.CORS_ORIGIN}`);
-  
-  // Start cron workers
-  logger.info('Starting background workers...');
-  startChamaDefaultWorker();
-  startStoryCleanupWorker();
-  startDailyPrizeWorker();
-  startFlashSaleWorker();
-  
-  // Start escrow approval cleanup worker
-  const { startEscrowApprovalCleanupWorker } = await import('./workers/escrowApprovalCleanup.worker.js');
-  startEscrowApprovalCleanupWorker();
-  
-  // Start recommendation system workers
-  const { startContentDistributionWorker } = await import('./workers/contentDistributionWorker.js');
-  const { startMicroInterestWorker } = await import('./workers/microInterestWorker.js');
-  const { startTrendingTopicsWorker } = await import('./workers/trendingTopicsWorker.js');
-  const { SocialMediaSyncWorker } = await import('./workers/socialMediaSync.worker.js');
-  const { startWithdrawalLimitResetWorker } = await import('./workers/withdrawalLimitReset.worker.js');
-  const { startNonceCleanupWorker } = await import('./workers/nonceCleanup.worker.js');
-  
-  startContentDistributionWorker();
-  startMicroInterestWorker();
-  startTrendingTopicsWorker();
-  SocialMediaSyncWorker.start();
-  startWithdrawalLimitResetWorker();
-  startNonceCleanupWorker();
-  
-  logger.info('All workers started successfully');
-  logger.info('Server ready to accept connections');
-});
+  httpServer.listen(PORT, async () => {
+    logger.info(`Krieta API running on port ${PORT}`);
+    logger.info(`Environment: ${env.NODE_ENV}`);
+    logger.info(`CORS Origin: ${env.CORS_ORIGIN}`);
+    
+    // Start cron workers
+    logger.info('Starting background workers...');
+    startChamaDefaultWorker();
+    startStoryCleanupWorker();
+    startDailyPrizeWorker();
+    startFlashSaleWorker();
+    
+    // Start escrow approval cleanup worker
+    const { startEscrowApprovalCleanupWorker } = await import('./workers/escrowApprovalCleanup.worker.js');
+    startEscrowApprovalCleanupWorker();
+    
+    // Start recommendation system workers
+    const { startContentDistributionWorker } = await import('./workers/contentDistributionWorker.js');
+    const { startMicroInterestWorker } = await import('./workers/microInterestWorker.js');
+    const { startTrendingTopicsWorker } = await import('./workers/trendingTopicsWorker.js');
+    const { SocialMediaSyncWorker } = await import('./workers/socialMediaSync.worker.js');
+    const { startWithdrawalLimitResetWorker } = await import('./workers/withdrawalLimitReset.worker.js');
+    const { startNonceCleanupWorker } = await import('./workers/nonceCleanup.worker.js');
+    
+    startContentDistributionWorker();
+    startMicroInterestWorker();
+    startTrendingTopicsWorker();
+    SocialMediaSyncWorker.start();
+    startWithdrawalLimitResetWorker();
+    startNonceCleanupWorker();
+    
+    logger.info('All workers started successfully');
+    logger.info('Server ready to accept connections');
+  });
+})();
 
 export { app, io };

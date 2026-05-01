@@ -64,7 +64,7 @@ export class ShopNotificationService {
       select: { userId: true, productId: true }
     });
 
-    const userIds = [...new Set(alerts.map(a => a.userId))];
+    const userIds = [...new Set(alerts.map((a: any) => a.userId))];
     for (const userId of userIds) {
       await send(
         userId,
@@ -82,7 +82,7 @@ export class ShopNotificationService {
       include: { wishlist: { select: { userId: true } } }
     });
 
-    const userIds = [...new Set(wishlistItems.map(i => i.wishlist.userId))];
+    const userIds = [...new Set(wishlistItems.map((i: any) => i.wishlist.userId))];
     for (const userId of userIds) {
       await send(
         userId,

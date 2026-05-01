@@ -1,6 +1,4 @@
-import { PrismaClient } from '../../../generated/prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../../config/database.js';
 
 interface TestAudienceConfig {
   totalSize: number;
@@ -98,7 +96,7 @@ export class ContentDistributionService {
       take: count,
       orderBy: { createdAt: 'desc' }
     });
-    return admirers.map(a => a.admirerId);
+    return admirers.map((a: any) => a.admirerId);
   }
 
   private async getSimilarInterestUsers(hashtags: string[], count: number, country?: string) {
@@ -116,7 +114,7 @@ export class ContentDistributionService {
       ORDER BY created_at DESC
       LIMIT ${count}
     `;
-    return users.map(u => u.user_id);
+    return users.map((u: any) => u.user_id);
   }
 
   private async getDemographicMatch(creatorId: string, count: number, country?: string) {
@@ -131,7 +129,7 @@ export class ContentDistributionService {
       select: { id: true },
       take: count
     });
-    return users.map(u => u.id);
+    return users.map((u: any) => u.id);
   }
 
   private async getRandomUsers(count: number, country?: string) {
@@ -141,11 +139,11 @@ export class ContentDistributionService {
       ORDER BY RANDOM() 
       LIMIT ${count}
     `;
-    return users.map(u => u.id);
+    return users.map((u: any) => u.id);
   }
 
   private async scheduleContentDelivery(contentId: string, contentType: string, userIds: string[]) {
-    const deliveries = userIds.map(userId => ({
+    const deliveries = userIds.map((userId: any) => ({
       userId,
       contentId,
       contentType,
@@ -172,11 +170,11 @@ export class ContentDistributionService {
     const totalViews = deliveries.length;
     if (totalViews < 2000) return { shouldAmplify: false, message: 'Not enough views yet' };
 
-    const completed = deliveries.filter(d => d.completed).length;
-    const liked = deliveries.filter(d => d.liked).length;
-    const shared = deliveries.filter(d => d.shared).length;
-    const commented = deliveries.filter(d => d.commented).length;
-    const rewatched = deliveries.filter(d => d.rewatchedCount > 0).length;
+    const completed = deliveries.filter((d: any) => d.completed).length;
+    const liked = deliveries.filter((d: any) => d.liked).length;
+    const shared = deliveries.filter((d: any) => d.shared).length;
+    const commented = deliveries.filter((d: any) => d.commented).length;
+    const rewatched = deliveries.filter((d: any) => d.rewatchedCount > 0).length;
 
     const completionRate = completed / totalViews;
     const likeRate = liked / totalViews;

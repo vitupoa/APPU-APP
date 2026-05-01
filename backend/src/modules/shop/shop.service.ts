@@ -301,7 +301,7 @@ export class ShopService {
       where: { status: 'active' },
       _count: true,
     });
-    return counts.map(c => ({ category: c.category, count: c._count }));
+    return counts.map((c: any) => ({ category: c.category, count: c._count }));
   }
 
   // ─── VEHICLE FAVORITES ─────────────────────────────────
@@ -326,7 +326,7 @@ export class ShopService {
       include: { product: { include: { seller: { select: SELLER_SELECT }, vehicleDetail: true } } },
       orderBy: { createdAt: 'desc' }
     });
-    return favorites.map(f => ({
+    return favorites.map((f: any) => ({
       id: f.id,
       createdAt: f.createdAt.toISOString(),
       product: formatProduct(f.product),
@@ -393,7 +393,7 @@ export class ShopService {
       where: { admirerId: userId },
       select: { admiredId: true }
     });
-    const friendIds = admirers.map(a => a.admiredId);
+    const friendIds = admirers.map((a: any) => a.admiredId);
 
     // Find orders containing this product from friends
     const orderItems = await prisma.orderItem.findMany({
@@ -413,7 +413,7 @@ export class ShopService {
       take: 10
     });
 
-    return orderItems.map(item => ({
+    return orderItems.map((item: any) => ({
       user: item.order.buyer,
       purchasedAt: item.order.createdAt.toISOString(),
     }));
@@ -425,7 +425,7 @@ export class ShopService {
       where: { admirerId: userId },
       select: { admiredId: true }
     });
-    const friendIds = admirers.map(a => a.admiredId);
+    const friendIds = admirers.map((a: any) => a.admiredId);
 
     if (!friendIds.length) return [];
 
@@ -450,13 +450,13 @@ export class ShopService {
 
     // Deduplicate by product ID
     const seen = new Set<string>();
-    const unique = orderItems.filter(item => {
+    const unique = orderItems.filter((item: any) => {
       if (seen.has(item.productId)) return false;
       seen.add(item.productId);
       return true;
     }).slice(0, limit);
 
-    return unique.map(item => formatProduct(item.product));
+    return unique.map((item: any) => formatProduct(item.product));
   }
 
   // ─── SPARE PARTS COMPATIBILITY ─────────────────────────
@@ -478,7 +478,7 @@ export class ShopService {
 
     // Filter by year range if provided
     const filtered = params.year
-      ? parts.filter(p => {
+      ? parts.filter((p: any) => {
           if (p.compatibleYearFrom && p.compatibleYearTo) {
             return params.year! >= p.compatibleYearFrom && params.year! <= p.compatibleYearTo;
           }
@@ -486,7 +486,7 @@ export class ShopService {
         })
       : parts;
 
-    return filtered.map(p => ({
+    return filtered.map((p: any) => ({
       ...formatProduct(p.product),
       sparePartDetail: formatDetail(p),
     }));

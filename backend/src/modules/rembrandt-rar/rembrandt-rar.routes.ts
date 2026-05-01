@@ -19,6 +19,12 @@ import {
 } from './rembrandt-rar.validation.js';
 import { prisma } from '../../config/database.js';
 
+
+// Helper to safely extract string from query parameter
+function getQueryParam(param: string | string[] | undefined): string | undefined {
+  if (Array.isArray(param)) return param[0];
+  return param;
+}
 const router = Router();
 
 // All RAR routes require auth + active admin profile

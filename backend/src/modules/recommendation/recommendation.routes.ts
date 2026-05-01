@@ -4,6 +4,12 @@ import { rateLimiter } from '../../middleware/rateLimiter';
 import { contentDistributionService } from './services/contentDistribution.service';
 import { feedGenerationService } from './services/feedGeneration.service';
 
+
+// Helper to safely extract string from query parameter
+function getQueryParam(param: string | string[] | undefined): string | undefined {
+  if (Array.isArray(param)) return param[0];
+  return param;
+}
 const router = Router();
 
 // Apply authentication to all routes
@@ -15,7 +21,7 @@ const interactionRateLimiter = rateLimiter({ windowMs: 10000, max: 100 }); // 10
 // Generate Discover feed
 router.get('/feed/discover', authenticate, async (req, res) => {
   try {
-    const userId = req.user!.id;
+    const userId = req.userId!;
     const limit = parseInt(req.query.limit as string) || 20;
     const cursor = req.query.cursor as string;
 
@@ -30,7 +36,7 @@ router.get('/feed/discover', authenticate, async (req, res) => {
 // Generate Admiring feed
 router.get('/feed/admiring', authenticate, async (req, res) => {
   try {
-    const userId = req.user!.id;
+    const userId = req.userId!;
     const limit = parseInt(req.query.limit as string) || 20;
 
     const feed = await feedGenerationService.generateAdmiringFeed(userId, limit);
@@ -44,7 +50,7 @@ router.get('/feed/admiring', authenticate, async (req, res) => {
 // Track user interaction (with rate limiting)
 router.post('/interactions/track', interactionRateLimiter, async (req, res) => {
   try {
-    const userId = req.user!.id;
+    const userId = req.userId!;
     const { contentId, contentType, signalType, watchDuration, totalDuration } = req.body;
 
     // Input validation
@@ -78,7 +84,7 @@ router.post('/interactions/track', interactionRateLimiter, async (req, res) => {
 router.post('/distribution/initialize', async (req, res) => {
   try {
     const { contentId, contentType, hashtags, location } = req.body;
-    const creatorId = req.user!.id;
+    const creatorId = req.userId!;
 
     // Input validation
     if (!contentId || !contentType) {

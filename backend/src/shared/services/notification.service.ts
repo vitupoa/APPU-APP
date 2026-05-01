@@ -228,7 +228,7 @@ export class NotificationService {
   /**
    * Send contest winner notification
    */
-  static async notifyContestWinner(userId: string, contestId: string, rank: number, prizeKr: number) {
+  static async notifyContestWinner(userId: string, contestId: string, rank: number, prizeTotalKr: number) {
     try {
       const [user, contest] = await Promise.all([
         prisma.user.findUnique({ where: { id: userId }, select: { fcmToken: true } }),

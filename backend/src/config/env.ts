@@ -48,10 +48,24 @@ const envSchema = z.object({
   MPESA_PASSKEY: z.string().optional(),
   MPESA_ENV: z.enum(['sandbox', 'production']).default('sandbox'),
   MPESA_CALLBACK_URL: z.string().optional(),
+  MPESA_INITIATOR_NAME: z.string().optional(),
+  MPESA_INITIATOR_PASSWORD: z.string().optional(),
 
   // Payoneer
   PAYONEER_PARTNER_ID: z.string().optional(),
   PAYONEER_API_TOKEN: z.string().optional(),
+
+  // OAuth - Instagram
+  INSTAGRAM_CLIENT_ID: z.string().optional(),
+  INSTAGRAM_CLIENT_SECRET: z.string().optional(),
+
+  // OAuth - TikTok
+  TIKTOK_CLIENT_KEY: z.string().optional(),
+  TIKTOK_CLIENT_SECRET: z.string().optional(),
+
+  // OAuth - YouTube
+  YOUTUBE_CLIENT_ID: z.string().optional(),
+  YOUTUBE_CLIENT_SECRET: z.string().optional(),
 
   // Exchange Rate API
   EXCHANGE_RATE_BASE_URL: z.string().default(

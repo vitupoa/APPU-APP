@@ -321,7 +321,7 @@ export class UserManagementService {
     let userIds = (config?.value as string[]) || [];
     
     if (userIds.includes(targetUserId)) {
-      userIds = userIds.filter(id => id !== targetUserId);
+      userIds = userIds.filter((id: any) => id !== targetUserId);
       await prisma.platformConfig.update({
         where: { key: 'AUTO_ADMIRE_USERS' },
         data: { value: userIds, updatedBy: adminId }

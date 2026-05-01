@@ -1,30 +1,29 @@
-import { Router } from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth.js';
-import { PrismaClient } from '../../generated/prisma/index.js';
+import { Router, Response } from 'express';
+import { authenticate, requireAdmin, AuthRequest } from '../../middleware/auth.js';
+import { prisma } from '../../config/database.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Get boost settings
-router.get('/settings', authenticate, async (req, res) => {
-  const settings = await req.prisma.creatorBoostSettings.findUnique({
+router.get('/settings', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  const settings = await prisma.creatorBoostSettings.findUnique({
     where: { id: '00000000-0000-0000-0000-000000000001' }
   });
   res.json(settings);
 });
 
 // Update boost settings (super admin only)
-router.patch('/settings', authenticate, requireAdmin, async (req, res) => {
+router.patch('/settings', authenticate, requireAdmin, async (req: AuthRequest, res: Response): Promise<void> => {
   const { minBoostAmountKes, shortCpmKes, postCpmKes, liveCpmKes } = req.body;
   
-  const settings = await req.prisma.creatorBoostSettings.upsert({
+  const settings = await prisma.creatorBoostSettings.upsert({
     where: { id: '00000000-0000-0000-0000-000000000001' },
     update: {
       minBoostAmountKes,
       shortCpmKes,
       postCpmKes,
       liveCpmKes,
-      updatedBy: req.user!.id
+      updatedBy: req.userId
     },
     create: {
       id: '00000000-0000-0000-0000-000000000001',
@@ -32,7 +31,7 @@ router.patch('/settings', authenticate, requireAdmin, async (req, res) => {
       shortCpmKes,
       postCpmKes,
       liveCpmKes,
-      updatedBy: req.user!.id
+      updatedBy: req.userId
     }
   });
   

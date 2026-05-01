@@ -1,6 +1,4 @@
-import { PrismaClient } from '../generated/prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../config/database.js';
 
 export function startTrendingTopicsWorker() {
   console.log('Starting Trending Topics Worker (runs every 15 minutes)');

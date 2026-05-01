@@ -173,11 +173,11 @@ export class FeatureFlagService {
     const summary: Record<string, { globalEnabled: boolean; overrides: number }> = {};
 
     for (const feature of PLATFORM_FEATURES) {
-      const flags = allFlags.filter(f => f.featureKey === feature);
+      const flags = allFlags.filter((f: any) => f.featureKey === feature);
       const globalFlag = flags.find(f => f.scope === 'GLOBAL');
       summary[feature] = {
         globalEnabled: globalFlag?.isEnabled ?? true,
-        overrides: flags.filter(f => f.scope !== 'GLOBAL').length,
+        overrides: flags.filter((f: any) => f.scope !== 'GLOBAL').length,
       };
     }
 

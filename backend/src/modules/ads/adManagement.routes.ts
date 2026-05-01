@@ -1,11 +1,12 @@
-import { Router, Response } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { AdManagementService } from './adManagement.service.js';
+import { getQueryString, getQueryNumber, getQueryDate } from '../../utils/queryParams.js';
 
 const router = Router();
 
 // Middleware to check if user is admin
-const adminMiddleware = async (req: AuthRequest, res: Response, next: Function) => {
+const adminMiddleware = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { prisma } = await import('../../config/database.js');
     const user = await prisma.user.findUnique({
@@ -14,7 +15,8 @@ const adminMiddleware = async (req: AuthRequest, res: Response, next: Function) 
     });
 
     if (!user?.isAdmin) {
-      return res.status(403).json({ error: 'Admin access required' });
+      res.status(403).json({ error: 'Admin access required' });
+      return;
     }
 
     next();
@@ -137,28 +139,30 @@ router.put('/config/toggle-max-load', authMiddleware, adminMiddleware, async (re
 // ==================== CAMPAIGN ROUTES ====================
 
 // GET /api/v1/admin/ads/campaigns - Get all campaigns with filters
-router.get('/campaigns', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/campaigns', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { status, brandId, adType, page, limit } = req.query;
     const result = await AdManagementService.getCampaigns({
-      status: status as string,
-      brandId: brandId as string,
-      adType: adType as string,
-      page: page ? parseInt(page as string) : undefined,
-      limit: limit ? parseInt(limit as string) : undefined
+      status: getQueryString(status),
+      brandId: getQueryString(brandId),
+      adType: getQueryString(adType),
+      page: getQueryNumber(page),
+      limit: getQueryNumber(limit)
     });
     res.json(result);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
 // GET /api/v1/admin/ads/campaigns/:id - Get campaign by ID
-router.get('/campaigns/:id', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/campaigns/:id', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const campaign = await AdManagementService.getCampaignById(req.params.id);
+    const campaign = await AdManagementService.getCampaignById(req.params.id as string);
     if (!campaign) {
-      return res.status(404).json({ error: 'Campaign not found' });
+      res.status(404).json({ error: 'Campaign not found' });
+      return;
     }
     res.json(campaign);
   } catch (error: any) {
@@ -167,23 +171,25 @@ router.get('/campaigns/:id', authMiddleware, adminMiddleware, async (req: AuthRe
 });
 
 // POST /api/v1/admin/ads/campaigns/:id/approve - Approve campaign
-router.post('/campaigns/:id/approve', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/campaigns/:id/approve', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const campaign = await AdManagementService.approveCampaign(req.params.id, req.userId!);
+    const campaign = await AdManagementService.approveCampaign(req.params.id as string, req.userId!);
     res.json(campaign);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 });
 
 // POST /api/v1/admin/ads/campaigns/:id/reject - Reject campaign
-router.post('/campaigns/:id/reject', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/campaigns/:id/reject', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { reason } = req.body;
     if (!reason) {
-      return res.status(400).json({ error: 'Rejection reason is required' });
+      res.status(400).json({ error: 'Rejection reason is required' });
+      return;
     }
-    const campaign = await AdManagementService.rejectCampaign(req.params.id, reason, req.userId!);
+    const campaign = await AdManagementService.rejectCampaign(req.params.id as string, reason, req.userId!);
     res.json(campaign);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
@@ -191,20 +197,22 @@ router.post('/campaigns/:id/reject', authMiddleware, adminMiddleware, async (req
 });
 
 // POST /api/v1/admin/ads/campaigns/:id/pause - Pause campaign
-router.post('/campaigns/:id/pause', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/campaigns/:id/pause', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const campaign = await AdManagementService.pauseCampaign(req.params.id, req.userId!);
+    const campaign = await AdManagementService.pauseCampaign(req.params.id as string, req.userId!);
     res.json(campaign);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 });
 
 // DELETE /api/v1/admin/ads/campaigns/:id - Delete campaign
-router.delete('/campaigns/:id', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete('/campaigns/:id', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await AdManagementService.deleteCampaign(req.params.id);
+    await AdManagementService.deleteCampaign(req.params.id as string);
     res.json({ success: true });
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -213,28 +221,30 @@ router.delete('/campaigns/:id', authMiddleware, adminMiddleware, async (req: Aut
 // ==================== SPONSORED POST ROUTES ====================
 
 // GET /api/v1/admin/ads/sponsored-posts - Get all sponsored posts with filters
-router.get('/sponsored-posts', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/sponsored-posts', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { status, brandId, creatorId, page, limit } = req.query;
     const result = await AdManagementService.getSponsoredPosts({
-      status: status as string,
-      brandId: brandId as string,
-      creatorId: creatorId as string,
-      page: page ? parseInt(page as string) : undefined,
-      limit: limit ? parseInt(limit as string) : undefined
+      status: getQueryString(status),
+      brandId: getQueryString(brandId),
+      creatorId: getQueryString(creatorId),
+      page: getQueryNumber(page),
+      limit: getQueryNumber(limit)
     });
     res.json(result);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
 // GET /api/v1/admin/ads/sponsored-posts/:id - Get sponsored post by ID
-router.get('/sponsored-posts/:id', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/sponsored-posts/:id', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const post = await AdManagementService.getSponsoredPostById(req.params.id);
+    const post = await AdManagementService.getSponsoredPostById(req.params.id as string);
     if (!post) {
-      return res.status(404).json({ error: 'Sponsored post not found' });
+      res.status(404).json({ error: 'Sponsored post not found' });
+      return;
     }
     res.json(post);
   } catch (error: any) {
@@ -243,20 +253,22 @@ router.get('/sponsored-posts/:id', authMiddleware, adminMiddleware, async (req: 
 });
 
 // POST /api/v1/admin/ads/sponsored-posts/:id/verify - Verify sponsored post
-router.post('/sponsored-posts/:id/verify', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/sponsored-posts/:id/verify', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const post = await AdManagementService.verifySponsoredPost(req.params.id, req.userId!);
+    const post = await AdManagementService.verifySponsoredPost(req.params.id as string, req.userId!);
     res.json(post);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 });
 
 // POST /api/v1/admin/ads/sponsored-posts/:id/release-payment - Release payment to creator
-router.post('/sponsored-posts/:id/release-payment', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/sponsored-posts/:id/release-payment', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const post = await AdManagementService.releasePayment(req.params.id, req.userId!);
+    const post = await AdManagementService.releasePayment(req.params.id as string, req.userId!);
     res.json(post);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -265,18 +277,19 @@ router.post('/sponsored-posts/:id/release-payment', authMiddleware, adminMiddlew
 // ==================== ANALYTICS ROUTES ====================
 
 // GET /api/v1/admin/ads/analytics - Get analytics for date range
-router.get('/analytics', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/analytics', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { startDate, endDate } = req.query;
     
-    if (!startDate || !endDate) {
-      return res.status(400).json({ error: 'startDate and endDate are required' });
+    const start = getQueryDate(startDate);
+    const end = getQueryDate(endDate);
+    
+    if (!start || !end) {
+      res.status(400).json({ error: 'startDate and endDate are required' });
+      return;
     }
 
-    const result = await AdManagementService.getAnalytics(
-      new Date(startDate as string),
-      new Date(endDate as string)
-    );
+    const result = await AdManagementService.getAnalytics(start, end);
     res.json(result);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -284,10 +297,11 @@ router.get('/analytics', authMiddleware, adminMiddleware, async (req: AuthReques
 });
 
 // GET /api/v1/admin/ads/stats - Get platform-wide stats
-router.get('/stats', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response) => {
+router.get('/stats', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const stats = await AdManagementService.getPlatformStats();
     res.json(stats);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

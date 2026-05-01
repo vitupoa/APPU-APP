@@ -49,8 +49,8 @@ export class StoriesService {
       select: { admiredId: true, isLovers: true },
     });
 
-    const admiredIds = admires.map(c => c.admiredId);
-    const lovedIds = admires.filter(c => c.isLovers).map(c => c.admiredId);
+    const admiredIds = admires.map((c: any) => c.admiredId);
+    const lovedIds = admires.filter((c: any) => c.isLovers).map((c: any) => c.admiredId);
 
     // Fetch active stories from these users (or public stories)
     const activeStories = await prisma.story.findMany({
@@ -211,7 +211,7 @@ export class StoriesService {
 
     if (preferredViewerIds.length > 0) {
       await prisma.storyViewerPreference.createMany({
-        data: preferredViewerIds.map(id => ({
+        data: preferredViewerIds.map((id: any) => ({
           ownerId: userId,
           preferredViewerId: id,
         })),

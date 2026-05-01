@@ -1,6 +1,4 @@
-import { PrismaClient } from '../generated/prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../config/database.js';
 
 export function startMicroInterestWorker() {
   console.log('Starting Micro Interest Worker (runs every hour)');
@@ -58,27 +56,36 @@ async function updateMicroInterests() {
         const weight = getSignalWeight(interaction.signal_type);
 
         for (const { tag } of hashtags) {
-          await prisma.userMicroInterest.upsert({
+          // Check if exists first
+          const existing = await prisma.userMicroInterest.findFirst({
             where: {
-              userId_category_subcategory: {
-                userId: interaction.user_id,
-                category: tag,
-                subcategory: null
-              }
-            },
-            create: {
               userId: interaction.user_id,
               category: tag,
-              affinity: Math.min(0.1 * weight, 1.0),
-              lastEngagedAt: new Date()
-            },
-            update: {
-              affinity: {
-                increment: Math.min(0.05 * weight, 0.2)
-              },
-              lastEngagedAt: new Date()
+              subcategory: null
             }
           });
+
+          if (existing) {
+            await prisma.userMicroInterest.update({
+              where: { id: existing.id },
+              data: {
+                affinity: {
+                  increment: Math.min(0.05 * weight, 0.2)
+                },
+                lastEngagedAt: new Date()
+              }
+            });
+          } else {
+            await prisma.userMicroInterest.create({
+              data: {
+                userId: interaction.user_id,
+                category: tag,
+                subcategory: null,
+                affinity: Math.min(0.1 * weight, 1.0),
+                lastEngagedAt: new Date()
+              }
+            });
+          }
         }
       } catch (error) {
         console.error(`[MicroInterestWorker] Error processing interaction:`, error);

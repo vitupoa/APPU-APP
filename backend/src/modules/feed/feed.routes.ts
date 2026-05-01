@@ -3,6 +3,12 @@ import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth
 import { FeedService } from './feed.service.js';
 import { z } from 'zod';
 
+
+// Helper to safely extract string from query parameter
+function getQueryParam(param: string | string[] | undefined): string | undefined {
+  if (Array.isArray(param)) return param[0];
+  return param;
+}
 const router = Router();
 
 const createPostSchema = z.object({

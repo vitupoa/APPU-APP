@@ -4,6 +4,12 @@ import { UserService } from './user.service.js';
 import { SubscriptionService } from './subscription.service.js';
 import { z } from 'zod';
 
+
+// Helper to safely extract string from query parameter
+function getQueryParam(param: string | string[] | undefined): string | undefined {
+  if (Array.isArray(param)) return param[0];
+  return param;
+}
 const router = Router();
 
 const updateProfileSchema = z.object({
@@ -153,7 +159,7 @@ router.get('/:id/lovers', async (req: AuthRequest, res: Response) => {
 // GET /api/v1/users/search/creators
 router.get('/search/creators', async (req: AuthRequest, res: Response) => {
   try {
-    const minAdmirers = req.query.minAdmirers ? parseInt(String(req.query.minAdmirers)) : undefined;
+    const minAdmirers = req.query.minAdmirers ? parseInt(String(Array.isArray(Array.isArray(req.query.minAdmirers) ? req.query.minAdmirers[0] : req.query.minAdmirers) ? req.query.minAdmirers[0] : req.query.minAdmirers || '')) : undefined;
     const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
     const result = await UserService.searchCreatorsByAdmireCount(minAdmirers, cursor);
     res.status(200).json(result);

@@ -17,7 +17,7 @@ function containsBannedWords(text: string): boolean {
 function filterMessage(text: string): string {
   let filtered = text;
   const lower = text.toLowerCase();
-  BANNED_WORDS.forEach(word => {
+  BANNED_WORDS.forEach((word: any) => {
     if (lower.includes(word)) {
       filtered = filtered.replace(new RegExp(word, 'gi'), '*'.repeat(word.length));
     }
@@ -371,15 +371,15 @@ export class LiveService {
     });
 
     // Fetch user details for each viewer
-    const userIds = viewers.map(v => v.userId);
+    const userIds = viewers.map((v: any) => v.userId);
     const users = await prisma.user.findMany({
       where: { id: { in: userIds } },
       select: { id: true, username: true, displayName: true, avatarUrl: true },
     });
 
-    const userMap = new Map(users.map(u => [u.id, u]));
+    const userMap = new Map(users.map((u: any) => [u.id, u]));
 
-    return viewers.map(v => ({
+    return viewers.map((v: any) => ({
       userId: v.userId,
       totalTipsKr: v.totalTipsKr,
       user: userMap.get(v.userId),

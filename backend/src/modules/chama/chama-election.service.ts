@@ -152,7 +152,7 @@ export class ChamaElectionService {
     }
 
     // Only nominations with at least 1 second can proceed
-    const qualified = election.nominations.filter(n => n.secondsCount > 0);
+    const qualified = election.nominations.filter((n: any) => n.secondsCount > 0);
     if (qualified.length === 0) throw new Error('No nominations have been seconded');
 
     if (qualified.length === 1) {
@@ -226,7 +226,7 @@ export class ChamaElectionService {
     if (sorted.length === 0) throw new Error('No votes cast');
 
     const topVotes = sorted[0]._count.votes;
-    const tiedCandidates = sorted.filter(n => n._count.votes === topVotes);
+    const tiedCandidates = sorted.filter((n: any) => n._count.votes === topVotes);
 
     const chama = await prisma.chama.findUnique({ where: { id: chamaId } });
 
@@ -240,7 +240,7 @@ export class ChamaElectionService {
       // Clear previous votes for re-run
       await prisma.chamaVote.deleteMany({ where: { electionId } });
 
-      const tiedNames = tiedCandidates.map(c => c.nominee.displayName).join(', ');
+      const tiedNames = tiedCandidates.map((c: any) => c.nominee.displayName).join(', ');
       await prisma.message.create({
         data: {
           chatId: chama!.chatId,

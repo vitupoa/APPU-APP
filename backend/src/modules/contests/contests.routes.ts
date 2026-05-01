@@ -5,6 +5,12 @@ import { z } from 'zod';
 import { richXssProtection, strictXssProtection } from '../../middleware/xssProtection.js';
 import { csrfProtection } from '../../middleware/csrfProtection.js';
 
+
+// Helper to safely extract string from query parameter
+function getQueryParam(param: string | string[] | undefined): string | undefined {
+  if (Array.isArray(param)) return param[0];
+  return param;
+}
 const router = Router();
 
 const createContestSchema = z.object({
@@ -12,7 +18,7 @@ const createContestSchema = z.object({
   description: z.string().min(10).max(2000),
   mediaType: z.enum(['PHOTO', 'VIDEO', 'PHOTO_AND_VIDEO']),
   category: z.enum(['DANCE', 'CHALLENGE', 'PROMOTION', 'CREATIVE', 'ART', 'MUSIC']),
-  prizeKr: z.number().positive('Prize must be positive'),
+  prizeTotalKr: z.number().positive('Prize must be positive'),
   requiredActions: z.array(z.object({
     type: z.string(),
     targetUrl: z.string().optional(),
@@ -33,7 +39,7 @@ const createContestSchema = z.object({
   entryFeeKr: z.number().positive().optional(),
   publicVoteWeight: z.number().min(0).max(100).optional(),
   allowDailyPrizes: z.boolean().optional(),
-  dailyPrizeKr: z.number().positive().optional(),
+  dailyprizeTotalKr: z.number().positive().optional(),
   targetAges: z.array(z.number()).length(2).optional(),
   targetGeos: z.array(z.string().length(2)).optional(),
   airdropKr: z.number().positive().optional(),

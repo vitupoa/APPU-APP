@@ -379,7 +379,7 @@ export class FinancialService {
     for (let i = 0; i < matchingWallets.length; i += BATCH_SIZE) {
       const batch = matchingWallets.slice(i, i + BATCH_SIZE);
       await prisma.$transaction(
-        batch.map(w =>
+        batch.map((w: any) =>
           prisma.wallet.update({
             where: { userId: w.userId },
             data: { krBalance: { decrement: krDecimal } }

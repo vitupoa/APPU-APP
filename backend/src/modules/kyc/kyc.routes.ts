@@ -4,6 +4,12 @@ import { kycService } from './kyc.service';
 import { withdrawalService } from './withdrawal.service';
 import type { WithdrawalSecurityMetadata } from './withdrawal.types';
 
+
+// Helper to safely extract string from query parameter
+function getQueryParam(param: string | string[] | undefined): string | undefined {
+  if (Array.isArray(param)) return param[0];
+  return param;
+}
 const router = Router();
 
 // ─── USER ENDPOINTS ───────────────────────────────────────
@@ -147,7 +153,7 @@ router.get('/withdrawal/history', authenticateToken, async (req, res) => {
     );
 
     // Filter to only user's withdrawals
-    const userWithdrawals = withdrawals.requests.filter(w => w.userId === userId);
+    const userWithdrawals = withdrawals.requests.filter((w: any) => w.userId === userId);
 
     res.json({
       withdrawals: userWithdrawals,

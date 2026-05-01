@@ -445,7 +445,7 @@ export class BrandMarketplaceService {
         contest: c.contest ? {
           id: c.contest.id,
           title: c.contest.title,
-          prizeKr: Number(c.contest.prizeTotalKr),
+          prizeTotalKr: Number(c.contest.prizeTotalKr),
           deadline: c.contest.deadline.toISOString()
         } : null,
         spotsAvailable: c.maxInfluencers - c.acceptedInfluencers,
@@ -721,7 +721,7 @@ export class BrandMarketplaceService {
         title: c.title,
         description: c.description,
         category: c.category,
-        prizeKr: Number(c.prizeTotalKr),
+        prizeTotalKr: Number(c.prizeTotalKr),
         participants: c.totalParticipants,
         submissions: c.totalSubmissions,
         deadline: c.deadline.toISOString(),

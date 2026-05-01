@@ -5,6 +5,12 @@ import { SalesFunnelService } from './sales-funnel.service.js';
 import socialMediaRoutes from './social-media.routes.js';
 import { z } from 'zod';
 
+
+// Helper to safely extract string from query parameter
+function getQueryParam(param: string | string[] | undefined): string | undefined {
+  if (Array.isArray(param)) return param[0];
+  return param;
+}
 const router = Router();
 
 // Mount social media routes
@@ -17,13 +23,13 @@ router.use('/', socialMediaRoutes);
 // GET /api/v1/marketplace/influencers - Search influencers (Brand view)
 router.get('/influencers', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const tier = req.query.tier ? String(req.query.tier).split(',') : undefined;
-    const categories = req.query.categories ? String(req.query.categories).split(',') : undefined;
-    const minFollowers = req.query.minFollowers ? parseInt(String(req.query.minFollowers)) : undefined;
-    const minEngagementRate = req.query.minEngagementRate ? parseFloat(String(req.query.minEngagementRate)) : undefined;
-    const minRating = req.query.minRating ? parseFloat(String(req.query.minRating)) : undefined;
-    const minAdmirers = req.query.minAdmirers ? parseInt(String(req.query.minAdmirers)) : undefined;
-    const minSubscribers = req.query.minSubscribers ? parseInt(String(req.query.minSubscribers)) : undefined;
+    const tier = req.query.tier ? String(Array.isArray(Array.isArray(req.query.tier) ? req.query.tier[0] : req.query.tier) ? req.query.tier[0] : req.query.tier || '').split(',') : undefined;
+    const categories = req.query.categories ? String(Array.isArray(Array.isArray(req.query.categories) ? req.query.categories[0] : req.query.categories) ? req.query.categories[0] : req.query.categories || '').split(',') : undefined;
+    const minFollowers = req.query.minFollowers ? parseInt(String(Array.isArray(Array.isArray(req.query.minFollowers) ? req.query.minFollowers[0] : req.query.minFollowers) ? req.query.minFollowers[0] : req.query.minFollowers || '')) : undefined;
+    const minEngagementRate = req.query.minEngagementRate ? parseFloat(String(Array.isArray(Array.isArray(req.query.minEngagementRate) ? req.query.minEngagementRate[0] : req.query.minEngagementRate) ? req.query.minEngagementRate[0] : req.query.minEngagementRate || '')) : undefined;
+    const minRating = req.query.minRating ? parseFloat(String(Array.isArray(Array.isArray(req.query.minRating) ? req.query.minRating[0] : req.query.minRating) ? req.query.minRating[0] : req.query.minRating || '')) : undefined;
+    const minAdmirers = req.query.minAdmirers ? parseInt(String(Array.isArray(Array.isArray(req.query.minAdmirers) ? req.query.minAdmirers[0] : req.query.minAdmirers) ? req.query.minAdmirers[0] : req.query.minAdmirers || '')) : undefined;
+    const minSubscribers = req.query.minSubscribers ? parseInt(String(Array.isArray(Array.isArray(req.query.minSubscribers) ? req.query.minSubscribers[0] : req.query.minSubscribers) ? req.query.minSubscribers[0] : req.query.minSubscribers || '')) : undefined;
     const sortBy = (req.query.sortBy as any) || 'engagement';
     const cursor = req.query.cursor as string | undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
@@ -121,9 +127,9 @@ router.post('/campaigns/:id/publish', authMiddleware, async (req: AuthRequest, r
 // GET /api/v1/marketplace/campaigns - Browse campaigns (Influencer view)
 router.get('/campaigns', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const type = req.query.type ? String(req.query.type).split(',') : undefined;
-    const categories = req.query.categories ? String(req.query.categories).split(',') : undefined;
-    const minCompensation = req.query.minCompensation ? parseFloat(String(req.query.minCompensation)) : undefined;
+    const type = req.query.type ? String(Array.isArray(Array.isArray(req.query.type) ? req.query.type[0] : req.query.type) ? req.query.type[0] : req.query.type || '').split(',') : undefined;
+    const categories = req.query.categories ? String(Array.isArray(Array.isArray(req.query.categories) ? req.query.categories[0] : req.query.categories) ? req.query.categories[0] : req.query.categories || '').split(',') : undefined;
+    const minCompensation = req.query.minCompensation ? parseFloat(String(Array.isArray(Array.isArray(req.query.minCompensation) ? req.query.minCompensation[0] : req.query.minCompensation) ? req.query.minCompensation[0] : req.query.minCompensation || '')) : undefined;
     const cursor = req.query.cursor as string | undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
 

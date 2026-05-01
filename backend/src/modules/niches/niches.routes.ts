@@ -1,13 +1,13 @@
-import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.js';
-import { PrismaClient } from '../../generated/prisma/index.js';
+import { Router, Response } from 'express';
+import { authenticate, AuthRequest } from '../../middleware/auth.js';
+import { prisma } from '../../config/database.js';
+import { getQueryString } from '../../utils/queryParams.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Get all niches (predefined + custom)
-router.get('/', authenticate, async (req, res) => {
-  const niches = await req.prisma.creatorNiche.findMany({
+router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  const niches = await prisma.creatorNiche.findMany({
     orderBy: [
       { isCustom: 'asc' },
       { usageCount: 'desc' }
@@ -17,26 +17,27 @@ router.get('/', authenticate, async (req, res) => {
 });
 
 // Add custom niche
-router.post('/custom', authenticate, async (req, res) => {
+router.post('/custom', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   const { name } = req.body;
   
-  const existing = await req.prisma.creatorNiche.findUnique({
+  const existing = await prisma.creatorNiche.findUnique({
     where: { name: name.toLowerCase() }
   });
   
   if (existing) {
-    await req.prisma.creatorNiche.update({
+    await prisma.creatorNiche.update({
       where: { id: existing.id },
       data: { usageCount: { increment: 1 } }
     });
-    return res.json(existing);
+    res.json(existing);
+    return;
   }
   
-  const niche = await req.prisma.creatorNiche.create({
+  const niche = await prisma.creatorNiche.create({
     data: {
       name: name.toLowerCase(),
       isCustom: true,
-      createdBy: req.user!.id
+      createdBy: req.userId!
     }
   });
   
@@ -44,11 +45,11 @@ router.post('/custom', authenticate, async (req, res) => {
 });
 
 // Update user niches
-router.patch('/me', authenticate, async (req, res) => {
+router.patch('/me', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   const { selectedNiches, customNiches } = req.body;
   
-  const user = await req.prisma.user.update({
-    where: { id: req.user!.id },
+  const user = await prisma.user.update({
+    where: { id: req.userId! },
     data: {
       selectedNiches: selectedNiches || [],
       customNiches: customNiches || []
@@ -59,9 +60,9 @@ router.patch('/me', authenticate, async (req, res) => {
 });
 
 // Get user niches
-router.get('/me', authenticate, async (req, res) => {
-  const user = await req.prisma.user.findUnique({
-    where: { id: req.user!.id },
+router.get('/me', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.userId! },
     select: { selectedNiches: true, customNiches: true }
   });
   
@@ -69,9 +70,9 @@ router.get('/me', authenticate, async (req, res) => {
 });
 
 // Get niches for specific user (public)
-router.get('/user/:userId', async (req, res) => {
-  const user = await req.prisma.user.findUnique({
-    where: { id: req.params.userId },
+router.get('/user/:userId', async (req: AuthRequest, res: Response): Promise<void> => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.params.userId as string },
     select: { selectedNiches: true, customNiches: true }
   });
   

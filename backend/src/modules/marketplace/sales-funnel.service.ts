@@ -180,7 +180,7 @@ export class SalesFunnelService {
 
     // Create recipients
     const recipients = await prisma.conversionCampaignRecipient.createMany({
-      data: targetUsers.map(userId => ({
+      data: targetUsers.map((userId: any) => ({
         campaignId: campaign.id,
         userId
       }))
@@ -212,7 +212,7 @@ export class SalesFunnelService {
           where: { contestId },
           select: { userId: true }
         });
-        const winnerIds = winners.map(w => w.userId);
+        const winnerIds = winners.map((w: any) => w.userId);
 
         const participants = await prisma.contestParticipant.findMany({
           where: {
@@ -222,7 +222,7 @@ export class SalesFunnelService {
           select: { userId: true }
         });
 
-        return participants.map(p => p.userId);
+        return participants.map((p: any) => p.userId);
       }
 
       case 'WINNERS': {
@@ -230,7 +230,7 @@ export class SalesFunnelService {
           where: { contestId },
           select: { userId: true }
         });
-        return winners.map(w => w.userId);
+        return winners.map((w: any) => w.userId);
       }
 
       case 'HIGH_ENGAGERS': {
@@ -240,7 +240,7 @@ export class SalesFunnelService {
           select: { userId: true },
           distinct: ['userId']
         });
-        return engagers.map(e => e.userId);
+        return engagers.map((e: any) => e.userId);
       }
 
       case 'ALL_PARTICIPANTS':
@@ -249,7 +249,7 @@ export class SalesFunnelService {
           where: { contestId },
           select: { userId: true }
         });
-        return participants.map(p => p.userId);
+        return participants.map((p: any) => p.userId);
       }
     }
   }
@@ -366,7 +366,7 @@ export class SalesFunnelService {
       ADVOCACY: 0
     };
 
-    events.forEach(e => {
+    events.forEach((e: any) => {
       stages[e.stage as keyof typeof stages] = e._count.userId;
     });
 
@@ -562,7 +562,7 @@ export class SalesFunnelService {
         marketing: points.marketingPoints,
         sales: points.salesPoints
       },
-      recentActivities: recentActivities.map(a => ({
+      recentActivities: recentActivities.map((a: any) => ({
         type: a.activityType,
         category: a.category,
         points: a.pointsEarned,

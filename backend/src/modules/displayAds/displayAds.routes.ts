@@ -7,7 +7,7 @@ const displayAdService = new DisplayAdCampaignService();
 
 router.post('/campaigns', authenticate, async (req, res) => {
   try {
-    const brandId = req.user!.id;
+    const brandId = req.userId!;
     const campaign = await displayAdService.createCampaign(brandId, req.body);
     res.status(201).json(campaign);
   } catch (error: any) {
@@ -17,7 +17,7 @@ router.post('/campaigns', authenticate, async (req, res) => {
 
 router.get('/campaigns', authenticate, async (req, res) => {
   try {
-    const brandId = req.user!.id;
+    const brandId = req.userId!;
     const campaigns = await displayAdService.getBrandCampaigns(brandId);
     res.json(campaigns);
   } catch (error: any) {
@@ -124,7 +124,7 @@ router.patch('/admin/campaigns/:id/approve', authenticate, async (req, res) => {
     }
     const campaign = await displayAdService.approveCampaign(
       req.params.id,
-      req.user!.id
+      req.userId!
     );
     res.json(campaign);
   } catch (error: any) {
@@ -140,7 +140,7 @@ router.patch('/admin/campaigns/:id/reject', authenticate, async (req, res) => {
     const { reason } = req.body;
     const campaign = await displayAdService.rejectCampaign(
       req.params.id,
-      req.user!.id,
+      req.userId!,
       reason
     );
     res.json(campaign);
@@ -172,7 +172,7 @@ router.post('/admin/settings', authenticate, async (req, res) => {
     }
     const settings = await displayAdService.updatePlatformSettings(
       req.body,
-      req.user!.id
+      req.userId!
     );
     res.json(settings);
   } catch (error: any) {

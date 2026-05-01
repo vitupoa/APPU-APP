@@ -287,14 +287,14 @@ export class UserService {
     });
 
     const filteredUsers = minAdmirers 
-      ? users.filter(u => u._count.admirers >= minAdmirers)
+      ? users.filter((u: any) => u._count.admirers >= minAdmirers)
       : users;
 
     const hasMore = filteredUsers.length > limit;
     const items = hasMore ? filteredUsers.slice(0, limit) : filteredUsers;
     
     return {
-      items: items.map(u => ({
+      items: items.map((u: any) => ({
         id: u.id,
         username: u.username,
         displayName: u.displayName,

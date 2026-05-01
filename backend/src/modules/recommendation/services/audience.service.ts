@@ -85,7 +85,7 @@ export class AudienceSelectionService {
       orderBy: { createdAt: 'desc' }
     });
 
-    return admirers.map(a => a.admirerId);
+    return admirers.map((a: any) => a.admirerId);
   }
 
   /**
@@ -102,12 +102,12 @@ export class AudienceSelectionService {
       SELECT DISTINCT sl.user_id
       FROM short_likes sl
       INNER JOIN shorts s ON sl.short_id = s.id
-      WHERE s.caption ILIKE ANY(ARRAY[${hashtags.map(tag => `%${tag}%`)}])
+      WHERE s.caption ILIKE ANY(ARRAY[${hashtags.map((tag: any) => `%${tag}%`)}])
       ORDER BY sl.created_at DESC
       LIMIT ${limit}
     `;
 
-    return users.map(u => u.user_id);
+    return users.map((u: any) => u.user_id);
   }
 
   /**
@@ -125,7 +125,7 @@ export class AudienceSelectionService {
       orderBy: { createdAt: 'desc' }
     });
 
-    return users.map(u => u.id);
+    return users.map((u: any) => u.id);
   }
 
   /**
@@ -145,7 +145,7 @@ export class AudienceSelectionService {
       LIMIT ${limit}
     `;
 
-    return users.map(u => u.id);
+    return users.map((u: any) => u.id);
   }
 
   /**
@@ -173,7 +173,7 @@ export class AudienceSelectionService {
     const engagedUsers = await this.getUsersEngagedWithSimilarContent(hashtags, nextTierSize);
 
     // Exclude users who already saw it
-    const newAudience = engagedUsers.filter(userId => !previousAudience.includes(userId));
+    const newAudience = engagedUsers.filter((userId: any) => !previousAudience.includes(userId));
 
     return this.shuffleArray(newAudience).slice(0, nextTierSize);
   }
@@ -191,12 +191,12 @@ export class AudienceSelectionService {
       SELECT DISTINCT sl.user_id
       FROM short_likes sl
       INNER JOIN shorts s ON sl.short_id = s.id
-      WHERE s.caption ILIKE ANY(ARRAY[${hashtags.map(tag => `%${tag}%`)}])
+      WHERE s.caption ILIKE ANY(ARRAY[${hashtags.map((tag: any) => `%${tag}%`)}])
       ORDER BY sl.created_at DESC
       LIMIT ${limit}
     `;
 
-    return users.map(u => u.user_id);
+    return users.map((u: any) => u.user_id);
   }
 
   /**
@@ -205,7 +205,7 @@ export class AudienceSelectionService {
   private static extractHashtags(text: string): string[] {
     const regex = /#([a-zA-Z0-9_]+)/g;
     const matches = text.match(regex);
-    return matches ? matches.map(tag => tag.toLowerCase()) : [];
+    return matches ? matches.map((tag: any) => tag.toLowerCase()) : [];
   }
 
   /**

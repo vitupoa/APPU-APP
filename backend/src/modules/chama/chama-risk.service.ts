@@ -189,7 +189,7 @@ export class ChamaRiskService {
 
     // Send warning message to target chama
     const warningText = activeDefaults
-      .map(d => `${d.chama.name} (${Number(d.amountOwedKr)} Kr owed)`)
+      .map((d: any) => `${d.chama.name} (${Number(d.amountOwedKr)} Kr owed)`)
       .join(', ');
 
     await prisma.message.create({
@@ -202,7 +202,7 @@ export class ChamaRiskService {
       },
     });
 
-    return { warnings: activeDefaults.length, chamas: activeDefaults.map(d => d.chamaName) };
+    return { warnings: activeDefaults.length, chamas: activeDefaults.map((d: any) => d.chamaName) };
   }
 
   /**

@@ -1,9 +1,6 @@
-import { PrismaClient } from '../../../generated/prisma/client';
+import { prisma } from '../../../config/database.js';
 import { redis } from '../../../config/redis.js';
 
-const prisma = new PrismaClient();
-
-// Cache TTLs
 const FEED_CACHE_TTL = 300; // 5 minutes
 const TRENDING_CACHE_TTL = 900; // 15 minutes
 const INTERESTS_CACHE_TTL = 3600; // 1 hour
@@ -76,7 +73,7 @@ export class FeedGenerationService {
       select: { admiredId: true }
     });
 
-    const creatorIds = admiringRelations.map(a => a.admiredId);
+    const creatorIds = admiringRelations.map((a: any) => a.admiredId);
     if (creatorIds.length === 0) return { content: [] };
 
     // Calculate split: 90% unseen, 7% trending, 3% favorites
@@ -184,7 +181,7 @@ export class FeedGenerationService {
 
     if (interests.length === 0) return this.getTrendingContent(count);
 
-    const categories = interests.map(i => i.category);
+    const categories = interests.map((i: any) => i.category);
 
     // Find content matching user interests that hasn't been delivered
     const content = await prisma.$queryRaw<any[]>`
@@ -211,7 +208,7 @@ export class FeedGenerationService {
       take: 20
     });
 
-    const creatorIds = admiringRelations.map(a => a.admiredId);
+    const creatorIds = admiringRelations.map((a: any) => a.admiredId);
     if (creatorIds.length === 0) return [];
 
     const content = await prisma.$queryRaw<any[]>`

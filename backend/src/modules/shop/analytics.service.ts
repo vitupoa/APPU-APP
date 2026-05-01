@@ -63,7 +63,7 @@ export class ShopAnalyticsService {
       productId,
       days,
       totals: { ...totals, conversionRate: parseFloat(conversionRate) },
-      daily: rows.map(r => ({
+      daily: rows.map((r: any) => ({
         date: r.date.toISOString().split('T')[0],
         views: r.views,
         clicks: r.clicks,
@@ -86,7 +86,7 @@ export class ShopAnalyticsService {
       select: { id: true, title: true, category: true, avgRating: true, viewCount: true, salesCount: true },
     });
 
-    const productIds = products.map(p => p.id);
+    const productIds = products.map((p: any) => p.id);
 
     // Aggregate analytics across all products
     const analytics = await prisma.productAnalytic.groupBy({
@@ -116,7 +116,7 @@ export class ShopAnalyticsService {
     return {
       sellerId,
       days,
-      products: products.map(p => ({
+      products: products.map((p: any) => ({
         ...p,
         avgRating: Number(p.avgRating),
       })),
@@ -128,7 +128,7 @@ export class ShopAnalyticsService {
         avgRating: reviewAgg._avg.rating ? Number(reviewAgg._avg.rating.toFixed(2)) : 0,
         totalReviews: reviewAgg._count,
       },
-      daily: analytics.map(a => ({
+      daily: analytics.map((a: any) => ({
         date: a.date.toISOString().split('T')[0],
         views: a._sum.views || 0,
         clicks: a._sum.clicks || 0,
@@ -153,7 +153,7 @@ export class ShopAnalyticsService {
       _sum: { viewCount: true, salesCount: true },
     });
 
-    return categories.map(c => ({
+    return categories.map((c: any) => ({
       category: c.category,
       totalProducts: c._count.id,
       avgPrice: c._avg.priceKr ? Number(Number(c._avg.priceKr).toFixed(2)) : 0,

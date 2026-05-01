@@ -1,6 +1,4 @@
-import { PrismaClient } from '../generated/prisma';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../config/database.js';
 
 export class DisplayAdCampaignService {
   async createCampaign(brandId: string, data: any) {

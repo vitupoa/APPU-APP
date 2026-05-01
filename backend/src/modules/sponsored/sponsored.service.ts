@@ -85,7 +85,7 @@ export class SponsoredContentService {
     });
 
     // Filter by targeting criteria
-    const matched = campaigns.filter(campaign => {
+    const matched = campaigns.filter((campaign: any) => {
       const targeting = campaign.targeting as any;
       if (!targeting) return true;
 
@@ -194,10 +194,10 @@ export class SponsoredContentService {
 
     if (!campaign) throw new Error('Campaign not found');
 
-    const impressions = campaign.impressionLog.filter(i => i.type === 'impression').length;
-    const views = campaign.impressionLog.filter(i => i.type === 'view').length;
-    const engagements = campaign.impressionLog.filter(i => ['like', 'comment', 'share'].includes(i.type)).length;
-    const clicks = campaign.impressionLog.filter(i => i.type === 'click').length;
+    const impressions = campaign.impressionLog.filter((i: any) => i.type === 'impression').length;
+    const views = campaign.impressionLog.filter((i: any) => i.type === 'view').length;
+    const engagements = campaign.impressionLog.filter((i: any) => ['like', 'comment', 'share'].includes(i.type)).length;
+    const clicks = campaign.impressionLog.filter((i: any) => i.type === 'click').length;
 
     return {
       campaignName: campaign.campaignName,

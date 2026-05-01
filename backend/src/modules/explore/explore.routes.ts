@@ -2,6 +2,12 @@ import { Router, Response } from 'express';
 import { optionalAuth, AuthRequest } from '../../middleware/auth.js';
 import { ExploreService } from './explore.service.js';
 
+
+// Helper to safely extract string from query parameter
+function getQueryParam(param: string | string[] | undefined): string | undefined {
+  if (Array.isArray(param)) return param[0];
+  return param;
+}
 const router = Router();
 
 // GET /api/v1/explore/trending/hashtags
@@ -61,12 +67,14 @@ router.get('/live', optionalAuth, async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/v1/explore/hashtag/:tag
-router.get('/hashtag/:tag', optionalAuth, async (req: AuthRequest, res: Response) => {
+router.get('/hashtag/:tag', optionalAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const tag = req.params.tag;
     const contentType = req.query.contentType as string | undefined;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
-    const cursor = req.query.cursor as string | undefined;
+    const limitQuery = req.query.limit;
+    const limit = limitQuery ? parseInt(Array.isArray(limitQuery) ? limitQuery[0] : limitQuery) : 20;
+    const cursorQuery = req.query.cursor;
+    const cursor = cursorQuery ? (Array.isArray(cursorQuery) ? cursorQuery[0] : cursorQuery) : undefined;
     const content = await ExploreService.getHashtagContent(tag, contentType, limit, cursor);
     res.status(200).json(content);
   } catch (error: any) {

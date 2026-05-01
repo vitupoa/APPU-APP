@@ -24,7 +24,7 @@ export class ShortsService {
         },
         select: { admiredId: true, admirerId: true }
       });
-      const admiringIds = admiringList.map(a => a.admirerId === userId ? a.admiredId : a.admirerId);
+      const admiringIds = admiringList.map((a: any) => a.admirerId === userId ? a.admiredId : a.admirerId);
 
       if (admiringIds.length === 0) {
         return { items: [], nextCursor: null };
@@ -42,7 +42,7 @@ export class ShortsService {
         },
         select: { admiredId: true, admirerId: true }
       });
-      const admiringIds = admiringList.map(a => a.admirerId === userId ? a.admiredId : a.admirerId);
+      const admiringIds = admiringList.map((a: any) => a.admirerId === userId ? a.admiredId : a.admirerId);
 
       // Exclude admiring users and self
       whereClause.userId = {
@@ -85,7 +85,7 @@ export class ShortsService {
       const likes = await prisma.shortLike.findMany({
         where: {
           userId,
-          shortId: { in: items.map(s => s.id) }
+          shortId: { in: items.map((s: any) => s.id) }
         },
         select: { shortId: true }
       });
@@ -93,7 +93,7 @@ export class ShortsService {
     }
 
     return {
-      items: items.map(s => ({
+      items: items.map((s: any) => ({
         id: s.id,
         creator: s.user,
         videoUrl: s.videoUrl,
@@ -212,7 +212,7 @@ export class ShortsService {
   private static extractHashtags(text: string): string[] {
     const hashtagRegex = /#[\w]+/g;
     const matches = text.match(hashtagRegex);
-    return matches ? matches.map(tag => tag.substring(1).toLowerCase()) : [];
+    return matches ? matches.map((tag: any) => tag.substring(1).toLowerCase()) : [];
   }
 
   /**

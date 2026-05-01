@@ -34,7 +34,7 @@ export class OrderService {
     }
 
     // Calculate totals
-    const lineItems = cartItems.map(item => {
+    const lineItems = cartItems.map((item: any) => {
       const unitPrice = item.bargainPrice
         ? Number(item.bargainPrice)
         : (item.product.wholesalePrice && item.quantity >= (item.product.wholesaleMinQty || 999))
@@ -62,7 +62,7 @@ export class OrderService {
           status: 'PENDING',
           notes,
           items: {
-            create: lineItems.map(i => ({
+            create: lineItems.map((i: any) => ({
               productId: i.productId,
               sellerId: i.sellerId,
               quantity: i.quantity,

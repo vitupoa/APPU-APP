@@ -1,7 +1,6 @@
-import { PrismaClient } from '../generated/prisma/client';
-import { Logger } from '../utils/logger';
+import { prisma } from '../config/database.js';
+import { Logger } from '../utils/logger.js';
 
-const prisma = new PrismaClient();
 const logger = new Logger('AnalyticsService');
 
 export interface AnalyticsEvent {

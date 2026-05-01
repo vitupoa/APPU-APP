@@ -21,7 +21,7 @@ export class ExploreService {
       }
     });
 
-    return hashtags.map(h => ({
+    return hashtags.map((h: any) => ({
       tag: `#${h.tag}`,
       viewCount: h.usageCount,
       postCount: h._count.contentHashtags
@@ -45,28 +45,29 @@ export class ExploreService {
     const shorts = await prisma.short.findMany({
       where: whereClause,
       orderBy: [
-        { viewsCount: 'desc' },
+        { views: 'desc' },
         { likesCount: 'desc' }
       ],
       take: limit,
       select: {
         id: true,
         videoUrl: true,
-        viewsCount: true,
+        views: true,
         creator: {
           select: {
             id: true,
             username: true,
             avatarUrl: true
-          }
+          },
+      include: { user: true }
         }
       }
     });
 
-    return shorts.map(s => ({
+    return shorts.map((s: any) => ({
       id: s.id,
       thumbnailUrl: s.videoUrl, // Use video URL as thumbnail (client can extract frame)
-      viewCount: s.viewsCount,
+      viewCount: s.views,
       creatorUsername: s.creator.username,
       creatorAvatar: s.creator.avatarUrl || ''
     }));
@@ -81,26 +82,26 @@ export class ExploreService {
         status: 'ACTIVE'
       },
       orderBy: [
-        { participantsCount: 'desc' },
-        { prizeKr: 'desc' }
+        { totalParticipants: 'desc' },
+        { prizeTotalKr: 'desc' }
       ],
       take: limit,
       select: {
         id: true,
         title: true,
         coverMediaUrl: true,
-        prizeKr: true,
-        participantsCount: true,
+        prizeTotalKr: true,
+        totalParticipants: true,
         category: true
       }
     });
 
-    return contests.map(c => ({
+    return contests.map((c: any) => ({
       id: c.id,
       title: c.title,
       thumbnailUrl: c.coverMediaUrl,
-      prizeKr: c.prizeKr,
-      participantsCount: c.participantsCount,
+      prizeTotalKr: c.prizeTotalKr,
+      totalParticipants: c.totalParticipants,
       category: c.category
     }));
   }
@@ -130,7 +131,7 @@ export class ExploreService {
       }
     });
 
-    return creators.map(c => ({
+    return creators.map((c: any) => ({
       id: c.id,
       username: c.username,
       displayName: c.displayName,
@@ -165,12 +166,13 @@ export class ExploreService {
             id: true,
             username: true,
             avatarUrl: true
-          }
+          },
+      include: { host: true }
         }
       }
     });
 
-    return streams.map(s => ({
+    return streams.map((s: any) => ({
       id: s.id,
       creatorId: s.host.id,
       creatorUsername: s.host.username,
@@ -218,14 +220,15 @@ export class ExploreService {
               id: true,
               videoUrl: true,
               caption: true,
-              viewsCount: true,
+              views: true,
               likesCount: true,
               creator: {
                 select: {
                   id: true,
                   username: true,
                   avatarUrl: true
-                }
+                },
+      include: { user: true }
               }
             }
           });
@@ -234,7 +237,7 @@ export class ExploreService {
             id: short.id,
             videoUrl: short.videoUrl,
             caption: short.caption,
-            viewsCount: short.viewsCount,
+            views: short.views,
             likesCount: short.likesCount,
             creator: short.creator
           } : null;
@@ -252,7 +255,8 @@ export class ExploreService {
                   id: true,
                   username: true,
                   avatarUrl: true
-                }
+                },
+      include: { user: true }
               }
             }
           });
@@ -271,7 +275,7 @@ export class ExploreService {
     );
 
     return {
-      items: contentDetails.filter(item => item !== null),
+      items: contentDetails.filter((item: any) => item !== null),
       nextCursor: result.nextCursor
     };
   }

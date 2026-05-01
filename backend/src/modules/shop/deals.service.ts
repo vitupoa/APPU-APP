@@ -22,7 +22,7 @@ export class FlashSaleService {
       });
 
       await tx.flashSaleProduct.createMany({
-        data: data.products.map(p => ({
+        data: data.products.map((p: any) => ({
           flashSaleId: s.id,
           productId: p.productId,
           salePrice: new Prisma.Decimal(p.salePrice),
@@ -38,7 +38,7 @@ export class FlashSaleService {
     });
 
     // Notify deal alert users and wishlist holders (outside transaction)
-    const productIds = data.products.map(p => p.productId);
+    const productIds = data.products.map((p: any) => p.productId);
     await ShopNotificationService.notifyFlashSaleStarted(productIds, data.title).catch(() => {});
     for (const p of data.products) {
       const product = await prisma.product.findUnique({ where: { id: p.productId }, select: { title: true } });
@@ -68,7 +68,7 @@ export class FlashSaleService {
       orderBy: { endTime: 'asc' }
     });
 
-    return sales.map(s => ({
+    return sales.map((s: any) => ({
       id: s.id,
       title: s.title,
       description: s.description,
@@ -76,7 +76,7 @@ export class FlashSaleService {
       startTime: s.startTime.toISOString(),
       endTime: s.endTime.toISOString(),
       timeRemaining: Math.max(0, s.endTime.getTime() - now.getTime()),
-      products: s.products.map(p => ({
+      products: s.products.map((p: any) => ({
         productId: p.productId,
         salePrice: Number(p.salePrice),
         originalPrice: Number(p.product.priceKr),

@@ -1,14 +1,15 @@
-import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.js';
-import { PrismaClient } from '../../generated/prisma/index.js';
+import { Router, Response, NextFunction } from 'express';
+import { authenticate, AuthRequest } from '../../middleware/auth.js';
+import { prisma } from '../../config/database.js';
+import { getQueryString } from '../../utils/queryParams.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
-router.post('/', authenticate, async (req, res) => {
+router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user!.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized' });
+    if (!req.isAdmin) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
     }
 
     const {
@@ -41,7 +42,7 @@ router.post('/', authenticate, async (req, res) => {
         longitude: longitude ? parseFloat(longitude) : null,
         population: population ? parseInt(population) : null,
         isActive: true,
-        createdBy: req.user!.id,
+        createdBy: req.userId!,
       },
     });
 
@@ -51,18 +52,18 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
-router.get('/', authenticate, async (req, res) => {
+router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { scope, parentId, search, countryCode } = req.query;
 
     const where: any = { isActive: true };
 
-    if (scope) where.scope = scope;
-    if (parentId) where.parentId = parentId;
-    if (countryCode) where.countryCode = countryCode;
+    if (scope) where.scope = getQueryString(scope);
+    if (parentId) where.parentId = getQueryString(parentId);
+    if (countryCode) where.countryCode = getQueryString(countryCode);
     if (search) {
       where.displayName = {
-        contains: search as string,
+        contains: getQueryString(search),
         mode: 'insensitive',
       };
     }
@@ -73,74 +74,80 @@ router.get('/', authenticate, async (req, res) => {
     });
 
     res.json(locations);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.get('/:id', authenticate, async (req, res) => {
+router.get('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const location = await prisma.locationMaster.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
     });
 
     if (!location) {
-      return res.status(404).json({ error: 'Location not found' });
+      res.status(404).json({ error: 'Location not found' });
+      return;
     }
 
     res.json(location);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.patch('/:id', authenticate, async (req, res) => {
+router.patch('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user!.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized' });
+    if (!req.isAdmin) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
     }
 
     const location = await prisma.locationMaster.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: req.body,
     });
 
     res.json(location);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 });
 
-router.delete('/:id', authenticate, async (req, res) => {
+router.delete('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user!.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized' });
+    if (!req.isAdmin) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
     }
 
     await prisma.locationMaster.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: { isActive: false },
     });
 
     res.json({ message: 'Location deleted' });
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 });
 
-router.get('/hierarchy/:countryCode', authenticate, async (req, res) => {
+router.get('/hierarchy/:countryCode', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { countryCode } = req.params;
-
     const hierarchy = await prisma.locationMaster.findMany({
       where: {
-        countryCode,
+        countryCode: req.params.countryCode as string,
         isActive: true,
       },
       orderBy: [{ scope: 'asc' }, { displayName: 'asc' }],
     });
 
     res.json(hierarchy);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

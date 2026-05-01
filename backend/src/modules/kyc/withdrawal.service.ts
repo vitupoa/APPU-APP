@@ -1,10 +1,9 @@
-import { PrismaClient, WithdrawalStatus } from '../../generated/prisma';
-import { kycService } from '../kyc/kyc.service';
-import { transactionSigner, TransactionPayload } from '../../utils/transactionSigner';
-import { nonceService } from '../../services/nonce.service';
-import { WithdrawalSecurityMetadata } from './withdrawal.types';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../config/database.js';
+import { WithdrawalStatus } from '../../generated/prisma/client.js';
+import { kycService } from '../kyc/kyc.service.js';
+import { transactionSigner, TransactionPayload } from '../../utils/transactionSigner.js';
+import { nonceService } from '../../services/nonce.service.js';
+import { WithdrawalSecurityMetadata } from './withdrawal.types.js';
 
 const DAILY_WITHDRAWAL_LIMIT = 500000;
 const RAPID_WITHDRAWAL_THRESHOLD = 3; // 3 withdrawals in 24 hours
@@ -95,7 +94,7 @@ export class WithdrawalService {
       where: { userId }
     });
 
-    if (!wallet || wallet.krBalance < amountKr) {
+    if (!wallet || Number(wallet.krBalance) < amountKr) {
       throw new Error('Insufficient balance');
     }
 
@@ -128,9 +127,11 @@ export class WithdrawalService {
     }
 
     // Check if exceeds daily limit
-    const newWithdrawnToday = Number(withdrawalLimit.withdrawnTodayKr) + amountKr;
-    if (newWithdrawnToday > Number(withdrawalLimit.dailyLimitKr)) {
-      throw new Error(`Daily withdrawal limit exceeded. Limit: Kr ${withdrawalLimit.dailyLimitKr}, Already withdrawn: Kr ${withdrawalLimit.withdrawnTodayKr}`);
+    const currentWithdrawn = Number(withdrawalLimit.withdrawnTodayKr);
+    const dailyLimit = Number(withdrawalLimit.dailyLimitKr);
+    const newWithdrawnToday = currentWithdrawn + amountKr;
+    if (newWithdrawnToday > dailyLimit) {
+      throw new Error(`Daily withdrawal limit exceeded. Limit: Kr ${dailyLimit}, Already withdrawn: Kr ${currentWithdrawn}`);
     }
 
     // Detect suspicious patterns
@@ -358,7 +359,7 @@ export class WithdrawalService {
 
   // Get pending withdrawals for review (Super Admin / Finance Manager)
   async getPendingWithdrawals(status?: WithdrawalStatus, limit: number = 50, offset: number = 0) {
-    const where = status ? { status } : { status: { in: ['PENDING', 'UNDER_REVIEW', 'FLAGGED'] } };
+    const where = status ? { status } : { status: { in: ['PENDING' as WithdrawalStatus, 'UNDER_REVIEW' as WithdrawalStatus, 'FLAGGED' as WithdrawalStatus] } };
 
     const requests = await prisma.withdrawalRequest.findMany({
       where,
@@ -371,7 +372,6 @@ export class WithdrawalService {
             lastName: true,
             email: true,
             kycStatus: true,
-            kycTier: true,
             createdAt: true
           }
         }
@@ -440,6 +440,7 @@ export class WithdrawalService {
       // If rejected, refund to wallet
       if (!approved && !flagReason) {
         const refundAmount = Number(request.amountKr);
+        const withdrawnAmount = Number(request.amountKr);
         
         await tx.wallet.update({
           where: { userId: request.userId },
@@ -452,7 +453,7 @@ export class WithdrawalService {
         await tx.withdrawalLimit.update({
           where: { userId: request.userId },
           data: {
-            withdrawnTodayKr: { decrement: request.amountKr }
+            withdrawnTodayKr: { decrement: withdrawnAmount }
           }
         });
 

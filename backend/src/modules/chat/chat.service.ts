@@ -59,7 +59,7 @@ export class ChatService {
         name,
         description,
         participants: {
-          create: allParticipantIds.map(id => ({
+          create: allParticipantIds.map((id: any) => ({
             userId: id,
             role: id === userId ? 'admin' : 'member',
           })),
@@ -71,7 +71,7 @@ export class ChatService {
     });
 
     // Optionally broadcast via Socket that these users were added
-    allParticipantIds.forEach(pid => {
+    allParticipantIds.forEach((pid: any) => {
       io.to(`user:${pid}`).emit('chat:new_chat', chat);
     });
 
@@ -143,7 +143,7 @@ export class ChatService {
       select: { userId: true },
     });
 
-    participants.forEach(p => {
+    participants.forEach((p: any) => {
       // Emit to each user's secure channel
       io.to(`user:${p.userId}`).emit('chat:new_message', message);
     });
@@ -236,7 +236,7 @@ export class ChatService {
       select: { userId: true },
     });
 
-    participants.forEach(p => {
+    participants.forEach((p: any) => {
       io.to(`user:${p.userId}`).emit('chat:tip_sent', {
         message,
         tipAmount: amountKr,
@@ -287,7 +287,7 @@ export class ChatService {
     });
 
     // Broadcast update to all participants
-    chat.participants.forEach(p => {
+    chat.participants.forEach((p: any) => {
       io.to(`user:${p.userId}`).emit('chat:updated', updatedChat);
     });
 
@@ -329,7 +329,7 @@ export class ChatService {
       });
 
       // Broadcast member removed
-      chat.participants.forEach(p => {
+      chat.participants.forEach((p: any) => {
         io.to(`user:${p.userId}`).emit('chat:member_removed', {
           chatId,
           userId: targetUserId,
@@ -346,7 +346,7 @@ export class ChatService {
     });
 
     // Broadcast role change
-    chat.participants.forEach(p => {
+    chat.participants.forEach((p: any) => {
       io.to(`user:${p.userId}`).emit('chat:member_role_changed', {
         chatId,
         userId: targetUserId,
@@ -398,7 +398,7 @@ export class ChatService {
     });
 
     // Broadcast ownership transfer
-    chat.participants.forEach(p => {
+    chat.participants.forEach((p: any) => {
       io.to(`user:${p.userId}`).emit('chat:ownership_transferred', {
         chatId,
         oldOwnerId: userId,
@@ -428,7 +428,7 @@ export class ChatService {
     }
 
     // If user is the only admin, prevent leaving
-    const admins = chat.participants.filter(p => p.role === 'admin');
+    const admins = chat.participants.filter((p: any) => p.role === 'admin');
     if (admins.length === 1 && participant.role === 'admin') {
       throw new Error('Transfer ownership before leaving the group');
     }
@@ -438,7 +438,7 @@ export class ChatService {
     });
 
     // Broadcast member left
-    chat.participants.forEach(p => {
+    chat.participants.forEach((p: any) => {
       if (p.userId !== userId) {
         io.to(`user:${p.userId}`).emit('chat:member_left', {
           chatId,

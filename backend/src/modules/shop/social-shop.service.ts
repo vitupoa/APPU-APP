@@ -199,7 +199,7 @@ export class CartService {
 
     // Calculate totals
     let totalKr = 0;
-    const formatted = items.map(item => {
+    const formatted = items.map((item: any) => {
       const price = item.bargainPrice
         ? Number(item.bargainPrice)
         : (item.product.wholesalePrice && item.quantity >= (item.product.wholesaleMinQty || 999))

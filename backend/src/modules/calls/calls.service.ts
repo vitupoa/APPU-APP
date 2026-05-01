@@ -32,7 +32,7 @@ export class CallService {
         type,
         status: 'RINGING',
         participants: {
-          create: chatParticipants.map(p => ({
+          create: chatParticipants.map((p: any) => ({
             userId: p.userId,
             status: p.userId === callerId ? 'joined' : 'invited',
             joinedAt: p.userId === callerId ? new Date() : null,
@@ -64,8 +64,8 @@ export class CallService {
 
     // Notify all other participants via WebSocket
     chatParticipants
-      .filter(p => p.userId !== callerId)
-      .forEach(p => {
+      .filter((p: any) => p.userId !== callerId)
+      .forEach((p: any) => {
         io.to(`user:${p.userId}`).emit('call:incoming', {
           call,
           caller,
@@ -105,7 +105,7 @@ export class CallService {
     }
 
     // Notify all participants
-    call.participants.forEach(p => {
+    call.participants.forEach((p: any) => {
       io.to(`user:${p.userId}`).emit('call:participant_joined', {
         callId,
         userId,
@@ -134,7 +134,7 @@ export class CallService {
     });
 
     // Check if all non-caller participants declined
-    const otherParticipants = call.participants.filter(p => p.userId !== call.callerId);
+    const otherParticipants = call.participants.filter((p: any) => p.userId !== call.callerId);
     const allDeclined = otherParticipants.every(
       p => p.userId === userId ? true : p.status === 'declined'
     );
@@ -185,7 +185,7 @@ export class CallService {
     });
 
     // Notify all participants
-    call.participants.forEach(p => {
+    call.participants.forEach((p: any) => {
       io.to(`user:${p.userId}`).emit('call:ended', {
         callId,
         endedBy: userId,
