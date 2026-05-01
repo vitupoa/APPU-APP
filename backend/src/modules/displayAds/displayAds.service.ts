@@ -158,7 +158,7 @@ export class DisplayAdCampaignService {
           contains: query,
           mode: 'insensitive',
         },
-        scope: scope || undefined,
+        scope: scope as any,
         isActive: true,
       },
       take: 20,

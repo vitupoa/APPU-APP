@@ -576,6 +576,7 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
     res.status(500).json({ error: e.message });
   }
 });
+});
 
 // ═══════════════════════════════════════════════════════════
 // DATABASE MONITORING (SUPER ADMIN ONLY)

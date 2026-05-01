@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth';
+import { authenticate, AuthRequest } from '../../middleware/auth';
 import rateLimit from 'express-rate-limit';
 import { contentDistributionService } from './services/contentDistribution.service';
 import { feedGenerationService } from './services/feedGeneration.service';
@@ -19,7 +19,7 @@ router.use(authenticate);
 const interactionRateLimiter = rateLimit({ windowMs: 10000, max: 100, standardHeaders: true, legacyHeaders: false }); // 100 requests per 10 seconds
 
 // Generate Discover feed
-router.get('/feed/discover', authenticate, async (req, res) => {
+router.get('/feed/discover', authenticate, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
     const limit = parseInt(req.query.limit as string) || 20;
@@ -34,7 +34,7 @@ router.get('/feed/discover', authenticate, async (req, res) => {
 });
 
 // Generate Admiring feed
-router.get('/feed/admiring', authenticate, async (req, res) => {
+router.get('/feed/admiring', authenticate, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
     const limit = parseInt(req.query.limit as string) || 20;
@@ -48,7 +48,7 @@ router.get('/feed/admiring', authenticate, async (req, res) => {
 });
 
 // Track user interaction (with rate limiting)
-router.post('/interactions/track', authenticate, interactionRateLimiter, async (req, res) => {
+router.post('/interactions/track', authenticate, interactionRateLimiter, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
     const { contentId, contentType, signalType, watchDuration, totalDuration } = req.body;
@@ -84,7 +84,7 @@ router.post('/interactions/track', authenticate, interactionRateLimiter, async (
 });
 
 // Initialize content distribution (called when content is uploaded)
-router.post('/distribution/initialize', authenticate, async (req, res) => {
+router.post('/distribution/initialize', authenticate, async (req: AuthRequest, res) => {
   try {
     const { contentId, contentType, hashtags, location } = req.body;
     const creatorId = req.userId!;

@@ -54,14 +54,12 @@ export class NicheAdTargetingService {
         OR: [
           { endDate: null },
           { endDate: { gte: new Date() } },
+          { targetContentNiches: { hasSome: targetNiches as any[] } },
+          { targetContentNiches: { isEmpty: true } },
         ],
         placements: {
           has: placement as any,
         },
-        OR: [
-          { targetContentNiches: { hasSome: targetNiches as any[] } },
-          { targetContentNiches: { isEmpty: true } },
-        ],
       },
       include: {
         locations: true,

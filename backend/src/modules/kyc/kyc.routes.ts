@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { authenticateToken } from '../../middleware/auth';
+import { authenticateToken, AuthRequest } from '../../middleware/auth';
 import { kycService } from './kyc.service';
 import { withdrawalService } from './withdrawal.service';
 import type { WithdrawalSecurityMetadata } from './withdrawal.types';
 import { DocumentType, WithdrawalStatus } from '../../generated/prisma/client.js';
+import { prisma } from '../../config/database.js';
 
 
 // Helper to safely extract string from query parameter
@@ -16,9 +17,9 @@ const router = Router();
 // ─── USER ENDPOINTS ───────────────────────────────────────
 
 // Submit KYC documents
-router.post('/submit', authenticateToken, async (req, res) => {
+router.post('/submit', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const userId = req.user!.userId as string;
+    const userId = req.userId as string;
     const { documentType, frontImageUrl, backImageUrl, selfieUrl } = req.body;
 
     if (!documentType || !frontImageUrl || !selfieUrl) {
@@ -44,9 +45,9 @@ router.post('/submit', authenticateToken, async (req, res) => {
 });
 
 // Get KYC status
-router.get('/status', authenticateToken, async (req, res) => {
+router.get('/status', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const userId = req.user!.userId as string;
+    const userId = req.userId as string;
     const status = await kycService.getKYCStatus(userId);
     res.json(status);
   } catch (error: any) {
@@ -55,9 +56,9 @@ router.get('/status', authenticateToken, async (req, res) => {
 });
 
 // Request withdrawal
-router.post('/withdrawal/request', authenticateToken, async (req, res) => {
+router.post('/withdrawal/request', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const userId = req.user!.userId as string;
+    const userId = req.userId as string;
     const { 
       amountKr, 
       provider, 
@@ -146,9 +147,9 @@ router.post('/withdrawal/request', authenticateToken, async (req, res) => {
 });
 
 // Get user's withdrawal history
-router.get('/withdrawal/history', authenticateToken, async (req, res) => {
+router.get('/withdrawal/history', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const userId = req.user!.userId;
+    const userId = req.userId;
     const limit = parseInt(req.query.limit as string) || 20;
     const offset = parseInt(req.query.offset as string) || 0;
 
@@ -173,10 +174,19 @@ router.get('/withdrawal/history', authenticateToken, async (req, res) => {
 // ─── ADMIN ENDPOINTS (SUPER_ADMIN & FINANCE_MANAGER) ──────
 
 // Get pending KYC documents
-router.get('/admin/kyc/pending', authenticateToken, async (req, res) => {
+router.get('/admin/kyc/pending', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const adminRole = req.user!.role;
-    if (adminRole !== 'SUPER_ADMIN' && adminRole !== 'FINANCIAL_ADMIN') {
+    if (!req.isAdmin) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const adminProfile = await prisma.adminProfile.findUnique({
+      where: { userId: req.userId },
+      select: { role: true }
+    });
+
+    if (!adminProfile || (adminProfile.role !== 'SUPER_ADMIN' && adminProfile.role !== 'FINANCIAL_ADMIN')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -192,16 +202,25 @@ router.get('/admin/kyc/pending', authenticateToken, async (req, res) => {
 });
 
 // Verify KYC document
-router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req, res) => {
+router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const adminRole = req.user!.role;
-    if (adminRole !== 'SUPER_ADMIN' && adminRole !== 'FINANCIAL_ADMIN') {
+    if (!req.isAdmin) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const adminProfile = await prisma.adminProfile.findUnique({
+      where: { userId: req.userId },
+      select: { role: true }
+    });
+
+    if (!adminProfile || (adminProfile.role !== 'SUPER_ADMIN' && adminProfile.role !== 'FINANCIAL_ADMIN')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
     const documentId = req.params.documentId;
-    const adminId = req.user!.userId as string;
+    const adminId = req.userId as string;
     const { approved, verificationNote, rejectionReason, nameMatches, nameMatchScore } = req.body;
 
     const document = await kycService.verifyKYC(
@@ -224,10 +243,19 @@ router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req, res)
 });
 
 // Get pending withdrawals
-router.get('/admin/withdrawal/pending', authenticateToken, async (req, res) => {
+router.get('/admin/withdrawal/pending', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const adminRole = req.user!.role;
-    if (adminRole !== 'SUPER_ADMIN' && adminRole !== 'FINANCIAL_ADMIN') {
+    if (!req.isAdmin) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const adminProfile = await prisma.adminProfile.findUnique({
+      where: { userId: req.userId },
+      select: { role: true }
+    });
+
+    if (!adminProfile || (adminProfile.role !== 'SUPER_ADMIN' && adminProfile.role !== 'FINANCIAL_ADMIN')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -244,16 +272,25 @@ router.get('/admin/withdrawal/pending', authenticateToken, async (req, res) => {
 });
 
 // Review withdrawal
-router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req, res) => {
+router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const adminRole = req.user!.role;
-    if (adminRole !== 'SUPER_ADMIN' && adminRole !== 'FINANCIAL_ADMIN') {
+    if (!req.isAdmin) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const adminProfile = await prisma.adminProfile.findUnique({
+      where: { userId: req.userId },
+      select: { role: true }
+    });
+
+    if (!adminProfile || (adminProfile.role !== 'SUPER_ADMIN' && adminProfile.role !== 'FINANCIAL_ADMIN')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
     const requestId = req.params.requestId;
-    const adminId = req.user!.userId as string;
+    const adminId = req.userId as string;
     const { approved, reviewNote, flagReason } = req.body;
 
     const withdrawal = await withdrawalService.reviewWithdrawal(
@@ -274,10 +311,19 @@ router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req
 });
 
 // Get suspicious activities
-router.get('/admin/suspicious', authenticateToken, async (req, res) => {
+router.get('/admin/suspicious', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const adminRole = req.user!.role;
-    if (adminRole !== 'SUPER_ADMIN' && adminRole !== 'FINANCIAL_ADMIN') {
+    if (!req.isAdmin) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const adminProfile = await prisma.adminProfile.findUnique({
+      where: { userId: req.userId },
+      select: { role: true }
+    });
+
+    if (!adminProfile || (adminProfile.role !== 'SUPER_ADMIN' && adminProfile.role !== 'FINANCIAL_ADMIN')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -294,16 +340,25 @@ router.get('/admin/suspicious', authenticateToken, async (req, res) => {
 });
 
 // Resolve suspicious activity
-router.post('/admin/suspicious/resolve/:activityId', authenticateToken, async (req, res) => {
+router.post('/admin/suspicious/resolve/:activityId', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const adminRole = req.user!.role;
-    if (adminRole !== 'SUPER_ADMIN' && adminRole !== 'FINANCIAL_ADMIN') {
+    if (!req.isAdmin) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const adminProfile = await prisma.adminProfile.findUnique({
+      where: { userId: req.userId },
+      select: { role: true }
+    });
+
+    if (!adminProfile || (adminProfile.role !== 'SUPER_ADMIN' && adminProfile.role !== 'FINANCIAL_ADMIN')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
     const activityId = req.params.activityId;
-    const adminId = req.user!.userId as string;
+    const adminId = req.userId as string;
     const { resolutionNote } = req.body;
 
     const activity = await withdrawalService.resolveSuspiciousActivity(

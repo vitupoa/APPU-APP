@@ -385,27 +385,34 @@ export class FeedGenerationService {
     `;
 
     for (const { tag } of hashtags) {
-      await prisma.userMicroInterest.upsert({
+      // Check if interest exists
+      const existing = await prisma.userMicroInterest.findFirst({
         where: {
-          userId_category_subcategory: {
-            userId,
-            category: tag,
-            subcategory: null
-          }
-        },
-        create: {
           userId,
-          category: tag,
-          affinity: Math.min(0.1 * weight, 1.0),
-          lastEngagedAt: new Date()
-        },
-        update: {
-          affinity: {
-            increment: Math.min(0.05 * weight, 0.2)
-          },
-          lastEngagedAt: new Date()
+          category: tag
         }
       });
+
+      if (existing) {
+        await prisma.userMicroInterest.update({
+          where: { id: existing.id },
+          data: {
+            affinity: {
+              increment: Math.min(0.05 * weight, 0.2)
+            },
+            lastEngagedAt: new Date()
+          }
+        });
+      } else {
+        await prisma.userMicroInterest.create({
+          data: {
+            userId,
+            category: tag,
+            affinity: Math.min(0.1 * weight, 1.0),
+            lastEngagedAt: new Date()
+          }
+        });
+      }
     }
   }
 }

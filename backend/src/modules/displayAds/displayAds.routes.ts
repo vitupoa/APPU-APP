@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth.js';
+import { authenticate, AuthRequest } from '../../middleware/auth.js';
 import { DisplayAdCampaignService } from './displayAds.service.js';
 
 const router = Router();
 const displayAdService = new DisplayAdCampaignService();
 
-router.post('/campaigns', authenticate, async (req, res) => {
+router.post('/campaigns', authenticate, async (req: AuthRequest, res) => {
   try {
     const brandId = req.userId!;
     const campaign = await displayAdService.createCampaign(brandId, req.body);
@@ -15,7 +15,7 @@ router.post('/campaigns', authenticate, async (req, res) => {
   }
 });
 
-router.get('/campaigns', authenticate, async (req, res) => {
+router.get('/campaigns', authenticate, async (req: AuthRequest, res) => {
   try {
     const brandId = req.userId!;
     const campaigns = await displayAdService.getBrandCampaigns(brandId);
@@ -25,7 +25,7 @@ router.get('/campaigns', authenticate, async (req, res) => {
   }
 });
 
-router.get('/campaigns/:id', authenticate, async (req, res) => {
+router.get('/campaigns/:id', authenticate, async (req: AuthRequest, res) => {
   try {
     const campaign = await displayAdService.getCampaignById(req.params.id as string);
     res.json(campaign);
@@ -36,7 +36,7 @@ router.get('/campaigns/:id', authenticate, async (req, res) => {
   }
 });
 
-router.patch('/campaigns/:id', authenticate, async (req, res) => {
+router.patch('/campaigns/:id', authenticate, async (req: AuthRequest, res) => {
   try {
     const campaign = await displayAdService.updateCampaign(req.params.id as string, req.body);
     res.json(campaign);
@@ -47,7 +47,7 @@ router.patch('/campaigns/:id', authenticate, async (req, res) => {
   }
 });
 
-router.patch('/campaigns/:id/toggle', authenticate, async (req, res) => {
+router.patch('/campaigns/:id/toggle', authenticate, async (req: AuthRequest, res) => {
   try {
     const campaign = await displayAdService.toggleCampaign(req.params.id as string);
     res.json(campaign);
@@ -58,7 +58,7 @@ router.patch('/campaigns/:id/toggle', authenticate, async (req, res) => {
   }
 });
 
-router.get('/campaigns/:id/analytics', authenticate, async (req, res) => {
+router.get('/campaigns/:id/analytics', authenticate, async (req: AuthRequest, res) => {
   try {
     const { startDate, endDate } = req.query;
     const analytics = await displayAdService.getCampaignAnalytics(
@@ -74,7 +74,7 @@ router.get('/campaigns/:id/analytics', authenticate, async (req, res) => {
   }
 });
 
-router.get('/locations/search', authenticate, async (req, res) => {
+router.get('/locations/search', authenticate, async (req: AuthRequest, res) => {
   try {
     const { query, scope } = req.query;
     const locations = await displayAdService.searchLocations(
@@ -89,7 +89,7 @@ router.get('/locations/search', authenticate, async (req, res) => {
   }
 });
 
-router.get('/cpm-ranges', authenticate, async (req, res) => {
+router.get('/cpm-ranges', authenticate, async (req: AuthRequest, res) => {
   try {
     const { locations, placements } = req.query;
     const ranges = await displayAdService.getCpmRanges(
@@ -104,7 +104,7 @@ router.get('/cpm-ranges', authenticate, async (req, res) => {
   }
 });
 
-router.get('/min-budget', authenticate, async (req, res) => {
+router.get('/min-budget', authenticate, async (req: AuthRequest, res) => {
   try {
     const { locations, budgetType } = req.query;
     const minBudget = await displayAdService.getMinimumBudget(
@@ -119,9 +119,9 @@ router.get('/min-budget', authenticate, async (req, res) => {
   }
 });
 
-router.get('/admin/campaigns/pending', authenticate, async (req, res) => {
+router.get('/admin/campaigns/pending', authenticate, async (req: AuthRequest, res) => {
   try {
-    if (!req.user!.isAdmin) {
+    if (!req.isAdmin) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
     const campaigns = await displayAdService.getPendingCampaigns();
@@ -133,9 +133,9 @@ router.get('/admin/campaigns/pending', authenticate, async (req, res) => {
   }
 });
 
-router.patch('/admin/campaigns/:id/approve', authenticate, async (req, res) => {
+router.patch('/admin/campaigns/:id/approve', authenticate, async (req: AuthRequest, res) => {
   try {
-    if (!req.user!.isAdmin) {
+    if (!req.isAdmin) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
     const campaign = await displayAdService.approveCampaign(
@@ -150,9 +150,9 @@ router.patch('/admin/campaigns/:id/approve', authenticate, async (req, res) => {
   }
 });
 
-router.patch('/admin/campaigns/:id/reject', authenticate, async (req, res) => {
+router.patch('/admin/campaigns/:id/reject', authenticate, async (req: AuthRequest, res) => {
   try {
-    if (!req.user!.isAdmin) {
+    if (!req.isAdmin) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
     const { reason } = req.body;
@@ -169,9 +169,9 @@ router.patch('/admin/campaigns/:id/reject', authenticate, async (req, res) => {
   }
 });
 
-router.get('/admin/settings', authenticate, async (req, res) => {
+router.get('/admin/settings', authenticate, async (req: AuthRequest, res) => {
   try {
-    if (!req.user!.isAdmin) {
+    if (!req.isAdmin) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
     const { scope, scopeValue } = req.query;
@@ -187,9 +187,9 @@ router.get('/admin/settings', authenticate, async (req, res) => {
   }
 });
 
-router.post('/admin/settings', authenticate, async (req, res) => {
+router.post('/admin/settings', authenticate, async (req: AuthRequest, res) => {
   try {
-    if (!req.user!.isAdmin) {
+    if (!req.isAdmin) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
     const settings = await displayAdService.updatePlatformSettings(
