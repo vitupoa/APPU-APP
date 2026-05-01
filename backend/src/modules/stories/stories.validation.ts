@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { StoryPrivacy } from '../../generated/prisma/enums.js';
+import { StoryPrivacy } from '../../generated/prisma/client.js';
 
 export const createStorySchema = z.object({
   body: z.object({

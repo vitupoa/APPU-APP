@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { StoryPrivacy } from '../../generated/prisma/enums.js';
+import { StoryPrivacy } from '../../generated/prisma/client.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { WalletService } from '../wallet/wallet.service.js';
 import { Prisma } from '../../generated/prisma/client.js';
