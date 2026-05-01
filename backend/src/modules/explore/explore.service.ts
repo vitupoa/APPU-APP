@@ -15,7 +15,7 @@ export class ExploreService {
         usageCount: true,
         _count: {
           select: {
-            contentHashtags: true
+            contentTags: true
           }
         }
       }
@@ -24,7 +24,7 @@ export class ExploreService {
     return hashtags.map((h: any) => ({
       tag: `#${h.tag}`,
       viewCount: h.usageCount,
-      postCount: h._count.contentHashtags
+      postCount: h._count.contentTags
     }));
   }
 
@@ -53,23 +53,16 @@ export class ExploreService {
         id: true,
         videoUrl: true,
         views: true,
-        creator: {
-          select: {
-            id: true,
-            username: true,
-            avatarUrl: true
-          },
-      include: { user: true }
-        }
+        userId: true
       }
     });
 
     return shorts.map((s: any) => ({
       id: s.id,
-      thumbnailUrl: s.videoUrl, // Use video URL as thumbnail (client can extract frame)
+      thumbnailUrl: s.videoUrl,
       viewCount: s.views,
-      creatorUsername: s.creator.username,
-      creatorAvatar: s.creator.avatarUrl || ''
+      creatorUsername: '',
+      creatorAvatar: ''
     }));
   }
 
@@ -148,7 +141,7 @@ export class ExploreService {
   static async getLiveStreams(limit: number = 20) {
     const streams = await prisma.liveStream.findMany({
       where: {
-        status: 'ACTIVE'
+        status: 'LIVE'
       },
       orderBy: {
         viewerCount: 'desc'
@@ -161,22 +154,15 @@ export class ExploreService {
         viewerCount: true,
         category: true,
         createdAt: true,
-        host: {
-          select: {
-            id: true,
-            username: true,
-            avatarUrl: true
-          },
-      include: { host: true }
-        }
+        hostId: true
       }
     });
 
     return streams.map((s: any) => ({
       id: s.id,
-      creatorId: s.host.id,
-      creatorUsername: s.host.username,
-      creatorAvatar: s.host.avatarUrl,
+      creatorId: s.hostId,
+      creatorUsername: '',
+      creatorAvatar: '',
       thumbnailUrl: s.thumbnailUrl || '',
       viewerCount: s.viewerCount,
       title: s.title,
@@ -222,14 +208,7 @@ export class ExploreService {
               caption: true,
               views: true,
               likesCount: true,
-              creator: {
-                select: {
-                  id: true,
-                  username: true,
-                  avatarUrl: true
-                },
-      include: { user: true }
-              }
+              userId: true
             }
           });
           return short ? {
@@ -239,7 +218,7 @@ export class ExploreService {
             caption: short.caption,
             views: short.views,
             likesCount: short.likesCount,
-            creator: short.creator
+            creator: { id: short.userId, username: '', avatarUrl: '' }
           } : null;
         } else if (item.contentType === 'POST') {
           const post = await prisma.post.findUnique({
@@ -247,27 +226,20 @@ export class ExploreService {
             select: {
               id: true,
               caption: true,
-              mediaUrls: true,
+              imageUrls: true,
               likesCount: true,
               commentsCount: true,
-              creator: {
-                select: {
-                  id: true,
-                  username: true,
-                  avatarUrl: true
-                },
-      include: { user: true }
-              }
+              userId: true
             }
           });
           return post ? {
             type: 'POST',
             id: post.id,
             caption: post.caption,
-            mediaUrls: post.mediaUrls,
+            mediaUrls: post.imageUrls,
             likesCount: post.likesCount,
             commentsCount: post.commentsCount,
-            creator: post.creator
+            creator: { id: post.userId, username: '', avatarUrl: '' }
           } : null;
         }
         return null;

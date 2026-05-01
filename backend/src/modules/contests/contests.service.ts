@@ -207,7 +207,6 @@ export class ContestService {
                 title: true,
                 description: true,
                 coverMediaUrl: true,
-                prizeTotalKr: true,
                 deadline: true,
                 creator: {
                   select: {
@@ -234,8 +233,7 @@ export class ContestService {
             coverMediaUrl: invite.contest.coverMediaUrl,
             creatorUsername: invite.contest.creator.username,
             creatorDisplayName: invite.contest.creator.displayName,
-            deadline: invite.contest.deadline.toISOString(),
-            prizeTotalKr: Number(invite.contest.prizeTotalKr)
+            deadline: invite.contest.deadline.toISOString()
           }
         });
 
@@ -268,7 +266,6 @@ export class ContestService {
             title: true,
             description: true,
             coverMediaUrl: true,
-            prizeTotalKr: true,
             deadline: true,
             creator: {
               select: {
@@ -296,8 +293,7 @@ export class ContestService {
         coverMediaUrl: invite.contest.coverMediaUrl,
         creatorUsername: invite.contest.creator.username,
         creatorDisplayName: invite.contest.creator.displayName,
-        deadline: invite.contest.deadline.toISOString(),
-        prizeTotalKr: Number(invite.contest.prizeTotalKr)
+        deadline: invite.contest.deadline.toISOString()
       }
     }));
   }
@@ -833,7 +829,7 @@ export class ContestService {
             contestId,
             userId: winnerId,
             rank: index + 1,
-            prizeTotalKr: prizeAmount
+            prizeKr: prizeAmount
           }
         });
 

@@ -8,10 +8,17 @@ export const topupInitiateSchema = z.object({
 });
 
 export const withdrawInitiateSchema = z.object({
+  krAmount: z.number().positive('Amount must be positive'),
   fiatAmount: z.number().int('Amount must be a whole number').positive('Amount must be positive'),
   currency: z.string().length(3),
-  provider: z.enum(['mpesa', 'payoneer']),
+  provider: z.enum(['mpesa', 'payoneer', 'paypal', 'paystack']),
   destinationAccount: z.string().min(1, 'Destination account details required'),
+  phoneNumber: z.string().optional(),
+  email: z.string().optional(),
+  accountNumber: z.string().optional(),
+  bankCode: z.string().optional(),
+  accountName: z.string().optional(),
+  country: z.string().optional(),
 });
 
 export const tipSchema = z.object({

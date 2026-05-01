@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../../middleware/auth';
-import { rateLimiter } from '../../middleware/rateLimiter';
+import rateLimit from 'express-rate-limit';
 import { contentDistributionService } from './services/contentDistribution.service';
 import { feedGenerationService } from './services/feedGeneration.service';
 
@@ -16,7 +16,7 @@ const router = Router();
 router.use(authenticate);
 
 // Apply stricter rate limiting for interaction tracking (prevent spam)
-const interactionRateLimiter = rateLimiter({ windowMs: 10000, max: 100 }); // 100 requests per 10 seconds
+const interactionRateLimiter = rateLimit({ windowMs: 10000, max: 100, standardHeaders: true, legacyHeaders: false }); // 100 requests per 10 seconds
 
 // Generate Discover feed
 router.get('/feed/discover', authenticate, async (req, res) => {
@@ -48,24 +48,27 @@ router.get('/feed/admiring', authenticate, async (req, res) => {
 });
 
 // Track user interaction (with rate limiting)
-router.post('/interactions/track', interactionRateLimiter, async (req, res) => {
+router.post('/interactions/track', authenticate, interactionRateLimiter, async (req, res) => {
   try {
     const userId = req.userId!;
     const { contentId, contentType, signalType, watchDuration, totalDuration } = req.body;
 
     // Input validation
     if (!contentId || !contentType || !signalType) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
     }
 
     const validSignalTypes = ['VIEW', 'LIKE', 'SHARE', 'COMMENT', 'REWATCH', 'SKIP', 'NOT_INTERESTED', 'HIDE', 'ADMIRE', 'UNADMIRE'];
     if (!validSignalTypes.includes(signalType)) {
-      return res.status(400).json({ error: 'Invalid signal type' });
+      res.status(400).json({ error: 'Invalid signal type' });
+      return;
     }
 
     const validContentTypes = ['SHORT', 'POST'];
     if (!validContentTypes.includes(contentType)) {
-      return res.status(400).json({ error: 'Invalid content type' });
+      res.status(400).json({ error: 'Invalid content type' });
+      return;
     }
 
     await feedGenerationService.trackInteraction(userId, contentId, contentType, {
@@ -81,19 +84,21 @@ router.post('/interactions/track', interactionRateLimiter, async (req, res) => {
 });
 
 // Initialize content distribution (called when content is uploaded)
-router.post('/distribution/initialize', async (req, res) => {
+router.post('/distribution/initialize', authenticate, async (req, res) => {
   try {
     const { contentId, contentType, hashtags, location } = req.body;
     const creatorId = req.userId!;
 
     // Input validation
     if (!contentId || !contentType) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
     }
 
     const validContentTypes = ['SHORT', 'POST'];
     if (!validContentTypes.includes(contentType)) {
-      return res.status(400).json({ error: 'Invalid content type' });
+      res.status(400).json({ error: 'Invalid content type' });
+      return;
     }
 
     const result = await contentDistributionService.initializeDistribution(

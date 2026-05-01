@@ -491,8 +491,7 @@ router.post('/mpesa/b2c/result', async (req: Request, res: Response) => {
       await prisma.withdrawalRequest.update({
         where: { id: withdrawal.id },
         data: {
-          status: resultCode === 0 ? 'COMPLETED' : 'FAILED',
-          reference
+          status: resultCode === 0 ? 'COMPLETED' : 'FAILED'
         }
       });
 
