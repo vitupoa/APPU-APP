@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { authenticate, AuthRequest } from '../../middleware/auth';
+import { authenticate, AuthRequest } from '../../middleware/auth.js';
 import rateLimit from 'express-rate-limit';
-import { contentDistributionService } from './services/contentDistribution.service';
-import { feedGenerationService } from './services/feedGeneration.service';
+import { contentDistributionService } from './services/contentDistribution.service.js';
+import { feedGenerationService } from './services/feedGeneration.service.js';
 
 
 // Helper to safely extract string from query parameter

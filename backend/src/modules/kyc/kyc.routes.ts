@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { authenticateToken, AuthRequest } from '../../middleware/auth';
-import { kycService } from './kyc.service';
-import { withdrawalService } from './withdrawal.service';
-import type { WithdrawalSecurityMetadata } from './withdrawal.types';
+import { authenticateToken, AuthRequest } from '../../middleware/auth.js';
+import { kycService } from './kyc.service.js';
+import { withdrawalService } from './withdrawal.service.js';
+import type { WithdrawalSecurityMetadata } from './withdrawal.types.js';
 import { DocumentType, WithdrawalStatus } from '../../generated/prisma/client.js';
 import { prisma } from '../../config/database.js';
 
