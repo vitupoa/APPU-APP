@@ -51,7 +51,8 @@ class ChatRoomViewModel(
                     val parts = token.split(".")
                     if (parts.size == 3) {
                         val payload = parts[1]
-                        val decodedJson = payload.decodeBase64()?.decodeToString() ?: ""
+                        // Simple base64 decode - just extract userId from JWT payload
+                        val decodedJson = String(java.util.Base64.getUrlDecoder().decode(payload))
                         val userId = decodedJson.substringAfter("\"userId\":\"").substringBefore("\"")
                         _state.value = _state.value.copy(currentUserId = userId)
                     }

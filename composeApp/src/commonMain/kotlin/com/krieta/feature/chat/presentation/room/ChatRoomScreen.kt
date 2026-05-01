@@ -55,7 +55,8 @@ class ChatRoomScreen(private val chatId: String, private val chatTitle: String) 
             bottomBar = {
                 Column {
                     // Reply bar
-                    if (state.replyingTo != null) {
+                    val replyingToMessage = state.replyingTo
+                    if (replyingToMessage != null) {
                         Surface(
                             color = MaterialTheme.colorScheme.surfaceVariant,
                             tonalElevation = 1.dp
@@ -72,12 +73,12 @@ class ChatRoomScreen(private val chatId: String, private val chatTitle: String) 
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Replying to ${state.replyingTo.sender?.displayName ?: "Unknown"}",
+                                        text = "Replying to ${replyingToMessage.sender?.displayName ?: "Unknown"}",
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(
-                                        text = state.replyingTo.payload,
+                                        text = replyingToMessage.payload,
                                         fontSize = 11.sp,
                                         maxLines = 1,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
