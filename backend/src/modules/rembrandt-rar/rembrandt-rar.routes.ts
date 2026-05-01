@@ -482,19 +482,21 @@ router.get('/team', requireSuperAdmin as any, async (_req: RarRequest, res: Resp
   catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
+router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: Response): Promise<void> => {
   try {
     const { email, username, firstName, lastName, password, role } = req.body;
 
     // Validate required fields
     if (!email || !username || !firstName || !lastName || !password || !role) {
-      return res.status(400).json({ error: 'All fields are required' });
+      res.status(400).json({ error: 'All fields are required' });
+      return;
     }
 
     // Validate role
     const validRoles = ['SUPER_ADMIN', 'MODERATOR', 'FINANCE_MANAGER', 'SUPPORT_AGENT'];
     if (!validRoles.includes(role)) {
-      return res.status(400).json({ error: 'Invalid role' });
+      res.status(400).json({ error: 'Invalid role' });
+      return;
     }
 
     // Check if user already exists
@@ -508,7 +510,8 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
     });
 
     if (existingUser) {
-      return res.status(400).json({ error: 'User with this email or username already exists' });
+      res.status(400).json({ error: 'User with this email or username already exists' });
+      return;
     }
 
     // Hash password
