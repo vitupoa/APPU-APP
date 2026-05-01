@@ -1,7 +1,4 @@
-generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-}
+generator client {`n  provider = "prisma-client-js"`n  output   = "../src/generated/prisma"`n}
 
 datasource db {
   provider = "postgresql"
@@ -4285,3 +4282,4 @@ model ContentNicheTag {
   @@index([contentType, niche])
   @@map("content_niche_tags")
 }
+
