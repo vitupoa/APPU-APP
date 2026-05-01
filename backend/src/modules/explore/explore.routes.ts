@@ -69,16 +69,18 @@ router.get('/live', optionalAuth, async (req: AuthRequest, res: Response) => {
 // GET /api/v1/explore/hashtag/:tag
 router.get('/hashtag/:tag', optionalAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const tag = req.params.tag;
+    const tag = req.params.tag as string;
     const contentType = req.query.contentType as string | undefined;
     const limitQuery = req.query.limit;
     const limit = limitQuery ? parseInt(Array.isArray(limitQuery) ? limitQuery[0] : limitQuery) : 20;
     const cursorQuery = req.query.cursor;
-    const cursor = cursorQuery ? (Array.isArray(cursorQuery) ? cursorQuery[0] : cursorQuery) : undefined;
-    const content = await ExploreService.getHashtagContent(tag, contentType, limit, cursor);
+    const cursor = cursorQuery ? (typeof cursorQuery === 'string' ? cursorQuery : (Array.isArray(cursorQuery) ? String(cursorQuery[0]) : String(cursorQuery))) : undefined;
+    const content = await ExploreService.getHashtagContent(tag as string, contentType, limit, cursor);
     res.status(200).json(content);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 

@@ -1,6 +1,4 @@
-import { PrismaClient } from '../../generated/prisma/client.js';
-
-const prisma = new PrismaClient();
+import { prisma } from '../config/database.js';
 
 // Nonce expiry time (5 minutes)
 const NONCE_EXPIRY_MS = 5 * 60 * 1000;

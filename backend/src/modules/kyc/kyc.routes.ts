@@ -36,6 +36,8 @@ router.post('/submit', authenticateToken, async (req, res) => {
       message: 'KYC documents submitted successfully',
       document: kycDocument
     });
+
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -116,6 +118,8 @@ router.post('/withdrawal/request', authenticateToken, async (req, res) => {
       message: 'Withdrawal request submitted',
       withdrawal
     });
+
+    return;
   } catch (error: any) {
     if (error.message.startsWith('KYC_REQUIRED') || error.message.startsWith('KYC_PENDING')) {
       return res.status(403).json({ 
@@ -159,6 +163,8 @@ router.get('/withdrawal/history', authenticateToken, async (req, res) => {
       withdrawals: userWithdrawals,
       total: userWithdrawals.length
     });
+
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -192,7 +198,7 @@ router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req, res)
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
-    const { documentId } = req.params;
+    const documentId = req.params.documentId as string;
     const adminId = req.user!.userId;
     const { approved, verificationNote, rejectionReason, nameMatches, nameMatchScore } = req.body;
 
@@ -210,6 +216,8 @@ router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req, res)
       message: approved ? 'KYC approved' : 'KYC rejected',
       document
     });
+
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -242,7 +250,7 @@ router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
-    const { requestId } = req.params;
+    const requestId = req.params.requestId as string;
     const adminId = req.user!.userId;
     const { approved, reviewNote, flagReason } = req.body;
 
@@ -258,6 +266,8 @@ router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req
       message: approved ? 'Withdrawal approved' : 'Withdrawal rejected',
       withdrawal
     });
+
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -290,7 +300,7 @@ router.post('/admin/suspicious/resolve/:activityId', authenticateToken, async (r
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
-    const { activityId } = req.params;
+    const activityId = req.params.activityId as string;
     const adminId = req.user!.userId;
     const { resolutionNote } = req.body;
 
@@ -304,6 +314,8 @@ router.post('/admin/suspicious/resolve/:activityId', authenticateToken, async (r
       message: 'Suspicious activity resolved',
       activity
     });
+
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth.js';
+import { getQueryString } from '../../utils/queryParams.js';
 import { UserService } from './user.service.js';
 import { SubscriptionService } from './subscription.service.js';
 import { z } from 'zod';
@@ -159,7 +160,7 @@ router.get('/:id/lovers', async (req: AuthRequest, res: Response) => {
 // GET /api/v1/users/search/creators
 router.get('/search/creators', async (req: AuthRequest, res: Response) => {
   try {
-    const minAdmirers = req.query.minAdmirers ? parseInt(String(Array.isArray(Array.isArray(req.query.minAdmirers) ? req.query.minAdmirers[0] : req.query.minAdmirers) ? req.query.minAdmirers[0] : req.query.minAdmirers || '')) : undefined;
+    const minAdmirers = req.query.minAdmirers ? parseInt(getQueryString(req.query.minAdmirers) || '') : undefined;
     const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
     const result = await UserService.searchCreatorsByAdmireCount(minAdmirers, cursor);
     res.status(200).json(result);

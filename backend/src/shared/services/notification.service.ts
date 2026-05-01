@@ -245,8 +245,8 @@ export class NotificationService {
           ${userId},
           'CONTEST_WINNER',
           'Congratulations! 🎉',
-          ${`You won ${rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} place in "${contest.title}" and earned Kr.${prizeKr}!`},
-          ${JSON.stringify({ contestId, rank, prizeKr })}::jsonb,
+          ${`You won ${rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} place in "${contest.title}" and earned Kr.${prizeTotalKr}!`},
+          ${JSON.stringify({ contestId, rank, prizeKr: prizeTotalKr })}::jsonb,
           false,
           NOW()
         )
@@ -256,7 +256,7 @@ export class NotificationService {
       if (user.fcmToken) {
         await this.sendPushNotification(user.fcmToken, {
           title: 'You Won! 🎉',
-          body: `Congratulations! You won Kr.${prizeKr} in "${contest.title}"`,
+          body: `Congratulations! You won Kr.${prizeTotalKr} in "${contest.title}"`,
           data: { type: 'CONTEST_WINNER', contestId, rank: rank.toString() }
         });
       }

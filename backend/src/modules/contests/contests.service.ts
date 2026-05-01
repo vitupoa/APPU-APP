@@ -89,7 +89,7 @@ export class ContestService {
           entryFeeKr: data.entryFeeKr ? new Prisma.Decimal(data.entryFeeKr) : null,
           publicVoteWeight: data.publicVoteWeight,
           allowDailyPrizes: data.allowDailyPrizes ?? false,
-          dailyprizeTotalKr: data.dailyPrizeKr ? new Prisma.Decimal(data.dailyPrizeKr) : null,
+          dailyPrizeKr: data.dailyPrizeKr ? new Prisma.Decimal(data.dailyPrizeKr) : null,
           targetAges: data.targetAges,
           targetGeos: data.targetGeos,
           airdropKr: data.airdropKr ? new Prisma.Decimal(data.airdropKr) : null,
@@ -213,8 +213,7 @@ export class ContestService {
                   select: {
                     username: true,
                     displayName: true
-                  },
-      include: { user: true }
+                  }
                 }
               }
             }
@@ -275,8 +274,7 @@ export class ContestService {
               select: {
                 username: true,
                 displayName: true
-              },
-      include: { user: true }
+                  }
             }
           }
         }
@@ -763,7 +761,9 @@ export class ContestService {
       await tx.contestVote.create({
         data: {
           voterId: userId,
-          submissionId
+          submissionId,
+          ipAddress: '',
+          fingerprint: ''
         }
       });
 

@@ -27,28 +27,34 @@ router.get('/campaigns', authenticate, async (req, res) => {
 
 router.get('/campaigns/:id', authenticate, async (req, res) => {
   try {
-    const campaign = await displayAdService.getCampaignById(req.params.id);
+    const campaign = await displayAdService.getCampaignById(req.params.id as string);
     res.json(campaign);
+    return;
   } catch (error: any) {
     res.status(404).json({ error: error.message });
+    return;
   }
 });
 
 router.patch('/campaigns/:id', authenticate, async (req, res) => {
   try {
-    const campaign = await displayAdService.updateCampaign(req.params.id, req.body);
+    const campaign = await displayAdService.updateCampaign(req.params.id as string, req.body);
     res.json(campaign);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
+    return;
   }
 });
 
 router.patch('/campaigns/:id/toggle', authenticate, async (req, res) => {
   try {
-    const campaign = await displayAdService.toggleCampaign(req.params.id);
+    const campaign = await displayAdService.toggleCampaign(req.params.id as string);
     res.json(campaign);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
+    return;
   }
 });
 
@@ -56,13 +62,15 @@ router.get('/campaigns/:id/analytics', authenticate, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     const analytics = await displayAdService.getCampaignAnalytics(
-      req.params.id,
+      req.params.id as string,
       startDate as string,
       endDate as string
     );
     res.json(analytics);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -74,8 +82,10 @@ router.get('/locations/search', authenticate, async (req, res) => {
       scope as string
     );
     res.json(locations);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -87,8 +97,10 @@ router.get('/cpm-ranges', authenticate, async (req, res) => {
       JSON.parse(placements as string)
     );
     res.json(ranges);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -100,8 +112,10 @@ router.get('/min-budget', authenticate, async (req, res) => {
       budgetType as string
     );
     res.json(minBudget);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -112,8 +126,10 @@ router.get('/admin/campaigns/pending', authenticate, async (req, res) => {
     }
     const campaigns = await displayAdService.getPendingCampaigns();
     res.json(campaigns);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -123,12 +139,14 @@ router.patch('/admin/campaigns/:id/approve', authenticate, async (req, res) => {
       return res.status(403).json({ error: 'Unauthorized' });
     }
     const campaign = await displayAdService.approveCampaign(
-      req.params.id,
+      req.params.id as string,
       req.userId!
     );
     res.json(campaign);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
+    return;
   }
 });
 
@@ -139,13 +157,15 @@ router.patch('/admin/campaigns/:id/reject', authenticate, async (req, res) => {
     }
     const { reason } = req.body;
     const campaign = await displayAdService.rejectCampaign(
-      req.params.id,
+      req.params.id as string,
       req.userId!,
       reason
     );
     res.json(campaign);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
+    return;
   }
 });
 
@@ -160,8 +180,10 @@ router.get('/admin/settings', authenticate, async (req, res) => {
       scopeValue as string
     );
     res.json(settings);
+    return;
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+    return;
   }
 });
 
@@ -175,8 +197,10 @@ router.post('/admin/settings', authenticate, async (req, res) => {
       req.userId!
     );
     res.json(settings);
+    return;
   } catch (error: any) {
     res.status(400).json({ error: error.message });
+    return;
   }
 });
 

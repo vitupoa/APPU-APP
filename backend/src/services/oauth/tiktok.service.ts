@@ -11,12 +11,12 @@ export class TikTokService {
    */
   static getAuthorizationUrl(redirectUri: string, state: string): string {
     const params = new URLSearchParams({
-      client_key: env.TIKTOK_CLIENT_KEY,
+      client_key: env.TIKTOK_CLIENT_KEY || '',
       scope: 'user.info.basic,video.list,user.info.stats',
       response_type: 'code',
       redirect_uri: redirectUri,
-      state
-    });
+      state: state
+    } as Record<string, string>);
 
     return `${TIKTOK_AUTH_URL}?${params.toString()}`;
   }
@@ -31,8 +31,8 @@ export class TikTokService {
     openId: string;
   }> {
     const response = await axios.post(TIKTOK_TOKEN_URL, {
-      client_key: env.TIKTOK_CLIENT_KEY,
-      client_secret: env.TIKTOK_CLIENT_SECRET,
+      client_key: env.TIKTOK_CLIENT_KEY || '',
+      client_secret: env.TIKTOK_CLIENT_SECRET || '',
       code,
       grant_type: 'authorization_code',
       redirect_uri: redirectUri
@@ -58,8 +58,8 @@ export class TikTokService {
     expiresIn: number;
   }> {
     const response = await axios.post(TIKTOK_TOKEN_URL, {
-      client_key: env.TIKTOK_CLIENT_KEY,
-      client_secret: env.TIKTOK_CLIENT_SECRET,
+      client_key: env.TIKTOK_CLIENT_KEY || '',
+      client_secret: env.TIKTOK_CLIENT_SECRET || '',
       grant_type: 'refresh_token',
       refresh_token: refreshToken
     }, {

@@ -73,7 +73,7 @@ export function initializeDatabaseMonitorSocket(httpServer: HTTPServer) {
       
       next();
     } catch (error) {
-      logger.error('Socket authentication failed:', error);
+      logger.error('Socket authentication failed:', error as any);
       next(new Error('Authentication failed'));
     }
   });
@@ -121,7 +121,7 @@ export function initializeDatabaseMonitorSocket(httpServer: HTTPServer) {
         ]);
         socket.emit('database-metrics', { stats, performance });
       } catch (error) {
-        logger.error('Error fetching metrics on demand:', error);
+        logger.error('Error fetching metrics on demand:', error as any);
         socket.emit('error', { message: 'Failed to fetch metrics' });
       }
     });
@@ -160,13 +160,13 @@ function startMonitoring(io: Server) {
       // Check for alerts
       checkAndSendAlerts(stats, performance);
     } catch (error) {
-      logger.error('Error in monitoring interval:', error);
+      logger.error('Error in monitoring interval:', error as any);
     }
   }, 10000); // 10 seconds
 }
 
 async function fetchDatabaseStats(): Promise<DatabaseStats> {
-  const [connections, slowQueries, indexUsage, tableStats] = await Promise.all([
+  const [connections, slowQueries, indexUsage, tableStats] = (await Promise.all([
     prisma.$queryRaw`SELECT count(*) as connections, state FROM pg_stat_activity GROUP BY state`,
     prisma.$queryRaw`
       SELECT query, calls, total_time, mean_time, max_time 
@@ -192,13 +192,13 @@ async function fetchDatabaseStats(): Promise<DatabaseStats> {
       ORDER BY n_live_tup DESC 
       LIMIT 20
     `,
-  ]);
+  ]) as any);
 
   return { connections, slowQueries, indexUsage, tableStats };
 }
 
 async function fetchPerformanceMetrics(): Promise<PerformanceMetrics> {
-  const [cacheHitRatio, indexHitRatio, locks] = await Promise.all([
+  const [cacheHitRatio, indexHitRatio, locks] = (await Promise.all([
     prisma.$queryRaw`
       SELECT sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read), 0) as cache_hit_ratio 
       FROM pg_statio_user_tables
@@ -213,7 +213,7 @@ async function fetchPerformanceMetrics(): Promise<PerformanceMetrics> {
       GROUP BY locktype, mode 
       ORDER BY count DESC
     `,
-  ]);
+  ]) as any);
 
   return { cacheHitRatio, indexHitRatio, locks };
 }

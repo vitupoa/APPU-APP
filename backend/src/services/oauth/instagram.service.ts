@@ -11,12 +11,12 @@ export class InstagramService {
    */
   static getAuthorizationUrl(redirectUri: string, state: string): string {
     const params = new URLSearchParams({
-      client_id: env.INSTAGRAM_CLIENT_ID,
+      client_id: env.INSTAGRAM_CLIENT_ID || '',
       redirect_uri: redirectUri,
       scope: 'user_profile,user_media',
       response_type: 'code',
-      state
-    });
+      state: state
+    } as Record<string, string>);
 
     return `${INSTAGRAM_AUTH_URL}?${params.toString()}`;
   }
@@ -29,12 +29,12 @@ export class InstagramService {
     userId: string;
   }> {
     const formData = new URLSearchParams({
-      client_id: env.INSTAGRAM_CLIENT_ID,
-      client_secret: env.INSTAGRAM_CLIENT_SECRET,
+      client_id: env.INSTAGRAM_CLIENT_ID || '',
+      client_secret: env.INSTAGRAM_CLIENT_SECRET || '',
       grant_type: 'authorization_code',
       redirect_uri: redirectUri,
-      code
-    });
+      code: code
+    } as Record<string, string>);
 
     const response = await axios.post(INSTAGRAM_TOKEN_URL, formData, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -56,7 +56,7 @@ export class InstagramService {
     const response = await axios.get(`${INSTAGRAM_GRAPH_URL}/access_token`, {
       params: {
         grant_type: 'ig_exchange_token',
-        client_secret: env.INSTAGRAM_CLIENT_SECRET,
+        client_secret: env.INSTAGRAM_CLIENT_SECRET || '',
         access_token: shortLivedToken
       }
     });

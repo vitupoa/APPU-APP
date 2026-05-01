@@ -14,7 +14,7 @@ export function startWithdrawalLimitResetWorker() {
       
       logger.info('Daily withdrawal limits reset successfully');
     } catch (error) {
-      logger.error('Error resetting daily withdrawal limits:', error);
+      logger.error('Error resetting daily withdrawal limits:', error as any);
     }
   });
 

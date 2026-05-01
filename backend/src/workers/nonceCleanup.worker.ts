@@ -14,7 +14,7 @@ export function startNonceCleanupWorker() {
       
       logger.info(`Nonce cleanup complete. Deleted ${deletedCount} expired nonces`);
     } catch (error) {
-      logger.error('Error cleaning up nonces:', error);
+      logger.error('Error cleaning up nonces:', error as any);
     }
   });
 

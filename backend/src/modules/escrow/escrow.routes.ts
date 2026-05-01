@@ -142,7 +142,7 @@ router.get(
   adminAuth,
   async (req: AuthRequest, res: Response) => {
     try {
-      const approvalId = req.params.approvalId;
+      const approvalId = req.params.approvalId as string;
       
       const approval = await EscrowApprovalManager.getApprovalRequest(approvalId);
 
@@ -155,8 +155,10 @@ router.get(
         success: true,
         approval
       });
+      return;
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+      return;
     }
   }
 );
@@ -173,7 +175,7 @@ router.post(
   csrfProtection,
   async (req: AuthRequest, res: Response) => {
     try {
-      const approvalId = req.params.approvalId;
+      const approvalId = req.params.approvalId as string;
       const data = submitApprovalSchema.parse(req.body);
 
       // Verify super admin

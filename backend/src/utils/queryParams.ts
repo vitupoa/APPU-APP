@@ -36,7 +36,9 @@ export function getQueryBoolean(value: string | string[] | ParsedQs | (string | 
  * Safely extract an array of strings from Express query parameters
  */
 export function getQueryArray(value: string | string[] | ParsedQs | (string | ParsedQs)[] | undefined): string[] {
-  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === 'string');
+  if (Array.isArray(value)) {
+    return value.filter((v): v is string => typeof v === 'string') as string[];
+  }
   if (typeof value === 'string') return [value];
   return [];
 }

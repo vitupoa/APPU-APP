@@ -11,14 +11,14 @@ export class YouTubeService {
    */
   static getAuthorizationUrl(redirectUri: string, state: string): string {
     const params = new URLSearchParams({
-      client_id: env.YOUTUBE_CLIENT_ID,
+      client_id: env.YOUTUBE_CLIENT_ID || '',
       redirect_uri: redirectUri,
       response_type: 'code',
       scope: 'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.force-ssl',
       access_type: 'offline',
       prompt: 'consent',
-      state
-    });
+      state: state
+    } as Record<string, string>);
 
     return `${YOUTUBE_AUTH_URL}?${params.toString()}`;
   }
@@ -33,8 +33,8 @@ export class YouTubeService {
   }> {
     const response = await axios.post(YOUTUBE_TOKEN_URL, {
       code,
-      client_id: env.YOUTUBE_CLIENT_ID,
-      client_secret: env.YOUTUBE_CLIENT_SECRET,
+      client_id: env.YOUTUBE_CLIENT_ID || '',
+      client_secret: env.YOUTUBE_CLIENT_SECRET || '',
       redirect_uri: redirectUri,
       grant_type: 'authorization_code'
     }, {
@@ -57,8 +57,8 @@ export class YouTubeService {
   }> {
     const response = await axios.post(YOUTUBE_TOKEN_URL, {
       refresh_token: refreshToken,
-      client_id: env.YOUTUBE_CLIENT_ID,
-      client_secret: env.YOUTUBE_CLIENT_SECRET,
+      client_id: env.YOUTUBE_CLIENT_ID || '',
+      client_secret: env.YOUTUBE_CLIENT_SECRET || '',
       grant_type: 'refresh_token'
     }, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }

@@ -179,7 +179,7 @@ export class ShortsService {
     }
 
     // Initialize content distribution (fire-and-forget)
-    const hashtags = short.caption ? extractHashtags(short.caption) : [];
+    const hashtags = short.caption ? ShortsService.extractHashtags(short.caption) : [];
     contentDistributionService.initializeDistribution(
       short.id,
       'SHORT',

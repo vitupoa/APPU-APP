@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { prisma } from '../config/database.js';
-import { verifyToken } from '../modules/auth/auth.service.js';
+import { prisma } from '../../config/database.js';
+import { verifyAccessToken as verifyToken } from '../../utils/jwt.js';
 
 export function initializeLiveSocket(httpServer: HttpServer) {
   const io = new Server(httpServer, {
@@ -22,7 +22,9 @@ export function initializeLiveSocket(httpServer: HttpServer) {
 
       const decoded = verifyToken(token);
       socket.data.userId = decoded.userId;
-      socket.data.username = decoded.username;
+      // Fetch username from database
+      const user = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { username: true } });
+      socket.data.username = user?.username || 'unknown';
       next();
     } catch (error) {
       next(new Error('Authentication error'));
