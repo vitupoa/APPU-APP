@@ -54,7 +54,8 @@ export class WebhookController {
         }
 
         // SECURITY: Verify amount matches
-        const amountMatch = Math.abs(amount - transaction.amountFiat) < 0.01;
+        const transactionAmount = typeof transaction.amountFiat === 'number' ? transaction.amountFiat : 0;
+        const amountMatch = Math.abs(amount - transactionAmount) < 0.01;
         if (!amountMatch) {
           console.error(`PayPal amount mismatch: Expected ${transaction.amountFiat}, got ${amount}`);
           await prisma.transaction.update({
@@ -192,7 +193,8 @@ export class WebhookController {
         }
 
         // SECURITY: Verify amount matches
-        const amountMatch = Math.abs(amount - transaction.amountFiat) < 0.01;
+        const transactionAmount2 = typeof transaction.amountFiat === 'number' ? transaction.amountFiat : 0;
+        const amountMatch = Math.abs(amount - transactionAmount2) < 0.01;
         if (!amountMatch) {
           console.error(`Paystack amount mismatch: Expected ${transaction.amountFiat}, got ${amount}`);
           await prisma.transaction.update({
@@ -317,8 +319,8 @@ export class WebhookController {
 
         if (transaction) {
           // SECURITY: Verify amount from PayPal response
-          const paidAmount = parseFloat(captureResult.amount.value);
-          const paidCurrency = captureResult.amount.currencyCode;
+          const paidAmount = parseFloat(captureResult.amount?.value ?? '0');
+          const paidCurrency = captureResult.amount?.currencyCode ?? '';
 
           await WalletService.confirmTopup(
             transaction.userId, 
@@ -433,7 +435,8 @@ export class WebhookController {
       if (callbackData.success) {
         // SECURITY: Verify amount matches (M-Pesa returns amount in callback)
         if (callbackData.amount) {
-          const amountMatch = Math.abs(callbackData.amount - transaction.amountFiat) < 0.01;
+          const transactionAmount3 = typeof transaction.amountFiat === 'number' ? transaction.amountFiat : 0;
+          const amountMatch = Math.abs(callbackData.amount - transactionAmount3) < 0.01;
           if (!amountMatch) {
             console.error(`M-Pesa amount mismatch: Expected ${transaction.amountFiat}, got ${callbackData.amount}`);
             await prisma.transaction.update({
@@ -459,8 +462,8 @@ export class WebhookController {
           data: {
             metadata: {
               ...(transaction.metadata as any),
-              mpesaReceiptNumber: callbackData.mpesaReceiptNumber,
-              phoneNumber: callbackData.phoneNumber,
+              mpesaReceiptNumber: callbackData.mpesaReceiptNumber ?? undefined,
+              phoneNumber: callbackData.phoneNumber ?? undefined,
               verifiedAmount: callbackData.amount
             }
           }
@@ -470,7 +473,7 @@ export class WebhookController {
         await WalletService.confirmTopup(
           transaction.userId,
           transaction.id,
-          callbackData.mpesaReceiptNumber,
+          callbackData.mpesaReceiptNumber ?? undefined,
           callbackData.amount,
           transaction.currency
         );

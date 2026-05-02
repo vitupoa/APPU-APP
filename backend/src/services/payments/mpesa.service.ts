@@ -111,8 +111,8 @@ export class MpesaService {
     success: boolean;
     checkoutRequestId: string;
     amount?: number;
-    mpesaReceiptNumber?: string;
-    phoneNumber?: string;
+    mpesaReceiptNumber?: string | null;
+    phoneNumber?: string | null;
   } {
     const stkCallback = body?.Body?.stkCallback;
     if (!stkCallback) {

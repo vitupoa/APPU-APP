@@ -484,7 +484,8 @@ export class WalletService {
 
     // SECURITY: If verified amount provided, ensure it matches transaction amount
     if (verifiedAmount !== undefined) {
-      const amountMatch = Math.abs(verifiedAmount - transaction.amountFiat) < 0.01;
+      const transactionAmount = typeof transaction.amountFiat === 'number' ? transaction.amountFiat : 0;
+      const amountMatch = Math.abs(verifiedAmount - transactionAmount) < 0.01;
       if (!amountMatch) {
         console.error(`Amount mismatch: Expected ${transaction.amountFiat}, got ${verifiedAmount}`);
         await prisma.transaction.update({
