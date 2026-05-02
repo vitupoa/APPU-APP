@@ -9,14 +9,15 @@ export class WebhookController {
   /**
    * PayPal webhook handler
    */
-  static async handlePayPalWebhook(req: Request, res: Response) {
+  static async handlePayPalWebhook(req: Request, res: Response): Promise<void> {
     try {
       // Verify webhook signature
       const isValid = await PayPalService.verifyWebhook(req.headers, req.body);
       
       if (!isValid) {
         console.error('Invalid PayPal webhook signature');
-        return res.status(401).json({ error: 'Invalid signature' });
+        res.status(401).json({ error: 'Invalid signature' });
+        return;
       }
 
       const event = req.body;
@@ -55,7 +56,7 @@ export class WebhookController {
   /**
    * Paystack webhook handler
    */
-  static async handlePaystackWebhook(req: Request, res: Response) {
+  static async handlePaystackWebhook(req: Request, res: Response): Promise<void> {
     try {
       // Verify webhook signature
       const signature = req.headers['x-paystack-signature'] as string;
@@ -65,7 +66,8 @@ export class WebhookController {
       
       if (!isValid) {
         console.error('Invalid Paystack webhook signature');
-        return res.status(401).json({ error: 'Invalid signature' });
+        res.status(401).json({ error: 'Invalid signature' });
+        return;
       }
 
       const event = req.body;
@@ -116,12 +118,13 @@ export class WebhookController {
   /**
    * PayPal success redirect handler
    */
-  static async handlePayPalSuccess(req: Request, res: Response) {
+  static async handlePayPalSuccess(req: Request, res: Response): Promise<void> {
     try {
       const { token } = req.query; // PayPal order ID
       
       if (!token) {
-        return res.status(400).send('Missing order ID');
+        res.status(400).send('Missing order ID');
+        return;
       }
 
       // Capture the payment
@@ -157,19 +160,20 @@ export class WebhookController {
   /**
    * PayPal cancel redirect handler
    */
-  static async handlePayPalCancel(req: Request, res: Response) {
+  static async handlePayPalCancel(req: Request, res: Response): Promise<void> {
     res.redirect(`krieta://topup/cancelled`);
   }
 
   /**
    * Paystack callback handler
    */
-  static async handlePaystackCallback(req: Request, res: Response) {
+  static async handlePaystackCallback(req: Request, res: Response): Promise<void> {
     try {
       const { reference } = req.query;
       
       if (!reference) {
-        return res.status(400).send('Missing reference');
+        res.status(400).send('Missing reference');
+        return;
       }
 
       // Verify the transaction

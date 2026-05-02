@@ -106,12 +106,13 @@ export class WalletController {
     }
   }
 
-  static async confirmTopup(req: AuthRequest, res: Response) {
+  static async confirmTopup(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { transactionId, reference } = req.body;
       
       if (!transactionId) {
-        return res.status(400).json({ error: 'Transaction ID required' });
+        res.status(400).json({ error: 'Transaction ID required' });
+        return;
       }
       
       const result = await WalletService.confirmTopup(req.userId!, transactionId, reference);

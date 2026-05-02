@@ -13,7 +13,7 @@ import com.krieta.com.core.theme.KrietaColors
 
 /**
  * Displays a Kr amount with fiat equivalent below.
- * Format: Kr.500 (~KES 850) — always dot between symbol and amount, no space.
+ * Format: Kr. 500 (~KES 850) — always dot space between symbol and amount.
  *
  * @param krAmount The amount in Kr
  * @param fiatAmount The equivalent in user's local fiat currency

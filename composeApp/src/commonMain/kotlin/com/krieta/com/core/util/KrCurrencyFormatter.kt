@@ -4,20 +4,20 @@ import kotlin.math.roundToInt
 
 object KrCurrencyFormatter {
     /**
-     * Formats a Kr amount: Kr.500, Kr.0.50, Kr.1
-     * Always: symbol DOT amount, no space
+     * Formats a Kr amount: Kr. 500, Kr. 0.50, Kr. 1
+     * Always: symbol DOT SPACE amount
      */
     fun formatKr(amount: Double): String {
         return if (amount == amount.toLong().toDouble()) {
-            "Kr.${amount.toLong()}"
+            "Kr. ${amount.toLong()}"
         } else {
             val rounded = (amount * 100).roundToInt() / 100.0
-            "Kr.${rounded.toString().trimEnd('0').trimEnd('.')}"
+            "Kr. ${rounded.toString().trimEnd('0').trimEnd('.')}"
         }
     }
 
     /**
-     * Formats Kr with fiat equivalent: Kr.500 (~KES 850)
+     * Formats Kr with fiat equivalent: Kr. 500 (~KES 850)
      */
     fun formatKrWithFiat(
         krAmount: Double,
