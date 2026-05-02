@@ -11,9 +11,7 @@ export interface JwtPayload {
 }
 
 export const generateAccessToken = (payload: JwtPayload): string => {
-  // Use environment variable or default to 30 days for persistent login like WhatsApp/TikTok
-  const expiresIn = env.JWT_ACCESS_EXPIRY || '30d';
-  return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn });
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn: env.JWT_ACCESS_EXPIRY || '30d' });
 };
 
 export const verifyAccessToken = (token: string): JwtPayload => {
