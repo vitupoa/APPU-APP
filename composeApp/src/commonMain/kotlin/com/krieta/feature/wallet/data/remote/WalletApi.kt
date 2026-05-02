@@ -6,6 +6,10 @@ import com.krieta.feature.wallet.data.remote.dto.TipRequestDto
 import com.krieta.feature.wallet.data.remote.dto.TipResponseDto
 import com.krieta.feature.wallet.data.remote.dto.TransactionDto
 import com.krieta.feature.wallet.data.remote.dto.WalletBalanceDto
+import com.krieta.feature.wallet.data.remote.dto.TopupInitiateRequestDto
+import com.krieta.feature.wallet.data.remote.dto.TopupInitiateResponseDto
+import com.krieta.feature.wallet.data.remote.dto.TopupConfirmRequestDto
+import com.krieta.feature.wallet.data.remote.dto.TopupConfirmResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -94,5 +98,17 @@ class WalletApi(
             parameter("nonce", nonce)
             setBody(request)
         }
+    }
+
+    suspend fun initiateTopup(request: TopupInitiateRequestDto): TopupInitiateResponseDto {
+        return httpClient.post(ApiConstants.WALLET_TOPUP_INITIATE) {
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun confirmTopup(request: TopupConfirmRequestDto): TopupConfirmResponseDto {
+        return httpClient.post("${ApiConstants.API_VERSION}/wallet/topup/confirm") {
+            setBody(request)
+        }.body()
     }
 }

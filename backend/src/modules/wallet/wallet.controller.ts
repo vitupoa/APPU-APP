@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../../middleware/auth.js';
 import { WalletService } from './wallet.service.js';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
-import { tipSchema, exchangeRateSchema } from './wallet.validation.js';
+import { tipSchema, exchangeRateSchema, topupInitiateSchema } from './wallet.validation.js';
 
 export class WalletController {
   static async getBalance(req: AuthRequest, res: Response) {
@@ -80,6 +80,44 @@ export class WalletController {
       } else {
         res.status(400).json({ error: error.message });
       }
+    }
+  }
+
+  static async initiateTopup(req: AuthRequest, res: Response) {
+    try {
+      const data = topupInitiateSchema.parse(req.body);
+      
+      const result = await WalletService.initiateTopup(
+        req.userId!,
+        data.fiatAmount,
+        data.currency,
+        data.provider,
+        data.phoneNumber,
+        data.email
+      );
+      
+      res.status(200).json(result);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        res.status(400).json({ error: 'Validation failed', details: error.errors });
+      } else {
+        res.status(400).json({ error: error.message });
+      }
+    }
+  }
+
+  static async confirmTopup(req: AuthRequest, res: Response) {
+    try {
+      const { transactionId, reference } = req.body;
+      
+      if (!transactionId) {
+        return res.status(400).json({ error: 'Transaction ID required' });
+      }
+      
+      const result = await WalletService.confirmTopup(req.userId!, transactionId, reference);
+      res.status(200).json(result);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
     }
   }
 }

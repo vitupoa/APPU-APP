@@ -61,8 +61,7 @@ class WithdrawViewModel(
     private val userCurrency: String,
     private val biometricAuthenticator: BiometricAuthenticator,
     private val secureKeyStorage: SecureKeyStorage,
-    private val userId: String,
-    private val deviceId: String
+    private val tokenManager: com.krieta.com.core.security.TokenManager
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(WithdrawState())
@@ -195,6 +194,10 @@ class WithdrawViewModel(
                 val krAmount = _state.value.krCost
                 val provider = _state.value.selectedProvider.name.lowercase()
                 val account = _state.value.destinationAccount
+                
+                // Get userId and deviceId
+                val userId = tokenManager.getUserId() ?: ""
+                val deviceId = com.krieta.com.core.util.DeviceFingerprint.getFingerprint()
                 
                 // Validation
                 if (krAmount <= 0) {

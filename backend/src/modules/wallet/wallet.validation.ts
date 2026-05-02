@@ -5,6 +5,7 @@ export const topupInitiateSchema = z.object({
   currency: z.string().length(3),
   provider: z.enum(['paypal', 'paystack', 'mpesa']),
   phoneNumber: z.string().optional(),
+  email: z.string().email('Invalid email address').optional(),
 });
 
 export const withdrawInitiateSchema = z.object({
@@ -14,7 +15,7 @@ export const withdrawInitiateSchema = z.object({
   provider: z.enum(['mpesa', 'payoneer', 'paypal', 'paystack']),
   destinationAccount: z.string().min(1, 'Destination account details required'),
   phoneNumber: z.string().optional(),
-  email: z.string().optional(),
+  email: z.string().email('Invalid email address').optional(),
   accountNumber: z.string().optional(),
   bankCode: z.string().optional(),
   accountName: z.string().optional(),

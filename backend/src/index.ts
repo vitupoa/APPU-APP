@@ -45,6 +45,7 @@ import exploreRoutes from './modules/explore/explore.routes.js';
 import recommendationRoutes from './modules/recommendation/recommendation.routes.js';
 import escrowRoutes from './modules/escrow/escrow.routes.js';
 import kycRoutes from './modules/kyc/kyc.routes.js';
+import webhookRoutes from './routes/webhook.routes.js';
 import { startChamaDefaultWorker } from './workers/chamaDefaultWorker.js';
 import { startStoryCleanupWorker } from './workers/storyCleanupWorker.js';
 import { startDailyPrizeWorker } from './workers/dailyPrizeWorker.js';
@@ -158,6 +159,7 @@ app.use('/api/v1/display-ads', displayAdsRoutes);
 app.use('/api/v1/locations', locationsRoutes);
 app.use('/api/v1/creator-boost', creatorBoostRoutes);
 app.use('/api/v1/niches', nichesRoutes);
+app.use('/api/v1/webhooks', webhookRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

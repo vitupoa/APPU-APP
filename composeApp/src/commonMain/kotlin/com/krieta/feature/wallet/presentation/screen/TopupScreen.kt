@@ -106,6 +106,36 @@ class TopupScreen : Screen {
                     }
                 )
 
+                // Phone Number for M-Pesa
+                if (state.selectedProvider == PaymentProvider.MPESA) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = state.phoneNumber,
+                        onValueChange = { viewModel.onPhoneNumberChanged(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("M-Pesa Phone Number") },
+                        placeholder = { Text("254712345678") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        singleLine = true,
+                        enabled = !state.isProcessing
+                    )
+                }
+
+                // Email for PayPal/Paystack
+                if (state.selectedProvider == PaymentProvider.PAYPAL || state.selectedProvider == PaymentProvider.PAYSTACK) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = state.email,
+                        onValueChange = { viewModel.onEmailChanged(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Email Address") },
+                        placeholder = { Text("your@email.com") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        singleLine = true,
+                        enabled = !state.isProcessing
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Live Kr Preview
@@ -156,6 +186,71 @@ class TopupScreen : Screen {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Payment Instructions
+                if (state.paymentInstructions != null) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                "Payment Instructions",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                state.paymentInstructions!!,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            
+                            // Show payment URL button for PayPal/Paystack
+                            if (state.paymentUrl != null) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Button(
+                                    onClick = { /* TODO: Open payment URL in browser */ },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("Continue to Payment")
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                // Success Message
+                if (state.success) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painterResource(Res.drawable.ic_check_circle),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.tertiary
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                "Top-up successful! Your wallet has been credited.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 // Error
                 if (state.error != null) {
                     Text(
@@ -168,15 +263,28 @@ class TopupScreen : Screen {
 
                 // Confirm Button
                 Button(
-                    onClick = { /* Initiate top-up via payment routes */ },
+                    onClick = { 
+                        if (state.success) {
+                            viewModel.resetSuccess()
+                            navigator.pop()
+                        } else {
+                            viewModel.initiateTopup()
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
-                    enabled = state.krPreview > 0 && !state.isProcessing && !state.isLoadingRate,
+                    enabled = (state.krPreview > 0 && !state.isProcessing && !state.isLoadingRate) || state.success,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     if (state.isProcessing) {
                         CircularProgressIndicator(
                             color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp)
+                        )
+                    } else if (state.success) {
+                        Text(
+                            "Done",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
                     } else {
                         Text(

@@ -19,19 +19,18 @@ val walletModule = module {
         TopupViewModel(get(), locationProvider.getCurrentCurrency())
     }
     factory {
-        val locationProvider = get<LocationProvider>()
-        val tokenManager = get<com.krieta.com.core.security.TokenManager>()
-        val biometricAuth = get<com.krieta.com.core.security.BiometricAuthenticator>()
-        val secureStorage = get<com.krieta.com.core.security.SecureKeyStorage>()
-        val userId = kotlinx.coroutines.runBlocking { tokenManager.getUserId() } ?: ""
-        val deviceId = com.krieta.com.core.util.DeviceFingerprint.getFingerprint()
-        WithdrawViewModel(
+        com.krieta.feature.wallet.presentation.viewmodel.WithdrawViewModel(
             walletRepository = get(),
-            userCurrency = locationProvider.getCurrentCurrency(),
-            biometricAuthenticator = biometricAuth,
-            secureKeyStorage = secureStorage,
-            userId = userId,
-            deviceId = deviceId
+            userCurrency = get<LocationProvider>().getCurrentCurrency(),
+            biometricAuthenticator = get(),
+            secureKeyStorage = get(),
+            tokenManager = get()
+        )
+    }
+    factory {
+        com.krieta.feature.wallet.presentation.withdraw.WithdrawViewModel(
+            repository = get(),
+            deviceSecurityChecker = get()
         )
     }
 }

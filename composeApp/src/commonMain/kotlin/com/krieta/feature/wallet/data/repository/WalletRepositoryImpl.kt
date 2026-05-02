@@ -5,12 +5,17 @@ import com.krieta.com.core.network.safeApiCall
 import com.krieta.com.core.security.TransactionSigner
 import com.krieta.feature.wallet.data.remote.WalletApi
 import com.krieta.feature.wallet.data.remote.dto.TipRequestDto
+import com.krieta.feature.wallet.data.remote.dto.TopupInitiateRequestDto
+import com.krieta.feature.wallet.data.remote.dto.TopupConfirmRequestDto
 import com.krieta.feature.wallet.domain.model.ExchangeRate
 import com.krieta.feature.wallet.domain.model.Transaction
 import com.krieta.feature.wallet.domain.model.TransactionStatus
 import com.krieta.feature.wallet.domain.model.TransactionType
 import com.krieta.feature.wallet.domain.model.WalletBalance
 import com.krieta.feature.wallet.domain.repository.WalletRepository
+import com.krieta.feature.wallet.domain.repository.TopupInitiateResponse
+import com.krieta.feature.wallet.domain.repository.TopupConfirmResponse
+import com.krieta.feature.wallet.domain.repository.PaymentInstructions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -119,6 +124,67 @@ class WalletRepositoryImpl(
             )
             
             api.withdraw(request, signature, timestamp, nonce)
+        }
+    }
+
+    override suspend fun initiateTopup(
+        fiatAmount: Int,
+        currency: String,
+        provider: String,
+        phoneNumber: String?,
+        email: String?
+    ): NetworkResult<TopupInitiateResponse> {
+        return safeApiCall {
+            val request = TopupInitiateRequestDto(
+                fiatAmount = fiatAmount,
+                currency = currency,
+                provider = provider,
+                phoneNumber = phoneNumber,
+                email = email
+            )
+            val response = api.initiateTopup(request)
+            
+            TopupInitiateResponse(
+                transactionId = response.transactionId,
+                reference = response.reference,
+                krAmount = response.krAmount,
+                fiatAmount = response.fiatAmount,
+                currency = response.currency,
+                provider = response.provider,
+                status = response.status,
+                paymentInstructions = PaymentInstructions(
+                    provider = response.paymentInstructions.provider,
+                    amount = response.paymentInstructions.amount,
+                    currency = response.paymentInstructions.currency,
+                    instructions = response.paymentInstructions.instructions,
+                    phoneNumber = response.paymentInstructions.phoneNumber,
+                    paybill = response.paymentInstructions.paybill,
+                    accountNumber = response.paymentInstructions.accountNumber,
+                    paymentUrl = response.paymentInstructions.paymentUrl
+                )
+            )
+        }
+    }
+
+    override suspend fun confirmTopup(
+        transactionId: String,
+        reference: String?
+    ): NetworkResult<TopupConfirmResponse> {
+        return safeApiCall {
+            val request = TopupConfirmRequestDto(
+                transactionId = transactionId,
+                reference = reference
+            )
+            val response = api.confirmTopup(request)
+            
+            // Refresh balance after successful topup
+            getBalance()
+            
+            TopupConfirmResponse(
+                transactionId = response.transactionId,
+                krAmount = response.krAmount,
+                status = response.status
+            )
         }
     }
 }

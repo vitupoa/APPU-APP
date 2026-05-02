@@ -4,6 +4,7 @@ import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.com.core.network.KtorClientFactory
 import com.krieta.com.core.security.TokenManager
 import com.krieta.com.core.security.DeviceSecurity
+import com.krieta.com.core.session.SessionManager
 import com.krieta.feature.auth.di.authModule
 import com.krieta.feature.contests.di.contestsModule
 import com.krieta.feature.feed.di.feedModule
@@ -24,11 +25,11 @@ import org.koin.dsl.module
 expect fun platformModule(): Module
 
 val coreModule = module {
-    single<HttpClient> { KtorClientFactory.create(get<TokenManager>(), get<DeviceSecurity>()) }
+    single<HttpClient> { KtorClientFactory.create(get<TokenManager>(), get<DeviceSecurity>(), get<SessionManager>()) }
     single { WebSocketService(get(), get()) }
     single { com.krieta.com.core.network.CloudinaryUploader(get()) }
     single<com.krieta.com.core.upload.UploadApi> { com.krieta.com.core.upload.UploadApiImpl(get()) }
-    // UserCurrencyProvider depends on LocationProvider (from platformModule) + WalletRepository (from walletModule)
+    single { SessionManager() }
     single { UserCurrencyProvider(get(), get()) }
 }
 

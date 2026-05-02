@@ -1,13 +1,15 @@
 package com.krieta.com.core.network
 
 import com.krieta.com.core.security.TokenManager
+import com.krieta.com.core.session.SessionManager
 import io.ktor.client.plugins.ClientRequestException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-/**
- * Enhanced API call wrapper that handles authentication errors gracefully
- */
 suspend inline fun <T> authenticatedApiCall(
     tokenManager: TokenManager,
+    sessionManager: SessionManager,
     crossinline block: suspend () -> T
 ): NetworkResult<T> {
     return try {
@@ -15,9 +17,11 @@ suspend inline fun <T> authenticatedApiCall(
     } catch (e: ClientRequestException) {
         when (e.response.status.value) {
             401 -> {
-                // Authentication failed - clear tokens
                 println("❌ Authentication failed (401) - Clearing tokens")
                 tokenManager.clearTokens()
+                CoroutineScope(Dispatchers.Main).launch {
+                    sessionManager.notifySessionExpired()
+                }
                 NetworkResult.Error(
                     code = 401,
                     message = "Your session has expired. Please login again."

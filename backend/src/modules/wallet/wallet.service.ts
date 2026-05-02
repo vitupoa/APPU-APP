@@ -1,6 +1,9 @@
 import { prisma } from '../../config/database.js';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
 import { Prisma } from '../../generated/prisma/client.js';
+import crypto from 'crypto';
+import PayPalService from '../../services/payment/paypal.service.js';
+import PaystackService from '../../services/payment/paystack.service.js';
 
 export class WalletService {
   /**
@@ -168,5 +171,227 @@ export class WalletService {
       ...u,
       isLovers: false // Adjust if necessary
     }));
+  }
+
+  /**
+   * Initiates a top-up transaction
+   */
+  static async initiateTopup(
+    userId: string,
+    fiatAmount: number,
+    currency: string,
+    provider: 'paypal' | 'paystack' | 'mpesa',
+    phoneNumber?: string,
+    email?: string
+  ) {
+    // Calculate Kr amount user will receive
+    const buyRate = await ExchangeService.getTransactionRate(currency, 'buy');
+    const baseUsd = fiatAmount / buyRate;
+    const krAmount = Math.floor(baseUsd * 100); // 1 Kr = $0.01 USD
+
+    if (krAmount < 1) {
+      throw new Error('Amount too small. Minimum 1 Kr required.');
+    }
+
+    // Generate unique transaction reference
+    const reference = `TOPUP_${Date.now()}_${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+
+    // Create pending transaction
+    const transaction = await prisma.transaction.create({
+      data: {
+        userId,
+        type: 'topup',
+        amountKr: new Prisma.Decimal(krAmount),
+        amountFiat: fiatAmount,
+        currency,
+        provider,
+        status: 'pending',
+        reference,
+        metadata: { phoneNumber, email }
+      }
+    });
+
+    // Generate payment instructions based on provider
+    let paymentInstructions: any = {};
+
+    switch (provider) {
+      case 'mpesa':
+        if (!phoneNumber) {
+          throw new Error('Phone number required for M-Pesa');
+        }
+        paymentInstructions = {
+          provider: 'mpesa',
+          phoneNumber,
+          amount: fiatAmount,
+          currency,
+          instructions: `You will receive an M-Pesa prompt on ${phoneNumber}. Enter your PIN to complete the payment.`,
+          paybill: '400200', // Example paybill number
+          accountNumber: reference
+        };
+        break;
+
+      case 'paypal':
+        if (!email) {
+          throw new Error('Email required for PayPal');
+        }
+        try {
+          const paypalOrder = await PayPalService.createOrder(fiatAmount, currency, reference, email);
+          paymentInstructions = {
+            provider: 'paypal',
+            amount: fiatAmount,
+            currency,
+            paymentUrl: paypalOrder.approvalUrl,
+            orderId: paypalOrder.orderId,
+            instructions: 'Click "Continue to Payment" to complete your payment via PayPal. You can pay with your PayPal balance, linked bank account, or credit/debit card.'
+          };
+          
+          // Store PayPal order ID in metadata
+          await prisma.transaction.update({
+            where: { id: transaction.id },
+            data: {
+              metadata: { phoneNumber, email, paypalOrderId: paypalOrder.orderId }
+            }
+          });
+        } catch (error: any) {
+          throw new Error(`PayPal integration error: ${error.message}`);
+        }
+        break;
+
+      case 'paystack':
+        if (!email) {
+          throw new Error('Email required for Paystack');
+        }
+        try {
+          const paystackTx = await PaystackService.initializeTransaction(
+            fiatAmount,
+            currency,
+            email,
+            reference
+          );
+          
+          // Get mobile money providers if applicable
+          const mobileMoneyProviders = PaystackService.getMobileMoneyProviders(currency.substring(0, 2));
+          const supportedChannels = PaystackService.getSupportedChannels(currency.substring(0, 2));
+          
+          let instructions = 'Click "Continue to Payment" to complete your payment via Paystack. ';
+          if (supportedChannels.includes('card')) {
+            instructions += 'You can pay with your debit/credit card. ';
+          }
+          if (supportedChannels.includes('mobile_money') && mobileMoneyProviders.length > 0) {
+            instructions += `Mobile Money supported: ${mobileMoneyProviders.join(', ')}. `;
+          }
+          if (supportedChannels.includes('bank_transfer')) {
+            instructions += 'Bank transfer available. ';
+          }
+          if (supportedChannels.includes('ussd')) {
+            instructions += 'USSD payment available.';
+          }
+          
+          paymentInstructions = {
+            provider: 'paystack',
+            amount: fiatAmount,
+            currency,
+            paymentUrl: paystackTx.authorizationUrl,
+            accessCode: paystackTx.accessCode,
+            instructions,
+            supportedChannels,
+            mobileMoneyProviders
+          };
+          
+          // Store Paystack access code in metadata
+          await prisma.transaction.update({
+            where: { id: transaction.id },
+            data: {
+              metadata: { phoneNumber, email, paystackAccessCode: paystackTx.accessCode }
+            }
+          });
+        } catch (error: any) {
+          throw new Error(`Paystack integration error: ${error.message}`);
+        }
+        break;
+    }
+
+    return {
+      success: true,
+      transactionId: transaction.id,
+      reference,
+      krAmount,
+      fiatAmount,
+      currency,
+      provider,
+      status: 'pending',
+      paymentInstructions
+    };
+  }
+
+  /**
+   * Confirms and completes a top-up transaction
+   */
+  static async confirmTopup(
+    userId: string,
+    transactionId: string,
+    paymentReference?: string
+  ) {
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: transactionId }
+    });
+
+    if (!transaction) {
+      throw new Error('Transaction not found');
+    }
+
+    if (transaction.userId !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    if (transaction.status !== 'pending') {
+      throw new Error(`Transaction already ${transaction.status}`);
+    }
+
+    // In production, verify payment with provider API here
+    // For now, we'll simulate successful payment
+
+    return prisma.$transaction(async (tx) => {
+      // Update transaction status
+      await tx.transaction.update({
+        where: { id: transactionId },
+        data: {
+          status: 'completed',
+          metadata: {
+            ...(transaction.metadata as any),
+            paymentReference,
+            completedAt: new Date().toISOString()
+          }
+        }
+      });
+
+      // Credit user wallet
+      await tx.wallet.upsert({
+        where: { userId },
+        create: {
+          userId,
+          krBalance: transaction.amountKr
+        },
+        update: {
+          krBalance: { increment: transaction.amountKr }
+        }
+      });
+
+      // Unlock wallet if first topup
+      const user = await tx.user.findUnique({ where: { id: userId } });
+      if (user && !user.isWalletUnlocked) {
+        await tx.user.update({
+          where: { id: userId },
+          data: { isWalletUnlocked: true }
+        });
+      }
+
+      return {
+        success: true,
+        transactionId,
+        krAmount: transaction.amountKr.toNumber(),
+        status: 'completed'
+      };
+    });
   }
 }

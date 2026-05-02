@@ -47,3 +47,51 @@ data class TipResponseDto(
     val krTipped: Double? = null,
     val error: String? = null
 )
+
+@Serializable
+data class TopupInitiateRequestDto(
+    val fiatAmount: Int,
+    val currency: String,
+    val provider: String,
+    val phoneNumber: String? = null,
+    val email: String? = null
+)
+
+@Serializable
+data class TopupInitiateResponseDto(
+    val success: Boolean,
+    val transactionId: String,
+    val reference: String,
+    val krAmount: Int,
+    val fiatAmount: Int,
+    val currency: String,
+    val provider: String,
+    val status: String,
+    val paymentInstructions: PaymentInstructionsDto
+)
+
+@Serializable
+data class PaymentInstructionsDto(
+    val provider: String,
+    val amount: Int,
+    val currency: String,
+    val instructions: String,
+    val phoneNumber: String? = null,
+    val paybill: String? = null,
+    val accountNumber: String? = null,
+    val paymentUrl: String? = null
+)
+
+@Serializable
+data class TopupConfirmRequestDto(
+    val transactionId: String,
+    val reference: String? = null
+)
+
+@Serializable
+data class TopupConfirmResponseDto(
+    val success: Boolean,
+    val transactionId: String,
+    val krAmount: Int,
+    val status: String
+)

@@ -27,7 +27,13 @@ data class TopupState(
     val isLoadingRate: Boolean = false,
     val isProcessing: Boolean = false,
     val error: String? = null,
-    val success: Boolean = false
+    val success: Boolean = false,
+    val paymentUrl: String? = null,
+    val transactionId: String? = null,
+    val reference: String? = null,
+    val paymentInstructions: String? = null,
+    val phoneNumber: String = "",
+    val email: String = ""
 )
 
 class TopupViewModel(
@@ -57,6 +63,14 @@ class TopupViewModel(
             delay(300)
             calculateKrPreview(input)
         }
+    }
+
+    fun onPhoneNumberChanged(input: String) {
+        _state.value = _state.value.copy(phoneNumber = input, error = null)
+    }
+
+    fun onEmailChanged(input: String) {
+        _state.value = _state.value.copy(email = input, error = null)
     }
 
     private fun calculateKrPreview(input: String) {
@@ -103,5 +117,122 @@ class TopupViewModel(
                 is NetworkResult.Loading -> {}
             }
         }
+    }
+
+    fun initiateTopup() {
+        screenModelScope.launch {
+            try {
+                _state.value = _state.value.copy(isProcessing = true, error = null)
+                
+                val fiatAmount = SafeConversion.toDoubleOrDefaultWithValidation(
+                    value = _state.value.fiatInput,
+                    fieldName = "topupAmount",
+                    min = 0.0,
+                    defaultValue = 0.0
+                ).toInt()
+                
+                if (fiatAmount <= 0) {
+                    _state.value = _state.value.copy(
+                        error = "Please enter a valid amount",
+                        isProcessing = false
+                    )
+                    return@launch
+                }
+
+                val provider = _state.value.selectedProvider.name.lowercase()
+                
+                // Validate required fields based on provider
+                val phoneNumber = if (provider == "mpesa") {
+                    if (_state.value.phoneNumber.isBlank()) {
+                        _state.value = _state.value.copy(
+                            error = "Phone number required for M-Pesa",
+                            isProcessing = false
+                        )
+                        return@launch
+                    }
+                    _state.value.phoneNumber
+                } else null
+
+                val email = if (provider == "paypal" || provider == "paystack") {
+                    if (_state.value.email.isBlank()) {
+                        _state.value = _state.value.copy(
+                            error = "Email required for ${_state.value.selectedProvider.displayName}",
+                            isProcessing = false
+                        )
+                        return@launch
+                    }
+                    _state.value.email
+                } else null
+                
+                when (val result = walletRepository.initiateTopup(
+                    fiatAmount = fiatAmount,
+                    currency = userCurrency,
+                    provider = provider,
+                    phoneNumber = phoneNumber,
+                    email = email
+                )) {
+                    is NetworkResult.Success -> {
+                        val data = result.data
+                        _state.value = _state.value.copy(
+                            transactionId = data.transactionId,
+                            reference = data.reference,
+                            paymentUrl = data.paymentInstructions.paymentUrl,
+                            paymentInstructions = data.paymentInstructions.instructions,
+                            isProcessing = false
+                        )
+                        
+                        // Auto-confirm for simulation (in production, wait for payment callback)
+                        if (provider == "mpesa") {
+                            // For M-Pesa, simulate STK push confirmation after delay
+                            delay(2000)
+                            confirmTopup()
+                        }
+                        // For PayPal/Paystack, user needs to complete payment via URL
+                        // Payment confirmation will come via webhook callback
+                    }
+                    is NetworkResult.Error -> {
+                        _state.value = _state.value.copy(
+                            error = result.message ?: "Failed to initiate top-up",
+                            isProcessing = false
+                        )
+                    }
+                    is NetworkResult.Loading -> {}
+                }
+                
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    error = e.message ?: "An error occurred",
+                    isProcessing = false
+                )
+            }
+        }
+    }
+
+    private suspend fun confirmTopup() {
+        val transactionId = _state.value.transactionId ?: return
+        
+        when (val result = walletRepository.confirmTopup(
+            transactionId = transactionId,
+            reference = _state.value.reference
+        )) {
+            is NetworkResult.Success -> {
+                _state.value = _state.value.copy(
+                    success = true,
+                    isProcessing = false,
+                    error = null
+                )
+            }
+            is NetworkResult.Error -> {
+                _state.value = _state.value.copy(
+                    error = result.message ?: "Failed to confirm top-up",
+                    isProcessing = false
+                )
+            }
+            is NetworkResult.Loading -> {}
+        }
+    }
+
+    fun resetSuccess() {
+        _state.value = _state.value.copy(success = false)
     }
 }

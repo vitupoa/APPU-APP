@@ -48,7 +48,9 @@ enum class TaskType {
 // Data class for task configuration
 data class TaskConfiguration(
     val type: TaskType,
-    val data: String // Username, URL, or custom description depending on type
+    val data: String, // Username, URL, or custom description depending on type
+    val customName: String? = null, // Custom name for CUSTOM_TASK type
+    val link: String? = null // Optional link for custom tasks
 )
 
 // Data class for judge information
@@ -96,6 +98,8 @@ data class CreateContestState(
     // Step 3: Tasks and Connectors (Subtask 2.4)
     val taskType: TaskType = TaskType.FOLLOW_KRIETA,
     val taskConfiguration: String = "", // Current task being configured
+    val customTaskName: String = "", // Custom task name for CUSTOM_TASK type
+    val customTaskLink: String = "", // Optional link for custom tasks
     val addedTasks: List<TaskConfiguration> = emptyList(),
     
     // Step 4: Prize Distribution (Subtask 2.5)
@@ -191,10 +195,7 @@ data class CreateContestState(
             
             val entryFeeValid = entryFee >= 0.0
             
-            // Mutual exclusivity: entry fee and paid voting (Requirements 9.2, 9.3, 9.4)
-            val mutualExclusivityValid = !(entryFee > 0.0 && paidVoting)
-            
-            demographicsValid && teamConfigValid && entryFeeValid && mutualExclusivityValid
+            demographicsValid && teamConfigValid && entryFeeValid
         } catch (e: Exception) {
             false
         }
@@ -417,11 +418,6 @@ class CreateContestViewModel(
             if (currentState.entryFee < 0.0) {
                 errors["entryFee"] = "Entry fee cannot be negative"
             }
-            
-            // Mutual exclusivity validation (Requirements 9.2, 9.3, 9.4)
-            if (currentState.entryFee > 0.0 && currentState.paidVoting) {
-                errors["mutualExclusivity"] = "Entry fee and paid voting are mutually exclusive"
-            }
         } catch (e: Exception) {
             errors["validation"] = "Validation error: ${e.message}"
         }
@@ -484,8 +480,11 @@ class CreateContestViewModel(
                         }
                     }
                     TaskType.CUSTOM_TASK -> {
+                        if (currentState.customTaskName.isBlank()) {
+                            errors["customTaskName"] = "Custom task label is required"
+                        }
                         if (currentState.taskConfiguration.isBlank()) {
-                            errors["taskConfiguration"] = "Custom task description is required"
+                            errors["taskConfiguration"] = "Link is required"
                         }
                     }
                 }
@@ -736,17 +735,23 @@ class CreateContestViewModel(
     // Step 3: Tasks Update Functions (Subtask 2.4)
     fun updateTaskType(v: TaskType) { _state.value = _state.value.copy(taskType = v) }
     fun updateTaskConfiguration(v: String) { _state.value = _state.value.copy(taskConfiguration = v) }
+    fun updateCustomTaskName(v: String) { _state.value = _state.value.copy(customTaskName = v) }
+    fun updateCustomTaskLink(v: String) { _state.value = _state.value.copy(customTaskLink = v) }
     
     fun addTask() {
         val currentState = _state.value
         if (currentState.taskConfiguration.isNotBlank()) {
             val newTask = TaskConfiguration(
                 type = currentState.taskType,
-                data = currentState.taskConfiguration
+                data = currentState.taskConfiguration,
+                customName = if (currentState.taskType == TaskType.CUSTOM_TASK) currentState.customTaskName.ifBlank { null } else null,
+                link = null
             )
             _state.value = currentState.copy(
                 addedTasks = currentState.addedTasks + newTask,
-                taskConfiguration = "" // Reset after adding
+                taskConfiguration = "",
+                customTaskName = "",
+                customTaskLink = ""
             )
         }
     }
@@ -964,7 +969,7 @@ class CreateContestViewModel(
                             TaskType.CUSTOM_TASK -> "CUSTOM_TASK"
                         },
                         targetUrl = task.data,
-                        label = task.data
+                        label = task.customName ?: getTaskTypeLabel(task.type)
                     )
                 }
                 
@@ -1085,5 +1090,19 @@ class CreateContestViewModel(
                 )
             }
         }
+    }
+}
+
+// Helper function to get task type labels
+private fun getTaskTypeLabel(taskType: TaskType): String {
+    return when (taskType) {
+        TaskType.FOLLOW_KRIETA -> "Follow Krieta"
+        TaskType.SUBSCRIBE_YOUTUBE -> "Subscribe YouTube"
+        TaskType.FOLLOW_SPOTIFY -> "Follow Spotify"
+        TaskType.FOLLOW_INSTAGRAM -> "Follow Instagram"
+        TaskType.FOLLOW_TIKTOK -> "Follow TikTok"
+        TaskType.WATCH_VIDEO -> "Watch Video"
+        TaskType.VISIT_SHOP -> "Visit Shop"
+        TaskType.CUSTOM_TASK -> "Custom Task"
     }
 }

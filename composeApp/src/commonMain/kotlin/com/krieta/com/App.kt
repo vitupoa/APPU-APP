@@ -14,6 +14,7 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import com.krieta.feature.auth.presentation.screen.LoginScreen
 import com.krieta.com.core.navigation.MainScreen
 import com.krieta.com.core.security.TokenManager
+import com.krieta.com.core.session.SessionManager
 import com.krieta.com.core.theme.KrietaTheme
 import com.krieta.com.core.theme.KrietaColors
 import org.koin.compose.KoinContext
@@ -26,7 +27,10 @@ fun App() {
         KrietaTheme {
             Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 val tokenManager = koinInject<TokenManager>()
+                val sessionManager = koinInject<SessionManager>()
                 var startScreen by remember { mutableStateOf<Screen?>(null) }
+                var currentNavigator by remember { mutableStateOf<Navigator?>(null) }
+                val scope = rememberCoroutineScope()
 
                 LaunchedEffect(Unit) {
                     val isLoggedIn = tokenManager.isLoggedIn()
@@ -37,8 +41,15 @@ fun App() {
                     }
                 }
 
+                LaunchedEffect(Unit) {
+                    sessionManager.sessionExpired.collect {
+                        currentNavigator?.replaceAll(LoginScreen())
+                    }
+                }
+
                 if (startScreen != null) {
                     Navigator(startScreen!!) { navigator ->
+                        currentNavigator = navigator
                         SlideTransition(navigator)
                     }
                 } else {

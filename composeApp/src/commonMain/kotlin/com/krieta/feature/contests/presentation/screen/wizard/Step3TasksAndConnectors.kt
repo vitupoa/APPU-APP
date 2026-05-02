@@ -68,13 +68,19 @@ fun Step3TasksAndConnectors(
         TaskConfigurationInput(
             taskType = state.taskType,
             value = state.taskConfiguration,
+            customTaskName = state.customTaskName,
+            customTaskLink = state.customTaskLink,
             onValueChange = { viewModel.updateTaskConfiguration(it) },
-            error = validationErrors["taskConfiguration"]
+            onCustomNameChange = { viewModel.updateCustomTaskName(it) },
+            onCustomLinkChange = { viewModel.updateCustomTaskLink(it) },
+            configError = validationErrors["taskConfiguration"],
+            nameError = validationErrors["customTaskName"]
         )
         
         // Add Task Button (Subtask 7.2, Requirements 6.10, 6.11)
         AddTaskButton(
-            enabled = state.taskConfiguration.isNotBlank(),
+            enabled = state.taskConfiguration.isNotBlank() && 
+                     (state.taskType != TaskType.CUSTOM_TASK || state.customTaskName.isNotBlank()),
             onClick = { viewModel.addTask() }
         )
         
@@ -185,84 +191,124 @@ private fun TaskTypeSelector(
 private fun TaskConfigurationInput(
     taskType: TaskType,
     value: String,
+    customTaskName: String,
+    customTaskLink: String,
     onValueChange: (String) -> Unit,
-    error: String?
+    onCustomNameChange: (String) -> Unit,
+    onCustomLinkChange: (String) -> Unit,
+    configError: String?,
+    nameError: String?
 ) {
-    val (label, placeholder, keyboardType) = when (taskType) {
-        TaskType.FOLLOW_KRIETA -> Triple(
-            "Krieta Username",
-            "Enter username to follow",
-            KeyboardType.Text
-        )
-        TaskType.SUBSCRIBE_YOUTUBE -> Triple(
-            "YouTube Channel URL",
-            "https://youtube.com/@channel",
-            KeyboardType.Uri
-        )
-        TaskType.FOLLOW_SPOTIFY -> Triple(
-            "Spotify Artist URL",
-            "https://open.spotify.com/artist/...",
-            KeyboardType.Uri
-        )
-        TaskType.FOLLOW_INSTAGRAM -> Triple(
-            "Instagram Username",
-            "@username",
-            KeyboardType.Text
-        )
-        TaskType.FOLLOW_TIKTOK -> Triple(
-            "TikTok Username",
-            "@username",
-            KeyboardType.Text
-        )
-        TaskType.WATCH_VIDEO -> Triple(
-            "Video URL",
-            "https://youtube.com/watch?v=...",
-            KeyboardType.Uri
-        )
-        TaskType.VISIT_SHOP -> Triple(
-            "Shop URL",
-            "https://shop.example.com",
-            KeyboardType.Uri
-        )
-        TaskType.CUSTOM_TASK -> Triple(
-            "Custom Task Description",
-            "Describe what participants need to do",
-            KeyboardType.Text
-        )
-    }
-    
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = { Text(label) },
-            placeholder = { Text(placeholder) },
-            singleLine = taskType != TaskType.CUSTOM_TASK,
-            minLines = if (taskType == TaskType.CUSTOM_TASK) 2 else 1,
-            maxLines = if (taskType == TaskType.CUSTOM_TASK) 4 else 1,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            isError = error != null,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFF5A623),
-                cursorColor = Color(0xFFF5A623),
-                focusedLabelColor = Color(0xFFF5A623),
-                unfocusedBorderColor = Color(0xFF3A3A3F),
-                errorBorderColor = Color(0xFFFF3B30),
-                focusedContainerColor = Color(0xFF1A1A1F),
-                unfocusedContainerColor = Color(0xFF1A1A1F)
-            ),
-            shape = RoundedCornerShape(12.dp)
-        )
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Task Label/Name Field
+        if (taskType == TaskType.CUSTOM_TASK) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                OutlinedTextField(
+                    value = customTaskName,
+                    onValueChange = onCustomNameChange,
+                    label = { Text("Task Label") },
+                    placeholder = { Text("e.g., Subscribe, Follow, Share") },
+                    singleLine = true,
+                    isError = nameError != null,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFFF5A623),
+                        cursorColor = Color(0xFFF5A623),
+                        focusedLabelColor = Color(0xFFF5A623),
+                        unfocusedBorderColor = Color(0xFF3A3A3F),
+                        errorBorderColor = Color(0xFFFF3B30),
+                        focusedContainerColor = Color(0xFF1A1A1F),
+                        unfocusedContainerColor = Color(0xFF1A1A1F)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                
+                if (nameError != null) {
+                    Text(
+                        text = nameError,
+                        color = Color(0xFFFF3B30),
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+        }
         
-        // Inline error message display (Requirement 15.1)
-        if (error != null) {
-            Text(
-                text = error,
-                color = Color(0xFFFF3B30),
-                fontSize = 12.sp,
-                modifier = Modifier.padding(start = 16.dp)
+        // Link/URL Field
+        val (label, placeholder, keyboardType) = when (taskType) {
+            TaskType.FOLLOW_KRIETA -> Triple(
+                "Krieta Username",
+                "Enter username to follow",
+                KeyboardType.Text
             )
+            TaskType.SUBSCRIBE_YOUTUBE -> Triple(
+                "YouTube Channel URL",
+                "https://youtube.com/@channel",
+                KeyboardType.Uri
+            )
+            TaskType.FOLLOW_SPOTIFY -> Triple(
+                "Spotify Artist URL",
+                "https://open.spotify.com/artist/...",
+                KeyboardType.Uri
+            )
+            TaskType.FOLLOW_INSTAGRAM -> Triple(
+                "Instagram Username",
+                "@username",
+                KeyboardType.Text
+            )
+            TaskType.FOLLOW_TIKTOK -> Triple(
+                "TikTok Username",
+                "@username",
+                KeyboardType.Text
+            )
+            TaskType.WATCH_VIDEO -> Triple(
+                "Video URL",
+                "https://youtube.com/watch?v=...",
+                KeyboardType.Uri
+            )
+            TaskType.VISIT_SHOP -> Triple(
+                "Shop URL",
+                "https://shop.example.com",
+                KeyboardType.Uri
+            )
+            TaskType.CUSTOM_TASK -> Triple(
+                "Link",
+                "https://example.com",
+                KeyboardType.Uri
+            )
+        }
+        
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                label = { Text(label) },
+                placeholder = { Text(placeholder) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                isError = configError != null,
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFF5A623),
+                    cursorColor = Color(0xFFF5A623),
+                    focusedLabelColor = Color(0xFFF5A623),
+                    unfocusedBorderColor = Color(0xFF3A3A3F),
+                    errorBorderColor = Color(0xFFFF3B30),
+                    focusedContainerColor = Color(0xFF1A1A1F),
+                    unfocusedContainerColor = Color(0xFF1A1A1F)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+            
+            // Inline error message display (Requirement 15.1)
+            if (configError != null) {
+                Text(
+                    text = configError,
+                    color = Color(0xFFFF3B30),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            }
         }
     }
 }
@@ -327,6 +373,9 @@ private fun TaskListItem(
     task: TaskConfiguration,
     onRemove: () -> Unit
 ) {
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+    val taskUrl = task.data
+    
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -342,22 +391,22 @@ private fun TaskListItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = getTaskTypeLabel(task.type),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFF5A623)
-                )
-                Text(
-                    text = task.data,
-                    fontSize = 14.sp,
-                    color = Color.White
-                )
-            }
+            // Task label - clickable
+            Text(
+                text = task.customName ?: getTaskTypeLabel(task.type),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF4A9EFF),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        try {
+                            uriHandler.openUri(taskUrl)
+                        } catch (e: Exception) {
+                            // Handle invalid URL
+                        }
+                    }
+            )
             
             IconButton(
                 onClick = onRemove,

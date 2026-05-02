@@ -3,6 +3,7 @@ package com.krieta.com.core.network
 
 import com.krieta.com.core.security.TokenManager
 import com.krieta.com.core.security.DeviceSecurity
+import com.krieta.com.core.session.SessionManager
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
@@ -25,6 +26,12 @@ import io.ktor.client.request.setBody
 import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
+import io.ktor.client.plugins.ResponseException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import io.ktor.http.HttpStatusCode
+
 object KtorClientFactory {
 
     val json = Json {
@@ -36,7 +43,7 @@ object KtorClientFactory {
         explicitNulls = false
     }
 
-    fun create(tokenManager: TokenManager, deviceSecurity: DeviceSecurity? = null): HttpClient {
+    fun create(tokenManager: TokenManager, deviceSecurity: DeviceSecurity? = null, sessionManager: SessionManager): HttpClient {
         return HttpClient {
             install(ContentNegotiation) {
                 json(json)
@@ -83,8 +90,15 @@ object KtorClientFactory {
                             null
                         } catch (e: Exception) {
                             println("❌ Token refresh exception: ${e.message}")
-                            // Clear tokens on refresh failure to force re-login
-                            tokenManager.clearTokens()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                tokenManager.clearTokens()
+                                sessionManager.notifySessionExpired()
+                            }
+                            
+                            // Check if it's a 401 error
+                            if (e is ResponseException && e.response.status == HttpStatusCode.Unauthorized) {
+                                println("❌ 401 during refresh - session expired")
+                            }
                             null
                         }
                     }

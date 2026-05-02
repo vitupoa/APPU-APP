@@ -309,8 +309,6 @@ class WithdrawScreen : Screen {
                     }
                 }
                 
-                Spacer(modifier = Modifier.weight(1f))
-                
                 Button(
                     onClick = { viewModel.withdraw() },
                     enabled = !state.isSubmitting && canWithdraw(state),
