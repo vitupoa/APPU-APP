@@ -11,7 +11,8 @@ export interface JwtPayload {
 }
 
 export const generateAccessToken = (payload: JwtPayload): string => {
-  return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn: (env.JWT_ACCESS_EXPIRY || '30d') as string });
+  const options: SignOptions = { expiresIn: env.JWT_ACCESS_EXPIRY || '30d' } as SignOptions;
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET, options);
 };
 
 export const verifyAccessToken = (token: string): JwtPayload => {
