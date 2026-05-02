@@ -24,5 +24,5 @@ actual fun platformModule(): Module = module {
     single<OAuthBrowser> { AndroidOAuthBrowser(androidContext()) }
     single<BiometricAuthenticator> { AndroidBiometricAuthenticator(androidContext()) }
     single<SecureKeyStorage> { AndroidSecureKeyStorage(androidContext()) }
-    single { DeviceSecurityChecker() }
+    single { DeviceSecurityChecker(androidContext()) }
 }

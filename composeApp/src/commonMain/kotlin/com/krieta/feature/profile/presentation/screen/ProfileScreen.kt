@@ -1,7 +1,5 @@
 package com.krieta.feature.profile.presentation.screen
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
@@ -18,8 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,20 +26,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.koin.koinScreenModel
-import org.koin.core.parameter.parametersOf
 import com.krieta.feature.profile.presentation.viewmodel.ProfileViewModel
 import com.krieta.feature.profile.presentation.viewmodel.BioLinksViewModel
 import com.krieta.feature.profile.domain.model.BioLink
-import com.krieta.feature.profile.presentation.screen.MilestonesScreen
-import com.krieta.feature.profile.presentation.screen.EditProfileScreen
 import com.krieta.feature.wallet.presentation.screen.WalletScreen
 import com.krieta.com.core.theme.KrietaColors
 import androidx.compose.ui.platform.LocalUriHandler
 import com.krieta.feature.auth.presentation.screen.LoginScreen
 import androidx.compose.foundation.BorderStroke
+import org.koin.core.parameter.parametersOf
 
 class ProfileScreen(val userId: String? = null) : Screen {
-    override val key: cafe.adriel.voyager.core.screen.ScreenKey = "ProfileScreen:${userId ?: "me"}"
+    override val key = "ProfileScreen:${userId ?: "me"}"
     
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -256,13 +250,13 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         AnalyticsStat(
                             count = "${profile.stats.admirers}", 
                             label = "Admirers", 
-                            modifier = Modifier.clickable { navigator.push(com.krieta.feature.profile.presentation.screen.SocialListScreen(userId = profile.id, title = "Admirers")) }.padding(8.dp)
+                            modifier = Modifier.clickable { navigator.push(SocialListScreen(userId = profile.id, title = "Admirers")) }.padding(8.dp)
                         )
                         Spacer(modifier = Modifier.width(32.dp))
                         AnalyticsStat(
                             count = "${profile.stats.admiring}", 
                             label = "Admiring", 
-                            modifier = Modifier.clickable { navigator.push(com.krieta.feature.profile.presentation.screen.SocialListScreen(userId = profile.id, title = "Admiring")) }.padding(8.dp)
+                            modifier = Modifier.clickable { navigator.push(SocialListScreen(userId = profile.id, title = "Admiring")) }.padding(8.dp)
                         )
                     }
 
@@ -359,15 +353,15 @@ class ProfileScreen(val userId: String? = null) : Screen {
                     }
                 }
 
-                // Tabs Configuration (No Grid requested)
+                // Tabs Configuration
                 Spacer(modifier = Modifier.height(24.dp))
                 var selectedTab by remember { mutableStateOf(0) }
+                val tabs = listOf("Videos", "Contests", "Liked")
                 PrimaryTabRow(
                     selectedTabIndex = selectedTab,
                     containerColor = Color.Transparent,
                     contentColor = KrietaColors.Primary
                 ) {
-                    val tabs = listOf("Videos", "Contests", "Liked")
                     tabs.forEachIndexed { index, title ->
                         Tab(
                             selected = selectedTab == index, 
@@ -383,7 +377,26 @@ class ProfileScreen(val userId: String? = null) : Screen {
                     }
                 }
 
-                // Empty space since Grid is excluded
+                // Tab Content
+                when (selectedTab) {
+                    0, 1, 2 -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = when (selectedTab) {
+                                    0 -> "Videos content coming soon"
+                                    1 -> "Contests content coming soon"
+                                    2 -> "Liked content coming soon"
+                                    else -> ""
+                                },
+                                color = KrietaColors.OnSurfaceVariant,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(100.dp))
                 }
             }
