@@ -475,11 +475,14 @@ private fun BioLinkBottomSheet(
                         .padding(vertical = 8.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .clickable {
-                        val url = link.url.let { u ->
-                            if (u.startsWith("http://") || u.startsWith("https://")) u
-                            else "https://$u"
-                        }
-                        try { uriHandler.openUri(url) } catch (_: Exception) {}
+                        try {
+                            val url = if (link.url.startsWith("http://") || link.url.startsWith("https://")) {
+                                link.url
+                            } else {
+                                "https://${link.url}"
+                            }
+                            uriHandler.openUri(url)
+                        } catch (_: Exception) {}
                     },
                     color = KrietaColors.SurfaceVariant,
                     border = BorderStroke(1.dp, KrietaColors.Outline.copy(alpha = 0.5f)),
