@@ -13,8 +13,8 @@ export class PaypalService {
 
       this.client = new Client({
         clientCredentialsAuthCredentials: {
-          oAuthClientId: env.PAYPAL_CLIENT_ID,
-          oAuthClientSecret: env.PAYPAL_CLIENT_SECRET,
+          oAuthClientId: env.PAYPAL_CLIENT_ID!,
+          oAuthClientSecret: env.PAYPAL_CLIENT_SECRET!,
         },
         environment,
       });
@@ -37,7 +37,7 @@ export class PaypalService {
 
     const response = await this.ordersController.createOrder({
       body: {
-        intent: 'CAPTURE',
+        intent: 'CAPTURE' as any,
         purchaseUnits: [{
           referenceId: params.referenceId,
           description: params.description,
@@ -50,7 +50,7 @@ export class PaypalService {
           returnUrl: `${env.MPESA_CALLBACK_URL}/api/v1/payments/paypal/success`,
           cancelUrl: `${env.MPESA_CALLBACK_URL}/api/v1/payments/paypal/cancel`,
           brandName: 'Krieta',
-          userAction: 'PAY_NOW'
+          userAction: 'PAY_NOW' as any
         }
       },
       prefer: 'return=representation'

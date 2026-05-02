@@ -31,7 +31,7 @@ class PayPalService {
     try {
       const response = await this.ordersController.createOrder({
         body: {
-          intent: 'CAPTURE',
+          intent: 'CAPTURE' as any,
           purchaseUnits: [
             {
               referenceId: reference,
@@ -47,8 +47,8 @@ class PayPalService {
           },
           applicationContext: {
             brandName: 'Krieta',
-            landingPage: 'BILLING',
-            userAction: 'PAY_NOW',
+            landingPage: 'BILLING' as any,
+            userAction: 'PAY_NOW' as any,
             returnUrl: `${process.env.BACKEND_URL}/api/v1/wallet/topup/paypal/success`,
             cancelUrl: `${process.env.BACKEND_URL}/api/v1/wallet/topup/paypal/cancel`,
           },
@@ -97,7 +97,7 @@ class PayPalService {
    */
   async verifyWebhook(headers: any, body: any): Promise<boolean> {
     try {
-      const response = await this.paymentsController.verifyWebhookSignature({
+      const response = await (this.paymentsController as any).verifyWebhookSignature({
         body: {
           authAlgo: headers['paypal-auth-algo'],
           certUrl: headers['paypal-cert-url'],
@@ -116,7 +116,5 @@ class PayPalService {
     }
   }
 }
-
-export default new PayPalService();
 
 export default new PayPalService();
