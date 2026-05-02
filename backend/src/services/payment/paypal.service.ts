@@ -1,57 +1,67 @@
-import paypal from '@paypal/checkout-server-sdk';
+import { PayPalClient, OrdersController, PaymentsController } from '@paypal/paypal-server-sdk';
+import { Environment } from '@paypal/paypal-server-sdk/dist/models/environment';
 
 class PayPalService {
-  private client: paypal.core.PayPalHttpClient;
+  private client: PayPalClient;
+  private ordersController: OrdersController;
+  private paymentsController: PaymentsController;
 
   constructor() {
     const clientId = process.env.PAYPAL_CLIENT_ID || '';
     const clientSecret = process.env.PAYPAL_CLIENT_SECRET || '';
     const environment = process.env.NODE_ENV === 'production'
-      ? new paypal.core.LiveEnvironment(clientId, clientSecret)
-      : new paypal.core.SandboxEnvironment(clientId, clientSecret);
+      ? Environment.Production
+      : Environment.Sandbox;
     
-    this.client = new paypal.core.PayPalHttpClient(environment);
+    this.client = new PayPalClient({
+      clientCredentialsAuthCredentials: {
+        oAuthClientId: clientId,
+        oAuthClientSecret: clientSecret,
+      },
+      environment,
+    });
+    
+    this.ordersController = new OrdersController(this.client);
+    this.paymentsController = new PaymentsController(this.client);
   }
 
   /**
    * Create a PayPal order for top-up
    */
   async createOrder(amount: number, currency: string, reference: string, email: string) {
-    const request = new paypal.orders.OrdersCreateRequest();
-    request.prefer('return=representation');
-    request.requestBody({
-      intent: 'CAPTURE',
-      purchase_units: [
-        {
-          reference_id: reference,
-          description: `Krieta Wallet Top-up - ${reference}`,
-          amount: {
-            currency_code: currency,
-            value: amount.toFixed(2),
+    try {
+      const response = await this.ordersController.ordersCreate({
+        body: {
+          intent: 'CAPTURE',
+          purchaseUnits: [
+            {
+              referenceId: reference,
+              description: `Krieta Wallet Top-up - ${reference}`,
+              amount: {
+                currencyCode: currency,
+                value: amount.toFixed(2),
+              },
+            },
+          ],
+          payer: {
+            emailAddress: email,
+          },
+          applicationContext: {
+            brandName: 'Krieta',
+            landingPage: 'BILLING',
+            userAction: 'PAY_NOW',
+            returnUrl: `${process.env.BACKEND_URL}/api/v1/wallet/topup/paypal/success`,
+            cancelUrl: `${process.env.BACKEND_URL}/api/v1/wallet/topup/paypal/cancel`,
           },
         },
-      ],
-      payer: {
-        email_address: email,
-      },
-      application_context: {
-        brand_name: 'Krieta',
-        landing_page: 'BILLING',
-        user_action: 'PAY_NOW',
-        return_url: `${process.env.BACKEND_URL}/api/v1/wallet/topup/paypal/success`,
-        cancel_url: `${process.env.BACKEND_URL}/api/v1/wallet/topup/paypal/cancel`,
-      },
-    });
-
-    try {
-      const response = await this.client.execute(request);
-      const order = response.result;
+        prefer: 'return=representation',
+      });
       
-      // Get approval URL
-      const approvalUrl = order.links?.find((link: any) => link.rel === 'approve')?.href;
+      const order = response.result;
+      const approvalUrl = order.links?.find((link) => link.rel === 'approve')?.href;
       
       return {
-        orderId: order.id,
+        orderId: order.id!,
         approvalUrl,
         status: order.status,
       };
@@ -65,16 +75,17 @@ class PayPalService {
    * Capture payment after user approves
    */
   async captureOrder(orderId: string) {
-    const request = new paypal.orders.OrdersCaptureRequest(orderId);
-    request.requestBody({});
-
     try {
-      const response = await this.client.execute(request);
+      const response = await this.ordersController.ordersCapture({
+        id: orderId,
+        prefer: 'return=representation',
+      });
+      
       return {
-        orderId: response.result.id,
+        orderId: response.result.id!,
         status: response.result.status,
         payer: response.result.payer,
-        amount: response.result.purchase_units[0].amount,
+        amount: response.result.purchaseUnits![0].amount,
       };
     } catch (error: any) {
       console.error('PayPal capture error:', error);
@@ -87,19 +98,19 @@ class PayPalService {
    */
   async verifyWebhook(headers: any, body: any): Promise<boolean> {
     try {
-      const request = new paypal.notifications.VerifyWebhookSignature();
-      request.requestBody({
-        auth_algo: headers['paypal-auth-algo'],
-        cert_url: headers['paypal-cert-url'],
-        transmission_id: headers['paypal-transmission-id'],
-        transmission_sig: headers['paypal-transmission-sig'],
-        transmission_time: headers['paypal-transmission-time'],
-        webhook_id: process.env.PAYPAL_WEBHOOK_ID || '',
-        webhook_event: body,
+      const response = await this.paymentsController.verifyWebhookSignature({
+        body: {
+          authAlgo: headers['paypal-auth-algo'],
+          certUrl: headers['paypal-cert-url'],
+          transmissionId: headers['paypal-transmission-id'],
+          transmissionSig: headers['paypal-transmission-sig'],
+          transmissionTime: headers['paypal-transmission-time'],
+          webhookId: process.env.PAYPAL_WEBHOOK_ID || '',
+          webhookEvent: body,
+        },
       });
 
-      const response = await this.client.execute(request);
-      return response.result.verification_status === 'SUCCESS';
+      return response.result.verificationStatus === 'SUCCESS';
     } catch (error) {
       console.error('PayPal webhook verification error:', error);
       return false;
