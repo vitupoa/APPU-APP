@@ -462,8 +462,8 @@ export class WebhookController {
           data: {
             metadata: {
               ...(transaction.metadata as any),
-              mpesaReceiptNumber: callbackData.mpesaReceiptNumber ?? undefined,
-              phoneNumber: callbackData.phoneNumber ?? undefined,
+              mpesaReceiptNumber: callbackData.mpesaReceiptNumber,
+              phoneNumber: callbackData.phoneNumber,
               verifiedAmount: callbackData.amount
             }
           }
@@ -473,9 +473,9 @@ export class WebhookController {
         await WalletService.confirmTopup(
           transaction.userId,
           transaction.id,
-          callbackData.mpesaReceiptNumber || undefined,
+          callbackData.mpesaReceiptNumber ?? undefined,
           callbackData.amount,
-          transaction.currency
+          transaction.currency ?? undefined
         );
         console.log(`✅ M-Pesa payment confirmed for transaction ${transaction.id}`);
       } else {

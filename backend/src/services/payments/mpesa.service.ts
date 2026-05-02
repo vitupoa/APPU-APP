@@ -111,8 +111,8 @@ export class MpesaService {
     success: boolean;
     checkoutRequestId: string;
     amount?: number;
-    mpesaReceiptNumber?: string | null;
-    phoneNumber?: string | null;
+    mpesaReceiptNumber?: string;
+    phoneNumber?: string;
   } {
     const stkCallback = body?.Body?.stkCallback;
     if (!stkCallback) {
@@ -131,14 +131,17 @@ export class MpesaService {
 
     // Extract metadata items
     const items = stkCallback.CallbackMetadata?.Item || [];
-    const getValue = (name: string) => items.find((i: any) => i.Name === name)?.Value;
+    const getValue = (name: string): any => {
+      const value = items.find((i: any) => i.Name === name)?.Value;
+      return value === null ? undefined : value;
+    };
 
     return {
       success: true,
       checkoutRequestId,
       amount: getValue('Amount'),
       mpesaReceiptNumber: getValue('MpesaReceiptNumber'),
-      phoneNumber: getValue('PhoneNumber')?.toString()
+      phoneNumber: getValue('PhoneNumber')?.toString() ?? undefined
     };
   }
 
