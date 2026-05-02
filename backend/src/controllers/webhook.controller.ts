@@ -473,7 +473,7 @@ export class WebhookController {
         await WalletService.confirmTopup(
           transaction.userId,
           transaction.id,
-          callbackData.mpesaReceiptNumber ?? undefined,
+          callbackData.mpesaReceiptNumber || undefined,
           callbackData.amount,
           transaction.currency
         );
