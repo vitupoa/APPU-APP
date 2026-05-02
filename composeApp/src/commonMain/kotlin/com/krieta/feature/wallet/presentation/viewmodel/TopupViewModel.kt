@@ -74,12 +74,16 @@ class TopupViewModel(
     }
 
     private fun calculateKrPreview(input: String) {
-        val fiatAmount = SafeConversion.toDoubleOrDefaultWithValidation(
-            value = input,
-            fieldName = "topupAmount",
-            min = 0.0,
-            defaultValue = 0.0
-        )
+        val fiatAmount = if (input.isEmpty()) {
+            0.0
+        } else {
+            try {
+                input.toDouble()
+            } catch (e: Exception) {
+                0.0
+            }
+        }
+        
         val rate = _state.value.exchangeRate
 
         if (fiatAmount <= 0 || rate == null) {
@@ -87,8 +91,13 @@ class TopupViewModel(
             return
         }
 
+        // Apply 4.5% platform margin + KES 30 flat fee
+        val fiatAfterFlatFee = kotlin.math.max(0.0, fiatAmount - 30.0)
+        val platformMargin = 0.045
+        val fiatAfterMargin = fiatAfterFlatFee * (1 - platformMargin)
+        
         // User pays buyRate for top-up (they buy Kr)
-        val krAmount = fiatAmount / rate.buyRate
+        val krAmount = fiatAfterMargin / rate.buyRate
         _state.value = _state.value.copy(krPreview = krAmount)
     }
 
@@ -124,12 +133,15 @@ class TopupViewModel(
             try {
                 _state.value = _state.value.copy(isProcessing = true, error = null)
                 
-                val fiatAmount = SafeConversion.toDoubleOrDefaultWithValidation(
-                    value = _state.value.fiatInput,
-                    fieldName = "topupAmount",
-                    min = 0.0,
-                    defaultValue = 0.0
-                ).toInt()
+                val fiatAmount = if (_state.value.fiatInput.isEmpty()) {
+                    0
+                } else {
+                    try {
+                        _state.value.fiatInput.toInt()
+                    } catch (e: Exception) {
+                        0
+                    }
+                }
                 
                 if (fiatAmount <= 0) {
                     _state.value = _state.value.copy(
@@ -181,14 +193,9 @@ class TopupViewModel(
                             isProcessing = false
                         )
                         
-                        // Auto-confirm for simulation (in production, wait for payment callback)
-                        if (provider == "mpesa") {
-                            // For M-Pesa, simulate STK push confirmation after delay
-                            delay(2000)
-                            confirmTopup()
-                        }
                         // For PayPal/Paystack, user needs to complete payment via URL
                         // Payment confirmation will come via webhook callback
+                        // For M-Pesa, STK push is sent, wait for user to enter PIN
                     }
                     is NetworkResult.Error -> {
                         _state.value = _state.value.copy(

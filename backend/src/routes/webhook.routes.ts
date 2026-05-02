@@ -13,4 +13,7 @@ router.get('/paypal/cancel', WebhookController.handlePayPalCancel);
 router.post('/paystack', express.json(), WebhookController.handlePaystackWebhook);
 router.get('/paystack/callback', WebhookController.handlePaystackCallback);
 
+// M-Pesa callback
+router.post('/mpesa/callback', express.json(), WebhookController.handleMpesaCallback);
+
 export default router;

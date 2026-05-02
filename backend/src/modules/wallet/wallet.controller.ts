@@ -87,13 +87,19 @@ export class WalletController {
     try {
       const data = topupInitiateSchema.parse(req.body);
       
+      // SECURITY: Get client IP address for audit trail
+      const ipAddress = (req.headers['x-forwarded-for'] as string)?.split(',')[0] || 
+                        req.socket.remoteAddress || 
+                        'unknown';
+      
       const result = await WalletService.initiateTopup(
         req.userId!,
         data.fiatAmount,
         data.currency,
         data.provider,
         data.phoneNumber,
-        data.email
+        data.email,
+        ipAddress
       );
       
       res.status(200).json(result);
@@ -108,15 +114,12 @@ export class WalletController {
 
   static async confirmTopup(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { transactionId, reference } = req.body;
-      
-      if (!transactionId) {
-        res.status(400).json({ error: 'Transaction ID required' });
-        return;
-      }
-      
-      const result = await WalletService.confirmTopup(req.userId!, transactionId, reference);
-      res.status(200).json(result);
+      // SECURITY: Users should NOT be able to manually confirm top-ups
+      // This endpoint should be disabled or heavily restricted
+      res.status(403).json({ 
+        error: 'Manual confirmation not allowed. Top-ups are confirmed automatically via payment provider webhooks.' 
+      });
+      return;
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }

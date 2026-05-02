@@ -25,7 +25,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.krieta.com.core.util.KrCurrencyFormatter
+import com.krieta.com.core.util.BrowserUtil
 import com.krieta.feature.wallet.presentation.viewmodel.PaymentProvider
 import com.krieta.feature.wallet.presentation.viewmodel.TopupViewModel
 
@@ -92,10 +92,15 @@ class TopupScreen : Screen {
 
                 OutlinedTextField(
                     value = state.fiatInput,
-                    onValueChange = { viewModel.onFiatAmountChanged(it) },
+                    onValueChange = { input ->
+                        // Only allow whole numbers (no decimals)
+                        if (input.isEmpty() || input.all { it.isDigit() }) {
+                            viewModel.onFiatAmountChanged(input)
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("0.00") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    placeholder = { Text("0") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     enabled = !state.isProcessing && !state.isLoadingRate,
                     prefix = {
@@ -168,19 +173,7 @@ class TopupScreen : Screen {
                             )
                         }
 
-                        if (state.exchangeRate != null) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "1 Kr ≈ ${state.exchangeRate?.currency} ${kotlin.math.round((state.exchangeRate?.buyRate ?: 0.0) * 100) / 100.0}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f)
-                            )
-                            Text(
-                                text = "Includes ${state.exchangeRate?.margin} platform margin",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.4f)
-                            )
-                        }
+
                     }
                 }
 
@@ -211,7 +204,7 @@ class TopupScreen : Screen {
                             if (state.paymentUrl != null) {
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Button(
-                                    onClick = { /* TODO: Open payment URL in browser */ },
+                                    onClick = { BrowserUtil.openUrl(state.paymentUrl!!) },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text("Continue to Payment")

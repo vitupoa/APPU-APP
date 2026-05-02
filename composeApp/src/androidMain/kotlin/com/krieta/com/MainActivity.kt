@@ -10,11 +10,14 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.krieta.com.core.util.BrowserUtil
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        
+        BrowserUtil.init(applicationContext)
 
         setContent {
             App()

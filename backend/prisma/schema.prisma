@@ -204,6 +204,8 @@ model Transaction {
   @@index([userId, createdAt])
   @@index([userId, type, createdAt], map: "transactions_user_type_created_idx")
   @@index([status, createdAt], map: "transactions_status_created_idx")
+  @@index([status, userId], map: "transactions_status_user_idx")
+  @@index([status, provider, type], map: "transactions_pending_provider_idx")
   @@map("transactions")
 }
 
