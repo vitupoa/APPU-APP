@@ -1,21 +1,27 @@
 package com.krieta.com.core.util
 
-import android.provider.Settings
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import android.content.Context
+import androidx.core.content.edit
+import java.util.UUID
 
 actual object DeviceFingerprint : KoinComponent {
     private val context: Context by inject()
+    private const val PREFS_NAME = "device_fingerprint"
+    private const val KEY_FINGERPRINT = "fingerprint_id"
     
     actual fun getFingerprint(): String {
         return try {
-            Settings.Secure.getString(
-                context.contentResolver,
-                Settings.Secure.ANDROID_ID
-            ) ?: "unknown-android-device"
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.getString(KEY_FINGERPRINT, null) ?: run {
+                val newId = UUID.randomUUID().toString()
+                prefs.edit { putString(KEY_FINGERPRINT, newId) }
+                newId
+            }
         } catch (e: Exception) {
-            "unknown-android-device"
+            e.printStackTrace()
+            UUID.randomUUID().toString()
         }
     }
 }

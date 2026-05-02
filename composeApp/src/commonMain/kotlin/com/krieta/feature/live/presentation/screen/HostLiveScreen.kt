@@ -49,7 +49,8 @@ class HostLiveScreen : Screen {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.DarkGray) // Placeholder for Camera Feed
+                .background(Color.DarkGray)
+                .windowInsetsPadding(WindowInsets(0))
         ) {
             // Camera Placeholder Text
             Text(
@@ -62,7 +63,7 @@ class HostLiveScreen : Screen {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 48.dp, start = 16.dp, end = 16.dp),
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -106,7 +107,7 @@ class HostLiveScreen : Screen {
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .padding(top = 100.dp)
+                        .padding(top = 60.dp)
                         .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {

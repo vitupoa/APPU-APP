@@ -38,7 +38,9 @@ class WalletRepositoryImpl(
 
     override suspend fun getExchangeRate(currency: String): NetworkResult<ExchangeRate> {
         return safeApiCall {
+            println("🔍 Fetching exchange rate for currency: $currency")
             val dto = api.getExchangeRate(currency)
+            println("✅ Exchange rate DTO received: $dto")
             ExchangeRate(
                 currency = dto.currency,
                 baseRate = dto.baseRate,

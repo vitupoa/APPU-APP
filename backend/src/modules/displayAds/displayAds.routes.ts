@@ -9,9 +9,9 @@ router.post('/campaigns', authenticate, async (req: AuthRequest, res) => {
   try {
     const brandId = req.userId!;
     const campaign = await displayAdService.createCampaign(brandId, req.body);
-    res.status(201).json(campaign);
+    res.status(201).json(campaign); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -19,9 +19,9 @@ router.get('/campaigns', authenticate, async (req: AuthRequest, res) => {
   try {
     const brandId = req.userId!;
     const campaigns = await displayAdService.getBrandCampaigns(brandId);
-    res.json(campaigns);
+    res.json(campaigns); return;
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message }); return;
   }
 });
 
@@ -122,7 +122,7 @@ router.get('/min-budget', authenticate, async (req: AuthRequest, res) => {
 router.get('/admin/campaigns/pending', authenticate, async (req: AuthRequest, res) => {
   try {
     if (!req.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Unauthorized' }); return;
     }
     const campaigns = await displayAdService.getPendingCampaigns();
     res.json(campaigns);
@@ -136,7 +136,7 @@ router.get('/admin/campaigns/pending', authenticate, async (req: AuthRequest, re
 router.patch('/admin/campaigns/:id/approve', authenticate, async (req: AuthRequest, res) => {
   try {
     if (!req.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Unauthorized' }); return;
     }
     const campaign = await displayAdService.approveCampaign(
       req.params.id as string,
@@ -153,7 +153,7 @@ router.patch('/admin/campaigns/:id/approve', authenticate, async (req: AuthReque
 router.patch('/admin/campaigns/:id/reject', authenticate, async (req: AuthRequest, res) => {
   try {
     if (!req.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Unauthorized' }); return;
     }
     const { reason } = req.body;
     const campaign = await displayAdService.rejectCampaign(
@@ -172,7 +172,7 @@ router.patch('/admin/campaigns/:id/reject', authenticate, async (req: AuthReques
 router.get('/admin/settings', authenticate, async (req: AuthRequest, res) => {
   try {
     if (!req.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Unauthorized' }); return;
     }
     const { scope, scopeValue } = req.query;
     const settings = await displayAdService.getPlatformSettings(
@@ -190,7 +190,7 @@ router.get('/admin/settings', authenticate, async (req: AuthRequest, res) => {
 router.post('/admin/settings', authenticate, async (req: AuthRequest, res) => {
   try {
     if (!req.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized' });
+      return res.status(403).json({ error: 'Unauthorized' }); return;
     }
     const settings = await displayAdService.updatePlatformSettings(
       req.body,

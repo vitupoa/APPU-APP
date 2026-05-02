@@ -81,8 +81,11 @@ class TopupViewModel(
     private fun fetchExchangeRate() {
         screenModelScope.launch {
             _state.value = _state.value.copy(isLoadingRate = true)
+            println("🔍 TopupViewModel: Fetching exchange rate for currency: $userCurrency")
+            
             when (val result = walletRepository.getExchangeRate(userCurrency)) {
                 is NetworkResult.Success -> {
+                    println("✅ TopupViewModel: Exchange rate loaded successfully: ${result.data}")
                     _state.value = _state.value.copy(
                         exchangeRate = result.data,
                         isLoadingRate = false
@@ -90,10 +93,10 @@ class TopupViewModel(
                     // Recalculate if user already typed something
                     calculateKrPreview(_state.value.fiatInput)
                 }
-                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
+                    println("❌ TopupViewModel: Exchange rate error: ${result.message}")
                     _state.value = _state.value.copy(
-                        error = "Failed to load exchange rate",
+                        error = "Exchange rate fetch failed: ${result.message}",
                         isLoadingRate = false
                     )
                 }

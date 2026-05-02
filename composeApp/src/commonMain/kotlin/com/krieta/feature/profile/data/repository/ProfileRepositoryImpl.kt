@@ -86,25 +86,34 @@ class ProfileRepositoryImpl(
 
     // ─── MAPPERS ──────────────────────────────────
 
-    private fun UserProfileDto.toDomain() = UserProfile(
-        id = id ?: "",
-        username = username ?: "unknown",
-        firstName = firstName ?: "",
-        lastName = lastName ?: "",
-        displayName = displayName ?: "Unknown User",
-        avatarUrl = avatarUrl,
-        coverPhotoUrl = coverPhotoUrl,
-        bio = bio,
-        country = country ?: "US",
-        currency = currency ?: "USD",
-        accountType = parseAccountType(accountType ?: "CREATOR"),
-        isVerified = isVerified,
-        isWalletUnlocked = isWalletUnlocked,
-        bioLinks = bioLinks.map { it.toBioLink() },
-        stats = ProfileStats(stats.admirers, stats.admiring, stats.lovers, stats.contestsWon),
-        relationshipStatus = parseRelationship(relationshipStatus),
-        createdAt = createdAt ?: ""
-    )
+    private fun UserProfileDto.toDomain(): UserProfile {
+        // Validate required fields - if missing, API likely returned an error (401, 403, etc.)
+        if (id == null || username == null || displayName == null) {
+            println("❌ ProfileRepositoryImpl: Invalid profile data - id=$id, username=$username, displayName=$displayName")
+            println("❌ This usually means: 1) Token expired (401), 2) User not found (404), or 3) Access denied (403)")
+            throw IllegalStateException("Unable to load profile. Your session may have expired. Please logout and login again.")
+        }
+        
+        return UserProfile(
+            id = id,
+            username = username,
+            firstName = firstName ?: "",
+            lastName = lastName ?: "",
+            displayName = displayName,
+            avatarUrl = avatarUrl,
+            coverPhotoUrl = coverPhotoUrl,
+            bio = bio,
+            country = country ?: "US",
+            currency = currency ?: "USD",
+            accountType = parseAccountType(accountType ?: "CREATOR"),
+            isVerified = isVerified,
+            isWalletUnlocked = isWalletUnlocked,
+            bioLinks = bioLinks.map { it.toBioLink() },
+            stats = ProfileStats(stats.admirers, stats.admiring, stats.lovers, stats.contestsWon),
+            relationshipStatus = parseRelationship(relationshipStatus),
+            createdAt = createdAt ?: ""
+        )
+    }
 
     private fun BioLinkDto.toBioLink() = BioLink(id, label, url, icon, sortOrder)
 

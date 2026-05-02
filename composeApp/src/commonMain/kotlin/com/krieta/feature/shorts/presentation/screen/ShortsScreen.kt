@@ -124,7 +124,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black).windowInsetsPadding(WindowInsets(0))) {
             if (state.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),

@@ -38,9 +38,9 @@ router.post('/submit', authenticateToken, async (req: AuthRequest, res) => {
     res.json({
       message: 'KYC documents submitted successfully',
       document: kycDocument
-    });
+    }); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -49,9 +49,9 @@ router.get('/status', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId as string;
     const status = await kycService.getKYCStatus(userId);
-    res.json(status);
+    res.json(status); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -119,7 +119,7 @@ router.post('/withdrawal/request', authenticateToken, async (req: AuthRequest, r
     res.json({
       message: 'Withdrawal request submitted',
       withdrawal
-    });
+    }); return;
   } catch (error: any) {
     if (error.message.startsWith('KYC_REQUIRED') || error.message.startsWith('KYC_PENDING')) {
       res.status(403).json({ 
@@ -142,7 +142,7 @@ router.post('/withdrawal/request', authenticateToken, async (req: AuthRequest, r
       });
       return;
     }
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -165,9 +165,9 @@ router.get('/withdrawal/history', authenticateToken, async (req: AuthRequest, re
     res.json({
       withdrawals: userWithdrawals,
       total: userWithdrawals.length
-    });
+    }); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -195,9 +195,9 @@ router.get('/admin/kyc/pending', authenticateToken, async (req: AuthRequest, res
     const offset = parseInt(req.query.offset as string) || 0;
 
     const result = await kycService.getPendingKYC(limit, offset);
-    res.json(result);
+    res.json(result); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -236,9 +236,9 @@ router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req: Auth
     res.json({
       message: approved ? 'KYC approved' : 'KYC rejected',
       document
-    });
+    }); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -265,9 +265,9 @@ router.get('/admin/withdrawal/pending', authenticateToken, async (req: AuthReque
     const offset = parseInt(req.query.offset as string) || 0;
 
     const result = await withdrawalService.getPendingWithdrawals(status, limit, offset);
-    res.json(result);
+    res.json(result); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -304,9 +304,9 @@ router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req
     res.json({
       message: approved ? 'Withdrawal approved' : 'Withdrawal rejected',
       withdrawal
-    });
+    }); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -333,9 +333,9 @@ router.get('/admin/suspicious', authenticateToken, async (req: AuthRequest, res)
     const offset = parseInt(req.query.offset as string) || 0;
 
     const result = await withdrawalService.getSuspiciousActivities(resolved, limit, offset);
-    res.json(result);
+    res.json(result); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 
@@ -370,9 +370,9 @@ router.post('/admin/suspicious/resolve/:activityId', authenticateToken, async (r
     res.json({
       message: 'Suspicious activity resolved',
       activity
-    });
+    }); return;
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message }); return;
   }
 });
 

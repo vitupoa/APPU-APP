@@ -148,7 +148,11 @@ class CreateContestScreen : Screen {
                     currentStep = state.currentStep,
                     isValid = viewModel.isCurrentStepValid(),
                     isSubmitting = state.isPublishing,
-                    onContinue = { viewModel.nextStep() },
+                    onContinue = { 
+                        // Clear error before attempting to continue
+                        viewModel.clearError()
+                        viewModel.nextStep() 
+                    },
                     onPublish = { viewModel.publishContest() }
                 )
             }

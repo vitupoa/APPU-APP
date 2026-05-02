@@ -17,15 +17,56 @@ class WalletApi(
     private val httpClient: HttpClient
 ) {
     suspend fun getBalance(currency: String? = null): WalletBalanceDto {
-        return httpClient.get(ApiConstants.WALLET_BALANCE) {
-            if (currency != null) parameter("currency", currency)
-        }.body()
+        return try {
+            println("🔍 Fetching wallet balance for currency: $currency")
+            val response = httpClient.get(ApiConstants.WALLET_BALANCE) {
+                if (currency != null) parameter("currency", currency)
+            }
+            
+            println("🔍 Wallet Balance Response Status: ${response.status}")
+            
+            // Try to get raw response
+            val rawBody = try {
+                response.body<String>()
+            } catch (e: Exception) {
+                "Unable to read body"
+            }
+            println("🔍 Wallet Balance Raw Response: $rawBody")
+            
+            val result: WalletBalanceDto = response.body()
+            println("✅ Wallet Balance Parsed: $result")
+            result
+        } catch (e: Exception) {
+            println("❌ Wallet Balance Error: ${e.message}")
+            throw e
+        }
     }
 
     suspend fun getExchangeRate(currency: String): ExchangeRateResponseDto {
-        return httpClient.get(ApiConstants.WALLET_EXCHANGE_RATE) {
-            parameter("currency", currency)
-        }.body()
+        return try {
+            val response = httpClient.get(ApiConstants.WALLET_EXCHANGE_RATE) {
+                parameter("currency", currency)
+            }
+            
+            println("🔍 Exchange Rate API Response Status: ${response.status}")
+            
+            // Try to get the raw response body first
+            val rawBody = try {
+                response.body<String>()
+            } catch (e: Exception) {
+                "Unable to read body as string"
+            }
+            println("🔍 Exchange Rate API Raw Response: $rawBody")
+            
+            // Now try to parse as DTO
+            val result: ExchangeRateResponseDto = response.body()
+            println("✅ Exchange Rate Parsed Successfully: $result")
+            result
+        } catch (e: Exception) {
+            println("❌ Exchange Rate API Error: ${e.message}")
+            println("❌ Error Type: ${e::class.simpleName}")
+            throw e
+        }
     }
 
     suspend fun sendTip(request: TipRequestDto): TipResponseDto {

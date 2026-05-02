@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 
-const JWT_EXPIRES_IN = '15m'; // 15 minutes for access token
+// Use environment variable or default to 30 days for persistent login like WhatsApp/TikTok
+const JWT_EXPIRES_IN = env.JWT_ACCESS_EXPIRY || '30d';
 
 export interface JwtPayload {
   userId: string;

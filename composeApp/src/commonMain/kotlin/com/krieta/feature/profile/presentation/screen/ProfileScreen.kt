@@ -114,7 +114,9 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         
                         // Top App Bar / Actions over Cover
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 48.dp, end = 16.dp, start = 16.dp, bottom = 16.dp),
                             horizontalArrangement = Arrangement.End
                         ) {
                             if (isOwnProfile) {

@@ -159,7 +159,7 @@ class CreateGroupScreen : Screen {
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
-                        items(state.users) { user ->
+                        items(state.users, key = { it.id }) { user ->
                             SelectableUserItem(
                                 user = user,
                                 isSelected = state.selectedUserIds.contains(user.id),

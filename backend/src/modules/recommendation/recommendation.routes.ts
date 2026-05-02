@@ -27,9 +27,9 @@ router.get('/feed/discover', authenticate, async (req: AuthRequest, res) => {
 
     const feed = await feedGenerationService.generateDiscoverFeed(userId, limit, cursor);
     
-    res.json(feed);
+    res.json(feed); return;
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message }); return;
   }
 });
 
@@ -41,9 +41,9 @@ router.get('/feed/admiring', authenticate, async (req: AuthRequest, res) => {
 
     const feed = await feedGenerationService.generateAdmiringFeed(userId, limit);
     
-    res.json(feed);
+    res.json(feed); return;
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message }); return;
   }
 });
 
@@ -77,9 +77,9 @@ router.post('/interactions/track', authenticate, interactionRateLimiter, async (
       totalDuration
     });
 
-    res.json({ success: true });
+    res.json({ success: true }); return;
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message }); return;
   }
 });
 
@@ -108,9 +108,9 @@ router.post('/distribution/initialize', authenticate, async (req: AuthRequest, r
       { hashtags, location }
     );
 
-    res.json(result);
+    res.json(result); return;
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message }); return;
   }
 });
 
@@ -121,9 +121,9 @@ router.post('/distribution/evaluate', authenticate, async (req, res) => {
 
     const result = await contentDistributionService.evaluatePerformance(contentId, contentType);
 
-    res.json(result);
+    res.json(result); return;
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message }); return;
   }
 });
 

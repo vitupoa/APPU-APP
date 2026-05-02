@@ -71,7 +71,7 @@ class ContestSubmissionFeedScreen : Screen {
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black).windowInsetsPadding(WindowInsets(0))) {
             when {
                 state.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -123,7 +123,7 @@ class ContestSubmissionFeedScreen : Screen {
                                 Box(
                                     modifier = Modifier
                                         .align(Alignment.TopCenter)
-                                        .padding(top = 120.dp)
+                                        .padding(top = 16.dp)
                                 ) {
                                     ContestSponsorBanner(
                                         sponsorName = "Safaricom",
@@ -249,7 +249,7 @@ class ContestSubmissionFeedScreen : Screen {
                 prizeKr = 5000.0,
                 currencyProvider = currencyProvider,
                 onJoin = onContestClick,
-                modifier = Modifier.align(Alignment.TopStart).padding(top = 110.dp, start = 16.dp)
+                modifier = Modifier.align(Alignment.TopStart).padding(top = 16.dp, start = 16.dp)
             )
 
             // Bottom info

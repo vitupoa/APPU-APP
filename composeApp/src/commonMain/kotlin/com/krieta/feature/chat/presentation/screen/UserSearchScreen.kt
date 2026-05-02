@@ -101,7 +101,7 @@ data class UserSearchScreen(val title: String = "New Chat") : Screen {
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
-                        items(state.users) { user ->
+                        items(state.users, key = { it.id }) { user ->
                             UserSearchItem(
                                 user = user,
                                 onClick = {

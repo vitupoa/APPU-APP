@@ -60,7 +60,7 @@ class LiveFeedScreen : Screen {
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black).windowInsetsPadding(WindowInsets(0))) {
             when {
                 isLoading -> {
                     CircularProgressIndicator(
@@ -115,7 +115,7 @@ class LiveFeedScreen : Screen {
                             Row(
                                 modifier = Modifier
                                     .align(Alignment.TopStart)
-                                    .padding(top = 120.dp, start = 16.dp),
+                                    .padding(top = 16.dp, start = 16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Box(

@@ -51,7 +51,7 @@ class WithdrawScreen : Screen {
         ) { padding ->
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(padding)
                     .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally

@@ -35,9 +35,23 @@ class ProfileViewModel(
 
     val isOwnProfile: Boolean get() = userId == null
 
+    companion object {
+        // Cache profile data to prevent "Unknown User" on tab switch
+        private var cachedOwnProfile: UserProfile? = null
+    }
+
     init { 
-        _state.value = ProfileState()
-        refreshProfile() 
+        println("🔍 ProfileViewModel init - userId: $userId, isOwnProfile: $isOwnProfile")
+        
+        // Use cached profile if available for own profile
+        if (isOwnProfile && cachedOwnProfile != null) {
+            println("✅ ProfileViewModel: Using cached profile - ${cachedOwnProfile?.displayName}")
+            _state.value = ProfileState(profile = cachedOwnProfile, isLoading = false)
+        } else {
+            println("🔍 ProfileViewModel: No cache, loading fresh profile")
+            refreshProfile()
+        }
+        
         observeProfileUpdates()
     }
 
@@ -134,8 +148,12 @@ class ProfileViewModel(
 
             // If loading own profile, verify we have a valid token
             if (isOwnProfile) {
+                println("🔍 ProfileViewModel: Loading own profile")
                 val isAuthenticated = authRepository.isAuthenticated()
+                println("🔍 ProfileViewModel: isAuthenticated = $isAuthenticated")
+                
                 if (!isAuthenticated) {
+                    println("❌ ProfileViewModel: Not authenticated!")
                     _state.value = ProfileState(
                         isLoading = false, 
                         error = "Not authenticated. Please log in again."
@@ -144,11 +162,25 @@ class ProfileViewModel(
                 }
             }
 
-            val profileResult = if (isOwnProfile) repository.getMyProfile() else repository.getProfile(userId!!)
+            val profileResult = if (isOwnProfile) {
+                println("🔍 ProfileViewModel: Calling getMyProfile()")
+                repository.getMyProfile()
+            } else {
+                println("🔍 ProfileViewModel: Calling getProfile($userId)")
+                repository.getProfile(userId!!)
+            }
 
             when (profileResult) {
                 is NetworkResult.Success -> {
                     val profile = profileResult.data
+                    println("✅ ProfileViewModel: Profile loaded successfully - ${profile.displayName}")
+                    
+                    // Cache own profile to prevent "Unknown User" on tab switch
+                    if (isOwnProfile) {
+                        cachedOwnProfile = profile
+                        println("💾 ProfileViewModel: Cached own profile")
+                    }
+                    
                     // Load subscription tiers if not own profile
                     val tiers = if (!isOwnProfile) {
                         when (val tiersResult = repository.getUserSubscriptionTiers(profile.id)) {
@@ -165,6 +197,7 @@ class ProfileViewModel(
                 }
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
+                    println("❌ ProfileViewModel: Profile load error - ${profileResult.message}")
                     _state.value = ProfileState(
                         isLoading = false, 
                         error = profileResult.message ?: "Failed to load profile"

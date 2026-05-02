@@ -130,9 +130,13 @@ data class CreateContestState(
 ) {
     // Computed property: Duration calculation (Requirement 2.6, 2.7)
     val duration: kotlin.time.Duration?
-        get() = if (startDate != null && endDate != null) {
-            endDate - startDate
-        } else null
+        get() = try {
+            if (startDate != null && endDate != null && endDate > startDate) {
+                endDate - startDate
+            } else null
+        } catch (e: Exception) {
+            null
+        }
     
     // Computed property: Total prize pool (Requirement 7.6, 7.7)
     val totalPrizePool: Double
@@ -152,63 +156,88 @@ data class CreateContestState(
     
     // Step 1 validation (Requirements 2.1-2.10)
     private fun validateStep1(): Boolean {
-        val titleValid = title.length in 3..80
-        val descriptionValid = description.length >= 10
-        val datesValid = startDate != null && endDate != null
-        val durationValid = duration?.let { it.inWholeHours >= 2 } ?: false
-        return titleValid && descriptionValid && datesValid && durationValid
+        return try {
+            val titleValid = title.length in 3..80
+            val descriptionValid = description.length >= 10
+            val datesValid = startDate != null && endDate != null
+            val durationValid = if (startDate != null && endDate != null) {
+                val dur = duration
+                dur != null && dur.inWholeHours >= 2
+            } else false
+            
+            titleValid && descriptionValid && datesValid && durationValid
+        } catch (e: Exception) {
+            // If any validation throws an exception, consider step invalid
+            false
+        }
     }
     
     // Step 2 validation (Requirements 3.1-5.4)
     private fun validateStep2(): Boolean {
-        val demographicsValid = if (demographicsLock) {
-            val ageValid = minAge != null && maxAge != null && minAge <= maxAge
-            ageValid
-        } else true
-        
-        val teamConfigValid = when (participationType) {
-            ParticipationType.TEAM_ONLY, ParticipationType.BOTH -> {
-                val teamSizeValid = teamSize == null || teamSize in 2..10
-                val maxTeamsValid = maxTeams == null || maxTeams > 0
-                teamSizeValid && maxTeamsValid
+        return try {
+            val demographicsValid = if (demographicsLock) {
+                val ageValid = minAge != null && maxAge != null && minAge <= maxAge
+                ageValid
+            } else true
+            
+            val teamConfigValid = when (participationType) {
+                ParticipationType.TEAM_ONLY, ParticipationType.BOTH -> {
+                    val teamSizeValid = teamSize == null || teamSize in 2..10
+                    val maxTeamsValid = maxTeams == null || maxTeams > 0
+                    teamSizeValid && maxTeamsValid
+                }
+                ParticipationType.INDIVIDUAL_ONLY -> true
             }
-            ParticipationType.INDIVIDUAL_ONLY -> true
+            
+            val entryFeeValid = entryFee >= 0.0
+            
+            // Mutual exclusivity: entry fee and paid voting (Requirements 9.2, 9.3, 9.4)
+            val mutualExclusivityValid = !(entryFee > 0.0 && paidVoting)
+            
+            demographicsValid && teamConfigValid && entryFeeValid && mutualExclusivityValid
+        } catch (e: Exception) {
+            false
         }
-        
-        val entryFeeValid = entryFee >= 0.0
-        
-        // Mutual exclusivity: entry fee and paid voting (Requirements 9.2, 9.3, 9.4)
-        val mutualExclusivityValid = !(entryFee > 0.0 && paidVoting)
-        
-        return demographicsValid && teamConfigValid && entryFeeValid && mutualExclusivityValid
     }
     
     // Step 3 validation (Requirements 6.1-6.14)
     private fun validateStep3(): Boolean {
-        return addedTasks.isNotEmpty()
+        return try {
+            addedTasks.isNotEmpty()
+        } catch (e: Exception) {
+            false
+        }
     }
     
     // Step 4 validation (Requirements 7.1-10.5)
     private fun validateStep4(): Boolean {
-        val prizesValid = prizeAmounts.all { it >= 0.0 } && prizeAmounts.size == winnerSlots
-        
-        val airdropValid = if (milestoneAirdropEnabled) {
-            milestoneAirdropAmount > 0.0 && milestoneAirdropLimit > 0
-        } else true
-        
-        // Mutual exclusivity: entry fee and paid voting (Requirements 9.2, 9.3, 9.4)
-        val mutualExclusivityValid = !(entryFee > 0.0 && paidVoting)
-        
-        return prizesValid && airdropValid && mutualExclusivityValid
+        return try {
+            val prizesValid = prizeAmounts.all { it >= 0.0 } && prizeAmounts.size == winnerSlots
+            
+            val airdropValid = if (milestoneAirdropEnabled) {
+                milestoneAirdropAmount > 0.0 && milestoneAirdropLimit > 0
+            } else true
+            
+            // Mutual exclusivity: entry fee and paid voting (Requirements 9.2, 9.3, 9.4)
+            val mutualExclusivityValid = !(entryFee > 0.0 && paidVoting)
+            
+            prizesValid && airdropValid && mutualExclusivityValid
+        } catch (e: Exception) {
+            false
+        }
     }
     
     // Step 5 validation (Requirements 11.1-12.9)
     private fun validateStep5(): Boolean {
-        val judgesValid = when (selectionMethod) {
-            SelectionMethod.MANUAL, SelectionMethod.COMBINATION -> judges.isNotEmpty() && judges.size <= 15
-            SelectionMethod.RANDOM, SelectionMethod.VOTING -> true
+        return try {
+            val judgesValid = when (selectionMethod) {
+                SelectionMethod.MANUAL, SelectionMethod.COMBINATION -> judges.isNotEmpty() && judges.size <= 15
+                SelectionMethod.RANDOM, SelectionMethod.VOTING -> true
+            }
+            judgesValid
+        } catch (e: Exception) {
+            false
         }
-        return judgesValid
     }
 }
 
@@ -233,11 +262,25 @@ class CreateContestViewModel(
      */
     fun nextStep() {
         val currentState = _state.value
+        
+        // Clear any previous errors
+        _state.value = currentState.copy(error = null)
+        
         // Validate current step before proceeding (Requirement 1.8)
-        if (currentState.isStepValid(currentState.currentStep) && currentState.currentStep < 5) {
+        if (!currentState.isStepValid(currentState.currentStep)) {
+            // Show validation error
+            _state.value = _state.value.copy(
+                error = "Please complete all required fields before continuing"
+            )
+            return
+        }
+        
+        // Proceed to next step if valid and not on last step
+        if (currentState.currentStep < 5) {
             _state.value = currentState.copy(
                 currentStep = currentState.currentStep + 1,
-                stepValidation = currentState.stepValidation + (currentState.currentStep to true)
+                stepValidation = currentState.stepValidation + (currentState.currentStep to true),
+                error = null
             )
         }
     }
@@ -334,48 +377,53 @@ class CreateContestViewModel(
      */
     fun validateStep2(): Map<String, String> {
         val errors = mutableMapOf<String, String>()
-        val currentState = _state.value
         
-        // Demographics validation (Requirements 3.1-3.5)
-        if (currentState.demographicsLock) {
-            if (currentState.minAge == null) {
-                errors["minAge"] = "Minimum age is required when demographics lock is enabled"
-            }
-            if (currentState.maxAge == null) {
-                errors["maxAge"] = "Maximum age is required when demographics lock is enabled"
-            }
-            if (currentState.minAge != null && currentState.maxAge != null && currentState.minAge > currentState.maxAge) {
-                errors["ageRange"] = "Minimum age must be less than or equal to maximum age"
-            }
-        }
-        
-        // Team configuration validation (Requirements 4.1-4.8)
-        when (currentState.participationType) {
-            ParticipationType.TEAM_ONLY, ParticipationType.BOTH -> {
-                currentState.teamSize?.let { teamSize ->
-                    if (teamSize !in 2..10) {
-                        errors["teamSize"] = "Team size must be between 2 and 10 members"
-                    }
+        try {
+            val currentState = _state.value
+            
+            // Demographics validation (Requirements 3.1-3.5)
+            if (currentState.demographicsLock) {
+                if (currentState.minAge == null) {
+                    errors["minAge"] = "Minimum age is required when demographics lock is enabled"
                 }
-                currentState.maxTeams?.let { maxTeams ->
-                    if (maxTeams <= 0) {
-                        errors["maxTeams"] = "Maximum teams must be a positive number"
-                    }
+                if (currentState.maxAge == null) {
+                    errors["maxAge"] = "Maximum age is required when demographics lock is enabled"
+                }
+                if (currentState.minAge != null && currentState.maxAge != null && currentState.minAge > currentState.maxAge) {
+                    errors["ageRange"] = "Minimum age must be less than or equal to maximum age"
                 }
             }
-            ParticipationType.INDIVIDUAL_ONLY -> {
-                // No team configuration validation needed
+            
+            // Team configuration validation (Requirements 4.1-4.8)
+            when (currentState.participationType) {
+                ParticipationType.TEAM_ONLY, ParticipationType.BOTH -> {
+                    currentState.teamSize?.let { teamSize ->
+                        if (teamSize !in 2..10) {
+                            errors["teamSize"] = "Team size must be between 2 and 10 members"
+                        }
+                    }
+                    currentState.maxTeams?.let { maxTeams ->
+                        if (maxTeams <= 0) {
+                            errors["maxTeams"] = "Maximum teams must be a positive number"
+                        }
+                    }
+                }
+                ParticipationType.INDIVIDUAL_ONLY -> {
+                    // No team configuration validation needed
+                }
             }
-        }
-        
-        // Entry fee validation (Requirements 5.1-5.4)
-        if (currentState.entryFee < 0.0) {
-            errors["entryFee"] = "Entry fee cannot be negative"
-        }
-        
-        // Mutual exclusivity validation (Requirements 9.2, 9.3, 9.4)
-        if (currentState.entryFee > 0.0 && currentState.paidVoting) {
-            errors["mutualExclusivity"] = "Entry fee and paid voting are mutually exclusive"
+            
+            // Entry fee validation (Requirements 5.1-5.4)
+            if (currentState.entryFee < 0.0) {
+                errors["entryFee"] = "Entry fee cannot be negative"
+            }
+            
+            // Mutual exclusivity validation (Requirements 9.2, 9.3, 9.4)
+            if (currentState.entryFee > 0.0 && currentState.paidVoting) {
+                errors["mutualExclusivity"] = "Entry fee and paid voting are mutually exclusive"
+            }
+        } catch (e: Exception) {
+            errors["validation"] = "Validation error: ${e.message}"
         }
         
         return errors
@@ -388,57 +436,62 @@ class CreateContestViewModel(
      */
     fun validateStep3(): Map<String, String> {
         val errors = mutableMapOf<String, String>()
-        val currentState = _state.value
         
-        // Task list validation (Requirements 6.10-6.14)
-        if (currentState.addedTasks.isEmpty()) {
-            errors["taskList"] = "At least one task is required"
-        }
-        
-        // Current task configuration validation (Requirements 6.1-6.9)
-        if (currentState.taskConfiguration.isNotBlank()) {
-            when (currentState.taskType) {
-                TaskType.FOLLOW_KRIETA -> {
-                    if (currentState.taskConfiguration.isBlank()) {
-                        errors["taskConfiguration"] = "Krieta username is required"
+        try {
+            val currentState = _state.value
+            
+            // Task list validation (Requirements 6.10-6.14)
+            if (currentState.addedTasks.isEmpty()) {
+                errors["taskList"] = "At least one task is required"
+            }
+            
+            // Current task configuration validation (Requirements 6.1-6.9)
+            if (currentState.taskConfiguration.isNotBlank()) {
+                when (currentState.taskType) {
+                    TaskType.FOLLOW_KRIETA -> {
+                        if (currentState.taskConfiguration.isBlank()) {
+                            errors["taskConfiguration"] = "Krieta username is required"
+                        }
                     }
-                }
-                TaskType.SUBSCRIBE_YOUTUBE -> {
-                    if (currentState.taskConfiguration.isBlank()) {
-                        errors["taskConfiguration"] = "YouTube channel URL is required"
+                    TaskType.SUBSCRIBE_YOUTUBE -> {
+                        if (currentState.taskConfiguration.isBlank()) {
+                            errors["taskConfiguration"] = "YouTube channel URL is required"
+                        }
                     }
-                }
-                TaskType.FOLLOW_SPOTIFY -> {
-                    if (currentState.taskConfiguration.isBlank()) {
-                        errors["taskConfiguration"] = "Spotify artist URL is required"
+                    TaskType.FOLLOW_SPOTIFY -> {
+                        if (currentState.taskConfiguration.isBlank()) {
+                            errors["taskConfiguration"] = "Spotify artist URL is required"
+                        }
                     }
-                }
-                TaskType.FOLLOW_INSTAGRAM -> {
-                    if (currentState.taskConfiguration.isBlank()) {
-                        errors["taskConfiguration"] = "Instagram username is required"
+                    TaskType.FOLLOW_INSTAGRAM -> {
+                        if (currentState.taskConfiguration.isBlank()) {
+                            errors["taskConfiguration"] = "Instagram username is required"
+                        }
                     }
-                }
-                TaskType.FOLLOW_TIKTOK -> {
-                    if (currentState.taskConfiguration.isBlank()) {
-                        errors["taskConfiguration"] = "TikTok username is required"
+                    TaskType.FOLLOW_TIKTOK -> {
+                        if (currentState.taskConfiguration.isBlank()) {
+                            errors["taskConfiguration"] = "TikTok username is required"
+                        }
                     }
-                }
-                TaskType.WATCH_VIDEO -> {
-                    if (currentState.taskConfiguration.isBlank()) {
-                        errors["taskConfiguration"] = "Video URL is required"
+                    TaskType.WATCH_VIDEO -> {
+                        if (currentState.taskConfiguration.isBlank()) {
+                            errors["taskConfiguration"] = "Video URL is required"
+                        }
                     }
-                }
-                TaskType.VISIT_SHOP -> {
-                    if (currentState.taskConfiguration.isBlank()) {
-                        errors["taskConfiguration"] = "Shop URL is required"
+                    TaskType.VISIT_SHOP -> {
+                        if (currentState.taskConfiguration.isBlank()) {
+                            errors["taskConfiguration"] = "Shop URL is required"
+                        }
                     }
-                }
-                TaskType.CUSTOM_TASK -> {
-                    if (currentState.taskConfiguration.isBlank()) {
-                        errors["taskConfiguration"] = "Custom task description is required"
+                    TaskType.CUSTOM_TASK -> {
+                        if (currentState.taskConfiguration.isBlank()) {
+                            errors["taskConfiguration"] = "Custom task description is required"
+                        }
                     }
                 }
             }
+        } catch (e: Exception) {
+            errors["validation"] = "Validation error: ${e.message}"
         }
         
         return errors
@@ -451,36 +504,41 @@ class CreateContestViewModel(
      */
     fun validateStep4(): Map<String, String> {
         val errors = mutableMapOf<String, String>()
-        val currentState = _state.value
         
-        // Prize distribution validation (Requirements 7.1-7.7)
-        if (currentState.prizeAmounts.size != currentState.winnerSlots) {
-            errors["prizeAmounts"] = "Prize amounts must match winner slots"
-        }
-        
-        currentState.prizeAmounts.forEachIndexed { index, amount ->
-            if (amount < 0.0) {
-                errors["prizeAmount_$index"] = "Prize amount cannot be negative"
+        try {
+            val currentState = _state.value
+            
+            // Prize distribution validation (Requirements 7.1-7.7)
+            if (currentState.prizeAmounts.size != currentState.winnerSlots) {
+                errors["prizeAmounts"] = "Prize amounts must match winner slots"
             }
-        }
-        
-        if (currentState.totalPrizePool <= 0.0) {
-            errors["totalPrizePool"] = "Total prize pool must be greater than zero"
-        }
-        
-        // Milestone airdrop validation (Requirements 10.1-10.5)
-        if (currentState.milestoneAirdropEnabled) {
-            if (currentState.milestoneAirdropAmount <= 0.0) {
-                errors["milestoneAirdropAmount"] = "Airdrop amount must be positive"
+            
+            currentState.prizeAmounts.forEachIndexed { index, amount ->
+                if (amount < 0.0) {
+                    errors["prizeAmount_$index"] = "Prize amount cannot be negative"
+                }
             }
-            if (currentState.milestoneAirdropLimit <= 0) {
-                errors["milestoneAirdropLimit"] = "Airdrop participant limit must be positive"
+            
+            if (currentState.totalPrizePool <= 0.0) {
+                errors["totalPrizePool"] = "Total prize pool must be greater than zero"
             }
-        }
-        
-        // Mutual exclusivity validation (Requirements 9.2, 9.3, 9.4)
-        if (currentState.entryFee > 0.0 && currentState.paidVoting) {
-            errors["mutualExclusivity"] = "Entry fee and paid voting are mutually exclusive"
+            
+            // Milestone airdrop validation (Requirements 10.1-10.5)
+            if (currentState.milestoneAirdropEnabled) {
+                if (currentState.milestoneAirdropAmount <= 0.0) {
+                    errors["milestoneAirdropAmount"] = "Airdrop amount must be positive"
+                }
+                if (currentState.milestoneAirdropLimit <= 0) {
+                    errors["milestoneAirdropLimit"] = "Airdrop participant limit must be positive"
+                }
+            }
+            
+            // Mutual exclusivity validation (Requirements 9.2, 9.3, 9.4)
+            if (currentState.entryFee > 0.0 && currentState.paidVoting) {
+                errors["mutualExclusivity"] = "Entry fee and paid voting are mutually exclusive"
+            }
+        } catch (e: Exception) {
+            errors["validation"] = "Validation error: ${e.message}"
         }
         
         return errors
@@ -493,21 +551,26 @@ class CreateContestViewModel(
      */
     fun validateStep5(): Map<String, String> {
         val errors = mutableMapOf<String, String>()
-        val currentState = _state.value
         
-        // Judge assignment validation (Requirements 11.1-11.7)
-        when (currentState.selectionMethod) {
-            SelectionMethod.MANUAL, SelectionMethod.COMBINATION -> {
-                if (currentState.judges.isEmpty()) {
-                    errors["judges"] = "At least one judge is required for manual or combination selection"
+        try {
+            val currentState = _state.value
+            
+            // Judge assignment validation (Requirements 11.1-11.7)
+            when (currentState.selectionMethod) {
+                SelectionMethod.MANUAL, SelectionMethod.COMBINATION -> {
+                    if (currentState.judges.isEmpty()) {
+                        errors["judges"] = "At least one judge is required for manual or combination selection"
+                    }
+                    if (currentState.judges.size > 15) {
+                        errors["judges"] = "Maximum 15 judges allowed"
+                    }
                 }
-                if (currentState.judges.size > 15) {
-                    errors["judges"] = "Maximum 15 judges allowed"
+                SelectionMethod.RANDOM, SelectionMethod.VOTING -> {
+                    // No judge validation needed for these methods
                 }
             }
-            SelectionMethod.RANDOM, SelectionMethod.VOTING -> {
-                // No judge validation needed for these methods
-            }
+        } catch (e: Exception) {
+            errors["validation"] = "Validation error: ${e.message}"
         }
         
         return errors

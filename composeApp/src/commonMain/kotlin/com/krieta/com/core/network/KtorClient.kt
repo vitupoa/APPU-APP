@@ -60,6 +60,8 @@ object KtorClientFactory {
                         val refresh = tokenManager.getRefreshToken() ?: return@refreshTokens null
                         val deviceId = deviceSecurity?.getDeviceId() ?: "UNKNOWN_DEVICE"
                         
+                        println("🔄 Token refresh triggered - attempting to refresh access token")
+                        
                         try {
                             val response = client.post(ApiConstants.AUTH_REFRESH) {
                                 setBody(mapOf("refreshToken" to refresh, "deviceId" to deviceId))
@@ -68,13 +70,21 @@ object KtorClientFactory {
                             if (response.status.value == 200) {
                                 val tokens = response.body<com.krieta.feature.auth.data.remote.dto.AuthResponseDto>()
                                 if (tokens.accessToken != null && tokens.refreshToken != null) {
+                                    println("✅ Token refresh successful - new tokens saved")
                                     tokenManager.saveAccessToken(tokens.accessToken)
                                     tokenManager.saveRefreshToken(tokens.refreshToken)
                                     return@refreshTokens BearerTokens(tokens.accessToken, tokens.refreshToken)
+                                } else {
+                                    println("❌ Token refresh failed - invalid response structure")
                                 }
+                            } else {
+                                println("❌ Token refresh failed - status: ${response.status.value}")
                             }
                             null
                         } catch (e: Exception) {
+                            println("❌ Token refresh exception: ${e.message}")
+                            // Clear tokens on refresh failure to force re-login
+                            tokenManager.clearTokens()
                             null
                         }
                     }

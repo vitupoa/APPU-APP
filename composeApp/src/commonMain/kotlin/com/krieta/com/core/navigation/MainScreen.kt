@@ -161,9 +161,6 @@ private fun KrietaBottomBar(onCreateClick: () -> Unit, showFAB: Boolean) {
                     )
                 }
             }
-        } else {
-            // Empty space to maintain layout balance
-            Spacer(Modifier.weight(1f))
         }
         
         TabItem(ChatsTab)

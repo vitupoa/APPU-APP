@@ -2,10 +2,27 @@ import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '../../config/database.js';
 import { generateAccessToken, JwtPayload } from '../../utils/jwt.js';
+import { env } from '../../config/env.js';
 import crypto from 'crypto';
 
-// Token expiration: 365 days simulating TikTok persistent logins securely!
-const REFRESH_TOKEN_TTL = 365 * 24 * 60 * 60 * 1000;
+// Parse JWT_REFRESH_EXPIRY from env (e.g., '365d' -> milliseconds)
+function parseExpiry(expiry: string): number {
+  const match = expiry.match(/^(\d+)([smhd])$/);
+  if (!match) return 365 * 24 * 60 * 60 * 1000; // Default 365 days
+  
+  const value = parseInt(match[1]);
+  const unit = match[2];
+  
+  switch (unit) {
+    case 's': return value * 1000;
+    case 'm': return value * 60 * 1000;
+    case 'h': return value * 60 * 60 * 1000;
+    case 'd': return value * 24 * 60 * 60 * 1000;
+    default: return 365 * 24 * 60 * 60 * 1000;
+  }
+}
+
+const REFRESH_TOKEN_TTL = parseExpiry(env.JWT_REFRESH_EXPIRY || '365d');
 
 export class AuthService {
   /**

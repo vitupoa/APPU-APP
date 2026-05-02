@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
             implementation("androidx.work:work-runtime-ktx:2.9.0")
+            implementation("androidx.core:core-ktx:1.13.1")
 
             // Ktor Android engine
             implementation(libs.ktor.client.okhttp)
