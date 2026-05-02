@@ -1,11 +1,9 @@
-import { PayPalClient, OrdersController, PayoutsController } from '@paypal/paypal-server-sdk';
-import { Environment } from '@paypal/paypal-server-sdk/dist/models/environment';
+import { Client, OrdersController, Environment } from '@paypal/paypal-server-sdk';
 import { env } from '../../config/env.js';
 
 export class PaypalService {
-  private static client: PayPalClient;
+  private static client: Client;
   private static ordersController: OrdersController;
-  private static payoutsController: PayoutsController;
 
   private static initClient() {
     if (!this.client) {
@@ -13,7 +11,7 @@ export class PaypalService {
         ? Environment.Production
         : Environment.Sandbox;
 
-      this.client = new PayPalClient({
+      this.client = new Client({
         clientCredentialsAuthCredentials: {
           oAuthClientId: env.PAYPAL_CLIENT_ID,
           oAuthClientSecret: env.PAYPAL_CLIENT_SECRET,
@@ -22,7 +20,6 @@ export class PaypalService {
       });
 
       this.ordersController = new OrdersController(this.client);
-      this.payoutsController = new PayoutsController(this.client);
     }
   }
 
@@ -38,7 +35,7 @@ export class PaypalService {
   }): Promise<{ orderId: string; approvalUrl: string }> {
     this.initClient();
 
-    const response = await this.ordersController.ordersCreate({
+    const response = await this.ordersController.createOrder({
       body: {
         intent: 'CAPTURE',
         purchaseUnits: [{
@@ -80,7 +77,7 @@ export class PaypalService {
   }> {
     this.initClient();
 
-    const response = await this.ordersController.ordersCapture({
+    const response = await this.ordersController.captureOrder({
       id: orderId,
       prefer: 'return=representation'
     });
@@ -100,6 +97,8 @@ export class PaypalService {
 
   /**
    * Creates a PayPal payout for withdrawal.
+   * Note: PayPal Payouts API requires separate approval and is not in the standard SDK.
+   * Using direct REST API for payouts.
    */
   static async createPayout(params: {
     email: string;
@@ -108,31 +107,58 @@ export class PaypalService {
     reference: string;
     note: string;
   }): Promise<{ payoutBatchId: string; payoutItemId: string }> {
-    this.initClient();
+    // Payouts require direct REST API call as SDK doesn't include Payouts controller
+    const axios = (await import('axios')).default;
+    const baseUrl = env.PAYPAL_MODE === 'live'
+      ? 'https://api-m.paypal.com'
+      : 'https://api-m.sandbox.paypal.com';
 
-    const response = await this.payoutsController.createPayout({
-      body: {
-        senderBatchHeader: {
-          senderBatchId: params.reference,
-          emailSubject: 'Krieta Withdrawal',
-          emailMessage: params.note
+    // Get access token
+    const auth = Buffer.from(
+      `${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_CLIENT_SECRET}`
+    ).toString('base64');
+
+    const tokenResponse = await axios.post(
+      `${baseUrl}/v1/oauth2/token`,
+      'grant_type=client_credentials',
+      {
+        headers: {
+          Authorization: `Basic ${auth}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    );
+
+    const response = await axios.post(
+      `${baseUrl}/v1/payments/payouts`,
+      {
+        sender_batch_header: {
+          sender_batch_id: params.reference,
+          email_subject: 'Krieta Withdrawal',
+          email_message: params.note
         },
         items: [{
-          recipientType: 'EMAIL',
+          recipient_type: 'EMAIL',
           amount: {
             value: params.amount.toFixed(2),
             currency: params.currency.toUpperCase()
           },
           receiver: params.email,
           note: params.note,
-          senderItemId: params.reference
+          sender_item_id: params.reference
         }]
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${tokenResponse.data.access_token}`,
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
 
     return {
-      payoutBatchId: response.result.batchHeader!.payoutBatchId!,
-      payoutItemId: response.result.items![0].payoutItemId!
+      payoutBatchId: response.data.batch_header.payout_batch_id,
+      payoutItemId: response.data.items[0].payout_item_id
     };
   }
 

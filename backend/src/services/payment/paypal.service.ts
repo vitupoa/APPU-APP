@@ -1,8 +1,7 @@
-import { PayPalClient, OrdersController, PaymentsController } from '@paypal/paypal-server-sdk';
-import { Environment } from '@paypal/paypal-server-sdk/dist/models/environment';
+import { Client, OrdersController, PaymentsController, Environment } from '@paypal/paypal-server-sdk';
 
 class PayPalService {
-  private client: PayPalClient;
+  private client: Client;
   private ordersController: OrdersController;
   private paymentsController: PaymentsController;
 
@@ -13,7 +12,7 @@ class PayPalService {
       ? Environment.Production
       : Environment.Sandbox;
     
-    this.client = new PayPalClient({
+    this.client = new Client({
       clientCredentialsAuthCredentials: {
         oAuthClientId: clientId,
         oAuthClientSecret: clientSecret,
@@ -30,7 +29,7 @@ class PayPalService {
    */
   async createOrder(amount: number, currency: string, reference: string, email: string) {
     try {
-      const response = await this.ordersController.ordersCreate({
+      const response = await this.ordersController.createOrder({
         body: {
           intent: 'CAPTURE',
           purchaseUnits: [
@@ -76,7 +75,7 @@ class PayPalService {
    */
   async captureOrder(orderId: string) {
     try {
-      const response = await this.ordersController.ordersCapture({
+      const response = await this.ordersController.captureOrder({
         id: orderId,
         prefer: 'return=representation',
       });
@@ -117,5 +116,7 @@ class PayPalService {
     }
   }
 }
+
+export default new PayPalService();
 
 export default new PayPalService();
