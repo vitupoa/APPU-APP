@@ -6,7 +6,9 @@ import { nonceService } from '../../services/nonce.service.js';
 import { WithdrawalSecurityMetadata } from './withdrawal.types.js';
 import { WithdrawalSecurityValidator } from '../../utils/withdrawalSecurity.js';
 
-const DAILY_WITHDRAWAL_LIMIT = 500000;
+const DAILY_WITHDRAWAL_LIMIT = 500000; // Kr. 500,000 per day
+const HOURLY_WITHDRAWAL_LIMIT = 30000; // Kr. 30,000 per hour
+const SINGLE_TRANSACTION_LIMIT = 30000; // Kr. 30,000 per transaction
 const RAPID_WITHDRAWAL_THRESHOLD = 3; // 3 withdrawals in 24 hours
 const NEW_ACCOUNT_DAYS = 7; // Account less than 7 days old
 const LARGE_FIRST_WITHDRAWAL_THRESHOLD = 50000;
@@ -202,6 +204,33 @@ export class WithdrawalService {
       throw new Error(`Minimum withdrawal amount is ${minWithdrawalAmount} Kr`);
     }
 
+    // SECURITY: Enforce maximum single transaction limit
+    if (finalAmount > SINGLE_TRANSACTION_LIMIT) {
+      throw new Error(`Maximum withdrawal per transaction is Kr. ${SINGLE_TRANSACTION_LIMIT.toLocaleString()}`);
+    }
+
+    // SECURITY: Check hourly withdrawal limit
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const hourlyWithdrawals = await prisma.withdrawalRequest.aggregate({
+      where: {
+        userId,
+        createdAt: { gte: oneHourAgo },
+        status: { in: ['PENDING', 'APPROVED', 'PROCESSING', 'COMPLETED'] }
+      },
+      _sum: { amountKr: true }
+    });
+
+    const withdrawnThisHour = Number(hourlyWithdrawals._sum.amountKr || 0);
+    const newHourlyTotal = withdrawnThisHour + finalAmount;
+
+    if (newHourlyTotal > HOURLY_WITHDRAWAL_LIMIT) {
+      throw new Error(
+        `Hourly withdrawal limit exceeded. Limit: Kr. ${HOURLY_WITHDRAWAL_LIMIT.toLocaleString()}, ` +
+        `Already withdrawn this hour: Kr. ${withdrawnThisHour.toLocaleString()}, ` +
+        `Available: Kr. ${(HOURLY_WITHDRAWAL_LIMIT - withdrawnThisHour).toLocaleString()}`
+      );
+    }
+
     // Reset if new day
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -221,9 +250,17 @@ export class WithdrawalService {
     // Check if exceeds daily limit
     const currentWithdrawn = Number(withdrawalLimit.withdrawnTodayKr);
     const dailyLimit = Number(withdrawalLimit.dailyLimitKr);
-    const newWithdrawnToday = currentWithdrawn + amountKr;
-    if (newWithdrawnToday > dailyLimit) {
-      throw new Error(`Daily withdrawal limit exceeded. Limit: Kr ${dailyLimit}, Already withdrawn: Kr ${currentWithdrawn}`);
+    
+    // SECURITY: Enforce maximum daily limit (cannot exceed 500,000 Kr)
+    const effectiveDailyLimit = Math.min(dailyLimit, DAILY_WITHDRAWAL_LIMIT);
+    const newWithdrawnToday = currentWithdrawn + finalAmount;
+    
+    if (newWithdrawnToday > effectiveDailyLimit) {
+      throw new Error(
+        `Daily withdrawal limit exceeded. Limit: Kr. ${effectiveDailyLimit.toLocaleString()}, ` +
+        `Already withdrawn today: Kr. ${currentWithdrawn.toLocaleString()}, ` +
+        `Available: Kr. ${(effectiveDailyLimit - currentWithdrawn).toLocaleString()}`
+      );
     }
 
     // Detect suspicious patterns

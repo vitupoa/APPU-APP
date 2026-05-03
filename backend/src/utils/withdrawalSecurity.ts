@@ -61,8 +61,8 @@ export class WithdrawalSecurityValidator {
   static validateWithdrawalAmount(
     requestedAmount: number,
     availableBalance: number,
-    minAmount: number = 1.0,
-    maxAmount: number = 1000000.0
+    minAmount: number = 100.0,
+    maxAmount: number = 30000.0 // Maximum per single transaction
   ): { isValid: boolean; message: string } {
     // Check if amount is positive
     if (requestedAmount <= 0) {
