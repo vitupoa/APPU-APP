@@ -6,7 +6,7 @@ builder = "nixpacks"
 NODE_ENV = "production"
 
 [deploy]
-startCommand = "npm run start"
+startCommand = "npm run migrate:rls && npm run start"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
