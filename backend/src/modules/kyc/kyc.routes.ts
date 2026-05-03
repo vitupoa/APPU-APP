@@ -5,6 +5,8 @@ import { withdrawalService } from './withdrawal.service.js';
 import type { WithdrawalSecurityMetadata } from './withdrawal.types.js';
 import { DocumentType, WithdrawalStatus } from '../../generated/prisma/client.js';
 import { prisma } from '../../config/database.js';
+import { withdrawalRateLimiter } from '../../middleware/ipRateLimiter.js';
+import { sanitizePaymentInput } from '../../middleware/sanitization.js';
 
 
 // Helper to safely extract string from query parameter
@@ -55,8 +57,12 @@ router.get('/status', authenticateToken, async (req: AuthRequest, res) => {
   }
 });
 
-// Request withdrawal
-router.post('/withdraw', authenticateToken, async (req: AuthRequest, res) => {
+// SECURITY: Request withdrawal with STRICT rate limiting and input sanitization
+router.post('/withdraw', 
+  authenticateToken, 
+  withdrawalRateLimiter,
+  sanitizePaymentInput,
+  async (req: AuthRequest, res) => {
   try {
     const userId = req.userId as string;
     const { 
