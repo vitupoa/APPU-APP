@@ -1,9 +1,8 @@
 import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import { env } from './config/env.js';
+import { helmetConfig, corsConfig, additionalSecurityHeaders } from './config/security.js';
 import { Logger } from './utils/logger.js';
 import { initializeGateway } from './shared/gateway/socket.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -77,9 +76,12 @@ initializeCallSocket(io);
 // Initialize Database Monitoring WebSocket (Super Admin only)
 const dbMonitorSocket = initializeDatabaseMonitorSocket(httpServer);
 
+// SECURITY: Apply security headers first
+app.use(helmetConfig);
+app.use(corsConfig);
+app.use(additionalSecurityHeaders);
+
 // Global middleware
-app.use(helmet());
-app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));

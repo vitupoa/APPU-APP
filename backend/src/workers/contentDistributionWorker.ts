@@ -20,7 +20,7 @@ async function evaluateContent() {
       SELECT cd.content_id, cd.content_type
       FROM content_distribution cd
       WHERE cd.should_amplify = false
-        AND cd.distribution_tier < 4
+        AND cd.distribution_tier::text NOT IN ('VIRAL', 'GLOBAL')
         AND (
           SELECT COUNT(*) 
           FROM user_content_delivery ucd 
