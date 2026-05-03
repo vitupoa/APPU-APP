@@ -46,30 +46,20 @@ async function runRLSMigration() {
     console.log('📄 SQL file loaded successfully');
     console.log(`📏 SQL length: ${sql.length} characters\n`);
 
-    // Split SQL into individual statements
-    const statements = sql
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
-
-    console.log(`📊 Found ${statements.length} SQL statements to execute\n`);
-
-    // Execute each statement
-    for (let i = 0; i < statements.length; i++) {
-      const statement = statements[i];
-      console.log(`⚙️  Executing statement ${i + 1}/${statements.length}...`);
-      
-      try {
-        await client.query(statement + ';');
-        console.log(`✅ Statement ${i + 1} executed successfully\n`);
-      } catch (error) {
-        // Some statements might fail if already applied
-        if (error.message.includes('already exists')) {
-          console.log(`⚠️  Statement ${i + 1} skipped (already exists)\n`);
-        } else {
-          console.error(`❌ Statement ${i + 1} failed:`, error.message);
-          throw error;
-        }
+    // Execute the entire SQL file as one transaction
+    console.log('⚙️  Executing RLS migration...\n');
+    
+    try {
+      await client.query(sql);
+      console.log('✅ RLS migration executed successfully\n');
+    } catch (error) {
+      // If it fails, it might be because some policies already exist
+      // Try to continue anyway
+      if (error.message.includes('already exists')) {
+        console.log('⚠️  Some policies already exist, continuing...\n');
+      } else {
+        console.error('❌ RLS migration failed:', error.message);
+        throw error;
       }
     }
 
