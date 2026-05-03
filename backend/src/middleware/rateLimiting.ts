@@ -1,28 +1,22 @@
 import rateLimit from 'express-rate-limit';
 import { Redis } from 'ioredis';
+import { RedisStore } from 'rate-limit-redis';
 
-const redis = process.env.REDIS_URL
-  ? new Redis(process.env.REDIS_URL, { db: parseInt(process.env.REDIS_RATE_LIMIT_DB || '1') })
-  : new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
-      db: parseInt(process.env.REDIS_RATE_LIMIT_DB || '1'),
-    });
+// Railway provides REDIS_URL directly — use it as-is, no db override
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
-// rate-limit-redis v4+ uses sendCommand
 function makeStore(prefix: string) {
-  return {
-    sendCommand: (...args: string[]) => redis.call(args[0], ...args.slice(1)) as Promise<number>,
+  return new RedisStore({
+    sendCommand: (...args: string[]) => redis.call(args[0], ...args.slice(1)) as any,
     prefix,
-  };
+  });
 }
 
-const keyGen = (req: any): string => (req.user?.id ?? req.ip ?? 'unknown') as string;
+const keyGen = (req: any): string => (req.userId ?? req.ip ?? 'unknown') as string;
 const skipAdmin = (req: any): boolean => req.user?.isAdmin === true;
 
 export const unlockRateLimiter = rateLimit({
-  store: makeStore('rl:unlock:') as any,
+  store: makeStore('rl:unlock:'),
   windowMs: 60 * 1000, max: 10,
   standardHeaders: true, legacyHeaders: false,
   keyGenerator: keyGen, skip: skipAdmin,
@@ -30,7 +24,7 @@ export const unlockRateLimiter = rateLimit({
 });
 
 export const subscriptionRateLimiter = rateLimit({
-  store: makeStore('rl:subscription:') as any,
+  store: makeStore('rl:subscription:'),
   windowMs: 60 * 1000, max: 5,
   standardHeaders: true, legacyHeaders: false,
   keyGenerator: keyGen, skip: skipAdmin,
@@ -38,21 +32,21 @@ export const subscriptionRateLimiter = rateLimit({
 });
 
 export const conversionRateLimiter = rateLimit({
-  store: makeStore('rl:conversion:') as any,
+  store: makeStore('rl:conversion:'),
   windowMs: 60 * 1000, max: 30,
   standardHeaders: true, legacyHeaders: false,
   keyGenerator: keyGen, skip: skipAdmin,
 });
 
 export const accessCheckRateLimiter = rateLimit({
-  store: makeStore('rl:access:') as any,
+  store: makeStore('rl:access:'),
   windowMs: 60 * 1000, max: 100,
   standardHeaders: true, legacyHeaders: false,
   keyGenerator: keyGen, skip: skipAdmin,
 });
 
 export const failedUnlockRateLimiter = rateLimit({
-  store: makeStore('rl:unlock:failed:') as any,
+  store: makeStore('rl:unlock:failed:'),
   windowMs: 15 * 60 * 1000, max: 5,
   skipSuccessfulRequests: true,
   standardHeaders: true, legacyHeaders: false,
@@ -61,14 +55,14 @@ export const failedUnlockRateLimiter = rateLimit({
 });
 
 export const globalRateLimiter = rateLimit({
-  store: makeStore('rl:global:') as any,
+  store: makeStore('rl:global:'),
   windowMs: 15 * 60 * 1000, max: 1000,
   standardHeaders: true, legacyHeaders: false,
   keyGenerator: keyGen, skip: skipAdmin,
 });
 
 export const walletRateLimiter = rateLimit({
-  store: makeStore('rl:wallet:') as any,
+  store: makeStore('rl:wallet:'),
   windowMs: 60 * 1000, max: 20,
   standardHeaders: true, legacyHeaders: false,
   keyGenerator: keyGen, skip: skipAdmin,
