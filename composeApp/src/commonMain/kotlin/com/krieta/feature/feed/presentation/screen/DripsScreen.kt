@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,11 +51,11 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import com.krieta.feature.feed.domain.model.Post
 import com.krieta.feature.feed.presentation.viewmodel.FeedViewModel
+import com.krieta.com.core.upload.UploadCompletionNotifier
+import com.krieta.com.core.upload.UploadType
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
-/**
- * DripsScreen - Instagram-like feed for text, image, and text+image posts
- * Accessed from Explore tab -> Drips card
- */
 class DripsScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -74,17 +75,23 @@ class DripsScreen : Screen {
         var showTippingFor by remember { mutableStateOf<Post?>(null) }
         var currentUserId by remember { mutableStateOf<String?>(null) }
         
-        // Get current user ID
         LaunchedEffect(Unit) {
             currentUserId = tokenManager.getUserId()
             currencyProvider.start()
             kotlinx.coroutines.delay(500)
             walletViewModel.fetchWalletData(currencyProvider.countryCode)
+            
+            UploadCompletionNotifier.uploadCompletions
+                .onEach { event ->
+                    if (event.success && event.type == UploadType.DRIP) {
+                        viewModel.refresh()
+                    }
+                }
+                .launchIn(this)
         }
 
         val listState = rememberLazyListState()
 
-        // Infinite scroll trigger
         val shouldLoadMore by remember {
             derivedStateOf {
                 val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
@@ -123,93 +130,94 @@ class DripsScreen : Screen {
                 )
             }
 
-            when {
-                state.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-                state.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(state.error!!, color = MaterialTheme.colorScheme.error)
-                        Spacer(Modifier.height(8.dp))
-                        Button(onClick = { viewModel.refresh() }) { Text("Retry") }
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { viewModel.refresh() },
+                modifier = Modifier.fillMaxSize().padding(padding)
+            ) {
+                when {
+                    state.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
-                }
-                else -> LazyColumn(
-                    state = listState,
-                    modifier = Modifier.fillMaxSize().padding(padding),
-                    contentPadding = PaddingValues(bottom = 80.dp)
-                ) {
-                    // Smart ad insertion: native ads every 6 posts, banner every 15, story-style every 20
-                    val postsWithAds = mutableListOf<Any>()
-                    state.items.forEachIndexed { index, post ->
-                        postsWithAds.add(post)
-                        
-                        // Native feed ad every 6 posts
-                        if ((index + 1) % 6 == 0 && index < state.items.size - 1) {
-                            postsWithAds.add("NATIVE_AD_$index")
-                        }
-                        // Banner ad every 15 posts
-                        else if ((index + 1) % 15 == 0 && index < state.items.size - 1) {
-                            postsWithAds.add("BANNER_AD_$index")
-                        }
-                        // Story-style full-screen ad every 20 posts
-                        else if ((index + 1) % 20 == 0 && index < state.items.size - 1) {
-                            postsWithAds.add("STORY_AD_$index")
+                    state.error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(state.error!!, color = MaterialTheme.colorScheme.error)
+                            Spacer(Modifier.height(8.dp))
+                            Button(onClick = { viewModel.refresh() }) { Text("Retry") }
                         }
                     }
+                    else -> LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    ) {
+                        val postsWithAds = mutableListOf<Any>()
+                        state.items.forEachIndexed { index, post ->
+                            postsWithAds.add(post)
+                            
+                            if ((index + 1) % 6 == 0 && index < state.items.size - 1) {
+                                postsWithAds.add("NATIVE_AD_$index")
+                            }
+                            else if ((index + 1) % 15 == 0 && index < state.items.size - 1) {
+                                postsWithAds.add("BANNER_AD_$index")
+                            }
+                            else if ((index + 1) % 20 == 0 && index < state.items.size - 1) {
+                                postsWithAds.add("STORY_AD_$index")
+                            }
+                        }
 
-                    items(postsWithAds.size, key = { index ->
-                        val item = postsWithAds[index]
-                        if (item is Post) item.id else "ad_$index"
-                    }) { index ->
-                        val item = postsWithAds[index]
-                        when {
-                            item is Post -> {
-                                // Check if post is sponsored
-                                if (item.isSponsored == true) {
-                                    SponsoredPostCard(
-                                        post = item,
-                                        onLike = { viewModel.toggleLike(item.id) },
-                                        onComment = { 
-                                            currentUserId?.let { userId ->
-                                                navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
-                                            }
-                                        },
-                                        onTip = { showTippingFor = item }
-                                    )
-                                } else {
-                                    PostCard(
-                                        post = item,
-                                        onLike = { viewModel.toggleLike(item.id) },
-                                        onComment = { 
-                                            currentUserId?.let { userId ->
-                                                navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
-                                            }
-                                        },
-                                        onTip = { showTippingFor = item }
-                                    )
+                        items(postsWithAds.size, key = { index ->
+                            val item = postsWithAds[index]
+                            if (item is Post) item.id else "ad_$index"
+                        }) { index ->
+                            val item = postsWithAds[index]
+                            when {
+                                item is Post -> {
+                                    if (item.isSponsored == true) {
+                                        SponsoredPostCard(
+                                            post = item,
+                                            onLike = { viewModel.toggleLike(item.id) },
+                                            onComment = { 
+                                                currentUserId?.let { userId ->
+                                                    navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
+                                                }
+                                            },
+                                            onTip = { showTippingFor = item }
+                                        )
+                                    } else {
+                                        PostCard(
+                                            post = item,
+                                            onLike = { viewModel.toggleLike(item.id) },
+                                            onComment = { 
+                                                currentUserId?.let { userId ->
+                                                    navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
+                                                }
+                                            },
+                                            onTip = { showTippingFor = item }
+                                        )
+                                    }
+                                    HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
                                 }
-                                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
-                            }
-                            item is String && item.startsWith("NATIVE_AD") -> {
-                                NativeAdCard()
-                                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
-                            }
-                            item is String && item.startsWith("BANNER_AD") -> {
-                                BannerAdCard()
-                                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
-                            }
-                            item is String && item.startsWith("STORY_AD") -> {
-                                StoryStyleAdCard()
-                                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                                item is String && item.startsWith("NATIVE_AD") -> {
+                                    NativeAdCard()
+                                    HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                                }
+                                item is String && item.startsWith("BANNER_AD") -> {
+                                    BannerAdCard()
+                                    HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                                }
+                                item is String && item.startsWith("STORY_AD") -> {
+                                    StoryStyleAdCard()
+                                    HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                                }
                             }
                         }
-                    }
 
-                    if (state.isLoadingMore) {
-                        item {
-                            Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        if (state.isLoadingMore) {
+                            item {
+                                Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                }
                             }
                         }
                     }
@@ -222,7 +230,6 @@ class DripsScreen : Screen {
     private fun PostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit) {
         Column(modifier = Modifier.fillMaxWidth()) {
 
-            // Header: avatar + username
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -244,14 +251,12 @@ class DripsScreen : Screen {
                 }
             }
 
-            // Image carousel (or locked overlay)
             if (post.isLocked) {
                 Box(
                     modifier = Modifier.fillMaxWidth().height(300.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        // Blurred placeholder
                         AsyncImage(
                             model = post.imageUrls.firstOrNull(),
                             contentDescription = null,
@@ -287,7 +292,6 @@ class DripsScreen : Screen {
                             contentScale = ContentScale.Crop
                         )
                     }
-                    // Dot indicators
                     if (post.imageUrls.size > 1) {
                         Row(
                             modifier = Modifier
@@ -312,12 +316,10 @@ class DripsScreen : Screen {
                 }
             }
 
-            // Action row: like, comment, tip
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Animated like button
                 val likeColor by animateColorAsState(
                     targetValue = if (post.isLiked) Color.Red else MaterialTheme.colorScheme.onSurface,
                     animationSpec = tween(200),
@@ -345,7 +347,6 @@ class DripsScreen : Screen {
                     modifier = Modifier.padding(end = 8.dp)
                 )
 
-                // Tip only on unlocked posts
                 if (!post.isLocked) {
                     IconButton(onClick = onTip) {
                         Icon(painterResource(Res.drawable.ic_send), contentDescription = "Tip")
@@ -353,7 +354,6 @@ class DripsScreen : Screen {
                 }
             }
 
-            // Caption
             if (post.caption.isNotBlank()) {
                 com.krieta.com.core.ui.components.HashtagMentionText(
                     text = post.caption,
@@ -361,10 +361,8 @@ class DripsScreen : Screen {
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 14.sp,
                     onHashtagClick = { tag ->
-                        // Navigate to hashtag search (future implementation)
                     },
                     onMentionClick = { username ->
-                        // Navigate to user profile (future implementation)
                     }
                 )
             }
@@ -374,7 +372,6 @@ class DripsScreen : Screen {
     @Composable
     private fun SponsoredPostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Sponsored badge at top
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -388,7 +385,6 @@ class DripsScreen : Screen {
                 )
             }
             
-            // Regular post content
             PostCard(post, onLike, onComment, onTip)
         }
     }
@@ -413,12 +409,10 @@ class DripsScreen : Screen {
                 
                 Spacer(Modifier.height(12.dp))
                 
-                // Ad content area
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Ad image
                     Box(
                         modifier = Modifier
                             .size(80.dp)
@@ -429,7 +423,6 @@ class DripsScreen : Screen {
                         Text("📸", fontSize = 32.sp)
                     }
                     
-                    // Ad text
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             "Your Brand Here",
@@ -449,7 +442,7 @@ class DripsScreen : Screen {
                 Spacer(Modifier.height(12.dp))
                 
                 Button(
-                    onClick = { /* Navigate to advertiser portal */ },
+                    onClick = { },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = androidx.compose.ui.graphics.Color(0xFFFFCC00)
@@ -514,7 +507,6 @@ class DripsScreen : Screen {
             )
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
-                // Full-screen ad content
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -544,7 +536,7 @@ class DripsScreen : Screen {
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Button(
-                            onClick = { /* CTA action */ },
+                            onClick = { },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = androidx.compose.ui.graphics.Color(0xFFFFCC00)
                             )
@@ -554,81 +546,12 @@ class DripsScreen : Screen {
                     }
                 }
                 
-                // Sponsored badge at top
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(16.dp)
                 ) {
                     com.krieta.feature.sponsored.presentation.SponsoredBadge()
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun AdSlotCard() {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Sponsored badge
-                com.krieta.feature.sponsored.presentation.SponsoredBadge()
-                
-                Spacer(Modifier.height(12.dp))
-                
-                // Ad placeholder content
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.surface),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            "📸",
-                            fontSize = 48.sp
-                        )
-                        Text(
-                            "Advertisement",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                        Text(
-                            "Your ad could be here",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                
-                Spacer(Modifier.height(12.dp))
-                
-                // CTA button
-                Button(
-                    onClick = { /* Navigate to ad creation or external link */ },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Learn More")
                 }
             }
         }

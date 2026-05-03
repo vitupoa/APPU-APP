@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 
 data class FeedState(
     val items: List<Post> = emptyList(),
@@ -28,8 +31,27 @@ class FeedViewModel(
 
     private val _state = MutableStateFlow(FeedState(isLoading = true))
     val state: StateFlow<FeedState> = _state.asStateFlow()
+    
+    private var autoRefreshJob: Job? = null
 
-    init { loadFeed() }
+    init { 
+        loadFeed()
+        startAutoRefresh()
+    }
+    
+    override fun onDispose() {
+        super.onDispose()
+        autoRefreshJob?.cancel()
+    }
+    
+    private fun startAutoRefresh() {
+        autoRefreshJob = screenModelScope.launch {
+            while (isActive) {
+                delay(30 * 60 * 1000L) // 30 minutes
+                refresh()
+            }
+        }
+    }
 
     fun refresh() {
         _state.value = _state.value.copy(isRefreshing = true, error = null)

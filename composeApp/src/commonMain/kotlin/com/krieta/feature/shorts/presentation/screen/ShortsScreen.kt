@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,10 @@ import org.koin.compose.koinInject
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType
 import kotlinx.coroutines.delay
 import com.krieta.feature.wallet.presentation.screen.TopupScreen
+import com.krieta.com.core.upload.UploadCompletionNotifier
+import com.krieta.com.core.upload.UploadType
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVER) : Screen {
     @Composable
@@ -81,6 +86,14 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         // Get current user ID
         LaunchedEffect(Unit) {
             currentUserId = tokenManager.getUserId()
+            
+            UploadCompletionNotifier.uploadCompletions
+                .onEach { event ->
+                    if (event.success && event.type == UploadType.SHORT) {
+                        viewModel.refresh()
+                    }
+                }
+                .launchIn(this)
         }
 
         // Set feed type in viewModel
@@ -125,6 +138,11 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         }
 
         Box(modifier = Modifier.fillMaxSize().background(Color.Black).windowInsetsPadding(WindowInsets(0))) {
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { viewModel.refresh() },
+                modifier = Modifier.fillMaxSize()
+            ) {
             if (state.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
@@ -172,6 +190,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                             // removed
                         }
                     )
+                }
                 }
             }
 

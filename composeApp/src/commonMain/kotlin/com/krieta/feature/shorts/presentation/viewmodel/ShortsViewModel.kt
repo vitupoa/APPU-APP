@@ -26,6 +26,7 @@ data class ShortsState(
     val currentIndex: Int = 0,
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
+    val isRefreshing: Boolean = false,
     val activeTab: ShortsTab = ShortsTab.DISCOVER,
     val nextCursor: String? = null,
     val error: String? = null,
@@ -111,6 +112,30 @@ class ShortsViewModel(
         if (_state.value.activeTab == tab) return
         _state.value = ShortsState(activeTab = tab) // Reset state on tab change
         loadFeed()
+    }
+
+    fun refresh() {
+        _state.value = _state.value.copy(isRefreshing = true, error = null)
+        screenModelScope.launch {
+            val result = when (_state.value.activeTab) {
+                ShortsTab.HOME -> shortsRepository.getFeed("home", null)
+                else -> shortsRepository.getFeed(_state.value.activeTab.apiValue, null)
+            }
+            
+            when (result) {
+                is NetworkResult.Success -> {
+                    _state.value = _state.value.copy(
+                        items = result.data.items,
+                        nextCursor = result.data.nextCursor,
+                        isRefreshing = false
+                    )
+                }
+                is NetworkResult.Error -> {
+                    _state.value = _state.value.copy(isRefreshing = false, error = result.message)
+                }
+                is NetworkResult.Loading -> {}
+            }
+        }
     }
 
     fun onShortVisible(index: Int) {

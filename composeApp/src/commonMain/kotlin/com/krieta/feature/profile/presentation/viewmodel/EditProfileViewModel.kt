@@ -46,6 +46,14 @@ class EditProfileViewModel(
     fun onUsernameChange(v: String) { _state.value = _state.value.copy(username = v) }
     fun onBioChange(v: String) { _state.value = _state.value.copy(bio = v) }
     
+    fun removeAvatar() {
+        _state.value = _state.value.copy(avatarUrl = "")
+    }
+    
+    fun removeBanner() {
+        _state.value = _state.value.copy(coverPhotoUrl = "")
+    }
+    
     fun addNiche(niche: String) {
         val current = _state.value.selectedNiches
         if (!current.contains(niche)) {

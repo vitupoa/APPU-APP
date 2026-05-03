@@ -1,202 +1,111 @@
-# Implementation Summary: Critical Features
+# Auto-Refresh and Profile Features Implementation Summary
 
-## ✅ Implemented Features
+## Features Implemented
 
-### 1. **Chama Contribution System** 🏦
+### 1. Auto-Refresh on Upload Completion
+- **Created**: `UploadCompletionNotifier.kt` - Central notification system for upload completions
+- **Updated**: `DripsScreen.kt` - Listens for DRIP upload completions and auto-refreshes feed
+- **Updated**: `ShortsScreen.kt` - Listens for SHORT upload completions and auto-refreshes feed
+- **How it works**: When user uploads a drip or short, upon completion, the feed automatically refreshes to show the new content
 
-#### Files Created:
-- `ChamaContributeViewModel.kt` - Handles contribution logic with state management
+### 2. Pull-to-Refresh for Drips
+- **Updated**: `DripsScreen.kt` - Added `PullToRefreshBox` wrapper
+- **Updated**: `FeedViewModel.kt` - Added `isRefreshing` state
+- **Feature**: Users can pull down on the drips feed to manually refresh content
 
-#### Files Modified:
-- `ChamaContributeScreen.kt` - Integrated ViewModel, added loading states, success/error handling
-- `ChamaModule.kt` - Registered ViewModel in DI container
+### 3. Pull-to-Refresh for Shorts
+- **Updated**: `ShortsScreen.kt` - Added `PullToRefreshBox` wrapper
+- **Updated**: `ShortsViewModel.kt` - Added `refresh()` method and `isRefreshing` state
+- **Feature**: Users can pull down on the shorts feed to manually refresh content
 
-#### Features Implemented:
-- ✅ Real-time balance display from backend
-- ✅ Amount validation (must be > 0)
-- ✅ API integration with `repository.contribute(chamaId, amount)`
-- ✅ Loading indicator during contribution
-- ✅ Success message with auto-navigation back
-- ✅ Error handling with user-friendly messages
-- ✅ Balance refresh after successful contribution
+### 4. Auto-Refresh Drips Every 30 Minutes
+- **Updated**: `FeedViewModel.kt` - Added auto-refresh coroutine job that runs every 30 minutes
+- **Feature**: Drips feed automatically refreshes every 30 minutes to serve fresh content
+- **Implementation**: Uses coroutine with 30-minute delay in a loop, properly disposed when ViewModel is destroyed
 
-#### Backend API Used:
-- `POST /api/v1/chama/:chamaId/contribute` with `amountKr` parameter
+### 5. Profile Photo/Avatar Management
+- **Updated**: `EditProfileScreen.kt` - Enhanced avatar and banner UI with add/change/remove functionality
+- **Updated**: `EditProfileViewModel.kt` - Added `removeAvatar()` and `removeBanner()` methods
+- **Features**:
+  - **Add**: Upload avatar/banner from device (already existed)
+  - **Edit/Change**: Replace existing avatar/banner with new image
+  - **Remove**: Delete avatar/banner (sets to empty string)
+  - **Preview**: Large preview of current avatar (120dp) and banner (150dp height)
+  - **Placeholder**: Shows icon placeholder when no image is set
+  - **Visual Feedback**: Upload progress indicators for both images
 
----
+### 6. Profile Edit Functionality
+- **Already Implemented**: `EditProfileScreen.kt` has full functionality:
+  - Add/remove/edit profile information
+  - Upload, change, and remove avatar and banner images
+  - Edit bio, display name, username (locked after wallet activation)
+  - Manage niches (predefined and custom)
+  - All changes saved to backend via `EditProfileViewModel.kt`
 
-### 2. **Contest Voting System** 🗳️
+## Technical Details
 
-#### Files Created:
-- `DeviceFingerprint.kt` (expect) - Cross-platform device ID interface
-- `DeviceFingerprint.android.kt` (actual) - Android implementation using `ANDROID_ID`
-- `DeviceFingerprint.ios.kt` (actual) - iOS implementation using `identifierForVendor`
-
-#### Files Modified:
-- `ContestsApi.kt` - Added `voteSubmission(submissionId, fingerprint)` method
-- `ContestsRepository.kt` - Added `voteSubmission()` interface method
-- `ContestsRepositoryImpl.kt` - Implemented voting with device fingerprint
-- `ContestSubmissionFeedViewModel.kt` - Replaced TODO with real API call
-
-#### Features Implemented:
-- ✅ Upvote submission with optimistic UI update
-- ✅ Device fingerprint generation for anti-fraud
-- ✅ API integration with backend voting endpoint
-- ✅ Duplicate vote prevention (handled by backend)
-- ✅ Error handling with vote reversion on failure
-- ✅ Downvote tracking (backend only, no UI change)
-
-#### Backend API Used:
-- `POST /api/v1/contests/vote` with `submissionId` and `fingerprint`
-
-#### Anti-Fraud Measures:
-- Device fingerprint (Android: ANDROID_ID, iOS: identifierForVendor)
-- IP address tracking (backend)
-- User ID tracking (backend)
-- Rate limiting (backend middleware)
-
----
-
-### 3. **Marketplace Social Media Management** 📱
-
-#### Files Created:
-- `SocialMediaManagementViewModel.kt` - Handles account sync, primary setting, deletion
-
-#### Files Modified:
-- `SocialMediaManagementScreen.kt` - Integrated ViewModel, replaced TODOs with real actions
-- `MarketplaceModule.kt` - Registered ViewModel in DI container
-
-#### Features Implemented:
-- ✅ **Sync Account**: Triggers OAuth refresh to update follower counts, engagement rates
-- ✅ **Set Primary Account**: Marks account as primary for profile display
-- ✅ **Delete Account**: Disconnects social media account via API
-- ✅ **Add Account**: Initiates OAuth flow for new platform connection
-- ✅ Real-time account list loading from backend
-- ✅ Success/error messages with Snackbar
-- ✅ Loading states during operations
-
-#### Backend APIs Used:
-- `GET /api/v1/marketplace/social/accounts` - Get connected accounts
-- `GET /api/v1/marketplace/social/oauth/:platform` - Get OAuth URL
-- `DELETE /api/v1/marketplace/social/:platform` - Disconnect account
-
----
-
-## 🔧 Technical Implementation Details
-
-### Device Fingerprint Strategy
-```kotlin
-// Android
-Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-
-// iOS
-UIDevice.currentDevice.identifierForVendor?.UUIDString
+### Avatar/Banner Management
+```
+User Actions:
+1. Add Photo → File picker → Upload to Cloudinary → Update state
+2. Change Photo → File picker → Upload to Cloudinary → Replace URL
+3. Remove Photo → Clear URL → Save empty string to backend
 ```
 
-### Optimistic UI Updates
-Contest voting uses optimistic updates:
-1. Immediately increment vote count in UI
-2. Call API in background
-3. Revert if API fails
-
-### State Management Pattern
-All ViewModels follow consistent pattern:
-```kotlin
-data class State(
-    val isLoading: Boolean,
-    val error: String?,
-    val successMessage: String?,
-    val data: T
-)
+### Upload Completion Flow
+```
+User uploads content → BackgroundUploader → Upload completes → 
+UploadCompletionNotifier.notifyUploadComplete() → 
+Screens listening to uploadCompletions flow → Auto-refresh triggered
 ```
 
----
+### Auto-Refresh Implementation
+- **Drips**: 30-minute timer in FeedViewModel
+- **Shorts/Drips**: Pull-to-refresh gesture support
+- **Upload completion**: Event-driven refresh via SharedFlow
 
-## 🎯 User Experience Improvements
+### Files Modified
+1. `FeedViewModel.kt` - Auto-refresh timer, refresh state
+2. `ShortsViewModel.kt` - Refresh method, refresh state
+3. `DripsScreen.kt` - Pull-to-refresh UI, upload listener
+4. `ShortsScreen.kt` - Pull-to-refresh UI, upload listener
+5. `EditProfileScreen.kt` - Enhanced avatar/banner UI with remove buttons
+6. `EditProfileViewModel.kt` - Added remove methods for avatar/banner
+7. `UploadCompletionNotifier.kt` - NEW file for upload events
 
-### Chama Contribution
-- **Before**: Button with TODO comment, no functionality
-- **After**: Full contribution flow with validation, loading, success feedback
+## User Experience
 
-### Contest Voting
-- **Before**: Placeholder that only updated local state
-- **After**: Real voting with fraud prevention, error handling, duplicate detection
+1. **Upload Drip/Short**: Content appears in feed automatically when upload completes
+2. **Manual Refresh**: Pull down on any feed to refresh
+3. **Background Refresh**: Drips feed refreshes every 30 minutes automatically
+4. **Profile Photo Management**: 
+   - Add avatar/banner by clicking "Add Photo"/"Add Banner"
+   - Change existing photo by clicking "Change"
+   - Remove photo by clicking "Remove" button
+   - See large preview of current photo
+   - Visual upload progress indicators
+5. **Discover Tab**: Users see their own shorts in Discover tab after upload completes
 
-### Marketplace Actions
-- **Before**: Empty onClick handlers with TODO comments
-- **After**: Full CRUD operations for social media accounts
+## UI Improvements
 
----
+### Avatar Section
+- Centered layout with 120dp circular preview
+- Placeholder icon when no avatar set
+- "Add Photo" button when empty, "Change" button when photo exists
+- "Remove" button appears only when photo exists
+- Upload progress bar below buttons
 
-## 🔐 Security Features
+### Banner Section
+- Full-width 150dp height preview with rounded corners
+- Placeholder icon when no banner set
+- "Add Banner"/"Change" buttons
+- "Remove" button appears only when banner exists
+- Upload progress bar below buttons
 
-### Contest Voting Security
-1. **Device Fingerprinting**: Unique device ID per vote
-2. **IP Tracking**: Backend logs IP address
-3. **User Authentication**: JWT required for voting
-4. **Rate Limiting**: Backend enforces voting rate limits
-5. **Duplicate Prevention**: Backend checks userId + IP + fingerprint
-
-### Social Media OAuth
-1. **State Parameter**: CSRF protection in OAuth flow
-2. **Secure Token Storage**: Encrypted SharedPreferences (Android) / Keychain (iOS)
-3. **Token Refresh**: Automatic refresh on sync
-
----
-
-## 📊 Testing Checklist
-
-### Chama Contribution
-- [ ] Contribute with valid amount
-- [ ] Try contributing 0 or negative amount (should show error)
-- [ ] Check balance updates after contribution
-- [ ] Test network error handling
-- [ ] Verify auto-navigation after success
-
-### Contest Voting
-- [ ] Vote on submission (should increment count)
-- [ ] Try voting twice on same submission (should show error)
-- [ ] Test on different devices (should allow)
-- [ ] Verify vote persists after app restart
-- [ ] Test network error handling
-
-### Marketplace Actions
-- [ ] Sync account (should update metrics)
-- [ ] Set primary account (should update UI)
-- [ ] Delete account (should remove from list)
-- [ ] Add new account (should open OAuth)
-- [ ] Test with no accounts connected
-
----
-
-## 🚀 Next Steps (Optional Enhancements)
-
-### Chama Contribution
-- Add contribution history view
-- Implement recurring contributions
-- Add wallet balance check before contribution
-
-### Contest Voting
-- Add vote animation
-- Show "Already voted" indicator
-- Implement vote leaderboard
-
-### Marketplace
-- Add analytics dashboard for each platform
-- Implement bulk account sync
-- Add account health monitoring
-
----
-
-## 📝 Notes
-
-1. **OAuth Flow**: Currently shows message, needs WebView integration for full OAuth
-2. **Device Fingerprint**: Persists across app reinstalls on same device
-3. **Error Messages**: All user-facing, no technical jargon
-4. **Loading States**: Prevent double-submission with disabled buttons
-
----
-
-## ✅ Status: COMPLETE
-
-All three critical features are now fully implemented and ready for testing.
+## Notes
+- All refresh operations are non-blocking and show loading indicators
+- Upload completion notifications use SharedFlow for multiple subscribers
+- Auto-refresh timer is properly cleaned up on ViewModel disposal
+- Profile editing respects wallet lock status for identity fields
+- Avatar/banner removal sets URL to empty string and saves to backend
+- Image uploads use Cloudinary with proper folder organization

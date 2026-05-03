@@ -38,12 +38,10 @@ fun Step4PrizesAndValidation(
     state: CreateContestState
 ) {
     val validationErrors = remember(state) { viewModel.validateStep4() }
-    val scrollState = rememberScrollState()
     
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .verticalScroll(scrollState)
             .padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {

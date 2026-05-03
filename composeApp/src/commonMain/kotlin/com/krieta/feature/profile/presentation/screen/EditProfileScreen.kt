@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -176,27 +177,60 @@ class EditProfileScreen : Screen {
 
                         // Avatar Image Picker
                         Text("Avatar Image", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
-                        Row(
+                        Box(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            contentAlignment = Alignment.Center
                         ) {
-                            if (state.avatarUrl.isNotEmpty()) {
-                                AsyncImage(
-                                    model = state.avatarUrl,
-                                    contentDescription = "Avatar",
-                                    modifier = Modifier.size(80.dp).clip(CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-                            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Button(
-                                    onClick = { avatarPicker.launch() },
-                                    modifier = Modifier.fillMaxWidth()
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Box {
+                                    if (state.avatarUrl.isNotEmpty()) {
+                                        AsyncImage(
+                                            model = state.avatarUrl,
+                                            contentDescription = "Avatar",
+                                            modifier = Modifier.size(120.dp).clip(CircleShape),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    } else {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(120.dp)
+                                                .clip(CircleShape)
+                                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                painterResource(Res.drawable.ic_person),
+                                                contentDescription = "No avatar",
+                                                modifier = Modifier.size(60.dp),
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+                                
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Icon(painterResource(Res.drawable.ic_photo_camera), "Upload")
-                                    Spacer(Modifier.width(8.dp))
-                                    Text("Upload from Device")
+                                    Button(
+                                        onClick = { avatarPicker.launch() }
+                                    ) {
+                                        Icon(painterResource(Res.drawable.ic_photo_camera), "Upload", modifier = Modifier.size(18.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(if (state.avatarUrl.isEmpty()) "Add Photo" else "Change")
+                                    }
+                                    
+                                    if (state.avatarUrl.isNotEmpty()) {
+                                        OutlinedButton(
+                                            onClick = { viewModel.removeAvatar() }
+                                        ) {
+                                            Icon(painterResource(Res.drawable.ic_delete), "Remove", modifier = Modifier.size(18.dp))
+                                            Spacer(Modifier.width(8.dp))
+                                            Text("Remove")
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -207,26 +241,57 @@ class EditProfileScreen : Screen {
 
                         // Banner Image Picker
                         Text("Banner Image", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
-                        Row(
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             if (state.coverPhotoUrl.isNotEmpty()) {
                                 AsyncImage(
                                     model = state.coverPhotoUrl,
                                     contentDescription = "Banner",
-                                    modifier = Modifier.fillMaxWidth().height(120.dp).clip(RoundedCornerShape(12.dp)),
+                                    modifier = Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(12.dp)),
                                     contentScale = ContentScale.Crop
                                 )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(150.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painterResource(Res.drawable.ic_image),
+                                        contentDescription = "No banner",
+                                        modifier = Modifier.size(48.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
-                            Button(
-                                onClick = { bannerPicker.launch() },
-                                modifier = Modifier.fillMaxWidth()
+                            
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Icon(painterResource(Res.drawable.ic_photo_camera), "Upload")
-                                Spacer(Modifier.width(8.dp))
-                                Text("Upload from Device")
+                                Button(
+                                    onClick = { bannerPicker.launch() },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(painterResource(Res.drawable.ic_photo_camera), "Upload", modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(if (state.coverPhotoUrl.isEmpty()) "Add Banner" else "Change")
+                                }
+                                
+                                if (state.coverPhotoUrl.isNotEmpty()) {
+                                    OutlinedButton(
+                                        onClick = { viewModel.removeBanner() },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(painterResource(Res.drawable.ic_delete), "Remove", modifier = Modifier.size(18.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text("Remove")
+                                    }
+                                }
                             }
                         }
 
