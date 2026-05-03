@@ -17,7 +17,7 @@
     "seed:admin": "tsx prisma/seeds/seed-super-admin.ts",
     "seed:niches": "tsx prisma/seeds/seed-niches.ts",
     "db:migrate:run": "tsx scripts/run-migrations.ts",
-    "migrate:rls": "tsx migrate-rls.ts",
+    "migrate:rls": "tsx migrate-rls-direct.ts",
     "test": "jest --coverage",
     "lint": "eslint src/ --ext .ts"
   },
