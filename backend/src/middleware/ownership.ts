@@ -272,6 +272,88 @@ export async function validateContentOwnership(
 }
 
 /**
+ * Validate user owns the influencer profile
+ */
+export async function verifyInfluencerOwnership(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const influencerId = (req.body.influencerId || req.params.influencerId) as string;
+  const currentUserId = req.userId;
+
+  if (!currentUserId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const influencer = await prisma.influencerProfile.findUnique({
+      where: { id: influencerId },
+      select: { userId: true }
+    });
+
+    if (!influencer) {
+      res.status(404).json({ error: 'Influencer profile not found' });
+      return;
+    }
+
+    if (influencer.userId === currentUserId || req.isAdmin) {
+      next();
+      return;
+    }
+
+    res.status(403).json({ 
+      error: 'Forbidden: You can only modify your own influencer profile',
+      code: 'OWNERSHIP_VIOLATION'
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to validate ownership' });
+  }
+}
+
+/**
+ * Validate user owns the social media account
+ */
+export async function verifySocialAccountOwnership(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const accountId = req.params.accountId as string;
+  const currentUserId = req.userId;
+
+  if (!currentUserId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const account = await prisma.socialMediaAccount.findUnique({
+      where: { id: accountId },
+      include: { influencer: { select: { userId: true } } }
+    });
+
+    if (!account) {
+      res.status(404).json({ error: 'Social media account not found' });
+      return;
+    }
+
+    if (account.influencer.userId === currentUserId || req.isAdmin) {
+      next();
+      return;
+    }
+
+    res.status(403).json({ 
+      error: 'Forbidden: You can only modify your own social media accounts',
+      code: 'OWNERSHIP_VIOLATION'
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to validate ownership' });
+  }
+}
+
+/**
  * Prevent users from modifying sensitive fields
  * Use on profile update routes
  */
