@@ -73,10 +73,10 @@ export class FeedService {
           caption: p.caption,
           isLocked: p.isLocked,
           requiredTier: p.requiredTier,
-          unlockAmountKr: p.unlockAmountKr ? Number(p.unlockAmountKr) : undefined,
+          unlockAmountKr: (p as any).unlockAmountKr ? Number((p as any).unlockAmountKr) : undefined,
           hasAccess: access.hasAccess,
-          requiresSubscription: access.requiresSubscription,
-          requiresUnlock: access.requiresUnlock,
+          requiresSubscription: (access as any).requiresSubscription,
+          requiresUnlock: (access as any).requiresUnlock,
           likesCount: p.likesCount,
           commentsCount: p.commentsCount,
           isLiked: likedIds.has(p.id),
@@ -104,7 +104,7 @@ export class FeedService {
         isLocked: data.isLocked,
         requiredTier: data.requiredTier as any,
         unlockAmountKr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
-      },
+      } as any,
       include: {
         user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
       }
@@ -117,7 +117,7 @@ export class FeedService {
 
     return {
       ...post,
-      creator: post.user,
+      creator: (post as any).user,
       createdAt: post.createdAt.toISOString()
     };
   }

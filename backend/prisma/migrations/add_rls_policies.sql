@@ -230,15 +230,10 @@ CREATE POLICY shorts_user_read
 ON shorts
 FOR SELECT
 USING (
-  -- Not locked
   is_locked = false 
-  -- Or is creator
   OR user_id::TEXT = current_user_id()::TEXT
-  -- Or has subscription access
-  OR (required_tier IS NOT NULL AND has_subscription_access(current_user_id(), user_id, required_tier::TEXT))
-  -- Or has unlocked
-  OR (unlock_amount_kr IS NOT NULL AND has_unlocked_content(current_user_id(), id, 'SHORT'))
-  -- Or is admin
+  OR (required_tier IS NOT NULL AND has_subscription_access(current_user_id(), user_id::UUID, required_tier::TEXT))
+  OR (unlock_amount_kr IS NOT NULL AND has_unlocked_content(current_user_id(), id::UUID, 'SHORT'))
   OR is_admin()
 );
 
@@ -261,15 +256,10 @@ CREATE POLICY posts_user_read
 ON posts
 FOR SELECT
 USING (
-  -- Not locked
   is_locked = false 
-  -- Or is creator
   OR user_id::TEXT = current_user_id()::TEXT
-  -- Or has subscription access
-  OR (required_tier IS NOT NULL AND has_subscription_access(current_user_id(), user_id, required_tier::TEXT))
-  -- Or has unlocked
-  OR (unlock_amount_kr IS NOT NULL AND has_unlocked_content(current_user_id(), id, 'POST'))
-  -- Or is admin
+  OR (required_tier IS NOT NULL AND has_subscription_access(current_user_id(), user_id::UUID, required_tier::TEXT))
+  OR (unlock_amount_kr IS NOT NULL AND has_unlocked_content(current_user_id(), id::UUID, 'POST'))
   OR is_admin()
 );
 
@@ -292,13 +282,9 @@ CREATE POLICY live_streams_user_read
 ON live_streams
 FOR SELECT
 USING (
-  -- No unlock amount (free)
   unlock_amount_kr IS NULL
-  -- Or is host
   OR host_id::TEXT = current_user_id()::TEXT
-  -- Or has unlocked
-  OR (unlock_amount_kr IS NOT NULL AND has_unlocked_content(current_user_id(), id, 'LIVE'))
-  -- Or is admin
+  OR (unlock_amount_kr IS NOT NULL AND has_unlocked_content(current_user_id(), id::UUID, 'LIVE'))
   OR is_admin()
 );
 

@@ -81,7 +81,7 @@ export class LiveService {
         contestId: data.contestId,
         orderId: data.orderId,
         unlockAmountKr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
-      },
+      } as any,
       include: {
         host: {
           select: { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true },
@@ -217,15 +217,10 @@ export class LiveService {
     }
 
     // Check if stream is locked and user has access
-    if (stream.unlockAmountKr && Number(stream.unlockAmountKr) > 0) {
+    if ((stream as any).unlockAmountKr && Number((stream as any).unlockAmountKr) > 0) {
       const access = await ContentLockService.checkAccess(
-        userId,
-        streamId,
-        'LIVE',
-        stream.hostId,
-        true,
-        undefined,
-        Number(stream.unlockAmountKr)
+        userId, streamId, 'LIVE', stream.hostId, true, undefined,
+        Number((stream as any).unlockAmountKr)
       );
 
       if (!access.hasAccess) {

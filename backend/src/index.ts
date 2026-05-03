@@ -136,7 +136,7 @@ app.get('/health', (_req, res) => {
 });
 
 // CSRF token endpoint
-app.get('/api/v1/csrf-token', authMiddleware, rlsMiddleware, getCsrfToken);
+app.get('/api/v1/csrf-token', authMiddleware, setRLSContext, getCsrfToken);
 
 // SECURITY: Apply RLS context middleware to all authenticated routes
 // This sets the PostgreSQL session variable for Row-Level Security

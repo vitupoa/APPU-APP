@@ -86,35 +86,23 @@ export class ContentLockService {
     let creatorId: string;
     let unlockAmountKr: number;
 
-    switch (contentType) {
-      case 'SHORT':
-        content = await prisma.short.findUnique({
-          where: { id: contentId },
-          select: { userId: true, isLocked: true, unlockAmountKr: true }
-        });
-        creatorId = content?.userId;
-        break;
-      case 'POST':
-        content = await prisma.post.findUnique({
-          where: { id: contentId },
-          select: { userId: true, isLocked: true, unlockAmountKr: true }
-        });
-        creatorId = content?.userId;
-        break;
-      case 'LIVE':
-        content = await prisma.liveStream.findUnique({
-          where: { id: contentId },
-          select: { hostId: true, unlockAmountKr: true }
-        });
-        creatorId = content?.hostId;
-        break;
+    type RawContent = { user_id?: string; host_id?: string; is_locked?: boolean; unlock_amount_kr?: string | null };
+    let rawRows: RawContent[] = [];
+    if (contentType === 'SHORT') {
+      rawRows = await prisma.$queryRaw<RawContent[]>`SELECT user_id, is_locked, unlock_amount_kr FROM shorts WHERE id = ${contentId} LIMIT 1`;
+    } else if (contentType === 'POST') {
+      rawRows = await prisma.$queryRaw<RawContent[]>`SELECT user_id, is_locked, unlock_amount_kr FROM posts WHERE id = ${contentId} LIMIT 1`;
+    } else if (contentType === 'LIVE') {
+      rawRows = await prisma.$queryRaw<RawContent[]>`SELECT host_id, unlock_amount_kr FROM live_streams WHERE id = ${contentId} LIMIT 1`;
     }
+    content = rawRows[0];
+    creatorId = (content?.user_id || content?.host_id) as string;
 
     if (!content) {
       throw new Error('Content not found');
     }
 
-    unlockAmountKr = content.unlockAmountKr ? Number(content.unlockAmountKr) : 0;
+    unlockAmountKr = content.unlock_amount_kr ? Number(content.unlock_amount_kr) : 0;
 
     if (!unlockAmountKr || unlockAmountKr <= 0) {
       throw new Error('Content does not have an unlock amount set');

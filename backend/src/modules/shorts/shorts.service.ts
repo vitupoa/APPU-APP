@@ -133,8 +133,8 @@ export class ShortsService {
           requiredTier: s.requiredTier,
           unlockAmountKr: s.unlockAmountKr ? Number(s.unlockAmountKr) : undefined,
           hasAccess: access.hasAccess,
-          requiresSubscription: access.requiresSubscription,
-          requiresUnlock: access.requiresUnlock,
+          requiresSubscription: (access as any).requiresSubscription,
+          requiresUnlock: (access as any).requiresUnlock,
           commentsEnabled: s.commentsEnabled ?? true,
           linkedProduct: s.linkedProduct ? {
             id: s.linkedProduct.id,
@@ -190,7 +190,7 @@ export class ShortsService {
         isLocked: data.isLocked || false,
         requiredTier: data.requiredTier,
         unlockAmountKr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
-      },
+      } as any,
       include: {
         user: {
           select: {
@@ -233,7 +233,7 @@ export class ShortsService {
       isLiked: false,
       isLocked: short.isLocked,
       requiredTier: short.requiredTier,
-      unlockAmountKr: short.unlockAmountKr ? Number(short.unlockAmountKr) : undefined,
+        unlockAmountKr: (short as any).unlockAmountKr ? Number((short as any).unlockAmountKr) : undefined,
       createdAt: short.createdAt.toISOString()
     };
   }

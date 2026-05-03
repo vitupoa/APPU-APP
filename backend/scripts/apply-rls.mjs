@@ -21,11 +21,21 @@ async function runMigration() {
     await client.connect();
     console.log('✅ Connected to database');
 
-    console.log('\n📦 Reading RLS migration file...');
+    // Step 1: Apply content unlock system (creates content_unlocks table)
+    console.log('\n📦 Step 1: Applying content unlock system migration...');
+    const contentUnlockSql = readFileSync(
+      join(__dirname, '..', 'prisma', 'migrations', 'add_content_unlock_system.sql'),
+      'utf-8'
+    );
+    await client.query(contentUnlockSql);
+    console.log('✅ Content unlock system applied');
+
+    // Step 2: Apply RLS policies
+    console.log('\n📦 Step 2: Applying RLS policies migration...');
     const sqlPath = join(__dirname, '..', 'prisma', 'migrations', 'add_rls_policies.sql');
     const sql = readFileSync(sqlPath, 'utf-8');
 
-    console.log('🚀 Applying RLS policies migration...');
+    console.log('🚀 Applying RLS policies...');
     await client.query(sql);
 
     console.log('✅ RLS policies migration applied successfully!');
