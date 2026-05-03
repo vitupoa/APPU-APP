@@ -104,10 +104,18 @@ export class WalletController {
       
       res.status(200).json(result);
     } catch (error: any) {
+      console.error('❌ Top-up initiation error:', error);
       if (error.name === 'ZodError') {
-        res.status(400).json({ error: 'Validation failed', details: error.errors });
+        res.status(400).json({ 
+          success: false,
+          error: 'Validation failed', 
+          details: error.errors 
+        });
       } else {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ 
+          success: false,
+          error: error.message || 'Failed to initiate top-up'
+        });
       }
     }
   }

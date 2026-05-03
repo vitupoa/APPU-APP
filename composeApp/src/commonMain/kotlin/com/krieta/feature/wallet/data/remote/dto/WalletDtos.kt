@@ -60,14 +60,15 @@ data class TopupInitiateRequestDto(
 @Serializable
 data class TopupInitiateResponseDto(
     val success: Boolean,
-    val transactionId: String,
-    val reference: String,
-    val krAmount: Int,
-    val fiatAmount: Int,
-    val currency: String,
-    val provider: String,
-    val status: String,
-    val paymentInstructions: PaymentInstructionsDto
+    val transactionId: String? = null,
+    val reference: String? = null,
+    val krAmount: Int? = null,
+    val fiatAmount: Int? = null,
+    val currency: String? = null,
+    val provider: String? = null,
+    val status: String? = null,
+    val paymentInstructions: PaymentInstructionsDto? = null,
+    val error: String? = null
 )
 
 @Serializable
