@@ -499,6 +499,15 @@ private fun PaidVotingToggle(
             }
         }
         
+        // Voting cost input when paid voting is enabled
+        if (state.paidVoting) {
+            VotingCostInput(
+                viewModel = viewModel,
+                state = state,
+                validationErrors = validationErrors
+            )
+        }
+        
         // Mutual exclusivity validation error (Requirements 9.2, 9.3, 9.4)
         if (validationErrors["mutualExclusivity"] != null) {
             Text(
@@ -782,6 +791,130 @@ private fun getSelectionMethodDescription(method: SelectionMethod): String {
         SelectionMethod.RANDOM -> "Winners selected randomly"
         SelectionMethod.VOTING -> "Community votes for winners"
         SelectionMethod.COMBINATION -> "Judges + voting combined"
+    }
+}
+
+/**
+ * Voting Cost Input Field
+ * Allows content creator to enter custom amount in their fiat currency
+ * Shows real-time conversion to Kr
+ */
+@Composable
+private fun VotingCostInput(
+    viewModel: CreateContestViewModel,
+    state: CreateContestState,
+    validationErrors: Map<String, String>
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = "Voting Cost",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFFA0A0A0)
+        )
+        
+        OutlinedTextField(
+            value = if (state.votingCostFiat > 0.0) state.votingCostFiat.toString() else "",
+            onValueChange = { 
+                val newAmount = SafeConversion.toDoubleOrDefaultWithValidation(it, "votingCost", 0.0, defaultValue = 0.0)
+                viewModel.updateVotingCostFiat(newAmount)
+            },
+            label = { Text("Amount per Vote") },
+            placeholder = { Text("0.00") },
+            leadingIcon = {
+                Text(
+                    text = viewModel.getCurrencyCode(),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFFA0A0A0),
+                    modifier = Modifier.padding(start = 12.dp)
+                )
+            },
+            supportingText = {
+                if (validationErrors["votingCost"] != null) {
+                    Text(
+                        text = validationErrors["votingCost"]!!,
+                        color = Color(0xFFFF3B30),
+                        fontSize = 12.sp
+                    )
+                } else {
+                    Text(
+                        text = "Amount users pay to vote (in your currency)",
+                        fontSize = 12.sp,
+                        color = Color(0xFFA0A0A0)
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            isError = validationErrors["votingCost"] != null,
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFFF5A623),
+                cursorColor = Color(0xFFF5A623),
+                focusedLabelColor = Color(0xFFF5A623),
+                unfocusedBorderColor = Color(0xFF3A3A3F),
+                errorBorderColor = Color(0xFFFF3B30),
+                focusedContainerColor = Color(0xFF1A1A1F),
+                unfocusedContainerColor = Color(0xFF1A1A1F),
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            ),
+            shape = RoundedCornerShape(12.dp)
+        )
+        
+        // Real-time Kr conversion display for content creator
+        if (state.votingCostFiat > 0.0) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF0A2912)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Kr Equivalent:",
+                            fontSize = 14.sp,
+                            color = Color(0xFFA0A0A0)
+                        )
+                        Text(
+                            text = viewModel.getVotingCostKrDisplay(),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF34C759)
+                        )
+                    }
+                    
+                    Divider(color = Color(0xFF3A3A3F), thickness = 1.dp)
+                    
+                    // Show how end users will see it
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = "Users will see:",
+                            fontSize = 12.sp,
+                            color = Color(0xFFA0A0A0)
+                        )
+                        Text(
+                            text = viewModel.getVotingCostUserDisplay(),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

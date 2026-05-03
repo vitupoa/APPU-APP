@@ -109,6 +109,7 @@ data class CreateContestState(
     // Step 4: Selection Method (Subtask 2.5)
     val selectionMethod: SelectionMethod = SelectionMethod.MANUAL,
     val paidVoting: Boolean = false,
+    val votingCostFiat: Double = 0.0,
     
     // Step 4: Milestone Airdrop (Subtask 2.5)
     val milestoneAirdropEnabled: Boolean = false,
@@ -536,6 +537,11 @@ class CreateContestViewModel(
             if (currentState.entryFee > 0.0 && currentState.paidVoting) {
                 errors["mutualExclusivity"] = "Entry fee and paid voting are mutually exclusive"
             }
+            
+            // Paid voting cost validation
+            if (currentState.paidVoting && currentState.votingCostFiat <= 0.0) {
+                errors["votingCost"] = "Voting cost must be greater than zero when paid voting is enabled"
+            }
         } catch (e: Exception) {
             errors["validation"] = "Validation error: ${e.message}"
         }
@@ -709,6 +715,31 @@ class CreateContestViewModel(
         return formatKr(krAmount)
     }
     
+    /**
+     * Real-time conversion display for voting cost.
+     * Converts the voting cost from fiat to Kr and returns formatted string.
+     * @return Formatted string showing Kr equivalent of voting cost
+     */
+    fun getVotingCostKrDisplay(): String {
+        val currentState = _state.value
+        if (currentState.votingCostFiat <= 0.0) return "Kr.0"
+        val krAmount = convertToKr(currentState.votingCostFiat, applyMargin = false)
+        return formatKr(krAmount)
+    }
+    
+    /**
+     * Formats voting cost with Kr and fiat for end user display.
+     * Shows Kr amount prominently with fiat equivalent below/next to it.
+     * @return Formatted string for end user display
+     */
+    fun getVotingCostUserDisplay(): String {
+        val currentState = _state.value
+        if (currentState.votingCostFiat <= 0.0) return "Free"
+        val krAmount = convertToKr(currentState.votingCostFiat, applyMargin = false)
+        val currencyCode = getCurrencyCode()
+        return "${formatKr(krAmount)} (~$currencyCode ${com.krieta.com.core.util.formatString("%.2f", currentState.votingCostFiat)})"
+    }
+    
     // Step 1: Contest Details and Dates Update Functions (Subtask 2.2)
     fun updateTitle(v: String) { _state.value = _state.value.copy(title = v) }
     fun updateDescription(v: String) { _state.value = _state.value.copy(description = v) }
@@ -784,6 +815,7 @@ class CreateContestViewModel(
     // Step 4: Selection Method Update Functions (Subtask 2.5)
     fun updateSelectionMethod(v: SelectionMethod) { _state.value = _state.value.copy(selectionMethod = v) }
     fun updatePaidVoting(v: Boolean) { _state.value = _state.value.copy(paidVoting = v) }
+    fun updateVotingCostFiat(v: Double) { _state.value = _state.value.copy(votingCostFiat = v) }
     
     // Step 4: Milestone Airdrop Update Functions (Subtask 2.5)
     fun updateMilestoneAirdropEnabled(v: Boolean) { _state.value = _state.value.copy(milestoneAirdropEnabled = v) }
