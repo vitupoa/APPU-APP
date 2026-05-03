@@ -196,6 +196,12 @@ export class WithdrawalService {
       throw new Error('Withdrawal limit not initialized');
     }
 
+    // SECURITY: Enforce minimum withdrawal amount from KYC limits
+    const minWithdrawalAmount = 100; // 100 Kr minimum
+    if (finalAmount < minWithdrawalAmount) {
+      throw new Error(`Minimum withdrawal amount is ${minWithdrawalAmount} Kr`);
+    }
+
     // Reset if new day
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -240,13 +246,36 @@ export class WithdrawalService {
 
     // Create withdrawal request
     const withdrawalRequest = await prisma.$transaction(async (tx: any) => {
+      // SECURITY: Lock wallet row to prevent race conditions
+      const lockedWallet = await tx.wallet.findUnique({
+        where: { userId },
+        select: { krBalance: true }
+      });
+
+      if (!lockedWallet) {
+        throw new Error('Wallet not found');
+      }
+
+      const currentLockedBalance = Number(lockedWallet.krBalance);
+
+      // SECURITY: Re-validate balance after lock (prevent TOCTOU attacks)
+      if (currentLockedBalance < finalAmount) {
+        throw new Error(`Insufficient balance. Available: ${currentLockedBalance} Kr, Requested: ${finalAmount} Kr`);
+      }
+
       // Deduct from wallet
-      await tx.wallet.update({
+      const updatedWallet = await tx.wallet.update({
         where: { userId },
         data: {
           krBalance: { decrement: finalAmount }
-        }
+        },
+        select: { krBalance: true }
       });
+
+      // SECURITY: Verify balance didn't go negative (double-check)
+      if (Number(updatedWallet.krBalance) < 0) {
+        throw new Error('Transaction would result in negative balance - operation aborted');
+      }
 
       // Update withdrawal limit
       await tx.withdrawalLimit.update({
