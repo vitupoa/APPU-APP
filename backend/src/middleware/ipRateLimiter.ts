@@ -228,9 +228,9 @@ export const paymentRateLimiter = createUserRateLimiter({
  * Prevents withdrawal fraud
  */
 export const withdrawalRateLimiter = createUserRateLimiter({
-  windowMs: 60 * 1000,      // 1 minute
-  maxRequests: 2,            // 2 requests
-  blockDurationMs: 10 * 60 * 1000 // Block for 10 minutes
+  windowMs: 15 * 60 * 1000,  // 15 minutes
+  maxRequests: 1,             // 1 request only
+  blockDurationMs: 15 * 60 * 1000 // Block for 15 minutes
 });
 
 /**
