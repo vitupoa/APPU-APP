@@ -18,7 +18,7 @@ val chamaModule = module {
     single<ChamaRepository> { ChamaRepositoryImpl(get()) }
 
     factory { ChamaListViewModel(get()) }
-    factory { CreateChamaViewModel(get()) }
+    factory { CreateChamaViewModel(get(), get(), get()) }
     factory { (chamaId: String) -> ChamaDashboardViewModel(chamaId, get(), get(), get()) }
     factory { (chamaId: String, electionId: String) -> ChamaElectionViewModel(chamaId, electionId, get()) }
     factory { DefaultersViewModel(get()) }

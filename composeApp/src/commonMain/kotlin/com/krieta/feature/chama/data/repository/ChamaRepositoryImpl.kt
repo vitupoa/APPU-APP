@@ -11,31 +11,52 @@ class ChamaRepositoryImpl(
 ) : ChamaRepository {
 
     override suspend fun createChama(request: CreateChamaRequest): NetworkResult<ChamaDto> {
-        return safeApiCall { api.createChama(request).chama }
+        return safeApiCall { 
+            val response = api.createChama(request)
+            response.chama ?: throw Exception(response.error ?: "Failed to create chama")
+        }
     }
 
     override suspend fun getMyChamas(): NetworkResult<List<ChamaDto>> {
-        return safeApiCall { api.getMyChamas().chamas }
+        return safeApiCall { 
+            val response = api.getMyChamas()
+            response.chamas
+        }
     }
 
     override suspend fun discoverChamas(page: Int, limit: Int): NetworkResult<List<ChamaDto>> {
-        return safeApiCall { api.discoverChamas(page, limit).chamas }
+        return safeApiCall { 
+            val response = api.discoverChamas(page, limit)
+            response.chamas
+        }
     }
 
     override suspend fun getChamaById(id: String): NetworkResult<ChamaDto> {
-        return safeApiCall { api.getChamaById(id).chama }
+        return safeApiCall { 
+            val response = api.getChamaById(id)
+            response.chama ?: throw Exception(response.error ?: "Chama not found")
+        }
     }
 
     override suspend fun updateChama(id: String, request: UpdateChamaRequest): NetworkResult<ChamaDto> {
-        return safeApiCall { api.updateChama(id, request).chama }
+        return safeApiCall { 
+            val response = api.updateChama(id, request)
+            response.chama ?: throw Exception(response.error ?: "Failed to update chama")
+        }
     }
 
     override suspend fun activateChama(id: String): NetworkResult<ChamaDto> {
-        return safeApiCall { api.activateChama(id).chama }
+        return safeApiCall { 
+            val response = api.activateChama(id)
+            response.chama ?: throw Exception(response.error ?: "Failed to activate chama")
+        }
     }
 
     override suspend fun joinChama(id: String): NetworkResult<ChamaDto> {
-        return safeApiCall { api.joinChama(id).chama }
+        return safeApiCall { 
+            val response = api.joinChama(id)
+            response.chama ?: throw Exception(response.error ?: "Failed to join chama")
+        }
     }
 
     override suspend fun leaveChama(id: String): NetworkResult<Unit> {
@@ -59,7 +80,10 @@ class ChamaRepositoryImpl(
     }
 
     override suspend fun getBalance(chamaId: String): NetworkResult<String> {
-        return safeApiCall { api.getBalance(chamaId).krBalance }
+        return safeApiCall { 
+            val response = api.getBalance(chamaId)
+            response.krBalance ?: throw Exception(response.error ?: "Failed to get balance")
+        }
     }
 
     override suspend fun getTransactions(chamaId: String, page: Int, limit: Int): NetworkResult<ChamaTransactionListResponseDto> {
@@ -71,19 +95,31 @@ class ChamaRepositoryImpl(
     }
 
     override suspend fun openCycle(chamaId: String): NetworkResult<ChamaCycleDto> {
-        return safeApiCall { api.openCycle(chamaId).cycle }
+        return safeApiCall { 
+            val response = api.openCycle(chamaId)
+            response.cycle ?: throw Exception(response.error ?: "Failed to open cycle")
+        }
     }
 
     override suspend fun getCycles(chamaId: String): NetworkResult<List<ChamaCycleDto>> {
-        return safeApiCall { api.getCycles(chamaId).cycles }
+        return safeApiCall { 
+            val response = api.getCycles(chamaId)
+            response.cycles
+        }
     }
 
     override suspend fun disburseCycle(chamaId: String, cycleId: String): NetworkResult<ChamaCycleDto> {
-        return safeApiCall { api.disburseCycle(chamaId, cycleId).cycle }
+        return safeApiCall { 
+            val response = api.disburseCycle(chamaId, cycleId)
+            response.cycle ?: throw Exception(response.error ?: "Failed to disburse cycle")
+        }
     }
 
     override suspend fun getActiveElections(chamaId: String): NetworkResult<List<ChamaElectionDto>> {
-        return safeApiCall { api.getActiveElections(chamaId).elections }
+        return safeApiCall { 
+            val response = api.getActiveElections(chamaId)
+            response.elections
+        }
     }
 
     override suspend fun startElection(chamaId: String, request: StartElectionRequest): NetworkResult<Unit> {
@@ -91,7 +127,10 @@ class ChamaRepositoryImpl(
     }
 
     override suspend fun getElectionStatus(chamaId: String, electionId: String): NetworkResult<ChamaElectionDto> {
-        return safeApiCall { api.getElectionStatus(chamaId, electionId).election }
+        return safeApiCall { 
+            val response = api.getElectionStatus(chamaId, electionId)
+            response.election ?: throw Exception(response.error ?: "Failed to get election status")
+        }
     }
 
     override suspend fun nominate(chamaId: String, electionId: String, request: NominateRequest): NetworkResult<Unit> {
@@ -115,7 +154,10 @@ class ChamaRepositoryImpl(
     }
 
     override suspend fun getDefaulters(page: Int, limit: Int): NetworkResult<List<ChamaDefaulterDto>> {
-        return safeApiCall { api.getDefaulters(page, limit).defaulters }
+        return safeApiCall { 
+            val response = api.getDefaulters(page, limit)
+            response.defaulters
+        }
     }
 
     override suspend fun resolveDefault(defaultId: String): NetworkResult<Unit> {

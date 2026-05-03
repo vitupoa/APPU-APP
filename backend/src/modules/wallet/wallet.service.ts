@@ -566,4 +566,91 @@ export class WalletService {
       timeout: 10000 // 10 second timeout
     });
   }
+
+  /**
+   * Verify bank account details
+   */
+  static async verifyAccount(accountNumber: string, bankCode: string, country: string) {
+    try {
+      // For now, we'll use Paystack's account verification for supported countries
+      if (country === 'NG' || country === 'GH' || country === 'ZA') {
+        const verification = await PaystackService.verifyAccount(accountNumber, bankCode);
+        return {
+          success: true,
+          accountName: verification.accountName
+        };
+      } else {
+        // For other countries like Kenya, account verification is not available
+        return {
+          success: false,
+          error: 'Account verification not available for this country'
+        };
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || 'Account verification failed'
+      };
+    }
+  }
+
+  /**
+   * Get list of banks for a country
+   */
+  static async getBanks(country: string) {
+    const banks = {
+      'KE': [
+        { name: 'Equity Bank', code: '68', country: 'KE', currency: 'KES' },
+        { name: 'KCB Bank', code: '01', country: 'KE', currency: 'KES' },
+        { name: 'Cooperative Bank', code: '11', country: 'KE', currency: 'KES' },
+        { name: 'ABSA Bank', code: '03', country: 'KE', currency: 'KES' },
+        { name: 'Standard Chartered', code: '02', country: 'KE', currency: 'KES' },
+        { name: 'NCBA Bank', code: '07', country: 'KE', currency: 'KES' },
+        { name: 'Stanbic Bank', code: '31', country: 'KE', currency: 'KES' },
+        { name: 'Diamond Trust Bank', code: '63', country: 'KE', currency: 'KES' },
+        { name: 'I&M Bank', code: '57', country: 'KE', currency: 'KES' },
+        { name: 'Family Bank', code: '70', country: 'KE', currency: 'KES' }
+      ],
+      'NG': [
+        { name: 'Access Bank', code: '044', country: 'NG', currency: 'NGN' },
+        { name: 'GTBank', code: '058', country: 'NG', currency: 'NGN' },
+        { name: 'Zenith Bank', code: '057', country: 'NG', currency: 'NGN' },
+        { name: 'First Bank', code: '011', country: 'NG', currency: 'NGN' },
+        { name: 'UBA', code: '033', country: 'NG', currency: 'NGN' },
+        { name: 'Fidelity Bank', code: '070', country: 'NG', currency: 'NGN' },
+        { name: 'FCMB', code: '214', country: 'NG', currency: 'NGN' },
+        { name: 'Stanbic IBTC', code: '221', country: 'NG', currency: 'NGN' },
+        { name: 'Sterling Bank', code: '232', country: 'NG', currency: 'NGN' },
+        { name: 'Wema Bank', code: '035', country: 'NG', currency: 'NGN' }
+      ],
+      'GH': [
+        { name: 'GCB Bank', code: 'GCB', country: 'GH', currency: 'GHS' },
+        { name: 'Ecobank Ghana', code: 'EBG', country: 'GH', currency: 'GHS' },
+        { name: 'Standard Chartered', code: 'SCB', country: 'GH', currency: 'GHS' },
+        { name: 'Absa Bank Ghana', code: 'ABG', country: 'GH', currency: 'GHS' },
+        { name: 'Fidelity Bank Ghana', code: 'FBG', country: 'GH', currency: 'GHS' }
+      ],
+      'ZA': [
+        { name: 'Standard Bank', code: '051001', country: 'ZA', currency: 'ZAR' },
+        { name: 'ABSA Bank', code: '632005', country: 'ZA', currency: 'ZAR' },
+        { name: 'FNB', code: '250655', country: 'ZA', currency: 'ZAR' },
+        { name: 'Nedbank', code: '198765', country: 'ZA', currency: 'ZAR' },
+        { name: 'Capitec Bank', code: '470010', country: 'ZA', currency: 'ZAR' }
+      ]
+    };
+
+    return banks[country as keyof typeof banks] || [];
+  }
+
+  /**
+   * Get list of supported countries
+   */
+  static async getCountries() {
+    return [
+      { code: 'KE', name: 'Kenya', currency: 'KES', accountType: 'bank_account' },
+      { code: 'NG', name: 'Nigeria', currency: 'NGN', accountType: 'nuban' },
+      { code: 'GH', name: 'Ghana', currency: 'GHS', accountType: 'mobile_money' },
+      { code: 'ZA', name: 'South Africa', currency: 'ZAR', accountType: 'bank_account' }
+    ];
+  }
 }

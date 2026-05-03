@@ -4,6 +4,7 @@ import { kycService } from '../kyc/kyc.service.js';
 import { transactionSigner, TransactionPayload } from '../../utils/transactionSigner.js';
 import { nonceService } from '../../services/nonce.service.js';
 import { WithdrawalSecurityMetadata } from './withdrawal.types.js';
+import { WithdrawalSecurityValidator } from '../../utils/withdrawalSecurity.js';
 
 const DAILY_WITHDRAWAL_LIMIT = 500000;
 const RAPID_WITHDRAWAL_THRESHOLD = 3; // 3 withdrawals in 24 hours
@@ -14,23 +15,112 @@ export class WithdrawalService {
   // Request withdrawal with transaction signing
   async requestWithdrawal(
     userId: string,
-    amountKr: number,
-    provider: string,
-    accountName: string,
-    accountDetails: any,
-    currency: string = 'KES',
+    request: any, // WithdrawRequestDto equivalent
     signature: string,
     timestamp: number,
     nonce: string,
     // NEW: Enhanced security parameters
     securityMetadata?: WithdrawalSecurityMetadata
   ) {
+    const { 
+      provider, 
+      krAmount: amountKr, 
+      currency, 
+      phoneNumber, 
+      accountNumber, 
+      bankCode, 
+      accountName, 
+      country,
+      deviceSecurityScore,
+      isRooted,
+      isEmulator,
+      amountHash,
+      requestTimestamp,
+      balanceHash
+    } = request;
+    
+    // SECURITY: Sanitize and validate the amount
+    const sanitizedAmount = WithdrawalSecurityValidator.sanitizeAmount(amountKr);
+    if (sanitizedAmount === null) {
+      throw new Error('Invalid withdrawal amount format');
+    }
+    
+    // SECURITY: Get current user balance for validation
+    const wallet = await prisma.wallet.findUnique({
+      where: { userId }
+    });
+    
+    if (!wallet) {
+      throw new Error('Wallet not found');
+    }
+    
+    const currentBalance = Number(wallet.krBalance);
+    
+    // SECURITY: Validate withdrawal amount constraints
+    const amountValidation = WithdrawalSecurityValidator.validateWithdrawalAmount(
+      sanitizedAmount,
+      currentBalance
+    );
+    
+    if (!amountValidation.isValid) {
+      throw new Error(amountValidation.message);
+    }
+    
+    // SECURITY: Validate request integrity (hashes and timestamp)
+    const integrityValidation = WithdrawalSecurityValidator.validateRequestIntegrity(
+      userId,
+      sanitizedAmount,
+      requestTimestamp,
+      amountHash,
+      balanceHash,
+      nonce,
+      currentBalance
+    );
+    
+    if (!integrityValidation.isValid) {
+      throw new Error(`Security validation failed: ${integrityValidation.message}`);
+    }
+    
+    // Use the sanitized amount for all further processing
+    const finalAmount = sanitizedAmount;
+    
+    // Build account details based on provider
+    let accountDetails: any = {};
+    
+    switch (provider) {
+      case 'mpesa':
+        accountDetails = { phoneNumber };
+        break;
+      case 'paystack':
+      case 'bank':
+        accountDetails = { 
+          accountNumber, 
+          bankCode, 
+          accountName, 
+          country 
+        };
+        break;
+      default:
+        throw new Error('Invalid provider');
+    }
+    
+    // Build security metadata
+    const metadata: WithdrawalSecurityMetadata = {
+      hardwareSecurityUsed: false,
+      biometricVerified: false,
+      multiSigRequired: false,
+      rateLimitChecked: true,
+      deviceSecurityScore: deviceSecurityScore || 50,
+      isRooted: isRooted || false,
+      isEmulator: isEmulator || false,
+      ...securityMetadata
+    };
     // Step 1: Verify transaction signature
     const payload: TransactionPayload = {
       userId,
-      amountKr,
+      amountKr: finalAmount,
       provider,
-      accountName,
+      accountName: accountName || 'N/A',
       accountDetails,
       currency,
       timestamp,
@@ -52,8 +142,8 @@ export class WithdrawalService {
     await nonceService.markNonceUsed(nonce, userId);
 
     // Step 4: Validate security metadata (if provided)
-    if (securityMetadata) {
-      this.validateSecurityMetadata(securityMetadata);
+    if (metadata) {
+      this.validateSecurityMetadata(metadata);
     }
     // Get user
     const user = await prisma.user.findUnique({
@@ -89,12 +179,8 @@ export class WithdrawalService {
       }
     }
 
-    // Check wallet balance
-    const wallet = await prisma.wallet.findUnique({
-      where: { userId }
-    });
-
-    if (!wallet || Number(wallet.krBalance) < amountKr) {
+    // Check wallet balance (double-check after security validation)
+    if (Number(wallet.krBalance) < finalAmount) {
       throw new Error('Insufficient balance');
     }
 
@@ -135,8 +221,8 @@ export class WithdrawalService {
     }
 
     // Detect suspicious patterns
-    const suspiciousFlags = await this.detectSuspiciousPatterns(userId, amountKr);
-    const riskScore = this.calculateRiskScore(suspiciousFlags, user.createdAt, amountKr, securityMetadata);
+    const suspiciousFlags = await this.detectSuspiciousPatterns(userId, finalAmount);
+    const riskScore = this.calculateRiskScore(suspiciousFlags, user.createdAt, finalAmount, metadata);
 
     // Determine initial status
     let status: WithdrawalStatus = 'PENDING';
@@ -158,7 +244,7 @@ export class WithdrawalService {
       await tx.wallet.update({
         where: { userId },
         data: {
-          krBalance: { decrement: amountKr }
+          krBalance: { decrement: finalAmount }
         }
       });
 
@@ -166,7 +252,7 @@ export class WithdrawalService {
       await tx.withdrawalLimit.update({
         where: { userId },
         data: {
-          withdrawnTodayKr: { increment: amountKr }
+          withdrawnTodayKr: { increment: finalAmount }
         }
       });
 
@@ -174,9 +260,9 @@ export class WithdrawalService {
       const request = await tx.withdrawalRequest.create({
         data: {
           userId,
-          amountKr,
+          amountKr: finalAmount,
           provider,
-          accountName,
+          accountName: accountName || 'N/A',
           accountDetails,
           currency,
           status,
@@ -185,9 +271,14 @@ export class WithdrawalService {
           suspiciousFlags,
           riskScore,
           // Store security metadata in metadata field
-          metadata: securityMetadata ? {
-            security: securityMetadata,
-            timestamp: new Date().toISOString()
+          metadata: metadata ? {
+            security: metadata,
+            timestamp: new Date().toISOString(),
+            requestTimestamp,
+            amountHash,
+            balanceHash,
+            originalAmount: amountKr,
+            sanitizedAmount: finalAmount
           } : undefined
         }
       });
@@ -197,13 +288,15 @@ export class WithdrawalService {
         data: {
           userId,
           type: 'withdraw',
-          amountKr,
+          amountKr: finalAmount,
           currency,
           provider,
           status: 'pending',
           reference: request.id,
           metadata: {
-            withdrawalAmount: amountKr
+            withdrawalAmount: finalAmount,
+            securityValidated: true,
+            requestTimestamp
           }
         }
       });

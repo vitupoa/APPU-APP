@@ -132,4 +132,45 @@ export class WalletController {
       res.status(400).json({ error: error.message });
     }
   }
+
+  static async verifyAccount(req: AuthRequest, res: Response) {
+    try {
+      const { accountNumber, bankCode, country } = req.body;
+      
+      if (!accountNumber || !bankCode || !country) {
+        res.status(400).json({ 
+          success: false,
+          error: 'Missing required fields: accountNumber, bankCode, country' 
+        });
+        return;
+      }
+      
+      const result = await WalletService.verifyAccount(accountNumber, bankCode, country);
+      res.status(200).json(result);
+    } catch (error: any) {
+      res.status(400).json({ 
+        success: false,
+        error: error.message 
+      });
+    }
+  }
+
+  static async getBanks(req: AuthRequest, res: Response) {
+    try {
+      const country = req.query.country as string || 'KE';
+      const result = await WalletService.getBanks(country);
+      res.status(200).json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  static async getCountries(req: AuthRequest, res: Response) {
+    try {
+      const result = await WalletService.getCountries();
+      res.status(200).json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }

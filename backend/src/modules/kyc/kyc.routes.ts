@@ -56,60 +56,81 @@ router.get('/status', authenticateToken, async (req: AuthRequest, res) => {
 });
 
 // Request withdrawal
-router.post('/withdrawal/request', authenticateToken, async (req: AuthRequest, res) => {
+router.post('/withdraw', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId as string;
     const { 
-      amountKr, 
-      provider, 
-      accountName, 
-      accountDetails, 
-      currency, 
+      provider,
+      krAmount,
+      currency,
+      phoneNumber,
+      accountNumber,
+      bankCode,
+      accountName,
+      country,
       signature, 
       timestamp, 
       nonce,
       // NEW: Enhanced security parameters
-      hardwareSignature,
-      deviceId,
-      biometricVerified,
-      biometricTimestamp,
-      multiSigSignatures,
-      multiSigApprovers,
-      rateLimitToken,
       deviceSecurityScore,
       isRooted,
-      isEmulator
+      isEmulator,
+      amountHash,
+      requestTimestamp,
+      balanceHash
     } = req.body;
 
-    if (!amountKr || !provider || !accountName || !accountDetails || !signature || !timestamp || !nonce) {
-      res.status(400).json({ error: 'Missing required fields. Signature, timestamp, and nonce are required.' });
+    if (!krAmount || !provider || !signature || !timestamp || !nonce) {
+      res.status(400).json({ error: 'Missing required fields: krAmount, provider, signature, timestamp, nonce' });
+      return;
+    }
+
+    // SECURITY: Validate security fields
+    if (!amountHash || !requestTimestamp || !balanceHash) {
+      res.status(400).json({ error: 'Missing security validation fields' });
+      return;
+    }
+
+    // Validate provider-specific fields
+    if (provider === 'mpesa' && !phoneNumber) {
+      res.status(400).json({ error: 'Phone number required for M-Pesa withdrawals' });
+      return;
+    }
+
+    if ((provider === 'paystack' || provider === 'bank') && (!accountNumber || !bankCode)) {
+      res.status(400).json({ error: 'Account number and bank code required for bank withdrawals' });
       return;
     }
 
     // Build security metadata
     const securityMetadata = {
-      hardwareSecurityUsed: !!hardwareSignature,
-      hardwareSignature,
-      deviceId,
-      biometricVerified: !!biometricVerified,
-      biometricTimestamp,
-      multiSigRequired: !!multiSigSignatures,
-      multiSigSignatures,
-      multiSigApprovers,
-      rateLimitChecked: !!rateLimitToken,
-      rateLimitToken,
+      hardwareSecurityUsed: false,
+      biometricVerified: false,
+      multiSigRequired: false,
+      rateLimitChecked: true,
       deviceSecurityScore: deviceSecurityScore || 50,
-      isRooted,
-      isEmulator
+      isRooted: isRooted || false,
+      isEmulator: isEmulator || false
     };
 
     const withdrawal = await withdrawalService.requestWithdrawal(
       userId,
-      Number(amountKr),
-      provider,
-      accountName,
-      accountDetails,
-      currency,
+      {
+        provider,
+        krAmount: Number(krAmount),
+        currency: currency || 'KES',
+        phoneNumber,
+        accountNumber,
+        bankCode,
+        accountName,
+        country,
+        deviceSecurityScore,
+        isRooted,
+        isEmulator,
+        amountHash,
+        requestTimestamp: Number(requestTimestamp),
+        balanceHash
+      },
       signature,
       timestamp,
       nonce,
@@ -117,8 +138,10 @@ router.post('/withdrawal/request', authenticateToken, async (req: AuthRequest, r
     );
 
     res.json({
-      message: 'Withdrawal request submitted',
-      withdrawal
+      success: true,
+      transactionId: withdrawal.id,
+      message: 'Withdrawal request submitted successfully',
+      processingTime: withdrawal.processingTime
     }); return;
   } catch (error: any) {
     if (error.message.startsWith('KYC_REQUIRED') || error.message.startsWith('KYC_PENDING')) {

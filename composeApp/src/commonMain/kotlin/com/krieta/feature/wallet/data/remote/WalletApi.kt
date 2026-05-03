@@ -10,6 +10,12 @@ import com.krieta.feature.wallet.data.remote.dto.TopupInitiateRequestDto
 import com.krieta.feature.wallet.data.remote.dto.TopupInitiateResponseDto
 import com.krieta.feature.wallet.data.remote.dto.TopupConfirmRequestDto
 import com.krieta.feature.wallet.data.remote.dto.TopupConfirmResponseDto
+import com.krieta.feature.wallet.data.remote.dto.WithdrawRequestDto
+import com.krieta.feature.wallet.data.remote.dto.WithdrawResponseDto
+import com.krieta.feature.wallet.data.remote.dto.AccountVerificationDto
+import com.krieta.feature.wallet.data.remote.dto.AccountVerificationResponseDto
+import com.krieta.feature.wallet.data.remote.dto.BankDto
+import com.krieta.feature.wallet.data.remote.dto.CountryDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -87,17 +93,33 @@ class WalletApi(
     }
 
     suspend fun withdraw(
-        request: Map<String, Any>,
+        request: WithdrawRequestDto,
         signature: String,
         timestamp: Long,
         nonce: String
-    ) {
-        httpClient.post("${ApiConstants.API_VERSION}/kyc/withdraw") {
+    ): WithdrawResponseDto {
+        return httpClient.post("${ApiConstants.API_VERSION}/kyc/withdraw") {
             parameter("signature", signature)
             parameter("timestamp", timestamp)
             parameter("nonce", nonce)
             setBody(request)
-        }
+        }.body()
+    }
+
+    suspend fun verifyAccount(request: AccountVerificationDto): AccountVerificationResponseDto {
+        return httpClient.post("${ApiConstants.API_VERSION}/wallet/verify-account") {
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun getBanks(country: String): List<BankDto> {
+        return httpClient.get("${ApiConstants.API_VERSION}/wallet/banks") {
+            parameter("country", country)
+        }.body()
+    }
+
+    suspend fun getCountries(): List<CountryDto> {
+        return httpClient.get("${ApiConstants.API_VERSION}/wallet/countries").body()
     }
 
     suspend fun initiateTopup(request: TopupInitiateRequestDto): TopupInitiateResponseDto {

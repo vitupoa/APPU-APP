@@ -9,6 +9,9 @@ import { initializeGateway } from './shared/gateway/socket.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { rateLimiter } from './middleware/rateLimiter.js';
 import { authMiddleware } from './middleware/auth.js';
+import { rlsMiddleware } from './middleware/rls.js';
+import { apiRateLimiter } from './middleware/ipRateLimiter.js';
+import { sanitizeInputs, preventPathTraversal, preventCommandInjection } from './middleware/sanitization.js';
 import { getCsrfToken } from './middleware/csrfProtection.js';
 import { jwtSecretManager } from './utils/jwtRotation.js';
 import authRoutes from './modules/auth/auth.routes.js';
@@ -114,7 +117,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// SECURITY: Apply global security middleware
 app.use(rateLimiter);
+app.use(apiRateLimiter); // IP-based rate limiting
+app.use(sanitizeInputs); // Input sanitization
+app.use(preventPathTraversal); // Prevent path traversal
+app.use(preventCommandInjection); // Prevent command injection
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -122,7 +130,22 @@ app.get('/health', (_req, res) => {
 });
 
 // CSRF token endpoint
-app.get('/api/v1/csrf-token', authMiddleware, getCsrfToken);
+app.get('/api/v1/csrf-token', authMiddleware, rlsMiddleware, getCsrfToken);
+
+// SECURITY: Apply RLS middleware to all authenticated routes
+// This sets the PostgreSQL session variable for Row-Level Security
+app.use('/api/v1/*', (req, res, next) => {
+  // Skip RLS for auth routes (no user context yet)
+  if (req.path.startsWith('/auth/')) {
+    return next();
+  }
+  // Skip RLS for webhooks (system operations)
+  if (req.path.startsWith('/webhooks/')) {
+    return next();
+  }
+  // Apply RLS middleware
+  return rlsMiddleware(req as any, res, next);
+});
 
 // API Routes — mounted as modules are implemented
 app.use('/api/v1/auth', authRoutes);

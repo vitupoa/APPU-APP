@@ -46,7 +46,8 @@ export class UserService {
       }
     }
 
-    return {
+    // SECURITY: Only return sensitive data for own profile
+    const baseProfile = {
       id: user.id,
       username: user.username,
       firstName: user.firstName,
@@ -56,10 +57,8 @@ export class UserService {
       coverPhotoUrl: user.coverPhotoUrl,
       bio: user.bio,
       country: user.country,
-      currency: user.currency,
       accountType: user.accountType,
       isVerified: user.isVerified,
-      isWalletUnlocked: user.isWalletUnlocked,
       bioLinks: user.bioLinks,
       stats: {
         admirers: user._count.admirers,
@@ -70,6 +69,18 @@ export class UserService {
       relationshipStatus,
       createdAt: user.createdAt.toISOString()
     };
+
+    // Only include sensitive data for own profile
+    if (viewerId === userId) {
+      return {
+        ...baseProfile,
+        currency: user.currency,
+        isWalletUnlocked: user.isWalletUnlocked,
+        kycStatus: user.kycStatus
+      };
+    }
+
+    return baseProfile;
   }
 
   /**

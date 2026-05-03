@@ -16,6 +16,11 @@ import com.krieta.feature.wallet.domain.repository.WalletRepository
 import com.krieta.feature.wallet.domain.repository.TopupInitiateResponse
 import com.krieta.feature.wallet.domain.repository.TopupConfirmResponse
 import com.krieta.feature.wallet.domain.repository.PaymentInstructions
+import com.krieta.feature.wallet.domain.repository.WithdrawRequest
+import com.krieta.feature.wallet.domain.repository.WithdrawResponse
+import com.krieta.feature.wallet.domain.repository.Bank
+import com.krieta.feature.wallet.domain.repository.Country
+import com.krieta.feature.wallet.domain.repository.AccountVerification
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -107,23 +112,93 @@ class WalletRepositoryImpl(
         }
     }
 
-    override suspend fun withdraw(request: Map<String, Any>): NetworkResult<Unit> {
+    override suspend fun withdraw(request: WithdrawRequest): NetworkResult<WithdrawResponse> {
         return safeApiCall {
-            val krAmount = request["krAmount"] as? Double ?: throw IllegalArgumentException("krAmount required")
-            val provider = request["provider"] as? String ?: throw IllegalArgumentException("provider required")
-            val currency = request["currency"] as? String ?: throw IllegalArgumentException("currency required")
-            
             val nonce = TransactionSigner.generateNonce()
             val timestamp = TransactionSigner.generateTimestamp()
             val signature = TransactionSigner.signWithdrawal(
-                krAmount = krAmount,
-                provider = provider,
-                currency = currency,
+                krAmount = request.krAmount,
+                provider = request.provider,
+                currency = request.currency,
                 timestamp = timestamp,
                 nonce = nonce
             )
             
-            api.withdraw(request, signature, timestamp, nonce)
+            val dto = api.withdraw(
+                request = com.krieta.feature.wallet.data.remote.dto.WithdrawRequestDto(
+                    provider = request.provider,
+                    krAmount = request.krAmount,
+                    currency = request.currency,
+                    phoneNumber = request.phoneNumber,
+                    accountNumber = request.accountNumber,
+                    bankCode = request.bankCode,
+                    accountName = request.accountName,
+                    country = request.country,
+                    deviceSecurityScore = request.deviceSecurityScore,
+                    isRooted = request.isRooted,
+                    isEmulator = request.isEmulator,
+                    amountHash = request.amountHash,
+                    requestTimestamp = request.requestTimestamp,
+                    balanceHash = request.balanceHash
+                ),
+                signature = signature,
+                timestamp = timestamp,
+                nonce = nonce
+            )
+            
+            WithdrawResponse(
+                success = dto.success,
+                transactionId = dto.transactionId,
+                message = dto.message,
+                error = dto.error,
+                processingTime = dto.processingTime
+            )
+        }
+    }
+
+    override suspend fun verifyAccount(accountNumber: String, bankCode: String, country: String): NetworkResult<AccountVerification> {
+        return safeApiCall {
+            val dto = api.verifyAccount(
+                com.krieta.feature.wallet.data.remote.dto.AccountVerificationDto(
+                    accountNumber = accountNumber,
+                    bankCode = bankCode,
+                    country = country
+                )
+            )
+            
+            AccountVerification(
+                success = dto.success,
+                accountName = dto.accountName,
+                error = dto.error
+            )
+        }
+    }
+
+    override suspend fun getBanks(country: String): NetworkResult<List<Bank>> {
+        return safeApiCall {
+            val dtos = api.getBanks(country)
+            dtos.map { dto ->
+                Bank(
+                    name = dto.name,
+                    code = dto.code,
+                    country = dto.country,
+                    currency = dto.currency
+                )
+            }
+        }
+    }
+
+    override suspend fun getCountries(): NetworkResult<List<Country>> {
+        return safeApiCall {
+            val dtos = api.getCountries()
+            dtos.map { dto ->
+                Country(
+                    code = dto.code,
+                    name = dto.name,
+                    currency = dto.currency,
+                    accountType = dto.accountType
+                )
+            }
         }
     }
 

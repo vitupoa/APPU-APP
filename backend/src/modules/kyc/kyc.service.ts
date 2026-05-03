@@ -61,10 +61,10 @@ export class KYCService {
       where: { userId }
     });
 
+    // SECURITY: Don't expose daily limit to prevent users from gaming the system
     return {
       kycStatus: user?.kycStatus || 'NOT_STARTED',
       documents: kycDocuments,
-      dailyLimit: withdrawalLimit?.dailyLimitKr || DAILY_WITHDRAWAL_LIMIT,
       withdrawnToday: withdrawalLimit?.withdrawnTodayKr || 0
     };
   }

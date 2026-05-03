@@ -293,17 +293,63 @@ private fun StepFinancials(state: CreateChamaState, viewModel: CreateChamaViewMo
             fontSize = 14.sp
         )
 
+        // Contribution Amount - Fiat Currency
         OutlinedTextField(
-            value = state.contributionAmountKr,
-            onValueChange = { viewModel.updateContributionAmountKr(it) },
-            label = { Text("Contribution Amount (Kr)") },
-            placeholder = { Text("e.g. 1000") },
+            value = state.contributionAmountFiat,
+            onValueChange = { viewModel.updateContributionAmountFiat(it) },
+            label = { Text("Contribution Amount (${state.userCurrency})") },
+            placeholder = { Text("e.g. 100") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             shape = RoundedCornerShape(14.dp),
-            leadingIcon = { Text("Kr", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 12.dp)) }
+            leadingIcon = { 
+                Text(
+                    state.userCurrency, 
+                    fontWeight = FontWeight.Bold, 
+                    modifier = Modifier.padding(start = 12.dp)
+                ) 
+            },
+            trailingIcon = {
+                if (state.isLoadingRate) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                }
+            }
         )
+
+        // Contribution Amount - Kr (Read-only display)
+        if (state.contributionAmountKr.isNotEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = ChamaGold.copy(alpha = 0.1f)
+                ),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "≈ ${state.contributionAmountKr} Kr",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = ChamaGold
+                    )
+                    if (state.exchangeRate != null) {
+                        Text(
+                            "Rate: ${String.format("%.2f", state.exchangeRate)}",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
 
         Text("Contribution Frequency", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
         val frequencies = listOf("DAILY", "WEEKLY", "BIWEEKLY", "MONTHLY", "ONE_OFF")
@@ -330,15 +376,47 @@ private fun StepFinancials(state: CreateChamaState, viewModel: CreateChamaViewMo
             }
         }
 
+        // Membership Fee - Fiat Currency
         OutlinedTextField(
-            value = state.membershipFeeKr,
-            onValueChange = { viewModel.updateMembershipFeeKr(it) },
-            label = { Text("Membership Fee (optional)") },
+            value = state.membershipFeeFiat,
+            onValueChange = { viewModel.updateMembershipFeeFiat(it) },
+            label = { Text("Membership Fee (${state.userCurrency}, optional)") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            shape = RoundedCornerShape(14.dp)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            shape = RoundedCornerShape(14.dp),
+            leadingIcon = { 
+                Text(
+                    state.userCurrency, 
+                    fontWeight = FontWeight.Bold, 
+                    modifier = Modifier.padding(start = 12.dp)
+                ) 
+            }
         )
+
+        // Membership Fee - Kr (Read-only display)
+        if (state.membershipFeeKr.isNotEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = ChamaGold.copy(alpha = 0.1f)
+                ),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "≈ ${state.membershipFeeKr} Kr",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = ChamaGold
+                    )
+                }
+            }
+        }
 
         OutlinedTextField(
             value = state.maxMembers,
@@ -483,9 +561,17 @@ private fun StepConfirmation(state: CreateChamaState) {
             ) {
                 ConfirmRow("Name", state.name)
                 ConfirmRow("Type", state.type.lowercase().replaceFirstChar { it.uppercase() })
-                ConfirmRow("Contribution", "${state.contributionAmountKr} Kr")
+                if (state.contributionAmountFiat.isNotEmpty()) {
+                    ConfirmRow("Contribution", "${state.contributionAmountFiat} ${state.userCurrency} (≈ ${state.contributionAmountKr} Kr)")
+                } else {
+                    ConfirmRow("Contribution", "${state.contributionAmountKr} Kr")
+                }
                 ConfirmRow("Frequency", state.contributionFrequency.lowercase().replace("_", "-"))
-                if (state.membershipFeeKr.isNotBlank()) ConfirmRow("Membership Fee", "${state.membershipFeeKr} Kr")
+                if (state.membershipFeeFiat.isNotBlank()) {
+                    ConfirmRow("Membership Fee", "${state.membershipFeeFiat} ${state.userCurrency} (≈ ${state.membershipFeeKr} Kr)")
+                } else if (state.membershipFeeKr.isNotBlank()) {
+                    ConfirmRow("Membership Fee", "${state.membershipFeeKr} Kr")
+                }
                 if (state.maxMembers.isNotBlank()) ConfirmRow("Max Members", state.maxMembers)
                 if (state.penaltyAmountKr.isNotBlank()) ConfirmRow("Late Penalty", "${state.penaltyAmountKr} Kr")
                 ConfirmRow("Grace Period", "${state.gracePeriodDays} days")

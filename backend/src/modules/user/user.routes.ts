@@ -1,5 +1,7 @@
 import { Router, Response } from 'express';
 import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth.js';
+import { validateProfileOwnership, preventSensitiveFieldModification } from '../../middleware/ownership.js';
+import { sanitizeProfileUpdate, sanitizeSearchQuery } from '../../middleware/sanitization.js';
 import { getQueryString } from '../../utils/queryParams.js';
 import { UserService } from './user.service.js';
 import { SubscriptionService } from './subscription.service.js';
@@ -53,7 +55,7 @@ router.get('/me', authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 // PUT /api/v1/users/me
-router.put('/me', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.put('/me', authMiddleware, preventSensitiveFieldModification, sanitizeProfileUpdate, async (req: AuthRequest, res: Response) => {
   try {
     const data = updateProfileSchema.parse(req.body);
     const updated = await UserService.updateProfile(req.userId!, data);
@@ -158,7 +160,7 @@ router.get('/:id/lovers', async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/v1/users/search/creators
-router.get('/search/creators', async (req: AuthRequest, res: Response) => {
+router.get('/search/creators', sanitizeSearchQuery, async (req: AuthRequest, res: Response) => {
   try {
     const minAdmirers = req.query.minAdmirers ? parseInt(getQueryString(req.query.minAdmirers) || '') : undefined;
     const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;

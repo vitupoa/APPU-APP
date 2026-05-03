@@ -17,6 +17,7 @@
     "seed:admin": "tsx prisma/seeds/seed-super-admin.ts",
     "seed:niches": "tsx prisma/seeds/seed-niches.ts",
     "db:migrate:run": "tsx scripts/run-migrations.ts",
+    "migrate:rls": "tsx migrate-rls.ts",
     "test": "jest --coverage",
     "lint": "eslint src/ --ext .ts"
   },
@@ -38,7 +39,7 @@
     "helmet": "^8.0.0",
     "html-escaper": "^3.0.3",
     "ioredis": "^5.4.2",
-    "isomorphic-dompurify": "^2.16.0",
+    "isomorphic-dompurify": "^2.36.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.1.1",
     "node-cron": "^4.2.1",

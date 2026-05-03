@@ -96,3 +96,63 @@ data class TopupConfirmResponseDto(
     val krAmount: Int,
     val status: String
 )
+
+@Serializable
+data class WithdrawRequestDto(
+    val provider: String, // mpesa, paystack, bank
+    val krAmount: Double,
+    val currency: String,
+    val phoneNumber: String? = null, // For M-Pesa
+    val accountNumber: String? = null, // For Bank/Paystack
+    val bankCode: String? = null, // For Bank/Paystack
+    val accountName: String? = null, // For Bank/Paystack - must match user's name
+    val country: String? = null, // For Paystack
+    val deviceSecurityScore: Int? = null,
+    val isRooted: Boolean? = null,
+    val isEmulator: Boolean? = null,
+    // Security: Amount validation hash to prevent tampering
+    val amountHash: String,
+    // Security: Timestamp to prevent replay attacks
+    val requestTimestamp: Long,
+    // Security: Client-side balance check hash
+    val balanceHash: String
+)
+
+@Serializable
+data class WithdrawResponseDto(
+    val success: Boolean,
+    val transactionId: String? = null,
+    val message: String? = null,
+    val error: String? = null,
+    val processingTime: String? = null
+)
+
+@Serializable
+data class BankDto(
+    val name: String,
+    val code: String,
+    val country: String,
+    val currency: String
+)
+
+@Serializable
+data class CountryDto(
+    val code: String,
+    val name: String,
+    val currency: String,
+    val accountType: String
+)
+
+@Serializable
+data class AccountVerificationDto(
+    val accountNumber: String,
+    val bankCode: String,
+    val country: String
+)
+
+@Serializable
+data class AccountVerificationResponseDto(
+    val success: Boolean,
+    val accountName: String? = null,
+    val error: String? = null
+)

@@ -210,46 +210,53 @@ data class CastVoteRequest(
 @Serializable
 data class ChamaResponseDto(
     val success: Boolean,
-    val chama: ChamaDto
+    val chama: ChamaDto? = null,
+    val error: String? = null
 )
 
 @Serializable
 data class ChamaListResponseDto(
     val success: Boolean,
-    val chamas: List<ChamaDto>
+    val chamas: List<ChamaDto> = emptyList(),
+    val error: String? = null
 )
 
 @Serializable
 data class ChamaDefaulterListResponseDto(
     val success: Boolean,
-    val defaulters: List<ChamaDefaulterDto>
+    val defaulters: List<ChamaDefaulterDto> = emptyList(),
+    val error: String? = null
 )
 
 @Serializable
 data class ChamaTransactionListResponseDto(
     val success: Boolean,
-    val transactions: List<ChamaTransactionDto>,
-    val total: Int,
-    val page: Int,
-    val limit: Int
+    val transactions: List<ChamaTransactionDto> = emptyList(),
+    val total: Int = 0,
+    val page: Int = 1,
+    val limit: Int = 50,
+    val error: String? = null
 )
 
 @Serializable
 data class ChamaBalanceResponseDto(
     val success: Boolean,
-    val krBalance: String
+    val krBalance: String? = null,
+    val error: String? = null
 )
 
 @Serializable
 data class ChamaElectionResponseDto(
     val success: Boolean,
-    val election: ChamaElectionDto
+    val election: ChamaElectionDto? = null,
+    val error: String? = null
 )
 
 @Serializable
 data class ChamaElectionListResponseDto(
     val success: Boolean,
-    val elections: List<ChamaElectionDto>
+    val elections: List<ChamaElectionDto> = emptyList(),
+    val error: String? = null
 )
 
 @Serializable
@@ -268,13 +275,15 @@ data class ChamaCycleDto(
 @Serializable
 data class ChamaCycleResponseDto(
     val success: Boolean,
-    val cycle: ChamaCycleDto
+    val cycle: ChamaCycleDto? = null,
+    val error: String? = null
 )
 
 @Serializable
 data class ChamaCycleListResponseDto(
     val success: Boolean,
-    val cycles: List<ChamaCycleDto>
+    val cycles: List<ChamaCycleDto> = emptyList(),
+    val error: String? = null
 )
 
 @Serializable
@@ -318,5 +327,6 @@ data class PayoutApprovalDto(
 @Serializable
 data class ChamaPayoutListResponseDto(
     val success: Boolean,
-    val payouts: List<ChamaPayoutDto>
+    val payouts: List<ChamaPayoutDto> = emptyList(),
+    val error: String? = null
 )

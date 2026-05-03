@@ -1,19 +1,36 @@
 import { Router } from 'express';
 import { WebhookController } from '../controllers/webhook.controller.js';
 import express from 'express';
+import { 
+  paypalWebhookWhitelist,
+  paystackWebhookWhitelist,
+  mpesaWebhookWhitelist
+} from '../middleware/ipRateLimiter.js';
 
 const router = Router();
 
-// PayPal webhooks and redirects
-router.post('/paypal', express.raw({ type: 'application/json' }), WebhookController.handlePayPalWebhook);
+// SECURITY: PayPal webhooks with IP whitelisting
+router.post('/paypal', 
+  paypalWebhookWhitelist,
+  express.raw({ type: 'application/json' }), 
+  WebhookController.handlePayPalWebhook
+);
 router.get('/paypal/success', WebhookController.handlePayPalSuccess);
 router.get('/paypal/cancel', WebhookController.handlePayPalCancel);
 
-// Paystack webhooks and redirects
-router.post('/paystack', express.json(), WebhookController.handlePaystackWebhook);
+// SECURITY: Paystack webhooks with IP whitelisting
+router.post('/paystack', 
+  paystackWebhookWhitelist,
+  express.json(), 
+  WebhookController.handlePaystackWebhook
+);
 router.get('/paystack/callback', WebhookController.handlePaystackCallback);
 
-// M-Pesa callback
-router.post('/mpesa/callback', express.json(), WebhookController.handleMpesaCallback);
+// SECURITY: M-Pesa callback with IP whitelisting
+router.post('/mpesa/callback', 
+  mpesaWebhookWhitelist,
+  express.json(), 
+  WebhookController.handleMpesaCallback
+);
 
 export default router;

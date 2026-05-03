@@ -162,6 +162,39 @@ class PaystackService {
   }
 
   /**
+   * Verify bank account details
+   */
+  async verifyAccount(accountNumber: string, bankCode: string) {
+    try {
+      const response = await axios.get(
+        `${this.baseUrl}/bank/resolve`,
+        {
+          params: {
+            account_number: accountNumber,
+            bank_code: bankCode
+          },
+          headers: {
+            Authorization: `Bearer ${this.secretKey}`,
+          },
+        }
+      );
+
+      if (response.data.status) {
+        return {
+          success: true,
+          accountName: response.data.data.account_name,
+          accountNumber: response.data.data.account_number
+        };
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error: any) {
+      console.error('Paystack account verification error:', error.response?.data || error.message);
+      throw new Error(`Account verification failed: ${error.response?.data?.message || error.message}`);
+    }
+  }
+
+  /**
    * Get mobile money providers for a country
    */
   getMobileMoneyProviders(countryCode: string): string[] {

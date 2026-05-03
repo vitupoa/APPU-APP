@@ -96,15 +96,15 @@ class WithdrawScreen : Screen {
                         modifier = Modifier.weight(1f)
                     )
                     ProviderChip(
-                        label = "PayPal",
-                        selected = state.provider == "paypal",
-                        onClick = { viewModel.setProvider("paypal") },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ProviderChip(
                         label = "Paystack",
                         selected = state.provider == "paystack",
                         onClick = { viewModel.setProvider("paystack") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    ProviderChip(
+                        label = "Bank",
+                        selected = state.provider == "bank",
+                        onClick = { viewModel.setProvider("bank") },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -114,7 +114,26 @@ class WithdrawScreen : Screen {
                     onValueChange = { viewModel.setAmount(it) },
                     label = { Text("Amount (Kr)") },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    isError = state.error?.contains("amount", ignoreCase = true) == true,
+                    supportingText = {
+                        if (state.error?.contains("amount", ignoreCase = true) == true) {
+                            Text(
+                                state.error,
+                                color = KrietaColors.Error,
+                                fontSize = 12.sp
+                            )
+                        } else if (state.amount.isNotEmpty()) {
+                            val amount = state.amount.toDoubleOrNull()
+                            if (amount != null && amount > 0) {
+                                Text(
+                                    "Available: ${state.availableBalance} Kr",
+                                    color = if (amount <= state.availableBalance) KrietaColors.Success else KrietaColors.Error,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    }
                 )
                 
                 when (state.provider) {
@@ -127,18 +146,32 @@ class WithdrawScreen : Screen {
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
-                    }
-                    "paypal" -> {
-                        OutlinedTextField(
-                            value = state.email,
-                            onValueChange = { viewModel.setEmail(it) },
-                            label = { Text("PayPal Email") },
-                            placeholder = { Text("user@example.com") },
+                        
+                        Card(
                             modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
-                        )
+                            colors = CardDefaults.cardColors(
+                                containerColor = KrietaColors.Warning.copy(alpha = 0.1f)
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    painterResource(Res.drawable.ic_info),
+                                    contentDescription = null,
+                                    tint = KrietaColors.Warning
+                                )
+                                Text(
+                                    "Ensure your M-Pesa account is registered with the same name as your Krieta profile: ${state.userFullName}",
+                                    fontSize = 12.sp,
+                                    color = KrietaColors.OnSurfaceVariant
+                                )
+                            }
+                        }
                     }
-                    "paystack" -> {
+                    "paystack", "bank" -> {
                         var countryExpanded by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(
                             expanded = countryExpanded,
@@ -284,7 +317,7 @@ class WithdrawScreen : Screen {
                                         tint = KrietaColors.Warning
                                     )
                                     Text(
-                                        "Account verification not available for Kenya. Please ensure account details are correct.",
+                                        "Account verification not available for Kenya. Please ensure account details are correct and the account is registered in your name: ${state.userFullName}",
                                         fontSize = 12.sp,
                                         color = KrietaColors.OnSurfaceVariant
                                     )
@@ -333,10 +366,11 @@ class WithdrawScreen : Screen {
         
         return when (state.provider) {
             "mpesa" -> state.phoneNumber.isNotEmpty()
-            "paypal" -> state.email.isNotEmpty()
-            "paystack" -> state.accountNumber.isNotEmpty() && 
-                         state.bankCode.isNotEmpty() && 
-                         state.verifiedAccountName != null
+            "paystack", "bank" -> {
+                state.accountNumber.isNotEmpty() && 
+                state.bankCode.isNotEmpty() && 
+                (state.country == "KE" || state.verifiedAccountName != null)
+            }
             else -> false
         }
     }
