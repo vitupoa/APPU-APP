@@ -88,7 +88,11 @@ router.post('/',
       ...data,
       deadline: new Date(data.deadline)
     });
-    res.status(201).json(contest);
+    // Return only contestId and message as expected by frontend
+    res.status(201).json({ 
+      contestId: contest.contestId,
+      message: 'Contest created successfully' 
+    });
   } catch (error: any) {
     if (error.name === 'ZodError') {
       res.status(400).json({ error: 'Validation failed', details: error.errors });
