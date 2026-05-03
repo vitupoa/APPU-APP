@@ -23,6 +23,7 @@ data class PostDto(
     val likesCount: Int = 0,
     val commentsCount: Int = 0,
     val isLiked: Boolean = false,
+    val commentsEnabled: Boolean = true,
     val createdAt: String
 )
 

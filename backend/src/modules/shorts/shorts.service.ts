@@ -108,6 +108,7 @@ export class ShortsService {
         isLiked: likedIds.has(s.id),
         isLocked: s.isLocked,
         requiredTier: s.requiredTier,
+        commentsEnabled: s.commentsEnabled ?? true,
         linkedProduct: s.linkedProduct ? {
           id: s.linkedProduct.id,
           title: s.linkedProduct.title,

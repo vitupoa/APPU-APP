@@ -52,6 +52,7 @@ export class FeedService {
         likesCount: p.likesCount,
         commentsCount: p.commentsCount,
         isLiked: likedIds.has(p.id),
+        commentsEnabled: p.commentsEnabled ?? true,
         createdAt: p.createdAt.toISOString()
       })),
       nextCursor

@@ -38,6 +38,7 @@ data class ShortDto(
     val commentsCount: Int = 0,
     val views: Int = 0,
     val isLiked: Boolean = false,
+    val commentsEnabled: Boolean = true,
     val createdAt: String
 )
 
