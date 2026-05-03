@@ -21,7 +21,7 @@ export async function validateProfileOwnership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const targetUserId = req.params.userId || req.body.userId;
+  const targetUserId = (req.params.userId || req.body.userId) as string;
   const currentUserId = req.userId;
 
   if (!currentUserId) {
@@ -80,7 +80,7 @@ export async function validateTransactionOwnership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const transactionId = req.params.transactionId;
+  const transactionId = req.params.transactionId as string;
   const currentUserId = req.userId;
 
   if (!currentUserId) {
@@ -129,7 +129,7 @@ export async function validateWithdrawalOwnership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const requestId = req.params.requestId;
+  const requestId = req.params.requestId as string;
   const currentUserId = req.userId;
 
   if (!currentUserId) {
@@ -178,7 +178,7 @@ export async function validateChamaMembership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const chamaId = req.params.chamaId;
+  const chamaId = req.params.chamaId as string;
   const currentUserId = req.userId;
 
   if (!currentUserId) {
@@ -222,7 +222,7 @@ export async function validateContentOwnership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const contentId = req.params.shortId || req.params.postId || req.params.contentId;
+  const contentId = (req.params.shortId || req.params.postId || req.params.contentId) as string;
   const contentType = req.params.shortId ? 'short' : 'post';
   const currentUserId = req.userId;
 

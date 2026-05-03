@@ -28,7 +28,8 @@ router.post('/topup/confirm', WalletController.confirmTopup);
 // SECURITY: Withdrawal with strict rate limiting
 router.post('/withdraw', 
   withdrawalRateLimiter,
-  WalletController.withdraw
+  // WalletController.withdraw - Not implemented yet
+  (req, res) => res.status(501).json({ error: 'Withdrawal endpoint not implemented' })
 );
 
 router.post('/verify-account', WalletController.verifyAccount);
