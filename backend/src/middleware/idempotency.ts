@@ -68,7 +68,7 @@ export function idempotencyMiddleware(options: {
   const ttlSeconds = options.ttlSeconds || 86400; // 24 hours default
   const autoGenerate = options.autoGenerate !== false;
 
-  return async (req: IdempotentRequest, res: Response, next: NextFunction) => {
+  return async (req: IdempotentRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Get idempotency key from header or generate from request
       let idempotencyKey = req.headers['idempotency-key'] as string;
@@ -78,19 +78,15 @@ export function idempotencyMiddleware(options: {
       }
       
       if (!idempotencyKey) {
-        return res.status(400).json({
-          error: 'Idempotency-Key header required for this operation',
-          code: 'IDEMPOTENCY_KEY_REQUIRED'
-        });
+        res.status(400).json({ error: 'Idempotency-Key header required for this operation', code: 'IDEMPOTENCY_KEY_REQUIRED' });
+        return;
       }
 
       // Validate idempotency key format (UUID or hex string)
       if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(idempotencyKey) &&
           !/^[a-f0-9]{64}$/i.test(idempotencyKey)) {
-        return res.status(400).json({
-          error: 'Invalid Idempotency-Key format. Must be UUID or 64-char hex string',
-          code: 'INVALID_IDEMPOTENCY_KEY'
-        });
+        res.status(400).json({ error: 'Invalid Idempotency-Key format. Must be UUID or 64-char hex string', code: 'INVALID_IDEMPOTENCY_KEY' });
+        return;
       }
 
       req.idempotencyKey = idempotencyKey;
@@ -98,9 +94,9 @@ export function idempotencyMiddleware(options: {
       // Check if this request is already in-flight
       const inFlightPromise = inFlightRequests.get(idempotencyKey);
       if (inFlightPromise) {
-        // Wait for the in-flight request to complete
         const result = await inFlightPromise;
-        return res.status(result.code).json(result.body);
+        res.status(result.code).json(result.body);
+        return;
       }
 
       // Check if we've seen this idempotency key before
@@ -114,9 +110,8 @@ export function idempotencyMiddleware(options: {
 
       if (existing && existing.length > 0) {
         const record = existing[0];
-        console.log(`Idempotency key hit: ${idempotencyKey}, returning cached response`);
-        
-        return res.status(record.response_code).json(record.response_body);
+        res.status(record.response_code).json(record.response_body);
+        return;
       }
 
       // Store original res.json to intercept response
@@ -133,15 +128,13 @@ export function idempotencyMiddleware(options: {
       };
 
       // Override res.json to capture response and store idempotency record
-      res.json = async function(body: any) {
+      res.json = function(body: any) {
         responseBody = body;
 
         // Only store successful responses (2xx)
         if (statusCode >= 200 && statusCode < 300) {
-          try {
-            const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
-            
-            await prisma.$executeRaw`
+          const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
+          prisma.$executeRaw`
               INSERT INTO idempotency_keys (
                 id, key, user_id, request_path, request_method, 
                 request_body, response_code, response_body, expires_at, created_at
@@ -158,16 +151,10 @@ export function idempotencyMiddleware(options: {
                 NOW()
               )
               ON CONFLICT (key) DO NOTHING
-            `;
-          } catch (error) {
-            console.error('Failed to store idempotency key:', error);
-            // Don't fail the request if we can't store the key
-          }
+            `.catch((error: any) => console.error('Failed to store idempotency key:', error));
         }
 
-        // Remove from in-flight map
         inFlightRequests.delete(idempotencyKey!);
-
         return originalJson(body);
       };
 
@@ -183,10 +170,7 @@ export function idempotencyMiddleware(options: {
       next();
     } catch (error: any) {
       console.error('Idempotency middleware error:', error);
-      return res.status(500).json({
-        error: 'Internal server error',
-        code: 'IDEMPOTENCY_ERROR'
-      });
+      res.status(500).json({ error: 'Internal server error', code: 'IDEMPOTENCY_ERROR' });
     }
   };
 }

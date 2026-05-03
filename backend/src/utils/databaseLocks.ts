@@ -227,8 +227,8 @@ export async function safeWalletTransfer(
     
     return {
       success: true,
-      senderBalance: senderWallet.kr_balance - amount,
-      recipientBalance: recipientWallet.kr_balance + amount
+      senderBalance: senderWallet.kr_balance - Number(amount),
+      recipientBalance: recipientWallet.kr_balance + Number(amount)
     };
   }, {
     isolationLevel: 'Serializable',

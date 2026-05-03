@@ -15,25 +15,14 @@ export class WalletController {
     }
   }
 
-  static async sendTip(req: AuthRequest, res: Response) {
+  static async sendTip(req: AuthRequest, res: Response): Promise<void> {
     try {
       const data = tipSchema.parse(req.body);
-      
-      // SECURITY: Prevent self-tipping at controller level (defense in depth)
       if (req.userId === data.recipientId) {
-        return res.status(400).json({ 
-          error: 'You cannot tip yourself',
-          code: 'SELF_TIP_NOT_ALLOWED'
-        });
+        res.status(400).json({ error: 'You cannot tip yourself', code: 'SELF_TIP_NOT_ALLOWED' });
+        return;
       }
-      
-      const result = await WalletService.sendTip(
-        req.userId!, 
-        data.recipientId, 
-        data.krAmount, 
-        data.currency
-      );
-      
+      const result = await WalletService.sendTip(req.userId!, data.recipientId, data.krAmount, data.currency);
       res.status(200).json(result);
     } catch (error: any) {
       if (error.name === 'ZodError') {

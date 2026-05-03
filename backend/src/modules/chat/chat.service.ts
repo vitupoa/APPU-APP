@@ -123,7 +123,7 @@ export class ChatService {
       throw new Error('Not authorized to send message in this chat');
     }
 
-    const message = await prisma.message.create({
+    const message = await (prisma.message.create as any)({
       data: {
         chatId,
         senderId,
@@ -136,11 +136,7 @@ export class ChatService {
       },
       include: {
         sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-        replyTo: {
-          include: {
-            sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-          },
-        },
+        replyTo: { include: { sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } },
         forwardedFrom: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
       },
     });
@@ -232,7 +228,7 @@ export class ChatService {
     }
 
     // Create forwarded message
-    const forwardedMessage = await prisma.message.create({
+    const forwardedMessage = await (prisma.message.create as any)({
       data: {
         chatId: targetChatId,
         senderId: userId,
@@ -287,15 +283,11 @@ export class ChatService {
 
     const skip = (page - 1) * limit;
 
-    return prisma.message.findMany({
+    return (prisma.message.findMany as any)({
       where: { chatId },
       include: {
         sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-        replyTo: {
-          include: {
-            sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-          },
-        },
+        replyTo: { include: { sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } },
         forwardedFrom: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
       },
       orderBy: { createdAt: 'desc' },

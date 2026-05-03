@@ -1,33 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config/database.js';
 
-/**
- * Middleware to set Row-Level Security (RLS) context for database queries
- * This sets the current user ID in the database session for RLS policies
- */
-export const setRLSContext = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const setRLSContext = async (req: any, res: Response, next: NextFunction) => {
   try {
-    // If user is authenticated, set their ID in the database context
-    if (req.user?.id) {
-      await prisma.$executeRawUnsafe(
-        `SET LOCAL app.current_user_id = '${req.user.id}'`
-      );
-      
-      // Set admin flag if user is admin
-      if (req.user.isAdmin) {
-        await prisma.$executeRawUnsafe(
-          `SET LOCAL app.is_admin = 'true'`
-        );
+    if (req.userId) {
+      await prisma.$executeRawUnsafe(`SET LOCAL app.current_user_id = '${req.userId}'`);
+      if (req.user?.isAdmin) {
+        await prisma.$executeRawUnsafe(`SET LOCAL app.is_admin = 'true'`);
       }
     }
-    
     next();
   } catch (error) {
-    console.error('Error setting RLS context:', error);
     next(error);
   }
 };
