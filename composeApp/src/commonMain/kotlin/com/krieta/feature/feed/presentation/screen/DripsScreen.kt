@@ -23,6 +23,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.gestures.detectTransformGestures
 
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -31,10 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -74,6 +79,9 @@ class DripsScreen : Screen {
 
         var showTippingFor by remember { mutableStateOf<Post?>(null) }
         var currentUserId by remember { mutableStateOf<String?>(null) }
+        var showImageViewer by remember { mutableStateOf(false) }
+        var selectedImages by remember { mutableStateOf<List<String>>(emptyList()) }
+        var selectedImageIndex by remember { mutableStateOf(0) }
         
         LaunchedEffect(Unit) {
             currentUserId = tokenManager.getUserId()
@@ -110,6 +118,14 @@ class DripsScreen : Screen {
                 )
             }
         ) { padding ->
+            if (showImageViewer) {
+                FullScreenImageViewer(
+                    images = selectedImages,
+                    initialPage = selectedImageIndex,
+                    onDismiss = { showImageViewer = false }
+                )
+            }
+            
             showTippingFor?.let { post ->
                 TippingModal(
                     recipientUsername = post.creator.username,
@@ -182,7 +198,13 @@ class DripsScreen : Screen {
                                                     navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
                                                 }
                                             },
-                                            onTip = { showTippingFor = item }
+                                            onTip = { showTippingFor = item },
+                                            onImageClick = { images, index ->
+                                                selectedImages = images
+                                                selectedImageIndex = index
+                                                showImageViewer = true
+                                            },
+                                            currentUserId = currentUserId
                                         )
                                     } else {
                                         PostCard(
@@ -193,7 +215,13 @@ class DripsScreen : Screen {
                                                     navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
                                                 }
                                             },
-                                            onTip = { showTippingFor = item }
+                                            onTip = { showTippingFor = item },
+                                            onImageClick = { images, index ->
+                                                selectedImages = images
+                                                selectedImageIndex = index
+                                                showImageViewer = true
+                                            },
+                                            currentUserId = currentUserId
                                         )
                                     }
                                     HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
@@ -227,7 +255,9 @@ class DripsScreen : Screen {
     }
 
     @Composable
-    private fun PostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit) {
+    private fun PostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit, onImageClick: (List<String>, Int) -> Unit, currentUserId: String? = null) {
+        val isOwnContent = currentUserId == post.creator.id
+        
         Column(modifier = Modifier.fillMaxWidth()) {
 
             Row(
@@ -288,7 +318,10 @@ class DripsScreen : Screen {
                         AsyncImage(
                             model = post.imageUrls[page],
                             contentDescription = "Post image ${page + 1}",
-                            modifier = Modifier.fillMaxWidth().height(350.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(350.dp)
+                                .clickable { onImageClick(post.imageUrls, page) },
                             contentScale = ContentScale.Crop
                         )
                     }
@@ -347,7 +380,7 @@ class DripsScreen : Screen {
                     modifier = Modifier.padding(end = 8.dp)
                 )
 
-                if (!post.isLocked) {
+                if (!post.isLocked && !isOwnContent) {
                     IconButton(onClick = onTip) {
                         Icon(painterResource(Res.drawable.ic_send), contentDescription = "Tip")
                     }
@@ -370,7 +403,7 @@ class DripsScreen : Screen {
     }
 
     @Composable
-    private fun SponsoredPostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit) {
+    private fun SponsoredPostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit, onImageClick: (List<String>, Int) -> Unit, currentUserId: String? = null) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
@@ -385,7 +418,7 @@ class DripsScreen : Screen {
                 )
             }
             
-            PostCard(post, onLike, onComment, onTip)
+            PostCard(post, onLike, onComment, onTip, onImageClick, currentUserId)
         }
     }
 
@@ -554,6 +587,133 @@ class DripsScreen : Screen {
                     com.krieta.feature.sponsored.presentation.SponsoredBadge()
                 }
             }
+        }
+    }
+    
+    @Composable
+    private fun FullScreenImageViewer(
+        images: List<String>,
+        initialPage: Int,
+        onDismiss: () -> Unit
+    ) {
+        Dialog(
+            onDismissRequest = onDismiss,
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnBackPress = true,
+                dismissOnClickOutside = false
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            ) {
+                val pagerState = rememberPagerState(
+                    initialPage = initialPage,
+                    pageCount = { images.size }
+                )
+                
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ) { page ->
+                    ZoomableImage(
+                        imageUrl = images[page],
+                        onDismiss = onDismiss
+                    )
+                }
+                
+                // Close button
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                        .size(40.dp)
+                        .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_close),
+                        contentDescription = "Close",
+                        tint = Color.White
+                    )
+                }
+                
+                // Image counter
+                if (images.size > 1) {
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 16.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color.Black.copy(alpha = 0.6f)
+                    ) {
+                        Text(
+                            "${pagerState.currentPage + 1} / ${images.size}",
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
+    @Composable
+    private fun ZoomableImage(
+        imageUrl: String,
+        onDismiss: () -> Unit
+    ) {
+        var scale by remember { mutableStateOf(1f) }
+        var offsetX by remember { mutableStateOf(0f) }
+        var offsetY by remember { mutableStateOf(0f) }
+        
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        scale = (scale * zoom).coerceIn(1f, 5f)
+                        
+                        if (scale > 1f) {
+                            offsetX += pan.x
+                            offsetY += pan.y
+                        } else {
+                            offsetX = 0f
+                            offsetY = 0f
+                        }
+                    }
+                }
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                ) {
+                    if (scale == 1f) {
+                        onDismiss()
+                    } else {
+                        scale = 1f
+                        offsetX = 0f
+                        offsetY = 0f
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "Full screen image",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale,
+                        translationX = offsetX,
+                        translationY = offsetY
+                    ),
+                contentScale = ContentScale.Fit
+            )
         }
     }
 }

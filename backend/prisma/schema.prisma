@@ -150,6 +150,10 @@ model User {
   isSuspended        Boolean             @default(false) @map("is_suspended")
   suspendedAt        DateTime?           @map("suspended_at")
 
+  // Content Unlocks
+  contentUnlocksPaid    ContentUnlock[] @relation("ContentUnlocksPaid")
+  contentUnlocksEarned  ContentUnlock[] @relation("ContentUnlocksEarned")
+
   @@index([admirersCount])
   @@index([selectedNiches])
   @@map("users")
@@ -344,6 +348,7 @@ model Short {
   musicArtist     String?               @map("music_artist")
   isLocked        Boolean               @default(false) @map("is_locked")
   requiredTier    SubscriptionTierType? @map("required_tier")
+  unlockAmountKr  Decimal?              @map("unlock_amount_kr") @db.Decimal(18, 4)
   contestId       String?               @map("contest_id")
   collectionId    String?               @map("collection_id")
   linkedProductId String?               @map("linked_product_id") // Shop product shown briefly during playback
@@ -417,6 +422,7 @@ model Post {
   imageUrls     String[]              @map("image_urls")
   isLocked      Boolean               @default(false) @map("is_locked")
   requiredTier  SubscriptionTierType? @map("required_tier")
+  unlockAmountKr Decimal?             @map("unlock_amount_kr") @db.Decimal(18, 4)
   likesCount    Int                   @default(0) @map("likes_count")
   commentsCount Int                   @default(0) @map("comments_count")
   createdAt     DateTime              @default(now()) @map("created_at")
@@ -1516,6 +1522,9 @@ model LiveStream {
   giftGoalTitle   String?  @map("gift_goal_title")
   giftGoalTarget  Decimal? @map("gift_goal_target") @db.Decimal(18, 4)
   giftGoalCurrent Decimal  @default(0) @map("gift_goal_current") @db.Decimal(18, 4)
+
+  // Content Lock
+  unlockAmountKr Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
 
   // Chama-exclusive
   chamaId String? @map("chama_id")
@@ -4289,5 +4298,28 @@ model ContentNicheTag {
   @@unique([contentId, contentType, niche])
   @@index([contentType, niche])
   @@map("content_niche_tags")
+}
+
+// ─── CONTENT UNLOCKS ──────────────────────────────────────
+
+model ContentUnlock {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  contentId  String   @map("content_id")
+  contentType String  @map("content_type") // SHORT, POST, LIVE
+  amountKr   Decimal  @map("amount_kr") @db.Decimal(18, 4)
+  amountFiat Decimal? @map("amount_fiat") @db.Decimal(18, 4)
+  currency   String?  @db.VarChar(3)
+  creatorId  String   @map("creator_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user    User @relation("ContentUnlocksPaid", fields: [userId], references: [id], onDelete: Cascade)
+  creator User @relation("ContentUnlocksEarned", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contentId, contentType])
+  @@index([userId])
+  @@index([contentId, contentType])
+  @@index([creatorId])
+  @@map("content_unlocks")
 }
 

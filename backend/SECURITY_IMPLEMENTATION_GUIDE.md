@@ -1,771 +1,509 @@
-# 🔒 KRIETA SECURITY IMPLEMENTATION GUIDE
-
-This guide provides step-by-step instructions to implement all security fixes identified in the security audit.
-
----
-
-## 📋 PREREQUISITES
-
-Before starting, ensure you have:
-- [ ] Database backup
-- [ ] Access to production environment
-- [ ] AWS account (for Secrets Manager)
-- [ ] Redis instance running
-- [ ] All team members notified of maintenance window
-
----
-
-## 🚀 PHASE 1: IMMEDIATE CRITICAL FIXES (Day 1)
-
-### 1.1 Enable Row-Level Security (RLS)
-
-**Priority:** CRITICAL
-**Time:** 30 minutes
-**Downtime:** None
-
-#### Steps:
-
-1. **Run the RLS migration:**
-   ```bash
-   cd backend
-   psql $DATABASE_URL -f prisma/migrations/enable_row_level_security.sql
-   ```
-
-2. **Verify RLS is enabled:**
-   ```sql
-   SELECT tablename, rowsecurity 
-   FROM pg_tables 
-   WHERE schemaname = 'public' 
-   AND tablename IN ('users', 'wallets', 'transactions');
-   ```
-   All should show `rowsecurity = true`
-
-3. **Update your Express app to set RLS context:**
-   
-   **File:** `backend/src/index.ts`
-   ```typescript
-   import { rlsMiddleware } from './middleware/rls.js';
-   import { authMiddleware } from './middleware/auth.js';
-   
-   // Apply RLS middleware AFTER auth middleware
-   app.use(authMiddleware);
-   app.use(rlsMiddleware);
-   ```
-
-4. **Test RLS policies:**
-   ```bash
-   npm run test:rls
-   ```
-
-#### Verification:
-- [ ] RLS enabled on all tables
-- [ ] Users can only access their own data
-- [ ] Admins can access all data
-- [ ] No errors in application logs
-
----
-
-### 1.2 Add IP Whitelisting for Webhooks
-
-**Priority:** CRITICAL
-**Time:** 15 minutes
-**Downtime:** None
-
-#### Steps:
-
-1. **Update webhook routes:**
-   
-   **File:** `backend/src/routes/webhook.routes.ts`
-   ```typescript
-   import { 
-     paypalWebhookWhitelist,
-     paystackWebhookWhitelist,
-     mpesaWebhookWhitelist
-   } from '../middleware/ipRateLimiter.js';
-   
-   // PayPal webhooks - ADD IP WHITELIST
-   router.post('/paypal', 
-     paypalWebhookWhitelist,  // ← ADD THIS
-     express.raw({ type: 'application/json' }), 
-     WebhookController.handlePayPalWebhook
-   );
-   
-   // Paystack webhooks - ADD IP WHITELIST
-   router.post('/paystack', 
-     paystackWebhookWhitelist,  // ← ADD THIS
-     express.json(), 
-     WebhookController.handlePaystackWebhook
-   );
-   
-   // M-Pesa callback - ADD IP WHITELIST
-   router.post('/mpesa/callback', 
-     mpesaWebhookWhitelist,  // ← ADD THIS
-     express.json(), 
-     WebhookController.handleMpesaCallback
-   );
-   ```
-
-2. **Test webhooks:**
-   ```bash
-   # Test from allowed IP (use PayPal sandbox)
-   curl -X POST https://your-api.com/webhooks/paypal \
-     -H "Content-Type: application/json" \
-     -d '{"test": "data"}'
-   
-   # Test from disallowed IP (should fail)
-   curl -X POST https://your-api.com/webhooks/paypal \
-     -H "X-Forwarded-For: 1.2.3.4" \
-     -d '{"test": "data"}'
-   ```
-
-#### Verification:
-- [ ] Webhooks only accept requests from whitelisted IPs
-- [ ] Test webhooks from PayPal/Paystack/M-Pesa work
-- [ ] Requests from other IPs are rejected with 403
-
----
-
-### 1.3 Add Ownership Validation
-
-**Priority:** CRITICAL
-**Time:** 30 minutes
-**Downtime:** None
-
-#### Steps:
-
-1. **Update user routes:**
-   
-   **File:** `backend/src/modules/user/user.routes.ts`
-   ```typescript
-   import { 
-     validateProfileOwnership,
-     preventSensitiveFieldModification
-   } from '../../middleware/ownership.js';
-   
-   // Protect profile update
-   router.put('/:userId', 
-     authMiddleware,
-     validateProfileOwnership,  // ← ADD THIS
-     preventSensitiveFieldModification,  // ← ADD THIS
-     UserController.updateProfile
-   );
-   ```
-
-2. **Update wallet routes:**
-   
-   **File:** `backend/src/modules/wallet/wallet.routes.ts`
-   ```typescript
-   import { validateWalletOwnership } from '../../middleware/ownership.js';
-   
-   // All wallet routes require ownership validation
-   router.use(authMiddleware);
-   router.use(validateWalletOwnership);  // ← ADD THIS
-   ```
-
-3. **Update KYC routes:**
-   
-   **File:** `backend/src/modules/kyc/kyc.routes.ts`
-   ```typescript
-   import { validateWithdrawalOwnership } from '../../middleware/ownership.js';
-   
-   // Protect withdrawal history
-   router.get('/withdrawal/history', 
-     authenticateToken,
-     validateWithdrawalOwnership,  // ← ADD THIS
-     async (req: AuthRequest, res) => {
-       // ...
-     }
-   );
-   ```
-
-#### Verification:
-- [ ] Users cannot update other users' profiles
-- [ ] Users cannot access other users' wallets
-- [ ] Users cannot view other users' withdrawals
-- [ ] Test with different user IDs
-
----
-
-### 1.4 Remove Sensitive Data from API Responses
-
-**Priority:** HIGH
-**Time:** 20 minutes
-**Downtime:** None
-
-#### Steps:
-
-1. **Update user service:**
-   
-   **File:** `backend/src/modules/user/user.service.ts`
-   ```typescript
-   static async getProfile(userId: string, viewerId?: string) {
-     const user = await prisma.user.findUniqueOrThrow({
-       where: { id: userId },
-       select: {
-         id: true,
-         username: true,
-         firstName: true,
-         lastName: true,
-         displayName: true,
-         avatarUrl: true,
-         coverPhotoUrl: true,
-         bio: true,
-         country: true,
-         // ❌ REMOVE THESE:
-         // isWalletUnlocked: true,
-         // kycStatus: true,
-         // currency: true,
-         isVerified: true,
-         createdAt: true
-       }
-     });
-     
-     // Only return sensitive data for own profile
-     if (viewerId === userId) {
-       return {
-         ...user,
-         isWalletUnlocked: user.isWalletUnlocked,
-         kycStatus: user.kycStatus,
-         currency: user.currency
-       };
-     }
-     
-     return user;
-   }
-   ```
-
-2. **Update KYC service:**
-   
-   **File:** `backend/src/modules/kyc/kyc.service.ts`
-   ```typescript
-   async getKYCStatus(userId: string) {
-     // ❌ REMOVE dailyLimit from response
-     return {
-       kycStatus: user?.kycStatus || 'NOT_STARTED',
-       documents: kycDocuments,
-       // dailyLimit: withdrawalLimit?.dailyLimitKr || DAILY_WITHDRAWAL_LIMIT,  // ← REMOVE
-       withdrawnToday: withdrawalLimit?.withdrawnTodayKr || 0
-     };
-   }
-   ```
-
-#### Verification:
-- [ ] Public profiles don't expose sensitive data
-- [ ] Own profile shows all data
-- [ ] Rate limits not exposed in responses
-
----
-
-### 1.5 Implement IP-Based Rate Limiting
-
-**Priority:** HIGH
-**Time:** 20 minutes
-**Downtime:** None
-
-#### Steps:
-
-1. **Update main app:**
-   
-   **File:** `backend/src/index.ts`
-   ```typescript
-   import { apiRateLimiter } from './middleware/ipRateLimiter.js';
-   
-   // Apply global rate limiting
-   app.use(apiRateLimiter);
-   ```
-
-2. **Update auth routes:**
-   
-   **File:** `backend/src/modules/auth/auth.routes.ts`
-   ```typescript
-   import { authRateLimiter } from '../../middleware/ipRateLimiter.js';
-   
-   router.post('/login', authRateLimiter, AuthController.login);
-   router.post('/register', authRateLimiter, AuthController.register);
-   ```
-
-3. **Update payment routes:**
-   
-   **File:** `backend/src/modules/wallet/wallet.routes.ts`
-   ```typescript
-   import { paymentRateLimiter, withdrawalRateLimiter } from '../../middleware/ipRateLimiter.js';
-   
-   router.post('/topup/initiate', paymentRateLimiter, WalletController.initiateTopup);
-   router.post('/withdraw', withdrawalRateLimiter, WalletController.withdraw);
-   ```
-
-#### Verification:
-- [ ] Rate limiting works per IP
-- [ ] Rate limiting works per user
-- [ ] Blocked users see appropriate error messages
-- [ ] Rate limit headers are present
-
----
-
-## 🔐 PHASE 2: HIGH PRIORITY FIXES (Week 1)
-
-### 2.1 Move Secrets to AWS Secrets Manager
-
-**Priority:** HIGH
-**Time:** 1 hour
-**Downtime:** 5 minutes (during deployment)
-
-#### Steps:
-
-1. **Install AWS SDK:**
-   ```bash
-   npm install @aws-sdk/client-secrets-manager
-   ```
-
-2. **Create secrets in AWS:**
-   ```bash
-   aws secretsmanager create-secret \
-     --name krieta/production/database \
-     --secret-string '{"url":"postgresql://..."}'
-   
-   aws secretsmanager create-secret \
-     --name krieta/production/jwt \
-     --secret-string '{"access":"...","refresh":"..."}'
-   
-   aws secretsmanager create-secret \
-     --name krieta/production/paypal \
-     --secret-string '{"clientId":"...","clientSecret":"..."}'
-   
-   aws secretsmanager create-secret \
-     --name krieta/production/paystack \
-     --secret-string '{"secretKey":"...","publicKey":"..."}'
-   
-   aws secretsmanager create-secret \
-     --name krieta/production/mpesa \
-     --secret-string '{"consumerKey":"...","consumerSecret":"..."}'
-   ```
-
-3. **Create secrets loader:**
-   
-   **File:** `backend/src/config/secrets.ts`
-   ```typescript
-   import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-   
-   const client = new SecretsManagerClient({ region: 'us-east-1' });
-   
-   export async function loadSecrets() {
-     const secrets = {
-       database: await getSecret('krieta/production/database'),
-       jwt: await getSecret('krieta/production/jwt'),
-       paypal: await getSecret('krieta/production/paypal'),
-       paystack: await getSecret('krieta/production/paystack'),
-       mpesa: await getSecret('krieta/production/mpesa')
-     };
-     
-     return secrets;
-   }
-   
-   async function getSecret(secretName: string) {
-     const command = new GetSecretValueCommand({ SecretId: secretName });
-     const response = await client.send(command);
-     return JSON.parse(response.SecretString || '{}');
-   }
-   ```
-
-4. **Update env.ts:**
-   
-   **File:** `backend/src/config/env.ts`
-   ```typescript
-   import { loadSecrets } from './secrets.js';
-   
-   let secrets: any = null;
-   
-   export async function initializeSecrets() {
-     if (process.env.NODE_ENV === 'production') {
-       secrets = await loadSecrets();
-     }
-   }
-   
-   export function getSecret(key: string) {
-     if (secrets) {
-       return secrets[key];
-     }
-     return process.env[key];
-   }
-   ```
-
-5. **Update index.ts:**
-   
-   **File:** `backend/src/index.ts`
-   ```typescript
-   import { initializeSecrets } from './config/secrets.js';
-   
-   async function start() {
-     await initializeSecrets();
-     // ... rest of app initialization
-   }
-   
-   start();
-   ```
-
-#### Verification:
-- [ ] Secrets loaded from AWS in production
-- [ ] .env still works in development
-- [ ] No secrets in code or logs
-- [ ] Application starts successfully
-
----
-
-### 2.2 Add Input Sanitization
-
-**Priority:** HIGH
-**Time:** 30 minutes
-**Downtime:** None
-
-#### Steps:
-
-1. **Install dependencies:**
-   ```bash
-   npm install isomorphic-dompurify
-   ```
-
-2. **Apply sanitization middleware:**
-   
-   **File:** `backend/src/index.ts`
-   ```typescript
-   import { 
-     sanitizeInputs,
-     preventPathTraversal,
-     preventCommandInjection
-   } from './middleware/sanitization.js';
-   
-   // Apply global sanitization
-   app.use(sanitizeInputs);
-   app.use(preventPathTraversal);
-   app.use(preventCommandInjection);
-   ```
-
-3. **Apply specific sanitization:**
-   
-   **File:** `backend/src/modules/user/user.routes.ts`
-   ```typescript
-   import { sanitizeProfileUpdate } from '../../middleware/sanitization.js';
-   
-   router.put('/:userId', 
-     authMiddleware,
-     sanitizeProfileUpdate,  // ← ADD THIS
-     UserController.updateProfile
-   );
-   ```
-   
-   **File:** `backend/src/modules/wallet/wallet.routes.ts`
-   ```typescript
-   import { sanitizePaymentInput } from '../../middleware/sanitization.js';
-   
-   router.post('/topup/initiate', 
-     authMiddleware,
-     sanitizePaymentInput,  // ← ADD THIS
-     WalletController.initiateTopup
-   );
-   ```
-
-#### Verification:
-- [ ] XSS attempts are blocked
-- [ ] SQL injection attempts are blocked
-- [ ] Path traversal attempts are blocked
-- [ ] Command injection attempts are blocked
-
----
-
-### 2.3 Add Security Headers
-
-**Priority:** HIGH
-**Time:** 10 minutes
-**Downtime:** None
-
-#### Steps:
-
-1. **Install helmet:**
-   ```bash
-   npm install helmet
-   ```
-
-2. **Configure helmet:**
-   
-   **File:** `backend/src/index.ts`
-   ```typescript
-   import helmet from 'helmet';
-   
-   app.use(helmet({
-     contentSecurityPolicy: {
-       directives: {
-         defaultSrc: ["'self'"],
-         styleSrc: ["'self'", "'unsafe-inline'"],
-         scriptSrc: ["'self'"],
-         imgSrc: ["'self'", "data:", "https:"],
-       },
-     },
-     hsts: {
-       maxAge: 31536000,
-       includeSubDomains: true,
-       preload: true
-     },
-     noSniff: true,
-     xssFilter: true,
-     referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
-   }));
-   ```
-
-#### Verification:
-- [ ] Security headers present in responses
-- [ ] CSP policy working
-- [ ] HSTS enabled
-- [ ] XSS filter enabled
-
----
-
-### 2.4 Fix CORS Configuration
-
-**Priority:** HIGH
-**Time:** 5 minutes
-**Downtime:** None
-
-#### Steps:
-
-1. **Update .env:**
-   ```env
-   # Development
-   CORS_ORIGIN=http://localhost:3000
-   
-   # Production
-   CORS_ORIGIN=https://krieta.com,https://www.krieta.com,https://app.krieta.com
-   ```
-
-2. **Update CORS middleware:**
-   
-   **File:** `backend/src/index.ts`
-   ```typescript
-   import cors from 'cors';
-   
-   app.use(cors({
-     origin: env.CORS_ORIGIN.split(','),
-     credentials: true,
-     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-     allowedHeaders: ['Content-Type', 'Authorization']
-   }));
-   ```
-
-#### Verification:
-- [ ] Only allowed origins can access API
-- [ ] Credentials work correctly
-- [ ] Preflight requests work
-
----
-
-## 🛡️ PHASE 3: MEDIUM PRIORITY FIXES (Week 2)
-
-### 3.1 Add Comprehensive Audit Logging
-
-**Priority:** MEDIUM
-**Time:** 1 hour
-**Downtime:** None
-
-#### Steps:
-
-1. **Create audit logging middleware:**
-   
-   **File:** `backend/src/middleware/auditLog.ts`
-   ```typescript
-   import { AuthRequest } from './auth.js';
-   import { prisma } from '../config/database.js';
-   
-   export async function auditLog(
-     action: string,
-     targetType: string,
-     targetId: string,
-     req: AuthRequest,
-     details?: any
-   ) {
-     await prisma.auditLog.create({
-       data: {
-         adminId: req.userId || 'system',
-         action,
-         targetType,
-         targetId,
-         details,
-         ipAddress: req.ip,
-         userAgent: req.headers['user-agent']
-       }
-     });
-   }
-   ```
-
-2. **Add logging to sensitive operations:**
-   
-   **File:** `backend/src/modules/wallet/wallet.service.ts`
-   ```typescript
-   // After successful withdrawal
-   await auditLog(
-     'WITHDRAWAL_REQUESTED',
-     'WITHDRAWAL',
-     withdrawal.id,
-     req,
-     { amount: krAmount, provider }
-   );
-   ```
-
-#### Verification:
-- [ ] All sensitive operations logged
-- [ ] Logs include IP and user agent
-- [ ] Logs are searchable
-
----
-
-### 3.2 Implement Idempotency Keys
-
-**Priority:** MEDIUM
-**Time:** 1 hour
-**Downtime:** None
-
-#### Steps:
-
-1. **Create idempotency middleware:**
-   
-   **File:** `backend/src/middleware/idempotency.ts`
-   ```typescript
-   import { Request, Response, NextFunction } from 'express';
-   import { redis } from '../config/redis.js';
-   
-   export function requireIdempotencyKey(
-     req: Request,
-     res: Response,
-     next: NextFunction
-   ): void {
-     const key = req.headers['idempotency-key'] as string;
-     
-     if (!key) {
-       res.status(400).json({ 
-         error: 'Idempotency-Key header required',
-         code: 'IDEMPOTENCY_KEY_REQUIRED'
-       });
-       return;
-     }
-     
-     req.body.idempotencyKey = key;
-     next();
-   }
-   
-   export async function checkIdempotency(
-     key: string,
-     userId: string
-   ): Promise<any | null> {
-     const cached = await redis.get(`idempotency:${userId}:${key}`);
-     return cached ? JSON.parse(cached) : null;
-   }
-   
-   export async function storeIdempotency(
-     key: string,
-     userId: string,
-     result: any
-   ): Promise<void> {
-     await redis.setex(
-       `idempotency:${userId}:${key}`,
-       86400, // 24 hours
-       JSON.stringify(result)
-     );
-   }
-   ```
-
-2. **Apply to payment endpoints:**
-   
-   **File:** `backend/src/modules/wallet/wallet.routes.ts`
-   ```typescript
-   import { requireIdempotencyKey } from '../../middleware/idempotency.js';
-   
-   router.post('/topup/initiate', 
-     authMiddleware,
-     requireIdempotencyKey,  // ← ADD THIS
-     WalletController.initiateTopup
-   );
-   ```
-
-#### Verification:
-- [ ] Duplicate requests return cached response
-- [ ] Idempotency keys expire after 24 hours
-- [ ] Different users can use same key
-
----
-
-## 📊 TESTING CHECKLIST
-
-### Security Tests
-
-- [ ] **RLS Tests**
-  - [ ] Users can only access own data
-  - [ ] Admins can access all data
-  - [ ] Direct database queries respect RLS
-
-- [ ] **Authorization Tests**
-  - [ ] Users cannot access other users' profiles
-  - [ ] Users cannot access other users' wallets
-  - [ ] Users cannot modify other users' data
-
-- [ ] **Rate Limiting Tests**
-  - [ ] IP-based rate limiting works
-  - [ ] User-based rate limiting works
-  - [ ] Progressive delays work
-
-- [ ] **Input Sanitization Tests**
-  - [ ] XSS attempts blocked
-  - [ ] SQL injection attempts blocked
-  - [ ] Path traversal attempts blocked
-
-- [ ] **Payment Security Tests**
-  - [ ] Webhooks only accept whitelisted IPs
-  - [ ] Amount tampering detected
-  - [ ] Double-spending prevented
-
----
-
-## 🚨 ROLLBACK PLAN
-
-If issues occur:
-
-1. **Disable RLS:**
-   ```sql
-   ALTER TABLE users DISABLE ROW LEVEL SECURITY;
-   ALTER TABLE wallets DISABLE ROW LEVEL SECURITY;
-   -- ... for all tables
-   ```
-
-2. **Remove middleware:**
-   ```typescript
-   // Comment out in index.ts
-   // app.use(rlsMiddleware);
-   // app.use(apiRateLimiter);
-   ```
-
-3. **Restore from backup:**
-   ```bash
-   pg_restore -d krieta_db backup.dump
-   ```
-
----
-
-## 📞 SUPPORT
-
-For issues during implementation:
-- Check logs: `tail -f logs/app.log`
-- Check Redis: `redis-cli monitor`
-- Check database: `psql $DATABASE_URL`
-
----
-
-## ✅ POST-IMPLEMENTATION CHECKLIST
-
-- [ ] All tests passing
-- [ ] No errors in production logs
-- [ ] Performance metrics normal
-- [ ] Security scan passed
-- [ ] Team trained on new security measures
+# Security Implementation Guide - Complete Setup
+
+## 📋 Overview
+
+This guide provides step-by-step instructions to implement all critical security features:
+1. Row-Level Security (RLS)
+2. Rate Limiting
+3. Fraud Detection
+4. Comprehensive Audit Logging
+
+## 🚀 Implementation Steps
+
+### Step 1: Database Setup (RLS Policies)
+
+#### 1.1 Run the RLS Migration
+
+```bash
+# Connect to your PostgreSQL database
+psql -U your_username -d krieta_db
+
+# Run the RLS migration
+\i backend/prisma/migrations/add_rls_policies.sql
+
+# Verify RLS is enabled
+SELECT schemaname, tablename, rowsecurity 
+FROM pg_tables 
+WHERE tablename IN (
+  'subscription_tiers', 
+  'subscriptions', 
+  'content_unlocks', 
+  'shorts', 
+  'posts', 
+  'live_streams',
+  'wallets',
+  'transactions'
+);
+```
+
+#### 1.2 Verify RLS Policies
+
+```sql
+-- List all policies
+SELECT schemaname, tablename, policyname, permissive, cmd 
+FROM pg_policies 
+WHERE tablename IN (
+  'subscription_tiers', 
+  'subscriptions', 
+  'content_unlocks', 
+  'shorts', 
+  'posts', 
+  'live_streams',
+  'wallets',
+  'transactions'
+)
+ORDER BY tablename, policyname;
+```
+
+### Step 2: Install Required Dependencies
+
+```bash
+cd backend
+
+# Install rate limiting dependencies
+npm install express-rate-limit rate-limit-redis ioredis
+
+# Install validation library
+npm install zod
+
+# Verify Redis is running
+redis-cli ping
+# Should return: PONG
+```
+
+### Step 3: Environment Configuration
+
+Add to your `.env` file:
+
+```env
+# Redis Configuration for Rate Limiting
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your_redis_password
+REDIS_RATE_LIMIT_DB=1
+
+# Security Settings
+ENABLE_RLS=true
+ENABLE_FRAUD_DETECTION=true
+ENABLE_AUDIT_LOGGING=true
+
+# Rate Limit Settings (optional overrides)
+UNLOCK_RATE_LIMIT=10
+SUBSCRIPTION_RATE_LIMIT=5
+CONVERSION_RATE_LIMIT=30
+```
+
+### Step 4: Update Main Application File
+
+Update your `src/index.ts` or main server file:
+
+```typescript
+import express from 'express';
+import { setRLSContext, clearRLSContext } from './middleware/rls.js';
+import { globalRateLimiter } from './middleware/rateLimiting.js';
+import contentLockRoutes from './modules/contentLock/contentLock.routes.js';
+import subscriptionRoutes from './modules/user/subscription.routes.js';
+
+const app = express();
+
+// Apply global rate limiter
+app.use(globalRateLimiter);
+
+// Apply RLS context middleware (after authentication)
+app.use(setRLSContext);
+
+// Register routes
+app.use('/api/content-lock', contentLockRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+
+// Clear RLS context after request
+app.use(clearRLSContext);
+
+// ... rest of your app setup
+```
+
+### Step 5: Update Prisma Client Usage
+
+For all database operations that should respect RLS, ensure you're using the authenticated context:
+
+```typescript
+// ✅ CORRECT - Uses RLS context set by middleware
+router.get('/my-data', authenticate, setRLSContext, async (req, res) => {
+  const data = await prisma.subscription.findMany({
+    where: { subscriberId: req.user.id }
+  });
+  res.json(data);
+});
+
+// ❌ INCORRECT - Bypasses RLS (only use for system operations)
+const data = await prisma.subscription.findMany({
+  where: { subscriberId: userId }
+});
+```
+
+### Step 6: System Operations (Bypassing RLS)
+
+For internal operations (cron jobs, system tasks) that need to bypass RLS:
+
+```typescript
+import { withSystemContext } from './middleware/rls.js';
+
+// Example: Subscription renewal cron job
+async function renewSubscriptions() {
+  await withSystemContext(async () => {
+    const dueSubscriptions = await prisma.subscription.findMany({
+      where: {
+        status: 'active',
+        nextBillingAt: { lte: new Date() }
+      }
+    });
+    
+    for (const sub of dueSubscriptions) {
+      await SubscriptionService.renewSubscription(sub.id);
+    }
+  });
+}
+```
+
+### Step 7: Testing RLS Policies
+
+Create a test file `tests/rls.test.ts`:
+
+```typescript
+import { prisma } from '../src/config/database.js';
+
+describe('RLS Policies', () => {
+  it('should prevent users from viewing other users wallets', async () => {
+    // Set user context
+    await prisma.$executeRawUnsafe(`SET LOCAL app.current_user_id = 'user1-id'`);
+    
+    // Try to query another user's wallet
+    const wallets = await prisma.wallet.findMany({
+      where: { userId: 'user2-id' }
+    });
+    
+    // Should return empty array due to RLS
+    expect(wallets).toHaveLength(0);
+  });
+  
+  it('should allow users to view their own subscriptions', async () => {
+    await prisma.$executeRawUnsafe(`SET LOCAL app.current_user_id = 'user1-id'`);
+    
+    const subscriptions = await prisma.subscription.findMany({
+      where: { subscriberId: 'user1-id' }
+    });
+    
+    // Should return user's subscriptions
+    expect(subscriptions.length).toBeGreaterThan(0);
+  });
+  
+  it('should allow system context to bypass RLS', async () => {
+    await prisma.$executeRawUnsafe(`SET LOCAL app.is_system = 'true'`);
+    
+    const allWallets = await prisma.wallet.findMany();
+    
+    // Should return all wallets
+    expect(allWallets.length).toBeGreaterThan(0);
+  });
+});
+```
+
+Run tests:
+```bash
+npm test tests/rls.test.ts
+```
+
+### Step 8: Monitoring Setup
+
+#### 8.1 Create Monitoring Dashboard
+
+Create `src/routes/admin/security.routes.ts`:
+
+```typescript
+import { Router } from 'express';
+import { authenticate, requireAdmin } from '../../middleware/auth.js';
+import { AuditLogService } from '../../services/auditLog.service.js';
+import { getRateLimitStatus } from '../../middleware/rateLimiting.js';
+
+const router = Router();
+
+router.use(authenticate, requireAdmin);
+
+// Get audit log statistics
+router.get('/audit-stats', async (req, res) => {
+  const stats = await AuditLogService.getStatistics({
+    startDate: new Date(Date.now() - 86400000), // Last 24 hours
+  });
+  res.json(stats);
+});
+
+// Get suspicious activities
+router.get('/suspicious-activities', async (req, res) => {
+  const activities = await req.prisma.suspiciousActivity.findMany({
+    where: { isResolved: false },
+    orderBy: { createdAt: 'desc' },
+    take: 100,
+  });
+  res.json(activities);
+});
+
+// Get rate limit status for user
+router.get('/rate-limit/:userId', async (req, res) => {
+  const { userId } = req.params;
+  
+  const statuses = await Promise.all([
+    getRateLimitStatus('rl:unlock:', userId),
+    getRateLimitStatus('rl:subscription:', userId),
+    getRateLimitStatus('rl:conversion:', userId),
+  ]);
+  
+  res.json({
+    unlock: statuses[0],
+    subscription: statuses[1],
+    conversion: statuses[2],
+  });
+});
+
+export default router;
+```
+
+#### 8.2 Set Up Alerts
+
+Create `src/services/alerting.service.ts`:
+
+```typescript
+import { prisma } from '../config/database.js';
+
+export class AlertingService {
+  static async checkAndAlert() {
+    // Check for high fraud scores
+    const highRiskActivities = await prisma.suspiciousActivity.count({
+      where: {
+        severity: 'critical',
+        isResolved: false,
+        createdAt: { gte: new Date(Date.now() - 3600000) }
+      }
+    });
+    
+    if (highRiskActivities > 10) {
+      await this.sendAlert('CRITICAL', `${highRiskActivities} critical fraud alerts in last hour`);
+    }
+    
+    // Check for rate limit violations
+    // Add more checks as needed
+  }
+  
+  private static async sendAlert(severity: string, message: string) {
+    // Implement your alerting mechanism (email, Slack, PagerDuty, etc.)
+    console.error(`[${severity}] ${message}`);
+  }
+}
+```
+
+### Step 9: Deployment Checklist
+
+Before deploying to production:
+
+- [ ] Run RLS migration on production database
+- [ ] Verify all RLS policies are active
+- [ ] Test RLS with different user roles
+- [ ] Configure Redis for rate limiting
+- [ ] Set up monitoring dashboards
+- [ ] Configure alerting system
+- [ ] Test fraud detection thresholds
+- [ ] Review audit log retention policy
+- [ ] Set up log aggregation (e.g., ELK stack)
+- [ ] Configure backup for audit logs
+- [ ] Test rate limiting under load
+- [ ] Document security procedures
+- [ ] Train team on security features
+
+### Step 10: Ongoing Maintenance
+
+#### Daily Tasks
+- Review suspicious activity logs
+- Check for rate limit violations
+- Monitor fraud detection alerts
+
+#### Weekly Tasks
+- Analyze audit log statistics
+- Review and adjust fraud detection thresholds
+- Check RLS policy effectiveness
+- Review rate limit configurations
+
+#### Monthly Tasks
+- Security audit of all policies
+- Review and update fraud detection rules
+- Analyze attack patterns
+- Update security documentation
+
+## 🔍 Verification Commands
+
+### Verify RLS is Working
+
+```sql
+-- Test as regular user
+SET LOCAL app.current_user_id = 'test-user-id';
+SELECT * FROM wallets; -- Should only see own wallet
+
+-- Test as admin
+SET LOCAL app.current_user_id = 'admin-user-id';
+SET LOCAL app.is_admin = 'true';
+SELECT * FROM wallets; -- Should see all wallets
+
+-- Test as system
+SET LOCAL app.is_system = 'true';
+SELECT * FROM wallets; -- Should see all wallets
+```
+
+### Verify Rate Limiting
+
+```bash
+# Test unlock rate limit (should block after 10 requests)
+for i in {1..15}; do
+  curl -X POST http://localhost:3000/api/content-lock/unlock \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{"contentId":"test-id","contentType":"SHORT"}'
+  echo ""
+done
+```
+
+### Verify Fraud Detection
+
+```bash
+# Trigger fraud detection with rapid unlocks
+for i in {1..15}; do
+  curl -X POST http://localhost:3000/api/content-lock/unlock \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{"contentId":"content-'$i'","contentType":"SHORT"}'
+  echo ""
+done
+```
+
+### Verify Audit Logging
+
+```sql
+-- Check recent audit logs
+SELECT * FROM audit_logs 
+ORDER BY created_at DESC 
+LIMIT 100;
+
+-- Check fraud detection logs
+SELECT * FROM suspicious_activities 
+WHERE is_resolved = false 
+ORDER BY created_at DESC;
+```
+
+## 🚨 Troubleshooting
+
+### RLS Not Working
+
+**Problem**: Users can see data they shouldn't
+
+**Solution**:
+1. Verify RLS is enabled: `SELECT rowsecurity FROM pg_tables WHERE tablename = 'your_table';`
+2. Check if context is being set: Add logging to `setRLSContext` middleware
+3. Verify policies exist: `SELECT * FROM pg_policies WHERE tablename = 'your_table';`
+
+### Rate Limiting Not Working
+
+**Problem**: Rate limits not being enforced
+
+**Solution**:
+1. Check Redis connection: `redis-cli ping`
+2. Verify middleware is applied: Check route definitions
+3. Check Redis keys: `redis-cli KEYS "rl:*"`
+
+### Fraud Detection Too Sensitive
+
+**Problem**: Legitimate users being blocked
+
+**Solution**:
+1. Review fraud detection thresholds in `fraudDetection.service.ts`
+2. Adjust risk scores for specific checks
+3. Add whitelist for trusted users
+4. Review and resolve false positives
+
+### Audit Logs Not Being Created
+
+**Problem**: No audit logs in database
+
+**Solution**:
+1. Check if `AuditLogService.log()` is being called
+2. Verify database permissions
+3. Check for errors in application logs
+4. Ensure audit_logs table exists
+
+## 📊 Performance Considerations
+
+### RLS Performance
+
+- RLS policies add overhead to queries
+- Use indexes on columns used in RLS policies
+- Monitor query performance with `EXPLAIN ANALYZE`
+- Consider caching for frequently accessed data
+
+### Rate Limiting Performance
+
+- Redis is fast but adds network latency
+- Use connection pooling for Redis
+- Monitor Redis memory usage
+- Consider using Redis Cluster for high traffic
+
+### Fraud Detection Performance
+
+- Fraud checks add latency to requests
+- Cache fraud check results for short periods
+- Use async processing for non-critical checks
+- Monitor fraud detection query performance
+
+## 🎯 Success Metrics
+
+Track these metrics to measure security effectiveness:
+
+1. **RLS Effectiveness**
+   - Unauthorized access attempts blocked
+   - Policy violations detected
+   - Query performance impact
+
+2. **Rate Limiting**
+   - Rate limit violations per day
+   - Legitimate vs malicious blocks
+   - Average response time impact
+
+3. **Fraud Detection**
+   - Fraud attempts detected
+   - False positive rate
+   - True positive rate
+   - Average detection time
+
+4. **Audit Logging**
+   - Logs created per day
+   - Log storage growth
+   - Query performance on logs
+   - Incident response time
+
+## 📞 Support
+
+For issues or questions:
+1. Check this guide first
+2. Review error logs
+3. Check monitoring dashboards
+4. Contact security team
+
+## ✅ Final Checklist
+
+Before marking implementation complete:
+
+- [ ] All RLS policies deployed and tested
+- [ ] Rate limiting active on all endpoints
+- [ ] Fraud detection integrated and tuned
+- [ ] Audit logging capturing all events
+- [ ] Monitoring dashboards configured
+- [ ] Alerting system active
+- [ ] Team trained on security features
 - [ ] Documentation updated
-- [ ] Monitoring alerts configured
-
----
-
-**Remember:** Security is an ongoing process. Schedule regular security audits and keep all dependencies updated.
+- [ ] Incident response plan documented
+- [ ] Regular security audits scheduled

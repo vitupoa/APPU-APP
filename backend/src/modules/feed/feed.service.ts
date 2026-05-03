@@ -1,5 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
+import { ContentLockService } from '../contentLock/contentLock.service.js';
+import { Prisma } from '../../generated/prisma/client.js';
 
 export class FeedService {
   static async getFeed(params: {
@@ -41,20 +43,47 @@ export class FeedService {
       liked.forEach((l) => likedIds.add(l.postId));
     }
 
+    // Check access for locked content
+    const accessChecks = await Promise.all(
+      items.map(async (p: any) => {
+        if (!p.isLocked) return { id: p.id, hasAccess: true };
+        if (!userId) return { id: p.id, hasAccess: false };
+        
+        const access = await ContentLockService.checkAccess(
+          userId,
+          p.id,
+          'POST',
+          p.userId,
+          p.isLocked,
+          p.requiredTier,
+          p.unlockAmountKr ? Number(p.unlockAmountKr) : undefined
+        );
+        return { id: p.id, ...access };
+      })
+    );
+    const accessMap = new Map(accessChecks.map(a => [a.id, a]));
+
     return {
-      items: items.map((p) => ({
-        id: p.id,
-        creator: p.user,
-        imageUrls: p.imageUrls,
-        caption: p.caption,
-        isLocked: p.isLocked,
-        requiredTier: p.requiredTier,
-        likesCount: p.likesCount,
-        commentsCount: p.commentsCount,
-        isLiked: likedIds.has(p.id),
-        commentsEnabled: (p as any).commentsEnabled ?? true,
-        createdAt: p.createdAt.toISOString()
-      })),
+      items: items.map((p) => {
+        const access = accessMap.get(p.id) || { hasAccess: true };
+        return {
+          id: p.id,
+          creator: p.user,
+          imageUrls: access.hasAccess ? p.imageUrls : [],
+          caption: p.caption,
+          isLocked: p.isLocked,
+          requiredTier: p.requiredTier,
+          unlockAmountKr: p.unlockAmountKr ? Number(p.unlockAmountKr) : undefined,
+          hasAccess: access.hasAccess,
+          requiresSubscription: access.requiresSubscription,
+          requiresUnlock: access.requiresUnlock,
+          likesCount: p.likesCount,
+          commentsCount: p.commentsCount,
+          isLiked: likedIds.has(p.id),
+          commentsEnabled: (p as any).commentsEnabled ?? true,
+          createdAt: p.createdAt.toISOString()
+        };
+      }),
       nextCursor
     };
   }
@@ -65,6 +94,7 @@ export class FeedService {
     caption: string;
     isLocked: boolean;
     requiredTier?: string;
+    unlockAmountKr?: number;
   }) {
     const post = await prisma.post.create({
       data: {
@@ -72,7 +102,8 @@ export class FeedService {
         imageUrls: data.imageUrls,
         caption: data.caption ?? '',
         isLocked: data.isLocked,
-        requiredTier: data.requiredTier as any
+        requiredTier: data.requiredTier as any,
+        unlockAmountKr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
       },
       include: {
         user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }

@@ -1,90 +1,109 @@
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config/database.js';
-import { AuthRequest } from './auth.js';
 
 /**
- * Row-Level Security (RLS) Middleware
- * 
- * This middleware sets the current user ID in PostgreSQL session variables
- * to enforce Row-Level Security policies at the database level.
- * 
- * CRITICAL: This provides defense-in-depth security beyond application-level auth.
- * Even if application logic is bypassed, the database will enforce access control.
- * 
- * Usage: Apply AFTER authMiddleware
+ * Middleware to set Row-Level Security (RLS) context for database queries
+ * This sets the current user ID in the database session for RLS policies
  */
-export async function rlsMiddleware(
-  req: AuthRequest,
+export const setRLSContext = async (
+  req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> {
+) => {
   try {
-    // Only set RLS context if user is authenticated
-    if (req.userId) {
-      // Set the current user ID in PostgreSQL session variable
-      // This is used by RLS policies to determine access rights
+    // If user is authenticated, set their ID in the database context
+    if (req.user?.id) {
       await prisma.$executeRawUnsafe(
-        `SELECT set_config('app.current_user_id', '${req.userId}', false)`
+        `SET LOCAL app.current_user_id = '${req.user.id}'`
       );
       
-      console.log(`[RLS] Set user context: ${req.userId}`);
+      // Set admin flag if user is admin
+      if (req.user.isAdmin) {
+        await prisma.$executeRawUnsafe(
+          `SET LOCAL app.is_admin = 'true'`
+        );
+      }
     }
     
     next();
   } catch (error) {
-    console.error('[RLS] Failed to set user context:', error);
-    // Don't fail the request, but log the error
-    // RLS will default to denying access if context is not set
-    next();
+    console.error('Error setting RLS context:', error);
+    next(error);
   }
-}
+};
 
 /**
- * Clear RLS context after request completes
- * This ensures the session variable doesn't leak to other requests
+ * Middleware to set system user context for internal operations
+ * Use this for operations that should bypass RLS (e.g., cron jobs, system tasks)
  */
-export async function clearRlsContext(
-  req: AuthRequest,
+export const setSystemContext = async (
+  req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> {
+) => {
   try {
-    // Clear the session variable
     await prisma.$executeRawUnsafe(
-      `SELECT set_config('app.current_user_id', '', false)`
+      `SET LOCAL app.is_system = 'true'`
     );
-  } catch (error) {
-    console.error('[RLS] Failed to clear user context:', error);
-  }
-  
-  next();
-}
-
-/**
- * Admin RLS Middleware
- * Sets admin context for privileged operations
- */
-export async function adminRlsMiddleware(
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    if (req.userId && req.isAdmin) {
-      // Set both user ID and admin flag
-      await prisma.$executeRawUnsafe(
-        `SELECT set_config('app.current_user_id', '${req.userId}', false)`
-      );
-      await prisma.$executeRawUnsafe(
-        `SELECT set_config('app.is_admin', 'true', false)`
-      );
-      
-      console.log(`[RLS] Set admin context: ${req.userId}`);
-    }
     
     next();
   } catch (error) {
-    console.error('[RLS] Failed to set admin context:', error);
-    next();
+    console.error('Error setting system context:', error);
+    next(error);
   }
+};
+
+/**
+ * Helper function to execute queries with system context
+ * Use this for internal operations that need to bypass RLS
+ */
+export async function withSystemContext<T>(
+  operation: () => Promise<T>
+): Promise<T> {
+  return prisma.$transaction(async (tx) => {
+    // Set system context
+    await tx.$executeRawUnsafe(`SET LOCAL app.is_system = 'true'`);
+    
+    // Execute operation
+    return operation();
+  });
 }
+
+/**
+ * Helper function to execute queries with specific user context
+ * Useful for testing or admin operations on behalf of users
+ */
+export async function withUserContext<T>(
+  userId: string,
+  operation: () => Promise<T>
+): Promise<T> {
+  return prisma.$transaction(async (tx) => {
+    // Set user context
+    await tx.$executeRawUnsafe(`SET LOCAL app.current_user_id = '${userId}'`);
+    
+    // Execute operation
+    return operation();
+  });
+}
+
+/**
+ * Middleware to clear RLS context after request
+ * This ensures context doesn't leak between requests
+ */
+export const clearRLSContext = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Clear context variables
+    await prisma.$executeRawUnsafe(`RESET app.current_user_id`);
+    await prisma.$executeRawUnsafe(`RESET app.is_admin`);
+    await prisma.$executeRawUnsafe(`RESET app.is_system`);
+    
+    next();
+  } catch (error) {
+    console.error('Error clearing RLS context:', error);
+    next(error);
+  }
+};

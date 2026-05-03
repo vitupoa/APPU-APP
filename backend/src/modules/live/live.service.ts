@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { WalletService } from '../wallet/wallet.service.js';
+import { ContentLockService } from '../contentLock/contentLock.service.js';
 import { v4 as uuidv4 } from 'uuid';
 
 // Banned words filter for live chat moderation
@@ -41,6 +42,7 @@ export class LiveService {
       isCoHostEnabled?: boolean;
       maxCoHosts?: number;
       scheduledStart?: string;
+      unlockAmountKr?: number;
     }
   ) {
     // Check for existing active stream
@@ -78,6 +80,7 @@ export class LiveService {
         chamaId: data.chamaId,
         contestId: data.contestId,
         orderId: data.orderId,
+        unlockAmountKr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
       },
       include: {
         host: {
@@ -211,6 +214,23 @@ export class LiveService {
         where: { chamaId: stream.chamaId, userId, status: 'ACTIVE' },
       });
       if (!membership) throw new Error('Only Chama members can view this stream');
+    }
+
+    // Check if stream is locked and user has access
+    if (stream.unlockAmountKr && Number(stream.unlockAmountKr) > 0) {
+      const access = await ContentLockService.checkAccess(
+        userId,
+        streamId,
+        'LIVE',
+        stream.hostId,
+        true,
+        undefined,
+        Number(stream.unlockAmountKr)
+      );
+
+      if (!access.hasAccess) {
+        throw new Error('You must unlock this live stream to join');
+      }
     }
 
     // Upsert viewer record

@@ -19,6 +19,14 @@ export class WalletController {
     try {
       const data = tipSchema.parse(req.body);
       
+      // SECURITY: Prevent self-tipping at controller level (defense in depth)
+      if (req.userId === data.recipientId) {
+        return res.status(400).json({ 
+          error: 'You cannot tip yourself',
+          code: 'SELF_TIP_NOT_ALLOWED'
+        });
+      }
+      
       const result = await WalletService.sendTip(
         req.userId!, 
         data.recipientId, 

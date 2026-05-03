@@ -3,6 +3,7 @@ import { Prisma, SubscriptionTierType } from '../../generated/prisma/client.js';
 import { emitLikeUpdate } from '../../shared/gateway/events.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { contentDistributionService } from '../recommendation/services/contentDistribution.service.js';
+import { ContentLockService } from '../contentLock/contentLock.service.js';
 
 export class ShortsService {
   /**
@@ -92,31 +93,58 @@ export class ShortsService {
       likes.forEach((l: { shortId: string }) => likedIds.add(l.shortId));
     }
 
+    // Check access for locked content
+    const accessChecks = await Promise.all(
+      items.map(async (s: any) => {
+        if (!s.isLocked) return { id: s.id, hasAccess: true };
+        if (!userId) return { id: s.id, hasAccess: false };
+        
+        const access = await ContentLockService.checkAccess(
+          userId,
+          s.id,
+          'SHORT',
+          s.userId,
+          s.isLocked,
+          s.requiredTier,
+          s.unlockAmountKr ? Number(s.unlockAmountKr) : undefined
+        );
+        return { id: s.id, ...access };
+      })
+    );
+    const accessMap = new Map(accessChecks.map(a => [a.id, a]));
+
     return {
-      items: items.map((s: any) => ({
-        id: s.id,
-        creator: s.user,
-        videoUrl: s.videoUrl,
-        thumbnailUrl: s.thumbnailUrl,
-        mediaType: s.mediaType,
-        aspectRatio: s.aspectRatio,
-        mediaUrls: s.mediaUrls,
-        caption: s.caption || '',
-        musicTrack: s.musicTitle ? `${s.musicTitle}${s.musicArtist ? ' - ' + s.musicArtist : ''}` : null,
-        likesCount: s.likesCount,
-        commentsCount: s.commentsCount,
-        isLiked: likedIds.has(s.id),
-        isLocked: s.isLocked,
-        requiredTier: s.requiredTier,
-        commentsEnabled: s.commentsEnabled ?? true,
-        linkedProduct: s.linkedProduct ? {
-          id: s.linkedProduct.id,
-          title: s.linkedProduct.title,
-          priceKr: Number(s.linkedProduct.priceKr),
-          imageUrl: s.linkedProduct.imageUrls[0] || null
-        } : null,
-        createdAt: s.createdAt.toISOString()
-      })),
+      items: items.map((s: any) => {
+        const access = accessMap.get(s.id) || { hasAccess: true };
+        return {
+          id: s.id,
+          creator: s.user,
+          videoUrl: access.hasAccess ? s.videoUrl : null,
+          thumbnailUrl: s.thumbnailUrl,
+          mediaType: s.mediaType,
+          aspectRatio: s.aspectRatio,
+          mediaUrls: access.hasAccess ? s.mediaUrls : [],
+          caption: s.caption || '',
+          musicTrack: s.musicTitle ? `${s.musicTitle}${s.musicArtist ? ' - ' + s.musicArtist : ''}` : null,
+          likesCount: s.likesCount,
+          commentsCount: s.commentsCount,
+          isLiked: likedIds.has(s.id),
+          isLocked: s.isLocked,
+          requiredTier: s.requiredTier,
+          unlockAmountKr: s.unlockAmountKr ? Number(s.unlockAmountKr) : undefined,
+          hasAccess: access.hasAccess,
+          requiresSubscription: access.requiresSubscription,
+          requiresUnlock: access.requiresUnlock,
+          commentsEnabled: s.commentsEnabled ?? true,
+          linkedProduct: s.linkedProduct ? {
+            id: s.linkedProduct.id,
+            title: s.linkedProduct.title,
+            priceKr: Number(s.linkedProduct.priceKr),
+            imageUrl: s.linkedProduct.imageUrls[0] || null
+          } : null,
+          createdAt: s.createdAt.toISOString()
+        };
+      }),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
   }
@@ -136,6 +164,7 @@ export class ShortsService {
     linkedProductId?: string;
     isLocked?: boolean;
     requiredTier?: SubscriptionTierType;
+    unlockAmountKr?: number;
   }) {
     // Parse musicTrack into title and artist
     let musicTitle: string | undefined;
@@ -159,7 +188,8 @@ export class ShortsService {
         musicArtist,
         linkedProductId: data.linkedProductId,
         isLocked: data.isLocked || false,
-        requiredTier: data.requiredTier
+        requiredTier: data.requiredTier,
+        unlockAmountKr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
       },
       include: {
         user: {
@@ -203,6 +233,7 @@ export class ShortsService {
       isLiked: false,
       isLocked: short.isLocked,
       requiredTier: short.requiredTier,
+      unlockAmountKr: short.unlockAmountKr ? Number(short.unlockAmountKr) : undefined,
       createdAt: short.createdAt.toISOString()
     };
   }

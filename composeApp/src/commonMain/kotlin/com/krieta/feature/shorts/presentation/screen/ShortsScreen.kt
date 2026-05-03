@@ -165,6 +165,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                         isActive = page == pagerState.currentPage,
                         isTipModalOpen = showTippingFor != null,
                         isSponsored = false,
+                        isOwnContent = currentUserId == short.creator.id,
                         onLike = { 
                             viewModel.toggleLike(short.id)
                             if (false) {
@@ -234,6 +235,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         isActive: Boolean,
         isTipModalOpen: Boolean,
         isSponsored: Boolean = false,
+        isOwnContent: Boolean = false,
         onLike: () -> Unit,
         onComment: () -> Unit,
         onTip: () -> Unit,
@@ -452,8 +454,8 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     Text("${short.commentsCount}", color = Color.White, fontSize = 12.sp)
                 }
 
-                // Tip (only if not locked)
-                if (!short.isLocked) {
+                // Tip (only if not locked and not own content)
+                if (!short.isLocked && !isOwnContent) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         IconButton(onClick = onTip) {
                             Icon(painterResource(Res.drawable.ic_send),

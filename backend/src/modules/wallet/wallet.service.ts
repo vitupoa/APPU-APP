@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import PayPalService from '../../services/payment/paypal.service.js';
 import PaystackService from '../../services/payment/paystack.service.js';
 import { MpesaService } from '../../services/payments/mpesa.service.js';
+import { lockWalletForUpdate, lockWalletsForUpdate, withDeadlockRetry } from '../../utils/databaseLocks.js';
 
 export class WalletService {
   /**
@@ -41,6 +42,7 @@ export class WalletService {
 
   /**
    * Transfers a Tip from one user to another atomically parsing explicit Tokenomics (15% platform cut).
+   * Uses database locks to prevent race conditions.
    */
   static async sendTip(senderId: string, recipientId: string, senderKrAmount: number, senderCurrency: string) {
     if (senderId === recipientId) {
@@ -64,73 +66,81 @@ export class WalletService {
     const recipientReceiveAmount = new Prisma.Decimal(senderKrAmount - platformCut);
     const platformCutDecimal = new Prisma.Decimal(platformCut);
 
-    // Execute atomic transaction for balance safety
-    return prisma.$transaction(async (tx) => {
-      const senderWallet = await tx.wallet.findUnique({ where: { userId: senderId } });
-      if (!senderWallet || senderWallet.krBalance.lessThan(krDecimal)) {
-        throw new Error("Insufficient Kr balance to tip");
-      }
+    // Execute atomic transaction with deadlock retry
+    return withDeadlockRetry(async () => {
+      return prisma.$transaction(async (tx) => {
+        // LOCK: Lock both wallets to prevent race conditions (ordered to prevent deadlocks)
+        const wallets = await lockWalletsForUpdate(tx, [senderId, recipientId]);
+        const senderWallet = wallets.find((w: any) => w.user_id === senderId);
+        
+        if (!senderWallet || senderWallet.kr_balance < senderKrAmount) {
+          throw new Error("Insufficient Kr balance to tip");
+        }
 
-      // Deduct Full Amount Sender (-100%)
-      await tx.wallet.update({
-        where: { userId: senderId },
-        data: { krBalance: { decrement: krDecimal } }
-      });
-
-      // Credit Recipient (-15% Platform cut applied -> 85%)
-      const recipientWallet = await tx.wallet.upsert({
-        where: { userId: recipientId },
-        create: { userId: recipientId, krBalance: recipientReceiveAmount },
-        update: { krBalance: { increment: recipientReceiveAmount } }
-      });
-
-      // Record Transactions accurately outlining Revenue Velocity
-      await tx.transaction.createMany({
-        data: [
-          {
-            userId: senderId,
-            counterpartyId: recipientId,
-            type: 'tip_sent',
-            amountKr: krDecimal,
-            amountFiat: fiatAmount,
-            currency: senderCurrency,
-            status: 'completed',
-            provider: 'platform'
-          },
-          {
-            userId: recipientId,
-            counterpartyId: senderId,
-            type: 'tip_received',
-            amountKr: recipientReceiveAmount,
-            status: 'completed',
-            provider: 'platform'
-          },
-          {
-            userId: senderId, // Associated essentially with the action
-            counterpartyId: 'PLATFORM_REVENUE',
-            type: 'platform_fee',
-            amountKr: platformCutDecimal,
-            status: 'completed',
-            provider: 'platform_engine'
-          }
-        ]
-      });
-
-      // Unlock Recipient Identity if this is their first inflow!
-      const recipientUser = await tx.user.findUnique({ where: { id: recipientId } });
-      if (recipientUser && !recipientUser.isWalletUnlocked) {
-        await tx.user.update({
-          where: { id: recipientId },
-          data: { isWalletUnlocked: true }
+        // Deduct Full Amount Sender (-100%)
+        await tx.wallet.update({
+          where: { userId: senderId },
+          data: { krBalance: { decrement: krDecimal } }
         });
-      }
 
-      return {
-        success: true,
-        krTipped: senderKrAmount,
-        krReceived: recipientReceiveAmount.toNumber(),
-        platformFee: platformCut
-      };
+        // Credit Recipient (-15% Platform cut applied -> 85%)
+        const recipientWallet = await tx.wallet.upsert({
+          where: { userId: recipientId },
+          create: { userId: recipientId, krBalance: recipientReceiveAmount },
+          update: { krBalance: { increment: recipientReceiveAmount } }
+        });
+
+        // Record Transactions accurately outlining Revenue Velocity
+        await tx.transaction.createMany({
+          data: [
+            {
+              userId: senderId,
+              counterpartyId: recipientId,
+              type: 'tip_sent',
+              amountKr: krDecimal,
+              amountFiat: fiatAmount,
+              currency: senderCurrency,
+              status: 'completed',
+              provider: 'platform'
+            },
+            {
+              userId: recipientId,
+              counterpartyId: senderId,
+              type: 'tip_received',
+              amountKr: recipientReceiveAmount,
+              status: 'completed',
+              provider: 'platform'
+            },
+            {
+              userId: senderId, // Associated essentially with the action
+              counterpartyId: 'PLATFORM_REVENUE',
+              type: 'platform_fee',
+              amountKr: platformCutDecimal,
+              status: 'completed',
+              provider: 'platform_engine'
+            }
+          ]
+        });
+
+        // Unlock Recipient Identity if this is their first inflow!
+        const recipientUser = await tx.user.findUnique({ where: { id: recipientId } });
+        if (recipientUser && !recipientUser.isWalletUnlocked) {
+          await tx.user.update({
+            where: { id: recipientId },
+            data: { isWalletUnlocked: true }
+          });
+        }
+
+        return {
+          success: true,
+          krTipped: senderKrAmount,
+          krReceived: recipientReceiveAmount.toNumber(),
+          platformFee: platformCut
+        };
+      }, {
+        isolationLevel: 'Serializable',
+        timeout: 10000
+      });
     });
   }
 
@@ -437,7 +447,7 @@ export class WalletService {
   }
 
   /**
-   * Confirms and completes a top-up transaction with strict security checks
+   * Confirms and completes a top-up transaction with strict security checks and database locks
    * CRITICAL: This should ONLY be called from verified webhook handlers
    */
   static async confirmTopup(
@@ -506,64 +516,69 @@ export class WalletService {
       throw new Error('Payment currency mismatch');
     }
 
-    // SECURITY: Use atomic transaction to prevent race conditions
-    return prisma.$transaction(async (tx) => {
-      // Double-check status within transaction
-      const txCheck = await tx.transaction.findUnique({
-        where: { id: transactionId }
-      });
-
-      if (!txCheck || txCheck.status !== 'pending') {
-        throw new Error('Transaction state changed');
-      }
-
-      // Update transaction status
-      await tx.transaction.update({
-        where: { id: transactionId },
-        data: {
-          status: 'completed',
-          metadata: {
-            ...(transaction.metadata as any),
-            paymentReference,
-            completedAt: new Date().toISOString(),
-            verifiedAmount,
-            verifiedCurrency
-          }
-        }
-      });
-
-      // SECURITY: Credit wallet with EXACT amount from transaction record (not from parameters)
-      await tx.wallet.upsert({
-        where: { userId },
-        create: {
-          userId,
-          krBalance: transaction.amountKr
-        },
-        update: {
-          krBalance: { increment: transaction.amountKr }
-        }
-      });
-
-      // Unlock wallet if first topup
-      const user = await tx.user.findUnique({ where: { id: userId } });
-      if (user && !user.isWalletUnlocked) {
-        await tx.user.update({
-          where: { id: userId },
-          data: { isWalletUnlocked: true }
+    // SECURITY: Use atomic transaction with deadlock retry and database locks
+    return withDeadlockRetry(async () => {
+      return prisma.$transaction(async (tx) => {
+        // LOCK: Lock wallet to prevent race conditions
+        await lockWalletForUpdate(tx, userId);
+        
+        // Double-check status within transaction
+        const txCheck = await tx.transaction.findUnique({
+          where: { id: transactionId }
         });
-      }
 
-      console.log(`✅ Top-up confirmed: User ${userId}, Transaction ${transactionId}, Amount ${transaction.amountKr} Kr`);
+        if (!txCheck || txCheck.status !== 'pending') {
+          throw new Error('Transaction state changed');
+        }
 
-      return {
-        success: true,
-        transactionId,
-        krAmount: transaction.amountKr.toNumber(),
-        status: 'completed'
-      };
-    }, {
-      isolationLevel: 'Serializable', // Highest isolation level
-      timeout: 10000 // 10 second timeout
+        // Update transaction status
+        await tx.transaction.update({
+          where: { id: transactionId },
+          data: {
+            status: 'completed',
+            metadata: {
+              ...(transaction.metadata as any),
+              paymentReference,
+              completedAt: new Date().toISOString(),
+              verifiedAmount,
+              verifiedCurrency
+            }
+          }
+        });
+
+        // SECURITY: Credit wallet with EXACT amount from transaction record (not from parameters)
+        await tx.wallet.upsert({
+          where: { userId },
+          create: {
+            userId,
+            krBalance: transaction.amountKr
+          },
+          update: {
+            krBalance: { increment: transaction.amountKr }
+          }
+        });
+
+        // Unlock wallet if first topup
+        const user = await tx.user.findUnique({ where: { id: userId } });
+        if (user && !user.isWalletUnlocked) {
+          await tx.user.update({
+            where: { id: userId },
+            data: { isWalletUnlocked: true }
+          });
+        }
+
+        console.log(`✅ Top-up confirmed: User ${userId}, Transaction ${transactionId}, Amount ${transaction.amountKr} Kr`);
+
+        return {
+          success: true,
+          transactionId,
+          krAmount: transaction.amountKr.toNumber(),
+          status: 'completed'
+        };
+      }, {
+        isolationLevel: 'Serializable', // Highest isolation level
+        timeout: 10000 // 10 second timeout
+      });
     });
   }
 

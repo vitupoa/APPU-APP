@@ -8,10 +8,11 @@ import { initializeGateway } from './shared/gateway/socket.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { rateLimiter } from './middleware/rateLimiter.js';
 import { authMiddleware } from './middleware/auth.js';
-import { rlsMiddleware } from './middleware/rls.js';
+import { setRLSContext } from './middleware/rls.js';
 import { apiRateLimiter } from './middleware/ipRateLimiter.js';
 import { sanitizeInputs, preventPathTraversal, preventCommandInjection } from './middleware/sanitization.js';
 import { getCsrfToken } from './middleware/csrfProtection.js';
+import { globalRateLimiter } from './middleware/rateLimiting.js';
 import { jwtSecretManager } from './utils/jwtRotation.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import walletRoutes from './modules/wallet/wallet.routes.js';
@@ -47,6 +48,8 @@ import exploreRoutes from './modules/explore/explore.routes.js';
 import recommendationRoutes from './modules/recommendation/recommendation.routes.js';
 import escrowRoutes from './modules/escrow/escrow.routes.js';
 import kycRoutes from './modules/kyc/kyc.routes.js';
+import contentLockRoutes from './modules/contentLock/contentLock.routes.js';
+import subscriptionRoutes from './modules/user/subscription.routes.js';
 import webhookRoutes from './routes/webhook.routes.js';
 import { startChamaDefaultWorker } from './workers/chamaDefaultWorker.js';
 import { startStoryCleanupWorker } from './workers/storyCleanupWorker.js';
@@ -122,6 +125,7 @@ app.use((req, res, next) => {
 // SECURITY: Apply global security middleware
 app.use(rateLimiter);
 app.use(apiRateLimiter); // IP-based rate limiting
+app.use(globalRateLimiter); // Redis-backed global rate limiting
 app.use(sanitizeInputs); // Input sanitization
 app.use(preventPathTraversal); // Prevent path traversal
 app.use(preventCommandInjection); // Prevent command injection
@@ -134,7 +138,7 @@ app.get('/health', (_req, res) => {
 // CSRF token endpoint
 app.get('/api/v1/csrf-token', authMiddleware, rlsMiddleware, getCsrfToken);
 
-// SECURITY: Apply RLS middleware to all authenticated routes
+// SECURITY: Apply RLS context middleware to all authenticated routes
 // This sets the PostgreSQL session variable for Row-Level Security
 app.use('/api/v1/*', (req, res, next) => {
   // Skip RLS for auth routes (no user context yet)
@@ -145,8 +149,8 @@ app.use('/api/v1/*', (req, res, next) => {
   if (req.path.startsWith('/webhooks/')) {
     return next();
   }
-  // Apply RLS middleware
-  return rlsMiddleware(req as any, res, next);
+  // Apply new RLS context middleware
+  return setRLSContext(req as any, res, next);
 });
 
 // API Routes — mounted as modules are implemented
@@ -184,6 +188,8 @@ app.use('/api/v1/display-ads', displayAdsRoutes);
 app.use('/api/v1/locations', locationsRoutes);
 app.use('/api/v1/creator-boost', creatorBoostRoutes);
 app.use('/api/v1/niches', nichesRoutes);
+app.use('/api/v1/content-lock', contentLockRoutes);
+app.use('/api/v1/subscriptions', subscriptionRoutes);
 app.use('/api/v1/webhooks', webhookRoutes);
 
 // Error handler (must be last)
@@ -238,6 +244,7 @@ const PORT = env.PORT || 3000;
     const { SocialMediaSyncWorker } = await import('./workers/socialMediaSync.worker.js');
     const { startWithdrawalLimitResetWorker } = await import('./workers/withdrawalLimitReset.worker.js');
     const { startNonceCleanupWorker } = await import('./workers/nonceCleanup.worker.js');
+    const { startIdempotencyCleanupWorker } = await import('./workers/idempotencyCleanup.worker.js');
     
     startContentDistributionWorker();
     startMicroInterestWorker();
@@ -245,6 +252,7 @@ const PORT = env.PORT || 3000;
     SocialMediaSyncWorker.start();
     startWithdrawalLimitResetWorker();
     startNonceCleanupWorker();
+    startIdempotencyCleanupWorker();
     
     logger.info('All workers started successfully');
     logger.info('Server ready to accept connections');
