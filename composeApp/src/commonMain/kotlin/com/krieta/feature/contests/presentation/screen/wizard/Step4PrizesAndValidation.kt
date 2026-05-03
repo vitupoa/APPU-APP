@@ -45,6 +45,15 @@ fun Step4PrizesAndValidation(
             .padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        // Entry Fee Section (moved from Step 2)
+        EntryFeeSection(
+            viewModel = viewModel,
+            state = state,
+            validationErrors = validationErrors
+        )
+        
+        Divider(color = Color(0xFF3A3A3F), thickness = 1.dp)
+        
         // Prize Distribution Section (Subtask 8.1)
         PrizeDistributionSection(
             viewModel = viewModel,
@@ -475,7 +484,10 @@ private fun PaidVotingToggle(
                         color = Color.White
                     )
                     Text(
-                        text = "Users pay Kr to vote for submissions",
+                        text = if (state.entryFee > 0.0) 
+                            "Participants can't pay to vote when they are paying to participate" 
+                        else 
+                            "Users pay Kr to vote for submissions",
                         fontSize = 12.sp,
                         color = Color(0xFFA0A0A0)
                     )
@@ -914,6 +926,147 @@ private fun VotingCostInput(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Entry Fee Configuration Section
+ * Moved from Step 2 to Step 4 for better UX (mutual exclusivity with paid voting)
+ * Requirements: 5.1, 5.2, 5.3, 5.4
+ */
+@Composable
+private fun EntryFeeSection(
+    viewModel: CreateContestViewModel,
+    state: CreateContestState,
+    validationErrors: Map<String, String>
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Section Header
+        Text(
+            text = "Entry Fee",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFF5A623)
+        )
+        
+        // Entry Fee Input Field (Requirements 5.1, 5.3, 5.4)
+        EntryFeeInputField(
+            value = state.entryFee,
+            onValueChange = { viewModel.updateEntryFee(it) },
+            currencyCode = viewModel.getCurrencyCode(),
+            error = validationErrors["entryFee"] ?: validationErrors["mutualExclusivity"]
+        )
+        
+        // Real-Time Kr Conversion Display (Requirements 5.2, 5.3)
+        if (state.entryFee > 0.0) {
+            KrConversionDisplay(
+                krAmount = viewModel.getEntryFeeKrDisplay()
+            )
+        }
+    }
+}
+
+/**
+ * Entry Fee Input Field
+ * Requirements: 5.1, 5.3, 5.4
+ */
+@Composable
+private fun EntryFeeInputField(
+    value: Double,
+    onValueChange: (Double) -> Unit,
+    currencyCode: String,
+    error: String?
+) {
+    OutlinedTextField(
+        value = if (value > 0.0) value.toString() else "",
+        onValueChange = { 
+            onValueChange(
+                SafeConversion.toDoubleOrDefault(
+                    value = it,
+                    fieldName = "entryFee",
+                    defaultValue = 0.0
+                )
+            )
+        },
+        label = { Text("Participation Fee") },
+        placeholder = { Text("0.00") },
+        leadingIcon = {
+            Text(
+                text = currencyCode,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFFA0A0A0),
+                modifier = Modifier.padding(start = 12.dp)
+            )
+        },
+        supportingText = {
+            if (error != null) {
+                Text(
+                    text = error,
+                    color = Color(0xFFFF3B30),
+                    fontSize = 12.sp
+                )
+            } else {
+                Text(
+                    text = "Leave at 0 for free contests",
+                    fontSize = 12.sp,
+                    color = Color(0xFFA0A0A0)
+                )
+            }
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        singleLine = true,
+        isError = error != null,
+        modifier = Modifier.fillMaxWidth(),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xFFF5A623),
+            cursorColor = Color(0xFFF5A623),
+            focusedLabelColor = Color(0xFFF5A623),
+            unfocusedBorderColor = Color(0xFF3A3A3F),
+            errorBorderColor = Color(0xFFFF3B30),
+            focusedContainerColor = Color(0xFF1A1A1F),
+            unfocusedContainerColor = Color(0xFF1A1A1F),
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White
+        ),
+        shape = RoundedCornerShape(12.dp)
+    )
+}
+
+/**
+ * Kr Conversion Display
+ * Requirements: 5.2, 5.3
+ */
+@Composable
+private fun KrConversionDisplay(
+    krAmount: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF0A2912)
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Kr Equivalent:",
+                fontSize = 14.sp,
+                color = Color(0xFFA0A0A0)
+            )
+            Text(
+                text = krAmount,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF34C759)
+            )
         }
     }
 }
