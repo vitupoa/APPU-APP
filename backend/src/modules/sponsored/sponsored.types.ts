@@ -4,7 +4,7 @@
  */
 
 // Import Prisma-generated enums
-import { SponsoredContentStatus, PricingModel } from '../../generated/prisma/client.js';
+import { SponsoredContentStatus, PricingModel } from '@prisma/client';
 
 // Re-export for convenience
 export { SponsoredContentStatus, PricingModel };

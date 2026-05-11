@@ -1,5 +1,5 @@
 import { prisma } from '../../../config/database.js';
-import { Prisma } from '../../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 import { AuditService } from './audit.service.js';
 import { ADMIN_ACTIONS } from '../rembrandt-rar.types.js';
 import { EmailService } from '../../../shared/services/email.service.js';

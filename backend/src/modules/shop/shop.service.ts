@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 import { categoryDetailSchemas } from './shop.types.js';
 import { io } from '../../index.js';
 import { emitProductCreated, emitProductUpdated, emitProductDeleted } from '../../shared/gateway/shop-socket.js';

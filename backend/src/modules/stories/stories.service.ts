@@ -1,8 +1,8 @@
 import { prisma } from '../../config/database.js';
-import { StoryPrivacy } from '../../generated/prisma/client.js';
+import { StoryPrivacy } from '@prisma/client';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { WalletService } from '../wallet/wallet.service.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 
 export class StoriesService {
   /**

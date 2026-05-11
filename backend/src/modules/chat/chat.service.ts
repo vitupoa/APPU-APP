@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 import { io } from '../../shared/gateway/socket.js';
 import { WalletService } from '../wallet/wallet.service.js';
 

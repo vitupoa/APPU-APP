@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 
 const SUBSCRIPTION_PLATFORM_FEE = 0.15; // 15%
 

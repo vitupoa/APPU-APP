@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma, ChamaType, ChamaStatus, ContributionFrequency } from '../../generated/prisma/client.js';
+import { Prisma, ChamaType, ChamaStatus, ContributionFrequency } from '@prisma/client';
 import { io } from '../../shared/gateway/socket.js';
 
 export class ChamaService {

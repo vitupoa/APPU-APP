@@ -4,7 +4,7 @@ import PayPalService from '../services/payment/paypal.service.js';
 import PaystackService from '../services/payment/paystack.service.js';
 import { MpesaService } from '../services/payments/mpesa.service.js';
 import { prisma } from '../config/database.js';
-import { Prisma } from '../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 
 export class WebhookController {
   /**

@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 import { WalletService } from '../wallet/wallet.service.js';
 import { ContentLockService } from '../contentLock/contentLock.service.js';
 import { v4 as uuidv4 } from 'uuid';

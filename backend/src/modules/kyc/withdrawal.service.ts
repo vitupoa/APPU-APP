@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { WithdrawalStatus } from '../../generated/prisma/client.js';
+import { WithdrawalStatus } from '@prisma/client';
 import { kycService } from '../kyc/kyc.service.js';
 import { transactionSigner, TransactionPayload } from '../../utils/transactionSigner.js';
 import { nonceService } from '../../services/nonce.service.js';

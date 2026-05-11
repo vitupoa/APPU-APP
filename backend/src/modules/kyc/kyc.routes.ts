@@ -3,7 +3,7 @@ import { authenticateToken, AuthRequest } from '../../middleware/auth.js';
 import { kycService } from './kyc.service.js';
 import { withdrawalService } from './withdrawal.service.js';
 import type { WithdrawalSecurityMetadata } from './withdrawal.types.js';
-import { DocumentType, WithdrawalStatus } from '../../generated/prisma/client.js';
+import { DocumentType, WithdrawalStatus } from '@prisma/client';
 import { prisma } from '../../config/database.js';
 import { withdrawalRateLimiter } from '../../middleware/ipRateLimiter.js';
 import { sanitizePaymentInput } from '../../middleware/sanitization.js';

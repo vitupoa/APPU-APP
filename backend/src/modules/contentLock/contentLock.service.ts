@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
 import { lockWalletsForUpdate, withDeadlockRetry } from '../../utils/databaseLocks.js';
 import crypto from 'crypto';

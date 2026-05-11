@@ -1,7 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { ContentLockService } from '../contentLock/contentLock.service.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 
 export class FeedService {
   static async getFeed(params: {

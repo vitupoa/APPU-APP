@@ -1,6 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
 import PayPalService from '../../services/payment/paypal.service.js';
 import PaystackService from '../../services/payment/paystack.service.js';

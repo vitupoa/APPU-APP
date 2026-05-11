@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma, SubscriptionTierType } from '../../generated/prisma/client.js';
+import { Prisma, SubscriptionTierType } from '@prisma/client';
 import { emitLikeUpdate } from '../../shared/gateway/events.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { contentDistributionService } from '../recommendation/services/contentDistribution.service.js';

@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 import { ShopAnalyticsService } from './analytics.service.js';
 import { ShopNotificationService } from './notifications.service.js';
 

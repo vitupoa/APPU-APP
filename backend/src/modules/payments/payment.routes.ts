@@ -7,7 +7,7 @@ import { PaypalService } from '../../services/payments/paypal.service.js';
 import { PaystackService } from '../../services/payments/paystack.service.js';
 import { topupInitiateSchema, withdrawInitiateSchema } from '../wallet/wallet.validation.js';
 import { prisma } from '../../config/database.js';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
 
 /**

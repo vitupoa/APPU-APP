@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { KYCStatus, DocumentType } from '../../generated/prisma/client.js';
+import { KYCStatus, DocumentType } from '@prisma/client';
 
 const DAILY_WITHDRAWAL_LIMIT = 500000;
 const LARGE_FIRST_WITHDRAWAL_THRESHOLD = 50000;

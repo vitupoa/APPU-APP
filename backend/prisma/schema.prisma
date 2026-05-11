@@ -1,6 +1,3 @@
-// Prisma Schema for Secure Financial Transactions
-// This schema includes all tables needed for the security implementation
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,194 +6,914 @@ datasource db {
   provider = "postgresql"
 }
 
-// ============================================================================
-// EXISTING MODELS (Add these if you don't have them)
-// ============================================================================
+model admires {
+  id                              String   @id
+  admirer_id                      String
+  admired_id                      String
+  is_lovers                       Boolean  @default(false)
+  created_at                      DateTime @default(now())
+  users_admires_admired_idTousers users    @relation("admires_admired_idTousers", fields: [admired_id], references: [id], onDelete: Cascade)
+  users_admires_admirer_idTousers users    @relation("admires_admirer_idTousers", fields: [admirer_id], references: [id], onDelete: Cascade)
 
-model User {
-  id                String   @id @default(uuid())
-  email             String   @unique
-  phone             String?  @unique
-  username          String   @unique
-  firstName         String
-  lastName          String
-  displayName       String
-  avatarUrl         String?
-  coverPhotoUrl     String?
-  bio               String?
-  country           String
-  currency          String
-  accountType       String
-  isVerified        Boolean  @default(false)
-  isWalletUnlocked  Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  // Relations
-  wallet                  Wallet?
-  sessionSecrets          UserSessionSecret[]
-  transactionsSent        Transaction[]       @relation("SenderTransactions")
-  transactionsReceived    Transaction[]       @relation("RecipientTransactions")
-  transactionNonces       TransactionNonce[]
-  financialTransactionLog FinancialTransactionLog[]
-
-  @@index([email])
-  @@index([username])
+  @@unique([admirer_id, admired_id])
 }
 
-model Wallet {
-  id         String   @id @default(uuid())
-  userId     String   @unique
-  krBalance  Decimal  @default(0) @db.Decimal(20, 2)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
+model bio_links {
+  id         String  @id
+  user_id    String
+  label      String
+  url        String
+  icon       String?
+  sort_order Int     @default(0)
+  users      users   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model Transaction {
-  id              String            @id @default(uuid())
-  userId          String
-  type            TransactionType
-  amountKr        Decimal           @db.Decimal(20, 2)
-  amountFiat      Decimal?          @db.Decimal(20, 2)
-  currency        String?
+model comment_likes {
+  id         String   @id
+  comment_id String
+  user_id    String
+  created_at DateTime @default(now())
+  comments   comments @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([comment_id, user_id])
+  @@index([comment_id])
+  @@index([user_id])
+}
+
+model comment_reports {
+  id          String   @id
+  comment_id  String
+  reporter_id String
+  reason      String
+  created_at  DateTime @default(now())
+  comments    comments @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  users       users    @relation(fields: [reporter_id], references: [id], onDelete: Cascade)
+
+  @@index([comment_id])
+}
+
+model comment_settings {
+  id               String  @id
+  content_id       String
+  content_type     String
+  comments_enabled Boolean @default(true)
+  replies_enabled  Boolean @default(true)
+
+  @@unique([content_id, content_type])
+}
+
+model comments {
+  id                                     String            @id
+  user_id                                String
+  content_id                             String
+  content_type                           String
+  text                                   String
+  parent_id                              String?
+  reply_to_user_id                       String?
+  likes_count                            Int               @default(0)
+  replies_count                          Int               @default(0)
+  is_pinned                              Boolean           @default(false)
+  is_edited                              Boolean           @default(false)
+  created_at                             DateTime          @default(now())
+  edited_at                              DateTime?
+  comment_likes                          comment_likes[]
+  comment_reports                        comment_reports[]
+  comments                               comments?         @relation("commentsTocomments", fields: [parent_id], references: [id], onDelete: Cascade)
+  other_comments                         comments[]        @relation("commentsTocomments")
+  users_comments_reply_to_user_idTousers users?            @relation("comments_reply_to_user_idTousers", fields: [reply_to_user_id], references: [id])
+  users_comments_user_idTousers          users             @relation("comments_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([content_type, content_id, created_at])
+  @@index([is_pinned, created_at])
+  @@index([parent_id])
+  @@index([user_id])
+}
+
+model contest_action_completions {
+  id                  String              @id
+  submission_id       String
+  action_id           String
+  is_completed        Boolean             @default(false)
+  proof_url           String?
+  contest_actions     contest_actions     @relation(fields: [action_id], references: [id], onDelete: Cascade)
+  contest_submissions contest_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+}
+
+model contest_actions {
+  id                         String                       @id
+  contest_id                 String
+  action_type                RequirementType
+  target_url                 String?
+  label                      String
+  is_verifiable              Boolean                      @default(false)
+  requires_upload            Boolean                      @default(false)
+  sort_order                 Int                          @default(0)
+  contest_action_completions contest_action_completions[]
+  contests                   contests                     @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+}
+
+model contest_judges {
+  id         String   @id
+  contest_id String
+  user_id    String
+  status     String   @default("pending")
+  added_at   DateTime @default(now())
+  contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, user_id])
+}
+
+model contest_participants {
+  id         String   @id
+  contest_id String
+  user_id    String
+  joined_at  DateTime @default(now())
+  contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, user_id])
+}
+
+model contest_prize_distributions {
+  id         String   @id
+  contest_id String
+  rank       Int
+  percentage Decimal  @db.Decimal(5, 2)
+  contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+}
+
+model contest_submissions {
+  id                         String                       @id
+  contest_id                 String
+  user_id                    String
+  media_url                  String
+  media_type                 String
+  proof_urls                 String[]
+  votes_count                Int                          @default(0)
+  judge_score                Decimal?                     @default(0) @db.Decimal(5, 2)
+  final_score                Decimal?                     @db.Decimal(7, 2)
+  rank                       Int?
+  submitted_at               DateTime                     @default(now())
+  contest_action_completions contest_action_completions[]
+  contests                   contests                     @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  users                      users                        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  contest_votes              contest_votes[]
+
+  @@unique([contest_id, user_id])
+}
+
+model contest_votes {
+  id                  String              @id
+  submission_id       String
+  voter_id            String
+  ip_address          String?
+  fingerprint         String?
+  created_at          DateTime            @default(now())
+  contest_submissions contest_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  users               users               @relation(fields: [voter_id], references: [id], onDelete: Cascade)
+
+  @@unique([submission_id, voter_id])
+}
+
+model contest_winners {
+  id         String   @id
+  contest_id String
+  user_id    String
+  rank       Int
+  prize_kr   Decimal  @db.Decimal(18, 4)
+  awarded_at DateTime @default(now())
+  contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model contests {
+  id                          String                        @id
+  creator_id                  String
+  title                       String
+  description                 String?
+  media_type                  ContestMediaType
+  category                    String
+  cover_media_url             String?
+  prize_total_kr              Decimal                       @db.Decimal(18, 4)
+  platform_fee_kr             Decimal                       @db.Decimal(18, 4)
+  participation_type          ParticipationType             @default(INDIVIDUAL_ONLY)
+  team_size                   Int?
+  max_teams                   Int?
+  entry_fee_kr                Decimal?                      @db.Decimal(18, 4)
+  public_vote_weight          Int?
+  target_ages                 Int[]
+  target_geos                 String[]
+  airdrop_kr                  Decimal?                      @db.Decimal(18, 4)
+  airdrop_limit               Int?
+  allow_daily_prizes          Boolean                       @default(false)
+  daily_prize_kr              Decimal?                      @db.Decimal(18, 4)
+  max_winners                 Int                           @db.SmallInt
+  judging_criteria            JudgingCriteria
+  sponsor_name                String?
+  sponsor_url                 String?
+  deadline                    DateTime
+  status                      ContestStatus                 @default(ACTIVE)
+  total_participants          Int                           @default(0)
+  total_submissions           Int                           @default(0)
+  created_at                  DateTime                      @default(now())
+  contest_actions             contest_actions[]
+  contest_judges              contest_judges[]
+  contest_participants        contest_participants[]
+  contest_prize_distributions contest_prize_distributions[]
+  contest_submissions         contest_submissions[]
+  contest_winners             contest_winners[]
+  users                       users                         @relation(fields: [creator_id], references: [id])
+  escrows                     escrows[]
+  judge_invites               judge_invites[]
+  milestones                  milestones[]
+  shorts                      shorts[]
+  team_contest_registrations  team_contest_registrations[]
+  team_submissions            team_submissions[]
+
+  @@index([status, deadline])
+}
+
+model daily_stats {
+  id           String   @id
+  user_id      String
+  date         DateTime @db.Date
+  views        Int      @default(0)
+  likes        Int      @default(0)
+  new_admirers Int      @default(0)
+  kr_earned    Decimal  @default(0) @db.Decimal(18, 4)
+  kr_spent     Decimal  @default(0) @db.Decimal(18, 4)
+  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, date])
+}
+
+model escrows {
+  id              String   @id
+  contest_id      String
+  user_id         String
+  prize_amount_kr Decimal  @db.Decimal(18, 4)
+  fee_amount_kr   Decimal  @db.Decimal(18, 4)
+  status          String   @default("held")
+  created_at      DateTime @default(now())
+  contests        contests @relation(fields: [contest_id], references: [id])
+  users           users    @relation(fields: [user_id], references: [id])
+}
+
+model judge_invites {
+  id           String            @id
+  contest_id   String
+  judge_id     String
+  status       JudgeInviteStatus @default(PENDING)
+  invited_at   DateTime          @default(now())
+  responded_at DateTime?
+  created_at   DateTime          @default(now())
+  updated_at   DateTime
+  contests     contests          @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  users        users             @relation(fields: [judge_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, judge_id])
+  @@index([contest_id])
+  @@index([judge_id])
+  @@index([status])
+}
+
+model live_banned_viewers {
+  id           String       @id
+  stream_id    String
+  user_id      String
+  reason       String?
+  banned_at    DateTime     @default(now())
+  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@unique([stream_id, user_id])
+}
+
+model live_battles {
+  id                                                         String       @id
+  stream_id                                                  String
+  opponent_stream_id                                         String
+  contest_id                                                 String?
+  duration_secs                                              Int          @default(300)
+  status                                                     BattleStatus @default(PENDING)
+  host_score                                                 Decimal      @default(0) @db.Decimal(18, 4)
+  opponent_score                                             Decimal      @default(0) @db.Decimal(18, 4)
+  winner_id                                                  String?
+  started_at                                                 DateTime?
+  ended_at                                                   DateTime?
+  created_at                                                 DateTime     @default(now())
+  live_streams_live_battles_opponent_stream_idTolive_streams live_streams @relation("live_battles_opponent_stream_idTolive_streams", fields: [opponent_stream_id], references: [id], onDelete: Cascade)
+  live_streams_live_battles_stream_idTolive_streams          live_streams @relation("live_battles_stream_idTolive_streams", fields: [stream_id], references: [id], onDelete: Cascade)
+}
+
+model live_co_hosts {
+  id           String       @id
+  stream_id    String
+  user_id      String
+  joined_at    DateTime     @default(now())
+  left_at      DateTime?
+  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@unique([stream_id, user_id])
+}
+
+model live_messages {
+  id           String       @id
+  stream_id    String
+  user_id      String
+  text         String
+  is_system    Boolean      @default(false)
+  is_pinned    Boolean      @default(false)
+  created_at   DateTime     @default(now())
+  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@index([stream_id, created_at])
+}
+
+model live_pinned_products {
+  id           String       @id
+  stream_id    String
+  product_id   String
+  sale_price   Decimal?     @db.Decimal(18, 4)
+  is_pinned    Boolean      @default(false)
+  pinned_at    DateTime?
+  units_sold   Int          @default(0)
+  sort_order   Int          @default(0)
+  products     products     @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@unique([stream_id, product_id])
+}
+
+model live_session_products {
+  id            String        @id
+  session_id    String
+  product_id    String
+  sale_price    Decimal?      @db.Decimal(18, 4)
+  units_sold    Int           @default(0)
+  sort_order    Int           @default(0)
+  created_at    DateTime      @default(now())
+  products      products      @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  live_sessions live_sessions @relation(fields: [session_id], references: [id], onDelete: Cascade)
+
+  @@unique([session_id, product_id])
+}
+
+model live_sessions {
+  id                    String                  @id
+  host_id               String
+  title                 String
+  description           String?
+  scheduled_start       DateTime
+  actual_start          DateTime?
+  ended_at              DateTime?
+  status                String                  @default("SCHEDULED")
+  viewer_count          Int                     @default(0)
+  peak_viewers          Int                     @default(0)
+  total_sales_kr        Decimal                 @default(0) @db.Decimal(18, 4)
+  created_at            DateTime                @default(now())
+  live_session_products live_session_products[]
+  users                 users                   @relation(fields: [host_id], references: [id], onDelete: Cascade)
+
+  @@index([host_id, status])
+  @@index([status, scheduled_start])
+}
+
+model live_streams {
+  id                                                         String                 @id
+  host_id                                                    String
+  title                                                      String
+  description                                                String?
+  category                                                   String?                @default("Chat") @db.VarChar(50)
+  thumbnail_url                                              String?
+  type                                                       LiveStreamType         @default(NORMAL)
+  status                                                     LiveStreamStatus       @default(SCHEDULED)
+  stream_key                                                 String                 @unique
+  stream_url                                                 String?
+  playback_url                                               String?
+  viewer_count                                               Int                    @default(0)
+  peak_viewers                                               Int                    @default(0)
+  likes_count                                                Int                    @default(0)
+  total_tips_kr                                              Decimal                @default(0) @db.Decimal(18, 4)
+  total_sales_kr                                             Decimal                @default(0) @db.Decimal(18, 4)
+  gift_goal_title                                            String?
+  gift_goal_target                                           Decimal?               @db.Decimal(18, 4)
+  gift_goal_current                                          Decimal                @default(0) @db.Decimal(18, 4)
+  unlock_amount_kr                                           Decimal?               @db.Decimal(18, 4)
+  chama_id                                                   String?
+  contest_id                                                 String?
+  order_id                                                   String?
+  is_co_host_enabled                                         Boolean                @default(false)
+  max_co_hosts                                               Int                    @default(1)
+  scheduled_start                                            DateTime?
+  actual_start                                               DateTime?
+  ended_at                                                   DateTime?
+  created_at                                                 DateTime               @default(now())
+  live_banned_viewers                                        live_banned_viewers[]
+  live_battles_live_battles_opponent_stream_idTolive_streams live_battles[]         @relation("live_battles_opponent_stream_idTolive_streams")
+  live_battles_live_battles_stream_idTolive_streams          live_battles[]         @relation("live_battles_stream_idTolive_streams")
+  live_co_hosts                                              live_co_hosts[]
+  live_messages                                              live_messages[]
+  live_pinned_products                                       live_pinned_products[]
+  users                                                      users                  @relation(fields: [host_id], references: [id], onDelete: Cascade)
+  live_tips                                                  live_tips[]
+  live_viewers                                               live_viewers[]
+
+  @@index([category, status])
+  @@index([host_id, status])
+  @@index([status, created_at])
+  @@index([status, viewer_count], map: "live_streams_status_viewers_idx")
+}
+
+model live_tips {
+  id           String       @id
+  stream_id    String
+  sender_id    String
+  recipient_id String
+  amount_kr    Decimal      @db.Decimal(18, 4)
+  gift_type    String?
+  message      String?
+  created_at   DateTime     @default(now())
+  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@index([stream_id, created_at])
+  @@index([stream_id, sender_id])
+}
+
+model live_viewers {
+  id            String       @id
+  stream_id     String
+  user_id       String
+  joined_at     DateTime     @default(now())
+  left_at       DateTime?
+  total_tips_kr Decimal      @default(0) @db.Decimal(18, 4)
+  likes_given   Int          @default(0)
+  live_streams  live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@unique([stream_id, user_id])
+  @@index([stream_id, total_tips_kr])
+}
+
+model milestone_completions {
+  id           String     @id
+  milestone_id String     @unique
+  user_id      String
+  completed_at DateTime   @default(now())
+  milestones   milestones @relation(fields: [milestone_id], references: [id])
+  users        users      @relation(fields: [user_id], references: [id])
+}
+
+model milestones {
+  id                    String                 @id
+  title                 String
+  description           String
+  requirement_type      String
+  requirement_value     Int
+  reward_kr             Decimal                @db.Decimal(18, 4)
+  contest_id            String?
+  created_at            DateTime               @default(now())
+  milestone_completions milestone_completions?
+  contests              contests?              @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+}
+
+model post_comments {
+  id         String   @id
+  post_id    String
+  user_id    String
+  text       String
+  created_at DateTime @default(now())
+  posts      posts    @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model post_likes {
+  id         String   @id
+  post_id    String
+  user_id    String
+  created_at DateTime @default(now())
+  posts      posts    @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([post_id, user_id])
+}
+
+model posts {
+  id             String                @id
+  user_id        String
+  caption        String?
+  image_urls     String[]
+  is_locked      Boolean               @default(false)
+  required_tier  SubscriptionTierType?
+  likes_count    Int                   @default(0)
+  comments_count Int                   @default(0)
+  created_at     DateTime              @default(now())
+  post_comments  post_comments[]
+  post_likes     post_likes[]
+  users          users                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, created_at])
+}
+
+model products {
+  id                    String                  @id
+  seller_id             String
+  title                 String
+  description           String?
+  image_urls            String[]
+  price_kr              Decimal                 @db.Decimal(18, 4)
+  category              String?
+  whatsapp_number       String
+  status                String                  @default("active")
+  created_at            DateTime                @default(now())
+  live_pinned_products  live_pinned_products[]
+  live_session_products live_session_products[]
+  users                 users                   @relation(fields: [seller_id], references: [id], onDelete: Cascade)
+  shorts                shorts[]
+
+  @@index([status, created_at])
+}
+
+model refresh_tokens {
+  id         String   @id
+  user_id    String
+  token_hash String
+  device_id  String
+  expires_at DateTime
+  created_at DateTime @default(now())
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model short_collections {
+  id         String   @id
+  user_id    String
+  name       String
+  cover_url  String?
+  sort_order Int      @default(0)
+  created_at DateTime @default(now())
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shorts     shorts[]
+}
+
+model short_comments {
+  id         String   @id
+  short_id   String
+  user_id    String
+  text       String
+  created_at DateTime @default(now())
+  shorts     shorts   @relation(fields: [short_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model short_likes {
+  id         String   @id
+  short_id   String
+  user_id    String
+  created_at DateTime @default(now())
+  shorts     shorts   @relation(fields: [short_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([short_id, user_id])
+}
+
+model shorts {
+  id                String                @id
+  user_id           String
+  video_url         String
+  thumbnail_url     String?
+  caption           String?
+  music_title       String?
+  music_artist      String?
+  is_locked         Boolean               @default(false)
+  required_tier     SubscriptionTierType?
+  contest_id        String?
+  collection_id     String?
+  linked_product_id String?
+  views             Int                   @default(0)
+  likes_count       Int                   @default(0)
+  comments_count    Int                   @default(0)
+  created_at        DateTime              @default(now())
+  short_comments    short_comments[]
+  short_likes       short_likes[]
+  short_collections short_collections?    @relation(fields: [collection_id], references: [id])
+  contests          contests?             @relation(fields: [contest_id], references: [id])
+  products          products?             @relation(fields: [linked_product_id], references: [id])
+  users             users                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, created_at])
+}
+
+model subscription_tiers {
+  id            String               @id
+  creator_id    String
+  tier          SubscriptionTierType
+  kr_amount     Decimal              @db.Decimal(18, 4)
+  benefits      String
+  is_enabled    Boolean              @default(true)
+  created_at    DateTime             @default(now())
+  users         users                @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  subscriptions subscriptions[]
+
+  @@unique([creator_id, tier])
+}
+
+model subscriptions {
+  id                                       String               @id
+  subscriber_id                            String
+  creator_id                               String
+  tier_id                                  String
+  tier                                     SubscriptionTierType
+  kr_amount                                Decimal              @db.Decimal(18, 4)
+  status                                   String               @default("active")
+  started_at                               DateTime             @default(now())
+  next_billing_at                          DateTime?
+  cancelled_at                             DateTime?
+  users_subscriptions_creator_idTousers    users                @relation("subscriptions_creator_idTousers", fields: [creator_id], references: [id], onDelete: Cascade)
+  users_subscriptions_subscriber_idTousers users                @relation("subscriptions_subscriber_idTousers", fields: [subscriber_id], references: [id], onDelete: Cascade)
+  subscription_tiers                       subscription_tiers   @relation(fields: [tier_id], references: [id])
+
+  @@unique([subscriber_id, creator_id])
+}
+
+model team_chats {
+  id         String   @id
+  team_id    String   @unique
+  chat_id    String
+  created_at DateTime @default(now())
+  teams      teams    @relation(fields: [team_id], references: [id], onDelete: Cascade)
+}
+
+model team_contest_registrations {
+  id            String   @id
+  contest_id    String
+  team_id       String
+  registered_at DateTime @default(now())
+  contests      contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  teams         teams    @relation(fields: [team_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, team_id])
+  @@index([contest_id])
+  @@index([team_id])
+}
+
+model team_invitations {
+  id                                       String           @id
+  team_id                                  String
+  inviter_id                               String
+  invitee_id                               String
+  status                                   InvitationStatus @default(PENDING)
+  expires_at                               DateTime
+  created_at                               DateTime         @default(now())
+  users_team_invitations_invitee_idTousers users            @relation("team_invitations_invitee_idTousers", fields: [invitee_id], references: [id], onDelete: Cascade)
+  users_team_invitations_inviter_idTousers users            @relation("team_invitations_inviter_idTousers", fields: [inviter_id], references: [id], onDelete: Cascade)
+  teams                                    teams            @relation(fields: [team_id], references: [id], onDelete: Cascade)
+
+  @@unique([team_id, invitee_id, status])
+  @@index([invitee_id, status])
+  @@index([team_id, status])
+}
+
+model team_members {
+  id        String   @id
+  team_id   String
+  user_id   String
+  role      TeamRole @default(MEMBER)
+  joined_at DateTime @default(now())
+  teams     teams    @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  users     users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([team_id, user_id])
+  @@index([team_id])
+  @@index([user_id])
+}
+
+model team_submission_votes {
+  id               String           @id
+  submission_id    String
+  voter_id         String
+  created_at       DateTime         @default(now())
+  team_submissions team_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  users            users            @relation(fields: [voter_id], references: [id], onDelete: Cascade)
+
+  @@unique([submission_id, voter_id])
+  @@index([submission_id])
+}
+
+model team_submissions {
+  id                    String                  @id
+  contest_id            String
+  team_id               String
+  media_url             String
+  media_type            String
+  caption               String?
+  contributors          String[]
+  votes_count           Int                     @default(0)
+  judge_score           Decimal?                @default(0) @db.Decimal(5, 2)
+  final_score           Decimal?                @db.Decimal(7, 2)
+  rank                  Int?
+  submitted_at          DateTime                @default(now())
+  team_submission_votes team_submission_votes[]
+  contests              contests                @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  teams                 teams                   @relation(fields: [team_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, team_id])
+  @@index([contest_id, votes_count])
+}
+
+model teams {
+  id                         String                       @id
+  name                       String                       @unique @db.VarChar(50)
+  avatar_url                 String?
+  leader_id                  String
+  max_members                Int                          @default(5)
+  total_wins                 Int                          @default(0)
+  total_prizes               Decimal                      @default(0) @db.Decimal(18, 4)
+  created_at                 DateTime                     @default(now())
+  updated_at                 DateTime
+  team_chats                 team_chats?
+  team_contest_registrations team_contest_registrations[]
+  team_invitations           team_invitations[]
+  team_members               team_members[]
+  team_submissions           team_submissions[]
+  users                      users                        @relation(fields: [leader_id], references: [id], onDelete: Cascade)
+}
+
+model transactions {
+  id              String   @id
+  user_id         String
+  type            String
+  amount_kr       Decimal  @db.Decimal(18, 4)
+  amount_fiat     Decimal? @db.Decimal(18, 4)
+  currency        String?  @db.VarChar(3)
   provider        String?
-  status          TransactionStatus @default(PENDING)
+  status          String   @default("pending")
   reference       String?
-  counterpartyId  String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  counterparty_id String?
+  metadata        Json?
+  created_at      DateTime @default(now())
+  users           users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  user         User  @relation("SenderTransactions", fields: [userId], references: [id], onDelete: Cascade)
-  counterparty User? @relation("RecipientTransactions", fields: [counterpartyId], references: [id], onDelete: SetNull)
-
-  @@index([userId])
-  @@index([counterpartyId])
-  @@index([status])
-  @@index([createdAt])
+  @@index([user_id, created_at])
 }
 
-enum TransactionType {
-  TIP
-  WITHDRAW
-  TOPUP
-  PURCHASE
-  REFUND
-  UNKNOWN
+model users {
+  id                                                  String                  @id
+  email                                               String                  @unique
+  username                                            String                  @unique
+  first_name                                          String
+  last_name                                           String
+  display_name                                        String
+  avatar_url                                          String?
+  cover_photo_url                                     String?
+  bio                                                 String?
+  country                                             String                  @db.VarChar(2)
+  currency                                            String                  @db.VarChar(3)
+  google_id                                           String?                 @unique
+  apple_id                                            String?                 @unique
+  account_type                                        AccountType             @default(CREATOR)
+  is_admin                                            Boolean                 @default(false)
+  is_verified                                         Boolean                 @default(false)
+  is_wallet_unlocked                                  Boolean                 @default(false)
+  wallet_pin_hash                                     String?
+  password_hash                                       String?
+  created_at                                          DateTime                @default(now())
+  updated_at                                          DateTime
+  admires_admires_admired_idTousers                   admires[]               @relation("admires_admired_idTousers")
+  admires_admires_admirer_idTousers                   admires[]               @relation("admires_admirer_idTousers")
+  bio_links                                           bio_links[]
+  comment_likes                                       comment_likes[]
+  comment_reports                                     comment_reports[]
+  comments_comments_reply_to_user_idTousers           comments[]              @relation("comments_reply_to_user_idTousers")
+  comments_comments_user_idTousers                    comments[]              @relation("comments_user_idTousers")
+  contest_judges                                      contest_judges[]
+  contest_participants                                contest_participants[]
+  contest_submissions                                 contest_submissions[]
+  contest_votes                                       contest_votes[]
+  contest_winners                                     contest_winners[]
+  contests                                            contests[]
+  daily_stats                                         daily_stats[]
+  escrows                                             escrows[]
+  judge_invites                                       judge_invites[]
+  live_sessions                                       live_sessions[]
+  live_streams                                        live_streams[]
+  milestone_completions                               milestone_completions[]
+  post_comments                                       post_comments[]
+  post_likes                                          post_likes[]
+  posts                                               posts[]
+  products                                            products[]
+  refresh_tokens                                      refresh_tokens[]
+  short_collections                                   short_collections[]
+  short_comments                                      short_comments[]
+  short_likes                                         short_likes[]
+  shorts                                              shorts[]
+  subscription_tiers                                  subscription_tiers[]
+  subscriptions_subscriptions_creator_idTousers       subscriptions[]         @relation("subscriptions_creator_idTousers")
+  subscriptions_subscriptions_subscriber_idTousers    subscriptions[]         @relation("subscriptions_subscriber_idTousers")
+  team_invitations_team_invitations_invitee_idTousers team_invitations[]      @relation("team_invitations_invitee_idTousers")
+  team_invitations_team_invitations_inviter_idTousers team_invitations[]      @relation("team_invitations_inviter_idTousers")
+  team_members                                        team_members[]
+  team_submission_votes                               team_submission_votes[]
+  teams                                               teams[]
+  transactions                                        transactions[]
+  wallets                                             wallets?
 }
 
-enum TransactionStatus {
+model wallets {
+  id         String   @id
+  user_id    String   @unique
+  kr_balance Decimal  @default(0) @db.Decimal(18, 4)
+  created_at DateTime @default(now())
+  updated_at DateTime
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+enum AccountType {
+  CREATOR
+  BUSINESS
+}
+
+enum BattleStatus {
   PENDING
-  PROCESSING
+  ACTIVE
   COMPLETED
-  FAILED
+}
+
+enum ContestMediaType {
+  PHOTO
+  VIDEO
+  PHOTO_AND_VIDEO
+}
+
+enum ContestStatus {
+  DRAFT
+  ACTIVE
+  JUDGING
+  PENDING_PAYOUT
+  COMPLETED
   CANCELLED
-  UNKNOWN
 }
 
-// ============================================================================
-// SECURITY MODELS (NEW - Required for secure financial transactions)
-// ============================================================================
-
-// Session Secrets Table
-// Stores server-generated secrets for HMAC-SHA256 transaction signing
-model UserSessionSecret {
-  id        BigInt   @id @default(autoincrement())
-  userId    String
-  secret    Bytes    // 256-bit (32 bytes) cryptographically secure secret
-  createdAt DateTime @default(now())
-  expiresAt DateTime // Expires after 24-48 hours
-  isActive  Boolean  @default(true)
-  deviceId  String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, isActive])
-  @@index([expiresAt])
-  @@map("user_session_secrets")
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
 }
 
-// Transaction Nonces Table
-// Tracks nonces to prevent replay attacks
-model TransactionNonce {
-  id              BigInt   @id @default(autoincrement())
-  nonce           String   @unique
-  userId          String
-  transactionType String   // TIP, WITHDRAW, TOPUP
-  createdAt       DateTime @default(now())
-  expiresAt       DateTime // Expires after 10 minutes
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([nonce])
-  @@index([expiresAt])
-  @@index([userId])
-  @@map("transaction_nonces")
+enum JudgeInviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }
 
-// Financial Transactions Log
-// Comprehensive audit trail for all financial transactions
-model FinancialTransactionLog {
-  id             BigInt   @id @default(autoincrement())
-  transactionId  String
-  userId         String
-  transactionType String  // TIP, WITHDRAW, TOPUP
-  amountKr       Decimal  @db.Decimal(20, 2)
-  amountFiat     Decimal? @db.Decimal(20, 2)
-  currency       String?
-  provider       String?
-  counterpartyId String?
-  signature      String   // HMAC-SHA256 signature
-  nonce          String
-  timestamp      BigInt   // Client timestamp
-  ipAddress      String?
-  userAgent      String?
-  deviceId       String?
-  status         String   // PENDING, COMPLETED, FAILED
-  errorMessage   String?
-  createdAt      DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([transactionId])
-  @@index([status])
-  @@index([createdAt])
-  @@map("financial_transactions_log")
+enum JudgingCriteria {
+  CREATOR_PICKS
+  COMMUNITY_VOTE
+  MOST_ENGAGEMENT
+  COMBINATION
 }
 
-// Rate Limiting Table (Optional - can use Redis instead)
-model RateLimit {
-  id        BigInt   @id @default(autoincrement())
-  userId    String
-  action    String   // tip, withdraw, topup
-  count     Int      @default(1)
-  windowStart DateTime @default(now())
-  expiresAt DateTime
-
-  @@unique([userId, action, windowStart])
-  @@index([userId, action])
-  @@index([expiresAt])
-  @@map("rate_limits")
+enum LiveStreamStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED
 }
 
-// Suspicious Activity Log
-model SuspiciousActivityLog {
-  id          BigInt   @id @default(autoincrement())
-  userId      String
-  activityType String  // RAPID_TRANSACTIONS, LARGE_AMOUNT, INVALID_SIGNATURE, etc.
-  description String
-  metadata    Json?    // Additional context
-  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
-  resolved    Boolean  @default(false)
-  createdAt   DateTime @default(now())
+enum LiveStreamType {
+  NORMAL
+  CHAMA
+  CONTEST_BATTLE
+  PROOF_OF_TASK
+  COMMERCE
+}
 
-  @@index([userId])
-  @@index([severity])
-  @@index([resolved])
-  @@index([createdAt])
-  @@map("suspicious_activity_log")
+enum ParticipationType {
+  INDIVIDUAL_ONLY
+  TEAM_ONLY
+  BOTH
+}
+
+enum RequirementType {
+  FOLLOW_KRIETA
+  YOUTUBE_SUB
+  SPOTIFY_FOLLOW
+  INSTAGRAM_FOLLOW
+  TIKTOK_FOLLOW
+  WATCH_VIDEO
+  VISIT_SHOP
+  CUSTOM
+}
+
+enum SubscriptionTierType {
+  TOP_FUN
+  REAL_FAN
+  TRUE_FAN
+  SUPER_FAN
+}
+
+enum TeamRole {
+  LEADER
+  CO_LEADER
+  MEMBER
 }

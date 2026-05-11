@@ -1,4 +1,4 @@
-import { AdminRole } from '../../generated/prisma/client.js';
+import { AdminRole } from '@prisma/client';
 
 // Permission matrix: maps each role to its allowed actions
 export const ROLE_PERMISSIONS: Record<string, string[]> = {

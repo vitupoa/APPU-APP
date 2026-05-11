@@ -1,5 +1,5 @@
 import { prisma } from '../../config/database.js';
-import { ChamaRole, ElectionPhase } from '../../generated/prisma/client.js';
+import { ChamaRole, ElectionPhase } from '@prisma/client';
 
 export class ChamaElectionService {
   /**
