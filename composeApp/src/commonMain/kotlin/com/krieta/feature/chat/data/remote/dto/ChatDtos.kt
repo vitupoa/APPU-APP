@@ -125,3 +125,16 @@ data class ActionResponse(
     val success: Boolean,
     val message: String? = null
 )
+
+@Serializable
+data class TypingIndicatorRequest(
+    val isTyping: Boolean
+)
+
+@Serializable
+data class TypingIndicatorDto(
+    val chatId: String,
+    val userId: String,
+    val user: UserSnippetDto,
+    val isTyping: Boolean
+)

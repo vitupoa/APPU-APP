@@ -3,6 +3,7 @@ import { AuthRequest } from '../../middleware/auth.js';
 import { WalletService } from './wallet.service.js';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
 import { tipSchema, exchangeRateSchema, topupInitiateSchema } from './wallet.validation.js';
+import crypto from 'crypto';
 
 export class WalletController {
   static async getBalance(req: AuthRequest, res: Response) {
@@ -15,6 +16,49 @@ export class WalletController {
     }
   }
 
+  /**
+   * Verifies HMAC signature for tip requests to prevent MITM attacks.
+   * Uses constant-time comparison to prevent timing attacks.
+   */
+  private static verifyTipSignature(
+    recipientId: string,
+    krAmount: number,
+    currency: string,
+    timestamp: number,
+    nonce: string,
+    signature: string
+  ): boolean {
+    const secret = process.env.TRANSACTION_SIGNING_SECRET;
+    if (!secret) {
+      console.error('❌ TRANSACTION_SIGNING_SECRET not configured');
+      return false;
+    }
+
+    // SECURITY: Reject requests older than 5 minutes (replay attack prevention)
+    const age = Date.now() - timestamp;
+    if (age > 5 * 60 * 1000 || age < -30000) {
+      console.warn(`⚠️ Tip signature timestamp expired: age=${age}ms`);
+      return false;
+    }
+
+    // Reconstruct the canonical string exactly as the client builds it
+    const canonical = `tip|recipientId=${recipientId}&krAmount=${krAmount}&currency=${currency}&timestamp=${timestamp}&nonce=${nonce}`;
+    const expected = crypto
+      .createHmac('sha256', secret)
+      .update(canonical)
+      .digest('base64');
+
+    try {
+      // SECURITY: Constant-time comparison to prevent timing attacks
+      return crypto.timingSafeEqual(
+        Buffer.from(signature, 'base64'),
+        Buffer.from(expected, 'base64')
+      );
+    } catch {
+      return false;
+    }
+  }
+
   static async sendTip(req: AuthRequest, res: Response): Promise<void> {
     try {
       const data = tipSchema.parse(req.body);
@@ -22,6 +66,23 @@ export class WalletController {
         res.status(400).json({ error: 'You cannot tip yourself', code: 'SELF_TIP_NOT_ALLOWED' });
         return;
       }
+
+      // SECURITY: Verify HMAC signature to prevent MITM tampering
+      const signatureValid = WalletController.verifyTipSignature(
+        data.recipientId,
+        data.krAmount,
+        data.currency,
+        data.timestamp,
+        data.nonce,
+        data.signature
+      );
+
+      if (!signatureValid) {
+        console.warn(`⚠️ Invalid tip signature from user ${req.userId}`);
+        res.status(403).json({ error: 'Invalid transaction signature', code: 'SIGNATURE_INVALID' });
+        return;
+      }
+
       const result = await WalletService.sendTip(req.userId!, data.recipientId, data.krAmount, data.currency);
       res.status(200).json(result);
     } catch (error: any) {

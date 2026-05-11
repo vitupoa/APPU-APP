@@ -51,7 +51,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.activity.compose.BackHandler
+import com.krieta.com.core.util.BackHandler
 import com.krieta.com.core.util.exitApp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -205,6 +205,16 @@ private fun CreateBottomSheet(onDismiss: () -> Unit) {
                 }
                 CreateOption("Product", "🛍️", Color(0xFF43A047)) {
                     navigator.push(com.krieta.feature.shop.presentation.screen.CreateListingScreen())
+                    onDismiss()
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                CreateOption("Live", "📹", Color(0xFFFF1744)) {
+                    navigator.push(com.krieta.feature.live.presentation.screen.StartLiveScreen())
                     onDismiss()
                 }
             }

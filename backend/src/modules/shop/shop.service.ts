@@ -1,6 +1,8 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '../../generated/prisma/client.js';
 import { categoryDetailSchemas } from './shop.types.js';
+import { io } from '../../index.js';
+import { emitProductCreated, emitProductUpdated, emitProductDeleted } from '../../shared/gateway/shop-socket.js';
 
 const SELLER_SELECT = {
   id: true, username: true, displayName: true, avatarUrl: true, isVerified: true
@@ -58,7 +60,12 @@ export class ShopService {
     });
 
     // Re-fetch with all details included
-    return this.getProduct(product.id);
+    const fullProduct = await this.getProduct(product.id);
+    
+    // Emit real-time event
+    emitProductCreated(io, fullProduct);
+    
+    return fullProduct;
   }
 
   static async updateProduct(productId: string, sellerId: string, data: any) {
@@ -101,13 +108,21 @@ export class ShopService {
       }
     });
 
-    return this.getProduct(productId);
+    const updatedProduct = await this.getProduct(productId);
+    
+    // Emit real-time event
+    emitProductUpdated(io, updatedProduct);
+    
+    return updatedProduct;
   }
 
   static async deleteProduct(productId: string, sellerId: string) {
     const existing = await prisma.product.findUniqueOrThrow({ where: { id: productId } });
     if (existing.sellerId !== sellerId) throw new Error('You can only delete your own products');
     await prisma.product.update({ where: { id: productId }, data: { status: 'removed' } });
+    
+    // Emit real-time event
+    emitProductDeleted(io, productId);
   }
 
   static async getProduct(productId: string, viewerId?: string) {
@@ -119,7 +134,9 @@ export class ShopService {
       fashionDetail: true,
       shoeDetail: true,
       electronicsDetail: true,
+      furnitureDetail: true,
       foodDetail: true,
+      groceryDetail: true,
       bookDetail: true,
       digitalProductDetail: true,
       serviceDetail: true,
@@ -244,7 +261,9 @@ export class ShopService {
       fashionDetail: true,
       shoeDetail: true,
       electronicsDetail: true,
+      furnitureDetail: true,
       foodDetail: true,
+      groceryDetail: true,
       bookDetail: true,
       digitalProductDetail: true,
       serviceDetail: true,
@@ -499,8 +518,8 @@ async function createCategoryDetail(tx: any, productId: string, category: string
   const map: Record<string, string> = {
     VEHICLES: 'vehicleDetail', SPARE_PARTS: 'sparePartDetail',
     REAL_ESTATE: 'realEstateDetail', FASHION: 'fashionDetail',
-    SHOES: 'shoeDetail', ELECTRONICS: 'electronicsDetail',
-    FOOD_FMCG: 'foodDetail', BOOKS: 'bookDetail',
+    SHOES: 'shoeDetail', ELECTRONICS: 'electronicsDetail', FURNITURE: 'furnitureDetail',
+    FOOD_FMCG: 'foodDetail', GROCERIES: 'groceryDetail', BOOKS: 'bookDetail',
     DIGITAL_PRODUCTS: 'digitalProductDetail', SERVICES: 'serviceDetail',
   };
   const model = map[category];
@@ -517,8 +536,8 @@ async function upsertCategoryDetail(tx: any, productId: string, category: string
   const map: Record<string, string> = {
     VEHICLES: 'vehicleDetail', SPARE_PARTS: 'sparePartDetail',
     REAL_ESTATE: 'realEstateDetail', FASHION: 'fashionDetail',
-    SHOES: 'shoeDetail', ELECTRONICS: 'electronicsDetail',
-    FOOD_FMCG: 'foodDetail', BOOKS: 'bookDetail',
+    SHOES: 'shoeDetail', ELECTRONICS: 'electronicsDetail', FURNITURE: 'furnitureDetail',
+    FOOD_FMCG: 'foodDetail', GROCERIES: 'groceryDetail', BOOKS: 'bookDetail',
     DIGITAL_PRODUCTS: 'digitalProductDetail', SERVICES: 'serviceDetail',
   };
   const model = map[category];
@@ -576,7 +595,7 @@ function formatProduct(p: any) {
   // Attach category-specific detail
   const detailKeys = [
     'vehicleDetail', 'sparePartDetail', 'realEstateDetail', 'fashionDetail',
-    'shoeDetail', 'electronicsDetail', 'foodDetail', 'bookDetail',
+    'shoeDetail', 'electronicsDetail', 'furnitureDetail', 'foodDetail', 'groceryDetail', 'bookDetail',
     'digitalProductDetail', 'serviceDetail'
   ];
   for (const key of detailKeys) {

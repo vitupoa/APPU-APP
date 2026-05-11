@@ -19,7 +19,8 @@ data class LiveStream(
     val giftGoalTarget: Double?,
     val giftGoalCurrent: Double,
     val isCoHostEnabled: Boolean,
-    val host: LiveHost? = null
+    val host: LiveHost? = null,
+    val pinnedProduct: LiveProduct? = null
 )
 
 data class LiveHost(
@@ -46,4 +47,12 @@ data class LiveMessage(
     val isSystem: Boolean,
     val isPinned: Boolean,
     val user: LiveHost? = null
+)
+
+data class LiveProduct(
+    val id: String,
+    val title: String,
+    val priceKr: Double,
+    val imageUrl: String?,
+    val whatsappNumber: String?
 )

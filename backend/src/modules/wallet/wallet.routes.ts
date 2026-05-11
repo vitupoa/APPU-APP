@@ -14,8 +14,10 @@ router.use(validateWalletOwnership);
 
 router.get('/balance', WalletController.getBalance);
 
-// SECURITY: Tip endpoint with idempotency to prevent duplicate tips
+// SECURITY: Tip endpoint with rate limiting, input sanitization, HMAC verification, and idempotency
 router.post('/tip', 
+  paymentRateLimiter,
+  sanitizePaymentInput,
   idempotencyMiddleware({ ttlSeconds: 86400, autoGenerate: true }),
   WalletController.sendTip
 );

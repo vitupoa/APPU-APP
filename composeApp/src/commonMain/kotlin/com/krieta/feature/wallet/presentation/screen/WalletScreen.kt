@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -56,7 +57,12 @@ class WalletScreen : Screen {
         LaunchedEffect(countryCode) {
             currencyProvider.start()
             kotlinx.coroutines.delay(500)
-            viewModel.fetchWalletData(countryCode)
+            if (countryCode.isNotEmpty()) {
+                viewModel.fetchWalletData(countryCode)
+            } else {
+                println("⚠️ Country code is empty, using default")
+                viewModel.fetchWalletData("US") // Fallback to US
+            }
         }
         
         LaunchedEffect(exchangeRate) {
@@ -83,12 +89,27 @@ class WalletScreen : Screen {
                     }
                     is WalletState.Error -> {
                         Column(
-                            modifier = Modifier.align(Alignment.Center),
+                            modifier = Modifier.align(Alignment.Center).padding(32.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("Failed to load wallet", color = MaterialTheme.colorScheme.error)
+                            Text(
+                                "Failed to load wallet", 
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
-                            Button(onClick = { viewModel.fetchWalletData(countryCode) }) {
+                            Text(
+                                currentState.message,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(onClick = { 
+                                val retryCountry = locationProvider.getCurrentCountry()
+                                viewModel.fetchWalletData(if (retryCountry.isEmpty()) "US" else retryCountry)
+                            }) {
                                 Text("Retry")
                             }
                         }

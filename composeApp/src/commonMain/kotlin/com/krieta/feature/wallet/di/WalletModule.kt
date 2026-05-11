@@ -11,7 +11,7 @@ import org.koin.dsl.module
 
 val walletModule = module {
     single { WalletApi(get()) }
-    single<WalletRepository> { WalletRepositoryImpl(get()) }
+    single<WalletRepository> { WalletRepositoryImpl(get(), get(), get(), get()) }
 
     factory { WalletViewModel(get(), get()) }
     factory {

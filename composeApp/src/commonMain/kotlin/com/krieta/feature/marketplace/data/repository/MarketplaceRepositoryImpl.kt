@@ -42,8 +42,27 @@ class MarketplaceRepositoryImpl(
         startDate: String,
         endDate: String
     ): NetworkResult<BrandCampaign> = try {
+        val tiers = if (targetTier == null) {
+            // ALL selected - include all tiers
+            listOf("NANO", "MICRO", "MID", "MACRO", "MEGA")
+        } else {
+            listOf(targetTier.name)
+        }
+        
         NetworkResult.Success(apiService.createCampaign(
-            CreateCampaignRequest(title, description, budget, targetTier, categories, requirements, deliverables, startDate, endDate)
+            CreateCampaignRequest(
+                title = title,
+                description = description,
+                type = "SPONSORED_POST",
+                targetTiers = tiers,
+                targetCategories = categories,
+                budgetKr = budget,
+                compensationPerInfluencer = budget,
+                maxInfluencers = 1,
+                contentGuidelines = requirements,
+                campaignStartDate = startDate,
+                campaignEndDate = endDate
+            )
         ))
     } catch (e: Exception) {
         NetworkResult.Error(message = e.message ?: "Failed to create campaign")

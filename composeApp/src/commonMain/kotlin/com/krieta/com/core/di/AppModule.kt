@@ -2,6 +2,13 @@ package com.krieta.com.core.di
 
 import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.com.core.network.KtorClientFactory
+import com.krieta.com.core.offline.MediaCacheManager
+import com.krieta.com.core.offline.OfflineActionQueue
+import com.krieta.com.core.offline.OfflineModeGuard
+import com.krieta.com.core.security.DatabaseEncryption
+import com.krieta.com.core.security.DataIntegrityChecker
+import com.krieta.com.core.security.FinancialTransactionSecurity
+import com.krieta.com.core.security.SecurityManager
 import com.krieta.com.core.security.TokenManager
 import com.krieta.com.core.security.DeviceSecurity
 import com.krieta.com.core.session.SessionManager
@@ -19,6 +26,8 @@ import com.krieta.feature.marketplace.di.marketplaceModule
 import com.krieta.feature.explore.di.exploreModule
 import com.krieta.com.core.network.WebSocketService
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -31,6 +40,17 @@ val coreModule = module {
     single<com.krieta.com.core.upload.UploadApi> { com.krieta.com.core.upload.UploadApiImpl(get()) }
     single { SessionManager() }
     single { UserCurrencyProvider(get(), get()) }
+    
+    // Offline support
+    single { CoroutineScope(SupervisorJob()) }
+    single { OfflineModeGuard() }
+    single { OfflineActionQueue(get(), get(), get()) }
+    
+    // Security
+    single { DatabaseEncryption(get()) }
+    single { DataIntegrityChecker(get()) }
+    single { FinancialTransactionSecurity() }
+    single { SecurityManager(get(), get(), get(), get()) }
 }
 
 val appModules: List<Module>

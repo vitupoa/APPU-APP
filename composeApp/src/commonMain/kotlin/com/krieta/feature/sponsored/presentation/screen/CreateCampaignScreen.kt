@@ -1,8 +1,7 @@
 package com.krieta.feature.sponsored.presentation.screen
 import com.krieta.com.core.util.SafeConversion
 import com.krieta.com.core.util.currentTimeMillis
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import com.krieta.com.core.util.formatString
 import androidx.compose.foundation.shape.CircleShape
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -30,18 +29,38 @@ class CreateCampaignScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val api = koinInject<SponsoredApi>()
+        val currencyProvider = koinInject<com.krieta.com.core.location.UserCurrencyProvider>()
         val scope = rememberCoroutineScope()
+        
+        val exchangeRate by currencyProvider.exchangeRate.collectAsState()
+        val currencyCode = currencyProvider.currencyCode
+        
+        LaunchedEffect(Unit) {
+            currencyProvider.start()
+        }
         
         var campaignName by remember { mutableStateOf("") }
         var contentType by remember { mutableStateOf("short") }
         var contentId by remember { mutableStateOf("") }
-        var budget by remember { mutableStateOf("") }
+        var budgetFiat by remember { mutableStateOf("") }
         var pricingModel by remember { mutableStateOf("CPM") }
-        var bidAmount by remember { mutableStateOf("") }
+        var bidAmountFiat by remember { mutableStateOf("") }
         var ageMin by remember { mutableStateOf("") }
         var ageMax by remember { mutableStateOf("") }
         var isCreating by remember { mutableStateOf(false) }
         var errorMessage by remember { mutableStateOf<String?>(null) }
+        
+        // Calculate KR values in real-time
+        val budgetKr = remember(budgetFiat, exchangeRate) {
+            budgetFiat.toDoubleOrNull()?.let { 
+                com.krieta.com.core.util.KrCurrencyFormatter.fiatToKr(it, exchangeRate?.baseRate ?: 0.0) 
+            } ?: 0.0
+        }
+        val bidAmountKr = remember(bidAmountFiat, exchangeRate) {
+            bidAmountFiat.toDoubleOrNull()?.let { 
+                com.krieta.com.core.util.KrCurrencyFormatter.fiatToKr(it, exchangeRate?.baseRate ?: 0.0) 
+            } ?: 0.0
+        }
         
         Scaffold(
             topBar = {
@@ -93,10 +112,16 @@ class CreateCampaignScreen : Screen {
                 )
                 
                 OutlinedTextField(
-                    value = budget,
-                    onValueChange = { budget = it },
-                    label = { Text("Budget (KR)") },
-                    modifier = Modifier.fillMaxWidth()
+                    value = budgetFiat,
+                    onValueChange = { budgetFiat = it },
+                    label = { Text("Budget ($currencyCode)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    supportingText = {
+                        Text(
+                            "≈ ${formatString("%.2f", budgetKr)} KR",
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 )
                 
                 Text("Pricing Model", fontWeight = FontWeight.SemiBold)
@@ -111,18 +136,24 @@ class CreateCampaignScreen : Screen {
                 }
                 
                 OutlinedTextField(
-                    value = bidAmount,
-                    onValueChange = { bidAmount = it },
-                    label = { Text("Bid Amount (KR)") },
+                    value = bidAmountFiat,
+                    onValueChange = { bidAmountFiat = it },
+                    label = { Text("Bid Amount ($currencyCode)") },
                     modifier = Modifier.fillMaxWidth(),
                     supportingText = { 
-                        Text(when (pricingModel) {
-                            "CPM" -> "Cost per 1000 impressions"
-                            "CPV" -> "Cost per view (3+ seconds)"
-                            "CPE" -> "Cost per engagement"
-                            "CPC" -> "Cost per click"
-                            else -> ""
-                        })
+                        Column {
+                            Text(
+                                "≈ ${formatString("%.4f", bidAmountKr)} KR",
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(when (pricingModel) {
+                                "CPM" -> "Cost per 1000 impressions"
+                                "CPV" -> "Cost per view (3+ seconds)"
+                                "CPE" -> "Cost per engagement"
+                                "CPC" -> "Cost per click"
+                                else -> ""
+                            })
+                        }
                     }
                 )
                 
@@ -156,9 +187,9 @@ class CreateCampaignScreen : Screen {
                                     contentType = com.krieta.feature.sponsored.domain.model.SponsoredContentType.valueOf(contentType.uppercase()),
                                     contentId = contentId,
                                     campaignName = campaignName,
-                                    budget = SafeConversion.toDoubleOrDefaultWithValidation(budget, "campaignBudget", 0.0, defaultValue = 0.0),
+                                    budget = budgetKr,
                                     pricingModel = com.krieta.feature.sponsored.domain.model.PricingModel.valueOf(pricingModel),
-                                    bidAmount = SafeConversion.toDoubleOrDefaultWithValidation(bidAmount, "bidAmount", 0.0, defaultValue = 0.0),
+                                    bidAmount = bidAmountKr,
                                     startDate = currentTimeMillis().toString(),
                                     endDate = (currentTimeMillis() + 30L * 24 * 60 * 60 * 1000).toString(),
                                     targeting = SponsoredTargeting(
@@ -176,7 +207,7 @@ class CreateCampaignScreen : Screen {
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !isCreating && campaignName.isNotBlank() && contentId.isNotBlank() && budget.isNotBlank() && bidAmount.isNotBlank()
+                    enabled = !isCreating && campaignName.isNotBlank() && contentId.isNotBlank() && budgetFiat.isNotBlank() && bidAmountFiat.isNotBlank()
                 ) {
                     if (isCreating) {
                         CircularProgressIndicator(modifier = Modifier.size(20.dp))

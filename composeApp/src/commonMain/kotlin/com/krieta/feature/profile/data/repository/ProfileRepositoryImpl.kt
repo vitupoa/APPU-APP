@@ -2,6 +2,7 @@ package com.krieta.feature.profile.data.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.safeApiCall
+import com.krieta.feature.profile.data.local.ProfileLocalDataSource
 import com.krieta.feature.profile.data.remote.ProfileApi
 import com.krieta.feature.profile.data.remote.dto.*
 import com.krieta.feature.profile.domain.model.*
@@ -12,17 +13,82 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 class ProfileRepositoryImpl(
-    private val api: ProfileApi
+    private val api: ProfileApi,
+    private val localDataSource: ProfileLocalDataSource
 ) : ProfileRepository {
 
     private val _profileUpdates = MutableSharedFlow<UserProfile>(extraBufferCapacity = 1)
     override val profileUpdates: SharedFlow<UserProfile> = _profileUpdates.asSharedFlow()
 
-    override suspend fun getMyProfile(): NetworkResult<UserProfile> =
-        safeApiCall { api.getMyProfile().toDomain() }
+    override suspend fun getMyProfile(): NetworkResult<UserProfile> {
+        // Try to load from cache first
+        val cachedProfile = localDataSource.getCachedMyProfile()
+        
+        // Make network call
+        return when (val result = safeApiCall { api.getMyProfile() }) {
+            is NetworkResult.Success -> {
+                try {
+                    val profile = result.data.toDomain()
+                    // Cache the fresh data
+                    localDataSource.cacheProfile(profile)
+                    NetworkResult.Success(profile)
+                } catch (e: Exception) {
+                    println("❌ ProfileRepositoryImpl: Failed to map profile data - ${e.message}")
+                    // Return cached data if mapping fails
+                    if (cachedProfile != null) {
+                        NetworkResult.Success(cachedProfile)
+                    } else {
+                        NetworkResult.Error(message = "Invalid profile data received from server")
+                    }
+                }
+            }
+            is NetworkResult.Error -> {
+                // Return cached data if network fails
+                if (cachedProfile != null) {
+                    println("✅ ProfileRepositoryImpl: Using cached profile (offline mode)")
+                    NetworkResult.Success(cachedProfile)
+                } else {
+                    result
+                }
+            }
+            is NetworkResult.Loading -> result
+        }
+    }
 
-    override suspend fun getProfile(userId: String): NetworkResult<UserProfile> =
-        safeApiCall { api.getProfile(userId).toDomain() }
+    override suspend fun getProfile(userId: String): NetworkResult<UserProfile> {
+        // Try to load from cache first
+        val cachedProfile = localDataSource.getCachedProfile(userId)
+        
+        // Make network call
+        return when (val result = safeApiCall { api.getProfile(userId) }) {
+            is NetworkResult.Success -> {
+                try {
+                    val profile = result.data.toDomain()
+                    // Cache the fresh data
+                    localDataSource.cacheProfile(profile)
+                    NetworkResult.Success(profile)
+                } catch (e: Exception) {
+                    println("❌ ProfileRepositoryImpl: Failed to map profile data - ${e.message}")
+                    // Return cached data if mapping fails
+                    if (cachedProfile != null) {
+                        NetworkResult.Success(cachedProfile)
+                    } else {
+                        NetworkResult.Error(message = "Invalid profile data received from server")
+                    }
+                }
+            }
+            is NetworkResult.Error -> {
+                // Return cached data if network fails
+                if (cachedProfile != null) {
+                    println("✅ ProfileRepositoryImpl: Using cached profile (offline mode)")
+                    NetworkResult.Success(cachedProfile)
+                } else {
+                    result
+                }
+            }
+            is NetworkResult.Loading -> result
+        }
+    }
 
     override suspend fun updateProfile(
         firstName: String?, lastName: String?, displayName: String?,
@@ -87,12 +153,10 @@ class ProfileRepositoryImpl(
     // ─── MAPPERS ──────────────────────────────────
 
     private fun UserProfileDto.toDomain(): UserProfile {
-        // Validate required fields - if missing, API likely returned an error (401, 403, etc.)
-        if (id == null || username == null || displayName == null) {
-            println("❌ ProfileRepositoryImpl: Invalid profile data - id=$id, username=$username, displayName=$displayName")
-            println("❌ This usually means: 1) Token expired (401), 2) User not found (404), or 3) Access denied (403)")
-            throw IllegalStateException("Unable to load profile. Your session may have expired. Please logout and login again.")
-        }
+        // Validate required fields - throw exception if missing so it can be caught and handled properly
+        requireNotNull(id) { "Profile ID is required" }
+        requireNotNull(username) { "Username is required" }
+        requireNotNull(displayName) { "Display name is required" }
         
         return UserProfile(
             id = id,

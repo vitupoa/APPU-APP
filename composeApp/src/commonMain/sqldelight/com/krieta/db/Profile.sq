@@ -1,0 +1,73 @@
+-- UserProfile table for offline caching
+CREATE TABLE IF NOT EXISTS UserProfile (
+    id TEXT PRIMARY KEY NOT NULL,
+    username TEXT NOT NULL,
+    firstName TEXT NOT NULL,
+    lastName TEXT NOT NULL,
+    displayName TEXT NOT NULL,
+    avatarUrl TEXT,
+    coverPhotoUrl TEXT,
+    bio TEXT,
+    country TEXT NOT NULL,
+    currency TEXT NOT NULL,
+    accountType TEXT NOT NULL,
+    isVerified INTEGER AS Boolean NOT NULL DEFAULT 0,
+    isWalletUnlocked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    admirers INTEGER NOT NULL DEFAULT 0,
+    admiring INTEGER NOT NULL DEFAULT 0,
+    lovers INTEGER NOT NULL DEFAULT 0,
+    contestsWon INTEGER NOT NULL DEFAULT 0,
+    relationshipStatus TEXT NOT NULL DEFAULT 'NONE',
+    selectedNiches TEXT NOT NULL DEFAULT '',
+    customNiches TEXT NOT NULL DEFAULT '',
+    createdAt TEXT NOT NULL,
+    cachedAt INTEGER NOT NULL
+);
+
+-- BioLink table for offline caching
+CREATE TABLE IF NOT EXISTS BioLink (
+    id TEXT PRIMARY KEY NOT NULL,
+    userId TEXT NOT NULL,
+    label TEXT NOT NULL,
+    url TEXT NOT NULL,
+    icon TEXT,
+    sortOrder INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (userId) REFERENCES UserProfile(id) ON DELETE CASCADE
+);
+
+-- Queries for UserProfile
+insertOrReplaceProfile:
+INSERT OR REPLACE INTO UserProfile (
+    id, username, firstName, lastName, displayName,
+    avatarUrl, coverPhotoUrl, bio, country, currency,
+    accountType, isVerified, isWalletUnlocked,
+    admirers, admiring, lovers, contestsWon,
+    relationshipStatus, selectedNiches, customNiches,
+    createdAt, cachedAt
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getProfileById:
+SELECT * FROM UserProfile WHERE id = ?;
+
+getMyProfile:
+SELECT * FROM UserProfile LIMIT 1;
+
+deleteProfile:
+DELETE FROM UserProfile WHERE id = ?;
+
+deleteAllProfiles:
+DELETE FROM UserProfile;
+
+-- Queries for BioLink
+insertOrReplaceBioLink:
+INSERT OR REPLACE INTO BioLink (id, userId, label, url, icon, sortOrder)
+VALUES (?, ?, ?, ?, ?, ?);
+
+getBioLinksByUserId:
+SELECT * FROM BioLink WHERE userId = ? ORDER BY sortOrder ASC;
+
+deleteBioLinksByUserId:
+DELETE FROM BioLink WHERE userId = ?;
+
+deleteAllBioLinks:
+DELETE FROM BioLink;

@@ -1,22 +1,10 @@
 package com.krieta.feature.shop.presentation.screen
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.shape.CircleShape
-
-
-import org.jetbrains.compose.resources.painterResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.collectAsState
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,10 +20,16 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.krieta.feature.shop.presentation.viewmodel.CreateListingViewModel
+import com.krieta.feature.shop.presentation.viewmodel.ProductCategory
+import com.krieta.feature.shop.presentation.viewmodel.CreateListingState
+import com.krieta.feature.shop.presentation.viewmodel.CategorySubcategories
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PickerMode
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
+import krieta.composeapp.generated.resources.Res
+import krieta.composeapp.generated.resources.*
 
 class CreateListingScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +44,7 @@ class CreateListingScreen : Screen {
         }
 
         val scope = rememberCoroutineScope()
-        
+
         val launcher = rememberFilePickerLauncher(
             type = PickerType.Image,
             mode = PickerMode.Multiple()
@@ -140,21 +134,178 @@ class CreateListingScreen : Screen {
                 OutlinedTextField(
                     value = state.priceKr,
                     onValueChange = { viewModel.onPriceChange(it) },
-                    label = { Text("Price (Kr)") },
+                    label = { Text("Retail Price (Kr) - Optional if wholesale set") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     shape = RoundedCornerShape(12.dp)
                 )
 
+                // Pricing Options Section
+                Text("Pricing Options (Optional)", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
+                
+                // Wholesale Pricing
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = state.wholesalePrice,
+                        onValueChange = { viewModel.onWholesalePriceChange(it) },
+                        label = { Text("Wholesale Price (Kr)") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    OutlinedTextField(
+                        value = state.wholesaleMinQty,
+                        onValueChange = { viewModel.onWholesaleMinQtyChange(it) },
+                        label = { Text("Min Qty") },
+                        modifier = Modifier.weight(0.6f),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                }
+
+                // Bargaining Option
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = state.bargainEnabled,
+                        onCheckedChange = { viewModel.onBargainEnabledChange(it) }
+                    )
+                    Text("Enable Bargaining", modifier = Modifier.weight(1f))
+                }
+                
+                if (state.bargainEnabled) {
+                    OutlinedTextField(
+                        value = state.bargainMinPrice,
+                        onValueChange = { viewModel.onBargainMinPriceChange(it) },
+                        label = { Text("Minimum Bargain Price (Kr) - Hidden from buyers") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        shape = RoundedCornerShape(12.dp),
+                        supportingText = { Text("Buyers won't see this. They'll be told if their offer is too low.", style = MaterialTheme.typography.bodySmall) }
+                    )
+                }
+
+                // Category Dropdown
+                var categoryExpanded by remember { mutableStateOf(false) }
+                ExposedDropdownMenuBox(
+                    expanded = categoryExpanded,
+                    onExpandedChange = { categoryExpanded = it },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = state.selectedCategory?.displayName ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Category") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    ExposedDropdownMenu(
+                        expanded = categoryExpanded,
+                        onDismissRequest = { categoryExpanded = false }
+                    ) {
+                        ProductCategory.entries.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(category.displayName) },
+                                onClick = {
+                                    viewModel.onCategoryChange(category)
+                                    categoryExpanded = false
+                                }
+                            )
+                        }
+                        state.customCategories.forEach { customCat ->
+                            DropdownMenuItem(
+                                text = { Text(customCat) },
+                                onClick = {
+                                    viewModel.onCategoryChange(ProductCategory.OTHER)
+                                    categoryExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                // Subcategory Dropdown (dynamic based on selected category)
+                val subcategories = state.selectedCategory?.let { CategorySubcategories.map[it] }
+                if (!subcategories.isNullOrEmpty()) {
+                    DropdownField(
+                        label = "Subcategory",
+                        value = state.selectedSubcategory,
+                        options = subcategories,
+                        onSelect = { viewModel.onSubcategoryChange(it) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                // Custom category input if OTHER
+                if (state.selectedCategory == ProductCategory.OTHER) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = state.customCategory,
+                            onValueChange = { viewModel.onCustomCategoryChange(it) },
+                            label = { Text("Custom Category") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        Button(
+                            onClick = { viewModel.addCustomCategory() },
+                            modifier = Modifier.height(56.dp),
+                            enabled = state.customCategory.isNotBlank()
+                        ) {
+                            Text("Add")
+                        }
+                    }
+                }
+
+                // Condition dropdown (for categories that need it)
+                if (state.selectedCategory != null && state.selectedCategory != ProductCategory.SERVICES && state.selectedCategory != ProductCategory.DIGITAL_PRODUCTS) {
+                    DropdownField(
+                        label = "Condition",
+                        value = state.conditionField,
+                        options = listOf("New", "Used", "Refurbished", "For Parts"),
+                        onSelect = { viewModel.onConditionChange(it.uppercase().replace(" ", "_")) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                // Location field
                 OutlinedTextField(
-                    value = state.category,
-                    onValueChange = { viewModel.onCategoryChange(it) },
-                    label = { Text("Category (optional)") },
+                    value = state.location,
+                    onValueChange = { viewModel.onLocationChange(it) },
+                    label = { Text("Location (optional)") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
+                    placeholder = { Text("e.g., Nairobi, Kenya") },
                     shape = RoundedCornerShape(12.dp)
                 )
+
+                // ── Dynamic Category-Specific Fields ──
+                when (state.selectedCategory) {
+                    ProductCategory.VEHICLES -> VehicleDetailsForm(viewModel, state)
+                    ProductCategory.SPARE_PARTS -> SparePartDetailsForm(viewModel, state)
+                    ProductCategory.REAL_ESTATE -> RealEstateDetailsForm(viewModel, state)
+                    ProductCategory.FASHION -> FashionDetailsForm(viewModel, state)
+                    ProductCategory.SHOES -> ShoeDetailsForm(viewModel, state)
+                    ProductCategory.ELECTRONICS -> ElectronicsDetailsForm(viewModel, state)
+                    ProductCategory.FURNITURE -> FurnitureDetailsForm(viewModel, state)
+                    ProductCategory.FOOD_FMCG -> FmcgDetailsForm(viewModel, state)
+                    ProductCategory.GROCERIES -> GroceryDetailsForm(viewModel, state)
+                    ProductCategory.BOOKS -> BookDetailsForm(viewModel, state)
+                    ProductCategory.DIGITAL_PRODUCTS -> DigitalProductDetailsForm(viewModel, state)
+                    ProductCategory.SERVICES -> ServiceDetailsForm(viewModel, state)
+                    else -> {}
+                }
 
                 OutlinedTextField(
                     value = state.whatsappNumber,
@@ -193,3 +344,127 @@ class CreateListingScreen : Screen {
     }
 }
 
+// ─── VEHICLE FORM ───────────────────────────────────────
+@Composable
+fun VehicleDetailsForm(viewModel: CreateListingViewModel, state: CreateListingState) {
+    SectionTitle("Vehicle Details")
+    DropdownField("Vehicle Type", state.vehicleDetails.vehicleType.replaceFirstChar { it.uppercase() },
+        listOf("Car", "Motorcycle", "Truck", "Bus", "Trailer"),
+        { viewModel.updateVehicle { copy(vehicleType = it.lowercase()) } }, Modifier.fillMaxWidth())
+    OutlinedTextField(value = state.vehicleDetails.make, onValueChange = { viewModel.onVehicleMakeChange(it) },
+        label = { Text("Make (e.g., Toyota, Honda)") }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(12.dp))
+    OutlinedTextField(value = state.vehicleDetails.model, onValueChange = { viewModel.onVehicleModelChange(it) },
+        label = { Text("Model") }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(value = state.vehicleDetails.year, onValueChange = { viewModel.onVehicleYearChange(it) },
+            label = { Text("Year") }, modifier = Modifier.weight(1f), singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(12.dp))
+        OutlinedTextField(value = state.vehicleDetails.mileage, onValueChange = { viewModel.onVehicleMileageChange(it) },
+            label = { Text("Mileage (km)") }, modifier = Modifier.weight(1f), singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(12.dp))
+    }
+    DropdownField("Fuel Type", state.vehicleDetails.fuelType,
+        listOf("Petrol", "Diesel", "Electric", "Hybrid", "LPG"),
+        { viewModel.onVehicleFuelTypeChange(it) }, Modifier.fillMaxWidth())
+    DropdownField("Transmission", state.vehicleDetails.transmission,
+        listOf("Manual", "Automatic", "CVT", "DCT"),
+        { viewModel.onVehicleTransmissionChange(it) }, Modifier.fillMaxWidth())
+    DropdownField("Body Type", state.vehicleDetails.bodyType,
+        listOf("Sedan", "SUV", "Hatchback", "Pickup", "Van", "Coupe", "Wagon", "Minivan", "Bus", "Truck", "Convertible"),
+        { viewModel.onVehicleBodyTypeChange(it) }, Modifier.fillMaxWidth())
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(value = state.vehicleDetails.engineSize, onValueChange = { viewModel.onVehicleEngineSizeChange(it) },
+            label = { Text("Engine Size") }, modifier = Modifier.weight(1f), singleLine = true,
+            placeholder = { Text("e.g., 2.0L") }, shape = RoundedCornerShape(12.dp))
+        OutlinedTextField(value = state.vehicleDetails.color, onValueChange = { viewModel.onVehicleColorChange(it) },
+            label = { Text("Color") }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(12.dp))
+    }
+    OutlinedTextField(value = state.vehicleDetails.numberOfOwners,
+        onValueChange = { viewModel.updateVehicle { copy(numberOfOwners = it) } },
+        label = { Text("Number of Owners") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(12.dp))
+    DropdownField("Import Status", state.vehicleDetails.importStatus,
+        listOf("Local", "Imported"), { viewModel.updateVehicle { copy(importStatus = it.lowercase()) } }, Modifier.fillMaxWidth())
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row { Checkbox(state.vehicleDetails.logbookReady, { viewModel.updateVehicle { copy(logbookReady = it) } }); Text("Logbook Ready", modifier = Modifier.padding(top = 14.dp)) }
+        Row { Checkbox(state.vehicleDetails.accidentHistory, { viewModel.updateVehicle { copy(accidentHistory = it) } }); Text("Accident History", modifier = Modifier.padding(top = 14.dp)) }
+    }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row { Checkbox(state.vehicleDetails.tradeInEnabled, { viewModel.updateVehicle { copy(tradeInEnabled = it) } }); Text("Trade-in OK", modifier = Modifier.padding(top = 14.dp)) }
+        Row { Checkbox(state.vehicleDetails.swapEnabled, { viewModel.updateVehicle { copy(swapEnabled = it) } }); Text("Swap OK", modifier = Modifier.padding(top = 14.dp)) }
+    }
+}
+
+// ─── ELECTRONICS FORM ───────────────────────────────────
+@Composable
+fun ElectronicsDetailsForm(viewModel: CreateListingViewModel, state: CreateListingState) {
+    SectionTitle("Electronics Details")
+    OutlinedTextField(value = state.electronicsDetails.brand, onValueChange = { viewModel.onElectronicsBrandChange(it) },
+        label = { Text("Brand") }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(12.dp))
+    OutlinedTextField(value = state.electronicsDetails.model, onValueChange = { viewModel.onElectronicsModelChange(it) },
+        label = { Text("Model") }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(12.dp))
+    OutlinedTextField(value = state.electronicsDetails.processor, onValueChange = { viewModel.onElectronicsProcessorChange(it) },
+        label = { Text("Processor (optional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+        placeholder = { Text("e.g., Intel i7") }, shape = RoundedCornerShape(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(value = state.electronicsDetails.ram, onValueChange = { viewModel.onElectronicsRamChange(it) },
+            label = { Text("RAM") }, modifier = Modifier.weight(1f), singleLine = true,
+            placeholder = { Text("e.g., 8GB") }, shape = RoundedCornerShape(12.dp))
+        OutlinedTextField(value = state.electronicsDetails.storage, onValueChange = { viewModel.onElectronicsStorageChange(it) },
+            label = { Text("Storage") }, modifier = Modifier.weight(1f), singleLine = true,
+            placeholder = { Text("e.g., 256GB") }, shape = RoundedCornerShape(12.dp))
+    }
+    OutlinedTextField(value = state.electronicsDetails.screenSize, onValueChange = { viewModel.onElectronicsScreenSizeChange(it) },
+        label = { Text("Screen Size (optional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+        placeholder = { Text("e.g., 15.6 inches") }, shape = RoundedCornerShape(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(value = state.electronicsDetails.batteryLife,
+            onValueChange = { viewModel.updateElectronics { copy(batteryLife = it) } },
+            label = { Text("Battery Life") }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(12.dp))
+        OutlinedTextField(value = state.electronicsDetails.os,
+            onValueChange = { viewModel.updateElectronics { copy(os = it) } },
+            label = { Text("OS") }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(12.dp))
+    }
+    OutlinedTextField(value = state.electronicsDetails.warrantyMonths,
+        onValueChange = { viewModel.updateElectronics { copy(warrantyMonths = it) } },
+        label = { Text("Warranty (months)") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(12.dp))
+}
+
+// ─── FASHION FORM ───────────────────────────────────────
+@Composable
+fun FashionDetailsForm(viewModel: CreateListingViewModel, state: CreateListingState) {
+    SectionTitle("Fashion Details")
+    OutlinedTextField(value = state.fashionDetails.brand, onValueChange = { viewModel.onFashionBrandChange(it) },
+        label = { Text("Brand") }, modifier = Modifier.fillMaxWidth(), singleLine = true, shape = RoundedCornerShape(12.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        DropdownField("Gender", state.fashionDetails.gender,
+            listOf("Men", "Women", "Boys", "Girls", "Baby", "Unisex"),
+            { viewModel.onFashionGenderChange(it) }, Modifier.weight(1f))
+        DropdownField("Age Group", state.fashionDetails.ageGroup,
+            listOf("Adult", "Teen", "Children", "Baby"),
+            { viewModel.updateFashion { copy(ageGroup = it) } }, Modifier.weight(1f))
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(value = state.fashionDetails.size, onValueChange = { viewModel.onFashionSizeChange(it) },
+            label = { Text("Size") }, modifier = Modifier.weight(1f), singleLine = true,
+            placeholder = { Text("e.g., M, L, XL, 2-3Y") }, shape = RoundedCornerShape(12.dp))
+        OutlinedTextField(value = state.fashionDetails.color, onValueChange = { viewModel.onFashionColorChange(it) },
+            label = { Text("Color") }, modifier = Modifier.weight(1f), singleLine = true, shape = RoundedCornerShape(12.dp))
+    }
+    OutlinedTextField(value = state.fashionDetails.material, onValueChange = { viewModel.onFashionMaterialChange(it) },
+        label = { Text("Material (optional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+        placeholder = { Text("e.g., Cotton, Polyester, Silk") }, shape = RoundedCornerShape(12.dp))
+    DropdownField("Fit Type", state.fashionDetails.fitType, listOf("Slim", "Regular", "Loose", "Oversized"),
+        { viewModel.updateFashion { copy(fitType = it.lowercase()) } }, Modifier.fillMaxWidth())
+    OutlinedTextField(value = state.fashionDetails.pattern,
+        onValueChange = { viewModel.updateFashion { copy(pattern = it) } },
+        label = { Text("Pattern (optional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+        placeholder = { Text("e.g., Striped, Floral, Plain") }, shape = RoundedCornerShape(12.dp))
+    DropdownField("Season", state.fashionDetails.season, listOf("Spring", "Summer", "Fall", "Winter", "All Season"),
+        { viewModel.updateFashion { copy(season = it.lowercase()) } }, Modifier.fillMaxWidth())
+    OutlinedTextField(value = state.fashionDetails.careInstructions,
+        onValueChange = { viewModel.updateFashion { copy(careInstructions = it) } },
+        label = { Text("Care Instructions (optional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+        placeholder = { Text("e.g., Machine wash cold, Dry clean only") }, shape = RoundedCornerShape(12.dp))
+}

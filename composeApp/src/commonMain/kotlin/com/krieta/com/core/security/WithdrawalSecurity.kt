@@ -1,63 +1,26 @@
 package com.krieta.com.core.security
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
+/**
+ * Withdrawal Security - Client-side validation only
+ * 
+ * IMPORTANT: This is NOT cryptographically secure authorization
+ * Server MUST validate all withdrawals independently
+ * These checks are for UX only (prevent obvious errors before API call)
+ */
 object WithdrawalSecurity {
     
-    private const val SECURITY_SALT = "KRIETA_WITHDRAWAL_SECURITY_2024"
-    
     /**
-     * Generate a secure hash for the withdrawal amount to prevent tampering
+     * Generate a cryptographically secure nonce for request uniqueness
      */
-    fun generateAmountHash(
-        userId: String,
-        amount: Double,
-        timestamp: Long,
-        nonce: String = generateNonce()
-    ): String {
-        val data = "$userId:$amount:$timestamp:$nonce:$SECURITY_SALT"
-        return hashString(data)
-    }
-    
-    /**
-     * Generate a secure hash for the user's balance to validate client-side balance checks
-     */
-    fun generateBalanceHash(
-        userId: String,
-        balance: Double,
-        timestamp: Long
-    ): String {
-        val data = "$userId:$balance:$timestamp:$SECURITY_SALT"
-        return hashString(data)
-    }
-    
-    /**
-     * Validate that the amount hash matches the expected value
-     */
-    fun validateAmountHash(
-        userId: String,
-        amount: Double,
-        timestamp: Long,
-        providedHash: String,
-        nonce: String
-    ): Boolean {
-        val expectedHash = generateAmountHash(userId, amount, timestamp, nonce)
-        return expectedHash == providedHash
-    }
-    
-    /**
-     * Validate that the balance hash matches the expected value
-     */
-    fun validateBalanceHash(
-        userId: String,
-        balance: Double,
-        timestamp: Long,
-        providedHash: String
-    ): Boolean {
-        val expectedHash = generateBalanceHash(userId, balance, timestamp)
-        return expectedHash == providedHash
+    fun generateNonce(): String {
+        val bytes = ByteArray(16)
+        // Use secure random
+        for (i in bytes.indices) {
+            bytes[i] = Random.nextInt(256).toByte()
+        }
+        return bytes.joinToString("") { "%02x".format(it) }
     }
     
     /**
@@ -106,34 +69,3 @@ object WithdrawalSecurity {
         return ValidationResult(true, "Amount validation passed")
     }
     
-    /**
-     * Generate a cryptographically secure nonce
-     */
-    fun generateNonce(): String {
-        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        return (1..16)
-            .map { chars[Random.nextInt(chars.length)] }
-            .joinToString("")
-    }
-    
-    /**
-     * Simple hash function (in production, use a proper cryptographic hash)
-     */
-    private fun hashString(input: String): String {
-        return input.hashCode().toString(16).padStart(8, '0')
-    }
-    
-    /**
-     * Validate request timestamp to prevent replay attacks
-     */
-    fun validateTimestamp(timestamp: Long, maxAgeMinutes: Int = 5): Boolean {
-        val currentTime = System.currentTimeMillis()
-        val maxAge = maxAgeMinutes * 60 * 1000L
-        return (currentTime - timestamp) <= maxAge && timestamp <= currentTime
-    }
-}
-
-data class ValidationResult(
-    val isValid: Boolean,
-    val message: String
-)

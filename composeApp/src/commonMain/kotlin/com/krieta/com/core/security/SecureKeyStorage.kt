@@ -43,6 +43,20 @@ interface SecureKeyStorage {
     suspend fun decryptData(alias: String, encryptedData: ByteArray): ByteArray?
     
     /**
+     * Store a symmetric key securely
+     * @param alias Key identifier
+     * @param keyData Key bytes to store
+     */
+    suspend fun storeKey(alias: String, keyData: ByteArray)
+    
+    /**
+     * Retrieve a symmetric key
+     * @param alias Key identifier
+     * @return Key bytes or null if not found
+     */
+    suspend fun retrieveKey(alias: String): ByteArray?
+    
+    /**
      * Delete key from secure storage
      * @param alias Key identifier
      */

@@ -1,9 +1,11 @@
 package com.krieta.feature.live.di
 
+import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.feature.live.data.repository.LiveRepositoryImpl
 import com.krieta.feature.live.data.socket.LiveSocketManager
 import com.krieta.feature.live.domain.repository.LiveRepository
 import com.krieta.feature.live.presentation.viewmodel.ViewerLiveViewModel
+import com.krieta.feature.wallet.domain.repository.WalletRepository
 import org.koin.dsl.module
 import kotlinx.coroutines.runBlocking
 
@@ -29,6 +31,8 @@ val liveModule = module {
         ViewerLiveViewModel(
             liveRepository = get(),
             socketManager = get(),
+            walletRepository = get<WalletRepository>(),
+            currencyProvider = get<UserCurrencyProvider>(),
             streamId = streamId,
             tokenManager = tokenManager,
             currentUserId = userId,

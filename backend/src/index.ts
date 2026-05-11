@@ -59,6 +59,7 @@ import { FCMService } from './services/fcm.service.js';
 import { initializeLiveSocket } from './shared/gateway/liveSocket.js';
 import { initializeCallSocket } from './shared/gateway/call-socket.js';
 import { initializeDatabaseMonitorSocket } from './shared/gateway/databaseMonitorSocket.js';
+import { initializeShopSocket } from './shared/gateway/shop-socket.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -78,6 +79,9 @@ initializeCallSocket(io);
 
 // Initialize Database Monitoring WebSocket (Super Admin only)
 const dbMonitorSocket = initializeDatabaseMonitorSocket(httpServer);
+
+// Initialize Shop WebSocket for real-time product updates
+initializeShopSocket(io);
 
 // SECURITY: Apply security headers first
 app.use(helmetConfig);
@@ -245,6 +249,7 @@ const PORT = env.PORT || 3000;
     const { startWithdrawalLimitResetWorker } = await import('./workers/withdrawalLimitReset.worker.js');
     const { startNonceCleanupWorker } = await import('./workers/nonceCleanup.worker.js');
     const { startIdempotencyCleanupWorker } = await import('./workers/idempotencyCleanup.worker.js');
+    const { startFinancialSecurityCleanupWorker } = await import('./workers/financialSecurityCleanup.worker.js');
     
     startContentDistributionWorker();
     startMicroInterestWorker();
@@ -253,6 +258,7 @@ const PORT = env.PORT || 3000;
     startWithdrawalLimitResetWorker();
     startNonceCleanupWorker();
     startIdempotencyCleanupWorker();
+    startFinancialSecurityCleanupWorker();
     
     logger.info('All workers started successfully');
     logger.info('Server ready to accept connections');

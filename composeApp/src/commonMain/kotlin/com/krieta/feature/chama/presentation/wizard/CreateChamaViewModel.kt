@@ -10,6 +10,7 @@ import com.krieta.feature.chama.domain.repository.ChamaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import com.krieta.com.core.util.formatString
 import kotlinx.coroutines.launch
 
 data class CreateChamaState(
@@ -59,7 +60,23 @@ class CreateChamaViewModel(
             _state.update { it.copy(isLoadingRate = true) }
             when (val result = walletRepository.getExchangeRate(currency)) {
                 is NetworkResult.Success -> {
-                    _state.update { it.copy(exchangeRate = result.data.buyRate, isLoadingRate = false) }
+                    _state.update { state -> 
+                        val rate = result.data.buyRate
+                        val krFromContribution = state.contributionAmountFiat.toDoubleOrNull()?.let { fiat ->
+                            formatString("%.2f", fiat * rate)
+                        } ?: state.contributionAmountKr
+                        
+                        val krFromMembership = state.membershipFeeFiat.toDoubleOrNull()?.let { fiat ->
+                            formatString("%.2f", fiat * rate)
+                        } ?: state.membershipFeeKr
+
+                        state.copy(
+                            exchangeRate = rate, 
+                            isLoadingRate = false,
+                            contributionAmountKr = krFromContribution,
+                            membershipFeeKr = krFromMembership
+                        ) 
+                    }
                 }
                 else -> {
                     _state.update { it.copy(isLoadingRate = false) }
@@ -80,42 +97,50 @@ class CreateChamaViewModel(
     fun updateMaxMembers(value: String) = _state.update { it.copy(maxMembers = value) }
     fun updateAutoLockOnFull(value: Boolean) = _state.update { it.copy(autoLockOnFull = value) }
     fun updateContributionAmountKr(value: String) {
-        _state.update { it.copy(contributionAmountKr = value) }
-        // Convert to fiat
         val kr = value.toDoubleOrNull()
-        if (kr != null && _state.value.exchangeRate != null) {
-            val fiat = kr / _state.value.exchangeRate!!
-            _state.update { it.copy(contributionAmountFiat = String.format("%.2f", fiat)) }
+        _state.update { state ->
+            val newFiat = if (kr != null && state.exchangeRate != null) {
+                formatString("%.2f", kr / state.exchangeRate)
+            } else {
+                if (value.isEmpty()) "" else state.contributionAmountFiat
+            }
+            state.copy(contributionAmountKr = value, contributionAmountFiat = newFiat)
         }
     }
 
     fun updateContributionAmountFiat(value: String) {
-        _state.update { it.copy(contributionAmountFiat = value) }
-        // Convert to Kr
         val fiat = value.toDoubleOrNull()
-        if (fiat != null && _state.value.exchangeRate != null) {
-            val kr = fiat * _state.value.exchangeRate!!
-            _state.update { it.copy(contributionAmountKr = String.format("%.2f", kr)) }
+        _state.update { state ->
+            val newKr = if (fiat != null && state.exchangeRate != null) {
+                formatString("%.2f", fiat * state.exchangeRate)
+            } else {
+                if (value.isEmpty()) "" else state.contributionAmountKr
+            }
+            state.copy(contributionAmountFiat = value, contributionAmountKr = newKr)
         }
     }
     fun updateContributionFrequency(value: String) = _state.update { it.copy(contributionFrequency = value) }
     fun updateMembershipFeeKr(value: String) {
-        _state.update { it.copy(membershipFeeKr = value) }
-        // Convert to fiat
         val kr = value.toDoubleOrNull()
-        if (kr != null && _state.value.exchangeRate != null) {
-            val fiat = kr / _state.value.exchangeRate!!
-            _state.update { it.copy(membershipFeeFiat = String.format("%.2f", fiat)) }
+        _state.update { state ->
+            val newFiat = if (kr != null && state.exchangeRate != null) {
+                formatString("%.2f", kr / state.exchangeRate)
+            } else {
+                if (value.isEmpty()) "" else state.membershipFeeFiat
+            }
+            state.copy(membershipFeeKr = value, membershipFeeFiat = newFiat)
         }
     }
 
     fun updateMembershipFeeFiat(value: String) {
-        _state.update { it.copy(membershipFeeFiat = value) }
-        // Convert to Kr
         val fiat = value.toDoubleOrNull()
-        if (fiat != null && _state.value.exchangeRate != null) {
-            val kr = fiat * _state.value.exchangeRate!!
-            _state.update { it.copy(membershipFeeKr = String.format("%.2f", kr)) }
+        _state.update { state ->
+            val newKr = if (fiat != null && state.exchangeRate != null) {
+                formatString("%.2f", fiat * state.exchangeRate)
+            } else {
+                if (value.isEmpty()) "" else state.membershipFeeKr
+            }
+            state.copy(membershipFeeFiat = value, membershipFeeKr = newKr)
         }
     }
     fun updatePenaltyAmountKr(value: String) = _state.update { it.copy(penaltyAmountKr = value) }

@@ -1,5 +1,6 @@
 package com.krieta.feature.shorts.di
 
+import com.krieta.feature.shorts.data.local.ShortLocalDataSource
 import com.krieta.feature.shorts.data.remote.ShortsApi
 import com.krieta.feature.shorts.data.repository.ShortsRepositoryImpl
 import com.krieta.feature.shorts.domain.repository.ShortsRepository
@@ -8,7 +9,8 @@ import org.koin.dsl.module
 
 val shortsModule = module {
     single { ShortsApi(get()) }
-    single<ShortsRepository> { ShortsRepositoryImpl(get()) }
+    single { ShortLocalDataSource(get()) }
+    single<ShortsRepository> { ShortsRepositoryImpl(get(), get(), get()) }
     factory { ShortsViewModel(get(), get(), get()) }  // shortsRepository, feedRepository, sponsoredManager
     factory { com.krieta.feature.shorts.presentation.viewmodel.CreateShortViewModel(get(), get()) }
 }

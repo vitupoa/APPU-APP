@@ -29,7 +29,7 @@ import com.krieta.com.core.util.SafeConversion
  * Input field for entering amounts in the user's local fiat currency with
  * real-time Kr conversion displayed as they type.
  *
- * User always enters in fiat → conversion to Kr shown below.
+ * User always enters in fiat (whole numbers only) → conversion to Kr shown below.
  */
 @Composable
 fun KrAmountInput(
@@ -38,9 +38,17 @@ fun KrAmountInput(
     onAmountChanged: (fiatAmount: Double, krAmount: Double) -> Unit,
     modifier: Modifier = Modifier,
     label: String = "Amount",
-    applyMargin: Boolean = true
+    applyMargin: Boolean = true,
+    initialFiatAmount: Int? = null
 ) {
-    var inputText by remember { mutableStateOf("") }
+    var inputText by remember { mutableStateOf(initialFiatAmount?.toString() ?: "") }
+
+    // Update input text when initialFiatAmount changes externally (quick-tip buttons)
+    LaunchedEffect(initialFiatAmount) {
+        if (initialFiatAmount != null && initialFiatAmount > 0) {
+            inputText = initialFiatAmount.toString()
+        }
+    }
 
     val fiatAmount by remember(inputText) {
         derivedStateOf { 
@@ -70,13 +78,17 @@ fun KrAmountInput(
         OutlinedTextField(
             value = inputText,
             onValueChange = { value ->
-                if (value.isEmpty() || value.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
-                    inputText = value
+                // SECURITY: Only allow whole numbers (digits only, no decimals)
+                if (value.isEmpty() || value.matches(Regex("^\\d+$"))) {
+                    // Cap at reasonable length to prevent overflow
+                    if (value.length <= 10) {
+                        inputText = value
+                    }
                 }
             },
             label = { Text(label) },
             prefix = { Text("$currencyCode ", color = MaterialTheme.colorScheme.onSurfaceVariant) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
@@ -96,4 +108,3 @@ fun KrAmountInput(
         }
     }
 }
-

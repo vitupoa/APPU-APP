@@ -5,6 +5,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
+import com.krieta.com.core.util.currentTimeMillis
 
 /**
  * Multi-signature manager for high-value transactions
@@ -135,8 +136,9 @@ class MultiSignatureManager {
         
         // Check if transaction expired
         val now = Clock.System.now()
-        val age = now - pending.createdAt
-        if (age.inWholeMinutes > config.signatureExpiryMinutes) {
+        val ageMillis = currentTimeMillis() - pending.createdAt.toEpochMilliseconds()
+        val ageMinutes = ageMillis / (60 * 1000)
+        if (ageMinutes > config.signatureExpiryMinutes) {
             pendingTransactions.remove(transactionId)
             return@withLock MultiSigResult.Error("Transaction expired. Please create a new withdrawal request.")
         }
@@ -201,9 +203,11 @@ class MultiSignatureManager {
      * Clean up expired transactions
      */
     suspend fun cleanupExpired() = mutex.withLock {
-        val now = Clock.System.now()
+        val now = currentTimeMillis()
         val expired = pendingTransactions.filter { (_, tx) ->
-            (now - tx.createdAt).inWholeMinutes > config.signatureExpiryMinutes
+            val ageMillis = now - tx.createdAt.toEpochMilliseconds()
+            val ageMinutes = ageMillis / (60 * 1000)
+            ageMinutes > config.signatureExpiryMinutes
         }
         expired.keys.forEach { pendingTransactions.remove(it) }
     }

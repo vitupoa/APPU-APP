@@ -176,7 +176,7 @@ data class CommentsScreen(
                                 onReport = { showReportDialog = it },
                                 onToggleExpand = { viewModel.toggleCommentExpanded(it.id) },
                                 onProfileClick = { navigator.push(ProfileScreen(it.author.id)) },
-                                isExpanded = comment.id in state.expandedComments,
+                                expandedComments = state.expandedComments,
                                 depth = 0
                             )
                         }
@@ -241,9 +241,10 @@ private fun CommentItem(
     onReport: (Comment) -> Unit,
     onToggleExpand: (Comment) -> Unit,
     onProfileClick: (Comment) -> Unit,
-    isExpanded: Boolean,
+    expandedComments: Set<String>,
     depth: Int
 ) {
+    val isExpanded = comment.id in expandedComments
     var showMenu by remember { mutableStateOf(false) }
     val backgroundColor = if (comment.isPinned) {
         Color(0xFF1A1A1A)
@@ -505,7 +506,7 @@ private fun CommentItem(
                         onReport = onReport,
                         onToggleExpand = onToggleExpand,
                         onProfileClick = onProfileClick,
-                        isExpanded = false,
+                        expandedComments = expandedComments,
                         depth = depth + 1
                     )
                 }

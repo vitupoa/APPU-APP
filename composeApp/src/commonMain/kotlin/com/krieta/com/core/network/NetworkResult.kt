@@ -32,22 +32,27 @@ suspend inline fun <T> safeApiCall(crossinline block: suspend () -> T): NetworkR
         NetworkResult.Success(block())
     } catch (e: io.ktor.client.plugins.ClientRequestException) {
         println("❌ ClientRequestException (${e.response.status.value}): ${e.message}")
-        NetworkResult.Error(e.response.status.value, "Client error: ${e.message}")
+        when (e.response.status.value) {
+            401 -> NetworkResult.Error(401, "Your session has expired. Please log in again.")
+            403 -> NetworkResult.Error(403, "Access denied. You don't have permission to view this.")
+            404 -> NetworkResult.Error(404, "The requested resource was not found.")
+            else -> NetworkResult.Error(e.response.status.value, "Request failed. Please try again.")
+        }
     } catch (e: io.ktor.client.plugins.ServerResponseException) {
         println("❌ ServerResponseException (${e.response.status.value}): ${e.message}")
-        NetworkResult.Error(e.response.status.value, "Server error: ${e.message}")
+        NetworkResult.Error(e.response.status.value, "Server error. Please try again later.")
     } catch (e: io.ktor.client.plugins.RedirectResponseException) {
         println("❌ RedirectResponseException: ${e.message}")
-        NetworkResult.Error(e.response.status.value, e.message)
+        NetworkResult.Error(e.response.status.value, "Unexpected redirect. Please try again.")
     } catch (e: kotlinx.io.IOException) {
         println("❌ IOException: ${e.message}")
-        NetworkResult.Error(message = "Network error: ${e.message}")
+        NetworkResult.Error(message = "No internet connection. Please check your network.")
     } catch (e: kotlinx.serialization.SerializationException) {
         println("❌ SerializationException: ${e.message}")
         println("❌ This usually means the API response doesn't match the expected DTO")
-        NetworkResult.Error(message = "Parse error: ${e.message}")
+        NetworkResult.Error(message = "Unable to process server response. Please try again.")
     } catch (e: Exception) {
         println("❌ Unexpected Exception: ${e::class.simpleName} - ${e.message}")
-        NetworkResult.Error(message = e.message ?: "Unknown error")
+        NetworkResult.Error(message = "Something went wrong. Please try again.")
     }
 }

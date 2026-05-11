@@ -1,0 +1,84 @@
+-- Drip table for offline caching
+CREATE TABLE IF NOT EXISTS Drip (
+    id TEXT PRIMARY KEY NOT NULL,
+    userId TEXT NOT NULL,
+    username TEXT NOT NULL,
+    userDisplayName TEXT NOT NULL,
+    userAvatarUrl TEXT,
+    isVerified INTEGER AS Boolean NOT NULL DEFAULT 0,
+    caption TEXT,
+    mediaUrl TEXT NOT NULL,
+    thumbnailUrl TEXT,
+    mediaType TEXT NOT NULL,
+    duration INTEGER,
+    aspectRatio REAL,
+    likesCount INTEGER NOT NULL DEFAULT 0,
+    commentsCount INTEGER NOT NULL DEFAULT 0,
+    sharesCount INTEGER NOT NULL DEFAULT 0,
+    viewsCount INTEGER NOT NULL DEFAULT 0,
+    isLiked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    isBookmarked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    createdAt TEXT NOT NULL,
+    cachedAt INTEGER NOT NULL
+);
+
+-- DripComment table for offline caching
+CREATE TABLE IF NOT EXISTS DripComment (
+    id TEXT PRIMARY KEY NOT NULL,
+    dripId TEXT NOT NULL,
+    userId TEXT NOT NULL,
+    username TEXT NOT NULL,
+    userDisplayName TEXT NOT NULL,
+    userAvatarUrl TEXT,
+    content TEXT NOT NULL,
+    likesCount INTEGER NOT NULL DEFAULT 0,
+    isLiked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    createdAt TEXT NOT NULL,
+    FOREIGN KEY (dripId) REFERENCES Drip(id) ON DELETE CASCADE
+);
+
+-- Queries for Drip
+insertOrReplaceDrip:
+INSERT OR REPLACE INTO Drip (
+    id, userId, username, userDisplayName, userAvatarUrl, isVerified,
+    caption, mediaUrl, thumbnailUrl, mediaType, duration, aspectRatio,
+    likesCount, commentsCount, sharesCount, viewsCount,
+    isLiked, isBookmarked, createdAt, cachedAt
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getAllDrips:
+SELECT * FROM Drip ORDER BY cachedAt DESC;
+
+getDripById:
+SELECT * FROM Drip WHERE id = ?;
+
+getDripsByUserId:
+SELECT * FROM Drip WHERE userId = ? ORDER BY createdAt DESC;
+
+deleteDrip:
+DELETE FROM Drip WHERE id = ?;
+
+deleteAllDrips:
+DELETE FROM Drip;
+
+updateDripLike:
+UPDATE Drip SET isLiked = ?, likesCount = ? WHERE id = ?;
+
+updateDripBookmark:
+UPDATE Drip SET isBookmarked = ? WHERE id = ?;
+
+-- Queries for DripComment
+insertOrReplaceComment:
+INSERT OR REPLACE INTO DripComment (
+    id, dripId, userId, username, userDisplayName, userAvatarUrl,
+    content, likesCount, isLiked, createdAt
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getCommentsByDripId:
+SELECT * FROM DripComment WHERE dripId = ? ORDER BY createdAt DESC;
+
+deleteComment:
+DELETE FROM DripComment WHERE id = ?;
+
+deleteCommentsByDripId:
+DELETE FROM DripComment WHERE dripId = ?;

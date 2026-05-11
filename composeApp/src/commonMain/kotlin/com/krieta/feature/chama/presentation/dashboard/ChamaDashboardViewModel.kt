@@ -52,7 +52,7 @@ class ChamaDashboardViewModel(
                 try {
                     val payload = token.split(".")[1]
                     val decoded = Json.decodeFromString<JsonObject>(
-                        String(Base64.decode(payload))
+                        Base64.decode(payload).decodeToString()
                     )
                     val userId = decoded["userId"]?.toString()?.removeSurrounding("\"")
                     _state.update { it.copy(currentUserId = userId) }

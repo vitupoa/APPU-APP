@@ -171,27 +171,9 @@ class LiveSocketManager(
         sendEvent("like:send", LikeData(userId, username, 1))
     }
     
-    suspend fun sendTip(
-        senderId: String,
-        senderName: String,
-        senderAvatar: String?,
-        recipientId: String,
-        amountKr: Double,
-        message: String?,
-        giftType: String?
-    ) {
-        val tipData = TipData(
-            "tip_${currentTimeMillis()}",
-            senderId,
-            senderName,
-            senderAvatar,
-            recipientId,
-            amountKr,
-            message,
-            giftType
-        )
-        sendEvent("tip:send", tipData)
-    }
+    // sendTip removed — tipping now uses the wallet REST API via WalletRepository.sendTip
+    // TipReceived socket events are still handled for broadcasting tip animations to viewers
+    
     
     private suspend fun sendEvent(event: String, data: Any) {
         try {

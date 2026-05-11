@@ -106,5 +106,11 @@ class ChatApi(private val httpClient: HttpClient) {
             parameter("type", "GROUP")
         }.body()
     }
+
+    suspend fun sendTypingIndicator(chatId: String, isTyping: Boolean): ActionResponse {
+        return httpClient.post("${ApiConstants.CHAT}/$chatId/typing") {
+            setBody(TypingIndicatorRequest(isTyping))
+        }.body()
+    }
 }
 

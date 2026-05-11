@@ -2,6 +2,10 @@ package com.krieta.feature.chat.data.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.safeApiCall
+import com.krieta.com.core.offline.ActionType
+import com.krieta.com.core.offline.EntityType
+import com.krieta.com.core.offline.OfflineActionQueue
+import com.krieta.feature.chat.data.local.ChatLocalDataSource
 import com.krieta.feature.chat.data.remote.ChatApi
 import com.krieta.feature.chat.data.remote.dto.ChatDto
 import com.krieta.feature.chat.data.remote.dto.ChatParticipantDto
@@ -16,7 +20,9 @@ import com.krieta.feature.chat.domain.repository.ChatRepository
 import kotlinx.datetime.Instant
 
 class ChatRepositoryImpl(
-    private val api: ChatApi
+    private val api: ChatApi,
+    private val localDataSource: ChatLocalDataSource,
+    private val offlineQueue: OfflineActionQueue
 ) : ChatRepository {
 
     override suspend fun getChats(page: Int): NetworkResult<List<Chat>> {
@@ -55,8 +61,39 @@ class ChatRepositoryImpl(
         replyToId: String?,
         forwardedFromId: String?
     ): NetworkResult<ChatMessage> {
-        return safeApiCall {
+        return when (val result = safeApiCall {
             api.sendMessage(chatId, payload, mediaUrl, mediaType, replyToId, forwardedFromId).message.toDomain()
+        }) {
+            is NetworkResult.Success -> result
+            is NetworkResult.Error -> {
+                // Queue message for later if offline
+                offlineQueue.queueAction(
+                    actionType = ActionType.SEND_MESSAGE,
+                    entityType = EntityType.CONVERSATION,
+                    entityId = chatId,
+                    payload = mapOf(
+                        "payload" to payload,
+                        "mediaUrl" to (mediaUrl ?: ""),
+                        "mediaType" to (mediaType ?: "")
+                    )
+                )
+                // Return optimistic result
+                NetworkResult.Success(ChatMessage(
+                    id = "temp_${System.currentTimeMillis()}",
+                    chatId = chatId,
+                    senderId = "",
+                    sender = null,
+                    payload = payload,
+                    mediaUrl = mediaUrl,
+                    mediaType = mediaType,
+                    isSystemEvent = false,
+                    status = "PENDING",
+                    replyTo = null,
+                    forwardedFrom = null,
+                    createdAt = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+                ))
+            }
+            is NetworkResult.Loading -> result
         }
     }
 
@@ -111,6 +148,12 @@ class ChatRepositoryImpl(
     override suspend fun searchGroups(query: String): NetworkResult<List<Chat>> {
         return safeApiCall {
             api.searchGroups(query).chats.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun sendTypingIndicator(chatId: String, isTyping: Boolean): NetworkResult<Boolean> {
+        return safeApiCall {
+            api.sendTypingIndicator(chatId, isTyping).success
         }
     }
 

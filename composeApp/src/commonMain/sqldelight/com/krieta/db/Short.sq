@@ -1,0 +1,83 @@
+-- Short table for offline caching
+CREATE TABLE IF NOT EXISTS Short (
+    id TEXT PRIMARY KEY NOT NULL,
+    userId TEXT NOT NULL,
+    username TEXT NOT NULL,
+    userDisplayName TEXT NOT NULL,
+    userAvatarUrl TEXT,
+    isVerified INTEGER AS Boolean NOT NULL DEFAULT 0,
+    caption TEXT,
+    videoUrl TEXT NOT NULL,
+    thumbnailUrl TEXT,
+    duration INTEGER NOT NULL,
+    aspectRatio REAL,
+    likesCount INTEGER NOT NULL DEFAULT 0,
+    commentsCount INTEGER NOT NULL DEFAULT 0,
+    sharesCount INTEGER NOT NULL DEFAULT 0,
+    viewsCount INTEGER NOT NULL DEFAULT 0,
+    isLiked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    isBookmarked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    createdAt TEXT NOT NULL,
+    cachedAt INTEGER NOT NULL
+);
+
+-- ShortComment table for offline caching
+CREATE TABLE IF NOT EXISTS ShortComment (
+    id TEXT PRIMARY KEY NOT NULL,
+    shortId TEXT NOT NULL,
+    userId TEXT NOT NULL,
+    username TEXT NOT NULL,
+    userDisplayName TEXT NOT NULL,
+    userAvatarUrl TEXT,
+    content TEXT NOT NULL,
+    likesCount INTEGER NOT NULL DEFAULT 0,
+    isLiked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    createdAt TEXT NOT NULL,
+    FOREIGN KEY (shortId) REFERENCES Short(id) ON DELETE CASCADE
+);
+
+-- Queries for Short
+insertOrReplaceShort:
+INSERT OR REPLACE INTO Short (
+    id, userId, username, userDisplayName, userAvatarUrl, isVerified,
+    caption, videoUrl, thumbnailUrl, duration, aspectRatio,
+    likesCount, commentsCount, sharesCount, viewsCount,
+    isLiked, isBookmarked, createdAt, cachedAt
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getAllShorts:
+SELECT * FROM Short ORDER BY cachedAt DESC;
+
+getShortById:
+SELECT * FROM Short WHERE id = ?;
+
+getShortsByUserId:
+SELECT * FROM Short WHERE userId = ? ORDER BY createdAt DESC;
+
+deleteShort:
+DELETE FROM Short WHERE id = ?;
+
+deleteAllShorts:
+DELETE FROM Short;
+
+updateShortLike:
+UPDATE Short SET isLiked = ?, likesCount = ? WHERE id = ?;
+
+updateShortBookmark:
+UPDATE Short SET isBookmarked = ? WHERE id = ?;
+
+-- Queries for ShortComment
+insertOrReplaceShortComment:
+INSERT OR REPLACE INTO ShortComment (
+    id, shortId, userId, username, userDisplayName, userAvatarUrl,
+    content, likesCount, isLiked, createdAt
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getCommentsByShortId:
+SELECT * FROM ShortComment WHERE shortId = ? ORDER BY createdAt DESC;
+
+deleteShortComment:
+DELETE FROM ShortComment WHERE id = ?;
+
+deleteCommentsByShortId:
+DELETE FROM ShortComment WHERE shortId = ?;

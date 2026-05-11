@@ -2,7 +2,13 @@ package com.krieta.feature.feed.data.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.safeApiCall
+import com.krieta.com.core.offline.ActionType
+import com.krieta.com.core.offline.EntityType
+import com.krieta.com.core.offline.MediaCacheManager
+import com.krieta.com.core.offline.MediaType
+import com.krieta.com.core.offline.OfflineActionQueue
 import com.krieta.com.core.util.currentTimeMillis
+import com.krieta.feature.feed.data.local.DripLocalDataSource
 import com.krieta.feature.feed.data.remote.FeedApi
 import com.krieta.feature.feed.data.remote.dto.PostDto
 import com.krieta.feature.feed.domain.model.Post
@@ -12,9 +18,15 @@ import com.krieta.feature.feed.domain.repository.FeedResult
 import com.krieta.feature.feed.domain.repository.DiscoverFeedResult
 import com.krieta.feature.feed.presentation.viewmodel.ContentItem
 import com.krieta.feature.feed.presentation.viewmodel.FeedComposition
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 class FeedRepositoryImpl(
-    private val api: FeedApi
+    private val api: FeedApi,
+    private val localDataSource: DripLocalDataSource,
+    private val offlineQueue: OfflineActionQueue,
+    private val mediaCache: MediaCacheManager
 ) : FeedRepository {
 
     // Client-side cache for feeds (5 minutes TTL)
@@ -39,11 +51,45 @@ class FeedRepositoryImpl(
     }
 
     override suspend fun toggleLike(postId: String): NetworkResult<Boolean> {
-        return safeApiCall { api.toggleLike(postId).liked }
+        // Update cache optimistically
+        val cachedDrip = localDataSource.getCachedDripById(postId)
+        if (cachedDrip != null) {
+            val newLikeState = !cachedDrip.isLiked
+            val newCount = if (newLikeState) cachedDrip.likesCount + 1 else cachedDrip.likesCount - 1
+            localDataSource.updateDripLike(postId, newLikeState, newCount)
+        }
+        
+        return when (val result = safeApiCall { api.toggleLike(postId).liked }) {
+            is NetworkResult.Success -> result
+            is NetworkResult.Error -> {
+                // Queue for later if offline
+                offlineQueue.queueAction(
+                    actionType = if (cachedDrip?.isLiked == true) ActionType.UNLIKE else ActionType.LIKE,
+                    entityType = EntityType.DRIP,
+                    entityId = postId,
+                    payload = emptyMap()
+                )
+                NetworkResult.Success(cachedDrip?.isLiked?.not() ?: true)
+            }
+            is NetworkResult.Loading -> result
+        }
     }
 
     override suspend fun addComment(postId: String, text: String): NetworkResult<Unit> {
-        return safeApiCall { api.addComment(postId, text); Unit }
+        return when (val result = safeApiCall { api.addComment(postId, text); Unit }) {
+            is NetworkResult.Success -> result
+            is NetworkResult.Error -> {
+                // Queue for later if offline
+                offlineQueue.queueAction(
+                    actionType = ActionType.COMMENT,
+                    entityType = EntityType.DRIP,
+                    entityId = postId,
+                    payload = mapOf("text" to text)
+                )
+                NetworkResult.Success(Unit)
+            }
+            is NetworkResult.Loading -> result
+        }
     }
 
     override suspend fun createPost(caption: String, imageUrls: List<String>): NetworkResult<Unit> {

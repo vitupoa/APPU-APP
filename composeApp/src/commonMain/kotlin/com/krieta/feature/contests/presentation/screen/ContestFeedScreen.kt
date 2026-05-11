@@ -123,11 +123,27 @@ class ContestFeedScreen : Screen {
                                 verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 items(currentState.items, key = { it.id }) { contest ->
+                                    val index = currentState.items.indexOf(contest)
+                                    val isSponsored = viewModel.isSponsored(index)
+                                    
                                     ContestCard(
                                         contest = contest,
                                         currencyProvider = currencyProvider,
-                                        onClick = { navigator.push(ContestDetailScreen(contest.id)) }
+                                        isSponsored = isSponsored,
+                                        onClick = { 
+                                            navigator.push(ContestDetailScreen(contest.id))
+                                            if (isSponsored) {
+                                                viewModel.recordSponsoredEngagement(index, "click")
+                                            }
+                                        }
                                     )
+                                    
+                                    // Track sponsored impression
+                                    if (isSponsored) {
+                                        LaunchedEffect(index) {
+                                            viewModel.recordSponsoredImpression(index)
+                                        }
+                                    }
                                 }
                                 if (isLoadingMore) {
                                     item {
@@ -146,7 +162,7 @@ class ContestFeedScreen : Screen {
     }
 
     @Composable
-    private fun ContestCard(contest: Contest, currencyProvider: UserCurrencyProvider, onClick: () -> Unit) {
+    private fun ContestCard(contest: Contest, currencyProvider: UserCurrencyProvider, isSponsored: Boolean = false, onClick: () -> Unit) {
         Card(
             onClick = onClick,
             modifier = Modifier.fillMaxWidth(),
@@ -154,7 +170,7 @@ class ContestFeedScreen : Screen {
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                // Status badge
+                // Status badge and sponsored badge
                 val (badgeColor, badgeText) = when (contest.status) {
                     ContestStatus.ACTIVE -> MaterialTheme.colorScheme.primaryContainer to "🟢 Active"
                     ContestStatus.JUDGING -> MaterialTheme.colorScheme.tertiaryContainer to "⚖️ Judging"
@@ -163,6 +179,11 @@ class ContestFeedScreen : Screen {
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (isSponsored) {
+                        com.krieta.feature.sponsored.presentation.SponsoredBadge(
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
                     Surface(
                         shape = RoundedCornerShape(6.dp),
                         color = badgeColor

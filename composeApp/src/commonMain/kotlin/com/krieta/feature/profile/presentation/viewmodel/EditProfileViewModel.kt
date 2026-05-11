@@ -79,7 +79,7 @@ class EditProfileViewModel(
         screenModelScope.launch {
             _state.value = _state.value.copy(isUploadingAvatar = true, error = null)
             try {
-                val url = cloudinaryUploader.uploadImage(filePath, "avatars")
+                val url = cloudinaryUploader.uploadImage(filePath, "Krieta/Profile/Images")
                 _state.value = _state.value.copy(avatarUrl = url, isUploadingAvatar = false)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(isUploadingAvatar = false, error = e.message)
@@ -91,7 +91,7 @@ class EditProfileViewModel(
         screenModelScope.launch {
             _state.value = _state.value.copy(isUploadingBanner = true, error = null)
             try {
-                val url = cloudinaryUploader.uploadImage(filePath, "banners")
+                val url = cloudinaryUploader.uploadImage(filePath, "Krieta/Profile/Images")
                 _state.value = _state.value.copy(coverPhotoUrl = url, isUploadingBanner = false)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(isUploadingBanner = false, error = e.message)

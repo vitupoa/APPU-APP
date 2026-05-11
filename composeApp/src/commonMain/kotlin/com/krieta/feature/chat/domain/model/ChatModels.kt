@@ -21,10 +21,12 @@ data class ChatMessage(
     val payload: String,
     val mediaUrl: String? = null,
     val mediaType: String? = null,
+    val thumbnailUrl: String? = null,
     val isSystemEvent: Boolean = false,
     val status: String = "sent",
     val replyTo: ChatMessage? = null,
     val forwardedFrom: UserSnippet? = null,
+    val repliesCount: Int = 0,
     val createdAt: Instant
 )
 

@@ -8,11 +8,12 @@ export class ChatService {
    * Create or fetch existing Direct Chat
    */
   static async createDirectChat(userId: string, recipientId: string) {
-    if (userId === recipientId) {
-      throw new Error('Cannot create chat with yourself');
-    }
+    // Allow self-chat
+    // if (userId === recipientId) {
+    //   throw new Error('Cannot create chat with yourself');
+    // }
 
-    // Check if a direct chat already exists between these two users
+    // Check if a direct chat already exists between these two users (or self-chat)
     const existingChat = await prisma.chat.findFirst({
       where: {
         type: 'DIRECT',
@@ -29,15 +30,14 @@ export class ChatService {
 
     if (existingChat) return existingChat;
 
-    // Create new direct chat
+    // Create new direct chat (including self-chat)
+    const participantIds = userId === recipientId ? [userId] : [userId, recipientId];
+    
     const newChat = await prisma.chat.create({
       data: {
         type: 'DIRECT',
         participants: {
-          create: [
-            { userId: userId, role: 'member' },
-            { userId: recipientId, role: 'member' },
-          ],
+          create: participantIds.map(id => ({ userId: id, role: 'member' })),
         },
       },
       include: {
@@ -46,9 +46,11 @@ export class ChatService {
       },
     });
 
-    // Broadcast new chat to both users in real-time
+    // Broadcast new chat to user(s) in real-time
     io.to(`user:${userId}`).emit('chat:new_chat', newChat);
-    io.to(`user:${recipientId}`).emit('chat:new_chat', newChat);
+    if (userId !== recipientId) {
+      io.to(`user:${recipientId}`).emit('chat:new_chat', newChat);
+    }
 
     return newChat;
   }
@@ -87,19 +89,45 @@ export class ChatService {
   /**
    * Fetch all chats for a user
    */
-  static async getChats(userId: string, page: number = 1, limit: number = 20) {
+  static async getChats(userId: string, page: number = 1, limit: number = 20, unreadOnly: boolean = false) {
     const skip = (page - 1) * limit;
 
-    return prisma.chat.findMany({
+    const chats = await prisma.chat.findMany({
       where: { participants: { some: { userId } } },
       include: {
         participants: { include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } },
-        messages: { orderBy: { createdAt: 'desc' }, take: 1 }, // Latest message
+        messages: { orderBy: { createdAt: 'desc' }, take: 1 },
       },
       orderBy: { updatedAt: 'desc' },
       skip,
       take: limit,
     });
+
+    if (!unreadOnly) return chats;
+
+    // Filter for unread chats
+    const unreadChats = [];
+    for (const chat of chats) {
+      const participant = await prisma.chatParticipant.findUnique({
+        where: { chatId_userId: { chatId: chat.id, userId } },
+      });
+
+      if (!participant) continue;
+
+      const unreadCount = await prisma.message.count({
+        where: {
+          chatId: chat.id,
+          senderId: { not: userId },
+          createdAt: { gt: participant.lastRead },
+        },
+      });
+
+      if (unreadCount > 0) {
+        unreadChats.push(chat);
+      }
+    }
+
+    return unreadChats;
   }
 
   /**
@@ -111,6 +139,7 @@ export class ChatService {
     payload: string,
     mediaUrl?: string,
     mediaType?: string,
+    thumbnailUrl?: string,
     replyToId?: string,
     forwardedFromId?: string
   ) {
@@ -123,23 +152,57 @@ export class ChatService {
       throw new Error('Not authorized to send message in this chat');
     }
 
+    // Sanitize payload
+    const sanitizedPayload = payload.trim().substring(0, 10000);
+
+    // Validate media URL if provided
+    if (mediaUrl) {
+      const { validateMediaUrl } = await import('../../utils/media-validator.js');
+      const validation = validateMediaUrl(mediaUrl);
+      
+      if (!validation.isValid) {
+        throw new Error(validation.error || 'Invalid media URL');
+      }
+      
+      // Use sanitized URL
+      mediaUrl = validation.sanitizedUrl;
+    }
+
     const message = await (prisma.message.create as any)({
       data: {
         chatId,
         senderId,
-        payload,
+        payload: sanitizedPayload,
         mediaUrl,
         mediaType,
+        thumbnailUrl,
         replyToId,
         forwardedFromId,
         status: 'sent',
       },
       include: {
         sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-        replyTo: { include: { sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } },
+        replyTo: { 
+          include: { 
+            sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+            replyTo: {
+              include: {
+                sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+              }
+            }
+          } 
+        },
         forwardedFrom: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
       },
     });
+
+    // Update replies count if this is a reply
+    if (replyToId) {
+      await prisma.message.update({
+        where: { id: replyToId },
+        data: { repliesCount: { increment: 1 } }
+      });
+    }
 
     // Update chat's updatedAt for sorting and fetch updated chat with latest message
     const updatedChat = await prisma.chat.update({
@@ -287,7 +350,16 @@ export class ChatService {
       where: { chatId },
       include: {
         sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-        replyTo: { include: { sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } },
+        replyTo: { 
+          include: { 
+            sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+            replyTo: {
+              include: {
+                sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+              }
+            }
+          } 
+        },
         forwardedFrom: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -566,5 +638,63 @@ export class ChatService {
     });
 
     return { success: true, message: 'You have left the group' };
+  }
+
+  /**
+   * Mark messages as read
+   */
+  static async markAsRead(userId: string, chatId: string) {
+    const participant = await prisma.chatParticipant.findUnique({
+      where: { chatId_userId: { chatId, userId } },
+    });
+
+    if (!participant) {
+      throw new Error('Not a participant in this chat');
+    }
+
+    await prisma.chatParticipant.update({
+      where: { chatId_userId: { chatId, userId } },
+      data: { lastRead: new Date() },
+    });
+
+    return { success: true, message: 'Messages marked as read' };
+  }
+
+  /**
+   * Send typing indicator
+   */
+  static async sendTypingIndicator(userId: string, chatId: string, isTyping: boolean) {
+    // Verify user is participant
+    const participant = await prisma.chatParticipant.findUnique({
+      where: { chatId_userId: { chatId, userId } },
+    });
+
+    if (!participant) {
+      throw new Error('Not a participant in this chat');
+    }
+
+    // Get user info
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, username: true, displayName: true, avatarUrl: true },
+    });
+
+    // Get all participants except the sender
+    const participants = await prisma.chatParticipant.findMany({
+      where: { chatId, userId: { not: userId } },
+      select: { userId: true },
+    });
+
+    // Broadcast typing indicator to other participants (not to self)
+    participants.forEach((p: any) => {
+      io.to(`user:${p.userId}`).emit('chat:typing', {
+        chatId,
+        userId,
+        user,
+        isTyping,
+      });
+    });
+
+    return { success: true };
   }
 }

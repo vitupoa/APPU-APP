@@ -4,6 +4,8 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.wallet.domain.repository.WalletRepository
+import com.krieta.feature.wallet.domain.repository.Bank
+import com.krieta.feature.wallet.domain.repository.Country
 import com.krieta.com.security.DeviceSecurityChecker
 import com.krieta.com.core.security.WithdrawalSecurity
 import com.krieta.com.core.security.ValidationResult
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.krieta.com.core.util.currentTimeMillis
 
 data class WithdrawState(
     val provider: String = "mpesa", // mpesa, paystack, bank
@@ -33,20 +36,6 @@ data class WithdrawState(
     // Security: Track the last validated amount to prevent tampering
     val lastValidatedAmount: Double = 0.0,
     val lastValidationTimestamp: Long = 0L
-)
-
-data class Bank(
-    val name: String,
-    val code: String,
-    val country: String,
-    val currency: String
-)
-
-data class Country(
-    val code: String,
-    val name: String,
-    val currency: String,
-    val accountType: String
 )
 
 class WithdrawViewModel(
@@ -128,7 +117,7 @@ class WithdrawViewModel(
                 amount = sanitizedAmount,
                 error = null,
                 lastValidatedAmount = numericAmount,
-                lastValidationTimestamp = System.currentTimeMillis()
+                lastValidationTimestamp = currentTimeMillis()
             )
         } else {
             _state.value = currentState.copy(
@@ -305,7 +294,7 @@ class WithdrawViewModel(
             _state.value = currentState.copy(isSubmitting = true, error = null)
             
             // Step 6: Generate security hashes
-            val timestamp = System.currentTimeMillis()
+            val timestamp = currentTimeMillis()
             val nonce = WithdrawalSecurity.generateNonce()
             val amountHash = WithdrawalSecurity.generateAmountHash(
                 userId = currentState.userId,
@@ -409,7 +398,7 @@ class WithdrawViewModel(
         }
         
         // Check if the validation timestamp is recent (within 5 minutes)
-        val currentTime = System.currentTimeMillis()
+        val currentTime = currentTimeMillis()
         val maxAge = 5 * 60 * 1000L // 5 minutes
         
         return (currentTime - state.lastValidationTimestamp) <= maxAge

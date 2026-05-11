@@ -10,6 +10,7 @@ import com.krieta.feature.live.domain.repository.LiveRepository
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 
 class LiveRepositoryImpl(
     private val client: HttpClient
@@ -53,14 +54,15 @@ class LiveRepositoryImpl(
         chamaId: String?
     ): Result<List<LiveStream>> {
         return try {
-            val response: ActiveStreamsResponseDto = client.get("/api/v1/live/active") {
+            val httpResponse = client.get("/api/v1/live/active") {
                 parameter("page", page)
                 parameter("limit", limit)
                 if (chamaId != null) parameter("chamaId", chamaId)
-            }.body()
+            }
+            val response: ActiveStreamsResponseDto = httpResponse.body()
             Result.success(response.streams.map { it.toDomain() })
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception("Failed to load live streams: ${e.message ?: "Unknown error"}"))
         }
     }
 

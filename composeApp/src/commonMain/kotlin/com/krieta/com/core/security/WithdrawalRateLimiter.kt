@@ -50,9 +50,10 @@ class WithdrawalRateLimiter {
         // Check hourly withdrawal count
         val withdrawalsLastHour = getWithdrawalsInWindow(now, 1.hours)
         if (withdrawalsLastHour.size >= config.maxWithdrawalsPerHour) {
-            val oldestInWindow = withdrawalsLastHour.minByOrNull { it.timestamp }
+            val oldestInWindow = withdrawalsLastHour.minByOrNull { it.timestamp.toEpochMilliseconds() }
             val retryAfter = oldestInWindow?.let { 
-                (it.timestamp + 1.hours) - now 
+                val millis = (it.timestamp.toEpochMilliseconds() + 3600000) - now.toEpochMilliseconds()
+                kotlin.time.Duration.parse("${millis}ms")
             }
             return@withLock RateLimitResult.Denied(
                 "Maximum ${config.maxWithdrawalsPerHour} withdrawals per hour exceeded. Please try again later.",
@@ -63,9 +64,10 @@ class WithdrawalRateLimiter {
         // Check daily withdrawal count
         val withdrawalsLastDay = getWithdrawalsInWindow(now, 24.hours)
         if (withdrawalsLastDay.size >= config.maxWithdrawalsPerDay) {
-            val oldestInWindow = withdrawalsLastDay.minByOrNull { it.timestamp }
+            val oldestInWindow = withdrawalsLastDay.minByOrNull { it.timestamp.toEpochMilliseconds() }
             val retryAfter = oldestInWindow?.let { 
-                (it.timestamp + 24.hours) - now 
+                val millis = (it.timestamp.toEpochMilliseconds() + 86400000) - now.toEpochMilliseconds()
+                kotlin.time.Duration.parse("${millis}ms")
             }
             return@withLock RateLimitResult.Denied(
                 "Maximum ${config.maxWithdrawalsPerDay} withdrawals per day exceeded. Please try again tomorrow.",
@@ -95,14 +97,16 @@ class WithdrawalRateLimiter {
         if (amountKr >= config.largeWithdrawalThresholdKr) {
             val lastLargeWithdrawal = withdrawalsLastHour
                 .filter { it.amountKr >= config.largeWithdrawalThresholdKr }
-                .maxByOrNull { it.timestamp }
+                .maxByOrNull { it.timestamp.toEpochMilliseconds() }
             
             if (lastLargeWithdrawal != null) {
-                val timeSinceLastLarge = now - lastLargeWithdrawal.timestamp
-                if (timeSinceLastLarge < config.cooldownBetweenLargeWithdrawals) {
-                    val retryAfter = config.cooldownBetweenLargeWithdrawals - timeSinceLastLarge
+                val timeSinceLastLargeMillis = now.toEpochMilliseconds() - lastLargeWithdrawal.timestamp.toEpochMilliseconds()
+                val cooldownMillis = config.cooldownBetweenLargeWithdrawals.inWholeMilliseconds
+                if (timeSinceLastLargeMillis < cooldownMillis) {
+                    val retryAfterMillis = cooldownMillis - timeSinceLastLargeMillis
+                    val retryAfter = kotlin.time.Duration.parse("${retryAfterMillis}ms")
                     return@withLock RateLimitResult.Denied(
-                        "Please wait ${retryAfter.inWholeMinutes} minutes between large withdrawals (>50,000 Kr).",
+                        "Please wait ${retryAfterMillis / 60000} minutes between large withdrawals (>50,000 Kr).",
                         retryAfter
                     )
                 }
@@ -152,13 +156,13 @@ class WithdrawalRateLimiter {
     }
     
     private fun getWithdrawalsInWindow(now: Instant, window: Duration): List<WithdrawalAttempt> {
-        val cutoff = now - window
-        return withdrawalHistory.filter { it.timestamp >= cutoff }
+        val cutoffMillis = now.toEpochMilliseconds() - window.inWholeMilliseconds
+        return withdrawalHistory.filter { it.timestamp.toEpochMilliseconds() >= cutoffMillis }
     }
     
     private fun cleanupOldHistory(now: Instant) {
-        val cutoff = now - 24.hours
-        withdrawalHistory.removeAll { it.timestamp < cutoff }
+        val cutoffMillis = now.toEpochMilliseconds() - 86400000 // 24 hours
+        withdrawalHistory.removeAll { it.timestamp.toEpochMilliseconds() < cutoffMillis }
     }
     
     data class WithdrawalStats(

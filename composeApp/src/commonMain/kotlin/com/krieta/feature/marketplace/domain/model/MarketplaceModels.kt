@@ -28,20 +28,56 @@ enum class InfluencerTier {
 data class BrandCampaign(
     val id: String,
     val brandId: String,
-    val brandName: String,
     val title: String,
     val description: String,
-    val budget: Double,
-    val targetTier: InfluencerTier?,
-    val categories: List<String>,
-    val requirements: String,
-    val deliverables: String,
-    val startDate: String,
-    val endDate: String,
+    val type: String,
     val status: CampaignStatus,
-    val applicationsCount: Int,
-    val selectedInfluencers: Int
-)
+    val targetTiers: List<String>,
+    val targetCategories: List<String>,
+    val minFollowers: Int? = null,
+    val minEngagementRate: Double? = null,
+    val targetGeos: List<String> = emptyList(),
+    val budgetKr: Double,
+    val compensationPerInfluencer: Double,
+    val maxInfluencers: Int,
+    val requiredPosts: Int = 0,
+    val requiredVideos: Int = 0,
+    val requiredStories: Int = 0,
+    val contentGuidelines: String? = null,
+    val hashtags: List<String> = emptyList(),
+    val mentions: List<String> = emptyList(),
+    val contestId: String? = null,
+    val applicationDeadline: String? = null,
+    val campaignStartDate: String,
+    val campaignEndDate: String,
+    val totalApplications: Int = 0,
+    val acceptedInfluencers: Int = 0,
+    val totalReach: Int = 0,
+    val totalEngagement: Int = 0,
+    val totalConversions: Int = 0,
+    val totalRevenueKr: Double = 0.0,
+    val roi: Double = 0.0,
+    val createdAt: String? = null,
+    val updatedAt: String? = null
+) {
+    // Computed properties for backward compatibility
+    val brandName: String get() = "" // Will be populated from brand relation if needed
+    val budget: Double get() = budgetKr
+    val targetTier: InfluencerTier? get() = targetTiers.firstOrNull()?.let { 
+        try { InfluencerTier.valueOf(it) } catch (e: Exception) { null }
+    }
+    val categories: List<String> get() = targetCategories
+    val requirements: String get() = contentGuidelines ?: ""
+    val deliverables: String get() = buildString {
+        if (requiredPosts > 0) append("$requiredPosts posts ")
+        if (requiredVideos > 0) append("$requiredVideos videos ")
+        if (requiredStories > 0) append("$requiredStories stories")
+    }.trim()
+    val startDate: String get() = campaignStartDate
+    val endDate: String get() = campaignEndDate
+    val applicationsCount: Int get() = totalApplications
+    val selectedInfluencers: Int get() = acceptedInfluencers
+}
 
 @Serializable
 enum class CampaignStatus {

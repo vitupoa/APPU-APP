@@ -1,6 +1,6 @@
 # Railway deployment configuration
 [build]
-builder = "nixpacks"
+builder = "railpack"
 
 [build.env]
 NODE_ENV = "production"

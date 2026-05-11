@@ -1,7 +1,5 @@
 package com.krieta.feature.chama.presentation.wizard
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.foundation.shape.CircleShape
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -34,6 +32,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.krieta.com.core.util.formatString
 
 private val ChamaGold = Color(0xFFF5A623)
 private val ChamaGoldDark = Color(0xFFD4891A)
@@ -342,7 +341,7 @@ private fun StepFinancials(state: CreateChamaState, viewModel: CreateChamaViewMo
                     )
                     if (state.exchangeRate != null) {
                         Text(
-                            "Rate: ${String.format("%.2f", state.exchangeRate)}",
+                            "Rate: ${formatString("%.2f", state.exchangeRate)}",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

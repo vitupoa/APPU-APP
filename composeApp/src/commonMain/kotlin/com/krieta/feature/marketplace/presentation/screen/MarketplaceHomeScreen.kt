@@ -25,14 +25,18 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.krieta.com.core.theme.KrietaColors
+import com.krieta.feature.profile.domain.model.AccountType
+import com.krieta.feature.profile.presentation.viewmodel.ProfileViewModel
 
 class MarketplaceHomeScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        var selectedRole by remember { mutableStateOf<MarketplaceRole>(MarketplaceRole.CREATOR) }
+        val profileViewModel = koinScreenModel<ProfileViewModel>()
+        val profileState by profileViewModel.state.collectAsState()
         
         Scaffold(
             topBar = {
@@ -48,47 +52,35 @@ class MarketplaceHomeScreen : Screen {
                 )
             }
         ) { padding ->
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Role Selector
-                Card(Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("I am a...", style = MaterialTheme.typography.titleMedium)
-                        Spacer(Modifier.height(12.dp))
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            MarketplaceRole.entries.forEach { role ->
-                                FilterChip(
-                                    selected = selectedRole == role,
-                                    onClick = { selectedRole = role },
-                                    label = { Text(role.displayName) },
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                        }
+            when {
+                profileState.isLoading -> {
+                    Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
                 }
-                
-                // Role-specific options
-                when (selectedRole) {
-                    MarketplaceRole.BUSINESS -> BusinessOptions(navigator)
-                    MarketplaceRole.CREATOR -> CreatorOptions(navigator)
+                profileState.error != null -> {
+                    Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                        Text("Error: ${profileState.error}")
+                    }
+                }
+                else -> {
+                    val accountType = profileState.profile?.accountType ?: AccountType.CREATOR
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        when (accountType) {
+                            AccountType.BUSINESS -> BusinessOptions(navigator)
+                            AccountType.CREATOR -> CreatorOptions(navigator)
+                        }
+                    }
                 }
             }
         }
     }
-}
-
-enum class MarketplaceRole(val displayName: String) {
-    BUSINESS("Business"),
-    CREATOR("Creator")
 }
 
 @Composable

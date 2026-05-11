@@ -117,9 +117,10 @@ class WithdrawScreen : Screen {
                     singleLine = true,
                     isError = state.error?.contains("amount", ignoreCase = true) == true,
                     supportingText = {
-                        if (state.error?.contains("amount", ignoreCase = true) == true) {
+                        val errorText = state.error
+                        if (errorText?.contains("amount", ignoreCase = true) == true) {
                             Text(
-                                state.error,
+                                errorText,
                                 color = KrietaColors.Error,
                                 fontSize = 12.sp
                             )
@@ -327,7 +328,8 @@ class WithdrawScreen : Screen {
                     }
                 }
                 
-                state.error?.let { error ->
+                val errorMessage = state.error
+                if (errorMessage != null) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
@@ -335,7 +337,7 @@ class WithdrawScreen : Screen {
                         )
                     ) {
                         Text(
-                            error,
+                            errorMessage,
                             modifier = Modifier.padding(16.dp),
                             color = KrietaColors.Error
                         )

@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export const ProductCategoryEnum = z.enum([
   'VEHICLES', 'SPARE_PARTS', 'REAL_ESTATE', 'FASHION', 'SHOES',
-  'ELECTRONICS', 'FOOD_FMCG', 'BOOKS', 'DIGITAL_PRODUCTS', 'SERVICES', 'OTHER'
+  'ELECTRONICS', 'FURNITURE', 'FOOD_FMCG', 'GROCERIES', 'BOOKS', 'DIGITAL_PRODUCTS', 'SERVICES', 'OTHER'
 ]);
 
 export const ProductConditionEnum = z.enum(['NEW', 'USED', 'REFURBISHED', 'FOR_PARTS']);
@@ -77,6 +77,7 @@ const fashionDetailSchema = z.object({
   pattern: z.string().optional(),
   season: z.string().optional(),
   gender: z.string().optional(),
+  ageGroup: z.string().optional(),
   careInstructions: z.string().optional(),
 });
 
@@ -87,6 +88,18 @@ const shoeDetailSchema = z.object({
   closureType: z.string().optional(),
   waterResistant: z.boolean().optional(),
   gender: z.string().optional(),
+});
+
+const furnitureDetailSchema = z.object({
+  furnitureType: z.string(),
+  material: z.string().optional(),
+  color: z.string().optional(),
+  dimensions: z.string().optional(),
+  weight: z.string().optional(),
+  seatingCapacity: z.number().int().optional(),
+  assemblyRequired: z.boolean().optional(),
+  style: z.string().optional(),
+  warrantyMonths: z.number().int().optional(),
 });
 
 const electronicsDetailSchema = z.object({
@@ -109,6 +122,22 @@ const foodDetailSchema = z.object({
   certifications: z.array(z.string()).optional(),
   isOrganic: z.boolean().optional(),
   weightVolume: z.string().optional(),
+});
+
+const groceryDetailSchema = z.object({
+  groceryType: z.string(), // fresh_produce, dry_goods, frozen, canned, dairy, bakery, beverages, snacks, household, baby, pet
+  brand: z.string().optional(),
+  weightVolume: z.string().optional(),
+  packSize: z.string().optional(),
+  ingredients: z.array(z.string()).optional(),
+  allergens: z.array(z.string()).optional(),
+  expiryDate: z.string().optional(),
+  storageType: z.string().optional(), // room_temp, refrigerated, frozen
+  isOrganic: z.boolean().optional(),
+  isHalal: z.boolean().optional(),
+  isVegan: z.boolean().optional(),
+  countryOfOrigin: z.string().optional(),
+  certifications: z.array(z.string()).optional(),
 });
 
 const bookDetailSchema = z.object({
@@ -150,7 +179,9 @@ export const categoryDetailSchemas: Record<string, z.ZodType> = {
   FASHION: fashionDetailSchema,
   SHOES: shoeDetailSchema,
   ELECTRONICS: electronicsDetailSchema,
+  FURNITURE: furnitureDetailSchema,
   FOOD_FMCG: foodDetailSchema,
+  GROCERIES: groceryDetailSchema,
   BOOKS: bookDetailSchema,
   DIGITAL_PRODUCTS: digitalProductDetailSchema,
   SERVICES: serviceDetailSchema,

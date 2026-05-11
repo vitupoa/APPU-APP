@@ -26,6 +26,10 @@ export const tipSchema = z.object({
   recipientId: z.string().uuid('Invalid recipient ID'),
   krAmount: z.number().int('Amount must be a whole number').positive('Tip must be a positive integer'),
   currency: z.string().length(3),
+  // MITM protection fields
+  signature: z.string().min(1, 'Transaction signature required'),
+  timestamp: z.number().int().positive('Timestamp required'),
+  nonce: z.string().min(1, 'Nonce required'),
 });
 
 export const exchangeRateSchema = z.object({

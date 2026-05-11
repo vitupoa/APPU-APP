@@ -26,7 +26,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class WalletRepositoryImpl(
-    private val api: WalletApi
+    private val api: WalletApi,
+    private val financialSecurity: com.krieta.com.core.security.FinancialTransactionSecurity,
+    private val offlineModeGuard: com.krieta.com.core.offline.OfflineModeGuard,
+    private val tokenManager: com.krieta.com.core.security.TokenManager
 ) : WalletRepository {
 
     private val _balance = MutableStateFlow<WalletBalance?>(null)
@@ -61,9 +64,46 @@ class WalletRepositoryImpl(
         }
     }
 
-    override suspend fun sendTip(recipientId: String, fiatAmount: Double, currency: String): NetworkResult<Double> {
+    override suspend fun sendTip(recipientId: String, krAmount: Int, currency: String): NetworkResult<Double> {
         return safeApiCall {
-            val dto = api.sendTip(TipRequestDto(recipientId, fiatAmount, currency))
+            // CRITICAL: Block if offline
+            offlineModeGuard.requireOnlineForFinancialTransaction()
+            
+            // Validate amount
+            val validation = financialSecurity.validateAmount(
+                amount = krAmount.toDouble(),
+                minAmount = 1.0,
+                maxAmount = 10000.0
+            )
+            if (!validation.isValid) {
+                throw IllegalArgumentException(validation.message)
+            }
+            
+            // Get current user ID
+            val userSession = tokenManager.getUserSession()
+                ?: throw IllegalStateException("User session not found")
+            
+            // Generate nonce and timestamp
+            val nonce = com.krieta.com.core.security.WithdrawalSecurity.generateNonce()
+            val timestamp = System.currentTimeMillis()
+            
+            // Sign with new secure method
+            val signature = financialSecurity.signTip(
+                senderId = userSession.userId,
+                recipientId = recipientId,
+                krAmount = krAmount,
+                nonce = nonce,
+                timestamp = timestamp
+            ) ?: throw IllegalStateException("Session expired. Please login again.")
+
+            val dto = api.sendTip(TipRequestDto(
+                recipientId = recipientId,
+                krAmount = krAmount,
+                currency = currency,
+                signature = signature,
+                timestamp = timestamp,
+                nonce = nonce
+            ))
             if (!dto.success || dto.krTipped == null) {
                 throw IllegalStateException(dto.error ?: "Tip failed")
             }
@@ -114,15 +154,36 @@ class WalletRepositoryImpl(
 
     override suspend fun withdraw(request: WithdrawRequest): NetworkResult<WithdrawResponse> {
         return safeApiCall {
-            val nonce = TransactionSigner.generateNonce()
-            val timestamp = TransactionSigner.generateTimestamp()
-            val signature = TransactionSigner.signWithdrawal(
+            // CRITICAL: Block if offline
+            offlineModeGuard.requireOnlineForFinancialTransaction()
+            
+            // Validate amount
+            val validation = financialSecurity.validateAmount(
+                amount = request.krAmount,
+                minAmount = 10.0,
+                maxAmount = 100000.0
+            )
+            if (!validation.isValid) {
+                throw IllegalArgumentException(validation.message)
+            }
+            
+            // Get current user ID
+            val userSession = tokenManager.getUserSession()
+                ?: throw IllegalStateException("User session not found")
+            
+            // Generate nonce and timestamp
+            val nonce = com.krieta.com.core.security.WithdrawalSecurity.generateNonce()
+            val timestamp = System.currentTimeMillis()
+            
+            // Sign with new secure method
+            val signature = financialSecurity.signWithdrawal(
+                userId = userSession.userId,
                 krAmount = request.krAmount,
                 provider = request.provider,
                 currency = request.currency,
-                timestamp = timestamp,
-                nonce = nonce
-            )
+                nonce = nonce,
+                timestamp = timestamp
+            ) ?: throw IllegalStateException("Session expired. Please login again.")
             
             val dto = api.withdraw(
                 request = com.krieta.feature.wallet.data.remote.dto.WithdrawRequestDto(
@@ -210,6 +271,37 @@ class WalletRepositoryImpl(
         email: String?
     ): NetworkResult<TopupInitiateResponse> {
         return safeApiCall {
+            // CRITICAL: Block if offline
+            offlineModeGuard.requireOnlineForFinancialTransaction()
+            
+            // Validate amount
+            val validation = financialSecurity.validateAmount(
+                amount = fiatAmount.toDouble(),
+                minAmount = 5.0,
+                maxAmount = 50000.0
+            )
+            if (!validation.isValid) {
+                throw IllegalArgumentException(validation.message)
+            }
+            
+            // Get current user ID
+            val userSession = tokenManager.getUserSession()
+                ?: throw IllegalStateException("User session not found")
+            
+            // Generate nonce and timestamp
+            val nonce = com.krieta.com.core.security.WithdrawalSecurity.generateNonce()
+            val timestamp = System.currentTimeMillis()
+            
+            // Sign with new secure method
+            val signature = financialSecurity.signTopUp(
+                userId = userSession.userId,
+                amount = fiatAmount.toDouble(),
+                currency = currency,
+                paymentMethod = provider,
+                nonce = nonce,
+                timestamp = timestamp
+            ) ?: throw IllegalStateException("Session expired. Please login again.")
+            
             val request = TopupInitiateRequestDto(
                 fiatAmount = fiatAmount,
                 currency = currency,
@@ -220,22 +312,22 @@ class WalletRepositoryImpl(
             val response = api.initiateTopup(request)
             
             TopupInitiateResponse(
-                transactionId = response.transactionId,
-                reference = response.reference,
-                krAmount = response.krAmount,
-                fiatAmount = response.fiatAmount,
-                currency = response.currency,
-                provider = response.provider,
-                status = response.status,
+                transactionId = response.transactionId ?: "",
+                reference = response.reference ?: "",
+                krAmount = response.krAmount ?: 0,
+                fiatAmount = response.fiatAmount ?: 0,
+                currency = response.currency ?: "",
+                provider = response.provider ?: "",
+                status = response.status ?: "",
                 paymentInstructions = PaymentInstructions(
-                    provider = response.paymentInstructions.provider,
-                    amount = response.paymentInstructions.amount,
-                    currency = response.paymentInstructions.currency,
-                    instructions = response.paymentInstructions.instructions,
-                    phoneNumber = response.paymentInstructions.phoneNumber,
-                    paybill = response.paymentInstructions.paybill,
-                    accountNumber = response.paymentInstructions.accountNumber,
-                    paymentUrl = response.paymentInstructions.paymentUrl
+                    provider = response.paymentInstructions?.provider ?: "",
+                    amount = response.paymentInstructions?.amount?.toString() ?: "",
+                    currency = response.paymentInstructions?.currency ?: "",
+                    instructions = response.paymentInstructions?.instructions ?: "",
+                    phoneNumber = response.paymentInstructions?.phoneNumber,
+                    paybill = response.paymentInstructions?.paybill,
+                    accountNumber = response.paymentInstructions?.accountNumber,
+                    paymentUrl = response.paymentInstructions?.paymentUrl
                 )
             )
         }

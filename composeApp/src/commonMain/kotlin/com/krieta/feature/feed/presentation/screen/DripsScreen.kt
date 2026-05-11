@@ -134,9 +134,8 @@ class DripsScreen : Screen {
                     currencyProvider = currencyProvider,
                     onDismiss = { showTippingFor = null },
                     onConfirm = { krAmount ->
-                        val fiatAmount = currencyProvider.krToFiat(krAmount)
                         scope.launch {
-                            walletRepository.sendTip(post.creator.id, fiatAmount, currencyProvider.currencyCode)
+                            walletRepository.sendTip(post.creator.id, krAmount.toInt(), currencyProvider.currencyCode)
                             showTippingFor = null
                         }
                     },
@@ -167,78 +166,57 @@ class DripsScreen : Screen {
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
-                        val postsWithAds = mutableListOf<Any>()
-                        state.items.forEachIndexed { index, post ->
-                            postsWithAds.add(post)
-                            
-                            if ((index + 1) % 6 == 0 && index < state.items.size - 1) {
-                                postsWithAds.add("NATIVE_AD_$index")
-                            }
-                            else if ((index + 1) % 15 == 0 && index < state.items.size - 1) {
-                                postsWithAds.add("BANNER_AD_$index")
-                            }
-                            else if ((index + 1) % 20 == 0 && index < state.items.size - 1) {
-                                postsWithAds.add("STORY_AD_$index")
-                            }
-                        }
-
-                        items(postsWithAds.size, key = { index ->
-                            val item = postsWithAds[index]
-                            if (item is Post) item.id else "ad_$index"
+                        items(state.items.size, key = { index ->
+                            state.items[index].id
                         }) { index ->
-                            val item = postsWithAds[index]
-                            when {
-                                item is Post -> {
-                                    if (item.isSponsored == true) {
-                                        SponsoredPostCard(
-                                            post = item,
-                                            onLike = { viewModel.toggleLike(item.id) },
-                                            onComment = { 
-                                                currentUserId?.let { userId ->
-                                                    navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
-                                                }
-                                            },
-                                            onTip = { showTippingFor = item },
-                                            onImageClick = { images, index ->
-                                                selectedImages = images
-                                                selectedImageIndex = index
-                                                showImageViewer = true
-                                            },
-                                            currentUserId = currentUserId
-                                        )
-                                    } else {
-                                        PostCard(
-                                            post = item,
-                                            onLike = { viewModel.toggleLike(item.id) },
-                                            onComment = { 
-                                                currentUserId?.let { userId ->
-                                                    navigator.push(CommentsScreen(ContentType.POST, item.id, userId))
-                                                }
-                                            },
-                                            onTip = { showTippingFor = item },
-                                            onImageClick = { images, index ->
-                                                selectedImages = images
-                                                selectedImageIndex = index
-                                                showImageViewer = true
-                                            },
-                                            currentUserId = currentUserId
-                                        )
-                                    }
-                                    HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                            val post = state.items[index]
+                            val isSponsored = viewModel.isSponsored(index)
+                            
+                            if (isSponsored) {
+                                SponsoredPostCard(
+                                    post = post,
+                                    onLike = { 
+                                        viewModel.toggleLike(post.id)
+                                        viewModel.recordSponsoredEngagement(index, "like")
+                                    },
+                                    onComment = { 
+                                        currentUserId?.let { userId ->
+                                            navigator.push(CommentsScreen(ContentType.POST, post.id, userId))
+                                        }
+                                        viewModel.recordSponsoredEngagement(index, "comment")
+                                    },
+                                    onTip = { showTippingFor = post },
+                                    onImageClick = { images, imgIndex ->
+                                        selectedImages = images
+                                        selectedImageIndex = imgIndex
+                                        showImageViewer = true
+                                    },
+                                    currentUserId = currentUserId
+                                )
+                                
+                                // Track sponsored impression
+                                LaunchedEffect(index) {
+                                    viewModel.recordSponsoredImpression(index)
                                 }
-                                item is String && item.startsWith("NATIVE_AD") -> {
-                                    NativeAdCard()
-                                    HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
-                                }
-                                item is String && item.startsWith("BANNER_AD") -> {
-                                    BannerAdCard()
-                                    HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
-                                }
-                                item is String && item.startsWith("STORY_AD") -> {
-                                    StoryStyleAdCard()
-                                    HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
-                                }
+                            } else {
+                                PostCard(
+                                    post = post,
+                                    onLike = { viewModel.toggleLike(post.id) },
+                                    onComment = { 
+                                        currentUserId?.let { userId ->
+                                            navigator.push(CommentsScreen(ContentType.POST, post.id, userId))
+                                        }
+                                    },
+                                    onTip = { showTippingFor = post },
+                                    onImageClick = { images, imgIndex ->
+                                        selectedImages = images
+                                        selectedImageIndex = imgIndex
+                                        showImageViewer = true
+                                    },
+                                    currentUserId = currentUserId
+                                )
                             }
+                            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
                         }
 
                         if (state.isLoadingMore) {
@@ -424,6 +402,8 @@ class DripsScreen : Screen {
 
     @Composable
     private fun NativeAdCard() {
+        val navigator = LocalNavigator.currentOrThrow
+        
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -475,7 +455,7 @@ class DripsScreen : Screen {
                 Spacer(Modifier.height(12.dp))
                 
                 Button(
-                    onClick = { },
+                    onClick = { navigator.push(com.krieta.feature.ads.presentation.screen.KrietaAdsManagerScreen()) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = androidx.compose.ui.graphics.Color(0xFFFFCC00)
@@ -489,11 +469,14 @@ class DripsScreen : Screen {
 
     @Composable
     private fun BannerAdCard() {
+        val navigator = LocalNavigator.currentOrThrow
+        
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp)
+                .clickable { navigator.push(com.krieta.feature.ads.presentation.screen.KrietaAdsManagerScreen()) },
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -529,6 +512,8 @@ class DripsScreen : Screen {
 
     @Composable
     private fun StoryStyleAdCard() {
+        val navigator = LocalNavigator.currentOrThrow
+        
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -569,7 +554,7 @@ class DripsScreen : Screen {
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Button(
-                            onClick = { },
+                            onClick = { navigator.push(com.krieta.feature.ads.presentation.screen.KrietaAdsManagerScreen()) },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = androidx.compose.ui.graphics.Color(0xFFFFCC00)
                             )

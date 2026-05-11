@@ -51,4 +51,22 @@ class ShopApi(private val client: HttpClient) {
     suspend fun deleteProduct(productId: String) {
         client.delete("${ApiConstants.SHOP_PRODUCTS}/$productId")
     }
+
+    suspend fun getProductReviews(productId: String, cursor: String? = null, limit: Int = 20): ReviewListResponseDto {
+        return client.get("${ApiConstants.SHOP_PRODUCTS}/$productId/reviews") {
+            cursor?.let { parameter("cursor", it) }
+            parameter("limit", limit)
+        }.body()
+    }
+
+    suspend fun createReview(request: CreateReviewRequestDto): ProductReviewDto {
+        return client.post("${ApiConstants.SHOP_BASE}/reviews") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun deleteReview(reviewId: String) {
+        client.delete("${ApiConstants.SHOP_BASE}/reviews/$reviewId")
+    }
 }

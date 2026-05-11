@@ -1,47 +1,47 @@
 package com.krieta.feature.contentlock.data
 
-import com.krieta.core.network.Result
+import com.krieta.com.core.network.NetworkResult
 
 interface ContentLockRepository {
-    suspend fun unlockContent(contentId: String, contentType: String): Result<UnlockResponse>
-    suspend fun getUnlockPrice(unlockAmountKr: Int, currency: String): Result<UnlockPriceResponse>
-    suspend fun convertFiatToKr(fiatAmount: Double, currency: String): Result<ConvertFiatResponse>
-    suspend fun checkAccess(contentId: String, contentType: String): Result<AccessCheckResponse>
+    suspend fun unlockContent(contentId: String, contentType: String): NetworkResult<UnlockResponse>
+    suspend fun getUnlockPrice(unlockAmountKr: Int, currency: String): NetworkResult<UnlockPriceResponse>
+    suspend fun convertFiatToKr(fiatAmount: Double, currency: String): NetworkResult<ConvertFiatResponse>
+    suspend fun checkAccess(contentId: String, contentType: String): NetworkResult<AccessCheckResponse>
 }
 
 class ContentLockRepositoryImpl(
     private val api: ContentLockApi
 ) : ContentLockRepository {
     
-    override suspend fun unlockContent(contentId: String, contentType: String): Result<UnlockResponse> {
+    override suspend fun unlockContent(contentId: String, contentType: String): NetworkResult<UnlockResponse> {
         return try {
-            Result.Success(api.unlockContent(contentId, contentType))
+            NetworkResult.Success(api.unlockContent(contentId, contentType))
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to unlock content")
+            NetworkResult.Error(message = e.message ?: "Failed to unlock content")
         }
     }
     
-    override suspend fun getUnlockPrice(unlockAmountKr: Int, currency: String): Result<UnlockPriceResponse> {
+    override suspend fun getUnlockPrice(unlockAmountKr: Int, currency: String): NetworkResult<UnlockPriceResponse> {
         return try {
-            Result.Success(api.getUnlockPrice(unlockAmountKr, currency))
+            NetworkResult.Success(api.getUnlockPrice(unlockAmountKr, currency))
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to get unlock price")
+            NetworkResult.Error(message = e.message ?: "Failed to get unlock price")
         }
     }
     
-    override suspend fun convertFiatToKr(fiatAmount: Double, currency: String): Result<ConvertFiatResponse> {
+    override suspend fun convertFiatToKr(fiatAmount: Double, currency: String): NetworkResult<ConvertFiatResponse> {
         return try {
-            Result.Success(api.convertFiatToKr(fiatAmount, currency))
+            NetworkResult.Success(api.convertFiatToKr(fiatAmount, currency))
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to convert currency")
+            NetworkResult.Error(message = e.message ?: "Failed to convert currency")
         }
     }
     
-    override suspend fun checkAccess(contentId: String, contentType: String): Result<AccessCheckResponse> {
+    override suspend fun checkAccess(contentId: String, contentType: String): NetworkResult<AccessCheckResponse> {
         return try {
-            Result.Success(api.checkAccess(contentId, contentType))
+            NetworkResult.Success(api.checkAccess(contentId, contentType))
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to check access")
+            NetworkResult.Error(message = e.message ?: "Failed to check access")
         }
     }
 }

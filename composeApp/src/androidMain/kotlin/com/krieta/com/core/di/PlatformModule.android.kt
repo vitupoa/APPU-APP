@@ -3,6 +3,7 @@ package com.krieta.com.core.di
 import com.krieta.com.core.location.LocationProvider
 import com.krieta.com.core.oauth.AndroidOAuthBrowser
 import com.krieta.com.core.oauth.OAuthBrowser
+import com.krieta.com.core.offline.MediaCacheManager
 import com.krieta.com.core.security.AndroidDeviceSecurity
 import com.krieta.com.core.security.AndroidTokenManager
 import com.krieta.com.core.security.DeviceSecurity
@@ -25,4 +26,5 @@ actual fun platformModule(): Module = module {
     single<BiometricAuthenticator> { AndroidBiometricAuthenticator(androidContext()) }
     single<SecureKeyStorage> { AndroidSecureKeyStorage(androidContext()) }
     single { DeviceSecurityChecker(androidContext()) }
+    single { MediaCacheManager(androidContext()) }
 }

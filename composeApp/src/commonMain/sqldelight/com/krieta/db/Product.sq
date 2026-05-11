@@ -1,0 +1,72 @@
+-- Product table for offline caching
+CREATE TABLE IF NOT EXISTS Product (
+    id TEXT PRIMARY KEY NOT NULL,
+    sellerId TEXT NOT NULL,
+    sellerUsername TEXT NOT NULL,
+    sellerDisplayName TEXT NOT NULL,
+    sellerAvatarUrl TEXT,
+    title TEXT NOT NULL,
+    description TEXT,
+    price REAL NOT NULL,
+    currency TEXT NOT NULL,
+    category TEXT NOT NULL,
+    condition TEXT NOT NULL,
+    stockQuantity INTEGER NOT NULL DEFAULT 0,
+    isAvailable INTEGER AS Boolean NOT NULL DEFAULT 1,
+    viewsCount INTEGER NOT NULL DEFAULT 0,
+    likesCount INTEGER NOT NULL DEFAULT 0,
+    isLiked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    createdAt TEXT NOT NULL,
+    updatedAt TEXT NOT NULL,
+    cachedAt INTEGER NOT NULL
+);
+
+-- ProductImage table for offline caching
+CREATE TABLE IF NOT EXISTS ProductImage (
+    id TEXT PRIMARY KEY NOT NULL,
+    productId TEXT NOT NULL,
+    imageUrl TEXT NOT NULL,
+    sortOrder INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (productId) REFERENCES Product(id) ON DELETE CASCADE
+);
+
+-- Queries for Product
+insertOrReplaceProduct:
+INSERT OR REPLACE INTO Product (
+    id, sellerId, sellerUsername, sellerDisplayName, sellerAvatarUrl,
+    title, description, price, currency, category, condition,
+    stockQuantity, isAvailable, viewsCount, likesCount, isLiked,
+    createdAt, updatedAt, cachedAt
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getAllProducts:
+SELECT * FROM Product WHERE isAvailable = 1 ORDER BY cachedAt DESC;
+
+getProductById:
+SELECT * FROM Product WHERE id = ?;
+
+getProductsBySellerId:
+SELECT * FROM Product WHERE sellerId = ? ORDER BY createdAt DESC;
+
+getProductsByCategory:
+SELECT * FROM Product WHERE category = ? AND isAvailable = 1 ORDER BY cachedAt DESC;
+
+deleteProduct:
+DELETE FROM Product WHERE id = ?;
+
+deleteAllProducts:
+DELETE FROM Product;
+
+updateProductLike:
+UPDATE Product SET isLiked = ?, likesCount = ? WHERE id = ?;
+
+-- Queries for ProductImage
+insertOrReplaceProductImage:
+INSERT OR REPLACE INTO ProductImage (id, productId, imageUrl, sortOrder)
+VALUES (?, ?, ?, ?);
+
+getImagesByProductId:
+SELECT * FROM ProductImage WHERE productId = ? ORDER BY sortOrder ASC;
+
+deleteImagesByProductId:
+DELETE FROM ProductImage WHERE productId = ?;

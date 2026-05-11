@@ -70,11 +70,43 @@ class LiveFeedScreen : Screen {
                 }
                 error != null -> {
                     Column(
-                        modifier = Modifier.align(Alignment.Center),
+                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Error loading streams", color = Color.White)
-                        Text(error ?: "", color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
+                        Text(
+                            "Error loading streams",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            error ?: "Unknown error",
+                            color = Color.White.copy(alpha = 0.7f),
+                            fontSize = 12.sp
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                isLoading = true
+                                error = null
+                                scope.launch {
+                                    liveRepository.getActiveStreams().fold(
+                                        onSuccess = { 
+                                            streams = it
+                                            isLoading = false
+                                        },
+                                        onFailure = { 
+                                            error = it.message
+                                            isLoading = false
+                                        }
+                                    )
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD700))
+                        ) {
+                            Text("Retry", color = Color.Black)
+                        }
                     }
                 }
                 streams.isEmpty() -> {

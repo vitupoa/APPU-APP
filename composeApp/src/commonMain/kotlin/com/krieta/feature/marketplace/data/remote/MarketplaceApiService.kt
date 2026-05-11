@@ -116,13 +116,25 @@ class MarketplaceApiService(private val client: HttpClient) {
 data class CreateCampaignRequest(
     val title: String,
     val description: String,
-    val budget: Double,
-    val targetTier: InfluencerTier?,
-    val categories: List<String>,
-    val requirements: String,
-    val deliverables: String,
-    val startDate: String,
-    val endDate: String
+    val type: String,
+    val targetTiers: List<String>,
+    val targetCategories: List<String>,
+    val minFollowers: Int? = null,
+    val minEngagementRate: Double? = null,
+    val targetGeos: List<String>? = null,
+    val budgetKr: Double,
+    val compensationPerInfluencer: Double,
+    val maxInfluencers: Int,
+    val requiredPosts: Int? = null,
+    val requiredVideos: Int? = null,
+    val requiredStories: Int? = null,
+    val contentGuidelines: String? = null,
+    val hashtags: List<String>? = null,
+    val mentions: List<String>? = null,
+    val contestId: String? = null,
+    val applicationDeadline: String? = null,
+    val campaignStartDate: String,
+    val campaignEndDate: String
 )
 
 @kotlinx.serialization.Serializable

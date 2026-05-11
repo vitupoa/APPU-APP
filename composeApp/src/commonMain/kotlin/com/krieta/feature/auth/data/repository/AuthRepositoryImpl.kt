@@ -23,7 +23,8 @@ class AuthRepositoryImpl(
     private val api: AuthApi,
     private val tokenManager: TokenManager,
     private val deviceSecurity: DeviceSecurity,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val financialSecurity: com.krieta.com.core.security.FinancialTransactionSecurity
 ) : AuthRepository {
 
     private val _currentUser = MutableStateFlow<User?>(null)
@@ -73,6 +74,14 @@ class AuthRepositoryImpl(
             response.refreshToken?.let { tokenManager.saveRefreshToken(it) }
             invalidateBearerCache()
             
+            // Initialize financial security with session secret
+            if (response.sessionSecret != null && response.secretExpiresAt != null) {
+                financialSecurity.initializeSessionSecret(
+                    secret = response.sessionSecret,
+                    expiresAt = response.secretExpiresAt
+                )
+            }
+            
             val user = response.user?.let { mapUser(it) }
                 ?: throw IllegalStateException("Login failed: Invalid server response")
             
@@ -103,6 +112,14 @@ class AuthRepositoryImpl(
             response.accessToken?.let { tokenManager.saveAccessToken(it) }
             response.refreshToken?.let { tokenManager.saveRefreshToken(it) }
             invalidateBearerCache()
+            
+            // Initialize financial security with session secret
+            if (response.sessionSecret != null && response.secretExpiresAt != null) {
+                financialSecurity.initializeSessionSecret(
+                    secret = response.sessionSecret,
+                    expiresAt = response.secretExpiresAt
+                )
+            }
             
             val user = response.user?.let { mapUser(it) }
                 ?: throw IllegalStateException("Login failed: Invalid server response")
@@ -136,6 +153,14 @@ class AuthRepositoryImpl(
             response.refreshToken?.let { tokenManager.saveRefreshToken(it) }
             invalidateBearerCache()
 
+            // Initialize financial security with session secret
+            if (response.sessionSecret != null && response.secretExpiresAt != null) {
+                financialSecurity.initializeSessionSecret(
+                    secret = response.sessionSecret,
+                    expiresAt = response.secretExpiresAt
+                )
+            }
+
             val user = mapUser(response.user)
             
             // Save user session for quick access
@@ -166,6 +191,9 @@ class AuthRepositoryImpl(
             }
             clearSession()
             invalidateBearerCache()
+            
+            // Clear financial security session
+            financialSecurity.clearSession()
         }
     }
 

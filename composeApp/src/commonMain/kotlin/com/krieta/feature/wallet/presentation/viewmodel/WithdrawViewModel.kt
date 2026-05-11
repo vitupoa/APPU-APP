@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
+import com.krieta.com.core.util.currentTimeMillis
 import kotlin.uuid.Uuid
 
 enum class WithdrawProvider(val displayName: String) {
@@ -303,22 +304,37 @@ class WithdrawViewModel(
                 
                 // Step 4: Hardware-backed signing (if available)
                 val signature = if (_state.value.hardwareSecurityAvailable) {
-                    val dataToSign = "$userId|$krAmount|$provider|$account".toByteArray()
+                    val dataToSign = "$userId|$krAmount|$provider|$account".encodeToByteArray()
                     secureKeyStorage.signData(WITHDRAWAL_KEY_ALIAS, dataToSign)
                 } else {
                     null
                 }
                 
                 // Step 5: Submit withdrawal request
-                val request: Map<String, Any> = buildMap {
-                    put("krAmount", krAmount)
-                    put("provider", provider)
-                    put("currency", userCurrency)
-                    put("account", account)
-                    signature?.let { sig ->
-                        put("hardwareSignature", sig.joinToString("") { byte -> "%02x".format(byte) })
-                    }
-                }
+                val timestamp = currentTimeMillis()
+                val nonce = com.krieta.com.core.security.WithdrawalSecurity.generateNonce()
+                val amountHash = com.krieta.com.core.security.WithdrawalSecurity.generateAmountHash(
+                    userId = userId,
+                    amount = krAmount,
+                    timestamp = timestamp,
+                    nonce = nonce
+                )
+                val balanceHash = com.krieta.com.core.security.WithdrawalSecurity.generateBalanceHash(
+                    userId = userId,
+                    balance = _state.value.krBalance,
+                    timestamp = timestamp
+                )
+                
+                val request = com.krieta.feature.wallet.domain.repository.WithdrawRequest(
+                    provider = provider,
+                    krAmount = krAmount,
+                    currency = userCurrency,
+                    phoneNumber = if (provider == "mpesa") account else null,
+                    accountNumber = if (provider != "mpesa") account else null,
+                    amountHash = amountHash,
+                    requestTimestamp = timestamp,
+                    balanceHash = balanceHash
+                )
                 
                 when (val result = walletRepository.withdraw(request)) {
                     is NetworkResult.Success -> {

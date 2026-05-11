@@ -13,7 +13,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.material3.*
@@ -30,7 +29,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.krieta.com.core.network.NetworkResult
+import com.krieta.com.core.ui.components.TippingModal
 import com.krieta.feature.live.presentation.viewmodel.ViewerLiveViewModel
+import com.krieta.feature.wallet.domain.repository.WalletRepository
+import com.krieta.feature.wallet.presentation.screen.TopupScreen
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
@@ -40,7 +43,23 @@ class ViewerLiveScreen(private val streamId: String) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinInject<ViewerLiveViewModel> { parametersOf(streamId) }
+        val walletRepository = koinInject<WalletRepository>()
         val state by viewModel.state.collectAsState()
+        val scope = rememberCoroutineScope()
+
+        // Wallet balance for tipping modal
+        var currentBalance by remember { mutableStateOf(0.0) }
+        var showTippingModal by remember { mutableStateOf(false) }
+
+        // Fetch wallet balance
+        LaunchedEffect(Unit) {
+            when (val result = walletRepository.getBalance()) {
+                is NetworkResult.Success -> {
+                    currentBalance = result.data.krBalance
+                }
+                else -> {}
+            }
+        }
 
         Box(
             modifier = Modifier
@@ -161,6 +180,69 @@ class ViewerLiveScreen(private val streamId: String) : Screen {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 24.dp)
             ) {
+                // Product Card (if commerce live)
+                if (state.stream?.type == com.krieta.feature.live.domain.model.LiveStreamType.COMMERCE && state.stream?.pinnedProduct != null) {
+                    val product = state.stream!!.pinnedProduct!!
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth(0.75f)
+                            .padding(bottom = 12.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(8.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (product.imageUrl != null) {
+                                    AsyncImage(
+                                        model = product.imageUrl,
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Text("📦", fontSize = 24.sp)
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    product.title,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    "${product.priceKr.toInt()} Kr",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF43A047)
+                                )
+                            }
+                            Button(
+                                onClick = { /* Contact seller */ },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF43A047)
+                                ),
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Text("Contact", fontSize = 12.sp, color = Color.White)
+                            }
+                        }
+                    }
+                }
+                
                 // Scrolling Chat
                 LazyColumn(
                     modifier = Modifier
@@ -228,17 +310,19 @@ class ViewerLiveScreen(private val streamId: String) : Screen {
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // Gift Button
-                    IconButton(
-                        onClick = { viewModel.sendTip(10.0, null, null) },
-                        modifier = Modifier
-                            .background(Color(0xFFFF1493), CircleShape)
-                            .size(48.dp)
-                    ) {
-                        Text("🎁", fontSize = 24.sp)
-                    }
+                    // Gift/Tip Button — only show for non-commerce live
+                    if (state.stream?.type != com.krieta.feature.live.domain.model.LiveStreamType.COMMERCE) {
+                        IconButton(
+                            onClick = { showTippingModal = true },
+                            modifier = Modifier
+                                .background(Color(0xFFFF1493), CircleShape)
+                                .size(48.dp)
+                        ) {
+                            Text("🎁", fontSize = 24.sp)
+                        }
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
+                    }
 
                     // Like Button
                     IconButton(
@@ -257,6 +341,25 @@ class ViewerLiveScreen(private val streamId: String) : Screen {
                         }
                     }
                 }
+            }
+
+            // TippingModal — uses wallet REST API (same as Drips/Shorts)
+            if (showTippingModal && state.stream != null) {
+                TippingModal(
+                    recipientUsername = state.stream!!.host?.username ?: "host",
+                    recipientDisplayName = state.stream!!.host?.displayName ?: "Host",
+                    currentBalance = currentBalance,
+                    currencyProvider = viewModel.currencyProvider,
+                    onDismiss = { showTippingModal = false },
+                    onConfirm = { krAmount ->
+                        viewModel.sendTip(krAmount.toInt())
+                        showTippingModal = false
+                    },
+                    onInsufficientBalance = {
+                        showTippingModal = false
+                        navigator.push(TopupScreen())
+                    }
+                )
             }
         }
     }

@@ -2,11 +2,14 @@ package com.krieta.feature.live.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.krieta.com.core.location.UserCurrencyProvider
+import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.live.data.socket.LiveSocketEvent
 import com.krieta.feature.live.data.socket.LiveSocketManager
 import com.krieta.feature.live.domain.model.LiveMessage
 import com.krieta.feature.live.domain.model.LiveStream
 import com.krieta.feature.live.domain.repository.LiveRepository
+import com.krieta.feature.wallet.domain.repository.WalletRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,12 +26,16 @@ data class ViewerLiveState(
     val showTipAnimation: Boolean = false,
     val lastTipAmount: Double = 0.0,
     val lastTipSender: String = "",
+    val isTipping: Boolean = false,
+    val tipError: String? = null,
     val error: String? = null
 )
 
 class ViewerLiveViewModel(
     private val liveRepository: LiveRepository,
     private val socketManager: LiveSocketManager,
+    private val walletRepository: WalletRepository,
+    val currencyProvider: UserCurrencyProvider,
     private val streamId: String,
     private val tokenManager: com.krieta.com.core.security.TokenManager,
     private val currentUserId: String,
@@ -138,18 +145,27 @@ class ViewerLiveViewModel(
         }
     }
 
-    fun sendTip(amountKr: Double, message: String?, giftType: String?) {
+    /**
+     * Send tip via the wallet REST API (same system used by Drips/Shorts).
+     * The wallet backend handles deduction, credit, platform fee, and transaction recording.
+     */
+    fun sendTip(krAmount: Int) {
+        val stream = _state.value.stream ?: return
         viewModelScope.launch {
-            val stream = _state.value.stream ?: return@launch
-            socketManager.sendTip(
-                senderId = currentUserId,
-                senderName = currentUsername,
-                senderAvatar = currentUserAvatar,
+            _state.update { it.copy(isTipping = true, tipError = null) }
+            when (val result = walletRepository.sendTip(
                 recipientId = stream.hostId,
-                amountKr = amountKr,
-                message = message,
-                giftType = giftType
-            )
+                krAmount = krAmount,
+                currency = currencyProvider.currencyCode
+            )) {
+                is NetworkResult.Success -> {
+                    _state.update { it.copy(isTipping = false) }
+                }
+                is NetworkResult.Error -> {
+                    _state.update { it.copy(isTipping = false, tipError = result.message) }
+                }
+                is NetworkResult.Loading -> {}
+            }
         }
     }
 

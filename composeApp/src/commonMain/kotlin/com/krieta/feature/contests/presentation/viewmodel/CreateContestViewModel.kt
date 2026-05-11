@@ -19,6 +19,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.plus
 import kotlin.time.ExperimentalTime
+import com.krieta.com.core.util.formatString
 
 // Enums for wizard configuration
 enum class ParticipationType {
@@ -737,7 +738,7 @@ class CreateContestViewModel(
         if (currentState.votingCostFiat <= 0.0) return "Free"
         val krAmount = convertToKr(currentState.votingCostFiat, applyMargin = false)
         val currencyCode = getCurrencyCode()
-        return "${formatKr(krAmount)} (~$currencyCode ${com.krieta.com.core.util.formatString("%.2f", currentState.votingCostFiat)})"
+        return "${formatKr(krAmount)} (~$currencyCode ${formatString("%.2f", currentState.votingCostFiat)})"
     }
     
     // Step 1: Contest Details and Dates Update Functions (Subtask 2.2)
@@ -1017,8 +1018,8 @@ class CreateContestViewModel(
                 // Convert selection method to judging criteria
                 val judgingCriteria = when (currentState.selectionMethod) {
                     SelectionMethod.MANUAL -> "CREATOR_PICKS"
-                    SelectionMethod.RANDOM -> "RANDOM"
-                    SelectionMethod.VOTING -> if (currentState.paidVoting) "PAID_VOTING" else "COMMUNITY_VOTING"
+                    SelectionMethod.RANDOM -> "MOST_ENGAGEMENT"
+                    SelectionMethod.VOTING -> "COMMUNITY_VOTE"
                     SelectionMethod.COMBINATION -> "COMBINATION"
                 }
                 
@@ -1035,7 +1036,7 @@ class CreateContestViewModel(
                     description = currentState.description,
                     mediaType = currentState.mediaType,
                     category = currentState.category,
-                    prizeKr = convertToKr(totalPrize, applyMargin = false), // Convert total prize pool to Kr
+                    prizeTotalKr = convertToKr(totalPrize, applyMargin = false), // Convert total prize pool to Kr
                     requiredActions = requiredActions,
                     maxWinners = currentState.winnerSlots,
                     prizeDistribution = prizeDistribution,

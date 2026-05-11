@@ -13,8 +13,12 @@ data class WalletBalanceDto(
 @Serializable
 data class TipRequestDto(
     val recipientId: String,
-    val fiatAmount: Double,
-    val currency: String
+    val krAmount: Int,
+    val currency: String,
+    // MITM protection: HMAC signature over (recipientId, krAmount, currency, timestamp, nonce)
+    val signature: String,
+    val timestamp: Long,
+    val nonce: String
 )
 
 @Serializable
@@ -45,6 +49,8 @@ data class ExchangeRateResponseDto(
 data class TipResponseDto(
     val success: Boolean,
     val krTipped: Double? = null,
+    val krReceived: Double? = null,
+    val platformFee: Double? = null,
     val error: String? = null
 )
 

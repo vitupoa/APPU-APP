@@ -160,37 +160,45 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     modifier = Modifier.fillMaxSize()
                 ) { page ->
                     val short = state.items.getOrNull(page) ?: return@VerticalPager
+                    val isSponsored = viewModel.isSponsored(page)
+                    
                     ShortItem(
                         short = short,
                         isActive = page == pagerState.currentPage,
                         isTipModalOpen = showTippingFor != null,
-                        isSponsored = false,
+                        isSponsored = isSponsored,
                         isOwnContent = currentUserId == short.creator.id,
                         onLike = { 
                             viewModel.toggleLike(short.id)
-                            if (false) {
-                                // removed
+                            if (isSponsored) {
+                                viewModel.recordSponsoredEngagement(page, "like")
                             }
                         },
                         onComment = { 
-                            // Only allow comments if user is authenticated
                             currentUserId?.let { userId ->
                                 navigator.push(CommentsScreen(ContentType.SHORT, short.id, userId))
                             }
-                            if (false) {
-                                // removed
+                            if (isSponsored) {
+                                viewModel.recordSponsoredEngagement(page, "comment")
                             }
                         },
                         onTip = { showTippingFor = short },
                         onWatchTimeUpdate = { watchTime ->
-                            if (false) {
-                                // removed
+                            if (isSponsored && watchTime >= 3) {
+                                viewModel.recordSponsoredView(page, watchTime)
                             }
                         },
                         onViewTracked = { watchDuration, totalDuration ->
-                            // removed
+                            viewModel.trackView(short.id, watchDuration, totalDuration)
                         }
                     )
+                    
+                    // Track sponsored impression when short appears
+                    LaunchedEffect(page, isSponsored) {
+                        if (isSponsored && page == pagerState.currentPage) {
+                            viewModel.recordSponsoredImpression(page)
+                        }
+                    }
                 }
                 }
             }
@@ -214,9 +222,8 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     currencyProvider = currencyProvider,
                     onDismiss = { showTippingFor = null },
                     onConfirm = { krAmount ->
-                        val fiatAmount = currencyProvider.krToFiat(krAmount)
                         scope.launch {
-                            walletRepository.sendTip(short.creator.id, fiatAmount, currencyProvider.currencyCode)
+                            walletRepository.sendTip(short.creator.id, krAmount.toInt(), currencyProvider.currencyCode)
                             showTippingFor = null
                         }
                     },

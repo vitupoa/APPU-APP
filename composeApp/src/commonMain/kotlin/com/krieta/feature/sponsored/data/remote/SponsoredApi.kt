@@ -59,16 +59,4 @@ class SponsoredApi(private val client: HttpClient) {
     suspend fun getMyCampaigns(): List<SponsoredContent> {
         return client.get("/api/v1/sponsored/campaigns/my").body()
     }
-    
-    suspend fun getPendingCampaigns(): List<SponsoredContent> {
-        return client.get("/api/v1/sponsored/campaigns/pending").body()
-    }
-    
-    suspend fun approveCampaign(campaignId: String): SponsoredContent {
-        return client.patch("/api/v1/sponsored/campaigns/$campaignId/approve").body()
-    }
-    
-    suspend fun rejectCampaign(campaignId: String): SponsoredContent {
-        return client.patch("/api/v1/sponsored/campaigns/$campaignId/reject").body()
-    }
 }

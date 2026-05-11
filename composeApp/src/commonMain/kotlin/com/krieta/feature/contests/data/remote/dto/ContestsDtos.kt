@@ -92,7 +92,7 @@ data class CreateContestRequestDto(
     val description: String,
     val mediaType: String,
     val category: String, // Matches backend 'category'
-    val prizeKr: Double,
+    val prizeTotalKr: Double,
     val requiredActions: List<RequiredActionDto>,
     val maxWinners: Int,
     val prizeDistribution: List<PrizeDistributionDto>, // Matches backend requirement

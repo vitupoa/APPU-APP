@@ -30,7 +30,8 @@ export class ChatController {
       const userId = req.userId!;
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 20;
-      const chats = await ChatService.getChats(userId, page, limit);
+      const unreadOnly = req.query.unreadOnly === 'true';
+      const chats = await ChatService.getChats(userId, page, limit, unreadOnly);
       res.json({ success: true, chats });
     } catch (error) {
       next(error);
@@ -169,6 +170,31 @@ export class ChatController {
 
       const message = await ChatService.forwardMessage(userId, messageId, targetChatId);
       res.json({ success: true, message });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async markAsRead(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId!;
+      const chatId = String(req.params.chatId);
+
+      const result = await ChatService.markAsRead(userId, chatId);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async sendTypingIndicator(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId!;
+      const chatId = String(req.params.chatId);
+      const { isTyping } = req.body;
+
+      const result = await ChatService.sendTypingIndicator(userId, chatId, isTyping);
+      res.json(result);
     } catch (error) {
       next(error);
     }

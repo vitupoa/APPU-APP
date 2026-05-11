@@ -16,10 +16,10 @@ data class CommentDto(
     val isLiked: Boolean,
     val isPinned: Boolean,
     val isEdited: Boolean,
-    val canDelete: Boolean,
-    val canEdit: Boolean,
-    val canPin: Boolean,
-    val canReply: Boolean,
+    val canDelete: Boolean? = false,
+    val canEdit: Boolean? = false,
+    val canPin: Boolean? = false,
+    val canReply: Boolean? = false,
     val createdAt: String,
     val editedAt: String?
 )
@@ -62,6 +62,6 @@ data class UpdateCommentRequestDto(
 
 @Serializable
 data class CommentActionResponseDto(
-    val success: Boolean,
+    val success: Boolean = true,
     val comment: CommentDto? = null
 )

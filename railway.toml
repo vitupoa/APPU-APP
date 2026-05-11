@@ -1,0 +1,10 @@
+[build]
+builder = "railpack"
+watchPaths = ["backend/**"]
+
+[build.env]
+NODE_ENV = "production"
+
+[deploy]
+startCommand = "npm run start"
+rootDirectory = "backend"

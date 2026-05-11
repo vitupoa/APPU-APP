@@ -15,7 +15,7 @@ export class ChamaController {
       const chama = await ChamaService.createChama(req.userId!, parsed);
       res.status(201).json({ success: true, chama });
     } catch (e: any) {
-      res.status(400).json({ success: false, error: e.message });
+      res.status(400).json({ success: false, chama: null, error: e.message });
     }
   }
 
@@ -24,7 +24,7 @@ export class ChamaController {
       const chamas = await ChamaService.getMyChamas(req.userId!);
       res.json({ success: true, chamas });
     } catch (e: any) {
-      res.status(400).json({ success: false, error: e.message });
+      res.status(400).json({ success: false, chamas: [], error: e.message });
     }
   }
 
@@ -35,7 +35,7 @@ export class ChamaController {
       const chamas = await ChamaService.discoverChamas(req.userId!, page, limit);
       res.json({ success: true, chamas });
     } catch (e: any) {
-      res.status(400).json({ success: false, error: e.message });
+      res.status(400).json({ success: false, chamas: [], error: e.message });
     }
   }
 
@@ -43,10 +43,10 @@ export class ChamaController {
     try {
       const chamaId = String(req.params.id);
       const chama = await ChamaService.getChamaById(chamaId);
-      if (!chama) return res.status(404).json({ success: false, error: 'Chama not found' });
+      if (!chama) return res.status(404).json({ success: false, chama: null, error: 'Chama not found' });
       return res.json({ success: true, chama });
     } catch (e: any) {
-      return res.status(400).json({ success: false, error: e.message });
+      return res.status(400).json({ success: false, chama: null, error: e.message });
     }
   }
 
@@ -57,7 +57,7 @@ export class ChamaController {
       const chama = await ChamaService.updateChama(req.userId!, chamaId, parsed);
       res.json({ success: true, chama });
     } catch (e: any) {
-      res.status(400).json({ success: false, error: e.message });
+      res.status(400).json({ success: false, chama: null, error: e.message });
     }
   }
 
@@ -67,7 +67,7 @@ export class ChamaController {
       const chama = await ChamaService.joinChama(req.userId!, chamaId);
       res.json({ success: true, chama });
     } catch (e: any) {
-      res.status(400).json({ success: false, error: e.message });
+      res.status(400).json({ success: false, chama: null, error: e.message });
     }
   }
 
@@ -99,7 +99,7 @@ export class ChamaController {
       const chama = await ChamaService.activateChama(req.userId!, chamaId);
       res.json({ success: true, chama });
     } catch (e: any) {
-      res.status(400).json({ success: false, error: e.message });
+      res.status(400).json({ success: false, chama: null, error: e.message });
     }
   }
 
@@ -110,7 +110,7 @@ export class ChamaController {
       const defaulters = await ChamaService.getDefaultersList(page, limit);
       res.json({ success: true, defaulters });
     } catch (e: any) {
-      res.status(400).json({ success: false, error: e.message });
+      res.status(400).json({ success: false, defaulters: [], error: e.message });
     }
   }
 

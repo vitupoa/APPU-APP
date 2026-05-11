@@ -17,4 +17,5 @@ interface ChatRepository {
     suspend fun transferOwnership(chatId: String, newOwnerId: String): NetworkResult<Boolean>
     suspend fun leaveGroup(chatId: String): NetworkResult<Boolean>
     suspend fun searchGroups(query: String): NetworkResult<List<Chat>>
+    suspend fun sendTypingIndicator(chatId: String, isTyping: Boolean): NetworkResult<Boolean>
 }

@@ -1,20 +1,21 @@
 package com.krieta.feature.chat.presentation.list
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
-
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -23,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -38,13 +43,18 @@ import com.krieta.feature.chat.domain.model.Chat
 import com.krieta.feature.chat.domain.model.ChatType
 import com.krieta.feature.chat.presentation.room.ChatRoomScreen
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-
 import com.krieta.feature.stories.presentation.viewmodel.StoriesViewModel
 import com.krieta.feature.stories.presentation.components.StoriesRow
 import com.krieta.feature.stories.presentation.screen.StoryViewerScreen
+import coil3.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.background
+
 
 class ChatListScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -57,6 +67,7 @@ class ChatListScreen : Screen {
         val state by viewModel.state.collectAsState()
         val storiesState by storiesViewModel.state.collectAsState()
         val chamaState by chamaViewModel.state.collectAsState()
+        val scope = rememberCoroutineScope()
         
         val tokenManager = org.koin.compose.koinInject<com.krieta.com.core.security.TokenManager>()
         val currentUserId = runBlocking { tokenManager.getUserId() }
@@ -64,11 +75,85 @@ class ChatListScreen : Screen {
         var showChatMenu by remember { mutableStateOf(false) }
         var searchQuery by remember { mutableStateOf("") }
         var selectedTab by remember { mutableStateOf(ChatTab.ALL) }
+        var isRefreshing by remember { mutableStateOf(false) }
+        var isSearchExpanded by remember { mutableStateOf(false) }
+        val searchFocusRequester = remember { FocusRequester() }
+        
+        // Collect IDs of users who have active stories for yellow ring indicator
+        val storyCreatorIds = remember(storiesState.storyGroups) {
+            storiesState.storyGroups.map { it.creator.id }.toSet()
+        }
 
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Chats", fontWeight = FontWeight.Bold) },
+                    title = {
+                        AnimatedVisibility(
+                            visible = isSearchExpanded,
+                            enter = fadeIn() + slideInHorizontally { it / 2 },
+                            exit = fadeOut() + slideOutHorizontally { it / 2 }
+                        ) {
+                            OutlinedTextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 48.dp)
+                                    .focusRequester(searchFocusRequester),
+                                placeholder = { Text("Search chats, groups...", fontSize = 14.sp) },
+                                singleLine = true,
+                                shape = RoundedCornerShape(24.dp),
+                                trailingIcon = {
+                                    IconButton(onClick = {
+                                        searchQuery = ""
+                                        isSearchExpanded = false
+                                    }) {
+                                        Icon(Icons.Default.Close, contentDescription = "Close search")
+                                    }
+                                },
+                                textStyle = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        if (!isSearchExpanded) {
+                            Text("Chats", fontWeight = FontWeight.Bold)
+                        }
+                    },
+                    actions = {
+                        if (!isSearchExpanded) {
+                            IconButton(
+                                onClick = {
+                                    isSearchExpanded = true
+                                    scope.launch {
+                                        delay(100)
+                                        try { searchFocusRequester.requestFocus() } catch (_: Exception) {}
+                                    }
+                                }
+                            ) {
+                                Icon(Icons.Default.Search, "Search")
+                            }
+                        }
+                        IconButton(
+                            onClick = {
+                                if (!isRefreshing) {
+                                    isRefreshing = true
+                                    viewModel.refreshChats()
+                                    scope.launch {
+                                        delay(1000)
+                                        isRefreshing = false
+                                    }
+                                }
+                            }
+                        ) {
+                            if (isRefreshing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(Icons.Default.Refresh, "Refresh")
+                            }
+                        }
+                    }
                 )
             },
             floatingActionButton = {
@@ -91,46 +176,43 @@ class ChatListScreen : Screen {
             }
         ) { padding ->
             Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-                // Stories Row
-                if (!storiesState.isLoading || storiesState.storyGroups.isNotEmpty()) {
-                    StoriesRow(
-                        storyGroups = storiesState.storyGroups,
-                        myStories = storiesState.myStories,
-                        onStoryGroupClick = { group ->
-                            val index = if (group == storiesState.myStories) {
-                                -1
-                            } else {
-                                storiesState.storyGroups.indexOf(group)
-                            }
-                            
-                            val allGroups = if (storiesState.myStories != null) {
-                                listOf(storiesState.myStories!!) + storiesState.storyGroups
-                            } else {
-                                storiesState.storyGroups
-                            }
-                            
-                            val actualIndex = if (index == -1) 0 else if (storiesState.myStories != null) index + 1 else index
-                            
-                            navigator.push(StoryViewerScreen(
-                                initialGroupIndex = actualIndex,
-                                storyGroups = allGroups,
-                                onStoryViewed = { storyId ->
-                                    storiesViewModel.markStoryAsViewed(storyId)
-                                },
-                                onStoryDeleted = { storyId ->
-                                    storiesViewModel.deleteStory(storyId)
-                                },
-                                currentUserId = currentUserId
-                            ))
-                        },
-                        onAddStoryClick = {
-                            navigator.push(com.krieta.feature.stories.presentation.screen.CreateStoryScreen())
+                // Stories row always visible (WhatsApp Status-style)
+                StoriesRow(
+                    storyGroups = storiesState.storyGroups,
+                    myStories = storiesState.myStories,
+                    onStoryGroupClick = { group ->
+                        val index = if (group == storiesState.myStories) {
+                            -1
+                        } else {
+                            storiesState.storyGroups.indexOf(group)
                         }
-                    )
-                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
-                }
+                        
+                        val allGroups = if (storiesState.myStories != null) {
+                            listOf(storiesState.myStories!!) + storiesState.storyGroups
+                        } else {
+                            storiesState.storyGroups
+                        }
+                        
+                        val actualIndex = if (index == -1) 0 else if (storiesState.myStories != null) index + 1 else index
+                        
+                        navigator.push(StoryViewerScreen(
+                            initialGroupIndex = actualIndex,
+                            storyGroups = allGroups,
+                            onStoryViewed = { storyId ->
+                                storiesViewModel.markStoryAsViewed(storyId)
+                            },
+                            onStoryDeleted = { storyId ->
+                                storiesViewModel.deleteStory(storyId)
+                            },
+                            currentUserId = currentUserId
+                        ))
+                    },
+                    onAddStoryClick = {
+                        navigator.push(com.krieta.feature.stories.presentation.screen.CreateStoryScreen())
+                    }
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
 
-                // Tabs
                 ScrollableTabRow(
                     selectedTabIndex = selectedTab.ordinal,
                     modifier = Modifier.fillMaxWidth(),
@@ -145,34 +227,6 @@ class ChatListScreen : Screen {
                     }
                 }
 
-                // Search Bar
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    placeholder = { Text("Search chats, groups...") },
-                    leadingIcon = { 
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
-                        )
-                    },
-                    trailingIcon = {
-                        if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "Clear"
-                                )
-                            }
-                        }
-                    },
-                    singleLine = true,
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-                )
-
                 if (state.isLoading && state.chats.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
@@ -182,7 +236,6 @@ class ChatListScreen : Screen {
                         Text("No chats yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
-                    // Combine and filter chats
                     val allChats = buildList {
                         addAll(state.chats.map { ChatListItem.RegularChat(it) })
                         addAll(chamaState.myChamas.map { ChatListItem.ChamaChat(it) })
@@ -193,7 +246,6 @@ class ChatListScreen : Screen {
                         }
                     }
 
-                    // Filter by tab
                     val tabFilteredChats = when (selectedTab) {
                         ChatTab.ALL -> allChats
                         ChatTab.DIRECT -> allChats.filter { 
@@ -206,20 +258,13 @@ class ChatListScreen : Screen {
                         ChatTab.UNREAD -> allChats.filter { item ->
                             when (item) {
                                 is ChatListItem.RegularChat -> item.chat.latestMessage?.status != "read"
-                                is ChatListItem.ChamaChat -> false // TODO: Add unread logic for Chama
+                                is ChatListItem.ChamaChat -> false
                             }
                         }
-                        ChatTab.ARCHIVED -> allChats.filter { item ->
-                            // TODO: Add archived flag to Chat model
-                            false
-                        }
-                        ChatTab.FAVORITES -> allChats.filter { item ->
-                            // TODO: Add favorite/pinned flag to Chat model
-                            false
-                        }
+                        ChatTab.ARCHIVED -> allChats.filter { false }
+                        ChatTab.FAVORITES -> allChats.filter { false }
                     }
 
-                    // Filter by search query
                     val filteredChats = if (searchQuery.isBlank()) {
                         tabFilteredChats
                     } else {
@@ -270,7 +315,12 @@ class ChatListScreen : Screen {
                             }) { item ->
                                 when (item) {
                                     is ChatListItem.RegularChat -> {
-                                        ChatItem(chat = item.chat) {
+                                        ChatItem(
+                                            chat = item.chat,
+                                            hasActiveStory = item.chat.participants.any { p ->
+                                                p.user?.id in storyCreatorIds
+                                            }
+                                        ) {
                                             navigator.push(ChatRoomScreen(
                                                 item.chat.id, 
                                                 item.chat.name ?: item.chat.participants.firstOrNull()?.user?.displayName ?: "Chat"
@@ -308,7 +358,12 @@ sealed class ChatListItem {
 }
 
 @Composable
-fun ChatItem(chat: Chat, onClick: () -> Unit) {
+fun ChatItem(chat: Chat, hasActiveStory: Boolean = false, onClick: () -> Unit) {
+    val storyRingColor = Color(0xFFFFCC00) // Yellow ring for active stories
+    val avatarUrl = chat.avatarUrl ?: chat.participants.firstOrNull()?.user?.avatarUrl
+    val displayName = chat.name ?: chat.participants.firstOrNull()?.user?.displayName ?: "Unknown"
+    val username = chat.participants.firstOrNull()?.user?.username ?: ""
+    
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -316,17 +371,48 @@ fun ChatItem(chat: Chat, onClick: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Avatar
-        Surface(
-            modifier = Modifier.size(52.dp).clip(CircleShape),
-            color = if (chat.type == ChatType.GROUP) 
-                MaterialTheme.colorScheme.secondaryContainer 
-            else 
-                MaterialTheme.colorScheme.surfaceVariant
+        // Avatar with optional yellow story ring
+        Box(
+            modifier = Modifier
+                .size(52.dp)
+                .then(
+                    if (hasActiveStory) {
+                        Modifier.border(2.5.dp, storyRingColor, CircleShape)
+                    } else {
+                        Modifier
+                    }
+                ),
+            contentAlignment = Alignment.Center
         ) {
-            if (chat.type == ChatType.GROUP) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text("👥", fontSize = 24.sp)
+            Surface(
+                modifier = Modifier
+                    .size(if (hasActiveStory) 46.dp else 52.dp)
+                    .clip(CircleShape),
+                color = if (chat.type == ChatType.GROUP)
+                    MaterialTheme.colorScheme.secondaryContainer
+                else
+                    MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                if (chat.type == ChatType.GROUP) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text("👥", fontSize = 24.sp)
+                    }
+                } else if (avatarUrl != null) {
+                    AsyncImage(
+                        model = avatarUrl,
+                        contentDescription = "$displayName avatar",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = displayName.take(1).uppercase(),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
@@ -340,7 +426,7 @@ fun ChatItem(chat: Chat, onClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = chat.name ?: chat.participants.firstOrNull()?.user?.displayName ?: "Unknown",
+                    text = displayName,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -389,7 +475,6 @@ fun ChamaGroupItem(chama: com.krieta.feature.chama.data.remote.dto.ChamaDto, onC
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Chama Avatar with distinctive styling
         Surface(
             modifier = Modifier.size(52.dp).clip(CircleShape),
             color = MaterialTheme.colorScheme.tertiaryContainer
@@ -467,7 +552,6 @@ fun ChatFloatingActionMenu(
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Menu items
         AnimatedVisibility(
             visible = expanded,
             enter = fadeIn() + expandVertically(),
@@ -477,21 +561,18 @@ fun ChatFloatingActionMenu(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // New Chama Group
                 ChatMenuOption(
                     icon = "🏦",
                     label = "New Chama",
                     onClick = onNewChama
                 )
                 
-                // New Normal Group
                 ChatMenuOption(
                     icon = "👥",
                     label = "New Group",
                     onClick = onNewGroup
                 )
                 
-                // New Direct Chat
                 ChatMenuOption(
                     icon = "💬",
                     label = "New Chat",
@@ -500,7 +581,6 @@ fun ChatFloatingActionMenu(
             }
         }
         
-        // Main FAB
         FloatingActionButton(
             onClick = { onExpandChange(!expanded) },
             containerColor = androidx.compose.ui.graphics.Color(0xFFFFCC00)

@@ -144,7 +144,13 @@ class ProfileViewModel(
 
     private fun loadProfile() {
         screenModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, error = null)
+            // Don't show loading if we have cached data
+            val hasCache = isOwnProfile && cachedOwnProfile != null
+            _state.value = _state.value.copy(
+                isLoading = !hasCache,
+                error = null,
+                profile = if (hasCache) cachedOwnProfile else _state.value.profile
+            )
 
             // If loading own profile, verify we have a valid token
             if (isOwnProfile) {
@@ -156,7 +162,7 @@ class ProfileViewModel(
                     println("❌ ProfileViewModel: Not authenticated!")
                     _state.value = ProfileState(
                         isLoading = false, 
-                        error = "Not authenticated. Please log in again."
+                        error = "Your session has expired. Please log in again."
                     )
                     return@launch
                 }
@@ -175,10 +181,10 @@ class ProfileViewModel(
                     val profile = profileResult.data
                     println("✅ ProfileViewModel: Profile loaded successfully - ${profile.displayName}")
                     
-                    // Cache own profile to prevent "Unknown User" on tab switch
+                    // Cache own profile in memory for quick access
                     if (isOwnProfile) {
                         cachedOwnProfile = profile
-                        println("💾 ProfileViewModel: Cached own profile")
+                        println("💾 ProfileViewModel: Cached own profile in memory")
                     }
                     
                     // Load subscription tiers if not own profile
@@ -200,7 +206,7 @@ class ProfileViewModel(
                     println("❌ ProfileViewModel: Profile load error - ${profileResult.message}")
                     _state.value = ProfileState(
                         isLoading = false, 
-                        error = profileResult.message ?: "Failed to load profile"
+                        error = profileResult.message
                     )
                 }
             }

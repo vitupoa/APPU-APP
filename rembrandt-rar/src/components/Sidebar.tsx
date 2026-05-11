@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useAdminStore } from '@/store/adminStore';
 import {
   LayoutDashboard, Users, Film, Wallet, Flag, Settings,
-  ScrollText, Shield, Megaphone, FileWarning, LogOut, ChevronLeft, Store, ShieldAlert, ShieldBan, TrendingDown, Database, FileCheck, CreditCard
+  ScrollText, Shield, Megaphone, FileWarning, LogOut, ChevronLeft, Store, ShieldAlert, ShieldBan, TrendingDown, Database, FileCheck, CreditCard, DollarSign, MapPin
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn, getInitials } from '@/lib/utils';
@@ -13,6 +13,9 @@ const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard, perm: 'analytics.view' },
   { href: '/users', label: 'Users', icon: Users, perm: 'users.view' },
   { href: '/content', label: 'Content', icon: Film, perm: 'content.view' },
+  { href: '/sponsored', label: 'Sponsored Campaigns', icon: Megaphone, perm: 'content.view' },
+  { href: '/ads', label: 'Ad Management', icon: DollarSign, superOnly: true },
+  { href: '/locations', label: 'Locations', icon: MapPin, superOnly: true },
   { href: '/financials', label: 'Financials', icon: Wallet, perm: 'withdrawals.view' },
   { href: '/kyc', label: 'KYC Verification', icon: FileCheck, financialOnly: true },
   { href: '/withdrawals', label: 'Withdrawals', icon: CreditCard, financialOnly: true },

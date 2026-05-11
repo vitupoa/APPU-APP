@@ -157,6 +157,11 @@ fun CreateCampaignScreen(
             item {
                 Text("Target Influencer Tier", style = MaterialTheme.typography.titleSmall)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = selectedTier == null,
+                        onClick = { selectedTier = null },
+                        label = { Text("ALL") }
+                    )
                     InfluencerTier.entries.forEach { tier ->
                         FilterChip(
                             selected = selectedTier == tier,
@@ -188,14 +193,18 @@ fun CreateCampaignScreen(
             }
             
             item {
-                Button(
-                    onClick = {
-                        viewModel.createCampaign(
-                            title, description, SafeConversion.toDoubleOrDefaultWithValidation(budget, "campaignBudget", 0.0, defaultValue = 0.0),
-                            selectedTier, emptyList(), requirements, deliverables,
-                            "", ""
-                        )
-                    },
+                    Button(
+                        onClick = {
+                            val now = kotlinx.datetime.Clock.System.now()
+                            val startDate = now.toString()
+                            val endDate = now.plus(kotlin.time.Duration.parse("P30D")).toString()
+                            
+                            viewModel.createCampaign(
+                                title, description, SafeConversion.toDoubleOrDefaultWithValidation(budget, "campaignBudget", 0.0, defaultValue = 0.0),
+                                selectedTier, emptyList(), requirements, deliverables,
+                                startDate, endDate
+                            )
+                        },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = createState !is CreateCampaignState.Loading
                 ) {

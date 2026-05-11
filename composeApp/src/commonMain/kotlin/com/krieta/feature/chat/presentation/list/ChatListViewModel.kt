@@ -6,6 +6,8 @@ import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.WebSocketService
 import com.krieta.feature.chat.data.remote.dto.ChatDto
 import com.krieta.feature.chat.data.remote.dto.MessageDto
+import com.krieta.feature.chat.domain.ChatEventBus
+import com.krieta.feature.chat.domain.ChatEvent
 import com.krieta.feature.chat.domain.model.Chat
 import com.krieta.feature.chat.domain.model.ChatMessage
 import com.krieta.feature.chat.domain.model.ChatParticipant
@@ -16,8 +18,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import com.krieta.com.core.util.currentTimeMillis
 
 data class ChatListState(
     val chats: List<Chat> = emptyList(),
@@ -27,22 +32,35 @@ data class ChatListState(
 
 class ChatListViewModel(
     private val repository: ChatRepository,
-    private val webSocketService: WebSocketService
+    private val webSocketService: WebSocketService,
+    private val eventBus: ChatEventBus
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(ChatListState(isLoading = true))
     val state: StateFlow<ChatListState> = _state.asStateFlow()
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+    private var pollingJob: Job? = null
+    private var lastRefreshTime = 0L
+    private val minRefreshInterval = 3000L // 3 seconds minimum between refreshes
 
     init {
         loadChats()
         observeWebSocketEvents()
+        observeChatEvents()
+        startPolling()
     }
 
-    private fun loadChats() {
+    override fun onDispose() {
+        super.onDispose()
+        pollingJob?.cancel()
+    }
+
+    private fun loadChats(showLoading: Boolean = true) {
         screenModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            if (showLoading) {
+                _state.value = _state.value.copy(isLoading = true)
+            }
             when (val result = repository.getChats()) {
                 is NetworkResult.Success -> {
                     _state.value = ChatListState(chats = result.data, isLoading = false)
@@ -51,7 +69,24 @@ class ChatListViewModel(
                 is NetworkResult.Error -> {
                     _state.value = ChatListState(isLoading = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
+            }
+        }
+    }
+
+    fun refreshChats() {
+        val currentTime = currentTimeMillis()
+        if (currentTime - lastRefreshTime >= minRefreshInterval) {
+            lastRefreshTime = currentTime
+            loadChats(showLoading = false)
+        }
+    }
+
+    private fun startPolling() {
+        pollingJob?.cancel()
+        pollingJob = screenModelScope.launch {
+            while (true) {
+                delay(10000L) // Poll every 10 seconds
+                loadChats(showLoading = false)
             }
         }
     }
@@ -80,6 +115,18 @@ class ChatListViewModel(
         }
     }
 
+    private fun observeChatEvents() {
+        screenModelScope.launch {
+            eventBus.events.collect { event ->
+                when (event) {
+                    is ChatEvent.MessageSent, is ChatEvent.MessageReceived -> {
+                        refreshChats()
+                    }
+                }
+            }
+        }
+    }
+
     private fun handleNewMessage(messageDto: MessageDto) {
         val currentChats = _state.value.chats.toMutableList()
         val index = currentChats.indexOfFirst { it.id == messageDto.chatId }
@@ -95,13 +142,13 @@ class ChatListViewModel(
             _state.value = _state.value.copy(chats = currentChats)
         } else {
             // New message for an unknown chat. Reload chats to fetch the new chat data.
-            loadChats()
+            refreshChats()
         }
     }
 
     private fun handleNewChat(chatDto: ChatDto) {
         // To simplify, just map and add to top. In a real scenario, you'd map ChatDto -> Chat directly in repo.
-        loadChats() // Quickest sync pattern for new chats
+        refreshChats() // Quickest sync pattern for new chats
     }
 
     private fun mapMessageDto(dto: MessageDto): ChatMessage {

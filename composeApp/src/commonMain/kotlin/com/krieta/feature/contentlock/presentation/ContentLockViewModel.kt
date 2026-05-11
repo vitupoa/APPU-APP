@@ -2,7 +2,7 @@ package com.krieta.feature.contentlock.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.krieta.core.network.Result
+import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.contentlock.data.ContentLockRepository
 import com.krieta.feature.contentlock.domain.ContentType
 import com.krieta.feature.contentlock.domain.UnlockPrice
@@ -28,15 +28,16 @@ class ContentLockViewModel(
         viewModelScope.launch {
             _uiState.value = ContentLockUiState.Loading
             when (val result = repository.unlockContent(contentId, contentType.toString())) {
-                is Result.Success -> {
+                is NetworkResult.Success -> {
                     _uiState.value = ContentLockUiState.UnlockSuccess(
                         krPaid = result.data.unlockAmountKr,
                         creatorReceived = result.data.creatorReceivedKr
                     )
                 }
-                is Result.Error -> {
+                is NetworkResult.Error -> {
                     _uiState.value = ContentLockUiState.Error(result.message)
                 }
+                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -44,7 +45,7 @@ class ContentLockViewModel(
     fun getUnlockPrice(unlockAmountKr: Int, currency: String) {
         viewModelScope.launch {
             when (val result = repository.getUnlockPrice(unlockAmountKr, currency)) {
-                is Result.Success -> {
+                is NetworkResult.Success -> {
                     _unlockPrice.value = UnlockPrice(
                         krAmount = result.data.krAmount,
                         fiatAmount = result.data.fiatAmount,
@@ -52,9 +53,10 @@ class ContentLockViewModel(
                         displayText = result.data.displayText
                     )
                 }
-                is Result.Error -> {
+                is NetworkResult.Error -> {
                     _uiState.value = ContentLockUiState.Error(result.message)
                 }
+                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -62,12 +64,13 @@ class ContentLockViewModel(
     fun convertFiatToKr(fiatAmount: Double, currency: String) {
         viewModelScope.launch {
             when (val result = repository.convertFiatToKr(fiatAmount, currency)) {
-                is Result.Success -> {
+                is NetworkResult.Success -> {
                     _convertedKr.value = result.data.krAmount
                 }
-                is Result.Error -> {
+                is NetworkResult.Error -> {
                     _uiState.value = ContentLockUiState.Error(result.message)
                 }
+                is NetworkResult.Loading -> {}
             }
         }
     }

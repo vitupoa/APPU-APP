@@ -259,6 +259,17 @@ export class SponsoredContentService {
   static async getPendingCampaigns() {
     return await prisma.sponsoredContent.findMany({
       where: { status: 'PENDING_REVIEW' },
+      include: { brand: { select: { username: true, displayName: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  /**
+   * Get all campaigns (admin)
+   */
+  static async getAllCampaigns() {
+    return await prisma.sponsoredContent.findMany({
+      include: { brand: { select: { username: true, displayName: true } } },
       orderBy: { createdAt: 'desc' }
     });
   }

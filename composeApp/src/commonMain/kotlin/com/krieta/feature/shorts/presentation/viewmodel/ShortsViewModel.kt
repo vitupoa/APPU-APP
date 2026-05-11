@@ -241,8 +241,9 @@ class ShortsViewModel(
             
             when (result) {
                 is NetworkResult.Success -> {
+                    val itemsWithSponsored = injectSponsoredContent(result.data.items)
                     _state.value = _state.value.copy(
-                        items = result.data.items,
+                        items = itemsWithSponsored,
                         nextCursor = result.data.nextCursor,
                         isLoading = false
                     )
@@ -264,8 +265,10 @@ class ShortsViewModel(
             
             when (result) {
                 is NetworkResult.Success -> {
+                    val currentSize = _state.value.items.size
+                    val itemsWithSponsored = injectSponsoredContent(result.data.items, currentSize)
                     _state.value = _state.value.copy(
-                        items = _state.value.items + result.data.items,
+                        items = _state.value.items + itemsWithSponsored,
                         nextCursor = result.data.nextCursor,
                         isLoadingMore = false
                     )

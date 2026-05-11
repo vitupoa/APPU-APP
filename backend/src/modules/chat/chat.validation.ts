@@ -16,10 +16,30 @@ export const createGroupChatSchema = z.object({
 
 export const sendMessageSchema = z.object({
   body: z.object({
-    payload: z.string().min(1, 'Message cannot be empty'),
+    payload: z.string().min(1, 'Message cannot be empty').max(10000, 'Message too long'),
     mediaUrl: z.string().url().optional(),
-    mediaType: z.enum(['image', 'video', 'document', 'voice']).optional(),
+    mediaType: z.enum(['image', 'video', 'document']).optional(),
     replyToId: z.string().uuid().optional(),
+  }),
+});
+
+export const mediaUploadSignatureSchema = z.object({
+  body: z.object({
+    mediaType: z.enum(['image', 'video', 'document']),
+    resourceType: z.enum(['image', 'video', 'raw']),
+  }),
+});
+
+export const validateMediaSchema = z.object({
+  body: z.object({
+    mediaUrl: z.string().url('Invalid media URL'),
+    mediaType: z.enum(['image', 'video', 'document']),
+  }),
+});
+
+export const validateLinkSchema = z.object({
+  body: z.object({
+    url: z.string().url('Invalid URL'),
   }),
 });
 

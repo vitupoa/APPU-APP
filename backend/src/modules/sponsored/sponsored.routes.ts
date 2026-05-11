@@ -103,6 +103,16 @@ router.get('/campaigns/pending', authMiddleware, async (req: AuthRequest, res: R
   }
 });
 
+// GET /api/v1/sponsored/campaigns/all — Get all campaigns (admin)
+router.get('/campaigns/all', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const campaigns = await SponsoredContentService.getAllCampaigns();
+    res.json(campaigns);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // PATCH /api/v1/sponsored/campaigns/:id/approve — Approve campaign (admin)
 router.patch('/campaigns/:id/approve', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {

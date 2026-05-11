@@ -72,22 +72,30 @@ class WalletViewModel(
         screenModelScope.launch {
             _state.value = WalletState.Loading
             
-            val balanceResult = walletRepository.getBalance(targetCurrency)
-            if (balanceResult is NetworkResult.Error) {
-                _state.value = WalletState.Error(balanceResult.message)
-                return@launch
-            }
-            
-            val txResult = walletRepository.getTransactions(limit = 10, offset = 0)
-            if (txResult is NetworkResult.Error) {
-                _state.value = WalletState.Error(txResult.message)
-                return@launch
-            }
+            try {
+                val balanceResult = walletRepository.getBalance(targetCurrency)
+                if (balanceResult is NetworkResult.Error) {
+                    println("❌ Balance fetch error: ${balanceResult.message}")
+                    _state.value = WalletState.Error(balanceResult.message)
+                    return@launch
+                }
+                
+                val txResult = walletRepository.getTransactions(limit = 10, offset = 0)
+                if (txResult is NetworkResult.Error) {
+                    println("❌ Transactions fetch error: ${txResult.message}")
+                    _state.value = WalletState.Error(txResult.message)
+                    return@launch
+                }
 
-            val balance = (balanceResult as NetworkResult.Success).data
-            val txList = (txResult as NetworkResult.Success).data
-            
-            _state.value = WalletState.Success(balance, txList)
+                val balance = (balanceResult as NetworkResult.Success).data
+                val txList = (txResult as NetworkResult.Success).data
+                
+                _state.value = WalletState.Success(balance, txList)
+            } catch (e: Exception) {
+                println("❌ Wallet fetch exception: ${e.message}")
+                e.printStackTrace()
+                _state.value = WalletState.Error(e.message ?: "Unknown error")
+            }
         }
     }
 

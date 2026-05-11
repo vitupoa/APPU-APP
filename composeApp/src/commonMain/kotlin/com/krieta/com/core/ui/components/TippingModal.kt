@@ -3,6 +3,7 @@ package com.krieta.com.core.ui.components
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 
@@ -17,6 +18,13 @@ import androidx.compose.ui.window.Dialog
 import com.krieta.com.core.location.UserCurrencyProvider
 import com.krieta.com.core.util.KrCurrencyFormatter
 
+/**
+ * Tipping modal where user enters amount in their local fiat currency.
+ * Real-time conversion to Kr is displayed. No decimals allowed.
+ * Platform fee is deducted silently on the backend — never shown to users.
+ *
+ * @param onConfirm Called with the integer Kr amount to send to the backend.
+ */
 @Composable
 fun TippingModal(
     recipientUsername: String,
@@ -29,8 +37,15 @@ fun TippingModal(
 ) {
     var fiatAmount by remember { mutableStateOf(0.0) }
     var krAmount by remember { mutableStateOf(0.0) }
+    var selectedQuickFiat by remember { mutableStateOf<Int?>(null) }
     val exchangeRate by currencyProvider.exchangeRate.collectAsState()
-    val minTipKr = 50.0
+    val currencyCode = currencyProvider.currencyCode
+
+    val minTipKr = 1.0
+    val krInt = krAmount.toInt()
+
+    // Quick-tip amounts in user's native fiat currency
+    val quickFiatAmounts = listOf(500, 1000, 5000, 50000)
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -39,8 +54,9 @@ fun TippingModal(
         ) {
             Column(
                 modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
+                // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -62,50 +78,61 @@ fun TippingModal(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
+                // Fiat amount input with real-time Kr conversion
                 KrAmountInput(
-                    currencyCode = currencyProvider.currencyCode,
+                    currencyCode = currencyCode,
                     exchangeRate = exchangeRate?.baseRate ?: 1.0,
                     onAmountChanged = { fiat, kr ->
                         fiatAmount = fiat
                         krAmount = kr
                     },
-                    label = "Tip Amount"
+                    label = "Tip Amount",
+                    applyMargin = false,
+                    initialFiatAmount = selectedQuickFiat
                 )
 
-                // Quick tip buttons
+                // Quick tip buttons in user's native fiat currency
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    listOf(500.0, 1000.0, 2000.0, 5000.0).forEach { amount ->
+                    quickFiatAmounts.forEach { amount ->
                         OutlinedButton(
-                            onClick = {
-                                krAmount = amount
-                                fiatAmount = currencyProvider.krToFiat(amount)
-                            },
+                            onClick = { selectedQuickFiat = amount },
                             modifier = Modifier.weight(1f),
-                            contentPadding = PaddingValues(0.dp)
+                            contentPadding = PaddingValues(horizontal = 2.dp, vertical = 0.dp),
+                            border = if (selectedQuickFiat == amount)
+                                BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                            else
+                                BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                         ) {
-                            Text("${amount.toInt()}", fontSize = 12.sp)
+                            Text(
+                                "${amount}",
+                                fontSize = 11.sp,
+                                maxLines = 1
+                            )
                         }
                     }
                 }
 
+                // Balance display
                 Text(
                     "Balance: ${KrCurrencyFormatter.formatKr(currentBalance)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                if (krAmount > 0 && krAmount < minTipKr) {
+                // Validation: minimum tip
+                if (krInt in 1 until minTipKr.toInt()) {
                     Text(
-                        "Minimum tip is Kr.$minTipKr",
+                        "Minimum tip is ${KrCurrencyFormatter.formatKr(minTipKr)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
                 }
 
-                if (krAmount > currentBalance) {
+                // Validation: insufficient balance
+                if (krInt > currentBalance.toInt()) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -122,18 +149,19 @@ fun TippingModal(
                     }
                 }
 
+                // Send button
                 Button(
                     onClick = {
                         when {
-                            krAmount < minTipKr -> {}
-                            krAmount > currentBalance -> onInsufficientBalance()
+                            krInt < minTipKr.toInt() -> {}
+                            krInt > currentBalance.toInt() -> onInsufficientBalance()
                             else -> onConfirm(krAmount)
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
-                    enabled = krAmount >= minTipKr && krAmount <= currentBalance
+                    enabled = krInt >= minTipKr.toInt() && krInt <= currentBalance.toInt()
                 ) {
-                    Text("Send Tip", fontWeight = FontWeight.Bold)
+                    Text("Send Kr. $krInt Tip", fontWeight = FontWeight.Bold)
                 }
             }
         }

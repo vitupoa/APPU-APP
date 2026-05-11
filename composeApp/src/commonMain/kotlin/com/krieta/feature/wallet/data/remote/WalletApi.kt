@@ -27,29 +27,13 @@ class WalletApi(
     private val httpClient: HttpClient
 ) {
     suspend fun getBalance(currency: String? = null): WalletBalanceDto {
-        return try {
-            println("🔍 Fetching wallet balance for currency: $currency")
-            val response = httpClient.get(ApiConstants.WALLET_BALANCE) {
-                if (currency != null) parameter("currency", currency)
-            }
-            
-            println("🔍 Wallet Balance Response Status: ${response.status}")
-            
-            // Try to get raw response
-            val rawBody = try {
-                response.body<String>()
-            } catch (e: Exception) {
-                "Unable to read body"
-            }
-            println("🔍 Wallet Balance Raw Response: $rawBody")
-            
-            val result: WalletBalanceDto = response.body()
-            println("✅ Wallet Balance Parsed: $result")
-            result
-        } catch (e: Exception) {
-            println("❌ Wallet Balance Error: ${e.message}")
-            throw e
+        println("🔍 Fetching wallet balance for currency: $currency")
+        println("🔍 API Endpoint: ${ApiConstants.WALLET_BALANCE}")
+        val response = httpClient.get(ApiConstants.WALLET_BALANCE) {
+            if (currency != null) parameter("currency", currency)
         }
+        println("✅ Wallet Balance Response Status: ${response.status}")
+        return response.body()
     }
 
     suspend fun getExchangeRate(currency: String): ExchangeRateResponseDto {

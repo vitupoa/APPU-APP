@@ -123,9 +123,9 @@ class CommentsRepositoryImpl(
             limit = 1
         )
         CommentSettings(
-            commentsEnabled = response.settings.commentsEnabled,
-            repliesEnabled = response.settings.repliesEnabled,
-            totalComments = response.settings.totalComments
+            commentsEnabled = response.settings.commentsEnabled ?: false,
+            repliesEnabled = response.settings.repliesEnabled ?: false,
+            totalComments = response.settings.totalComments ?: 0
         )
     }
 
@@ -139,13 +139,13 @@ class CommentsRepositoryImpl(
         replyToUser = replyToUser?.toDomain(),
         likesCount = likesCount,
         repliesCount = repliesCount,
-        isLiked = isLiked,
-        isPinned = isPinned,
-        isEdited = isEdited,
-        canDelete = canDelete,
-        canEdit = canEdit,
-        canPin = canPin,
-        canReply = canReply,
+        isLiked = isLiked ?: false,
+        isPinned = isPinned ?: false,
+        isEdited = isEdited ?: false,
+        canDelete = canDelete ?: false,
+        canEdit = canEdit ?: false,
+        canPin = canPin ?: false,
+        canReply = canReply ?: false,
         createdAt = Instant.parse(createdAt),
         editedAt = editedAt?.let { Instant.parse(it) }
     )

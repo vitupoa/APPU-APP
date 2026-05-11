@@ -57,11 +57,12 @@ class ProfileScreen(val userId: String? = null) : Screen {
         val profile = profileState.profile
         val isLoading = profileState.isLoading
         val error = profileState.error
-        if (isLoading) {
+        
+        if (isLoading && profile == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = KrietaColors.Primary)
             }
-        } else if (error != null) {
+        } else if (error != null && profile == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
                     Text("😕", fontSize = 48.sp)

@@ -2,6 +2,10 @@ package com.krieta.feature.shorts.data.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.safeApiCall
+import com.krieta.com.core.offline.ActionType
+import com.krieta.com.core.offline.EntityType
+import com.krieta.com.core.offline.OfflineActionQueue
+import com.krieta.feature.shorts.data.local.ShortLocalDataSource
 import com.krieta.feature.shorts.data.remote.ShortsApi
 import com.krieta.feature.shorts.domain.model.LinkedProduct
 import com.krieta.feature.shorts.domain.model.Short
@@ -11,30 +15,89 @@ import com.krieta.feature.shorts.domain.repository.ShortsFeedResult
 import com.krieta.feature.shorts.domain.repository.ShortsRepository
 
 class ShortsRepositoryImpl(
-    private val api: ShortsApi
+    private val api: ShortsApi,
+    private val localDataSource: ShortLocalDataSource,
+    private val offlineQueue: OfflineActionQueue
 ) : ShortsRepository {
 
     override suspend fun getFeed(tab: String, cursor: String?): NetworkResult<ShortsFeedResult> {
-        return safeApiCall {
+        // Load from cache first
+        val cachedShorts = localDataSource.getCachedShorts()
+        
+        return when (val result = safeApiCall {
             val dto = api.getFeed(tab, cursor)
             ShortsFeedResult(
                 items = dto.items.map { it.toDomain() },
                 nextCursor = dto.nextCursor
             )
+        }) {
+            is NetworkResult.Success -> {
+                // Cache fresh data
+                localDataSource.cacheShorts(result.data.items)
+                result
+            }
+            is NetworkResult.Error -> {
+                // Return cached data if available
+                if (cachedShorts.isNotEmpty()) {
+                    NetworkResult.Success(ShortsFeedResult(cachedShorts, null))
+                } else {
+                    result
+                }
+            }
+            is NetworkResult.Loading -> result
         }
     }
 
     override suspend fun getShortById(shortId: String): NetworkResult<Short> {
-        return safeApiCall {
+        // Load from cache first
+        val cachedShort = localDataSource.getCachedShortById(shortId)
+        
+        return when (val result = safeApiCall {
             val dto = api.getShortById(shortId)
             dto.toDomain()
+        }) {
+            is NetworkResult.Success -> {
+                // Cache fresh data
+                localDataSource.cacheShorts(listOf(result.data))
+                result
+            }
+            is NetworkResult.Error -> {
+                // Return cached data if available
+                if (cachedShort != null) {
+                    NetworkResult.Success(cachedShort)
+                } else {
+                    result
+                }
+            }
+            is NetworkResult.Loading -> result
         }
     }
 
     override suspend fun toggleLike(shortId: String): NetworkResult<Boolean> {
-        return safeApiCall {
+        // Update cache optimistically
+        val cachedShort = localDataSource.getCachedShortById(shortId)
+        if (cachedShort != null) {
+            val newLikeState = !cachedShort.isLiked
+            val newCount = if (newLikeState) cachedShort.likesCount + 1 else cachedShort.likesCount - 1
+            localDataSource.updateShortLike(shortId, newLikeState, newCount)
+        }
+        
+        return when (val result = safeApiCall {
             val dto = api.toggleLike(shortId)
             dto.liked
+        }) {
+            is NetworkResult.Success -> result
+            is NetworkResult.Error -> {
+                // Queue for later if offline
+                offlineQueue.queueAction(
+                    actionType = if (cachedShort?.isLiked == true) ActionType.UNLIKE else ActionType.LIKE,
+                    entityType = EntityType.SHORT,
+                    entityId = shortId,
+                    payload = emptyMap()
+                )
+                NetworkResult.Success(cachedShort?.isLiked?.not() ?: true)
+            }
+            is NetworkResult.Loading -> result
         }
     }
 
@@ -60,7 +123,7 @@ class ShortsRepositoryImpl(
     }
 
     override suspend fun addComment(shortId: String, text: String): NetworkResult<ShortComment> {
-        return safeApiCall {
+        return when (val result = safeApiCall {
             val c = api.addComment(shortId, text)
             ShortComment(
                 id = c.id,
@@ -75,6 +138,25 @@ class ShortsRepositoryImpl(
                 text = c.text,
                 createdAt = c.createdAt
             )
+        }) {
+            is NetworkResult.Success -> result
+            is NetworkResult.Error -> {
+                // Queue for later if offline
+                offlineQueue.queueAction(
+                    actionType = ActionType.COMMENT,
+                    entityType = EntityType.SHORT,
+                    entityId = shortId,
+                    payload = mapOf("text" to text)
+                )
+                // Return optimistic result
+                NetworkResult.Success(ShortComment(
+                    id = "temp_${System.currentTimeMillis()}",
+                    user = ShortCreator("", "", "", null, false, "CREATOR"),
+                    text = text,
+                    createdAt = ""
+                ))
+            }
+            is NetworkResult.Loading -> result
         }
     }
 

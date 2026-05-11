@@ -64,6 +64,10 @@ data class AuthResponseDto(
     val accessToken: String? = null,
     val refreshToken: String? = null,
     
+    // Financial transaction security
+    val sessionSecret: String? = null,
+    val secretExpiresAt: Long? = null,
+    
     // For oauth specific responses
     val isNewUser: Boolean? = null,
     val error: String? = null,
