@@ -2001,16 +2001,6 @@ model social_media_sync_logs {
   @@index([status])
 }
 
-model platform_rate_limits {
-  id                 String         @id
-  platform           SocialPlatform @unique
-  requests_per_hour  Int
-  requests_remaining Int
-  reset_at           DateTime
-  last_request_at    DateTime?
-  updated_at         DateTime
-}
-
 model spare_part_details {
   id                   String   @id
   product_id           String   @unique
