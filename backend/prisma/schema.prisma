@@ -6,54 +6,59 @@ datasource db {
   provider = "postgresql"
 }
 
-model admires {
+model Admire {
   id                              String   @id
   admirer_id                      String
   admired_id                      String
   is_lovers                       Boolean  @default(false)
   created_at                      DateTime @default(now())
-  users_admires_admired_idTousers users    @relation("admires_admired_idTousers", fields: [admired_id], references: [id], onDelete: Cascade)
-  users_admires_admirer_idTousers users    @relation("admires_admirer_idTousers", fields: [admirer_id], references: [id], onDelete: Cascade)
+  users_admires_admired_idTousers User     @relation("admires_admired_idTousers", fields: [admired_id], references: [id], onDelete: Cascade)
+  users_admires_admirer_idTousers User     @relation("admires_admirer_idTousers", fields: [admirer_id], references: [id], onDelete: Cascade)
 
   @@unique([admirer_id, admired_id])
+  @@map("admires")
 }
 
-model bio_links {
+model BioLink {
   id         String  @id
   user_id    String
   label      String
   url        String
   icon       String?
   sort_order Int     @default(0)
-  users      users   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  users      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("bio_links")
 }
 
-model comment_likes {
+model CommentLike {
   id         String   @id
   comment_id String
   user_id    String
   created_at DateTime @default(now())
-  comments   comments @relation(fields: [comment_id], references: [id], onDelete: Cascade)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  comments   Comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  users      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([comment_id, user_id])
   @@index([comment_id])
   @@index([user_id])
+  @@map("comment_likes")
 }
 
-model comment_reports {
+model CommentReport {
   id          String   @id
   comment_id  String
   reporter_id String
   reason      String
   created_at  DateTime @default(now())
-  comments    comments @relation(fields: [comment_id], references: [id], onDelete: Cascade)
-  users       users    @relation(fields: [reporter_id], references: [id], onDelete: Cascade)
+  comments    Comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  users       User     @relation(fields: [reporter_id], references: [id], onDelete: Cascade)
 
   @@index([comment_id])
+  @@map("comment_reports")
 }
 
-model comment_settings {
+model CommentSetting {
   id               String  @id
   content_id       String
   content_type     String
@@ -61,9 +66,10 @@ model comment_settings {
   replies_enabled  Boolean @default(true)
 
   @@unique([content_id, content_type])
+  @@map("comment_settings")
 }
 
-model comments {
+model Comment {
   id                                     String            @id
   user_id                                String
   content_id                             String
@@ -77,20 +83,21 @@ model comments {
   is_edited                              Boolean           @default(false)
   created_at                             DateTime          @default(now())
   edited_at                              DateTime?
-  comment_likes                          comment_likes[]
-  comment_reports                        comment_reports[]
-  comments                               comments?         @relation("commentsTocomments", fields: [parent_id], references: [id], onDelete: Cascade)
-  other_comments                         comments[]        @relation("commentsTocomments")
-  users_comments_reply_to_user_idTousers users?            @relation("comments_reply_to_user_idTousers", fields: [reply_to_user_id], references: [id])
-  users_comments_user_idTousers          users             @relation("comments_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade)
+  comment_likes                          CommentLike[]
+  comment_reports                        CommentReport[]
+  comments                               Comment?          @relation("commentsTocomments", fields: [parent_id], references: [id], onDelete: Cascade)
+  other_comments                         Comment[]         @relation("commentsTocomments")
+  users_comments_reply_to_user_idTousers User?             @relation("comments_reply_to_user_idTousers", fields: [reply_to_user_id], references: [id])
+  users_comments_user_idTousers          User              @relation("comments_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([content_type, content_id, created_at])
   @@index([is_pinned, created_at])
   @@index([parent_id])
   @@index([user_id])
+  @@map("comments")
 }
 
-model contest_action_completions {
+model ContestActionCompletion {
   id                  String              @id
   submission_id       String
   action_id           String
@@ -98,9 +105,11 @@ model contest_action_completions {
   proof_url           String?
   contest_actions     contest_actions     @relation(fields: [action_id], references: [id], onDelete: Cascade)
   contest_submissions contest_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+
+  @@map("contest_action_completions")
 }
 
-model contest_actions {
+model ContestAction {
   id                         String                       @id
   contest_id                 String
   action_type                RequirementType
@@ -111,9 +120,11 @@ model contest_actions {
   sort_order                 Int                          @default(0)
   contest_action_completions contest_action_completions[]
   contests                   contests                     @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+
+  @@map("contest_actions")
 }
 
-model contest_judges {
+model ContestJudge {
   id         String   @id
   contest_id String
   user_id    String
@@ -123,9 +134,10 @@ model contest_judges {
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([contest_id, user_id])
+  @@map("contest_judges")
 }
 
-model contest_participants {
+model ContestParticipant {
   id         String   @id
   contest_id String
   user_id    String
@@ -134,17 +146,20 @@ model contest_participants {
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([contest_id, user_id])
+  @@map("contest_participants")
 }
 
-model contest_prize_distributions {
+model ContestPrizeDistribution {
   id         String   @id
   contest_id String
   rank       Int
   percentage Decimal  @db.Decimal(5, 2)
   contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+
+  @@map("contest_prize_distributions")
 }
 
-model contest_submissions {
+model ContestSubmission {
   id                         String                       @id
   contest_id                 String
   user_id                    String
@@ -162,9 +177,10 @@ model contest_submissions {
   contest_votes              contest_votes[]
 
   @@unique([contest_id, user_id])
+  @@map("contest_submissions")
 }
 
-model contest_votes {
+model ContestVote {
   id                  String              @id
   submission_id       String
   voter_id            String
@@ -175,9 +191,10 @@ model contest_votes {
   users               users               @relation(fields: [voter_id], references: [id], onDelete: Cascade)
 
   @@unique([submission_id, voter_id])
+  @@map("contest_votes")
 }
 
-model contest_winners {
+model ContestWinner {
   id         String   @id
   contest_id String
   user_id    String
@@ -186,9 +203,11 @@ model contest_winners {
   awarded_at DateTime @default(now())
   contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("contest_winners")
 }
 
-model contests {
+model Contest {
   id                          String                        @id
   creator_id                  String
   title                       String
@@ -233,9 +252,10 @@ model contests {
   team_submissions            team_submissions[]
 
   @@index([status, deadline])
+  @@map("contests")
 }
 
-model daily_stats {
+model DailyStat {
   id           String   @id
   user_id      String
   date         DateTime @db.Date
@@ -247,9 +267,10 @@ model daily_stats {
   users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, date])
+  @@map("daily_stats")
 }
 
-model escrows {
+model Escrow {
   id              String   @id
   contest_id      String
   user_id         String
@@ -259,9 +280,11 @@ model escrows {
   created_at      DateTime @default(now())
   contests        contests @relation(fields: [contest_id], references: [id])
   users           users    @relation(fields: [user_id], references: [id])
+
+  @@map("escrows")
 }
 
-model judge_invites {
+model JudgeInvite {
   id           String            @id
   contest_id   String
   judge_id     String
@@ -277,9 +300,10 @@ model judge_invites {
   @@index([contest_id])
   @@index([judge_id])
   @@index([status])
+  @@map("judge_invites")
 }
 
-model live_banned_viewers {
+model LiveBannedViewer {
   id           String       @id
   stream_id    String
   user_id      String
@@ -288,9 +312,10 @@ model live_banned_viewers {
   live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@unique([stream_id, user_id])
+  @@map("live_banned_viewers")
 }
 
-model live_battles {
+model LiveBattle {
   id                                                         String       @id
   stream_id                                                  String
   opponent_stream_id                                         String
@@ -305,9 +330,11 @@ model live_battles {
   created_at                                                 DateTime     @default(now())
   live_streams_live_battles_opponent_stream_idTolive_streams live_streams @relation("live_battles_opponent_stream_idTolive_streams", fields: [opponent_stream_id], references: [id], onDelete: Cascade)
   live_streams_live_battles_stream_idTolive_streams          live_streams @relation("live_battles_stream_idTolive_streams", fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@map("live_battles")
 }
 
-model live_co_hosts {
+model LiveCoHost {
   id           String       @id
   stream_id    String
   user_id      String
@@ -316,9 +343,10 @@ model live_co_hosts {
   live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@unique([stream_id, user_id])
+  @@map("live_co_hosts")
 }
 
-model live_messages {
+model LiveMessage {
   id           String       @id
   stream_id    String
   user_id      String
@@ -329,9 +357,10 @@ model live_messages {
   live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@index([stream_id, created_at])
+  @@map("live_messages")
 }
 
-model live_pinned_products {
+model LivePinnedProduct {
   id           String       @id
   stream_id    String
   product_id   String
@@ -344,9 +373,10 @@ model live_pinned_products {
   live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@unique([stream_id, product_id])
+  @@map("live_pinned_products")
 }
 
-model live_session_products {
+model LiveSessionProduct {
   id            String        @id
   session_id    String
   product_id    String
@@ -358,9 +388,10 @@ model live_session_products {
   live_sessions live_sessions @relation(fields: [session_id], references: [id], onDelete: Cascade)
 
   @@unique([session_id, product_id])
+  @@map("live_session_products")
 }
 
-model live_sessions {
+model LiveSession {
   id                    String                  @id
   host_id               String
   title                 String
@@ -378,9 +409,10 @@ model live_sessions {
 
   @@index([host_id, status])
   @@index([status, scheduled_start])
+  @@map("live_sessions")
 }
 
-model live_streams {
+model LiveStream {
   id                                                         String                 @id
   host_id                                                    String
   title                                                      String
@@ -424,9 +456,10 @@ model live_streams {
   @@index([host_id, status])
   @@index([status, created_at])
   @@index([status, viewer_count], map: "live_streams_status_viewers_idx")
+  @@map("live_streams")
 }
 
-model live_tips {
+model LiveTip {
   id           String       @id
   stream_id    String
   sender_id    String
@@ -439,9 +472,10 @@ model live_tips {
 
   @@index([stream_id, created_at])
   @@index([stream_id, sender_id])
+  @@map("live_tips")
 }
 
-model live_viewers {
+model LiveViewer {
   id            String       @id
   stream_id     String
   user_id       String
@@ -453,18 +487,21 @@ model live_viewers {
 
   @@unique([stream_id, user_id])
   @@index([stream_id, total_tips_kr])
+  @@map("live_viewers")
 }
 
-model milestone_completions {
+model MilestoneCompletion {
   id           String     @id
   milestone_id String     @unique
   user_id      String
   completed_at DateTime   @default(now())
   milestones   milestones @relation(fields: [milestone_id], references: [id])
   users        users      @relation(fields: [user_id], references: [id])
+
+  @@map("milestone_completions")
 }
 
-model milestones {
+model Milestone {
   id                    String                 @id
   title                 String
   description           String
@@ -475,9 +512,11 @@ model milestones {
   created_at            DateTime               @default(now())
   milestone_completions milestone_completions?
   contests              contests?              @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+
+  @@map("milestones")
 }
 
-model post_comments {
+model PostComment {
   id         String   @id
   post_id    String
   user_id    String
@@ -485,9 +524,11 @@ model post_comments {
   created_at DateTime @default(now())
   posts      posts    @relation(fields: [post_id], references: [id], onDelete: Cascade)
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("post_comments")
 }
 
-model post_likes {
+model PostLike {
   id         String   @id
   post_id    String
   user_id    String
@@ -496,9 +537,10 @@ model post_likes {
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([post_id, user_id])
+  @@map("post_likes")
 }
 
-model posts {
+model Post {
   id             String                @id
   user_id        String
   caption        String?
@@ -513,9 +555,10 @@ model posts {
   users          users                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
+  @@map("posts")
 }
 
-model products {
+model Product {
   id                    String                  @id
   seller_id             String
   title                 String
@@ -532,9 +575,10 @@ model products {
   shorts                shorts[]
 
   @@index([status, created_at])
+  @@map("products")
 }
 
-model refresh_tokens {
+model RefreshToken {
   id         String   @id
   user_id    String
   token_hash String
@@ -542,9 +586,11 @@ model refresh_tokens {
   expires_at DateTime
   created_at DateTime @default(now())
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
 }
 
-model short_collections {
+model ShortCollection {
   id         String   @id
   user_id    String
   name       String
@@ -553,9 +599,11 @@ model short_collections {
   created_at DateTime @default(now())
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   shorts     shorts[]
+
+  @@map("short_collections")
 }
 
-model short_comments {
+model ShortComment {
   id         String   @id
   short_id   String
   user_id    String
@@ -563,9 +611,11 @@ model short_comments {
   created_at DateTime @default(now())
   shorts     shorts   @relation(fields: [short_id], references: [id], onDelete: Cascade)
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("short_comments")
 }
 
-model short_likes {
+model ShortLike {
   id         String   @id
   short_id   String
   user_id    String
@@ -574,9 +624,10 @@ model short_likes {
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([short_id, user_id])
+  @@map("short_likes")
 }
 
-model shorts {
+model Short {
   id                String                @id
   user_id           String
   video_url         String
@@ -601,9 +652,10 @@ model shorts {
   users             users                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
+  @@map("shorts")
 }
 
-model subscription_tiers {
+model SubscriptionTier {
   id            String               @id
   creator_id    String
   tier          SubscriptionTierType
@@ -615,9 +667,10 @@ model subscription_tiers {
   subscriptions subscriptions[]
 
   @@unique([creator_id, tier])
+  @@map("subscription_tiers")
 }
 
-model subscriptions {
+model Subscription {
   id                                       String               @id
   subscriber_id                            String
   creator_id                               String
@@ -633,17 +686,20 @@ model subscriptions {
   subscription_tiers                       subscription_tiers   @relation(fields: [tier_id], references: [id])
 
   @@unique([subscriber_id, creator_id])
+  @@map("subscriptions")
 }
 
-model team_chats {
+model TeamChat {
   id         String   @id
   team_id    String   @unique
   chat_id    String
   created_at DateTime @default(now())
   teams      teams    @relation(fields: [team_id], references: [id], onDelete: Cascade)
+
+  @@map("team_chats")
 }
 
-model team_contest_registrations {
+model TeamContestRegistration {
   id            String   @id
   contest_id    String
   team_id       String
@@ -654,9 +710,10 @@ model team_contest_registrations {
   @@unique([contest_id, team_id])
   @@index([contest_id])
   @@index([team_id])
+  @@map("team_contest_registrations")
 }
 
-model team_invitations {
+model TeamInvitation {
   id                                       String           @id
   team_id                                  String
   inviter_id                               String
@@ -671,9 +728,10 @@ model team_invitations {
   @@unique([team_id, invitee_id, status])
   @@index([invitee_id, status])
   @@index([team_id, status])
+  @@map("team_invitations")
 }
 
-model team_members {
+model TeamMember {
   id        String   @id
   team_id   String
   user_id   String
@@ -685,9 +743,10 @@ model team_members {
   @@unique([team_id, user_id])
   @@index([team_id])
   @@index([user_id])
+  @@map("team_members")
 }
 
-model team_submission_votes {
+model TeamSubmissionVote {
   id               String           @id
   submission_id    String
   voter_id         String
@@ -697,9 +756,10 @@ model team_submission_votes {
 
   @@unique([submission_id, voter_id])
   @@index([submission_id])
+  @@map("team_submission_votes")
 }
 
-model team_submissions {
+model TeamSubmission {
   id                    String                  @id
   contest_id            String
   team_id               String
@@ -718,9 +778,10 @@ model team_submissions {
 
   @@unique([contest_id, team_id])
   @@index([contest_id, votes_count])
+  @@map("team_submissions")
 }
 
-model teams {
+model Team {
   id                         String                       @id
   name                       String                       @unique @db.VarChar(50)
   avatar_url                 String?
@@ -736,9 +797,11 @@ model teams {
   team_members               team_members[]
   team_submissions           team_submissions[]
   users                      users                        @relation(fields: [leader_id], references: [id], onDelete: Cascade)
+
+  @@map("teams")
 }
 
-model transactions {
+model Transaction {
   id              String   @id
   user_id         String
   type            String
@@ -754,9 +817,10 @@ model transactions {
   users           users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
+  @@map("transactions")
 }
 
-model users {
+model User {
   id                                                  String                  @id
   email                                               String                  @unique
   username                                            String                  @unique
@@ -816,15 +880,19 @@ model users {
   teams                                               teams[]
   transactions                                        transactions[]
   wallets                                             wallets?
+
+  @@map("users")
 }
 
-model wallets {
+model Wallet {
   id         String   @id
   user_id    String   @unique
   kr_balance Decimal  @default(0) @db.Decimal(18, 4)
   created_at DateTime @default(now())
   updated_at DateTime
   users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("wallets")
 }
 
 enum AccountType {
