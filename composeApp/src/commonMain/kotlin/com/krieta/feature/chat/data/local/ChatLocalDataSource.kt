@@ -1,104 +1,119 @@
 package com.krieta.feature.chat.data.local
 
-import com.krieta.com.db.KrietaDatabase
-import com.krieta.feature.chat.domain.model.Conversation
-import com.krieta.feature.chat.domain.model.Message
-import com.krieta.feature.chat.domain.model.ChatUser
+import com.krieta.db.KrietaDatabase
+import com.krieta.feature.chat.domain.model.Chat
+import com.krieta.feature.chat.domain.model.ChatMessage
+import com.krieta.feature.chat.domain.model.ChatParticipant
+import com.krieta.feature.chat.domain.model.ChatType
+import com.krieta.feature.chat.domain.model.UserSnippet
+import com.krieta.com.core.util.currentTimeMillis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 
 class ChatLocalDataSource(private val database: KrietaDatabase) {
-    
-    private val conversationQueries = database.conversationQueries
-    private val messageQueries = database.messageQueries
-    
-    suspend fun cacheConversations(conversations: List<Conversation>) = withContext(Dispatchers.IO) {
-        conversations.forEach { conversation ->
-            conversationQueries.insertOrReplaceConversation(
-                id = conversation.id,
-                otherUserId = conversation.otherUser.id,
-                otherUsername = conversation.otherUser.username,
-                otherDisplayName = conversation.otherUser.displayName,
-                otherAvatarUrl = conversation.otherUser.avatarUrl,
-                lastMessageContent = conversation.lastMessage?.content,
-                lastMessageSenderId = conversation.lastMessage?.senderId,
-                lastMessageTimestamp = conversation.lastMessage?.timestamp,
-                unreadCount = conversation.unreadCount.toLong(),
-                isOnline = conversation.otherUser.isOnline,
-                updatedAt = conversation.updatedAt,
-                cachedAt = System.currentTimeMillis()
+
+    private val chatQueries = database.chatQueries
+
+    suspend fun cacheChats(chats: List<Chat>) = withContext(Dispatchers.IO) {
+        chats.forEach { chat ->
+            val otherParticipant = chat.participants.firstOrNull()?.user
+            val latest = chat.latestMessage
+            chatQueries.insertOrReplaceConversation(
+                id = chat.id,
+                otherUserId = otherParticipant?.id ?: "",
+                otherUsername = otherParticipant?.username ?: "",
+                otherDisplayName = otherParticipant?.displayName ?: "",
+                otherAvatarUrl = otherParticipant?.avatarUrl,
+                lastMessageContent = latest?.payload,
+                lastMessageSenderId = latest?.senderId,
+                lastMessageTimestamp = latest?.createdAt?.toString(),
+                unreadCount = 0L,
+                isOnline = 0L,
+                updatedAt = chat.updatedAt.toString(),
+                cachedAt = currentTimeMillis()
             )
         }
     }
-    
-    suspend fun getCachedConversations(): List<Conversation> = withContext(Dispatchers.IO) {
-        conversationQueries.getAllConversations().executeAsList().map { entity ->
-            Conversation(
+
+    suspend fun getCachedChats(): List<Chat> = withContext(Dispatchers.IO) {
+        chatQueries.getAllConversations().executeAsList().map { entity ->
+            val otherUser = UserSnippet(
+                id = entity.otherUserId,
+                username = entity.otherUsername,
+                displayName = entity.otherDisplayName,
+                avatarUrl = entity.otherAvatarUrl
+            )
+            Chat(
                 id = entity.id,
-                otherUser = ChatUser(
-                    id = entity.otherUserId,
-                    username = entity.otherUsername,
-                    displayName = entity.otherDisplayName,
-                    avatarUrl = entity.otherAvatarUrl,
-                    isOnline = entity.isOnline
-                ),
-                lastMessage = if (entity.lastMessageContent != null) {
-                    Message(
-                        id = "",
-                        conversationId = entity.id,
-                        senderId = entity.lastMessageSenderId ?: "",
-                        content = entity.lastMessageContent,
-                        timestamp = entity.lastMessageTimestamp ?: "",
-                        isRead = true,
-                        messageType = "TEXT"
+                type = ChatType.DIRECT,
+                participants = listOf(
+                    ChatParticipant(
+                        userId = entity.otherUserId,
+                        role = "member",
+                        joinedAt = Instant.fromEpochMilliseconds(0),
+                        user = otherUser
                     )
-                } else null,
-                unreadCount = entity.unreadCount.toInt(),
-                updatedAt = entity.updatedAt
+                ),
+                latestMessage = entity.lastMessageContent?.let {
+                    ChatMessage(
+                        id = "",
+                        chatId = entity.id,
+                        senderId = entity.lastMessageSenderId ?: "",
+                        sender = null,
+                        payload = it,
+                        createdAt = entity.lastMessageTimestamp
+                            ?.let { ts -> runCatching { Instant.parse(ts) }.getOrNull() }
+                            ?: Instant.fromEpochMilliseconds(0)
+                    )
+                },
+                createdAt = Instant.fromEpochMilliseconds(0),
+                updatedAt = runCatching { Instant.parse(entity.updatedAt) }.getOrElse { Instant.fromEpochMilliseconds(0) }
             )
         }
     }
-    
-    suspend fun cacheMessages(conversationId: String, messages: List<Message>) = withContext(Dispatchers.IO) {
+
+    suspend fun cacheMessages(chatId: String, messages: List<ChatMessage>) = withContext(Dispatchers.IO) {
         messages.forEach { message ->
-            messageQueries.insertOrReplaceMessage(
+            chatQueries.insertOrReplaceMessage(
                 id = message.id,
-                conversationId = conversationId,
+                conversationId = chatId,
                 senderId = message.senderId,
-                senderUsername = message.senderUsername ?: "",
-                senderDisplayName = message.senderDisplayName ?: "",
-                senderAvatarUrl = message.senderAvatarUrl,
-                content = message.content,
-                messageType = message.messageType,
+                senderUsername = message.sender?.username ?: "",
+                senderDisplayName = message.sender?.displayName ?: "",
+                senderAvatarUrl = message.sender?.avatarUrl,
+                content = message.payload,
+                messageType = message.mediaType ?: "TEXT",
                 mediaUrl = message.mediaUrl,
-                isRead = message.isRead,
-                createdAt = message.timestamp,
-                cachedAt = System.currentTimeMillis()
+                isRead = 0L,
+                createdAt = message.createdAt.toString(),
+                cachedAt = currentTimeMillis()
             )
         }
     }
-    
-    suspend fun getCachedMessages(conversationId: String): List<Message> = withContext(Dispatchers.IO) {
-        messageQueries.getMessagesByConversationId(conversationId).executeAsList().map { entity ->
-            Message(
+
+    suspend fun getCachedMessages(chatId: String): List<ChatMessage> = withContext(Dispatchers.IO) {
+        chatQueries.getMessagesByConversationId(chatId).executeAsList().map { entity ->
+            ChatMessage(
                 id = entity.id,
-                conversationId = entity.conversationId,
+                chatId = entity.conversationId,
                 senderId = entity.senderId,
-                senderUsername = entity.senderUsername,
-                senderDisplayName = entity.senderDisplayName,
-                senderAvatarUrl = entity.senderAvatarUrl,
-                content = entity.content,
-                messageType = entity.messageType,
+                sender = UserSnippet(
+                    id = entity.senderId,
+                    username = entity.senderUsername,
+                    displayName = entity.senderDisplayName,
+                    avatarUrl = entity.senderAvatarUrl
+                ),
+                payload = entity.content,
                 mediaUrl = entity.mediaUrl,
-                isRead = entity.isRead,
-                timestamp = entity.createdAt
+                mediaType = entity.messageType,
+                createdAt = runCatching { Instant.parse(entity.createdAt) }.getOrElse { Instant.fromEpochMilliseconds(0) }
             )
         }
     }
-    
+
     suspend fun clearCache() = withContext(Dispatchers.IO) {
-        messageQueries.deleteMessagesByConversationId("")
-        conversationQueries.deleteAllConversations()
+        chatQueries.deleteAllConversations()
     }
 }

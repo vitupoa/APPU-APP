@@ -68,7 +68,7 @@ class SubscriptionTierSetupViewModel(
                     SubscriptionTier(
                         id = "",
                         tier = it.tier,
-                        krAmount = SafeConversion.toDoubleOrDefaultWithValidation(it.krAmount, "subscriptionAmount", 0.0, defaultValue = 0.0),
+                        krAmount = SafeConversion.toDoubleOrDefaultWithValidation(it.krAmount, "subscriptionAmount", 0.0, defaultValue = 0.0) ?: 0.0,
                         benefits = it.benefits,
                         isEnabled = it.isEnabled
                     )
@@ -112,3 +112,4 @@ class SubscriptionTierSetupViewModel(
         }
     }
 }
+

@@ -2,6 +2,7 @@ package com.krieta.com.core.security
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 
 /**
  * Security manager that initializes and coordinates all security components
@@ -96,7 +97,7 @@ object SecurityLogger {
     data class SecurityEvent(
         val type: EventType,
         val message: String,
-        val timestamp: Long = System.currentTimeMillis()
+        val timestamp: Long = Clock.System.now().toEpochMilliseconds()
     )
     
     enum class EventType {

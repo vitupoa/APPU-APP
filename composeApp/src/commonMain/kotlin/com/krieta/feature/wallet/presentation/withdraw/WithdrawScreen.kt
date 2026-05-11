@@ -364,7 +364,7 @@ class WithdrawScreen : Screen {
     
     private fun canWithdraw(state: WithdrawState): Boolean {
         val amount = SafeConversion.toDoubleOrDefaultWithValidation(state.amount, "withdrawAmount", 0.0, defaultValue = 0.0)
-        if (amount <= 0 || amount > state.availableBalance) return false
+        if ((amount ?: 0.0) <= 0 || (amount ?: 0.0) > state.availableBalance) return false
         
         return when (state.provider) {
             "mpesa" -> state.phoneNumber.isNotEmpty()
@@ -392,3 +392,4 @@ private fun ProviderChip(
         modifier = modifier
     )
 }
+

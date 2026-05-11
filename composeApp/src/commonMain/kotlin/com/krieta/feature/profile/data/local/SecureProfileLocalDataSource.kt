@@ -3,7 +3,7 @@ package com.krieta.feature.profile.data.local
 import com.krieta.com.core.security.DatabaseEncryption
 import com.krieta.com.core.security.DataIntegrityChecker
 import com.krieta.com.core.security.InputValidator
-import com.krieta.com.db.KrietaDatabase
+import com.krieta.db.KrietaDatabase
 import com.krieta.feature.profile.domain.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -51,8 +51,8 @@ class SecureProfileLocalDataSource(
                 country = InputValidator.validateText(profile.country, "Country"),
                 currency = InputValidator.validateText(profile.currency, "Currency"),
                 accountType = profile.accountType.name,
-                isVerified = profile.isVerified,
-                isWalletUnlocked = profile.isWalletUnlocked,
+                isVerified = if (profile.isVerified) 1L else 0L,
+                isWalletUnlocked = if (profile.isWalletUnlocked) 1L else 0L,
                 admirers = profile.stats.admirers.toLong(),
                 admiring = profile.stats.admiring.toLong(),
                 lovers = profile.stats.lovers.toLong(),
@@ -131,8 +131,8 @@ class SecureProfileLocalDataSource(
                 country = profileEntity.country,
                 currency = profileEntity.currency,
                 accountType = parseAccountType(profileEntity.accountType),
-                isVerified = profileEntity.isVerified,
-                isWalletUnlocked = profileEntity.isWalletUnlocked,
+                isVerified = profileEntity.isVerified != 0L,
+                isWalletUnlocked = profileEntity.isWalletUnlocked != 0L,
                 bioLinks = bioLinks.map { 
                     BioLink(
                         id = it.id,
@@ -201,8 +201,8 @@ class SecureProfileLocalDataSource(
                 country = profileEntity.country,
                 currency = profileEntity.currency,
                 accountType = parseAccountType(profileEntity.accountType),
-                isVerified = profileEntity.isVerified,
-                isWalletUnlocked = profileEntity.isWalletUnlocked,
+                isVerified = profileEntity.isVerified != 0L,
+                isWalletUnlocked = profileEntity.isWalletUnlocked != 0L,
                 bioLinks = bioLinks.map { 
                     BioLink(
                         id = it.id,
@@ -248,3 +248,4 @@ class SecureProfileLocalDataSource(
         RelationshipStatus.NONE 
     }
 }
+

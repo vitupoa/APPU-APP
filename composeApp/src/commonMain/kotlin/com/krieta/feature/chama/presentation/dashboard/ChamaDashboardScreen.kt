@@ -208,14 +208,14 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
                                 min = 0.0,
                                 defaultValue = 0.0
                             )
-                            if (amount > 0) {
-                                viewModel.contribute(amount)
+                            if ((amount ?: 0.0) > 0) {
+                                viewModel.contribute(amount ?: 0.0)
                                 showContributeDialog = false
                                 contributeAmount = ""
                             }
                         },
                         enabled = contributeAmount.isNotEmpty() && 
-                            SafeConversion.toDoubleOrDefault(contributeAmount, "chamaContribution", 0.0) > 0 && 
+                            (SafeConversion.toDoubleOrDefault(contributeAmount, "chamaContribution", 0.0) ?: 0.0) > 0 && 
                             !state.isContributing,
                         colors = ButtonDefaults.buttonColors(containerColor = ChamaGold)
                     ) {

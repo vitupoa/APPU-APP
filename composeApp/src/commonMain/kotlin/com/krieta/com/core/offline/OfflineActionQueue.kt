@@ -1,6 +1,6 @@
 package com.krieta.com.core.offline
 
-import com.krieta.com.db.KrietaDatabase
+import com.krieta.db.KrietaDatabase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

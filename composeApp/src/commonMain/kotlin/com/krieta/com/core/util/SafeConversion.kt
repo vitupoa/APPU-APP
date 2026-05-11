@@ -40,13 +40,15 @@ object SafeConversion {
         fieldName: String,
         min: Double = 0.0,
         max: Double = Double.MAX_VALUE,
-        defaultValue: Double = 0.0
-    ): Double {
+        defaultValue: Double? = 0.0
+    ): Double? {
         val converted = value.toDoubleOrNull()
         
         return when {
             converted == null -> {
-                logger.w { "Failed to convert '$fieldName' to Double. Input: '$value'. Using default: $defaultValue" }
+                if (defaultValue != null) {
+                    logger.w { "Failed to convert '$fieldName' to Double. Input: '$value'. Using default: $defaultValue" }
+                }
                 defaultValue
             }
             converted < min -> {

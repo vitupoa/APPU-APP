@@ -441,7 +441,7 @@ class CreateListingViewModel(
                 title = s.title,
                 description = s.description.ifBlank { null },
                 imageUrls = s.imageUrls,
-                priceKr = if (hasRetailPrice) price else SafeConversion.toDoubleOrDefaultWithValidation(s.wholesalePrice, "wholesalePrice", 0.0, defaultValue = 0.0),
+                priceKr = if (hasRetailPrice) (price ?: 0.0) else SafeConversion.toDoubleOrDefaultWithValidation(s.wholesalePrice, "wholesalePrice", 0.0, defaultValue = 0.0) ?: 0.0,
                 wholesalePrice = if (s.wholesalePrice.isNotBlank()) SafeConversion.toDoubleOrDefaultWithValidation(s.wholesalePrice, "wholesalePrice", 0.0, defaultValue = null) else null,
                 wholesaleMinQty = if (s.wholesaleMinQty.isNotBlank()) s.wholesaleMinQty.toIntOrNull() else null,
                 bargainEnabled = s.bargainEnabled,

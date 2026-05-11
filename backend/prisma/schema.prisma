@@ -6,207 +6,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model Admire {
-  id                              String   @id
-  admirer_id                      String
-  admired_id                      String
-  is_lovers                       Boolean  @default(false)
-  created_at                      DateTime @default(now())
-  users_admires_admired_idTousers User     @relation("admires_admired_idTousers", fields: [admired_id], references: [id], onDelete: Cascade)
-  users_admires_admirer_idTousers User     @relation("admires_admirer_idTousers", fields: [admirer_id], references: [id], onDelete: Cascade)
-
-  @@unique([admirer_id, admired_id])
-  @@map("admires")
-}
-
-model BioLink {
-  id         String  @id
-  user_id    String
-  label      String
-  url        String
-  icon       String?
-  sort_order Int     @default(0)
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("bio_links")
-}
-
-model CommentLike {
-  id         String   @id
-  comment_id String
-  user_id    String
-  created_at DateTime @default(now())
-  comments   Comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
-  User      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@unique([comment_id, user_id])
-  @@index([comment_id])
-  @@index([user_id])
-  @@map("comment_likes")
-}
-
-model CommentReport {
-  id          String   @id
-  comment_id  String
-  reporter_id String
-  reason      String
-  created_at  DateTime @default(now())
-  comments    Comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
-  User       User     @relation(fields: [reporter_id], references: [id], onDelete: Cascade)
-
-  @@index([comment_id])
-  @@map("comment_reports")
-}
-
-model CommentSetting {
-  id               String  @id
-  content_id       String
-  content_type     String
-  comments_enabled Boolean @default(true)
-  replies_enabled  Boolean @default(true)
-
-  @@unique([content_id, content_type])
-  @@map("comment_settings")
-}
-
-model Comment {
-  id                                     String            @id
-  user_id                                String
-  content_id                             String
-  content_type                           String
-  text                                   String
-  parent_id                              String?
-  reply_to_user_id                       String?
-  likes_count                            Int               @default(0)
-  replies_count                          Int               @default(0)
-  is_pinned                              Boolean           @default(false)
-  is_edited                              Boolean           @default(false)
-  created_at                             DateTime          @default(now())
-  edited_at                              DateTime?
-  comment_likes                          CommentLike[]
-  comment_reports                        CommentReport[]
-  comments                               Comment?          @relation("commentsTocomments", fields: [parent_id], references: [id], onDelete: Cascade)
-  other_comments                         Comment[]         @relation("commentsTocomments")
-  users_comments_reply_to_user_idTousers User?             @relation("comments_reply_to_user_idTousers", fields: [reply_to_user_id], references: [id])
-  users_comments_user_idTousers          User              @relation("comments_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([content_type, content_id, created_at])
-  @@index([is_pinned, created_at])
-  @@index([parent_id])
-  @@index([user_id])
-  @@map("comments")
-}
-
-model ContestActionCompletion {
-  id                  String              @id
-  submission_id       String
-  action_id           String
-  is_completed        Boolean             @default(false)
-  proof_url           String?
-  ContestAction     ContestAction     @relation(fields: [action_id], references: [id], onDelete: Cascade)
-  ContestSubmission ContestSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
-
-  @@map("contest_action_completions")
-}
-
-model ContestAction {
-  id                         String                       @id
-  contest_id                 String
-  action_type                RequirementType
-  target_url                 String?
-  label                      String
-  is_verifiable              Boolean                      @default(false)
-  requires_upload            Boolean                      @default(false)
-  sort_order                 Int                          @default(0)
-  contest_action_completions ContestActionCompletion[]
-  Contest                   Contest                     @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-
-  @@map("ContestAction")
-}
-
-model ContestJudge {
-  id         String   @id
-  contest_id String
-  user_id    String
-  status     String   @default("pending")
-  added_at   DateTime @default(now())
-  Contest   Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@unique([contest_id, user_id])
-  @@map("contest_judges")
-}
-
-model ContestParticipant {
-  id         String   @id
-  contest_id String
-  user_id    String
-  joined_at  DateTime @default(now())
-  Contest   Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@unique([contest_id, user_id])
-  @@map("contest_participants")
-}
-
-model ContestPrizeDistribution {
-  id         String   @id
-  contest_id String
-  rank       Int
-  percentage Decimal  @db.Decimal(5, 2)
-  Contest   Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-
-  @@map("contest_prize_distributions")
-}
-
-model ContestSubmission {
-  id                         String                       @id
-  contest_id                 String
-  user_id                    String
-  media_url                  String
-  media_type                 String
-  proof_urls                 String[]
-  votes_count                Int                          @default(0)
-  judge_score                Decimal?                     @default(0) @db.Decimal(5, 2)
-  final_score                Decimal?                     @db.Decimal(7, 2)
-  rank                       Int?
-  submitted_at               DateTime                     @default(now())
-  contest_action_completions ContestActionCompletion[]
-  Contest                   Contest                     @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  User                      User                        @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  contest_votes              ContestVote[]
-
-  @@unique([contest_id, user_id])
-  @@map("ContestSubmission")
-}
-
-model ContestVote {
-  id                  String              @id
-  submission_id       String
-  voter_id            String
-  ip_address          String?
-  fingerprint         String?
-  created_at          DateTime            @default(now())
-  ContestSubmission ContestSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
-  User               User               @relation(fields: [voter_id], references: [id], onDelete: Cascade)
-
-  @@unique([submission_id, voter_id])
-  @@map("contest_votes")
-}
-
-model ContestWinner {
-  id         String   @id
-  contest_id String
-  user_id    String
-  rank       Int
-  prize_kr   Decimal  @db.Decimal(18, 4)
-  awarded_at DateTime @default(now())
-  Contest   Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("contest_winners")
-}
-
 model Contest {
   id                          String                        @id
   creator_id                  String
@@ -237,158 +36,61 @@ model Contest {
   total_participants          Int                           @default(0)
   total_submissions           Int                           @default(0)
   created_at                  DateTime                      @default(now())
-  ContestAction             ContestAction[]
-  contest_judges              ContestJudge[]
-  contest_participants        ContestParticipant[]
-  contest_prize_distributions ContestPrizeDistribution[]
-  ContestSubmission         ContestSubmission[]
-  contest_winners             ContestWinner[]
-  User                       User                         @relation(fields: [creator_id], references: [id])
-  escrows                     Escrow[]
-  judge_invites               JudgeInvite[]
-  milestones                  Milestone[]
-  shorts                      Short[]
-  team_contest_registrations  TeamContestRegistration[]
-  team_submissions            TeamSubmission[]
+  User                        User                          @relation(fields: [creator_id], references: [id])
+  ContestAction               ContestAction[]
+  ContestSubmission           ContestSubmission[]
+  brand_campaigns             brand_campaigns[]
+  contest_analytics           contest_analytics[]
+  contest_engagement_actions  contest_engagement_actions[]
+  contest_judges              contest_judges[]
+  contest_participants        contest_participants[]
+  contest_prize_distributions contest_prize_distributions[]
+  contest_purchase_entries    contest_purchase_entries[]
+  contest_sponsorships        contest_sponsorships[]
+  contest_winners             contest_winners[]
+  conversion_campaigns        conversion_campaigns[]
+  escrows                     escrows[]
+  judge_invites               judge_invites[]
+  milestones                  milestones[]
+  sales_funnel_events         sales_funnel_events[]
+  shorts                      shorts[]
+  team_contest_registrations  team_contest_registrations[]
+  team_submissions            team_submissions[]
 
   @@index([status, deadline])
-  @@map("Contest")
 }
 
-model DailyStat {
-  id           String   @id
-  user_id      String
-  date         DateTime @db.Date
-  views        Int      @default(0)
-  likes        Int      @default(0)
-  new_admirers Int      @default(0)
-  kr_earned    Decimal  @default(0) @db.Decimal(18, 4)
-  kr_spent     Decimal  @default(0) @db.Decimal(18, 4)
-  User        User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@unique([user_id, date])
-  @@map("daily_stats")
+model ContestAction {
+  id                         String                       @id
+  contest_id                 String
+  action_type                RequirementType
+  target_url                 String?
+  label                      String
+  is_verifiable              Boolean                      @default(false)
+  requires_upload            Boolean                      @default(false)
+  sort_order                 Int                          @default(0)
+  Contest                    Contest                      @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  contest_action_completions contest_action_completions[]
 }
 
-model Escrow {
-  id              String   @id
-  contest_id      String
-  user_id         String
-  prize_amount_kr Decimal  @db.Decimal(18, 4)
-  fee_amount_kr   Decimal  @db.Decimal(18, 4)
-  status          String   @default("held")
-  created_at      DateTime @default(now())
-  Contest        Contest @relation(fields: [contest_id], references: [id])
-  User           User    @relation(fields: [user_id], references: [id])
+model ContestSubmission {
+  id                         String                       @id
+  contest_id                 String
+  user_id                    String
+  media_url                  String
+  media_type                 String
+  proof_urls                 String[]
+  votes_count                Int                          @default(0)
+  judge_score                Decimal?                     @default(0) @db.Decimal(5, 2)
+  final_score                Decimal?                     @db.Decimal(7, 2)
+  rank                       Int?
+  submitted_at               DateTime                     @default(now())
+  Contest                    Contest                      @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User                       User                         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  contest_action_completions contest_action_completions[]
+  contest_votes              contest_votes[]
 
-  @@map("escrows")
-}
-
-model JudgeInvite {
-  id           String            @id
-  contest_id   String
-  judge_id     String
-  status       JudgeInviteStatus @default(PENDING)
-  invited_at   DateTime          @default(now())
-  responded_at DateTime?
-  created_at   DateTime          @default(now())
-  updated_at   DateTime
-  Contest     Contest          @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  User        User             @relation(fields: [judge_id], references: [id], onDelete: Cascade)
-
-  @@unique([contest_id, judge_id])
-  @@index([contest_id])
-  @@index([judge_id])
-  @@index([status])
-  @@map("judge_invites")
-}
-
-model LiveBannedViewer {
-  id           String       @id
-  stream_id    String
-  user_id      String
-  reason       String?
-  banned_at    DateTime     @default(now())
-  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
-
-  @@unique([stream_id, user_id])
-  @@map("live_banned_viewers")
-}
-
-model LiveBattle {
-  id                                                         String       @id
-  stream_id                                                  String
-  opponent_stream_id                                         String
-  contest_id                                                 String?
-  duration_secs                                              Int          @default(300)
-  status                                                     BattleStatus @default(PENDING)
-  host_score                                                 Decimal      @default(0) @db.Decimal(18, 4)
-  opponent_score                                             Decimal      @default(0) @db.Decimal(18, 4)
-  winner_id                                                  String?
-  started_at                                                 DateTime?
-  ended_at                                                   DateTime?
-  created_at                                                 DateTime     @default(now())
-  live_streams_live_battles_opponent_stream_idTolive_streams LiveStream @relation("live_battles_opponent_stream_idTolive_streams", fields: [opponent_stream_id], references: [id], onDelete: Cascade)
-  live_streams_live_battles_stream_idTolive_streams          LiveStream @relation("live_battles_stream_idTolive_streams", fields: [stream_id], references: [id], onDelete: Cascade)
-
-  @@map("live_battles")
-}
-
-model LiveCoHost {
-  id           String       @id
-  stream_id    String
-  user_id      String
-  joined_at    DateTime     @default(now())
-  left_at      DateTime?
-  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
-
-  @@unique([stream_id, user_id])
-  @@map("live_co_hosts")
-}
-
-model LiveMessage {
-  id           String       @id
-  stream_id    String
-  user_id      String
-  text         String
-  is_system    Boolean      @default(false)
-  is_pinned    Boolean      @default(false)
-  created_at   DateTime     @default(now())
-  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
-
-  @@index([stream_id, created_at])
-  @@map("live_messages")
-}
-
-model LivePinnedProduct {
-  id           String       @id
-  stream_id    String
-  product_id   String
-  sale_price   Decimal?     @db.Decimal(18, 4)
-  is_pinned    Boolean      @default(false)
-  pinned_at    DateTime?
-  units_sold   Int          @default(0)
-  sort_order   Int          @default(0)
-  Product     Product     @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
-
-  @@unique([stream_id, product_id])
-  @@map("live_pinned_products")
-}
-
-model LiveSessionProduct {
-  id            String        @id
-  session_id    String
-  product_id    String
-  sale_price    Decimal?      @db.Decimal(18, 4)
-  units_sold    Int           @default(0)
-  sort_order    Int           @default(0)
-  created_at    DateTime      @default(now())
-  Product      Product      @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  LiveSession LiveSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
-
-  @@unique([session_id, product_id])
-  @@map("live_session_products")
+  @@unique([contest_id, user_id])
 }
 
 model LiveSession {
@@ -404,190 +106,75 @@ model LiveSession {
   peak_viewers          Int                     @default(0)
   total_sales_kr        Decimal                 @default(0) @db.Decimal(18, 4)
   created_at            DateTime                @default(now())
-  live_session_products LiveSessionProduct[]
-  User                 User                   @relation(fields: [host_id], references: [id], onDelete: Cascade)
+  User                  User                    @relation(fields: [host_id], references: [id], onDelete: Cascade)
+  live_session_products live_session_products[]
 
   @@index([host_id, status])
   @@index([status, scheduled_start])
-  @@map("LiveSession")
 }
 
 model LiveStream {
-  id                                                         String                 @id
-  host_id                                                    String
-  title                                                      String
-  description                                                String?
-  category                                                   String?                @default("Chat") @db.VarChar(50)
-  thumbnail_url                                              String?
-  type                                                       LiveStreamType         @default(NORMAL)
-  status                                                     LiveStreamStatus       @default(SCHEDULED)
-  stream_key                                                 String                 @unique
-  stream_url                                                 String?
-  playback_url                                               String?
-  viewer_count                                               Int                    @default(0)
-  peak_viewers                                               Int                    @default(0)
-  likes_count                                                Int                    @default(0)
-  total_tips_kr                                              Decimal                @default(0) @db.Decimal(18, 4)
-  total_sales_kr                                             Decimal                @default(0) @db.Decimal(18, 4)
-  gift_goal_title                                            String?
-  gift_goal_target                                           Decimal?               @db.Decimal(18, 4)
-  gift_goal_current                                          Decimal                @default(0) @db.Decimal(18, 4)
-  unlock_amount_kr                                           Decimal?               @db.Decimal(18, 4)
-  chama_id                                                   String?
-  contest_id                                                 String?
-  order_id                                                   String?
-  is_co_host_enabled                                         Boolean                @default(false)
-  max_co_hosts                                               Int                    @default(1)
-  scheduled_start                                            DateTime?
-  actual_start                                               DateTime?
-  ended_at                                                   DateTime?
-  created_at                                                 DateTime               @default(now())
-  live_banned_viewers                                        LiveBannedViewer[]
-  live_battles_live_battles_opponent_stream_idTolive_streams LiveBattle[]         @relation("live_battles_opponent_stream_idTolive_streams")
-  live_battles_live_battles_stream_idTolive_streams          LiveBattle[]         @relation("live_battles_stream_idTolive_streams")
-  live_co_hosts                                              LiveCoHost[]
-  live_messages                                              LiveMessage[]
-  live_pinned_products                                       LivePinnedProduct[]
-  User                                                      User                  @relation(fields: [host_id], references: [id], onDelete: Cascade)
-  live_tips                                                  LiveTip[]
-  live_viewers                                               LiveViewer[]
+  id                                                       String                 @id
+  host_id                                                  String
+  title                                                    String
+  description                                              String?
+  category                                                 String?                @default("Chat") @db.VarChar(50)
+  thumbnail_url                                            String?
+  type                                                     LiveStreamType         @default(NORMAL)
+  status                                                   LiveStreamStatus       @default(SCHEDULED)
+  stream_key                                               String                 @unique
+  stream_url                                               String?
+  playback_url                                             String?
+  viewer_count                                             Int                    @default(0)
+  peak_viewers                                             Int                    @default(0)
+  likes_count                                              Int                    @default(0)
+  total_tips_kr                                            Decimal                @default(0) @db.Decimal(18, 4)
+  total_sales_kr                                           Decimal                @default(0) @db.Decimal(18, 4)
+  gift_goal_title                                          String?
+  gift_goal_target                                         Decimal?               @db.Decimal(18, 4)
+  gift_goal_current                                        Decimal                @default(0) @db.Decimal(18, 4)
+  unlock_amount_kr                                         Decimal?               @db.Decimal(18, 4)
+  chama_id                                                 String?
+  contest_id                                               String?
+  order_id                                                 String?
+  is_co_host_enabled                                       Boolean                @default(false)
+  max_co_hosts                                             Int                    @default(1)
+  scheduled_start                                          DateTime?
+  actual_start                                             DateTime?
+  ended_at                                                 DateTime?
+  created_at                                               DateTime               @default(now())
+  User                                                     User                   @relation(fields: [host_id], references: [id], onDelete: Cascade)
+  live_banned_viewers                                      live_banned_viewers[]
+  live_battles_live_battles_opponent_stream_idToLiveStream live_battles[]         @relation("live_battles_opponent_stream_idToLiveStream")
+  live_battles_live_battles_stream_idToLiveStream          live_battles[]         @relation("live_battles_stream_idToLiveStream")
+  live_co_hosts                                            live_co_hosts[]
+  live_messages                                            live_messages[]
+  live_pinned_products                                     live_pinned_products[]
+  live_tips                                                live_tips[]
+  live_viewers                                             live_viewers[]
 
   @@index([category, status])
   @@index([host_id, status])
   @@index([status, created_at])
   @@index([status, viewer_count], map: "live_streams_status_viewers_idx")
-  @@map("LiveStream")
-}
-
-model LiveTip {
-  id           String       @id
-  stream_id    String
-  sender_id    String
-  recipient_id String
-  amount_kr    Decimal      @db.Decimal(18, 4)
-  gift_type    String?
-  message      String?
-  created_at   DateTime     @default(now())
-  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
-
-  @@index([stream_id, created_at])
-  @@index([stream_id, sender_id])
-  @@map("live_tips")
-}
-
-model LiveViewer {
-  id            String       @id
-  stream_id     String
-  user_id       String
-  joined_at     DateTime     @default(now())
-  left_at       DateTime?
-  total_tips_kr Decimal      @default(0) @db.Decimal(18, 4)
-  likes_given   Int          @default(0)
-  LiveStream  LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
-
-  @@unique([stream_id, user_id])
-  @@index([stream_id, total_tips_kr])
-  @@map("live_viewers")
-}
-
-model MilestoneCompletion {
-  id           String     @id
-  milestone_id String     @unique
-  user_id      String
-  completed_at DateTime   @default(now())
-  milestones   Milestone  @relation(fields: [milestone_id], references: [id])
-  User        User      @relation(fields: [user_id], references: [id])
-
-  @@map("milestone_completions")
-}
-
-model Milestone {
-  id                    String                 @id
-  title                 String
-  description           String
-  requirement_type      String
-  requirement_value     Int
-  reward_kr             Decimal                @db.Decimal(18, 4)
-  contest_id            String?
-  created_at            DateTime               @default(now())
-  milestone_completions MilestoneCompletion?
-  Contest              Contest?              @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-
-  @@map("milestones")
-}
-
-model PostComment {
-  id         String   @id
-  post_id    String
-  user_id    String
-  text       String
-  created_at DateTime @default(now())
-  Post      Post    @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("post_comments")
-}
-
-model PostLike {
-  id         String   @id
-  post_id    String
-  user_id    String
-  created_at DateTime @default(now())
-  Post      Post    @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@unique([post_id, user_id])
-  @@map("post_likes")
 }
 
 model Post {
-  id             String                @id
-  user_id        String
-  caption        String?
-  image_urls     String[]
-  is_locked      Boolean               @default(false)
-  required_tier  SubscriptionTierType?
-  likes_count    Int                   @default(0)
-  comments_count Int                   @default(0)
-  created_at     DateTime              @default(now())
-  post_comments  PostComment[]
-  post_likes     PostLike[]
-  User          User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id               String                @id
+  user_id          String
+  caption          String?
+  image_urls       String[]
+  is_locked        Boolean               @default(false)
+  required_tier    SubscriptionTierType?
+  likes_count      Int                   @default(0)
+  comments_count   Int                   @default(0)
+  created_at       DateTime              @default(now())
+  unlock_amount_kr Decimal?              @db.Decimal(18, 4)
+  User             User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  post_comments    post_comments[]
+  post_likes       post_likes[]
 
   @@index([user_id, created_at])
-  @@map("Post")
-}
-
-model Product {
-  id                    String                  @id
-  seller_id             String
-  title                 String
-  description           String?
-  image_urls            String[]
-  price_kr              Decimal                 @db.Decimal(18, 4)
-  category              String?
-  whatsapp_number       String
-  status                String                  @default("active")
-  created_at            DateTime                @default(now())
-  live_pinned_products  LivePinnedProduct[]
-  live_session_products LiveSessionProduct[]
-  User                 User                   @relation(fields: [seller_id], references: [id], onDelete: Cascade)
-  shorts                Short[]
-
-  @@index([status, created_at])
-  @@map("Product")
-}
-
-model RefreshToken {
-  id         String   @id
-  user_id    String
-  token_hash String
-  device_id  String
-  expires_at DateTime
-  created_at DateTime @default(now())
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("refresh_tokens")
 }
 
 model ShortCollection {
@@ -597,37 +184,1725 @@ model ShortCollection {
   cover_url  String?
   sort_order Int      @default(0)
   created_at DateTime @default(now())
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  shorts     Short[]
-
-  @@map("ShortCollection")
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shorts     shorts[]
 }
 
-model ShortComment {
+model SubscriptionTier {
+  id            String               @id
+  creator_id    String
+  tier          SubscriptionTierType
+  kr_amount     Decimal              @db.Decimal(18, 4)
+  benefits      String
+  is_enabled    Boolean              @default(true)
+  created_at    DateTime             @default(now())
+  User          User                 @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  subscriptions subscriptions[]
+
+  @@unique([creator_id, tier])
+}
+
+model Team {
+  id                         String                       @id
+  name                       String                       @unique @db.VarChar(50)
+  avatar_url                 String?
+  leader_id                  String
+  max_members                Int                          @default(5)
+  total_wins                 Int                          @default(0)
+  total_prizes               Decimal                      @default(0) @db.Decimal(18, 4)
+  created_at                 DateTime                     @default(now())
+  updated_at                 DateTime
+  User                       User                         @relation(fields: [leader_id], references: [id], onDelete: Cascade)
+  team_chats                 team_chats?
+  team_contest_registrations team_contest_registrations[]
+  team_invitations           team_invitations[]
+  team_members               team_members[]
+  team_submissions           team_submissions[]
+}
+
+model User {
+  id                                                               String                           @id
+  email                                                            String                           @unique
+  username                                                         String                           @unique
+  first_name                                                       String
+  last_name                                                        String
+  display_name                                                     String
+  avatar_url                                                       String?
+  cover_photo_url                                                  String?
+  bio                                                              String?
+  country                                                          String                           @db.VarChar(2)
+  currency                                                         String                           @db.VarChar(3)
+  google_id                                                        String?                          @unique
+  apple_id                                                         String?                          @unique
+  account_type                                                     AccountType                      @default(CREATOR)
+  is_admin                                                         Boolean                          @default(false)
+  is_verified                                                      Boolean                          @default(false)
+  is_wallet_unlocked                                               Boolean                          @default(false)
+  wallet_pin_hash                                                  String?
+  password_hash                                                    String?
+  created_at                                                       DateTime                         @default(now())
+  updated_at                                                       DateTime
+  devicePlatform                                                   String?
+  fcmToken                                                         String?
+  Contest                                                          Contest[]
+  ContestSubmission                                                ContestSubmission[]
+  LiveSession                                                      LiveSession[]
+  LiveStream                                                       LiveStream[]
+  Post                                                             Post[]
+  ShortCollection                                                  ShortCollection[]
+  SubscriptionTier                                                 SubscriptionTier[]
+  Team                                                             Team[]
+  ad_campaigns                                                     ad_campaigns[]
+  admires_admires_admired_idToUser                                 admires[]                        @relation("admires_admired_idToUser")
+  admires_admires_admirer_idToUser                                 admires[]                        @relation("admires_admirer_idToUser")
+  bio_links                                                        bio_links[]
+  brand_campaigns                                                  brand_campaigns[]
+  cart_items                                                       cart_items[]
+  comment_likes                                                    comment_likes[]
+  comment_reports                                                  comment_reports[]
+  comments_comments_reply_to_user_idToUser                         comments[]                       @relation("comments_reply_to_user_idToUser")
+  comments_comments_user_idToUser                                  comments[]                       @relation("comments_user_idToUser")
+  content_unlocks_content_unlocks_creator_idToUser                 content_unlocks[]                @relation("content_unlocks_creator_idToUser")
+  content_unlocks_content_unlocks_user_idToUser                    content_unlocks[]                @relation("content_unlocks_user_idToUser")
+  contest_engagement_actions                                       contest_engagement_actions[]
+  contest_judges                                                   contest_judges[]
+  contest_participants                                             contest_participants[]
+  contest_purchase_entries                                         contest_purchase_entries[]
+  contest_sponsorships                                             contest_sponsorships[]
+  contest_votes                                                    contest_votes[]
+  contest_winners                                                  contest_winners[]
+  conversion_campaign_recipients                                   conversion_campaign_recipients[]
+  conversion_campaigns                                             conversion_campaigns[]
+  daily_stats                                                      daily_stats[]
+  deal_alerts                                                      deal_alerts[]
+  escrows                                                          escrows[]
+  gamification_activities                                          gamification_activities[]
+  gamification_points                                              gamification_points?
+  garage_bookings                                                  garage_bookings[]
+  garage_profiles                                                  garage_profiles?
+  garage_reviews                                                   garage_reviews[]
+  gifts_gifts_recipient_idToUser                                   gifts[]                          @relation("gifts_recipient_idToUser")
+  gifts_gifts_sender_idToUser                                      gifts[]                          @relation("gifts_sender_idToUser")
+  group_buy_participants                                           group_buy_participants[]
+  import_requests                                                  import_requests[]
+  importer_profiles                                                importer_profiles?
+  influencer_profiles                                              influencer_profiles?
+  judge_invites                                                    judge_invites[]
+  logistics_companies                                              logistics_companies?
+  messages_messages_forwarded_from_idToUser                        messages[]                       @relation("messages_forwarded_from_idToUser")
+  messages_messages_sender_idToUser                                messages[]                       @relation("messages_sender_idToUser")
+  milestone_completions                                            milestone_completions[]
+  orders                                                           orders[]
+  post_comments                                                    post_comments[]
+  post_likes                                                       post_likes[]
+  product_reviews                                                  product_reviews[]
+  product_shares                                                   product_shares[]
+  products                                                         products[]
+  refresh_tokens                                                   refresh_tokens[]
+  sales_funnel_events                                              sales_funnel_events[]
+  shipping_jobs                                                    shipping_jobs[]
+  short_comments                                                   short_comments[]
+  short_likes                                                      short_likes[]
+  shorts                                                           shorts[]
+  sponsored_content                                                sponsored_content[]
+  sponsored_impressions                                            sponsored_impressions[]
+  sponsored_post_requests_sponsored_post_requests_brand_idToUser   sponsored_post_requests[]        @relation("sponsored_post_requests_brand_idToUser")
+  sponsored_post_requests_sponsored_post_requests_creator_idToUser sponsored_post_requests[]        @relation("sponsored_post_requests_creator_idToUser")
+  subscriptions_subscriptions_creator_idToUser                     subscriptions[]                  @relation("subscriptions_creator_idToUser")
+  subscriptions_subscriptions_subscriber_idToUser                  subscriptions[]                  @relation("subscriptions_subscriber_idToUser")
+  team_invitations_team_invitations_invitee_idToUser               team_invitations[]               @relation("team_invitations_invitee_idToUser")
+  team_invitations_team_invitations_inviter_idToUser               team_invitations[]               @relation("team_invitations_inviter_idToUser")
+  team_members                                                     team_members[]
+  team_submission_votes                                            team_submission_votes[]
+  transactions                                                     transactions[]
+  wallets                                                          wallets?
+  wishlists                                                        wishlists[]
+
+  @@index([fcmToken])
+}
+
+model ad_analytics {
+  id                          String   @id
+  date                        DateTime @unique @db.Date
+  total_ad_spend_kes          Decimal  @default(0) @db.Decimal(18, 4)
+  platform_revenue_kes        Decimal  @default(0) @db.Decimal(18, 4)
+  creator_revenue_kes         Decimal  @default(0) @db.Decimal(18, 4)
+  active_campaigns            Int      @default(0)
+  total_impressions           Int      @default(0)
+  total_clicks                Int      @default(0)
+  total_conversions           Int      @default(0)
+  native_impressions          Int      @default(0)
+  banner_impressions          Int      @default(0)
+  story_impressions           Int      @default(0)
+  sponsored_posts_active      Int      @default(0)
+  sponsored_posts_revenue_kes Decimal  @default(0) @db.Decimal(18, 4)
+  created_at                  DateTime @default(now())
+
+  @@index([date])
+}
+
+model ad_campaign_locations {
+  id                   String               @id
+  campaign_id          String
+  scope                TargetingScope
+  scope_value          String
+  scope_display_name   String
+  continent            String?
+  country              String?
+  region               String?
+  city                 String?
+  town                 String?
+  road                 String?
+  landmark             String?
+  shopping_center      String?
+  latitude             Decimal?             @db.Decimal(10, 7)
+  longitude            Decimal?             @db.Decimal(10, 7)
+  radius_km            Decimal?             @db.Decimal(6, 2)
+  is_excluded          Boolean              @default(false)
+  created_at           DateTime             @default(now())
+  display_ad_campaigns display_ad_campaigns @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+
+  @@index([campaign_id])
+  @@index([scope, scope_value])
+}
+
+model ad_campaigns {
+  id               String               @id
+  brand_id         String
+  campaign_name    String
+  ad_type          AdType
+  budget_kes       Decimal              @db.Decimal(18, 4)
+  spent_kes        Decimal              @default(0) @db.Decimal(18, 4)
+  cpm_bid          Decimal              @db.Decimal(10, 2)
+  target_age_min   Int?
+  target_age_max   Int?
+  target_genders   String[]
+  target_locations String[]
+  target_interests String[]
+  title            String
+  description      String?
+  image_url        String?
+  cta_text         String?              @db.VarChar(50)
+  cta_url          String?
+  start_date       DateTime
+  end_date         DateTime
+  status           AdCampaignStatusType @default(PENDING)
+  rejection_reason String?
+  impressions      Int                  @default(0)
+  clicks           Int                  @default(0)
+  conversions      Int                  @default(0)
+  approved_by      String?
+  approved_at      DateTime?
+  created_at       DateTime             @default(now())
+  updated_at       DateTime
+  User             User                 @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+
+  @@index([brand_id])
+  @@index([start_date, end_date])
+  @@index([status])
+}
+
+model ad_config {
+  id                      String   @id
+  platform_cut_percentage Decimal  @default(15.0) @db.Decimal(5, 2)
+  native_ad_min_cpm       Decimal  @default(40.0) @db.Decimal(10, 2)
+  native_ad_max_cpm       Decimal  @default(150.0) @db.Decimal(10, 2)
+  native_ad_frequency     Int      @default(6)
+  banner_ad_min_cpm       Decimal  @default(30.0) @db.Decimal(10, 2)
+  banner_ad_max_cpm       Decimal  @default(100.0) @db.Decimal(10, 2)
+  banner_ad_frequency     Int      @default(15)
+  story_ad_min_cpm        Decimal  @default(80.0) @db.Decimal(10, 2)
+  story_ad_max_cpm        Decimal  @default(200.0) @db.Decimal(10, 2)
+  story_ad_frequency      Int      @default(20)
+  ads_enabled             Boolean  @default(true)
+  max_ad_load_enabled     Boolean  @default(false)
+  updated_by              String?
+  created_at              DateTime @default(now())
+  updated_at              DateTime
+}
+
+model ad_impressions {
+  id               String        @id
+  campaign_id      String
+  user_id          String
+  placement        PlacementType
+  content_id       String?
+  content_type     String?
+  chat_id          String?
+  chat_niche       ChatNiche?
+  was_clicked      Boolean       @default(false)
+  was_converted    Boolean       @default(false)
+  view_duration_ms Int           @default(0)
+  cost_kes         Decimal       @db.Decimal(10, 4)
+  user_country     String?
+  user_city        String?
+  created_at       DateTime      @default(now())
+
+  @@index([campaign_id, user_id])
+  @@index([placement, created_at])
+  @@index([user_id, created_at])
+}
+
+model ad_platform_settings {
+  id                      String         @id
+  scope                   TargetingScope
+  scope_value             String?
+  min_daily_budget_kes    Decimal        @db.Decimal(18, 4)
+  min_lifetime_budget_kes Decimal        @db.Decimal(18, 4)
+  live_stream_min_cpm     Decimal        @db.Decimal(10, 2)
+  live_stream_max_cpm     Decimal        @db.Decimal(10, 2)
+  contest_min_cpm         Decimal        @db.Decimal(10, 2)
+  contest_max_cpm         Decimal        @db.Decimal(10, 2)
+  discover_min_cpm        Decimal        @db.Decimal(10, 2)
+  discover_max_cpm        Decimal        @db.Decimal(10, 2)
+  admiring_min_cpm        Decimal        @db.Decimal(10, 2)
+  admiring_max_cpm        Decimal        @db.Decimal(10, 2)
+  drips_min_cpm           Decimal        @db.Decimal(10, 2)
+  drips_max_cpm           Decimal        @db.Decimal(10, 2)
+  stories_min_cpm         Decimal        @db.Decimal(10, 2)
+  stories_max_cpm         Decimal        @db.Decimal(10, 2)
+  group_chat_min_cpm      Decimal        @db.Decimal(10, 2)
+  group_chat_max_cpm      Decimal        @db.Decimal(10, 2)
+  chama_chat_min_cpm      Decimal        @db.Decimal(10, 2)
+  chama_chat_max_cpm      Decimal        @db.Decimal(10, 2)
+  targeting_multiplier    Decimal        @default(1.0) @db.Decimal(3, 2)
+  priority                Int            @default(0)
+  is_active               Boolean        @default(true)
+  created_by              String?
+  updated_by              String?
+  created_at              DateTime       @default(now())
+  updated_at              DateTime
+
+  @@unique([scope, scope_value])
+  @@index([scope, priority])
+}
+
+model admires {
+  id                            String   @id
+  admirer_id                    String
+  admired_id                    String
+  is_lovers                     Boolean  @default(false)
+  created_at                    DateTime @default(now())
+  User_admires_admired_idToUser User     @relation("admires_admired_idToUser", fields: [admired_id], references: [id], onDelete: Cascade)
+  User_admires_admirer_idToUser User     @relation("admires_admirer_idToUser", fields: [admirer_id], references: [id], onDelete: Cascade)
+
+  @@unique([admirer_id, admired_id])
+}
+
+model bio_links {
+  id         String  @id
+  user_id    String
+  label      String
+  url        String
+  icon       String?
+  sort_order Int     @default(0)
+  User       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model book_details {
+  id           String   @id
+  product_id   String   @unique
+  author       String
+  isbn         String?
+  publisher    String?
+  edition      String?
+  language     String?
+  page_count   Int?
+  genre        String?
+  downloadable Boolean  @default(false)
+  download_url String?
+  products     products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model brand_campaigns {
+  id                          String                  @id
+  brand_id                    String
+  title                       String
+  description                 String
+  type                        CampaignType
+  status                      CampaignStatus          @default(DRAFT)
+  target_tiers                InfluencerTier[]
+  target_categories           String[]
+  min_followers               Int?
+  min_engagement_rate         Decimal?                @db.Decimal(5, 2)
+  target_geos                 String[]
+  budget_kr                   Decimal                 @db.Decimal(18, 4)
+  compensation_per_influencer Decimal                 @db.Decimal(18, 4)
+  max_influencers             Int
+  required_posts              Int                     @default(0)
+  required_videos             Int                     @default(0)
+  required_stories            Int                     @default(0)
+  content_guidelines          String?
+  hashtags                    String[]
+  mentions                    String[]
+  contest_id                  String?
+  application_deadline        DateTime?
+  campaign_start_date         DateTime
+  campaign_end_date           DateTime
+  total_applications          Int                     @default(0)
+  accepted_influencers        Int                     @default(0)
+  total_reach                 Int                     @default(0)
+  total_engagement            Int                     @default(0)
+  total_conversions           Int                     @default(0)
+  total_revenue_kr            Decimal                 @default(0) @db.Decimal(18, 4)
+  roi                         Decimal                 @default(0) @db.Decimal(10, 2)
+  created_at                  DateTime                @default(now())
+  updated_at                  DateTime
+  User                        User                    @relation(fields: [brand_id], references: [id])
+  Contest                     Contest?                @relation(fields: [contest_id], references: [id])
+  campaign_analytics          campaign_analytics[]
+  campaign_applications       campaign_applications[]
+  campaign_deliverables       campaign_deliverables[]
+  sales_funnel_events         sales_funnel_events[]
+
+  @@index([brand_id])
+  @@index([contest_id])
+  @@index([status, campaign_start_date])
+}
+
+model campaign_analytics {
+  id              String          @id
+  campaign_id     String
+  date            DateTime        @db.Date
+  impressions     Int             @default(0)
+  reach           Int             @default(0)
+  engagement      Int             @default(0)
+  clicks          Int             @default(0)
+  conversions     Int             @default(0)
+  revenue         Decimal         @default(0) @db.Decimal(18, 4)
+  spent_kr        Decimal         @default(0) @db.Decimal(18, 4)
+  ctr             Decimal         @default(0) @db.Decimal(5, 4)
+  conversion_rate Decimal         @default(0) @db.Decimal(5, 4)
+  cpa             Decimal         @default(0) @db.Decimal(18, 4)
+  roas            Decimal         @default(0) @db.Decimal(10, 2)
+  brand_campaigns brand_campaigns @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+
+  @@unique([campaign_id, date])
+  @@index([date])
+}
+
+model campaign_applications {
+  id                  String              @id
+  campaign_id         String
+  influencer_id       String
+  status              ApplicationStatus   @default(PENDING)
+  pitch               String
+  proposed_rate       Decimal?            @db.Decimal(18, 4)
+  availability        String?
+  response_note       String?
+  responded_at        DateTime?
+  applied_at          DateTime            @default(now())
+  brand_campaigns     brand_campaigns     @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+  influencer_profiles influencer_profiles @relation(fields: [influencer_id], references: [id], onDelete: Cascade)
+
+  @@unique([campaign_id, influencer_id])
+  @@index([influencer_id, status])
+}
+
+model campaign_deliverables {
+  id                  String              @id
+  campaign_id         String
+  influencer_id       String
+  type                String
+  platform            String
+  content_url         String
+  caption             String?
+  views               Int                 @default(0)
+  likes               Int                 @default(0)
+  comments            Int                 @default(0)
+  shares              Int                 @default(0)
+  clicks              Int                 @default(0)
+  conversions         Int                 @default(0)
+  status              DeliverableStatus   @default(PENDING)
+  review_note         String?
+  reviewed_at         DateTime?
+  submitted_at        DateTime            @default(now())
+  brand_campaigns     brand_campaigns     @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+  influencer_profiles influencer_profiles @relation(fields: [influencer_id], references: [id], onDelete: Cascade)
+
+  @@index([campaign_id, status])
+  @@index([influencer_id])
+}
+
+model cart_items {
+  id            String   @id
+  user_id       String
+  product_id    String
+  quantity      Int      @default(1)
+  bargain_price Decimal? @db.Decimal(18, 4)
+  added_at      DateTime @default(now())
+  products      products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  User          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, product_id])
+}
+
+model comment_likes {
+  id         String   @id
+  comment_id String
+  user_id    String
+  created_at DateTime @default(now())
+  comments   comments @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([comment_id, user_id])
+  @@index([comment_id])
+  @@index([user_id])
+}
+
+model comment_reports {
+  id          String   @id
+  comment_id  String
+  reporter_id String
+  reason      String
+  created_at  DateTime @default(now())
+  comments    comments @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  User        User     @relation(fields: [reporter_id], references: [id], onDelete: Cascade)
+
+  @@index([comment_id])
+}
+
+model comment_settings {
+  id               String  @id
+  content_id       String
+  content_type     String
+  comments_enabled Boolean @default(true)
+  replies_enabled  Boolean @default(true)
+
+  @@unique([content_id, content_type])
+}
+
+model comments {
+  id                                   String            @id
+  user_id                              String
+  content_id                           String
+  content_type                         String
+  text                                 String
+  parent_id                            String?
+  reply_to_user_id                     String?
+  likes_count                          Int               @default(0)
+  replies_count                        Int               @default(0)
+  is_pinned                            Boolean           @default(false)
+  is_edited                            Boolean           @default(false)
+  created_at                           DateTime          @default(now())
+  edited_at                            DateTime?
+  comment_likes                        comment_likes[]
+  comment_reports                      comment_reports[]
+  comments                             comments?         @relation("commentsTocomments", fields: [parent_id], references: [id], onDelete: Cascade)
+  other_comments                       comments[]        @relation("commentsTocomments")
+  User_comments_reply_to_user_idToUser User?             @relation("comments_reply_to_user_idToUser", fields: [reply_to_user_id], references: [id])
+  User_comments_user_idToUser          User              @relation("comments_user_idToUser", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([content_type, content_id, created_at])
+  @@index([is_pinned, created_at])
+  @@index([parent_id])
+  @@index([user_id])
+}
+
+model content_unlocks {
+  id                                    String   @id
+  user_id                               String
+  content_id                            String
+  content_type                          String
+  amount_kr                             Decimal  @db.Decimal(18, 4)
+  amount_fiat                           Decimal? @db.Decimal(18, 4)
+  currency                              String?  @db.VarChar(3)
+  creator_id                            String
+  created_at                            DateTime @default(now())
+  User_content_unlocks_creator_idToUser User     @relation("content_unlocks_creator_idToUser", fields: [creator_id], references: [id], onDelete: Cascade)
+  User_content_unlocks_user_idToUser    User     @relation("content_unlocks_user_idToUser", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, content_id, content_type])
+  @@index([content_id, content_type])
+  @@index([creator_id])
+  @@index([user_id])
+}
+
+model contest_action_completions {
+  id                String            @id
+  submission_id     String
+  action_id         String
+  is_completed      Boolean           @default(false)
+  proof_url         String?
+  ContestAction     ContestAction     @relation(fields: [action_id], references: [id], onDelete: Cascade)
+  ContestSubmission ContestSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+}
+
+model contest_analytics {
+  id              String   @id
+  contest_id      String
+  date            DateTime @db.Date
+  views           Int      @default(0)
+  joins           Int      @default(0)
+  submissions     Int      @default(0)
+  votes           Int      @default(0)
+  shares          Int      @default(0)
+  shop_visits     Int      @default(0)
+  product_views   Int      @default(0)
+  add_to_carts    Int      @default(0)
+  purchases       Int      @default(0)
+  revenue         Decimal  @default(0) @db.Decimal(18, 4)
+  join_rate       Decimal  @default(0) @db.Decimal(5, 4)
+  submission_rate Decimal  @default(0) @db.Decimal(5, 4)
+  purchase_rate   Decimal  @default(0) @db.Decimal(5, 4)
+  Contest         Contest  @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, date])
+  @@index([date])
+}
+
+model contest_engagement_actions {
+  id           String    @id
+  contest_id   String
+  user_id      String
+  action_type  String
+  target_url   String?
+  proof_url    String?
+  metadata     Json?
+  is_completed Boolean   @default(false)
+  completed_at DateTime?
+  created_at   DateTime  @default(now())
+  Contest      Contest   @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User         User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([action_type, is_completed])
+  @@index([contest_id, user_id])
+}
+
+model contest_judges {
+  id         String   @id
+  contest_id String
+  user_id    String
+  status     String   @default("pending")
+  added_at   DateTime @default(now())
+  Contest    Contest  @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, user_id])
+}
+
+model contest_participants {
+  id         String   @id
+  contest_id String
+  user_id    String
+  joined_at  DateTime @default(now())
+  Contest    Contest  @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, user_id])
+}
+
+model contest_prize_distributions {
+  id         String  @id
+  contest_id String
+  rank       Int
+  percentage Decimal @db.Decimal(5, 2)
+  Contest    Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+}
+
+model contest_purchase_entries {
+  id              String   @id
+  contest_id      String
+  user_id         String
+  order_id        String
+  purchase_amount Decimal  @db.Decimal(18, 4)
+  product_ids     String[]
+  is_eligible     Boolean  @default(true)
+  auto_entered    Boolean  @default(false)
+  purchased_at    DateTime @default(now())
+  Contest         Contest  @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([contest_id, user_id])
+  @@index([order_id])
+}
+
+model contest_sponsorships {
+  id                String          @id
+  contest_id        String
+  brand_id          String
+  type              SponsorshipType
+  sponsorship_kr    Decimal         @db.Decimal(18, 4)
+  benefits          String[]
+  logo_url          String?
+  brand_message     String?
+  website_url       String?
+  impressions       Int             @default(0)
+  clicks            Int             @default(0)
+  conversions       Int             @default(0)
+  revenue_generated Decimal         @default(0) @db.Decimal(18, 4)
+  is_active         Boolean         @default(true)
+  start_date        DateTime
+  end_date          DateTime
+  created_at        DateTime        @default(now())
+  User              User            @relation(fields: [brand_id], references: [id])
+  Contest           Contest         @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+
+  @@index([brand_id])
+  @@index([contest_id])
+}
+
+model contest_votes {
+  id                String            @id
+  submission_id     String
+  voter_id          String
+  ip_address        String?
+  fingerprint       String?
+  created_at        DateTime          @default(now())
+  ContestSubmission ContestSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  User              User              @relation(fields: [voter_id], references: [id], onDelete: Cascade)
+
+  @@unique([submission_id, voter_id])
+}
+
+model contest_winners {
+  id         String   @id
+  contest_id String
+  user_id    String
+  rank       Int
+  prize_kr   Decimal  @db.Decimal(18, 4)
+  awarded_at DateTime @default(now())
+  Contest    Contest  @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model conversion_campaign_recipients {
+  id                   String               @id
+  campaign_id          String
+  user_id              String
+  sent_at              DateTime             @default(now())
+  opened_at            DateTime?
+  clicked_at           DateTime?
+  converted_at         DateTime?
+  order_id             String?
+  revenue_kr           Decimal?             @db.Decimal(18, 4)
+  conversion_campaigns conversion_campaigns @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+  User                 User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([campaign_id, user_id])
+  @@index([user_id])
+}
+
+model conversion_campaigns {
+  id                             String                           @id
+  contest_id                     String
+  brand_id                       String?
+  type                           ConversionCampaignType
+  title                          String
+  description                    String?
+  target_segment                 String
+  discount_percent               Decimal?                         @db.Decimal(5, 2)
+  discount_code                  String?
+  offer_expires_at               DateTime?
+  total_sent                     Int                              @default(0)
+  total_opened                   Int                              @default(0)
+  total_clicked                  Int                              @default(0)
+  total_converted                Int                              @default(0)
+  revenue_generated              Decimal                          @default(0) @db.Decimal(18, 4)
+  is_active                      Boolean                          @default(true)
+  created_at                     DateTime                         @default(now())
+  conversion_campaign_recipients conversion_campaign_recipients[]
+  User                           User?                            @relation(fields: [brand_id], references: [id])
+  Contest                        Contest                          @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+
+  @@index([contest_id])
+  @@index([type, is_active])
+}
+
+model daily_stats {
+  id           String   @id
+  user_id      String
+  date         DateTime @db.Date
+  views        Int      @default(0)
+  likes        Int      @default(0)
+  new_admirers Int      @default(0)
+  kr_earned    Decimal  @default(0) @db.Decimal(18, 4)
+  kr_spent     Decimal  @default(0) @db.Decimal(18, 4)
+  User         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, date])
+}
+
+model deal_alerts {
+  id           String           @id
+  user_id      String
+  product_id   String?
+  category     ProductCategory?
+  max_price_kr Decimal?         @db.Decimal(18, 4)
+  keywords     String[]
+  is_active    Boolean          @default(true)
+  created_at   DateTime         @default(now())
+  products     products?        @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  User         User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, is_active])
+}
+
+model digital_product_details {
+  id             String   @id
+  product_id     String   @unique
+  file_format    String
+  file_size_mb   Decimal? @db.Decimal(10, 2)
+  license_type   String
+  download_limit Int?
+  drm_protected  Boolean  @default(false)
+  download_url   String?
+  products       products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model display_ad_analytics {
+  id                      String               @id
+  campaign_id             String
+  date                    DateTime             @db.Date
+  live_stream_impressions Int                  @default(0)
+  live_stream_clicks      Int                  @default(0)
+  contest_impressions     Int                  @default(0)
+  contest_clicks          Int                  @default(0)
+  discover_impressions    Int                  @default(0)
+  discover_clicks         Int                  @default(0)
+  admiring_impressions    Int                  @default(0)
+  admiring_clicks         Int                  @default(0)
+  drips_impressions       Int                  @default(0)
+  drips_clicks            Int                  @default(0)
+  stories_impressions     Int                  @default(0)
+  stories_clicks          Int                  @default(0)
+  group_chat_impressions  Int                  @default(0)
+  group_chat_clicks       Int                  @default(0)
+  chama_chat_impressions  Int                  @default(0)
+  chama_chat_clicks       Int                  @default(0)
+  total_impressions       Int                  @default(0)
+  total_clicks            Int                  @default(0)
+  total_conversions       Int                  @default(0)
+  total_spent_kes         Decimal              @default(0) @db.Decimal(18, 4)
+  ctr                     Decimal              @default(0) @db.Decimal(5, 4)
+  avg_cpm                 Decimal              @default(0) @db.Decimal(10, 2)
+  cost_per_click          Decimal              @default(0) @db.Decimal(10, 2)
+  created_at              DateTime             @default(now())
+  display_ad_campaigns    display_ad_campaigns @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+
+  @@unique([campaign_id, date])
+  @@index([date])
+}
+
+model display_ad_campaigns {
+  id                    String                  @id
+  brand_id              String
+  campaign_name         String
+  campaign_objective    String
+  ad_title              String
+  ad_description        String?
+  primary_image_url     String
+  secondary_image_urls  String[]                @default([])
+  video_url             String?
+  cta_text              String
+  cta_url               String
+  budget_type           BudgetType
+  daily_budget_kes      Decimal?                @db.Decimal(18, 4)
+  lifetime_budget_kes   Decimal?                @db.Decimal(18, 4)
+  total_spent_kes       Decimal                 @default(0) @db.Decimal(18, 4)
+  bidding_strategy      BiddingStrategy
+  target_cpm            Decimal?                @db.Decimal(10, 2)
+  cost_cap              Decimal?                @db.Decimal(10, 2)
+  target_age_min        Int?
+  target_age_max        Int?
+  target_genders        String[]                @default([])
+  target_languages      String[]                @default([])
+  target_interests      String[]                @default([])
+  target_behaviors      String[]                @default([])
+  target_creator_tiers  String[]                @default([])
+  placements            PlacementType[]         @default([])
+  chat_niches           ChatNiche[]             @default([])
+  pixel_id              String?
+  conversion_events     String[]                @default([])
+  start_date            DateTime
+  end_date              DateTime?
+  status                AdCampaignStatus        @default(PENDING)
+  rejection_reason      String?
+  approved_by           String?
+  approved_at           DateTime?
+  impressions           Int                     @default(0)
+  clicks                Int                     @default(0)
+  conversions           Int                     @default(0)
+  reach                 Int                     @default(0)
+  frequency             Decimal                 @default(0) @db.Decimal(5, 2)
+  ctr                   Decimal                 @default(0) @db.Decimal(5, 4)
+  conversion_rate       Decimal                 @default(0) @db.Decimal(5, 4)
+  avg_cpm               Decimal                 @default(0) @db.Decimal(10, 2)
+  escrow_id             String?
+  payment_status        String                  @default("PENDING")
+  created_at            DateTime                @default(now())
+  updated_at            DateTime
+  ad_campaign_locations ad_campaign_locations[]
+  display_ad_analytics  display_ad_analytics[]
+
+  @@index([brand_id, status])
+  @@index([status, start_date])
+}
+
+model electronics_details {
+  id              String   @id
+  product_id      String   @unique
+  processor       String?
+  ram             String?
+  storage         String?
+  screen_size     String?
+  battery_life    String?
+  os              String?
+  connectivity    String[]
+  serial_number   String?
+  warranty_months Int?
+  products        products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model escrows {
+  id              String   @id
+  contest_id      String
+  user_id         String
+  prize_amount_kr Decimal  @db.Decimal(18, 4)
+  fee_amount_kr   Decimal  @db.Decimal(18, 4)
+  status          String   @default("held")
+  created_at      DateTime @default(now())
+  Contest         Contest  @relation(fields: [contest_id], references: [id])
+  User            User     @relation(fields: [user_id], references: [id])
+}
+
+model fashion_details {
+  id                String   @id
+  product_id        String   @unique
+  size              String?
+  material          String?
+  color_variants    String[]
+  fit_type          String?
+  pattern           String?
+  season            String?
+  gender            String?
+  care_instructions String?
+  products          products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model flash_sale_products {
+  id             String      @id
+  flash_sale_id  String
+  product_id     String
+  sale_price     Decimal     @db.Decimal(18, 4)
+  stock_limit    Int?
+  sold_count     Int         @default(0)
+  per_user_limit Int?
+  flash_sales    flash_sales @relation(fields: [flash_sale_id], references: [id], onDelete: Cascade)
+  products       products    @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([flash_sale_id, product_id])
+}
+
+model flash_sales {
+  id                  String                @id
+  title               String
+  description         String?
+  type                FlashSaleType
+  status              FlashSaleStatus       @default(SCHEDULED)
+  start_time          DateTime
+  end_time            DateTime
+  created_at          DateTime              @default(now())
+  flash_sale_products flash_sale_products[]
+
+  @@index([status, start_time])
+}
+
+model food_details {
+  id               String    @id
+  product_id       String    @unique
+  ingredients      String[]
+  nutritional_info Json?
+  expiry_date      DateTime?
+  allergens        String[]
+  certifications   String[]
+  is_organic       Boolean   @default(false)
+  weight_volume    String?
+  products         products  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model gamification_activities {
+  id             String   @id
+  user_id        String
+  activity_type  String
+  category       String
+  points_earned  Int
+  reference_type String?
+  reference_id   String?
+  description    String?
+  created_at     DateTime @default(now())
+  User           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([activity_type])
+  @@index([user_id, created_at])
+}
+
+model gamification_points {
+  id                String   @id
+  user_id           String   @unique
+  engagement_points Int      @default(0)
+  marketing_points  Int      @default(0)
+  sales_points      Int      @default(0)
+  total_points      Int      @default(0)
+  current_level     Int      @default(1)
+  next_level_at     Int
+  updated_at        DateTime
+  User              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([total_points])
+}
+
+model garage_bookings {
+  id              String          @id
+  garage_id       String
+  user_id         String
+  service_type    String
+  scheduled_date  DateTime
+  notes           String?
+  status          BookingStatus   @default(PENDING)
+  price_kr        Decimal?        @db.Decimal(18, 4)
+  is_on_site      Boolean         @default(false)
+  location        String?
+  created_at      DateTime        @default(now())
+  garage_profiles garage_profiles @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+  User            User            @relation(fields: [user_id], references: [id])
+
+  @@index([garage_id, status])
+}
+
+model garage_profiles {
+  id              String            @id
+  user_id         String            @unique
+  business_name   String
+  description     String?
+  service_types   String[]
+  certifications  String[]
+  location        String?
+  latitude        Decimal?          @db.Decimal(10, 7)
+  longitude       Decimal?          @db.Decimal(10, 7)
+  service_area    String?
+  offers_on_site  Boolean           @default(false)
+  avg_rating      Decimal           @default(0) @db.Decimal(3, 2)
+  review_count    Int               @default(0)
+  is_verified     Boolean           @default(false)
+  created_at      DateTime          @default(now())
+  garage_bookings garage_bookings[]
+  User            User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  garage_reviews  garage_reviews[]
+}
+
+model garage_reviews {
+  id              String          @id
+  garage_id       String
+  user_id         String
+  rating          Int
+  text            String?
+  created_at      DateTime        @default(now())
+  garage_profiles garage_profiles @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+  User            User            @relation(fields: [user_id], references: [id])
+
+  @@unique([garage_id, user_id])
+}
+
+model gifts {
+  id                            String   @id
+  sender_id                     String
+  recipient_id                  String
+  product_id                    String
+  message                       String?
+  amount_kr                     Decimal  @db.Decimal(18, 4)
+  escrow_status                 String   @default("held")
+  status                        String   @default("pending")
+  created_at                    DateTime @default(now())
+  User_gifts_recipient_idToUser User     @relation("gifts_recipient_idToUser", fields: [recipient_id], references: [id])
+  User_gifts_sender_idToUser    User     @relation("gifts_sender_idToUser", fields: [sender_id], references: [id])
+}
+
+model group_buy_participants {
+  id           String     @id
+  group_buy_id String
+  user_id      String
+  joined_at    DateTime   @default(now())
+  group_buys   group_buys @relation(fields: [group_buy_id], references: [id], onDelete: Cascade)
+  User         User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([group_buy_id, user_id])
+}
+
+model group_buys {
+  id                     String                   @id
+  product_id             String
+  organizer_id           String
+  title                  String
+  description            String?
+  target_participants    Int
+  current_count          Int                      @default(0)
+  discount_percent       Decimal                  @db.Decimal(5, 2)
+  status                 GroupBuyStatus           @default(OPEN)
+  expires_at             DateTime
+  created_at             DateTime                 @default(now())
+  group_buy_participants group_buy_participants[]
+  products               products                 @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([status, expires_at])
+}
+
+model idempotency_keys {
+  id             String   @id
+  key            String   @unique
+  user_id        String
+  request_path   String   @db.VarChar(500)
+  request_method String   @db.VarChar(10)
+  request_body   Json?
+  response_code  Int
+  response_body  Json
+  created_at     DateTime @default(now())
+  expires_at     DateTime
+
+  @@index([expires_at])
+  @@index([key])
+  @@index([user_id, created_at])
+}
+
+model import_quotes {
+  id                String            @id
+  request_id        String
+  importer_id       String
+  quote_amount_kr   Decimal           @db.Decimal(18, 4)
+  estimated_days    Int?
+  notes             String?
+  status            String            @default("pending")
+  created_at        DateTime          @default(now())
+  importer_profiles importer_profiles @relation(fields: [importer_id], references: [id])
+  import_requests   import_requests   @relation(fields: [request_id], references: [id], onDelete: Cascade)
+
+  @@unique([request_id, importer_id])
+}
+
+model import_requests {
+  id                String              @id
+  user_id           String
+  make              String
+  model             String
+  year_from         Int?
+  year_to           Int?
+  country_of_origin String?
+  budget            Decimal?            @db.Decimal(18, 4)
+  requirements      String?
+  status            ImportRequestStatus @default(PENDING)
+  created_at        DateTime            @default(now())
+  import_quotes     import_quotes[]
+  User              User                @relation(fields: [user_id], references: [id])
+
+  @@index([user_id, status])
+}
+
+model importer_profiles {
+  id               String          @id
+  user_id          String          @unique
+  business_name    String
+  description      String?
+  countries_served String[]
+  specialization   String?
+  years_experience Int?
+  total_imports    Int             @default(0)
+  is_verified      Boolean         @default(false)
+  created_at       DateTime        @default(now())
+  import_quotes    import_quotes[]
+  User             User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model influencer_profiles {
+  id                    String                  @id
+  user_id               String                  @unique
+  tier                  InfluencerTier
+  bio                   String?
+  categories            String[]
+  avg_engagement_rate   Decimal                 @default(0) @db.Decimal(5, 2)
+  avg_views             Int                     @default(0)
+  rate_per_post         Decimal?                @db.Decimal(18, 4)
+  rate_per_video        Decimal?                @db.Decimal(18, 4)
+  rate_per_story        Decimal?                @db.Decimal(18, 4)
+  is_available          Boolean                 @default(true)
+  is_verified           Boolean                 @default(false)
+  verified_at           DateTime?
+  total_campaigns       Int                     @default(0)
+  total_earnings_kr     Decimal                 @default(0) @db.Decimal(18, 4)
+  avg_rating            Decimal                 @default(0) @db.Decimal(3, 2)
+  created_at            DateTime                @default(now())
+  updated_at            DateTime
+  campaign_applications campaign_applications[]
+  campaign_deliverables campaign_deliverables[]
+  User                  User                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  influencer_reviews    influencer_reviews[]
+  social_media_accounts social_media_accounts[]
+
+  @@index([avg_engagement_rate])
+  @@index([tier, is_available])
+}
+
+model influencer_reviews {
+  id                   String              @id
+  campaign_id          String
+  influencer_id        String
+  brand_id             String
+  rating               Int
+  review               String?
+  communication_rating Int
+  quality_rating       Int
+  timeliness_rating    Int
+  created_at           DateTime            @default(now())
+  influencer_profiles  influencer_profiles @relation(fields: [influencer_id], references: [id], onDelete: Cascade)
+
+  @@unique([campaign_id, influencer_id])
+  @@index([influencer_id])
+}
+
+model judge_invites {
+  id           String            @id
+  contest_id   String
+  judge_id     String
+  status       JudgeInviteStatus @default(PENDING)
+  invited_at   DateTime          @default(now())
+  responded_at DateTime?
+  created_at   DateTime          @default(now())
+  updated_at   DateTime
+  Contest      Contest           @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User         User              @relation(fields: [judge_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, judge_id])
+  @@index([contest_id])
+  @@index([judge_id])
+  @@index([status])
+}
+
+model live_banned_viewers {
+  id         String     @id
+  stream_id  String
+  user_id    String
+  reason     String?
+  banned_at  DateTime   @default(now())
+  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@unique([stream_id, user_id])
+}
+
+model live_battles {
+  id                                                     String       @id
+  stream_id                                              String
+  opponent_stream_id                                     String
+  contest_id                                             String?
+  duration_secs                                          Int          @default(300)
+  status                                                 BattleStatus @default(PENDING)
+  host_score                                             Decimal      @default(0) @db.Decimal(18, 4)
+  opponent_score                                         Decimal      @default(0) @db.Decimal(18, 4)
+  winner_id                                              String?
+  started_at                                             DateTime?
+  ended_at                                               DateTime?
+  created_at                                             DateTime     @default(now())
+  LiveStream_live_battles_opponent_stream_idToLiveStream LiveStream   @relation("live_battles_opponent_stream_idToLiveStream", fields: [opponent_stream_id], references: [id], onDelete: Cascade)
+  LiveStream_live_battles_stream_idToLiveStream          LiveStream   @relation("live_battles_stream_idToLiveStream", fields: [stream_id], references: [id], onDelete: Cascade)
+}
+
+model live_co_hosts {
+  id         String     @id
+  stream_id  String
+  user_id    String
+  joined_at  DateTime   @default(now())
+  left_at    DateTime?
+  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@unique([stream_id, user_id])
+}
+
+model live_messages {
+  id         String     @id
+  stream_id  String
+  user_id    String
+  text       String
+  is_system  Boolean    @default(false)
+  is_pinned  Boolean    @default(false)
+  created_at DateTime   @default(now())
+  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@index([stream_id, created_at])
+}
+
+model live_pinned_products {
+  id         String     @id
+  stream_id  String
+  product_id String
+  sale_price Decimal?   @db.Decimal(18, 4)
+  is_pinned  Boolean    @default(false)
+  pinned_at  DateTime?
+  units_sold Int        @default(0)
+  sort_order Int        @default(0)
+  products   products   @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@unique([stream_id, product_id])
+}
+
+model live_session_products {
+  id          String      @id
+  session_id  String
+  product_id  String
+  sale_price  Decimal?    @db.Decimal(18, 4)
+  units_sold  Int         @default(0)
+  sort_order  Int         @default(0)
+  created_at  DateTime    @default(now())
+  products    products    @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  LiveSession LiveSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+
+  @@unique([session_id, product_id])
+}
+
+model live_tips {
+  id           String     @id
+  stream_id    String
+  sender_id    String
+  recipient_id String
+  amount_kr    Decimal    @db.Decimal(18, 4)
+  gift_type    String?
+  message      String?
+  created_at   DateTime   @default(now())
+  LiveStream   LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@index([stream_id, created_at])
+  @@index([stream_id, sender_id])
+}
+
+model live_viewers {
+  id            String     @id
+  stream_id     String
+  user_id       String
+  joined_at     DateTime   @default(now())
+  left_at       DateTime?
+  total_tips_kr Decimal    @default(0) @db.Decimal(18, 4)
+  likes_given   Int        @default(0)
+  LiveStream    LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+
+  @@unique([stream_id, user_id])
+  @@index([stream_id, total_tips_kr])
+}
+
+model location_master {
+  id           String         @id
+  scope        TargetingScope
+  scope_value  String
+  display_name String
+  parent_id    String?
+  continent    String?
+  country      String?
+  country_code String?        @db.VarChar(2)
+  region       String?
+  city         String?
+  latitude     Decimal?       @db.Decimal(10, 7)
+  longitude    Decimal?       @db.Decimal(10, 7)
+  population   Int?
+  is_active    Boolean        @default(true)
+  created_at   DateTime       @default(now())
+
+  @@unique([scope, scope_value])
+  @@index([country_code])
+  @@index([parent_id])
+}
+
+model logistics_companies {
+  id             String          @id
+  user_id        String          @unique
+  company_name   String
+  description    String?
+  service_types  String[]
+  coverage_areas String[]
+  vehicle_types  String[]
+  is_verified    Boolean         @default(false)
+  created_at     DateTime        @default(now())
+  User           User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shipping_jobs  shipping_jobs[]
+}
+
+model messages {
+  id                                    String   @id
+  sender_id                             String
+  recipient_id                          String?
+  chat_id                               String?
+  text                                  String?
+  media_url                             String?
+  media_type                            String?
+  forwarded_from_id                     String?
+  is_read                               Boolean  @default(false)
+  created_at                            DateTime @default(now())
+  User_messages_forwarded_from_idToUser User?    @relation("messages_forwarded_from_idToUser", fields: [forwarded_from_id], references: [id])
+  User_messages_sender_idToUser         User     @relation("messages_sender_idToUser", fields: [sender_id], references: [id], onDelete: Cascade)
+
+  @@index([chat_id])
+  @@index([created_at])
+  @@index([recipient_id])
+  @@index([sender_id])
+}
+
+model milestone_completions {
+  id           String     @id
+  milestone_id String     @unique
+  user_id      String
+  completed_at DateTime   @default(now())
+  milestones   milestones @relation(fields: [milestone_id], references: [id])
+  User         User       @relation(fields: [user_id], references: [id])
+}
+
+model milestones {
+  id                    String                 @id
+  title                 String
+  description           String
+  requirement_type      String
+  requirement_value     Int
+  reward_kr             Decimal                @db.Decimal(18, 4)
+  contest_id            String?
+  created_at            DateTime               @default(now())
+  milestone_completions milestone_completions?
+  Contest               Contest?               @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+}
+
+model order_items {
+  id             String    @id
+  order_id       String
+  product_id     String
+  seller_id      String
+  quantity       Int
+  unit_price_kr  Decimal   @db.Decimal(18, 4)
+  total_price_kr Decimal   @db.Decimal(18, 4)
+  escrow_status  String    @default("held")
+  delivered_at   DateTime?
+  orders         orders    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  products       products  @relation(fields: [product_id], references: [id])
+}
+
+model orders {
+  id              String        @id
+  buyer_id        String
+  total_kr        Decimal       @db.Decimal(18, 4)
+  platform_fee_kr Decimal       @db.Decimal(18, 4)
+  status          OrderStatus   @default(PENDING)
+  notes           String?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime
+  order_items     order_items[]
+  User            User          @relation(fields: [buyer_id], references: [id])
+
+  @@index([buyer_id, status])
+}
+
+model platform_rate_limits {
+  id                 String         @id
+  platform           SocialPlatform @unique
+  requests_per_hour  Int
+  requests_remaining Int
+  reset_at           DateTime
+  last_request_at    DateTime?
+  updated_at         DateTime
+}
+
+model post_comments {
+  id         String   @id
+  post_id    String
+  user_id    String
+  text       String
+  created_at DateTime @default(now())
+  Post       Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model post_likes {
+  id         String   @id
+  post_id    String
+  user_id    String
+  created_at DateTime @default(now())
+  Post       Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([post_id, user_id])
+}
+
+model premium_listings {
+  id            String      @id
+  product_id    String
+  seller_id     String
+  type          PremiumType
+  daily_rate_kr Decimal     @db.Decimal(10, 2)
+  total_paid_kr Decimal     @db.Decimal(18, 4)
+  start_date    DateTime
+  end_date      DateTime
+  is_active     Boolean     @default(true)
+  created_at    DateTime    @default(now())
+  products      products    @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([is_active, end_date])
+}
+
+model product_analytics {
+  id               String   @id
+  product_id       String
+  date             DateTime @db.Date
+  views            Int      @default(0)
+  clicks           Int      @default(0)
+  add_to_cart      Int      @default(0)
+  purchases        Int      @default(0)
+  revenue          Decimal  @default(0) @db.Decimal(18, 4)
+  conversion_rate  Decimal  @default(0) @db.Decimal(5, 4)
+  avg_time_on_page Int      @default(0)
+  bounce_rate      Decimal  @default(0) @db.Decimal(5, 4)
+  products         products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([product_id, date])
+}
+
+model product_discounts {
+  id             String   @id
+  product_id     String
+  discount_type  String
+  discount_value Decimal  @db.Decimal(10, 2)
+  min_quantity   Int      @default(1)
+  start_date     DateTime
+  end_date       DateTime
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now())
+  products       products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([product_id, is_active])
+}
+
+model product_reviews {
+  id           String   @id
+  product_id   String
+  user_id      String
+  rating       Int
+  title        String?
+  text         String?
+  video_url    String?
+  image_urls   String[]
+  is_verified  Boolean  @default(false)
+  is_moderated Boolean  @default(false)
+  created_at   DateTime @default(now())
+  products     products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  User         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([product_id, user_id])
+  @@index([product_id, rating])
+}
+
+model product_shares {
+  id           String   @id
+  product_id   String
+  user_id      String
+  content_id   String?
+  content_type String?
+  caption      String?
+  clicks       Int      @default(0)
+  conversions  Int      @default(0)
+  created_at   DateTime @default(now())
+  products     products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  User         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model product_tags {
+  id           String   @id
+  product_id   String
+  content_id   String
+  content_type String
+  position_x   Decimal? @db.Decimal(5, 2)
+  position_y   Decimal? @db.Decimal(5, 2)
+  timestamp    Int?
+  clicks       Int      @default(0)
+  created_at   DateTime @default(now())
+  products     products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([content_id, content_type])
+}
+
+model products {
+  id                      String                   @id
+  seller_id               String
+  title                   String
+  description             String?
+  image_urls              String[]
+  price_kr                Decimal                  @db.Decimal(18, 4)
+  whatsapp_number         String?
+  status                  String                   @default("active")
+  created_at              DateTime                 @default(now())
+  avg_rating              Decimal                  @default(0) @db.Decimal(3, 2)
+  bargain_enabled         Boolean                  @default(false)
+  bargain_min_price       Decimal?                 @db.Decimal(18, 4)
+  brand                   String?
+  condition               ProductCondition         @default(NEW)
+  contactMethod           ContactMethod            @default(WHATSAPP)
+  currency                String?                  @db.VarChar(3)
+  featured_until          DateTime?
+  is_featured             Boolean                  @default(false)
+  is_promoted             Boolean                  @default(false)
+  is_top_spot             Boolean                  @default(false)
+  latitude                Decimal?                 @db.Decimal(10, 7)
+  local_price             Decimal?                 @db.Decimal(18, 4)
+  location                String?
+  longitude               Decimal?                 @db.Decimal(10, 7)
+  promoted_until          DateTime?
+  purchase_url            String?
+  review_count            Int                      @default(0)
+  sales_count             Int                      @default(0)
+  stock                   Int                      @default(1)
+  subcategory             String?
+  tags                    String[]
+  top_spot_until          DateTime?
+  updated_at              DateTime
+  view_count              Int                      @default(0)
+  wholesale_min_qty       Int?
+  wholesale_price         Decimal?                 @db.Decimal(18, 4)
+  category                ProductCategory          @default(OTHER)
+  book_details            book_details?
+  cart_items              cart_items[]
+  deal_alerts             deal_alerts[]
+  digital_product_details digital_product_details?
+  electronics_details     electronics_details?
+  fashion_details         fashion_details?
+  flash_sale_products     flash_sale_products[]
+  food_details            food_details?
+  group_buys              group_buys[]
+  live_pinned_products    live_pinned_products[]
+  live_session_products   live_session_products[]
+  order_items             order_items[]
+  premium_listings        premium_listings[]
+  product_analytics       product_analytics[]
+  product_discounts       product_discounts[]
+  product_reviews         product_reviews[]
+  product_shares          product_shares[]
+  product_tags            product_tags[]
+  User                    User                     @relation(fields: [seller_id], references: [id], onDelete: Cascade)
+  real_estate_details     real_estate_details?
+  service_details         service_details?
+  shoe_details            shoe_details?
+  shorts                  shorts[]
+  spare_part_details      spare_part_details?
+  vehicle_details         vehicle_details?
+  wishlist_items          wishlist_items[]
+
+  @@index([category, status])
+  @@index([seller_id, status])
+  @@index([status, created_at])
+}
+
+model real_estate_details {
+  id              String   @id
+  product_id      String   @unique
+  property_type   String
+  listing_type    String
+  land_size       String?
+  bedrooms        Int?
+  bathrooms       Int?
+  floors          Int?
+  year_built      Int?
+  amenities       String[]
+  legal_documents String[]
+  furnished       Boolean  @default(false)
+  parking         Boolean  @default(false)
+  products        products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([property_type, listing_type])
+}
+
+model refresh_tokens {
+  id         String   @id
+  user_id    String
+  token_hash String
+  device_id  String
+  expires_at DateTime
+  created_at DateTime @default(now())
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model sales_funnel_events {
+  id              String           @id
+  user_id         String
+  contest_id      String?
+  campaign_id     String?
+  stage           FunnelStage
+  event_type      String
+  source_type     String?
+  source_id       String?
+  metadata        Json?
+  created_at      DateTime         @default(now())
+  brand_campaigns brand_campaigns? @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+  Contest         Contest?         @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User            User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([campaign_id, stage])
+  @@index([contest_id, stage])
+  @@index([created_at])
+  @@index([user_id, stage])
+}
+
+model service_details {
+  id                String   @id
+  product_id        String   @unique
+  service_type      String
+  delivery_mode     String
+  duration_minutes  Int?
+  availability      String?
+  revisions_allowed Int?
+  turnaround_days   Int?
+  products          products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model shipping_jobs {
+  id                  String               @id
+  requester_id        String
+  logistics_id        String?
+  pickup_location     String
+  delivery_location   String
+  job_type            String
+  vehicle_desc        String?
+  price_kr            Decimal?             @db.Decimal(18, 4)
+  status              String               @default("open")
+  created_at          DateTime             @default(now())
+  logistics_companies logistics_companies? @relation(fields: [logistics_id], references: [id])
+  User                User                 @relation(fields: [requester_id], references: [id])
+
+  @@index([status])
+}
+
+model shoe_details {
+  id              String   @id
+  product_id      String   @unique
+  shoe_size       String
+  sole_material   String?
+  heel_height     String?
+  closure_type    String?
+  water_resistant Boolean  @default(false)
+  gender          String?
+  products        products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model short_comments {
   id         String   @id
   short_id   String
   user_id    String
   text       String
   created_at DateTime @default(now())
-  shorts     Short    @relation(fields: [short_id], references: [id], onDelete: Cascade)
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("short_comments")
+  shorts     shorts   @relation(fields: [short_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model ShortLike {
+model short_likes {
   id         String   @id
   short_id   String
   user_id    String
   created_at DateTime @default(now())
-  shorts     Short    @relation(fields: [short_id], references: [id], onDelete: Cascade)
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shorts     shorts   @relation(fields: [short_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([short_id, user_id])
-  @@map("short_likes")
 }
 
-model Short {
+model shorts {
   id                String                @id
   user_id           String
   video_url         String
@@ -644,122 +1919,240 @@ model Short {
   likes_count       Int                   @default(0)
   comments_count    Int                   @default(0)
   created_at        DateTime              @default(now())
-  short_comments    ShortComment[]
-  short_likes       ShortLike[]
-  ShortCollection ShortCollection?    @relation(fields: [collection_id], references: [id])
-  Contest          Contest?             @relation(fields: [contest_id], references: [id])
-  Product          Product?             @relation(fields: [linked_product_id], references: [id])
-  User             User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  unlock_amount_kr  Decimal?              @db.Decimal(18, 4)
+  short_comments    short_comments[]
+  short_likes       short_likes[]
+  ShortCollection   ShortCollection?      @relation(fields: [collection_id], references: [id])
+  Contest           Contest?              @relation(fields: [contest_id], references: [id])
+  products          products?             @relation(fields: [linked_product_id], references: [id])
+  User              User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
-  @@map("shorts")
 }
 
-model SubscriptionTier {
-  id            String               @id
-  creator_id    String
-  tier          SubscriptionTierType
-  kr_amount     Decimal              @db.Decimal(18, 4)
-  benefits      String
-  is_enabled    Boolean              @default(true)
-  created_at    DateTime             @default(now())
-  User         User                @relation(fields: [creator_id], references: [id], onDelete: Cascade)
-  subscriptions Subscription[]
+model social_media_accounts {
+  id                  String              @id
+  influencer_id       String
+  platform            SocialPlatform
+  username            String
+  profile_url         String
+  display_name        String?
+  follower_count      Int                 @default(0)
+  subscriber_count    Int                 @default(0)
+  video_count         Int                 @default(0)
+  total_views         BigInt              @default(0)
+  avg_views           Int                 @default(0)
+  avg_likes           Int                 @default(0)
+  engagement_rate     Decimal             @default(0) @db.Decimal(5, 2)
+  is_verified         Boolean             @default(false)
+  is_primary          Boolean             @default(false)
+  last_synced_at      DateTime?
+  sync_status         String              @default("pending")
+  sync_error          String?
+  access_token        String?
+  refresh_token       String?
+  token_expires_at    DateTime?
+  created_at          DateTime            @default(now())
+  updated_at          DateTime
+  influencer_profiles influencer_profiles @relation(fields: [influencer_id], references: [id], onDelete: Cascade)
 
-  @@unique([creator_id, tier])
-  @@map("SubscriptionTier")
+  @@unique([influencer_id, platform])
+  @@index([influencer_id, is_primary])
+  @@index([platform, follower_count])
 }
 
-model Subscription {
-  id                                       String               @id
-  subscriber_id                            String
-  creator_id                               String
-  tier_id                                  String
-  tier                                     SubscriptionTierType
-  kr_amount                                Decimal              @db.Decimal(18, 4)
-  status                                   String               @default("active")
-  started_at                               DateTime             @default(now())
-  next_billing_at                          DateTime?
-  cancelled_at                             DateTime?
-  users_subscriptions_creator_idTousers    User                @relation("subscriptions_creator_idTousers", fields: [creator_id], references: [id], onDelete: Cascade)
-  users_subscriptions_subscriber_idTousers User                @relation("subscriptions_subscriber_idTousers", fields: [subscriber_id], references: [id], onDelete: Cascade)
-  SubscriptionTier                       SubscriptionTier   @relation(fields: [tier_id], references: [id])
+model social_media_sync_logs {
+  id               String   @id
+  account_id       String
+  sync_type        String
+  status           String
+  followers_before Int
+  followers_after  Int
+  follower_change  Int
+  error_message    String?
+  error_code       String?
+  duration_ms      Int
+  synced_at        DateTime @default(now())
+
+  @@index([account_id, synced_at])
+  @@index([status])
+}
+
+model spare_part_details {
+  id                   String   @id
+  product_id           String   @unique
+  compatible_makes     String[]
+  compatible_models    String[]
+  compatible_year_from Int?
+  compatible_year_to   Int?
+  part_type            String
+  part_number          String?
+  oem_number           String?
+  is_genuine           Boolean  @default(false)
+  fits_left            Boolean  @default(false)
+  fits_right           Boolean  @default(false)
+  fits_front           Boolean  @default(false)
+  fits_rear            Boolean  @default(false)
+  products             products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([compatible_makes])
+  @@index([part_type])
+}
+
+model sponsored_content {
+  id                    String                  @id
+  brand_user_id         String
+  content_type          SponsoredContentType
+  content_id            String
+  campaign_name         String
+  budget                Decimal                 @db.Decimal(18, 4)
+  spent                 Decimal                 @default(0) @db.Decimal(18, 4)
+  pricing_model         PricingModel
+  bid_amount            Decimal                 @db.Decimal(18, 4)
+  start_date            DateTime
+  end_date              DateTime
+  targeting             Json?
+  status                SponsoredContentStatus  @default(PENDING_REVIEW)
+  impressions           Int                     @default(0)
+  views                 Int                     @default(0)
+  engagements           Int                     @default(0)
+  clicks                Int                     @default(0)
+  escrow_id             String?
+  created_at            DateTime                @default(now())
+  updated_at            DateTime
+  User                  User                    @relation(fields: [brand_user_id], references: [id], onDelete: Cascade)
+  sponsored_impressions sponsored_impressions[]
+
+  @@index([bid_amount])
+  @@index([brand_user_id, status])
+  @@index([content_type, status, start_date, end_date])
+}
+
+model sponsored_impressions {
+  id                String            @id
+  campaign_id       String
+  user_id           String
+  type              String
+  cost              Decimal           @default(0) @db.Decimal(18, 4)
+  created_at        DateTime          @default(now())
+  sponsored_content sponsored_content @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+  User              User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([campaign_id, type])
+  @@index([user_id, created_at])
+}
+
+model sponsored_post_requests {
+  id                                            String              @id
+  brand_id                                      String
+  creator_id                                    String
+  campaign_name                                 String
+  description                                   String
+  requirements                                  String
+  total_payment_kes                             Decimal             @db.Decimal(18, 4)
+  creator_payment_kes                           Decimal             @db.Decimal(18, 4)
+  platform_fee_kes                              Decimal             @db.Decimal(18, 4)
+  content_type                                  String
+  content_id                                    String?
+  content_url                                   String?
+  status                                        SponsoredPostStatus @default(PENDING)
+  rejection_reason                              String?
+  verified_by                                   String?
+  verified_at                                   DateTime?
+  payment_released_at                           DateTime?
+  created_at                                    DateTime            @default(now())
+  updated_at                                    DateTime
+  User_sponsored_post_requests_brand_idToUser   User                @relation("sponsored_post_requests_brand_idToUser", fields: [brand_id], references: [id], onDelete: Cascade)
+  User_sponsored_post_requests_creator_idToUser User                @relation("sponsored_post_requests_creator_idToUser", fields: [creator_id], references: [id], onDelete: Cascade)
+
+  @@index([brand_id])
+  @@index([creator_id])
+  @@index([status])
+}
+
+model subscriptions {
+  id                                     String               @id
+  subscriber_id                          String
+  creator_id                             String
+  tier_id                                String
+  tier                                   SubscriptionTierType
+  kr_amount                              Decimal              @db.Decimal(18, 4)
+  status                                 String               @default("active")
+  started_at                             DateTime             @default(now())
+  next_billing_at                        DateTime?
+  cancelled_at                           DateTime?
+  User_subscriptions_creator_idToUser    User                 @relation("subscriptions_creator_idToUser", fields: [creator_id], references: [id], onDelete: Cascade)
+  User_subscriptions_subscriber_idToUser User                 @relation("subscriptions_subscriber_idToUser", fields: [subscriber_id], references: [id], onDelete: Cascade)
+  SubscriptionTier                       SubscriptionTier     @relation(fields: [tier_id], references: [id])
 
   @@unique([subscriber_id, creator_id])
-  @@map("subscriptions")
 }
 
-model TeamChat {
+model team_chats {
   id         String   @id
   team_id    String   @unique
   chat_id    String
   created_at DateTime @default(now())
-  Team      Team    @relation(fields: [team_id], references: [id], onDelete: Cascade)
-
-  @@map("team_chats")
+  Team       Team     @relation(fields: [team_id], references: [id], onDelete: Cascade)
 }
 
-model TeamContestRegistration {
+model team_contest_registrations {
   id            String   @id
   contest_id    String
   team_id       String
   registered_at DateTime @default(now())
-  Contest      Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  Team         Team    @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  Contest       Contest  @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  Team          Team     @relation(fields: [team_id], references: [id], onDelete: Cascade)
 
   @@unique([contest_id, team_id])
   @@index([contest_id])
   @@index([team_id])
-  @@map("team_contest_registrations")
 }
 
-model TeamInvitation {
-  id                                       String           @id
-  team_id                                  String
-  inviter_id                               String
-  invitee_id                               String
-  status                                   InvitationStatus @default(PENDING)
-  expires_at                               DateTime
-  created_at                               DateTime         @default(now())
-  users_team_invitations_invitee_idTousers User            @relation("team_invitations_invitee_idTousers", fields: [invitee_id], references: [id], onDelete: Cascade)
-  users_team_invitations_inviter_idTousers User            @relation("team_invitations_inviter_idTousers", fields: [inviter_id], references: [id], onDelete: Cascade)
-  Team                                    Team            @relation(fields: [team_id], references: [id], onDelete: Cascade)
+model team_invitations {
+  id                                     String           @id
+  team_id                                String
+  inviter_id                             String
+  invitee_id                             String
+  status                                 InvitationStatus @default(PENDING)
+  expires_at                             DateTime
+  created_at                             DateTime         @default(now())
+  User_team_invitations_invitee_idToUser User             @relation("team_invitations_invitee_idToUser", fields: [invitee_id], references: [id], onDelete: Cascade)
+  User_team_invitations_inviter_idToUser User             @relation("team_invitations_inviter_idToUser", fields: [inviter_id], references: [id], onDelete: Cascade)
+  Team                                   Team             @relation(fields: [team_id], references: [id], onDelete: Cascade)
 
   @@unique([team_id, invitee_id, status])
   @@index([invitee_id, status])
   @@index([team_id, status])
-  @@map("team_invitations")
 }
 
-model TeamMember {
+model team_members {
   id        String   @id
   team_id   String
   user_id   String
   role      TeamRole @default(MEMBER)
   joined_at DateTime @default(now())
-  Team     Team    @relation(fields: [team_id], references: [id], onDelete: Cascade)
-  User     User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Team      Team     @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([team_id, user_id])
   @@index([team_id])
   @@index([user_id])
-  @@map("team_members")
 }
 
-model TeamSubmissionVote {
+model team_submission_votes {
   id               String           @id
   submission_id    String
   voter_id         String
   created_at       DateTime         @default(now())
-  team_submissions TeamSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
-  User            User            @relation(fields: [voter_id], references: [id], onDelete: Cascade)
+  team_submissions team_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  User             User             @relation(fields: [voter_id], references: [id], onDelete: Cascade)
 
   @@unique([submission_id, voter_id])
   @@index([submission_id])
-  @@map("team_submission_votes")
 }
 
-model TeamSubmission {
+model team_submissions {
   id                    String                  @id
   contest_id            String
   team_id               String
@@ -772,36 +2165,15 @@ model TeamSubmission {
   final_score           Decimal?                @db.Decimal(7, 2)
   rank                  Int?
   submitted_at          DateTime                @default(now())
-  team_submission_votes TeamSubmissionVote[]
-  Contest              Contest                @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  Team                 Team                   @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  team_submission_votes team_submission_votes[]
+  Contest               Contest                 @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  Team                  Team                    @relation(fields: [team_id], references: [id], onDelete: Cascade)
 
   @@unique([contest_id, team_id])
   @@index([contest_id, votes_count])
-  @@map("team_submissions")
 }
 
-model Team {
-  id                         String                       @id
-  name                       String                       @unique @db.VarChar(50)
-  avatar_url                 String?
-  leader_id                  String
-  max_members                Int                          @default(5)
-  total_wins                 Int                          @default(0)
-  total_prizes               Decimal                      @default(0) @db.Decimal(18, 4)
-  created_at                 DateTime                     @default(now())
-  updated_at                 DateTime
-  team_chats                 TeamChat?
-  team_contest_registrations TeamContestRegistration[]
-  team_invitations           TeamInvitation[]
-  team_members               TeamMember[]
-  team_submissions           TeamSubmission[]
-  User                      User                        @relation(fields: [leader_id], references: [id], onDelete: Cascade)
-
-  @@map("Team")
-}
-
-model Transaction {
+model transactions {
   id              String   @id
   user_id         String
   type            String
@@ -814,85 +2186,77 @@ model Transaction {
   counterparty_id String?
   metadata        Json?
   created_at      DateTime @default(now())
-  User           User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
-  @@map("transactions")
 }
 
-model User {
-  id                                                  String                  @id
-  email                                               String                  @unique
-  username                                            String                  @unique
-  first_name                                          String
-  last_name                                           String
-  display_name                                        String
-  avatar_url                                          String?
-  cover_photo_url                                     String?
-  bio                                                 String?
-  country                                             String                  @db.VarChar(2)
-  currency                                            String                  @db.VarChar(3)
-  google_id                                           String?                 @unique
-  apple_id                                            String?                 @unique
-  account_type                                        AccountType             @default(CREATOR)
-  is_admin                                            Boolean                 @default(false)
-  is_verified                                         Boolean                 @default(false)
-  is_wallet_unlocked                                  Boolean                 @default(false)
-  wallet_pin_hash                                     String?
-  password_hash                                       String?
-  created_at                                          DateTime                @default(now())
-  updated_at                                          DateTime
-  admires_admires_admired_idTousers                   Admire[]               @relation("admires_admired_idTousers")
-  admires_admires_admirer_idTousers                   Admire[]               @relation("admires_admirer_idTousers")
-  bio_links                                           BioLink[]
-  comment_likes                                       CommentLike[]
-  comment_reports                                     CommentReport[]
-  comments_comments_reply_to_user_idTousers           Comment[]              @relation("comments_reply_to_user_idTousers")
-  comments_comments_user_idTousers                    Comment[]              @relation("comments_user_idTousers")
-  contest_judges                                      ContestJudge[]
-  contest_participants                                ContestParticipant[]
-  ContestSubmission                                 ContestSubmission[]
-  contest_votes                                       ContestVote[]
-  contest_winners                                     ContestWinner[]
-  Contest                                            Contest[]
-  daily_stats                                         DailyStat[]
-  escrows                                             Escrow[]
-  judge_invites                                       JudgeInvite[]
-  LiveSession                                       LiveSession[]
-  LiveStream                                        LiveStream[]
-  milestone_completions                               MilestoneCompletion[]
-  post_comments                                       PostComment[]
-  post_likes                                          PostLike[]
-  Post                                               Post[]
-  Product                                            Product[]
-  refresh_tokens                                      RefreshToken[]
-  ShortCollection                                   ShortCollection[]
-  short_comments                                      ShortComment[]
-  short_likes                                         ShortLike[]
-  shorts                                              Short[]
-  SubscriptionTier                                  SubscriptionTier[]
-  subscriptions_subscriptions_creator_idTousers       Subscription[]         @relation("subscriptions_creator_idTousers")
-  subscriptions_subscriptions_subscriber_idTousers    Subscription[]         @relation("subscriptions_subscriber_idTousers")
-  team_invitations_team_invitations_invitee_idTousers TeamInvitation[]      @relation("team_invitations_invitee_idTousers")
-  team_invitations_team_invitations_inviter_idTousers TeamInvitation[]      @relation("team_invitations_inviter_idTousers")
-  team_members                                        TeamMember[]
-  team_submission_votes                               TeamSubmissionVote[]
-  Team                                               Team[]
-  transactions                                        Transaction[]
-  wallets                                             Wallet?
+model vehicle_details {
+  id                String            @id
+  product_id        String            @unique
+  vehicle_type      String
+  make              String
+  model             String
+  year              Int
+  mileage           Int?
+  fuel_type         FuelType?
+  transmission      TransmissionType?
+  body_type         VehicleBodyType?
+  engine_size       String?
+  color             String?
+  vin               String?
+  number_of_owners  Int?
+  logbook_ready     Boolean           @default(false)
+  import_status     String?
+  import_cert_url   String?
+  auction_sheet_url String?
+  accident_history  Boolean           @default(false)
+  trade_in_enabled  Boolean           @default(false)
+  swap_enabled      Boolean           @default(false)
+  products          products          @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
-  @@map("User")
+  @@index([body_type])
+  @@index([make, model])
+  @@index([year])
 }
 
-model Wallet {
+model wallets {
   id         String   @id
   user_id    String   @unique
   kr_balance Decimal  @default(0) @db.Decimal(18, 4)
   created_at DateTime @default(now())
   updated_at DateTime
-  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
 
-  @@map("wallets")
+model wishlist_items {
+  id           String    @id
+  wishlist_id  String
+  product_id   String
+  quantity     Int       @default(1)
+  priority     Int       @default(0)
+  notes        String?
+  is_purchased Boolean   @default(false)
+  added_at     DateTime  @default(now())
+  products     products  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  wishlists    wishlists @relation(fields: [wishlist_id], references: [id], onDelete: Cascade)
+
+  @@unique([wishlist_id, product_id])
+}
+
+model wishlists {
+  id             String           @id
+  user_id        String
+  name           String
+  is_public      Boolean          @default(false)
+  is_registry    Boolean          @default(false)
+  event_type     String?
+  event_date     DateTime?
+  created_at     DateTime         @default(now())
+  wishlist_items wishlist_items[]
+  User           User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
 }
 
 enum AccountType {
@@ -900,10 +2264,100 @@ enum AccountType {
   BUSINESS
 }
 
+enum AdCampaignStatus {
+  PENDING
+  APPROVED
+  ACTIVE
+  PAUSED
+  REJECTED
+  COMPLETED
+}
+
+enum AdCampaignStatusType {
+  PENDING
+  APPROVED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  REJECTED
+}
+
+enum AdType {
+  NATIVE
+  BANNER
+  STORY
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
 enum BattleStatus {
   PENDING
   ACTIVE
   COMPLETED
+}
+
+enum BiddingStrategy {
+  LOWEST_COST
+  TARGET_CPM
+  COST_CAP
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum BudgetType {
+  DAILY
+  LIFETIME
+}
+
+enum CampaignStatus {
+  DRAFT
+  OPEN
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+  CANCELLED
+}
+
+enum CampaignType {
+  SPONSORED_POST
+  PRODUCT_REVIEW
+  BRAND_AMBASSADOR
+  CONTEST_PROMOTION
+  AFFILIATE
+  EVENT_COVERAGE
+  CONTENT_CREATION
+}
+
+enum ChatNiche {
+  DOCTORS
+  REAL_ESTATE_INVESTMENT
+  FINANCE
+  TECH
+  FASHION
+  AUTOMOTIVE
+  FOOD_BEVERAGE
+  HEALTH_FITNESS
+  EDUCATION
+  ENTERTAINMENT
+  GENERAL
+}
+
+enum ContactMethod {
+  WHATSAPP
+  WEBSITE
+  PHONE
+  IN_APP_CHAT
 }
 
 enum ContestMediaType {
@@ -919,6 +2373,76 @@ enum ContestStatus {
   PENDING_PAYOUT
   COMPLETED
   CANCELLED
+}
+
+enum ConversionCampaignType {
+  POST_CONTEST_DISCOUNT
+  WINNER_ADVOCACY
+  PARTICIPANT_RETARGETING
+  ENGAGEMENT_REWARD
+}
+
+enum DeliverableStatus {
+  PENDING
+  SUBMITTED
+  APPROVED
+  REJECTED
+  REVISION_REQUESTED
+}
+
+enum FlashSaleStatus {
+  SCHEDULED
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum FlashSaleType {
+  FLASH
+  LIGHTNING
+  DAILY_FEATURED
+  CLEARANCE
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+  HYBRID
+  LPG
+}
+
+enum FunnelStage {
+  AWARENESS
+  INTEREST
+  CONSIDERATION
+  CONVERSION
+  RETENTION
+  ADVOCACY
+}
+
+enum GroupBuyStatus {
+  OPEN
+  THRESHOLD_MET
+  CLOSED
+  CANCELLED
+}
+
+enum ImportRequestStatus {
+  PENDING
+  QUOTED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum InfluencerTier {
+  NANO
+  MICRO
+  MID
+  MACRO
+  MEGA
 }
 
 enum InvitationStatus {
@@ -941,6 +2465,13 @@ enum JudgingCriteria {
   COMBINATION
 }
 
+enum LiveSessionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED
+}
+
 enum LiveStreamStatus {
   SCHEDULED
   LIVE
@@ -956,10 +2487,65 @@ enum LiveStreamType {
   COMMERCE
 }
 
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
 enum ParticipationType {
   INDIVIDUAL_ONLY
   TEAM_ONLY
   BOTH
+}
+
+enum PlacementType {
+  LIVE_STREAMS
+  CONTESTS
+  DISCOVER_SHORTS
+  ADMIRING_SHORTS
+  DRIPS_FEED
+  STORIES
+  GROUP_CHATS
+  CHAMA_CHATS
+}
+
+enum PremiumType {
+  FEATURED
+  PROMOTED
+  TOP_SPOT
+}
+
+enum PricingModel {
+  CPM
+  CPV
+  CPE
+  CPC
+  FLAT_FEE
+}
+
+enum ProductCategory {
+  VEHICLES
+  SPARE_PARTS
+  REAL_ESTATE
+  FASHION
+  SHOES
+  ELECTRONICS
+  FOOD_FMCG
+  BOOKS
+  DIGITAL_PRODUCTS
+  SERVICES
+  OTHER
+}
+
+enum ProductCondition {
+  NEW
+  USED
+  REFURBISHED
+  FOR_PARTS
 }
 
 enum RequirementType {
@@ -973,6 +2559,51 @@ enum RequirementType {
   CUSTOM
 }
 
+enum SocialPlatform {
+  TIKTOK
+  YOUTUBE
+  INSTAGRAM
+  FACEBOOK
+  TWITTER
+  TWITCH
+  LINKEDIN
+  SNAPCHAT
+}
+
+enum SponsoredContentStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum SponsoredContentType {
+  SHORT
+  POST
+  STORY
+}
+
+enum SponsoredPostStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  PAYMENT_RELEASED
+  COMPLETED
+}
+
+enum SponsorshipType {
+  CONTEST_PRIZE
+  CONTEST_BRANDING
+  CONTEST_EXCLUSIVE
+  CONTENT_SPONSORSHIP
+}
+
 enum SubscriptionTierType {
   TOP_FUN
   REAL_FAN
@@ -980,8 +2611,43 @@ enum SubscriptionTierType {
   SUPER_FAN
 }
 
+enum TargetingScope {
+  GLOBAL
+  CONTINENT
+  COUNTRY
+  REGION
+  CITY
+  TOWN
+  ROAD
+  LANDMARK
+  SHOPPING_CENTER
+}
+
 enum TeamRole {
   LEADER
   CO_LEADER
   MEMBER
+}
+
+enum TransmissionType {
+  MANUAL
+  AUTOMATIC
+  CVT
+  DCT
+}
+
+enum VehicleBodyType {
+  SEDAN
+  COUPE
+  HATCHBACK
+  SUV
+  PICKUP
+  VAN
+  CONVERTIBLE
+  WAGON
+  MINIVAN
+  BUS
+  TRUCK
+  TRAILER
+  MOTORCYCLE
 }

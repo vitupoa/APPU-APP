@@ -44,7 +44,7 @@ val coreModule = module {
     // Offline support
     single { CoroutineScope(SupervisorJob()) }
     single { OfflineModeGuard() }
-    single { OfflineActionQueue(get(), get(), get()) }
+    single<OfflineActionQueue> { OfflineActionQueue(get(), get(), get()) }
     
     // Security
     single { DatabaseEncryption(get()) }

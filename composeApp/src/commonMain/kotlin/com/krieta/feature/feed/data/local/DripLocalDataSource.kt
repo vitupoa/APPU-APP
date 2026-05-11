@@ -1,8 +1,9 @@
 package com.krieta.feature.feed.data.local
 
-import com.krieta.com.db.KrietaDatabase
+import com.krieta.db.KrietaDatabase
 import com.krieta.feature.feed.domain.model.Drip
 import com.krieta.feature.feed.domain.model.DripAuthor
+import com.krieta.com.core.util.currentTimeMillis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -19,21 +20,21 @@ class DripLocalDataSource(private val database: KrietaDatabase) {
                 username = drip.author.username,
                 userDisplayName = drip.author.displayName,
                 userAvatarUrl = drip.author.avatarUrl,
-                isVerified = drip.author.isVerified,
+                isVerified = if (drip.author.isVerified) 1L else 0L,
                 caption = drip.caption,
                 mediaUrl = drip.mediaUrl,
                 thumbnailUrl = drip.thumbnailUrl,
                 mediaType = drip.mediaType,
                 duration = drip.duration?.toLong(),
-                aspectRatio = drip.aspectRatio,
+                aspectRatio = drip.aspectRatio?.toDouble(),
                 likesCount = drip.likesCount.toLong(),
                 commentsCount = drip.commentsCount.toLong(),
                 sharesCount = drip.sharesCount.toLong(),
                 viewsCount = drip.viewsCount.toLong(),
-                isLiked = drip.isLiked,
-                isBookmarked = drip.isBookmarked,
+                isLiked = if (drip.isLiked) 1L else 0L,
+                isBookmarked = if (drip.isBookmarked) 1L else 0L,
                 createdAt = drip.createdAt,
-                cachedAt = System.currentTimeMillis()
+                cachedAt = currentTimeMillis()
             )
         }
     }
@@ -47,20 +48,20 @@ class DripLocalDataSource(private val database: KrietaDatabase) {
                     username = entity.username,
                     displayName = entity.userDisplayName,
                     avatarUrl = entity.userAvatarUrl,
-                    isVerified = entity.isVerified
+                    isVerified = entity.isVerified != 0L
                 ),
-                caption = entity.caption,
+                caption = entity.caption ?: "",
                 mediaUrl = entity.mediaUrl,
                 thumbnailUrl = entity.thumbnailUrl,
                 mediaType = entity.mediaType,
                 duration = entity.duration?.toInt(),
-                aspectRatio = entity.aspectRatio,
+                aspectRatio = entity.aspectRatio?.toFloat(),
                 likesCount = entity.likesCount.toInt(),
                 commentsCount = entity.commentsCount.toInt(),
                 sharesCount = entity.sharesCount.toInt(),
                 viewsCount = entity.viewsCount.toInt(),
-                isLiked = entity.isLiked,
-                isBookmarked = entity.isBookmarked,
+                isLiked = entity.isLiked != 0L,
+                isBookmarked = entity.isBookmarked != 0L,
                 createdAt = entity.createdAt
             )
         }
@@ -75,31 +76,31 @@ class DripLocalDataSource(private val database: KrietaDatabase) {
                     username = entity.username,
                     displayName = entity.userDisplayName,
                     avatarUrl = entity.userAvatarUrl,
-                    isVerified = entity.isVerified
+                    isVerified = entity.isVerified != 0L
                 ),
-                caption = entity.caption,
+                caption = entity.caption ?: "",
                 mediaUrl = entity.mediaUrl,
                 thumbnailUrl = entity.thumbnailUrl,
                 mediaType = entity.mediaType,
                 duration = entity.duration?.toInt(),
-                aspectRatio = entity.aspectRatio,
+                aspectRatio = entity.aspectRatio?.toFloat(),
                 likesCount = entity.likesCount.toInt(),
                 commentsCount = entity.commentsCount.toInt(),
                 sharesCount = entity.sharesCount.toInt(),
                 viewsCount = entity.viewsCount.toInt(),
-                isLiked = entity.isLiked,
-                isBookmarked = entity.isBookmarked,
+                isLiked = entity.isLiked != 0L,
+                isBookmarked = entity.isBookmarked != 0L,
                 createdAt = entity.createdAt
             )
         }
     }
     
     suspend fun updateDripLike(dripId: String, isLiked: Boolean, likesCount: Int) = withContext(Dispatchers.IO) {
-        queries.updateDripLike(isLiked, likesCount.toLong(), dripId)
+        queries.updateDripLike(if (isLiked) 1L else 0L, likesCount.toLong(), dripId)
     }
     
     suspend fun updateDripBookmark(dripId: String, isBookmarked: Boolean) = withContext(Dispatchers.IO) {
-        queries.updateDripBookmark(isBookmarked, dripId)
+        queries.updateDripBookmark(if (isBookmarked) 1L else 0L, dripId)
     }
     
     suspend fun clearCache() = withContext(Dispatchers.IO) {

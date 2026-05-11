@@ -1,13 +1,13 @@
 package com.krieta.com.core.network
 
-import com.krieta.com.BuildConfig
+import com.krieta.com.core.security.AppConfig
 
 object ApiConstants {
     // Railway backend base URL securely passed via local.properties
-    val BASE_URL = if (BuildConfig.RAILWAY_URL.contains("10.0.2.2") || BuildConfig.RAILWAY_URL.contains("localhost")) {
-        "http://${BuildConfig.RAILWAY_URL}"
+    val BASE_URL = if (AppConfig.RAILWAY_URL.contains("10.0.2.2") || AppConfig.RAILWAY_URL.contains("localhost")) {
+        "http://${AppConfig.RAILWAY_URL}"
     } else {
-        "https://${BuildConfig.RAILWAY_URL}"
+        "https://${AppConfig.RAILWAY_URL}"
     }
     const val API_VERSION = "/api/v1"
 
@@ -51,6 +51,7 @@ object ApiConstants {
 
     // Shop
     const val SHOP_PRODUCTS = "$API_VERSION/shop/products"
+    const val SHOP_BASE = "$API_VERSION/shop"
 
     // Analytics
     const val ANALYTICS = "$API_VERSION/analytics"

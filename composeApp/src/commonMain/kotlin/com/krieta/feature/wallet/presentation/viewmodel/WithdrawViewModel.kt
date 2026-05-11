@@ -136,13 +136,13 @@ class WithdrawViewModel(
         )
         val rate = _state.value.exchangeRate
 
-        if (fiatAmount <= 0 || rate == null) {
+        if ((fiatAmount ?: 0.0) <= 0 || rate == null) {
             _state.value = _state.value.copy(krCost = 0.0)
             return
         }
 
         // Sell rate: how much Kr to get this fiat
-        val krNeeded = fiatAmount / rate.sellRate
+        val krNeeded = (fiatAmount ?: 0.0) / rate.sellRate
         _state.value = _state.value.copy(krCost = krNeeded)
     }
 
@@ -155,7 +155,6 @@ class WithdrawViewModel(
                 is NetworkResult.Success -> {
                     _state.value = _state.value.copy(krBalance = balanceResult.data.krBalance)
                 }
-                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(error = "Failed to load balance")
                 }
@@ -170,7 +169,6 @@ class WithdrawViewModel(
                         isLoadingRate = false
                     )
                 }
-                is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(
                         error = "Failed to load exchange rate",
@@ -322,7 +320,8 @@ class WithdrawViewModel(
                 val balanceHash = com.krieta.com.core.security.WithdrawalSecurity.generateBalanceHash(
                     userId = userId,
                     balance = _state.value.krBalance,
-                    timestamp = timestamp
+                    timestamp = timestamp,
+                    nonce = nonce
                 )
                 
                 val request = com.krieta.feature.wallet.domain.repository.WithdrawRequest(
@@ -370,3 +369,4 @@ class WithdrawViewModel(
         _state.value = _state.value.copy(success = false)
     }
 }
+

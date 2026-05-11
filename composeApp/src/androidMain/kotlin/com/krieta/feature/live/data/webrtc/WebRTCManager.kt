@@ -148,6 +148,7 @@ actual class WebRTCManager(private val context: Context) {
                             else -> {}
                         }
                     }
+                    override fun onIceConnectionReceivingChange(receiving: Boolean) {}
                     override fun onIceGatheringChange(state: PeerConnection.IceGatheringState?) {}
                     override fun onAddStream(stream: MediaStream?) {}
                     override fun onRemoveStream(stream: MediaStream?) {}

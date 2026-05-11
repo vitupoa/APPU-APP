@@ -78,6 +78,16 @@ kotlin {
 
             // Coroutines Android
             implementation(libs.kotlinx.coroutines.android)
+
+            // CameraX
+            implementation("androidx.camera:camera-core:1.4.1")
+            implementation("androidx.camera:camera-camera2:1.4.1")
+            implementation("androidx.camera:camera-lifecycle:1.4.1")
+            implementation("androidx.camera:camera-video:1.4.1")
+            implementation("androidx.camera:camera-view:1.4.1")
+            
+            // WebRTC
+            implementation("io.getstream:stream-webrtc-android:1.1.3")
         }
 
         commonMain.dependencies {
@@ -158,7 +168,8 @@ kotlin {
 sqldelight {
     databases {
         create("KrietaDatabase") {
-            packageName.set("com.krieta.com.db")
+            packageName.set("com.krieta.db")
+            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
         }
     }
 }

@@ -3,6 +3,7 @@ package com.krieta.com.core.security
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
+import kotlinx.datetime.Clock
 
 /**
  * DEPRECATED: Use FinancialTransactionSecurity instead
@@ -24,7 +25,5 @@ object TransactionSigner {
         return Base64.Default.encode(bytes)
     }
 
-    fun generateTimestamp(): Long {
-        return System.currentTimeMillis()
-    }
+    fun generateTimestamp(): Long = Clock.System.now().toEpochMilliseconds()
 }

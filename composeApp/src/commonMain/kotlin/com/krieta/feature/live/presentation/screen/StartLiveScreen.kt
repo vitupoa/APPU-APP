@@ -1,4 +1,5 @@
 package com.krieta.feature.live.presentation.screen
+import com.krieta.feature.live.domain.model.LiveType
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,7 +65,7 @@ class StartLiveScreen : Screen {
                     emoji = "📹",
                     color = Color(0xFFE53935)
                 ) {
-                    navigator.push(HostLiveScreen(liveType = LiveType.NORMAL))
+                    navigator.push(HostLiveScreen(liveType = LiveType.STANDARD))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -86,7 +87,7 @@ class StartLiveScreen : Screen {
                     emoji = "⚔️",
                     color = Color(0xFFFF6F00)
                 ) {
-                    navigator.push(HostLiveScreen(liveType = LiveType.BATTLE))
+                    navigator.push(HostLiveScreen(liveType = LiveType.CONTEST))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -97,7 +98,7 @@ class StartLiveScreen : Screen {
                     emoji = "👥",
                     color = Color(0xFF7B1FA2)
                 ) {
-                    navigator.push(HostLiveScreen(liveType = LiveType.MULTI_GUEST))
+                    navigator.push(HostLiveScreen(liveType = LiveType.COLLABORATION))
                 }
             }
         }
@@ -106,7 +107,7 @@ class StartLiveScreen : Screen {
             SelectProductSheet(
                 onDismiss = { showLiveTypeSheet = false },
                 onProductSelected = { productId ->
-                    navigator.push(HostLiveScreen(liveType = LiveType.COMMERCE, productId = productId))
+                    navigator.push(HostLiveScreen(liveType = LiveType.SHOPPING, productId = productId))
                     showLiveTypeSheet = false
                 }
             )
@@ -292,3 +293,4 @@ class StartLiveScreen : Screen {
         val imageUrl: String
     )
 }
+

@@ -20,13 +20,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.theme.KrietaColors
-import com.krieta.feature.live.presentation.viewmodel.LiveType
+import com.krieta.feature.live.domain.model.LiveType
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
 
 class HostLiveScreen(
-    private val liveType: LiveType = LiveType.NORMAL,
+    private val liveType: LiveType = LiveType.STANDARD,
     private val productId: String? = null
 ) : Screen {
     
@@ -118,7 +118,7 @@ class HostLiveScreen(
                 contentAlignment = Alignment.Center
             ) {
                 when (liveType) {
-                    LiveType.BATTLE -> {
+                    LiveType.CONTEST -> {
                         // Split screen for battle
                         Row(modifier = Modifier.fillMaxSize()) {
                             Box(
@@ -155,7 +155,7 @@ class HostLiveScreen(
                             }
                         }
                     }
-                    LiveType.MULTI_GUEST -> {
+                    LiveType.COLLABORATION -> {
                         // Grid layout for multi-guest
                         Column(modifier = Modifier.fillMaxSize()) {
                             Box(
@@ -344,7 +344,7 @@ class HostLiveScreen(
                     .padding(16.dp)
             ) {
                 // Product Card (if selling)
-                if (showProductCard && mockProduct != null && liveType == LiveType.COMMERCE) {
+                if (showProductCard && mockProduct != null && liveType == LiveType.SHOPPING) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth(0.75f)
@@ -444,7 +444,7 @@ class HostLiveScreen(
                                 IconButton(
                                     onClick = {
                                         messages = messages + ChatMessage(
-                                            id = "${System.currentTimeMillis()}",
+                                            id = "msg_${messages.size}",
                                             username = "You",
                                             text = messageText
                                         )
@@ -465,13 +465,13 @@ class HostLiveScreen(
 
                     // Quick Actions
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (liveType == LiveType.MULTI_GUEST) {
+                        if (liveType == LiveType.COLLABORATION) {
                             HostToolButton(painterResource(Res.drawable.ic_person_add), "Invite") {
                                 coHosts = coHosts + "Guest ${coHosts.size + 1}"
                             }
                         }
                         
-                        if (liveType == LiveType.COMMERCE) {
+                        if (liveType == LiveType.SHOPPING) {
                             HostToolButton(painterResource(Res.drawable.ic_shopping_cart), "Shop") {
                                 showProductCard = !showProductCard
                             }

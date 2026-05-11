@@ -1,8 +1,8 @@
 package com.krieta.feature.shorts.data.local
 
-import com.krieta.com.db.KrietaDatabase
+import com.krieta.db.KrietaDatabase
 import com.krieta.feature.shorts.domain.model.Short
-import com.krieta.feature.shorts.domain.model.ShortAuthor
+import com.krieta.feature.shorts.domain.model.ShortCreator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -15,22 +15,22 @@ class ShortLocalDataSource(private val database: KrietaDatabase) {
         shorts.forEach { short ->
             queries.insertOrReplaceShort(
                 id = short.id,
-                userId = short.author.id,
-                username = short.author.username,
-                userDisplayName = short.author.displayName,
-                userAvatarUrl = short.author.avatarUrl,
-                isVerified = short.author.isVerified,
+                userId = short.creator.id,
+                username = short.creator.username,
+                userDisplayName = short.creator.displayName,
+                userAvatarUrl = short.creator.avatarUrl,
+                isVerified = if (short.creator.isVerified) 1L else 0L,
                 caption = short.caption,
                 videoUrl = short.videoUrl,
                 thumbnailUrl = short.thumbnailUrl,
-                duration = short.duration.toLong(),
-                aspectRatio = short.aspectRatio,
+                duration = 0L,
+                aspectRatio = short.aspectRatio?.toDouble(),
                 likesCount = short.likesCount.toLong(),
                 commentsCount = short.commentsCount.toLong(),
-                sharesCount = short.sharesCount.toLong(),
-                viewsCount = short.viewsCount.toLong(),
-                isLiked = short.isLiked,
-                isBookmarked = short.isBookmarked,
+                sharesCount = 0L,
+                viewsCount = short.views.toLong(),
+                isLiked = if (short.isLiked) 1L else 0L,
+                isBookmarked = 0L,
                 createdAt = short.createdAt,
                 cachedAt = System.currentTimeMillis()
             )
@@ -38,68 +38,51 @@ class ShortLocalDataSource(private val database: KrietaDatabase) {
     }
     
     suspend fun getCachedShorts(): List<Short> = withContext(Dispatchers.IO) {
-        queries.getAllShorts().executeAsList().map { entity ->
-            Short(
-                id = entity.id,
-                author = ShortAuthor(
-                    id = entity.userId,
-                    username = entity.username,
-                    displayName = entity.userDisplayName,
-                    avatarUrl = entity.userAvatarUrl,
-                    isVerified = entity.isVerified
-                ),
-                caption = entity.caption,
-                videoUrl = entity.videoUrl,
-                thumbnailUrl = entity.thumbnailUrl,
-                duration = entity.duration.toInt(),
-                aspectRatio = entity.aspectRatio,
-                likesCount = entity.likesCount.toInt(),
-                commentsCount = entity.commentsCount.toInt(),
-                sharesCount = entity.sharesCount.toInt(),
-                viewsCount = entity.viewsCount.toInt(),
-                isLiked = entity.isLiked,
-                isBookmarked = entity.isBookmarked,
-                createdAt = entity.createdAt
-            )
-        }
+        queries.getAllShorts().executeAsList().map { entity -> mapToShort(entity) }
     }
     
     suspend fun getCachedShortById(shortId: String): Short? = withContext(Dispatchers.IO) {
-        queries.getShortById(shortId).executeAsOneOrNull()?.let { entity ->
-            Short(
-                id = entity.id,
-                author = ShortAuthor(
-                    id = entity.userId,
-                    username = entity.username,
-                    displayName = entity.userDisplayName,
-                    avatarUrl = entity.userAvatarUrl,
-                    isVerified = entity.isVerified
-                ),
-                caption = entity.caption,
-                videoUrl = entity.videoUrl,
-                thumbnailUrl = entity.thumbnailUrl,
-                duration = entity.duration.toInt(),
-                aspectRatio = entity.aspectRatio,
-                likesCount = entity.likesCount.toInt(),
-                commentsCount = entity.commentsCount.toInt(),
-                sharesCount = entity.sharesCount.toInt(),
-                viewsCount = entity.viewsCount.toInt(),
-                isLiked = entity.isLiked,
-                isBookmarked = entity.isBookmarked,
-                createdAt = entity.createdAt
-            )
-        }
+        queries.getShortById(shortId).executeAsOneOrNull()?.let { mapToShort(it) }
     }
     
     suspend fun updateShortLike(shortId: String, isLiked: Boolean, likesCount: Int) = withContext(Dispatchers.IO) {
-        queries.updateShortLike(isLiked, likesCount.toLong(), shortId)
+        queries.updateShortLike(if (isLiked) 1L else 0L, likesCount.toLong(), shortId)
     }
     
     suspend fun updateShortBookmark(shortId: String, isBookmarked: Boolean) = withContext(Dispatchers.IO) {
-        queries.updateShortBookmark(isBookmarked, shortId)
+        queries.updateShortBookmark(if (isBookmarked) 1L else 0L, shortId)
     }
     
     suspend fun clearCache() = withContext(Dispatchers.IO) {
         queries.deleteAllShorts()
     }
+    
+    private fun mapToShort(entity: com.krieta.db.Short) = Short(
+        id = entity.id,
+        creator = ShortCreator(
+            id = entity.userId,
+            username = entity.username,
+            displayName = entity.userDisplayName,
+            avatarUrl = entity.userAvatarUrl,
+            isVerified = entity.isVerified != 0L,
+            accountType = "CREATOR"
+        ),
+        videoUrl = entity.videoUrl,
+        thumbnailUrl = entity.thumbnailUrl,
+        mediaType = "VIDEO",
+        aspectRatio = entity.aspectRatio?.toFloat(),
+        mediaUrls = emptyList(),
+        caption = entity.caption ?: "",
+        musicTrack = null,
+        contestId = null,
+        collectionId = null,
+        linkedProduct = null,
+        isLocked = false,
+        requiredTier = null,
+        likesCount = entity.likesCount.toInt(),
+        commentsCount = entity.commentsCount.toInt(),
+        views = entity.viewsCount.toInt(),
+        isLiked = entity.isLiked != 0L,
+        createdAt = entity.createdAt
+    )
 }

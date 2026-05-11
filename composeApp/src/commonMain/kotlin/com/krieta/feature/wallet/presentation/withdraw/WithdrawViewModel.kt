@@ -297,14 +297,15 @@ class WithdrawViewModel(
             val timestamp = currentTimeMillis()
             val nonce = WithdrawalSecurity.generateNonce()
             val amountHash = WithdrawalSecurity.generateAmountHash(
-                userId = currentState.userId,
                 amount = amount,
-                timestamp = timestamp,
-                nonce = nonce
+                nonce = nonce,
+                userId = currentState.userId,
+                timestamp = timestamp
             )
             val balanceHash = WithdrawalSecurity.generateBalanceHash(
-                userId = currentState.userId,
                 balance = currentState.availableBalance,
+                nonce = nonce,
+                userId = currentState.userId,
                 timestamp = timestamp
             )
             

@@ -2,7 +2,6 @@ package com.krieta.feature.wallet.data.repository
 
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.safeApiCall
-import com.krieta.com.core.security.TransactionSigner
 import com.krieta.feature.wallet.data.remote.WalletApi
 import com.krieta.feature.wallet.data.remote.dto.TipRequestDto
 import com.krieta.feature.wallet.data.remote.dto.TopupInitiateRequestDto
@@ -85,9 +84,7 @@ class WalletRepositoryImpl(
             
             // Generate nonce and timestamp
             val nonce = com.krieta.com.core.security.WithdrawalSecurity.generateNonce()
-            val timestamp = System.currentTimeMillis()
-            
-            // Sign with new secure method
+            val timestamp = com.krieta.com.core.util.currentTimeMillis()
             val signature = financialSecurity.signTip(
                 senderId = userSession.userId,
                 recipientId = recipientId,
@@ -173,9 +170,7 @@ class WalletRepositoryImpl(
             
             // Generate nonce and timestamp
             val nonce = com.krieta.com.core.security.WithdrawalSecurity.generateNonce()
-            val timestamp = System.currentTimeMillis()
-            
-            // Sign with new secure method
+            val timestamp = com.krieta.com.core.util.currentTimeMillis()
             val signature = financialSecurity.signWithdrawal(
                 userId = userSession.userId,
                 krAmount = request.krAmount,
@@ -290,9 +285,7 @@ class WalletRepositoryImpl(
             
             // Generate nonce and timestamp
             val nonce = com.krieta.com.core.security.WithdrawalSecurity.generateNonce()
-            val timestamp = System.currentTimeMillis()
-            
-            // Sign with new secure method
+            val timestamp = com.krieta.com.core.util.currentTimeMillis()
             val signature = financialSecurity.signTopUp(
                 userId = userSession.userId,
                 amount = fiatAmount.toDouble(),

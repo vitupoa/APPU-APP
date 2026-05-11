@@ -1,6 +1,6 @@
 package com.krieta.feature.shop.data.local
 
-import com.krieta.com.db.KrietaDatabase
+import com.krieta.db.KrietaDatabase
 import com.krieta.feature.shop.domain.model.Product
 import com.krieta.feature.shop.domain.model.ProductSeller
 import kotlinx.coroutines.Dispatchers
@@ -21,23 +21,22 @@ class ProductLocalDataSource(private val database: KrietaDatabase) {
                 sellerAvatarUrl = product.seller.avatarUrl,
                 title = product.title,
                 description = product.description,
-                price = product.price,
-                currency = product.currency,
-                category = product.category,
-                condition = product.condition,
-                stockQuantity = product.stockQuantity.toLong(),
-                isAvailable = product.isAvailable,
-                viewsCount = product.viewsCount.toLong(),
-                likesCount = product.likesCount.toLong(),
-                isLiked = product.isLiked,
+                price = product.priceKr,
+                currency = product.currency ?: "KR",
+                category = product.category ?: "",
+                condition = product.condition ?: "NEW",
+                stockQuantity = product.stock.toLong(),
+                isAvailable = if (product.status == "ACTIVE") 1L else 0L,
+                viewsCount = product.viewCount.toLong(),
+                likesCount = 0L,
+                isLiked = 0L,
                 createdAt = product.createdAt,
-                updatedAt = product.updatedAt,
+                updatedAt = product.createdAt,
                 cachedAt = System.currentTimeMillis()
             )
             
-            // Cache product images
             productQueries.deleteImagesByProductId(product.id)
-            product.images.forEachIndexed { index, imageUrl ->
+            product.imageUrls.forEachIndexed { index, imageUrl ->
                 productQueries.insertOrReplaceProductImage(
                     id = "${product.id}_img_$index",
                     productId = product.id,
@@ -50,73 +49,46 @@ class ProductLocalDataSource(private val database: KrietaDatabase) {
     
     suspend fun getCachedProducts(): List<Product> = withContext(Dispatchers.IO) {
         productQueries.getAllProducts().executeAsList().map { entity ->
-            val images = productQueries.getImagesByProductId(entity.id)
-                .executeAsList()
-                .map { it.imageUrl }
-            
-            Product(
-                id = entity.id,
-                seller = ProductSeller(
-                    id = entity.sellerId,
-                    username = entity.sellerUsername,
-                    displayName = entity.sellerDisplayName,
-                    avatarUrl = entity.sellerAvatarUrl
-                ),
-                title = entity.title,
-                description = entity.description,
-                price = entity.price,
-                currency = entity.currency,
-                category = entity.category,
-                condition = entity.condition,
-                images = images,
-                stockQuantity = entity.stockQuantity.toInt(),
-                isAvailable = entity.isAvailable,
-                viewsCount = entity.viewsCount.toInt(),
-                likesCount = entity.likesCount.toInt(),
-                isLiked = entity.isLiked,
-                createdAt = entity.createdAt,
-                updatedAt = entity.updatedAt
-            )
+            val images = productQueries.getImagesByProductId(entity.id).executeAsList().map { it.imageUrl }
+            mapToProduct(entity, images)
         }
     }
     
     suspend fun getCachedProductById(productId: String): Product? = withContext(Dispatchers.IO) {
         productQueries.getProductById(productId).executeAsOneOrNull()?.let { entity ->
-            val images = productQueries.getImagesByProductId(entity.id)
-                .executeAsList()
-                .map { it.imageUrl }
-            
-            Product(
-                id = entity.id,
-                seller = ProductSeller(
-                    id = entity.sellerId,
-                    username = entity.sellerUsername,
-                    displayName = entity.sellerDisplayName,
-                    avatarUrl = entity.sellerAvatarUrl
-                ),
-                title = entity.title,
-                description = entity.description,
-                price = entity.price,
-                currency = entity.currency,
-                category = entity.category,
-                condition = entity.condition,
-                images = images,
-                stockQuantity = entity.stockQuantity.toInt(),
-                isAvailable = entity.isAvailable,
-                viewsCount = entity.viewsCount.toInt(),
-                likesCount = entity.likesCount.toInt(),
-                isLiked = entity.isLiked,
-                createdAt = entity.createdAt,
-                updatedAt = entity.updatedAt
-            )
+            val images = productQueries.getImagesByProductId(entity.id).executeAsList().map { it.imageUrl }
+            mapToProduct(entity, images)
         }
     }
     
     suspend fun updateProductLike(productId: String, isLiked: Boolean, likesCount: Int) = withContext(Dispatchers.IO) {
-        productQueries.updateProductLike(isLiked, likesCount.toLong(), productId)
+        productQueries.updateProductLike(if (isLiked) 1L else 0L, likesCount.toLong(), productId)
     }
     
     suspend fun clearCache() = withContext(Dispatchers.IO) {
         productQueries.deleteAllProducts()
     }
+    
+    private fun mapToProduct(entity: com.krieta.db.Product, images: List<String>) = Product(
+        id = entity.id,
+        seller = ProductSeller(
+            id = entity.sellerId,
+            username = entity.sellerUsername,
+            displayName = entity.sellerDisplayName,
+            avatarUrl = entity.sellerAvatarUrl,
+            isVerified = false
+        ),
+        title = entity.title,
+        description = entity.description,
+        imageUrls = images,
+        priceKr = entity.price,
+        currency = entity.currency,
+        category = entity.category,
+        condition = entity.condition,
+        whatsappNumber = "",
+        stock = entity.stockQuantity.toInt(),
+        viewCount = entity.viewsCount.toInt(),
+        status = if (entity.isAvailable != 0L) "ACTIVE" else "INACTIVE",
+        createdAt = entity.createdAt
+    )
 }

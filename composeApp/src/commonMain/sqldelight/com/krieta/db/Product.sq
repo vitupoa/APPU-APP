@@ -12,10 +12,10 @@ CREATE TABLE IF NOT EXISTS Product (
     category TEXT NOT NULL,
     condition TEXT NOT NULL,
     stockQuantity INTEGER NOT NULL DEFAULT 0,
-    isAvailable INTEGER AS Boolean NOT NULL DEFAULT 1,
+    isAvailable INTEGER NOT NULL DEFAULT 1,
     viewsCount INTEGER NOT NULL DEFAULT 0,
     likesCount INTEGER NOT NULL DEFAULT 0,
-    isLiked INTEGER AS Boolean NOT NULL DEFAULT 0,
+    isLiked INTEGER NOT NULL DEFAULT 0,
     createdAt TEXT NOT NULL,
     updatedAt TEXT NOT NULL,
     cachedAt INTEGER NOT NULL

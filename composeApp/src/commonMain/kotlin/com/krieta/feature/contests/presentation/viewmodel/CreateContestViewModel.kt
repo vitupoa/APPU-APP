@@ -926,7 +926,7 @@ class CreateContestViewModel(
             defaultValue = 0.0
         )
         
-        if (currentState.title.isBlank() || currentState.description.isBlank() || prize <= 0) {
+        if (currentState.title.isBlank() || currentState.description.isBlank() || (prize ?: 0.0) <= 0) {
             _state.value = currentState.copy(error = "Please fill all required fields correctly")
             return
         }
@@ -1139,3 +1139,4 @@ private fun getTaskTypeLabel(taskType: TaskType): String {
         TaskType.CUSTOM_TASK -> "Custom Task"
     }
 }
+

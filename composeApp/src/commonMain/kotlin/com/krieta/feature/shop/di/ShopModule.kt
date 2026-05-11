@@ -1,6 +1,6 @@
 package com.krieta.feature.shop.di
 
-import com.krieta.BuildConfig
+import com.krieta.com.core.security.AppConfig
 import com.krieta.feature.shop.data.local.ProductLocalDataSource
 import com.krieta.feature.shop.data.remote.ShopApi
 import com.krieta.feature.shop.data.remote.ShopWebSocketManager
@@ -14,7 +14,7 @@ import org.koin.dsl.module
 val shopModule = module {
     single { ShopApi(get()) }
     single { ProductLocalDataSource(get()) }
-    single { ShopWebSocketManager(get(), "http://${BuildConfig.RAILWAY_URL}") }
+    single { ShopWebSocketManager(get(), "http://${AppConfig.RAILWAY_URL}") }
     single<ShopRepository> { ShopRepositoryImpl(get(), get(), get()) }
 
     factory { ShopListViewModel(get(), get()) }

@@ -185,4 +185,35 @@ class AndroidSecureKeyStorage(private val context: Context) : SecureKeyStorage {
             false
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override suspend fun storeKey(alias: String, keyData: ByteArray) {
+        try {
+            val keyGenerator = KeyGenerator.getInstance(
+                KeyProperties.KEY_ALGORITHM_AES,
+                "AndroidKeyStore"
+            )
+            val builder = KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setKeySize(256)
+            keyGenerator.init(builder.build())
+            keyGenerator.generateKey()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun retrieveKey(alias: String): ByteArray? {
+        return try {
+            val secretKey = keyStore.getKey(alias, null) as? SecretKey
+            secretKey?.encoded
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 }

@@ -228,7 +228,7 @@ private fun PrizeInputField(
         OutlinedTextField(
             value = if (amount == 0.0) "" else amount.toString(),
             onValueChange = { 
-                val newAmount = com.krieta.com.core.util.SafeConversion.toDoubleOrDefaultWithValidation(it, "prizeAmount", 0.0, defaultValue = 0.0)
+                val newAmount = com.krieta.com.core.util.SafeConversion.toDoubleOrDefaultWithValidation(it, "prizeAmount", 0.0, defaultValue = 0.0) ?: 0.0
                 onAmountChange(newAmount)
             },
             label = { Text("Prize Amount ($currencyCode)") },
@@ -681,7 +681,7 @@ private fun AirdropAmountInput(
         OutlinedTextField(
             value = if (amount == 0.0) "" else amount.toString(),
             onValueChange = { 
-                val newAmount = com.krieta.com.core.util.SafeConversion.toDoubleOrDefaultWithValidation(it, "prizeAmount", 0.0, defaultValue = 0.0)
+                val newAmount = com.krieta.com.core.util.SafeConversion.toDoubleOrDefaultWithValidation(it, "prizeAmount", 0.0, defaultValue = 0.0) ?: 0.0
                 onAmountChange(newAmount)
             },
             label = { Text("Kr Amount") },
@@ -828,7 +828,7 @@ private fun VotingCostInput(
         OutlinedTextField(
             value = if (state.votingCostFiat > 0.0) state.votingCostFiat.toString() else "",
             onValueChange = { 
-                val newAmount = SafeConversion.toDoubleOrDefaultWithValidation(it, "votingCost", 0.0, defaultValue = 0.0)
+                val newAmount = SafeConversion.toDoubleOrDefaultWithValidation(it, "votingCost", 0.0, defaultValue = 0.0) ?: 0.0
                 viewModel.updateVotingCostFiat(newAmount)
             },
             label = { Text("Amount per Vote") },
@@ -1070,6 +1070,7 @@ private fun KrConversionDisplay(
         }
     }
 }
+
 
 
 

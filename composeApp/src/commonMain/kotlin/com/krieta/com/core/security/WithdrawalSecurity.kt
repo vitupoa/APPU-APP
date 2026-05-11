@@ -69,3 +69,20 @@ object WithdrawalSecurity {
         return ValidationResult(true, "Amount validation passed")
     }
     
+    /**
+     * Generate amount hash for client-side validation
+     * Note: This is NOT secure - server must validate independently
+     */
+    fun generateAmountHash(amount: Double, nonce: String, userId: String, timestamp: Long): String {
+        return "${amount}_${nonce}_${userId}_${timestamp}".hashCode().toString()
+    }
+    
+    /**
+     * Generate balance hash for client-side validation
+     * Note: This is NOT secure - server must validate independently
+     */
+    fun generateBalanceHash(balance: Double, nonce: String, userId: String, timestamp: Long): String {
+        return "${balance}_${nonce}_${userId}_${timestamp}".hashCode().toString()
+    }
+    
+}

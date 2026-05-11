@@ -200,7 +200,7 @@ fun CreateCampaignScreen(
                             val endDate = now.plus(kotlin.time.Duration.parse("P30D")).toString()
                             
                             viewModel.createCampaign(
-                                title, description, SafeConversion.toDoubleOrDefaultWithValidation(budget, "campaignBudget", 0.0, defaultValue = 0.0),
+                                title, description, SafeConversion.toDoubleOrDefaultWithValidation(budget, "campaignBudget", 0.0, defaultValue = 0.0) ?: 0.0,
                                 selectedTier, emptyList(), requirements, deliverables,
                                 startDate, endDate
                             )
@@ -227,3 +227,4 @@ fun CreateCampaignScreen(
         }
     }
 }
+

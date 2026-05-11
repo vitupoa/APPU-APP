@@ -2,6 +2,7 @@ package com.krieta.com.core.security
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.datetime.Clock
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -30,7 +31,7 @@ class FinancialTransactionSecurity {
     @OptIn(ExperimentalEncodingApi::class)
     suspend fun initializeSessionSecret(secret: String, expiresAt: Long) = mutex.withLock {
         require(secret.isNotEmpty()) { "Session secret cannot be empty" }
-        require(expiresAt > System.currentTimeMillis()) { "Secret already expired" }
+        require(expiresAt > Clock.System.now().toEpochMilliseconds()) { "Secret already expired" }
         
         sessionSecret = Base64.decode(secret)
         secretExpiresAt = expiresAt
@@ -42,7 +43,7 @@ class FinancialTransactionSecurity {
      * Check if session secret is valid and not expired
      */
     suspend fun isSessionValid(): Boolean = mutex.withLock {
-        sessionSecret != null && System.currentTimeMillis() < secretExpiresAt
+        sessionSecret != null && Clock.System.now().toEpochMilliseconds() < secretExpiresAt
     }
     
     /**

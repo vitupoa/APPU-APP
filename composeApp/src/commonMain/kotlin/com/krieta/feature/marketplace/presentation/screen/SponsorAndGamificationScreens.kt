@@ -119,7 +119,7 @@ fun SponsorContestScreen(
                     onClick = {
                         viewModel.sponsorContest(
                             contestId,
-                            SafeConversion.toDoubleOrDefaultWithValidation(amount, "sponsorAmount", 0.0, defaultValue = 0.0),
+                            SafeConversion.toDoubleOrDefaultWithValidation(amount, "sponsorAmount", 0.0, defaultValue = 0.0) ?: 0.0,
                             productUrl.ifBlank { null },
                             enablePurchaseToEnter
                         )
@@ -244,3 +244,4 @@ fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
         }
     }
 }
+
