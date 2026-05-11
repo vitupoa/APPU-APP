@@ -26,7 +26,7 @@ model BioLink {
   url        String
   icon       String?
   sort_order Int     @default(0)
-  users      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("bio_links")
 }
@@ -37,7 +37,7 @@ model CommentLike {
   user_id    String
   created_at DateTime @default(now())
   comments   Comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
-  users      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([comment_id, user_id])
   @@index([comment_id])
@@ -52,7 +52,7 @@ model CommentReport {
   reason      String
   created_at  DateTime @default(now())
   comments    Comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
-  users       User     @relation(fields: [reporter_id], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [reporter_id], references: [id], onDelete: Cascade)
 
   @@index([comment_id])
   @@map("comment_reports")
@@ -103,8 +103,8 @@ model ContestActionCompletion {
   action_id           String
   is_completed        Boolean             @default(false)
   proof_url           String?
-  contest_actions     contest_actions     @relation(fields: [action_id], references: [id], onDelete: Cascade)
-  contest_submissions contest_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  ContestAction     ContestAction     @relation(fields: [action_id], references: [id], onDelete: Cascade)
+  ContestSubmission ContestSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
 
   @@map("contest_action_completions")
 }
@@ -118,10 +118,10 @@ model ContestAction {
   is_verifiable              Boolean                      @default(false)
   requires_upload            Boolean                      @default(false)
   sort_order                 Int                          @default(0)
-  contest_action_completions contest_action_completions[]
-  contests                   contests                     @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  contest_action_completions ContestActionCompletion[]
+  Contest                   Contest                     @relation(fields: [contest_id], references: [id], onDelete: Cascade)
 
-  @@map("contest_actions")
+  @@map("ContestAction")
 }
 
 model ContestJudge {
@@ -130,8 +130,8 @@ model ContestJudge {
   user_id    String
   status     String   @default("pending")
   added_at   DateTime @default(now())
-  contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Contest   Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([contest_id, user_id])
   @@map("contest_judges")
@@ -142,8 +142,8 @@ model ContestParticipant {
   contest_id String
   user_id    String
   joined_at  DateTime @default(now())
-  contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Contest   Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([contest_id, user_id])
   @@map("contest_participants")
@@ -154,7 +154,7 @@ model ContestPrizeDistribution {
   contest_id String
   rank       Int
   percentage Decimal  @db.Decimal(5, 2)
-  contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  Contest   Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
 
   @@map("contest_prize_distributions")
 }
@@ -171,13 +171,13 @@ model ContestSubmission {
   final_score                Decimal?                     @db.Decimal(7, 2)
   rank                       Int?
   submitted_at               DateTime                     @default(now())
-  contest_action_completions contest_action_completions[]
-  contests                   contests                     @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  users                      users                        @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  contest_votes              contest_votes[]
+  contest_action_completions ContestActionCompletion[]
+  Contest                   Contest                     @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User                      User                        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  contest_votes              ContestVote[]
 
   @@unique([contest_id, user_id])
-  @@map("contest_submissions")
+  @@map("ContestSubmission")
 }
 
 model ContestVote {
@@ -187,8 +187,8 @@ model ContestVote {
   ip_address          String?
   fingerprint         String?
   created_at          DateTime            @default(now())
-  contest_submissions contest_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade)
-  users               users               @relation(fields: [voter_id], references: [id], onDelete: Cascade)
+  ContestSubmission ContestSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  User               User               @relation(fields: [voter_id], references: [id], onDelete: Cascade)
 
   @@unique([submission_id, voter_id])
   @@map("contest_votes")
@@ -201,8 +201,8 @@ model ContestWinner {
   rank       Int
   prize_kr   Decimal  @db.Decimal(18, 4)
   awarded_at DateTime @default(now())
-  contests   contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Contest   Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("contest_winners")
 }
@@ -237,22 +237,22 @@ model Contest {
   total_participants          Int                           @default(0)
   total_submissions           Int                           @default(0)
   created_at                  DateTime                      @default(now())
-  contest_actions             contest_actions[]
-  contest_judges              contest_judges[]
-  contest_participants        contest_participants[]
-  contest_prize_distributions contest_prize_distributions[]
-  contest_submissions         contest_submissions[]
-  contest_winners             contest_winners[]
-  users                       users                         @relation(fields: [creator_id], references: [id])
-  escrows                     escrows[]
-  judge_invites               judge_invites[]
-  milestones                  milestones[]
-  shorts                      shorts[]
-  team_contest_registrations  team_contest_registrations[]
-  team_submissions            team_submissions[]
+  ContestAction             ContestAction[]
+  contest_judges              ContestJudge[]
+  contest_participants        ContestParticipant[]
+  contest_prize_distributions ContestPrizeDistribution[]
+  ContestSubmission         ContestSubmission[]
+  contest_winners             ContestWinner[]
+  User                       User                         @relation(fields: [creator_id], references: [id])
+  escrows                     Escrow[]
+  judge_invites               JudgeInvite[]
+  milestones                  Milestone[]
+  shorts                      Short[]
+  team_contest_registrations  TeamContestRegistration[]
+  team_submissions            TeamSubmission[]
 
   @@index([status, deadline])
-  @@map("contests")
+  @@map("Contest")
 }
 
 model DailyStat {
@@ -264,7 +264,7 @@ model DailyStat {
   new_admirers Int      @default(0)
   kr_earned    Decimal  @default(0) @db.Decimal(18, 4)
   kr_spent     Decimal  @default(0) @db.Decimal(18, 4)
-  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User        User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, date])
   @@map("daily_stats")
@@ -278,8 +278,8 @@ model Escrow {
   fee_amount_kr   Decimal  @db.Decimal(18, 4)
   status          String   @default("held")
   created_at      DateTime @default(now())
-  contests        contests @relation(fields: [contest_id], references: [id])
-  users           users    @relation(fields: [user_id], references: [id])
+  Contest        Contest @relation(fields: [contest_id], references: [id])
+  User           User    @relation(fields: [user_id], references: [id])
 
   @@map("escrows")
 }
@@ -293,8 +293,8 @@ model JudgeInvite {
   responded_at DateTime?
   created_at   DateTime          @default(now())
   updated_at   DateTime
-  contests     contests          @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  users        users             @relation(fields: [judge_id], references: [id], onDelete: Cascade)
+  Contest     Contest          @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User        User             @relation(fields: [judge_id], references: [id], onDelete: Cascade)
 
   @@unique([contest_id, judge_id])
   @@index([contest_id])
@@ -309,7 +309,7 @@ model LiveBannedViewer {
   user_id      String
   reason       String?
   banned_at    DateTime     @default(now())
-  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@unique([stream_id, user_id])
   @@map("live_banned_viewers")
@@ -328,8 +328,8 @@ model LiveBattle {
   started_at                                                 DateTime?
   ended_at                                                   DateTime?
   created_at                                                 DateTime     @default(now())
-  live_streams_live_battles_opponent_stream_idTolive_streams live_streams @relation("live_battles_opponent_stream_idTolive_streams", fields: [opponent_stream_id], references: [id], onDelete: Cascade)
-  live_streams_live_battles_stream_idTolive_streams          live_streams @relation("live_battles_stream_idTolive_streams", fields: [stream_id], references: [id], onDelete: Cascade)
+  live_streams_live_battles_opponent_stream_idTolive_streams LiveStream @relation("live_battles_opponent_stream_idTolive_streams", fields: [opponent_stream_id], references: [id], onDelete: Cascade)
+  live_streams_live_battles_stream_idTolive_streams          LiveStream @relation("live_battles_stream_idTolive_streams", fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@map("live_battles")
 }
@@ -340,7 +340,7 @@ model LiveCoHost {
   user_id      String
   joined_at    DateTime     @default(now())
   left_at      DateTime?
-  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@unique([stream_id, user_id])
   @@map("live_co_hosts")
@@ -354,7 +354,7 @@ model LiveMessage {
   is_system    Boolean      @default(false)
   is_pinned    Boolean      @default(false)
   created_at   DateTime     @default(now())
-  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@index([stream_id, created_at])
   @@map("live_messages")
@@ -369,8 +369,8 @@ model LivePinnedProduct {
   pinned_at    DateTime?
   units_sold   Int          @default(0)
   sort_order   Int          @default(0)
-  products     products     @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+  Product     Product     @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@unique([stream_id, product_id])
   @@map("live_pinned_products")
@@ -384,8 +384,8 @@ model LiveSessionProduct {
   units_sold    Int           @default(0)
   sort_order    Int           @default(0)
   created_at    DateTime      @default(now())
-  products      products      @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  live_sessions live_sessions @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  Product      Product      @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  LiveSession LiveSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
 
   @@unique([session_id, product_id])
   @@map("live_session_products")
@@ -404,12 +404,12 @@ model LiveSession {
   peak_viewers          Int                     @default(0)
   total_sales_kr        Decimal                 @default(0) @db.Decimal(18, 4)
   created_at            DateTime                @default(now())
-  live_session_products live_session_products[]
-  users                 users                   @relation(fields: [host_id], references: [id], onDelete: Cascade)
+  live_session_products LiveSessionProduct[]
+  User                 User                   @relation(fields: [host_id], references: [id], onDelete: Cascade)
 
   @@index([host_id, status])
   @@index([status, scheduled_start])
-  @@map("live_sessions")
+  @@map("LiveSession")
 }
 
 model LiveStream {
@@ -442,21 +442,21 @@ model LiveStream {
   actual_start                                               DateTime?
   ended_at                                                   DateTime?
   created_at                                                 DateTime               @default(now())
-  live_banned_viewers                                        live_banned_viewers[]
-  live_battles_live_battles_opponent_stream_idTolive_streams live_battles[]         @relation("live_battles_opponent_stream_idTolive_streams")
-  live_battles_live_battles_stream_idTolive_streams          live_battles[]         @relation("live_battles_stream_idTolive_streams")
-  live_co_hosts                                              live_co_hosts[]
-  live_messages                                              live_messages[]
-  live_pinned_products                                       live_pinned_products[]
-  users                                                      users                  @relation(fields: [host_id], references: [id], onDelete: Cascade)
-  live_tips                                                  live_tips[]
-  live_viewers                                               live_viewers[]
+  live_banned_viewers                                        LiveBannedViewer[]
+  live_battles_live_battles_opponent_stream_idTolive_streams LiveBattle[]         @relation("live_battles_opponent_stream_idTolive_streams")
+  live_battles_live_battles_stream_idTolive_streams          LiveBattle[]         @relation("live_battles_stream_idTolive_streams")
+  live_co_hosts                                              LiveCoHost[]
+  live_messages                                              LiveMessage[]
+  live_pinned_products                                       LivePinnedProduct[]
+  User                                                      User                  @relation(fields: [host_id], references: [id], onDelete: Cascade)
+  live_tips                                                  LiveTip[]
+  live_viewers                                               LiveViewer[]
 
   @@index([category, status])
   @@index([host_id, status])
   @@index([status, created_at])
   @@index([status, viewer_count], map: "live_streams_status_viewers_idx")
-  @@map("live_streams")
+  @@map("LiveStream")
 }
 
 model LiveTip {
@@ -468,7 +468,7 @@ model LiveTip {
   gift_type    String?
   message      String?
   created_at   DateTime     @default(now())
-  live_streams live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+  LiveStream LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@index([stream_id, created_at])
   @@index([stream_id, sender_id])
@@ -483,7 +483,7 @@ model LiveViewer {
   left_at       DateTime?
   total_tips_kr Decimal      @default(0) @db.Decimal(18, 4)
   likes_given   Int          @default(0)
-  live_streams  live_streams @relation(fields: [stream_id], references: [id], onDelete: Cascade)
+  LiveStream  LiveStream @relation(fields: [stream_id], references: [id], onDelete: Cascade)
 
   @@unique([stream_id, user_id])
   @@index([stream_id, total_tips_kr])
@@ -495,8 +495,8 @@ model MilestoneCompletion {
   milestone_id String     @unique
   user_id      String
   completed_at DateTime   @default(now())
-  milestones   milestones @relation(fields: [milestone_id], references: [id])
-  users        users      @relation(fields: [user_id], references: [id])
+  milestones   Milestone  @relation(fields: [milestone_id], references: [id])
+  User        User      @relation(fields: [user_id], references: [id])
 
   @@map("milestone_completions")
 }
@@ -510,8 +510,8 @@ model Milestone {
   reward_kr             Decimal                @db.Decimal(18, 4)
   contest_id            String?
   created_at            DateTime               @default(now())
-  milestone_completions milestone_completions?
-  contests              contests?              @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  milestone_completions MilestoneCompletion?
+  Contest              Contest?              @relation(fields: [contest_id], references: [id], onDelete: Cascade)
 
   @@map("milestones")
 }
@@ -522,8 +522,8 @@ model PostComment {
   user_id    String
   text       String
   created_at DateTime @default(now())
-  posts      posts    @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Post      Post    @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("post_comments")
 }
@@ -533,8 +533,8 @@ model PostLike {
   post_id    String
   user_id    String
   created_at DateTime @default(now())
-  posts      posts    @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Post      Post    @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([post_id, user_id])
   @@map("post_likes")
@@ -550,12 +550,12 @@ model Post {
   likes_count    Int                   @default(0)
   comments_count Int                   @default(0)
   created_at     DateTime              @default(now())
-  post_comments  post_comments[]
-  post_likes     post_likes[]
-  users          users                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  post_comments  PostComment[]
+  post_likes     PostLike[]
+  User          User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
-  @@map("posts")
+  @@map("Post")
 }
 
 model Product {
@@ -569,13 +569,13 @@ model Product {
   whatsapp_number       String
   status                String                  @default("active")
   created_at            DateTime                @default(now())
-  live_pinned_products  live_pinned_products[]
-  live_session_products live_session_products[]
-  users                 users                   @relation(fields: [seller_id], references: [id], onDelete: Cascade)
-  shorts                shorts[]
+  live_pinned_products  LivePinnedProduct[]
+  live_session_products LiveSessionProduct[]
+  User                 User                   @relation(fields: [seller_id], references: [id], onDelete: Cascade)
+  shorts                Short[]
 
   @@index([status, created_at])
-  @@map("products")
+  @@map("Product")
 }
 
 model RefreshToken {
@@ -585,7 +585,7 @@ model RefreshToken {
   device_id  String
   expires_at DateTime
   created_at DateTime @default(now())
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
 }
@@ -597,10 +597,10 @@ model ShortCollection {
   cover_url  String?
   sort_order Int      @default(0)
   created_at DateTime @default(now())
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  shorts     shorts[]
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shorts     Short[]
 
-  @@map("short_collections")
+  @@map("ShortCollection")
 }
 
 model ShortComment {
@@ -609,8 +609,8 @@ model ShortComment {
   user_id    String
   text       String
   created_at DateTime @default(now())
-  shorts     shorts   @relation(fields: [short_id], references: [id], onDelete: Cascade)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shorts     Short    @relation(fields: [short_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("short_comments")
 }
@@ -620,8 +620,8 @@ model ShortLike {
   short_id   String
   user_id    String
   created_at DateTime @default(now())
-  shorts     shorts   @relation(fields: [short_id], references: [id], onDelete: Cascade)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shorts     Short    @relation(fields: [short_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([short_id, user_id])
   @@map("short_likes")
@@ -644,12 +644,12 @@ model Short {
   likes_count       Int                   @default(0)
   comments_count    Int                   @default(0)
   created_at        DateTime              @default(now())
-  short_comments    short_comments[]
-  short_likes       short_likes[]
-  short_collections short_collections?    @relation(fields: [collection_id], references: [id])
-  contests          contests?             @relation(fields: [contest_id], references: [id])
-  products          products?             @relation(fields: [linked_product_id], references: [id])
-  users             users                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  short_comments    ShortComment[]
+  short_likes       ShortLike[]
+  ShortCollection ShortCollection?    @relation(fields: [collection_id], references: [id])
+  Contest          Contest?             @relation(fields: [contest_id], references: [id])
+  Product          Product?             @relation(fields: [linked_product_id], references: [id])
+  User             User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
   @@map("shorts")
@@ -663,11 +663,11 @@ model SubscriptionTier {
   benefits      String
   is_enabled    Boolean              @default(true)
   created_at    DateTime             @default(now())
-  users         users                @relation(fields: [creator_id], references: [id], onDelete: Cascade)
-  subscriptions subscriptions[]
+  User         User                @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
 
   @@unique([creator_id, tier])
-  @@map("subscription_tiers")
+  @@map("SubscriptionTier")
 }
 
 model Subscription {
@@ -681,9 +681,9 @@ model Subscription {
   started_at                               DateTime             @default(now())
   next_billing_at                          DateTime?
   cancelled_at                             DateTime?
-  users_subscriptions_creator_idTousers    users                @relation("subscriptions_creator_idTousers", fields: [creator_id], references: [id], onDelete: Cascade)
-  users_subscriptions_subscriber_idTousers users                @relation("subscriptions_subscriber_idTousers", fields: [subscriber_id], references: [id], onDelete: Cascade)
-  subscription_tiers                       subscription_tiers   @relation(fields: [tier_id], references: [id])
+  users_subscriptions_creator_idTousers    User                @relation("subscriptions_creator_idTousers", fields: [creator_id], references: [id], onDelete: Cascade)
+  users_subscriptions_subscriber_idTousers User                @relation("subscriptions_subscriber_idTousers", fields: [subscriber_id], references: [id], onDelete: Cascade)
+  SubscriptionTier                       SubscriptionTier   @relation(fields: [tier_id], references: [id])
 
   @@unique([subscriber_id, creator_id])
   @@map("subscriptions")
@@ -694,7 +694,7 @@ model TeamChat {
   team_id    String   @unique
   chat_id    String
   created_at DateTime @default(now())
-  teams      teams    @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  Team      Team    @relation(fields: [team_id], references: [id], onDelete: Cascade)
 
   @@map("team_chats")
 }
@@ -704,8 +704,8 @@ model TeamContestRegistration {
   contest_id    String
   team_id       String
   registered_at DateTime @default(now())
-  contests      contests @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  teams         teams    @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  Contest      Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  Team         Team    @relation(fields: [team_id], references: [id], onDelete: Cascade)
 
   @@unique([contest_id, team_id])
   @@index([contest_id])
@@ -721,9 +721,9 @@ model TeamInvitation {
   status                                   InvitationStatus @default(PENDING)
   expires_at                               DateTime
   created_at                               DateTime         @default(now())
-  users_team_invitations_invitee_idTousers users            @relation("team_invitations_invitee_idTousers", fields: [invitee_id], references: [id], onDelete: Cascade)
-  users_team_invitations_inviter_idTousers users            @relation("team_invitations_inviter_idTousers", fields: [inviter_id], references: [id], onDelete: Cascade)
-  teams                                    teams            @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  users_team_invitations_invitee_idTousers User            @relation("team_invitations_invitee_idTousers", fields: [invitee_id], references: [id], onDelete: Cascade)
+  users_team_invitations_inviter_idTousers User            @relation("team_invitations_inviter_idTousers", fields: [inviter_id], references: [id], onDelete: Cascade)
+  Team                                    Team            @relation(fields: [team_id], references: [id], onDelete: Cascade)
 
   @@unique([team_id, invitee_id, status])
   @@index([invitee_id, status])
@@ -737,8 +737,8 @@ model TeamMember {
   user_id   String
   role      TeamRole @default(MEMBER)
   joined_at DateTime @default(now())
-  teams     teams    @relation(fields: [team_id], references: [id], onDelete: Cascade)
-  users     users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Team     Team    @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  User     User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([team_id, user_id])
   @@index([team_id])
@@ -751,8 +751,8 @@ model TeamSubmissionVote {
   submission_id    String
   voter_id         String
   created_at       DateTime         @default(now())
-  team_submissions team_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade)
-  users            users            @relation(fields: [voter_id], references: [id], onDelete: Cascade)
+  team_submissions TeamSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  User            User            @relation(fields: [voter_id], references: [id], onDelete: Cascade)
 
   @@unique([submission_id, voter_id])
   @@index([submission_id])
@@ -772,9 +772,9 @@ model TeamSubmission {
   final_score           Decimal?                @db.Decimal(7, 2)
   rank                  Int?
   submitted_at          DateTime                @default(now())
-  team_submission_votes team_submission_votes[]
-  contests              contests                @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  teams                 teams                   @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  team_submission_votes TeamSubmissionVote[]
+  Contest              Contest                @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  Team                 Team                   @relation(fields: [team_id], references: [id], onDelete: Cascade)
 
   @@unique([contest_id, team_id])
   @@index([contest_id, votes_count])
@@ -791,14 +791,14 @@ model Team {
   total_prizes               Decimal                      @default(0) @db.Decimal(18, 4)
   created_at                 DateTime                     @default(now())
   updated_at                 DateTime
-  team_chats                 team_chats?
-  team_contest_registrations team_contest_registrations[]
-  team_invitations           team_invitations[]
-  team_members               team_members[]
-  team_submissions           team_submissions[]
-  users                      users                        @relation(fields: [leader_id], references: [id], onDelete: Cascade)
+  team_chats                 TeamChat?
+  team_contest_registrations TeamContestRegistration[]
+  team_invitations           TeamInvitation[]
+  team_members               TeamMember[]
+  team_submissions           TeamSubmission[]
+  User                      User                        @relation(fields: [leader_id], references: [id], onDelete: Cascade)
 
-  @@map("teams")
+  @@map("Team")
 }
 
 model Transaction {
@@ -814,7 +814,7 @@ model Transaction {
   counterparty_id String?
   metadata        Json?
   created_at      DateTime @default(now())
-  users           users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User           User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
   @@map("transactions")
@@ -842,46 +842,46 @@ model User {
   password_hash                                       String?
   created_at                                          DateTime                @default(now())
   updated_at                                          DateTime
-  admires_admires_admired_idTousers                   admires[]               @relation("admires_admired_idTousers")
-  admires_admires_admirer_idTousers                   admires[]               @relation("admires_admirer_idTousers")
-  bio_links                                           bio_links[]
-  comment_likes                                       comment_likes[]
-  comment_reports                                     comment_reports[]
-  comments_comments_reply_to_user_idTousers           comments[]              @relation("comments_reply_to_user_idTousers")
-  comments_comments_user_idTousers                    comments[]              @relation("comments_user_idTousers")
-  contest_judges                                      contest_judges[]
-  contest_participants                                contest_participants[]
-  contest_submissions                                 contest_submissions[]
-  contest_votes                                       contest_votes[]
-  contest_winners                                     contest_winners[]
-  contests                                            contests[]
-  daily_stats                                         daily_stats[]
-  escrows                                             escrows[]
-  judge_invites                                       judge_invites[]
-  live_sessions                                       live_sessions[]
-  live_streams                                        live_streams[]
-  milestone_completions                               milestone_completions[]
-  post_comments                                       post_comments[]
-  post_likes                                          post_likes[]
-  posts                                               posts[]
-  products                                            products[]
-  refresh_tokens                                      refresh_tokens[]
-  short_collections                                   short_collections[]
-  short_comments                                      short_comments[]
-  short_likes                                         short_likes[]
-  shorts                                              shorts[]
-  subscription_tiers                                  subscription_tiers[]
-  subscriptions_subscriptions_creator_idTousers       subscriptions[]         @relation("subscriptions_creator_idTousers")
-  subscriptions_subscriptions_subscriber_idTousers    subscriptions[]         @relation("subscriptions_subscriber_idTousers")
-  team_invitations_team_invitations_invitee_idTousers team_invitations[]      @relation("team_invitations_invitee_idTousers")
-  team_invitations_team_invitations_inviter_idTousers team_invitations[]      @relation("team_invitations_inviter_idTousers")
-  team_members                                        team_members[]
-  team_submission_votes                               team_submission_votes[]
-  teams                                               teams[]
-  transactions                                        transactions[]
-  wallets                                             wallets?
+  admires_admires_admired_idTousers                   Admire[]               @relation("admires_admired_idTousers")
+  admires_admires_admirer_idTousers                   Admire[]               @relation("admires_admirer_idTousers")
+  bio_links                                           BioLink[]
+  comment_likes                                       CommentLike[]
+  comment_reports                                     CommentReport[]
+  comments_comments_reply_to_user_idTousers           Comment[]              @relation("comments_reply_to_user_idTousers")
+  comments_comments_user_idTousers                    Comment[]              @relation("comments_user_idTousers")
+  contest_judges                                      ContestJudge[]
+  contest_participants                                ContestParticipant[]
+  ContestSubmission                                 ContestSubmission[]
+  contest_votes                                       ContestVote[]
+  contest_winners                                     ContestWinner[]
+  Contest                                            Contest[]
+  daily_stats                                         DailyStat[]
+  escrows                                             Escrow[]
+  judge_invites                                       JudgeInvite[]
+  LiveSession                                       LiveSession[]
+  LiveStream                                        LiveStream[]
+  milestone_completions                               MilestoneCompletion[]
+  post_comments                                       PostComment[]
+  post_likes                                          PostLike[]
+  Post                                               Post[]
+  Product                                            Product[]
+  refresh_tokens                                      RefreshToken[]
+  ShortCollection                                   ShortCollection[]
+  short_comments                                      ShortComment[]
+  short_likes                                         ShortLike[]
+  shorts                                              Short[]
+  SubscriptionTier                                  SubscriptionTier[]
+  subscriptions_subscriptions_creator_idTousers       Subscription[]         @relation("subscriptions_creator_idTousers")
+  subscriptions_subscriptions_subscriber_idTousers    Subscription[]         @relation("subscriptions_subscriber_idTousers")
+  team_invitations_team_invitations_invitee_idTousers TeamInvitation[]      @relation("team_invitations_invitee_idTousers")
+  team_invitations_team_invitations_inviter_idTousers TeamInvitation[]      @relation("team_invitations_inviter_idTousers")
+  team_members                                        TeamMember[]
+  team_submission_votes                               TeamSubmissionVote[]
+  Team                                               Team[]
+  transactions                                        Transaction[]
+  wallets                                             Wallet?
 
-  @@map("users")
+  @@map("User")
 }
 
 model Wallet {
@@ -890,7 +890,7 @@ model Wallet {
   kr_balance Decimal  @default(0) @db.Decimal(18, 4)
   created_at DateTime @default(now())
   updated_at DateTime
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("wallets")
 }
