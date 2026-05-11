@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  fieldMapping = "camelCase"
 }
 
 datasource db {
@@ -317,6 +318,9 @@ model User {
   transactions                                                     transactions[]
   wallets                                                          wallets?
   wishlists                                                        wishlists[]
+  notifications                                                    notifications[]
+  user_micro_interests                                             user_micro_interests[]
+  stories                                                          stories[]
 
   @@index([fcmToken])
 }
@@ -1334,11 +1338,30 @@ model influencer_profiles {
   campaign_applications campaign_applications[]
   campaign_deliverables campaign_deliverables[]
   User                  User                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  influencer_portfolio  influencer_portfolio[]
   influencer_reviews    influencer_reviews[]
   social_media_accounts social_media_accounts[]
 
   @@index([avg_engagement_rate])
   @@index([tier, is_available])
+}
+
+model influencer_portfolio {
+  id            String              @id
+  influencer_id String
+  title         String
+  description   String?
+  media_url     String
+  media_type    String
+  platform      String
+  views         Int                 @default(0)
+  likes         Int                 @default(0)
+  comments      Int                 @default(0)
+  shares        Int                 @default(0)
+  created_at    DateTime            @default(now())
+  influencer_profiles influencer_profiles @relation(fields: [influencer_id], references: [id], onDelete: Cascade)
+
+  @@index([influencer_id])
 }
 
 model influencer_reviews {
@@ -1978,6 +2001,16 @@ model social_media_sync_logs {
   @@index([status])
 }
 
+model platform_rate_limits {
+  id                 String         @id
+  platform           SocialPlatform @unique
+  requests_per_hour  Int
+  requests_remaining Int
+  reset_at           DateTime
+  last_request_at    DateTime?
+  updated_at         DateTime
+}
+
 model spare_part_details {
   id                   String   @id
   product_id           String   @unique
@@ -2257,6 +2290,68 @@ model wishlists {
   User           User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
+}
+
+model notifications {
+  id         String    @id
+  user_id    String
+  type       String
+  title      String
+  message    String    @db.Text
+  data       Json?
+  is_read    Boolean   @default(false)
+  read_at    DateTime?
+  created_at DateTime  @default(now())
+  User       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, is_read, created_at])
+  @@index([type])
+}
+
+model user_micro_interests {
+  id           String   @id
+  user_id      String
+  interest     String
+  weight       Decimal  @default(1.0) @db.Decimal(5, 2)
+  last_updated DateTime @default(now())
+  User         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, interest])
+  @@index([user_id])
+}
+
+model stories {
+  id              String    @id
+  user_id         String
+  media_url       String
+  media_type      String
+  caption         String?
+  duration_secs   Int       @default(15)
+  views_count     Int       @default(0)
+  likes_count     Int       @default(0)
+  replies_count   Int       @default(0)
+  is_highlighted  Boolean   @default(false)
+  expires_at      DateTime
+  created_at      DateTime  @default(now())
+  User            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, created_at])
+  @@index([expires_at])
+}
+
+model trending_topics {
+  id             String   @id
+  topic          String   @unique
+  category       String?
+  mention_count  Int      @default(0)
+  engagement     Int      @default(0)
+  trend_score    Decimal  @default(0) @db.Decimal(10, 2)
+  is_active      Boolean  @default(true)
+  last_updated   DateTime @default(now())
+  created_at     DateTime @default(now())
+
+  @@index([trend_score])
+  @@index([is_active, trend_score])
 }
 
 enum AccountType {
