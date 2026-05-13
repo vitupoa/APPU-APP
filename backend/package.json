@@ -9,6 +9,7 @@
     "postinstall": "prisma generate",
     "build": "prisma generate && tsc --noEmitOnError false && node -e \"import('fs').then(fs => { try { if (fs.existsSync('src/generated')) { fs.cpSync('src/generated', 'dist/generated', {recursive: true}); } } catch (err) { console.log('Skipping generated copy:', err.message); } })\"",
     "start": "node dist/index.js",
+    "start:prod": "npm run migrate:rls && npm run start",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",

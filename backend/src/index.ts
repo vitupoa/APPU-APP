@@ -216,47 +216,58 @@ const PORT = env.PORT || 3000;
 
 // Initialize JWT rotation manager and start server
 (async () => {
-  await jwtSecretManager.initialize();
-  logger.info('JWT Secret Manager initialized');
+  try {
+    await jwtSecretManager.initialize();
+    logger.info('JWT Secret Manager initialized');
 
-  httpServer.listen(PORT, async () => {
-    logger.info(`Krieta API running on port ${PORT}`);
-    logger.info(`Environment: ${env.NODE_ENV}`);
-    logger.info(`CORS Origin: ${env.CORS_ORIGIN}`);
-    
-    // Start cron workers
-    logger.info('Starting background workers...');
-    startChamaDefaultWorker();
-    startStoryCleanupWorker();
-    startDailyPrizeWorker();
-    startFlashSaleWorker();
-    
-    // Start escrow approval cleanup worker
-    const { startEscrowApprovalCleanupWorker } = await import('./workers/escrowApprovalCleanup.worker.js');
-    startEscrowApprovalCleanupWorker();
-    
-    // Start recommendation system workers
-    const { startContentDistributionWorker } = await import('./workers/contentDistributionWorker.js');
-    const { startMicroInterestWorker } = await import('./workers/microInterestWorker.js');
-    const { startTrendingTopicsWorker } = await import('./workers/trendingTopicsWorker.js');
-    const { SocialMediaSyncWorker } = await import('./workers/socialMediaSync.worker.js');
-    const { startWithdrawalLimitResetWorker } = await import('./workers/withdrawalLimitReset.worker.js');
-    const { startNonceCleanupWorker } = await import('./workers/nonceCleanup.worker.js');
-    const { startIdempotencyCleanupWorker } = await import('./workers/idempotencyCleanup.worker.js');
-    const { startFinancialSecurityCleanupWorker } = await import('./workers/financialSecurityCleanup.worker.js');
-    
-    startContentDistributionWorker();
-    startMicroInterestWorker();
-    startTrendingTopicsWorker();
-    SocialMediaSyncWorker.start();
-    startWithdrawalLimitResetWorker();
-    startNonceCleanupWorker();
-    startIdempotencyCleanupWorker();
-    startFinancialSecurityCleanupWorker();
-    
-    logger.info('All workers started successfully');
-    logger.info('Server ready to accept connections');
-  });
+    httpServer.listen(PORT, async () => {
+      logger.info(`Krieta API running on port ${PORT}`);
+      logger.info(`Environment: ${env.NODE_ENV}`);
+      logger.info(`CORS Origin: ${env.CORS_ORIGIN}`);
+      
+      // Start cron workers
+      logger.info('Starting background workers...');
+      try {
+        startChamaDefaultWorker();
+        startStoryCleanupWorker();
+        startDailyPrizeWorker();
+        startFlashSaleWorker();
+        
+        // Start escrow approval cleanup worker
+        const { startEscrowApprovalCleanupWorker } = await import('./workers/escrowApprovalCleanup.worker.js');
+        startEscrowApprovalCleanupWorker();
+        
+        // Start recommendation system workers
+        const { startContentDistributionWorker } = await import('./workers/contentDistributionWorker.js');
+        const { startMicroInterestWorker } = await import('./workers/microInterestWorker.js');
+        const { startTrendingTopicsWorker } = await import('./workers/trendingTopicsWorker.js');
+        const { SocialMediaSyncWorker } = await import('./workers/socialMediaSync.worker.js');
+        const { startWithdrawalLimitResetWorker } = await import('./workers/withdrawalLimitReset.worker.js');
+        const { startNonceCleanupWorker } = await import('./workers/nonceCleanup.worker.js');
+        const { startIdempotencyCleanupWorker } = await import('./workers/idempotencyCleanup.worker.js');
+        const { startFinancialSecurityCleanupWorker } = await import('./workers/financialSecurityCleanup.worker.js');
+        
+        startContentDistributionWorker();
+        startMicroInterestWorker();
+        startTrendingTopicsWorker();
+        SocialMediaSyncWorker.start();
+        startWithdrawalLimitResetWorker();
+        startNonceCleanupWorker();
+        startIdempotencyCleanupWorker();
+        startFinancialSecurityCleanupWorker();
+        
+        logger.info('All workers started successfully');
+      } catch (workerError) {
+        logger.error('Error starting workers:', { error: workerError instanceof Error ? workerError.message : String(workerError) });
+        logger.warn('Continuing without some workers...');
+      }
+      
+      logger.info('Server ready to accept connections');
+    });
+  } catch (error) {
+    logger.fatal('Failed to start server:', { error: error instanceof Error ? error.message : String(error) });
+    process.exit(1);
+  }
 })();
 
 export { app, io };

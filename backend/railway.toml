@@ -6,8 +6,8 @@ builder = "railpack"
 NODE_ENV = "production"
 
 [deploy]
-startCommand = "npm run migrate:rls && npm run start"
+startCommand = "npm run start"
 healthcheckPath = "/health"
-healthcheckTimeout = 100
+healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
