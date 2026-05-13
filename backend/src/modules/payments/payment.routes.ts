@@ -304,7 +304,7 @@ router.post('/withdraw', authMiddleware, async (req: AuthRequest, res: Response)
     const reference = `withdraw_${user_id}_${Date.now()}`;
 
     // Check wallet balance
-    const wallet = await prisma.wallet.findUnique({ where: { user_id } });
+    const wallet = await prisma.wallets.findUnique({ where: { user_id } });
     if (!wallet || wallet.kr_balance.lessThan(data.krAmount)) {
       res.status(400).json({ error: 'Insufficient balance' });
       return;
@@ -378,7 +378,7 @@ router.post('/withdraw', authMiddleware, async (req: AuthRequest, res: Response)
     });
 
     // Deduct from wallet
-    await prisma.wallet.update({
+    await prisma.wallets.update({
       where: { user_id },
       data: { kr_balance: { decrement: new Prisma.Decimal(data.krAmount) } }
     });
@@ -497,7 +497,7 @@ router.post('/mpesa/b2c/result', async (req: Request, res: Response) => {
 
       // If failed, refund to wallet
       if (resultCode !== 0) {
-        await prisma.wallet.update({
+        await prisma.wallets.update({
           where: { user_id: withdrawal.user_id },
           data: { kr_balance: { increment: withdrawal.amount_kr } }
         });

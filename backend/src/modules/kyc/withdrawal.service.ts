@@ -48,7 +48,7 @@ export class WithdrawalService {
     }
     
     // SECURITY: Get current user balance for validation
-    const wallet = await prisma.wallet.findUnique({
+    const wallet = await prisma.wallets.findUnique({
       where: { user_id }
     });
     

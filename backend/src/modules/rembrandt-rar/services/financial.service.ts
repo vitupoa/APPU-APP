@@ -8,13 +8,13 @@ export class FinancialService {
   // ─── PLATFORM WALLET ────────────────────────────────────
 
   static async getPlatformWallets() {
-    return prisma.platformWallet.findMany();
+    return prisma.platform_wallet.findMany();
   }
 
   static async ensurePlatformWallet(label = 'main') {
-    return prisma.platformWallet.upsert({
-      where: { label },
-      create: { label, kr_balance: 0 },
+    return prisma.platform_wallet.upsert({
+      where: { id: label },
+      create: { kr_balance: 0 },
       update: {},
     });
   }
@@ -31,8 +31,8 @@ export class FinancialService {
       throw new Error('Insufficient platform wallet balance');
     }
 
-    const updated = await prisma.platformWallet.update({
-      where: { label: 'main' },
+    const updated = await prisma.platform_wallet.update({
+      where: { id: 'main' },
       data: {
         kr_balance: data.action === 'topup'
           ? { increment: amount }
@@ -58,15 +58,15 @@ export class FinancialService {
     data: { user_id: string; amountKr: number; reason: string },
     ip?: string, ua?: string
   ) {
-    const amount = new Prisma.Decimal(data.amount_kr);
+    const amount = new Prisma.Decimal(data.amountKr);
 
-    const wallet = await prisma.wallet.upsert({
+    const wallet = await prisma.wallets.upsert({
       where: { user_id: data.user_id },
       create: { user_id: data.user_id, kr_balance: amount },
       update: { kr_balance: { increment: amount } },
     });
 
-    await prisma.transaction.create({
+    await prisma.transactions.create({
       data: {
         user_id: data.user_id,
         type: 'admin_topup',
@@ -79,7 +79,7 @@ export class FinancialService {
     });
 
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_WALLET_TOPUP, 'user', data.user_id, {
-      amount_kr: data.amount_kr, reason: data.reason
+      amount_kr: data.amountKr, reason: data.reason
     }, ip, ua);
 
     return { success: true, newBalance: wallet.kr_balance };
@@ -90,13 +90,13 @@ export class FinancialService {
   static async listWithdrawals(options: {
     page?: number; limit?: number; status?: string; userId?: string;
   }) {
-    const { page = 1, limit = 20, status, user_id } = options;
+    const { page = 1, limit = 20, status, userId } = options;
     const where: any = {};
     if (status) where.status = status;
     if (userId) where.user_id = userId;
 
     const [items, total] = await Promise.all([
-      prisma.withdrawalRequest.findMany({
+      prisma.withdrawal_requests.findMany({
         where,
         include: {
           user: { select: { id: true, username: true, display_name: true, first_name: true, last_name: true } }

@@ -13,7 +13,7 @@ import {
   isNonceUsed,
   isTimestampValid,
   storeNonce
-} from './services/financialSecurity';
+} from '../services/financialSecurity';
 import crypto from 'crypto';
 
 const router = express.Router();
@@ -134,7 +134,7 @@ router.post('/api/auth/logout', authenticateJWT, async (req: Request, res: Respo
     const userId = req.user.id;
     
     // Deactivate all session secrets for this user
-    await prisma.userSessionSecret.updateMany({
+    await prisma.user_session_secrets.updateMany({
       where: { user_id, is_active: true },
       data: { is_active: false }
     });
@@ -269,7 +269,7 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     }
     
     // 6. Check balance
-    const wallet = await prisma.wallet.findUnique({
+    const wallet = await prisma.wallets.findUnique({
       where: { user_id }
     });
     
@@ -280,13 +280,13 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     // 7. Process withdrawal atomically
     await prisma.$transaction(async (tx) => {
       // Deduct from wallet
-      await tx.wallet.update({
+      await tx.wallets.update({
         where: { user_id },
         data: { kr_balance: { decrement: krAmount } }
       });
       
       // Record transaction
-      await tx.transaction.create({
+      await tx.transactions.create({
         data: {
           id: transactionId,
           user_id,
@@ -299,7 +299,7 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
       });
       
       // Store nonce
-      await tx.transactionNonce.create({
+      await tx.transaction_nonces.create({
         data: {
           nonce,
           user_id,

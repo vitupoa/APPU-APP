@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  fieldMapping  = "camelCase"
 }
 
 datasource db {
@@ -3589,4 +3590,199 @@ model creator_boost_global_settings {
   updated_at         DateTime @updatedAt
 
   @@map("creator_boost_global_settings")
+}
+
+enum Chama_Payout_Decision {
+  APPROVED
+  REJECTED
+}
+
+enum Chama_Transaction_Type {
+  CONTRIBUTION
+  PAYOUT
+  PENALTY
+  REFUND
+}
+
+enum Chama_Election_Phase {
+  NOMINATION
+  SECONDMENT
+  VOTING
+  COMPLETED
+}
+
+enum Admin_Role {
+  ADMIN
+  MODERATOR
+  FINANCIAL_ADMIN
+}
+
+model prohibited_names {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  reason     String?
+  created_at DateTime @default(now())
+  created_by String?
+
+  @@map("prohibited_names")
+}
+
+model reserved_usernames {
+  id         String   @id @default(uuid())
+  username   String   @unique
+  reason     String?
+  created_at DateTime @default(now())
+  created_by String?
+
+  @@map("reserved_usernames")
+}
+
+model platform_wallet {
+  id         String   @id @default(uuid())
+  kr_balance Decimal  @default(0) @db.Decimal(18, 4)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("platform_wallet")
+}
+
+model user_suspensions {
+  id         String    @id @default(uuid())
+  user_id    String
+  reason     String
+  type       String
+  expires_at DateTime?
+  created_at DateTime  @default(now())
+  created_by String?
+
+  @@index([user_id])
+  @@map("user_suspensions")
+}
+
+model feature_flags {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  is_enabled  Boolean  @default(false)
+  config      Json?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("feature_flags")
+}
+
+model platform_announcements {
+  id         String   @id @default(uuid())
+  title      String
+  message    String
+  type       String
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  created_by String?
+
+  @@map("platform_announcements")
+}
+
+model content_moderation_logs {
+  id          String   @id @default(uuid())
+  content_id  String
+  content_type String
+  action      String
+  reason      String?
+  moderator_id String?
+  created_at  DateTime @default(now())
+
+  @@index([content_id])
+  @@index([content_type])
+  @@map("content_moderation_logs")
+}
+
+model audit_logs {
+  id          String   @id @default(uuid())
+  admin_id    String?
+  action      String
+  target_type String?
+  target_id   String?
+  details     Json?
+  ip_address  String?
+  created_at  DateTime @default(now())
+
+  @@index([admin_id])
+  @@index([action])
+  @@index([created_at])
+  @@map("audit_logs")
+}
+
+model suspicious_activities {
+  id          String   @id @default(uuid())
+  user_id     String
+  activity_type String
+  description String
+  risk_score  Int
+  is_resolved Boolean  @default(false)
+  created_at  DateTime @default(now())
+  resolved_at DateTime?
+
+  @@index([user_id])
+  @@index([is_resolved])
+  @@map("suspicious_activities")
+}
+
+model withdrawal_limits {
+  id                String   @id @default(uuid())
+  user_id           String   @unique
+  daily_limit_kr    Decimal  @db.Decimal(18, 4)
+  monthly_limit_kr  Decimal  @db.Decimal(18, 4)
+  daily_used_kr     Decimal  @default(0) @db.Decimal(18, 4)
+  monthly_used_kr   Decimal  @default(0) @db.Decimal(18, 4)
+  last_reset_daily  DateTime @default(now())
+  last_reset_monthly DateTime @default(now())
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  @@map("withdrawal_limits")
+}
+
+model kyc_documents {
+  id            String   @id @default(uuid())
+  user_id       String
+  document_type String
+  document_url  String
+  status        String
+  verified_at   DateTime?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([user_id])
+  @@map("kyc_documents")
+}
+
+model AdminProfile {
+  id         String   @id @default(uuid())
+  user_id    String   @unique
+  role       Admin_Role
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("admin_profiles")
+}
+
+model call {
+  id          String   @id @default(uuid())
+  chat_id     String
+  caller_id   String
+  call_type   String
+  status      String
+  started_at  DateTime @default(now())
+  ended_at    DateTime?
+  duration    Int?
+  chat        chat     @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+
+  @@index([chat_id])
+  @@index([caller_id])
+  @@map("calls")
 }
