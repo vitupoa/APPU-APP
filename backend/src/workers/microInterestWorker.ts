@@ -79,6 +79,7 @@ async function updateMicroInterests() {
               data: {
                 user_id: interaction.user_id,
                 interest: tag,
+                category: 'hashtag', // Add required category field
                 weight: Math.min(0.1 * weight, 1.0),
                 last_updated: new Date()
               }

@@ -25,16 +25,16 @@ router.post('/unlock', unlockRateLimiter, failedUnlockRateLimiter, async (req: A
 
     const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(userId, 'unlock', { content_id, contentType, amount_kr: amountKr });
     if (fraudCheck.shouldBlock) {
-      await AuditLogService.logFraudDetection(req, { user_id: userId, operationType: 'unlock', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
+      await AuditLogService.logFraudDetection(req, { userId: userId, operationType: 'unlock', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
       res.status(403).json({ error: 'Operation blocked', message: 'Suspicious activity detected.', reasons: fraudCheck.reasons });
       return;
     }
 
     const result = await ContentLockService.unlockContent(userId, content_id, contentType, user?.currency || 'USD');
-    await AuditLogService.logUnlock(req, { user_id: userId, contentId, contentType, amountKr: result.unlockAmountKr, success: true, fraudCheckResult: fraudCheck });
+    await AuditLogService.logUnlock(req, { userId: userId, contentId, contentType, amountKr: result.unlockAmountKr, success: true, fraudCheckResult: fraudCheck });
     res.json(result);
   } catch (error: any) {
-    await AuditLogService.logUnlock(req, { user_id: userId, contentId, contentType, amountKr: 0, success: false, error: error.message });
+    await AuditLogService.logUnlock(req, { userId: userId, contentId, contentType, amountKr: 0, success: false, error: error.message });
     next(error);
   }
 });
@@ -82,13 +82,13 @@ router.get('/check-access', accessCheckRateLimiter, async (req: AuthRequest, res
     if (!rows[0]) { res.status(404).json({ error: 'Content not found' }); return; }
 
     const row = rows[0];
-    const creatorId = (row.user_id || row.host_id)!;
-    const isLocked = contentType === 'LIVE' ? !!row.unlock_amount_kr : !!row.is_locked;
+    const creatorId = row.user_id!;
+    const isLocked = !!row.is_locked;
     const requiredTier = row.required_tier;
     const unlockAmountKr = row.unlock_amount_kr ? Number(row.unlock_amount_kr) : undefined;
 
     const access = await ContentLockService.checkAccess(userId, content_id, contentType as any, creatorId, isLocked, requiredTier, unlockAmountKr);
-    await AuditLogService.logAccessCheck(req, { user_id: userId, contentId, contentType, hasAccess: access.hasAccess, accessReason: (access as any).reason });
+    await AuditLogService.logAccessCheck(req, { userId: userId, contentId, contentType, hasAccess: access.hasAccess, accessReason: (access as any).reason });
     res.json(access);
   } catch (error) { next(error); }
 });

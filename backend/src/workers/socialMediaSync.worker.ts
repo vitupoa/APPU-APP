@@ -197,11 +197,11 @@ export class SocialMediaSyncWorker {
           }
           case 'TWITCH': {
             const userInfo = await TwitchService.getUserInfo(account.access_token!);
-            followersAfter = userInfo.follower_count;
+            followersAfter = userInfo.followerCount;
             await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                follower_count: userInfo.follower_count,
+                follower_count: userInfo.followerCount,
                 total_views: BigInt(userInfo.view_count),
                 last_synced_at: new Date()
               }

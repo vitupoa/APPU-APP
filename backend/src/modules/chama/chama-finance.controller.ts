@@ -34,7 +34,7 @@ export class ChamaFinanceController {
       const payoutId = String(req.params.pid);
       const parsed = approvePayoutSchema.parse(req.body);
       const result = await ChamaFinanceService.approvePayout(
-        req.userId!, chamaId, payoutId, parsed.decision as 'APPROVED' | 'REJECTED', parsed.reason
+        req.userId!, chamaId, payoutId, parsed.decision as 'APPROVE' | 'REJECT', parsed.reason
       );
       res.json(result);
     } catch (e: any) {

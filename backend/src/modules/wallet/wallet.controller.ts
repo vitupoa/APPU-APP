@@ -42,7 +42,7 @@ export class WalletController {
     }
 
     // Reconstruct the canonical string exactly as the client builds it
-    const canonical = `tip|recipientId=${recipient_id}&krAmount=${krAmount}&currency=${currency}&timestamp=${timestamp}&nonce=${nonce}`;
+    const canonical = `tip|recipientId=${recipientId}&krAmount=${krAmount}&currency=${currency}&timestamp=${timestamp}&nonce=${nonce}`;
     const expected = crypto
       .createHmac('sha256', secret)
       .update(canonical)

@@ -69,14 +69,14 @@ router.post('/subscribe', subscriptionRateLimiter, async (req: AuthRequest, res,
     const amountKr = Number(tier.kr_amount);
     const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(subscriberId, 'subscription', { creator_id, tierType, amount_kr: amountKr });
     if (fraudCheck.shouldBlock) {
-      await AuditLogService.logFraudDetection(req, { user_id: subscriberId, operationType: 'subscription', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
+      await AuditLogService.logFraudDetection(req, { userId: subscriberId, operationType: 'subscription', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
       return res.status(403).json({ error: 'Operation blocked', message: 'Suspicious activity detected.', reasons: fraudCheck.reasons });
     }
     const subscription = await SubscriptionService.subscribe(subscriberId, creator_id, tierType);
-    await AuditLogService.logSubscription(req, { subscriber_id: subscriberId, creatorId: creator_id, tierType, amountKr, operation: 'SUBSCRIBE', success: true, fraudCheckResult: fraudCheck });
+    await AuditLogService.logSubscription(req, { subscriberId: subscriberId, creatorId: creator_id, tierType, amountKr, operation: 'SUBSCRIBE', success: true, fraudCheckResult: fraudCheck });
     return res.json(subscription);
   } catch (error: any) {
-    await AuditLogService.logSubscription(req, { subscriber_id: subscriberId, creatorId: creator_id, tierType, amountKr: 0, operation: 'SUBSCRIBE', success: false, error: error.message });
+    await AuditLogService.logSubscription(req, { subscriberId: subscriberId, creatorId: creator_id, tierType, amountKr: 0, operation: 'SUBSCRIBE', success: false, error: error.message });
     return next(error);
   }
 });
@@ -91,10 +91,10 @@ router.post('/unsubscribe', subscriptionRateLimiter, async (req: AuthRequest, re
   try {
     if (!creator_id) return res.status(400).json({ error: 'creator_id is required' });
     const result = await SubscriptionService.unsubscribe(subscriberId, creator_id);
-    await AuditLogService.logSubscription(req, { subscriber_id: subscriberId, creatorId: creator_id, tierType: 'N/A', amountKr: 0, operation: 'UNSUBSCRIBE', success: true });
+    await AuditLogService.logSubscription(req, { subscriberId: subscriberId, creatorId: creator_id, tierType: 'N/A', amountKr: 0, operation: 'UNSUBSCRIBE', success: true });
     return res.json(result);
   } catch (error: any) {
-    await AuditLogService.logSubscription(req, { subscriber_id: subscriberId, creatorId: creator_id, tierType: 'N/A', amountKr: 0, operation: 'UNSUBSCRIBE', success: false, error: error.message });
+    await AuditLogService.logSubscription(req, { subscriberId: subscriberId, creatorId: creator_id, tierType: 'N/A', amountKr: 0, operation: 'UNSUBSCRIBE', success: false, error: error.message });
     return next(error);
   }
 });

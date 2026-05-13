@@ -21,7 +21,7 @@ export class ExchangeService {
     
     // Check cache
     const cached = rateCache.get(currency);
-    if (cached && cached.expires_at > Date.now()) {
+    if (cached && cached.expiresAt > Date.now()) {
       return cached.rate;
     }
 
@@ -40,7 +40,7 @@ export class ExchangeService {
       // Cache the result
       rateCache.set(currency, {
         rate: rawRate,
-        expires_at: Date.now() + CACHE_TTL
+        expiresAt: Date.now() + CACHE_TTL
       });
 
       return rawRate;

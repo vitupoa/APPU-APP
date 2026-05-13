@@ -139,7 +139,7 @@ export class FinancialService {
 
     // Name matching check
     const krietaName = `${withdrawal.user.first_name} ${withdrawal.user.last_name}`.toLowerCase().trim();
-    const accountName = withdrawal.account_name.toLowerCase().trim();
+    const accountName = (withdrawal.account_name || '').toLowerCase().trim();
     const nameMatch = this.fuzzyNameMatch(krietaName, accountName);
 
     if (data.action === 'approve') {

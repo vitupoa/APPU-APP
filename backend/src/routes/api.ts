@@ -29,12 +29,13 @@ const prisma = new PrismaClient();
  */
 router.post('/api/auth/login', async (req: Request, res: Response) => {
   try {
-    const { email, password, device_id } = req.body;
+    const { email, password, deviceId } = req.body;
     
     // 1. Authenticate user (implement your auth logic)
     const user = await authenticateUser(email, password);
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      res.status(401).json({ error: 'Invalid credentials' });
+      return;
     }
     
     // 2. Generate JWT tokens (implement your JWT logic)
@@ -53,21 +54,21 @@ router.post('/api/auth/login', async (req: Request, res: Response) => {
         id: user.id,
         email: user.email,
         username: user.username,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        display_name: user.display_name,
-        avatar_url: user.avatar_url,
-        cover_photo_url: user.cover_photo_url,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        displayName: user.display_name,
+        avatarUrl: user.avatar_url,
+        coverPhotoUrl: user.cover_photo_url,
         bio: user.bio,
         country: user.country,
         currency: user.currency,
-        account_type: user.account_type,
-        is_verified: user.is_verified,
-        is_wallet_unlocked: user.is_wallet_unlocked,
-        created_at: user.created_at
+        accountType: user.account_type,
+        isVerified: user.is_verified,
+        isWalletUnlocked: user.is_wallet_unlocked,
+        createdAt: user.created_at
       },
-      access_token,
-      refresh_token,
+      accessToken,
+      refreshToken,
       sessionSecret,      // ← Client stores this securely
       secretExpiresAt     // ← Client checks expiry
     });
@@ -86,14 +87,14 @@ router.post('/api/auth/login', async (req: Request, res: Response) => {
  */
 router.post('/api/auth/register', async (req: Request, res: Response) => {
   try {
-    const { email, password, first_name, last_name, username, device_id, ...rest } = req.body;
+    const { email, password, firstName, lastName, username, deviceId, ...rest } = req.body;
     
     // 1. Create user (implement your registration logic)
     const user = await createUser({
       email,
       password,
-      first_name,
-      last_name,
+      firstName,
+      lastName,
       username,
       ...rest
     });
@@ -111,8 +112,8 @@ router.post('/api/auth/register', async (req: Request, res: Response) => {
     // 4. Return response
     res.json({
       user,
-      access_token,
-      refresh_token,
+      accessToken,
+      refreshToken,
       sessionSecret,
       secretExpiresAt
     });
@@ -131,15 +132,15 @@ router.post('/api/auth/register', async (req: Request, res: Response) => {
  */
 router.post('/api/auth/logout', authenticateJWT, async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = (req as any).user.id;
     
     // Deactivate all session secrets for this user
     await prisma.user_session_secrets.updateMany({
-      where: { user_id, is_active: true },
+      where: { user_id: userId, is_active: true },
       data: { is_active: false }
     });
     
-    console.log(`✅ User ${user_id} logged out - session secrets deactivated`);
+    console.log(`✅ User ${userId} logged out - session secrets deactivated`);
     
     res.json({ success: true });
     
@@ -159,20 +160,20 @@ router.post('/api/auth/logout', authenticateJWT, async (req: Request, res: Respo
  */
 router.post('/api/wallet/tip', authenticateJWT, async (req: Request, res: Response) => {
   try {
-    const senderId = req.user.id;
-    const { recipient_id, krAmount, currency, signature, nonce, timestamp } = req.body;
+    const senderId = (req as any).user.id;
+    const { recipientId, krAmount, currency, signature, nonce, timestamp } = req.body;
     
     // Get client info
     const ipAddress = req.ip;
     const userAgent = req.headers['user-agent'];
     const deviceId = req.headers['x-device-id'] as string;
     
-    console.log(`💰 Tip request: ${sender_id} → ${recipient_id}, ${krAmount} Kr`);
+    console.log(`💰 Tip request: ${senderId} → ${recipientId}, ${krAmount} Kr`);
     
     // Process transaction with all security checks
     const result = await processTipTransaction({
-      sender_id,
-      recipient_id,
+      sender_id: senderId,
+      recipientId,
       krAmount,
       currency,
       signature,
@@ -180,7 +181,7 @@ router.post('/api/wallet/tip', authenticateJWT, async (req: Request, res: Respon
       timestamp,
       ipAddress,
       userAgent,
-      device_id
+      deviceId
     });
     
     res.json(result);
@@ -190,16 +191,20 @@ router.post('/api/wallet/tip', authenticateJWT, async (req: Request, res: Respon
     
     // Return appropriate error
     if (error.message.includes('signature')) {
-      return res.status(401).json({ error: error.message });
+      res.status(401).json({ error: error.message });
+      return;
     }
     if (error.message.includes('nonce') || error.message.includes('timestamp')) {
-      return res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
+      return;
     }
     if (error.message.includes('Rate limit')) {
-      return res.status(429).json({ error: error.message });
+      res.status(429).json({ error: error.message });
+      return;
     }
     if (error.message.includes('balance')) {
-      return res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
+      return;
     }
     
     res.status(500).json({ error: 'Transaction failed' });
@@ -214,7 +219,7 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
   const transactionId = crypto.randomUUID();
   
   try {
-    const userId = req.user.id;
+    const userId = (req as any).user.id;
     const {
       provider,
       krAmount,
@@ -233,11 +238,11 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     const userAgent = req.headers['user-agent'];
     const deviceId = req.headers['x-device-id'] as string;
     
-    console.log(`💸 Withdrawal request: ${user_id}, ${krAmount} Kr to ${provider}`);
+    console.log(`💸 Withdrawal request: ${userId}, ${krAmount} Kr to ${provider}`);
     
     // 1. Verify signature
     const isValid = await verifyWithdrawalSignature({
-      user_id,
+      user_id: userId,
       krAmount,
       provider,
       currency,
@@ -270,7 +275,7 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     
     // 6. Check balance
     const wallet = await prisma.wallets.findUnique({
-      where: { user_id }
+      where: { user_id: userId }
     });
     
     if (!wallet || Number(wallet.kr_balance) < krAmount) {
@@ -281,7 +286,7 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     await prisma.$transaction(async (tx) => {
       // Deduct from wallet
       await tx.wallets.update({
-        where: { user_id },
+        where: { user_id: userId },
         data: { kr_balance: { decrement: krAmount } }
       });
       
@@ -289,7 +294,7 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
       await tx.transactions.create({
         data: {
           id: transactionId,
-          user_id,
+          user_id: userId,
           type: 'WITHDRAW',
           amount_kr: krAmount,
           currency,
@@ -302,7 +307,7 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
       await tx.transaction_nonces.create({
         data: {
           nonce,
-          user_id,
+          user_id: userId,
           transactionType: 'WITHDRAW',
           expires_at: new Date(timestamp + 10 * 60 * 1000)
         }
@@ -311,10 +316,10 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     
     // 8. Log transaction
     await logFinancialTransaction({
-      transaction_id,
-      user_id,
+      transactionId,
+      userId,
       transactionType: 'WITHDRAW',
-      amount_kr: krAmount,
+      amountKr: krAmount,
       currency,
       provider,
       signature,
@@ -322,18 +327,18 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
       timestamp,
       ipAddress,
       userAgent,
-      device_id,
+      deviceId,
       status: 'PENDING'
     });
     
     // 9. Process withdrawal with provider (implement your logic)
     // await processWithdrawalWithProvider(provider, { ... });
     
-    console.log(`✅ Withdrawal ${transaction_id} initiated`);
+    console.log(`✅ Withdrawal ${transactionId} initiated`);
     
     res.json({
       success: true,
-      transaction_id,
+      transactionId,
       message: 'Withdrawal initiated',
       processingTime: '1-3 business days'
     });
@@ -343,10 +348,10 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     
     // Log failed transaction
     await logFinancialTransaction({
-      transaction_id,
-      user_id: req.user.id,
+      transactionId,
+      userId: (req as any).user.id,
       transactionType: 'WITHDRAW',
-      amount_kr: req.body.krAmount,
+      amountKr: req.body.krAmount,
       currency: req.body.currency,
       provider: req.body.provider,
       signature: req.body.signature,
@@ -354,19 +359,22 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
       timestamp: req.body.timestamp,
       ipAddress: req.ip,
       userAgent: req.headers['user-agent'],
-      device_id: req.headers['x-device-id'] as string,
+      deviceId: req.headers['x-device-id'] as string,
       status: 'FAILED',
       errorMessage: error.message
     });
     
     if (error.message.includes('signature')) {
-      return res.status(401).json({ error: error.message });
+      res.status(401).json({ error: error.message });
+      return;
     }
     if (error.message.includes('nonce') || error.message.includes('timestamp')) {
-      return res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
+      return;
     }
     if (error.message.includes('Rate limit')) {
-      return res.status(429).json({ error: error.message });
+      res.status(429).json({ error: error.message });
+      return;
     }
     
     res.status(500).json({ error: 'Withdrawal failed' });
@@ -381,7 +389,7 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
   const transactionId = crypto.randomUUID();
   
   try {
-    const userId = req.user.id;
+    const userId = (req as any).user.id;
     const {
       fiatAmount,
       currency,
@@ -393,11 +401,11 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
       timestamp
     } = req.body;
     
-    console.log(`💳 Top-up request: ${user_id}, ${fiatAmount} ${currency}`);
+    console.log(`💳 Top-up request: ${userId}, ${fiatAmount} ${currency}`);
     
     // 1. Verify signature
     const isValid = await verifyTopUpSignature({
-      user_id,
+      user_id: userId,
       amount: fiatAmount,
       currency,
       paymentMethod: provider,
@@ -433,7 +441,7 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
     const krAmount = Math.floor(fiatAmount / exchangeRate.buyRate);
     
     // 7. Store nonce
-    await storeNonce(nonce, user_id, 'TOPUP', timestamp);
+    await storeNonce(nonce, userId, 'TOPUP', timestamp);
     
     // 8. Generate payment instructions (implement your logic)
     const paymentInstructions = await generatePaymentInstructions({
@@ -446,11 +454,11 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
     
     // 9. Log transaction
     await logFinancialTransaction({
-      transaction_id,
-      user_id,
+      transactionId,
+      userId,
       transactionType: 'TOPUP',
-      amount_kr: krAmount,
-      amount_fiat: fiatAmount,
+      amountKr: krAmount,
+      amountFiat: fiatAmount,
       currency,
       provider,
       signature,
@@ -458,14 +466,14 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
       timestamp,
       ipAddress: req.ip,
       userAgent: req.headers['user-agent'],
-      device_id: req.headers['x-device-id'] as string,
+      deviceId: req.headers['x-device-id'] as string,
       status: 'PENDING'
     });
     
-    console.log(`✅ Top-up ${transaction_id} initiated`);
+    console.log(`✅ Top-up ${transactionId} initiated`);
     
     res.json({
-      transaction_id,
+      transactionId,
       reference: transactionId,
       krAmount,
       fiatAmount,
@@ -479,13 +487,16 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
     console.error('❌ Top-up initiation failed:', error.message);
     
     if (error.message.includes('signature')) {
-      return res.status(401).json({ error: error.message });
+      res.status(401).json({ error: error.message });
+      return;
     }
     if (error.message.includes('nonce') || error.message.includes('timestamp')) {
-      return res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
+      return;
     }
     if (error.message.includes('Rate limit')) {
-      return res.status(429).json({ error: error.message });
+      res.status(429).json({ error: error.message });
+      return;
     }
     
     res.status(500).json({ error: 'Top-up initiation failed' });
@@ -496,13 +507,13 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
 // HELPER FUNCTIONS (Implement these based on your app)
 // ============================================================================
 
-async function authenticateUser(email: string, password: string) {
+async function authenticateUser(email: string, password: string): Promise<any | null> {
   // Implement your authentication logic
   // Return user object or null
   throw new Error('Not implemented');
 }
 
-async function createUser(data: any) {
+async function createUser(data: any): Promise<any> {
   // Implement your user creation logic
   throw new Error('Not implemented');
 }
@@ -517,18 +528,18 @@ function generateRefreshToken(user: any): string {
   throw new Error('Not implemented');
 }
 
-function authenticateJWT(req: Request, res: Response, next: any) {
+function authenticateJWT(req: Request, res: Response, next: any): void {
   // Implement your JWT authentication middleware
   // Set req.user with authenticated user
   throw new Error('Not implemented');
 }
 
-async function getExchangeRate(currency: string) {
+async function getExchangeRate(currency: string): Promise<{ buyRate: number }> {
   // Implement your exchange rate logic
   throw new Error('Not implemented');
 }
 
-async function generatePaymentInstructions(data: any) {
+async function generatePaymentInstructions(data: any): Promise<any> {
   // Implement your payment instructions logic
   throw new Error('Not implemented');
 }
