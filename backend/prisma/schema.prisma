@@ -185,6 +185,9 @@ model User {
   is_wallet_unlocked                                               Boolean                          @default(false)
   wallet_pin_hash                                                  String?
   password_hash                                                    String?
+  isRotationLocked                                                 Boolean                          @default(false)
+  isSuspended                                                      Boolean                          @default(false)
+  suspendedAt                                                      DateTime?
   created_at                                                       DateTime                         @default(now())
   updated_at                                                       DateTime
   devicePlatform                                                   String?
@@ -279,10 +282,13 @@ model User {
   chama_secondments                                                ChamaSecondment[]
   chama_votes                                                      ChamaVote[]
   chama_defaulters                                                 ChamaDefaulter[]
+  chamas_created                                                   Chama[]                          @relation("chama_creator")
   chat_participants                                                chatParticipant[]
   adminProfile                                                     AdminProfile?
   contentMentions                                                  contentMention[]
   vehicle_favorites                                                vehicle_favorites[]
+  suspensions                                                      user_suspensions[]
+  withdrawal_requests                                              withdrawal_requests[]
 
   @@index([fcmToken])
   @@map("user")
@@ -320,26 +326,41 @@ model chatParticipant {
 }
 
 model Chama {
-  id                     String              @id @default(uuid())
-  name                   String
-  chat_id                String
-  status                 String              @default("ACTIVE")
-  contribution_amount_kr Decimal             @db.Decimal(18, 4)
-  penalty_amount_kr      Decimal?            @db.Decimal(18, 4)
-  current_cycle_number   Int                 @default(1)
-  min_approvals          Int                 @default(2)
-  created_at             DateTime            @default(now())
-  updated_at             DateTime
-  chama_wallet           ChamaWallet?
-  chama_members          ChamaMember[]
-  chama_cycles           ChamaCycle[]
-  chama_transactions     ChamaTransaction[]
-  chama_payouts          ChamaPayout[]
-  chama_contributions    ChamaContribution[]
-  chama_elections        ChamaElection[]
-  chama_defaulters       ChamaDefaulter[]
+  id                      String                @id @default(uuid())
+  name                    String
+  type                    ChamaType
+  description             String?
+  reason                  String?
+  chat_id                 String
+  creator_id              String
+  status                  ChamaStatus           @default(SETUP)
+  isLocked                Boolean               @default(false)
+  maxMembers              Int?
+  autoLockOnFull          Boolean               @default(false)
+  contribution_amount_kr  Decimal               @db.Decimal(18, 4)
+  contributionFrequency   ContributionFrequency
+  membershipFeeKr         Decimal?              @db.Decimal(18, 4)
+  lockPeriodDays          Int?
+  penalty_amount_kr       Decimal?              @db.Decimal(18, 4)
+  gracePeriodDays         Int                   @default(3)
+  current_cycle_number    Int                   @default(1)
+  min_approvals           Int                   @default(2)
+  allowMidTermVoteOut     Boolean               @default(true)
+  avatar_url              String?
+  created_at              DateTime              @default(now())
+  updated_at              DateTime
+  creator                 User                  @relation("chama_creator", fields: [creator_id], references: [id])
+  chama_wallet            ChamaWallet?
+  chama_members           ChamaMember[]
+  chama_cycles            ChamaCycle[]
+  chama_transactions      ChamaTransaction[]
+  chama_payouts           ChamaPayout[]
+  chama_contributions     ChamaContribution[]
+  chama_elections         ChamaElection[]
+  chama_defaulters        ChamaDefaulter[]
 
   @@index([status])
+  @@index([creator_id])
   @@map("chama")
 }
 
@@ -350,6 +371,8 @@ model ChamaMember {
   role                Chama_Member_Role
   status              Chama_Member_Status @default(ACTIVE)
   is_defaulter        Boolean             @default(false)
+  rotationNumber      Int?
+  leftAt              DateTime?
   total_contributed   Decimal             @default(0) @db.Decimal(18, 4)
   total_received      Decimal             @default(0) @db.Decimal(18, 4)
   created_at          DateTime            @default(now())
@@ -2539,18 +2562,36 @@ model wallets {
 }
 
 model withdrawal_requests {
-  id          String           @id @default(uuid())
-  user_id     String
-  amount_kr   Decimal          @db.Decimal(18, 4)
-  status      WithdrawalStatus @default(PENDING)
-  method      String?
-  destination String?
-  created_at  DateTime         @default(now())
-  updated_at  DateTime
-  processed_at DateTime?
+  id                String           @id @default(uuid())
+  user_id           String
+  amount_kr         Decimal          @db.Decimal(18, 4)
+  amount_fiat       Decimal?         @db.Decimal(18, 4)
+  status            WithdrawalStatus @default(PENDING)
+  method            String?
+  destination       String?
+  provider          String?
+  account_name      String?
+  account_details   Json?
+  currency          String?
+  requires_kyc      Boolean          @default(false)
+  kyc_document_ids  String[]         @default([])
+  suspicious_flags  Json?
+  risk_score        Int              @default(0)
+  metadata          Json?
+  reviewed_by       String?
+  review_note       String?
+  flag_reason       String?
+  name_match_status String?
+  reviewed_at       DateTime?
+  flagged_at        DateTime?
+  created_at        DateTime         @default(now())
+  updated_at        DateTime
+  processed_at      DateTime?
+  user              User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, status])
   @@index([status, created_at])
+  @@index([risk_score])
   @@map("withdrawal_requests")
 }
 
@@ -2717,6 +2758,7 @@ model platform_config {
   id         String   @id @default(uuid())
   key        String   @unique
   value      Json
+  updated_by String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -3172,6 +3214,31 @@ enum VehicleBodyType {
 
 // Chama Enums
 
+enum ChamaType {
+  ROTATING
+  SAVINGS
+  INVESTMENT
+  HYBRID
+  WELFARE
+}
+
+enum ChamaStatus {
+  SETUP
+  ACTIVE
+  PAUSED
+  COMPLETED
+  DISSOLVED
+}
+
+enum ContributionFrequency {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  QUARTERLY
+  ONE_OFF
+}
+
 enum Chama_Member_Role {
   ADMIN
   CHAIRPERSON
@@ -3190,6 +3257,8 @@ enum StoryPrivacy {
 enum Chama_Member_Status {
   ACTIVE
   INACTIVE
+  LEFT
+  REMOVED
 }
 
 enum Chama_Cycle_Status {
@@ -3204,22 +3273,28 @@ enum Chama_Payout_Status {
   APPROVED
   REJECTED
   DISBURSED
+  FAILED
+}
+
+enum Chama_Payout_Decision {
+  APPROVE
+  REJECT
+  APPROVED
+  REJECTED
 }
 
 enum Chama_Transaction_Type {
   CONTRIBUTION
   PAYOUT
-  EXTERNAL
   PENALTY
-}
-
-enum Chama_Payout_Decision {
-  APPROVED
-  REJECTED
+  MEMBERSHIP_FEE
+  REFUND
+  EXTERNAL
 }
 
 enum Chama_Election_Phase {
   NOMINATION
+  SECONDMENT
   SECONDING
   VOTING
   RERUN
@@ -3230,13 +3305,16 @@ enum AdminRole {
   SUPER_ADMIN
   ADMIN
   MODERATOR
+  FINANCIAL_ADMIN
 }
 
 model AdminProfile {
   id            String    @id @default(uuid())
   user_id       String    @unique
   role          AdminRole @default(ADMIN)
+  permissions   Json?
   is_active     Boolean   @default(true)
+  granted_by    String?
   last_login_at DateTime?
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
@@ -3391,6 +3469,7 @@ model suspicious_activities {
   resolved          Boolean  @default(false)
   resolved_by       String?
   resolved_at       DateTime?
+  resolution_note   String?
   created_at        DateTime @default(now())
 
   @@index([user_id])
@@ -3445,6 +3524,7 @@ enum WithdrawalStatus {
   COMPLETED
   FAILED
   CANCELLED
+  FLAGGED
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3592,53 +3672,35 @@ model creator_boost_global_settings {
   @@map("creator_boost_global_settings")
 }
 
-enum Chama_Payout_Decision {
-  APPROVED
-  REJECTED
-}
-
-enum Chama_Transaction_Type {
-  CONTRIBUTION
-  PAYOUT
-  PENALTY
-  REFUND
-}
-
-enum Chama_Election_Phase {
-  NOMINATION
-  SECONDMENT
-  VOTING
-  COMPLETED
-}
-
-enum Admin_Role {
-  ADMIN
-  MODERATOR
-  FINANCIAL_ADMIN
-}
-
 model prohibited_names {
   id         String   @id @default(uuid())
   name       String   @unique
+  type       String?
   reason     String?
   created_at DateTime @default(now())
   created_by String?
+  added_by   String?
 
+  @@index([type])
   @@map("prohibited_names")
 }
 
 model reserved_usernames {
-  id         String   @id @default(uuid())
-  username   String   @unique
-  reason     String?
-  created_at DateTime @default(now())
-  created_by String?
+  id           String   @id @default(uuid())
+  username     String   @unique
+  reserved_for String?
+  reason       String?
+  created_at   DateTime @default(now())
+  created_by   String?
+  reserved_by  String?
 
+  @@index([reserved_for])
   @@map("reserved_usernames")
 }
 
 model platform_wallet {
   id         String   @id @default(uuid())
+  label      String?  @unique
   kr_balance Decimal  @default(0) @db.Decimal(18, 4)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -3647,15 +3709,19 @@ model platform_wallet {
 }
 
 model user_suspensions {
-  id         String    @id @default(uuid())
-  user_id    String
-  reason     String
-  type       String
-  expires_at DateTime?
-  created_at DateTime  @default(now())
-  created_by String?
+  id          String    @id @default(uuid())
+  user_id     String
+  reason      String
+  type        String
+  suspendedBy String?
+  liftedBy    String?
+  liftedAt    DateTime?
+  expires_at  DateTime?
+  created_at  DateTime  @default(now())
+  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
+  @@index([expires_at])
   @@map("user_suspensions")
 }
 
@@ -3666,123 +3732,27 @@ model feature_flags {
   description String?
   is_enabled  Boolean  @default(false)
   config      Json?
+  scope       String?
+  scope_value String?
+  priority    Int      @default(0)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
+  @@unique([key, scope, scope_value], name: "featureKey_scope_scopeValue")
+  @@index([scope, priority])
   @@map("feature_flags")
 }
 
 model platform_announcements {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   title      String
   message    String
   type       String
-  is_active  Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  is_active  Boolean   @default(true)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
   created_by String?
+  expires_at DateTime?
 
   @@map("platform_announcements")
-}
-
-model content_moderation_logs {
-  id          String   @id @default(uuid())
-  content_id  String
-  content_type String
-  action      String
-  reason      String?
-  moderator_id String?
-  created_at  DateTime @default(now())
-
-  @@index([content_id])
-  @@index([content_type])
-  @@map("content_moderation_logs")
-}
-
-model audit_logs {
-  id          String   @id @default(uuid())
-  admin_id    String?
-  action      String
-  target_type String?
-  target_id   String?
-  details     Json?
-  ip_address  String?
-  created_at  DateTime @default(now())
-
-  @@index([admin_id])
-  @@index([action])
-  @@index([created_at])
-  @@map("audit_logs")
-}
-
-model suspicious_activities {
-  id          String   @id @default(uuid())
-  user_id     String
-  activity_type String
-  description String
-  risk_score  Int
-  is_resolved Boolean  @default(false)
-  created_at  DateTime @default(now())
-  resolved_at DateTime?
-
-  @@index([user_id])
-  @@index([is_resolved])
-  @@map("suspicious_activities")
-}
-
-model withdrawal_limits {
-  id                String   @id @default(uuid())
-  user_id           String   @unique
-  daily_limit_kr    Decimal  @db.Decimal(18, 4)
-  monthly_limit_kr  Decimal  @db.Decimal(18, 4)
-  daily_used_kr     Decimal  @default(0) @db.Decimal(18, 4)
-  monthly_used_kr   Decimal  @default(0) @db.Decimal(18, 4)
-  last_reset_daily  DateTime @default(now())
-  last_reset_monthly DateTime @default(now())
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
-
-  @@map("withdrawal_limits")
-}
-
-model kyc_documents {
-  id            String   @id @default(uuid())
-  user_id       String
-  document_type String
-  document_url  String
-  status        String
-  verified_at   DateTime?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
-  @@index([user_id])
-  @@map("kyc_documents")
-}
-
-model AdminProfile {
-  id         String   @id @default(uuid())
-  user_id    String   @unique
-  role       Admin_Role
-  is_active  Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@map("admin_profiles")
-}
-
-model call {
-  id          String   @id @default(uuid())
-  chat_id     String
-  caller_id   String
-  call_type   String
-  status      String
-  started_at  DateTime @default(now())
-  ended_at    DateTime?
-  duration    Int?
-  chat        chat     @relation(fields: [chat_id], references: [id], onDelete: Cascade)
-
-  @@index([chat_id])
-  @@index([caller_id])
-  @@map("calls")
 }

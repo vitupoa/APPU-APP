@@ -46,7 +46,7 @@ export function startDailyPrizeWorker() {
                 // Deposit the Kr securely using Prisma Transactions
                 await prisma.$transaction(async (tx: any) => {
                     // Update user's actual KR balance cleanly
-                    await tx.wallet.update({
+                    await tx.wallets.update({
                         where: { user_id: winner.user_id },
                         data: {
                             kr_balance: {
@@ -56,7 +56,7 @@ export function startDailyPrizeWorker() {
                     });
 
                     // Log the transaction preventing phantom money creation natively
-                    await tx.transaction.create({
+                    await tx.transactions.create({
                         data: {
                             user_id: winner.user_id,
                             type: 'contest_prize', // Specific enumeration

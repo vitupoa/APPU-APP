@@ -18,11 +18,10 @@ async function main() {
       console.log(`User ${email} or ${username} already exists. Upgrading to Super Admin...`);
       await prisma.adminProfile.upsert({
         where: { user_id: existing.id },
-        update: { role: 'SUPER_ADMIN', permissions: ['*'] },
+        update: { role: 'SUPER_ADMIN' },
         create: {
           user_id: existing.id,
           role: 'SUPER_ADMIN',
-          permissions: ['*'],
         }
       });
       console.log('Successfully upgraded user to SUPER_ADMIN.');
@@ -44,10 +43,10 @@ async function main() {
         password_hash: hashedPassword,
         is_verified: true,
         account_type: 'CREATOR',
+        updated_at: new Date(),
         adminProfile: {
           create: {
             role: 'SUPER_ADMIN',
-            permissions: ['*'],
           }
         }
       }

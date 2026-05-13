@@ -8,12 +8,12 @@ export class ContentModerationService {
   static async listContent(type: ContentType, options: {
     page?: number; limit?: number; search?: string; userId?: string; status?: string;
   }) {
-    const { page = 1, limit = 20, search, user_id, status } = options;
+    const { page = 1, limit = 20, search, userId, status } = options;
 
     switch (type) {
       case 'short': return this.listShorts(page, limit, search, userId);
       case 'post': return this.listPosts(page, limit, search, userId);
-      case 'contest': return this.listContests(page, limit, search, user_id, status);
+      case 'contest': return this.listContests(page, limit, search, userId, status);
       case 'story': return this.listStories(page, limit, userId);
       default: throw new Error(`Unknown content type: ${type}`);
     }
@@ -25,13 +25,13 @@ export class ContentModerationService {
     if (search) where.caption = { contains: search, mode: 'insensitive' };
 
     const [items, total] = await Promise.all([
-      prisma.short.findMany({
+      prisma.shorts.findMany({
         where,
-        include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
         orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
-      prisma.short.count({ where }),
+      prisma.shorts.count({ where }),
     ]);
     return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
@@ -44,7 +44,7 @@ export class ContentModerationService {
     const [items, total] = await Promise.all([
       prisma.post.findMany({
         where,
-        include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
         orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
@@ -62,7 +62,7 @@ export class ContentModerationService {
     const [items, total] = await Promise.all([
       prisma.contest.findMany({
         where,
-        include: { creator: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
         orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
@@ -94,34 +94,34 @@ export class ContentModerationService {
     action: string, reason?: string, ip?: string, ua?: string
   ) {
     if (action === 'delete') {
-      await prisma.short.delete({ where: { id: shortId } });
+      await prisma.shorts.delete({ where: { id: shortId } });
     }
     // For 'hide', we'd add a hidden flag — using delete as primary action for now
 
-    await prisma.contentModerationLog.create({
-      data: { adminId, contentType: 'short', content_id: shortId, action, reason }
+    await prisma.content_moderation_logs.create({
+      data: { admin_id: adminId, content_type: 'short', content_id: shortId, action, reason }
     });
     await AuditService.log(adminId, `content.${action}`, 'short', shortId, { reason }, ip, ua);
     return { success: true, message: `Short ${action}d` };
   }
 
   static async moderatePost(
-    adminId: string, post_id: string,
+    adminId: string, postId: string,
     action: string, reason?: string, ip?: string, ua?: string
   ) {
     if (action === 'delete') {
       await prisma.post.delete({ where: { id: postId } });
     }
 
-    await prisma.contentModerationLog.create({
-      data: { adminId, contentType: 'post', content_id: postId, action, reason }
+    await prisma.content_moderation_logs.create({
+      data: { admin_id: adminId, content_type: 'post', content_id: postId, action, reason }
     });
-    await AuditService.log(adminId, `content.${action}`, 'post', post_id, { reason }, ip, ua);
+    await AuditService.log(adminId, `content.${action}`, 'post', postId, { reason }, ip, ua);
     return { success: true, message: `Post ${action}d` };
   }
 
   static async moderateContest(
-    adminId: string, contest_id: string,
+    adminId: string, contestId: string,
     action: string, reason?: string, ip?: string, ua?: string
   ) {
     if (action === 'delete') {
@@ -132,10 +132,10 @@ export class ContentModerationService {
       await prisma.contest.update({ where: { id: contestId }, data: { status: 'ACTIVE' } });
     }
 
-    await prisma.contentModerationLog.create({
-      data: { adminId, contentType: 'contest', content_id: contestId, action, reason }
+    await prisma.content_moderation_logs.create({
+      data: { admin_id: adminId, content_type: 'contest', content_id: contestId, action, reason }
     });
-    await AuditService.log(adminId, `content.${action}`, 'contest', contest_id, { reason }, ip, ua);
+    await AuditService.log(adminId, `content.${action}`, 'contest', contestId, { reason }, ip, ua);
     return { success: true, message: `Contest ${action}d` };
   }
 
@@ -147,8 +147,8 @@ export class ContentModerationService {
       await prisma.story.delete({ where: { id: storyId } });
     }
 
-    await prisma.contentModerationLog.create({
-      data: { adminId, contentType: 'story', content_id: storyId, action, reason }
+    await prisma.content_moderation_logs.create({
+      data: { admin_id: adminId, content_type: 'story', content_id: storyId, action, reason }
     });
     await AuditService.log(adminId, `content.${action}`, 'story', storyId, { reason }, ip, ua);
     return { success: true, message: `Story ${action}d` };
@@ -159,15 +159,15 @@ export class ContentModerationService {
   }) {
     const { page = 1, limit = 50, contentType, adminId } = options;
     const where: any = {};
-    if (contentType) where.contentType = contentType;
-    if (adminId) where.adminId = adminId;
+    if (contentType) where.content_type = contentType;
+    if (adminId) where.admin_id = adminId;
 
     const [items, total] = await Promise.all([
-      prisma.contentModerationLog.findMany({
+      prisma.content_moderation_logs.findMany({
         where, orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
-      prisma.contentModerationLog.count({ where }),
+      prisma.content_moderation_logs.count({ where }),
     ]);
     return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }

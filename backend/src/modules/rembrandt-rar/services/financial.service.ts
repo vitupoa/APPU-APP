@@ -55,30 +55,30 @@ export class FinancialService {
 
   static async topupUserWallet(
     adminId: string,
-    data: { user_id: string; amountKr: number; reason: string },
+    data: { userId: string; amountKr: number; reason: string },
     ip?: string, ua?: string
   ) {
     const amount = new Prisma.Decimal(data.amountKr);
 
     const wallet = await prisma.wallets.upsert({
-      where: { user_id: data.user_id },
-      create: { user_id: data.user_id, kr_balance: amount },
+      where: { user_id: data.userId },
+      create: { user_id: data.userId, kr_balance: amount },
       update: { kr_balance: { increment: amount } },
     });
 
     await prisma.transactions.create({
       data: {
-        user_id: data.user_id,
+        user_id: data.userId,
         type: 'admin_topup',
         amount_kr: amount,
         status: 'completed',
         provider: 'platform_admin',
-        counterpartyId: adminId,
+        counterparty_id: adminId,
         metadata: { reason: data.reason, adminId },
       }
     });
 
-    await AuditService.log(adminId, ADMIN_ACTIONS.USER_WALLET_TOPUP, 'user', data.user_id, {
+    await AuditService.log(adminId, ADMIN_ACTIONS.USER_WALLET_TOPUP, 'user', data.userId, {
       amount_kr: data.amountKr, reason: data.reason
     }, ip, ua);
 
@@ -104,13 +104,13 @@ export class FinancialService {
         orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
-      prisma.withdrawalRequest.count({ where }),
+      prisma.withdrawal_requests.count({ where }),
     ]);
     return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
   static async getWithdrawalDetail(withdrawalId: string) {
-    return prisma.withdrawalRequest.findUniqueOrThrow({
+    return prisma.withdrawal_requests.findUniqueOrThrow({
       where: { id: withdrawalId },
       include: {
         user: {
@@ -128,7 +128,7 @@ export class FinancialService {
     data: { action: 'approve' | 'reject'; note?: string },
     ip?: string, ua?: string
   ) {
-    const withdrawal = await prisma.withdrawalRequest.findUniqueOrThrow({
+    const withdrawal = await prisma.withdrawal_requests.findUniqueOrThrow({
       where: { id: withdrawalId },
       include: { user: { select: { first_name: true, last_name: true, display_name: true } } }
     });
@@ -139,17 +139,17 @@ export class FinancialService {
 
     // Name matching check
     const krietaName = `${withdrawal.user.first_name} ${withdrawal.user.last_name}`.toLowerCase().trim();
-    const accountName = withdrawal.accountName.toLowerCase().trim();
+    const accountName = withdrawal.account_name.toLowerCase().trim();
     const nameMatch = this.fuzzyNameMatch(krietaName, accountName);
 
     if (data.action === 'approve') {
       if (!nameMatch.isMatch) {
         // Auto-flag if names don't match, admin must explicitly override
-        if (withdrawal.nameMatchStatus !== 'admin_override') {
+        if (withdrawal.name_match_status !== 'admin_override') {
           return {
             success: false,
             warning: 'NAME_MISMATCH',
-            message: `Account name "${withdrawal.accountName}" does not match Krieta name "${withdrawal.user.first_name} ${withdrawal.user.last_name}"`,
+            message: `Account name "${withdrawal.account_name}" does not match Krieta name "${withdrawal.user.first_name} ${withdrawal.user.last_name}"`,
             similarity: nameMatch.similarity,
             requiresOverride: true,
           };
@@ -157,14 +157,14 @@ export class FinancialService {
       }
 
       await prisma.$transaction(async (tx) => {
-        await tx.withdrawalRequest.update({
+        await tx.withdrawal_requests.update({
           where: { id: withdrawalId },
           data: {
             status: 'APPROVED',
-            nameMatchStatus: nameMatch.isMatch ? 'match' : 'admin_override',
-            reviewedBy: adminId,
-            reviewNote: data.note,
-            reviewedAt: new Date(),
+            name_match_status: nameMatch.isMatch ? 'match' : 'admin_override',
+            reviewed_by: adminId,
+            review_note: data.note,
+            reviewed_at: new Date(),
           }
         });
 
@@ -173,12 +173,12 @@ export class FinancialService {
         const totalDeduction = withdrawal.amount_kr.add(new Prisma.Decimal(withdrawalFeeKr));
 
         // Deduct from user wallet (withdrawal amount + invisible fee)
-        await tx.wallet.update({
+        await tx.wallets.update({
           where: { user_id: withdrawal.user_id },
           data: { kr_balance: { decrement: totalDeduction } }
         });
 
-        await tx.transaction.create({
+        await tx.transactions.create({
           data: {
             user_id: withdrawal.user_id,
             type: 'withdraw',
@@ -187,7 +187,7 @@ export class FinancialService {
             currency: withdrawal.currency,
             status: 'completed',
             provider: withdrawal.provider,
-            counterpartyId: adminId,
+            counterparty_id: adminId,
           }
         });
 
@@ -195,7 +195,7 @@ export class FinancialService {
         if (withdrawalFeeKr > 0) {
           const opsUser = await tx.user.findFirst({ where: { username: 'JohnOyugi' } });
           if (opsUser) {
-            await tx.wallet.upsert({
+            await tx.wallets.upsert({
               where: { user_id: opsUser.id },
               create: { user_id: opsUser.id, kr_balance: new Prisma.Decimal(withdrawalFeeKr) },
               update: { kr_balance: { increment: new Prisma.Decimal(withdrawalFeeKr) } },
@@ -211,13 +211,13 @@ export class FinancialService {
       return { success: true, message: 'Withdrawal approved' };
 
     } else {
-      await prisma.withdrawalRequest.update({
+      await prisma.withdrawal_requests.update({
         where: { id: withdrawalId },
         data: {
           status: 'REJECTED',
-          reviewedBy: adminId,
-          reviewNote: data.note || 'Rejected by admin',
-          reviewedAt: new Date(),
+          reviewed_by: adminId,
+          review_note: data.note || 'Rejected by admin',
+          reviewed_at: new Date(),
         }
       });
 
@@ -230,9 +230,9 @@ export class FinancialService {
   }
 
   static async overrideNameMatch(adminId: string, withdrawalId: string) {
-    await prisma.withdrawalRequest.update({
+    await prisma.withdrawal_requests.update({
       where: { id: withdrawalId },
-      data: { nameMatchStatus: 'admin_override' }
+      data: { name_match_status: 'admin_override' }
     });
     return { success: true, message: 'Name match overridden by admin' };
   }
@@ -242,18 +242,18 @@ export class FinancialService {
   static async listTransactions(options: {
     page?: number; limit?: number; userId?: string; type?: string; status?: string;
   }) {
-    const { page = 1, limit = 50, user_id, type, status } = options;
+    const { page = 1, limit = 50, userId, type, status } = options;
     const where: any = {};
     if (userId) where.user_id = userId;
     if (type) where.type = type;
     if (status) where.status = status;
 
     const [items, total] = await Promise.all([
-      prisma.transaction.findMany({
+      prisma.transactions.findMany({
         where, orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
-      prisma.transaction.count({ where }),
+      prisma.transactions.count({ where }),
     ]);
     return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
@@ -266,59 +266,59 @@ export class FinancialService {
     if (status) where.status = status;
 
     const [items, total] = await Promise.all([
-      prisma.escrow.findMany({
+      prisma.escrows.findMany({
         where,
         include: {
-          user: { select: { id: true, username: true, display_name: true } },
-          contest: { select: { id: true, title: true } },
+          User: { select: { id: true, username: true, display_name: true } },
+          Contest: { select: { id: true, title: true } },
         },
         orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
-      prisma.escrow.count({ where }),
+      prisma.escrows.count({ where }),
     ]);
     return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  static async releaseEscrow(adminId: string, escrow_id: string, ip?: string, ua?: string) {
-    const escrow = await prisma.escrow.findUniqueOrThrow({ where: { id: escrowId } });
+  static async releaseEscrow(adminId: string, escrowId: string, ip?: string, ua?: string) {
+    const escrow = await prisma.escrows.findUniqueOrThrow({ where: { id: escrowId } });
     if (escrow.status !== 'held') throw new Error('Escrow not in held status');
 
     await prisma.$transaction(async (tx) => {
-      await tx.escrow.update({ where: { id: escrowId }, data: { status: 'released' } });
-      await tx.wallet.update({
+      await tx.escrows.update({ where: { id: escrowId }, data: { status: 'released' } });
+      await tx.wallets.update({
         where: { user_id: escrow.user_id },
-        data: { kr_balance: { increment: escrow.prizeAmountKr } }
+        data: { kr_balance: { increment: escrow.prize_amount_kr } }
       });
     });
 
-    await AuditService.log(adminId, ADMIN_ACTIONS.ESCROW_RELEASE, 'escrow', escrow_id, {
-      amount_kr: escrow.prizeAmountKr.toString()
+    await AuditService.log(adminId, ADMIN_ACTIONS.ESCROW_RELEASE, 'escrow', escrowId, {
+      amount_kr: escrow.prize_amount_kr.toString()
     }, ip, ua);
     return { success: true, message: 'Escrow released' };
   }
 
-  static async refundEscrow(adminId: string, escrow_id: string, ip?: string, ua?: string) {
-    const escrow = await prisma.escrow.findUniqueOrThrow({ where: { id: escrowId } });
+  static async refundEscrow(adminId: string, escrowId: string, ip?: string, ua?: string) {
+    const escrow = await prisma.escrows.findUniqueOrThrow({ where: { id: escrowId } });
     if (escrow.status !== 'held') throw new Error('Escrow not in held status');
 
     await prisma.$transaction(async (tx) => {
-      await tx.escrow.update({ where: { id: escrowId }, data: { status: 'refunded' } });
-      const totalRefund = escrow.prizeAmountKr.add(escrow.feeAmountKr);
-      await tx.wallet.update({
+      await tx.escrows.update({ where: { id: escrowId }, data: { status: 'refunded' } });
+      const totalRefund = escrow.prize_amount_kr.add(escrow.fee_amount_kr);
+      await tx.wallets.update({
         where: { user_id: escrow.user_id },
         data: { kr_balance: { increment: totalRefund } }
       });
     });
 
-    await AuditService.log(adminId, ADMIN_ACTIONS.ESCROW_REFUND, 'escrow', escrow_id, {}, ip, ua);
+    await AuditService.log(adminId, ADMIN_ACTIONS.ESCROW_REFUND, 'escrow', escrowId, {}, ip, ua);
     return { success: true, message: 'Escrow refunded' };
   }
 
   // ─── FEE CONFIG ─────────────────────────────────────────
 
   static async getFeeConfig() {
-    const config = await prisma.platformConfig.findUnique({ where: { key: 'fee_structure' } });
+    const config = await prisma.platform_config.findUnique({ where: { key: 'fee_structure' } });
     return config?.value ?? {
       tipFeePercent: 15,
       contestFeePercent: 10,
@@ -328,13 +328,13 @@ export class FinancialService {
     };
   }
 
-  static async updateFeeConfig(adminId: string, fees: Record<string, number>, ip?: string, ua?: string) {
-    await prisma.platformConfig.upsert({
+  static async updateFeeConfig(_adminId: string, fees: Record<string, number>, ip?: string, ua?: string) {
+    await prisma.platform_config.upsert({
       where: { key: 'fee_structure' },
-      create: { key: 'fee_structure', value: fees, updatedBy: adminId },
-      update: { value: fees, updatedBy: adminId },
+      create: { key: 'fee_structure', value: fees },
+      update: { value: fees },
     });
-    await AuditService.log(adminId, ADMIN_ACTIONS.FEE_UPDATE, 'config', 'fee_structure', fees, ip, ua);
+    await AuditService.log(_adminId, ADMIN_ACTIONS.FEE_UPDATE, 'config', 'fee_structure', fees, ip, ua);
     return { success: true, fees };
   }
 
@@ -360,9 +360,9 @@ export class FinancialService {
     if (krAmount <= 0) throw new Error('Deduction amount too small to convert');
 
     // Find all users with matching currency who have sufficient balance
-    const matchingWallets = await prisma.wallet.findMany({
+    const matchingWallets = await prisma.wallets.findMany({
       where: {
-        user: { currency: { equals: currency, mode: 'insensitive' } },
+        User: { currency: { equals: currency, mode: 'insensitive' } },
         kr_balance: { gte: krDecimal }
       },
       select: { user_id: true, kr_balance: true }
@@ -380,7 +380,7 @@ export class FinancialService {
       const batch = matchingWallets.slice(i, i + BATCH_SIZE);
       await prisma.$transaction(
         batch.map((w: any) =>
-          prisma.wallet.update({
+          prisma.wallets.update({
             where: { user_id: w.user_id },
             data: { kr_balance: { decrement: krDecimal } }
           })
@@ -392,7 +392,7 @@ export class FinancialService {
     // Credit total deducted to @JohnOyugi's operational wallet
     const opsUser = await prisma.user.findFirst({ where: { username: 'JohnOyugi' } });
     if (opsUser) {
-      await prisma.wallet.upsert({
+      await prisma.wallets.upsert({
         where: { user_id: opsUser.id },
         create: { user_id: opsUser.id, kr_balance: totalDeducted },
         update: { kr_balance: { increment: totalDeducted } },

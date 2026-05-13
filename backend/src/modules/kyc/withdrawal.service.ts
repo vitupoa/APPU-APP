@@ -49,7 +49,7 @@ export class WithdrawalService {
     
     // SECURITY: Get current user balance for validation
     const wallet = await prisma.wallets.findUnique({
-      where: { user_id }
+      where: { user_id: userId }
     });
     
     if (!wallet) {
@@ -119,8 +119,8 @@ export class WithdrawalService {
     };
     // Step 1: Verify transaction signature
     const payload: TransactionPayload = {
-      user_id,
-      amount_kr: finalAmount,
+      user_id: userId,
+      amountKr: finalAmount,
       provider,
       accountName: accountName || 'N/A',
       accountDetails,
@@ -154,7 +154,7 @@ export class WithdrawalService {
         id: true,
         first_name: true,
         last_name: true,
-        kycStatus: true,
+        kyc_status: true,
         created_at: true
       }
     });
@@ -168,8 +168,8 @@ export class WithdrawalService {
     
     if (!hasKYC) {
       // Check if user has submitted KYC documents
-      const kycDocuments = await prisma.kYCDocument.findMany({
-        where: { user_id, status: { in: ['PENDING', 'APPROVED'] } }
+      const kycDocuments = await prisma.kyc_documents.findMany({
+        where: { user_id: userId, status: { in: ['PENDING', 'APPROVED'] } }
       });
 
       if (kycDocuments.length === 0) {
@@ -190,8 +190,8 @@ export class WithdrawalService {
     await kycService.initializeWithdrawalLimit(userId);
 
     // Check daily withdrawal limit
-    const withdrawalLimit = await prisma.withdrawalLimit.findUnique({
-      where: { user_id }
+    const withdrawalLimit = await prisma.withdrawal_limits.findUnique({
+      where: { user_id: userId }
     });
 
     if (!withdrawalLimit) {
@@ -211,9 +211,9 @@ export class WithdrawalService {
 
     // SECURITY: Check hourly withdrawal limit
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const hourlyWithdrawals = await prisma.withdrawalRequest.aggregate({
+    const hourlyWithdrawals = await prisma.withdrawal_requests.aggregate({
       where: {
-        user_id,
+        user_id: userId,
         created_at: { gte: oneHourAgo },
         status: { in: ['PENDING', 'APPROVED', 'PROCESSING', 'COMPLETED'] }
       },
@@ -234,22 +234,22 @@ export class WithdrawalService {
     // Reset if new day
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const lastReset = new Date(withdrawalLimit.lastResetDate);
+    const lastReset = new Date(withdrawalLimit.last_reset_date);
     lastReset.setHours(0, 0, 0, 0);
 
     if (today > lastReset) {
-      await prisma.withdrawalLimit.update({
-        where: { user_id },
+      await prisma.withdrawal_limits.update({
+        where: { user_id: userId },
         data: {
-          withdrawnTodayKr: 0,
-          lastResetDate: today
+          withdrawn_today_kr: 0,
+          last_reset_date: today
         }
       });
     }
 
     // Check if exceeds daily limit
-    const currentWithdrawn = Number(withdrawalLimit.withdrawnTodayKr);
-    const dailyLimit = Number(withdrawalLimit.dailyLimitKr);
+    const currentWithdrawn = Number(withdrawalLimit.withdrawn_today_kr);
+    const dailyLimit = Number(withdrawalLimit.daily_limit_kr);
     
     // SECURITY: Enforce maximum daily limit (cannot exceed 500,000 Kr)
     const effectiveDailyLimit = Math.min(dailyLimit, DAILY_WITHDRAWAL_LIMIT);
@@ -276,16 +276,16 @@ export class WithdrawalService {
     }
 
     // Get KYC document IDs
-    const kycDocumentIds = (await prisma.kYCDocument.findMany({
-      where: { user_id, status: 'APPROVED' },
+    const kycDocumentIds = (await prisma.kyc_documents.findMany({
+      where: { user_id: userId, status: 'APPROVED' },
       select: { id: true }
     })).map((doc: { id: string }) => doc.id);
 
     // Create withdrawal request
     const withdrawalRequest = await prisma.$transaction(async (tx: any) => {
       // SECURITY: Lock wallet row to prevent race conditions
-      const lockedWallet = await tx.wallet.findUnique({
-        where: { user_id },
+      const lockedWallet = await tx.wallets.findUnique({
+        where: { user_id: userId },
         select: { kr_balance: true }
       });
 
@@ -301,8 +301,8 @@ export class WithdrawalService {
       }
 
       // Deduct from wallet
-      const updatedWallet = await tx.wallet.update({
-        where: { user_id },
+      const updatedWallet = await tx.wallets.update({
+        where: { user_id: userId },
         data: {
           kr_balance: { decrement: finalAmount }
         },
@@ -315,27 +315,27 @@ export class WithdrawalService {
       }
 
       // Update withdrawal limit
-      await tx.withdrawalLimit.update({
-        where: { user_id },
+      await tx.withdrawal_limits.update({
+        where: { user_id: userId },
         data: {
-          withdrawnTodayKr: { increment: finalAmount }
+          withdrawn_today_kr: { increment: finalAmount }
         }
       });
 
       // Create withdrawal request
-      const request = await tx.withdrawalRequest.create({
+      const request = await tx.withdrawal_requests.create({
         data: {
-          user_id,
+          user_id: userId,
           amount_kr: finalAmount,
           provider,
-          accountName: accountName || 'N/A',
-          accountDetails,
+          account_name: accountName || 'N/A',
+          account_details: accountDetails,
           currency,
           status,
-          requiresKyc: true,
-          kycDocumentIds,
-          suspiciousFlags,
-          riskScore,
+          requires_kyc: true,
+          kyc_document_ids: kycDocumentIds,
+          suspicious_flags: suspiciousFlags,
+          risk_score: riskScore,
           // Store security metadata in metadata field
           metadata: metadata ? {
             security: metadata,
@@ -350,9 +350,9 @@ export class WithdrawalService {
       });
 
       // Create transaction record
-      await tx.transaction.create({
+      await tx.transactions.create({
         data: {
-          user_id,
+          user_id: userId,
           type: 'withdraw',
           amount_kr: finalAmount,
           currency,
@@ -382,14 +382,14 @@ export class WithdrawalService {
   }
 
   // Detect suspicious patterns
-  private async detectSuspiciousPatterns(userId: string, amount_kr: number) {
+  private async detectSuspiciousPatterns(userId: string, finalAmount: number) {
     const flags: any = {};
 
     // Check rapid withdrawals (3+ in 24 hours)
     const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const recentWithdrawals = await prisma.withdrawalRequest.count({
+    const recentWithdrawals = await prisma.withdrawal_requests.count({
       where: {
-        user_id,
+        user_id: userId,
         created_at: { gte: last24Hours }
       }
     });
@@ -418,30 +418,30 @@ export class WithdrawalService {
     }
 
     // Check unusual amount (> 10x average)
-    const avgWithdrawal = await prisma.withdrawalRequest.aggregate({
+    const avgWithdrawal = await prisma.withdrawal_requests.aggregate({
       where: {
-        user_id,
+        user_id: userId,
         status: { in: ['COMPLETED', 'PROCESSING'] }
       },
       _avg: { amount_kr: true }
     });
 
-    if (avgWithdrawal._avg.amount_kr && amountKr > Number(avgWithdrawal._avg.amount_kr) * 10) {
+    if (avgWithdrawal._avg.amount_kr && finalAmount > Number(avgWithdrawal._avg.amount_kr) * 10) {
       flags.unusualAmount = {
-        amount: amountKr,
+        amount: finalAmount,
         average: avgWithdrawal._avg.amount_kr,
-        multiplier: amountKr / Number(avgWithdrawal._avg.amount_kr)
+        multiplier: finalAmount / Number(avgWithdrawal._avg.amount_kr)
       };
     }
 
     // Check if first withdrawal is large (> 50000)
-    const withdrawalCount = await prisma.withdrawalRequest.count({
-      where: { user_id }
+    const withdrawalCount = await prisma.withdrawal_requests.count({
+      where: { user_id: userId }
     });
 
-    if (withdrawalCount === 0 && amountKr > LARGE_FIRST_WITHDRAWAL_THRESHOLD) {
+    if (withdrawalCount === 0 && finalAmount > LARGE_FIRST_WITHDRAWAL_THRESHOLD) {
       flags.largeFirstWithdrawal = {
-        amount: amountKr,
+        amount: finalAmount,
         threshold: LARGE_FIRST_WITHDRAWAL_THRESHOLD
       };
     }
@@ -474,7 +474,7 @@ export class WithdrawalService {
   private calculateRiskScore(
     flags: any, 
     accountCreatedAt: Date, 
-    amount_kr: number,
+    finalAmount: number,
     securityMetadata?: WithdrawalSecurityMetadata
   ): number {
     let score = 0;
@@ -486,7 +486,7 @@ export class WithdrawalService {
 
     // Additional risk for very new accounts with large withdrawals
     const accountAgeDays = Math.floor((Date.now() - accountCreatedAt.getTime()) / (1000 * 60 * 60 * 24));
-    if (accountAgeDays < 3 && amountKr > 500) {
+    if (accountAgeDays < 3 && finalAmount > 500) {
       score += 20;
     }
 
@@ -505,10 +505,10 @@ export class WithdrawalService {
   private async logSuspiciousActivity(userId: string, flags: any, riskScore: number) {
     const severity = riskScore >= 70 ? 'critical' : riskScore >= 50 ? 'high' : riskScore >= 30 ? 'medium' : 'low';
 
-    await prisma.suspiciousActivity.create({
+    await prisma.suspicious_activities.create({
       data: {
-        user_id,
-        activityType: 'withdrawal_request',
+        user_id: userId,
+        activity_type: 'withdrawal_request',
         description: `Suspicious withdrawal patterns detected: ${Object.keys(flags).join(', ')}`,
         severity,
         metadata: { flags, riskScore }
@@ -520,7 +520,7 @@ export class WithdrawalService {
   async getPendingWithdrawals(status?: WithdrawalStatus, limit: number = 50, offset: number = 0) {
     const where = status ? { status } : { status: { in: ['PENDING' as WithdrawalStatus, 'UNDER_REVIEW' as WithdrawalStatus, 'FLAGGED' as WithdrawalStatus] } };
 
-    const requests = await prisma.withdrawalRequest.findMany({
+    const requests = await prisma.withdrawal_requests.findMany({
       where,
       include: {
         user: {
@@ -530,13 +530,13 @@ export class WithdrawalService {
             first_name: true,
             last_name: true,
             email: true,
-            kycStatus: true,
+            kyc_status: true,
             created_at: true
           }
         }
       },
       orderBy: [
-        { riskScore: 'desc' },
+        { risk_score: 'desc' },
         { created_at: 'asc' }
       ],
       take: limit,
@@ -546,9 +546,9 @@ export class WithdrawalService {
     // Fetch KYC documents for each request
     const requestsWithKYC = await Promise.all(
       requests.map(async (request: any) => {
-        const kycDocuments = request.kycDocumentIds.length > 0 ?
-          await prisma.kYCDocument.findMany({
-            where: { id: { in: request.kycDocumentIds } }
+        const kycDocuments = request.kyc_document_ids.length > 0 ?
+          await prisma.kyc_documents.findMany({
+            where: { id: { in: request.kyc_document_ids } }
           }) : [];
 
         return {
@@ -558,7 +558,7 @@ export class WithdrawalService {
       })
     );
 
-    const total = await prisma.withdrawalRequest.count({ where });
+    const total = await prisma.withdrawal_requests.count({ where });
 
     return { requests: requestsWithKYC, total };
   }
@@ -571,9 +571,8 @@ export class WithdrawalService {
     reviewNote?: string,
     flagReason?: string
   ) {
-    const request = await prisma.withdrawalRequest.findUnique({
-      where: { id: requestId },
-      include: { user: true }
+    const request = await prisma.withdrawal_requests.findUnique({
+      where: { id: requestId }
     });
 
     if (!request) {
@@ -584,15 +583,15 @@ export class WithdrawalService {
 
     const updatedRequest = await prisma.$transaction(async (tx: any) => {
       // Update withdrawal request
-      const updated = await tx.withdrawalRequest.update({
+      const updated = await tx.withdrawal_requests.update({
         where: { id: requestId },
         data: {
           status: newStatus,
-          reviewedBy: adminId,
-          reviewNote,
-          flagReason,
-          reviewedAt: new Date(),
-          flaggedAt: flagReason ? new Date() : undefined
+          reviewed_by: adminId,
+          review_note: reviewNote,
+          flag_reason: flagReason,
+          reviewed_at: new Date(),
+          flagged_at: flagReason ? new Date() : undefined
         }
       });
 
@@ -601,7 +600,7 @@ export class WithdrawalService {
         const refundAmount = Number(request.amount_kr);
         const withdrawnAmount = Number(request.amount_kr);
         
-        await tx.wallet.update({
+        await tx.wallets.update({
           where: { user_id: request.user_id },
           data: {
             kr_balance: { increment: refundAmount }
@@ -609,20 +608,20 @@ export class WithdrawalService {
         });
 
         // Update withdrawal limit
-        await tx.withdrawalLimit.update({
+        await tx.withdrawal_limits.update({
           where: { user_id: request.user_id },
           data: {
-            withdrawnTodayKr: { decrement: withdrawnAmount }
+            withdrawn_today_kr: { decrement: withdrawnAmount }
           }
         });
 
         // Create refund transaction
-        await tx.transaction.create({
+        await tx.transactions.create({
           data: {
             user_id: request.user_id,
             type: 'withdrawal_refund',
             amount_kr: refundAmount,
-            currency: request.currency,
+            currency: 'KES',
             status: 'completed',
             reference: requestId,
             metadata: { reason: 'Withdrawal rejected', reviewNote }
@@ -634,12 +633,12 @@ export class WithdrawalService {
     });
 
     // Log audit
-    await prisma.auditLog.create({
+    await prisma.audit_logs.create({
       data: {
-        adminId,
+        admin_id: adminId,
         action: approved ? 'WITHDRAWAL_APPROVED' : 'WITHDRAWAL_REJECTED',
-        targetType: 'WITHDRAWAL_REQUEST',
-        targetId: requestId,
+        target_type: 'WITHDRAWAL_REQUEST',
+        target_id: requestId,
         details: {
           user_id: request.user_id,
           amount: request.amount_kr,
@@ -654,8 +653,8 @@ export class WithdrawalService {
 
   // Get suspicious activities
   async getSuspiciousActivities(resolved: boolean = false, limit: number = 50, offset: number = 0) {
-    const activities = await prisma.suspiciousActivity.findMany({
-      where: { isResolved: resolved },
+    const activities = await prisma.suspicious_activities.findMany({
+      where: { resolved: resolved },
       orderBy: [
         { severity: 'desc' },
         { created_at: 'desc' }
@@ -664,8 +663,8 @@ export class WithdrawalService {
       skip: offset
     });
 
-    const total = await prisma.suspiciousActivity.count({
-      where: { isResolved: resolved }
+    const total = await prisma.suspicious_activities.count({
+      where: { resolved: resolved }
     });
 
     return { activities, total };
@@ -673,13 +672,13 @@ export class WithdrawalService {
 
   // Resolve suspicious activity
   async resolveSuspiciousActivity(activityId: string, adminId: string, resolutionNote: string) {
-    return await prisma.suspiciousActivity.update({
+    return await prisma.suspicious_activities.update({
       where: { id: activityId },
       data: {
-        isResolved: true,
-        resolvedBy: adminId,
-        resolvedAt: new Date(),
-        resolutionNote
+        resolved: true,
+        resolved_by: adminId,
+        resolved_at: new Date(),
+        resolution_note: resolutionNote
       }
     });
   }

@@ -10,12 +10,15 @@ export class AuditService {
     ipAddress?: string | null,
     userAgent?: string | null
   ) {
-    return prisma.auditLog.create({
+    return prisma.audit_logs.create({
       data: {
-        adminId, action, targetType, targetId,
+        admin_id: adminId,
+        action,
+        target_type: targetType,
+        target_id: targetId,
         details: (details ?? undefined) as any,
-        ipAddress: ipAddress ?? null,
-        userAgent: userAgent ?? null,
+        ip_address: ipAddress ?? null,
+        user_agent: userAgent ?? null,
       }
     });
   }
@@ -30,13 +33,13 @@ export class AuditService {
     startDate?: Date;
     endDate?: Date;
   }) {
-    const { page = 1, limit = 50, adminId, action, targetType, targetId, start_date, end_date } = options;
+    const { page = 1, limit = 50, adminId, action, targetType, targetId, startDate, endDate } = options;
     const where: any = {};
 
-    if (adminId) where.adminId = adminId;
+    if (adminId) where.admin_id = adminId;
     if (action) where.action = { contains: action };
-    if (targetType) where.targetType = targetType;
-    if (targetId) where.targetId = targetId;
+    if (targetType) where.target_type = targetType;
+    if (targetId) where.target_id = targetId;
     if (startDate || endDate) {
       where.created_at = {};
       if (startDate) where.created_at.gte = startDate;
@@ -44,13 +47,13 @@ export class AuditService {
     }
 
     const [items, total] = await Promise.all([
-      prisma.auditLog.findMany({
+      prisma.audit_logs.findMany({
         where,
         orderBy: { created_at: 'desc' },
         take: limit,
         skip: (page - 1) * limit,
       }),
-      prisma.auditLog.count({ where }),
+      prisma.audit_logs.count({ where }),
     ]);
 
     return {

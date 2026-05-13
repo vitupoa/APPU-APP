@@ -49,7 +49,7 @@ export class CallController {
       const page = parseInt(String(req.query.page || '1'));
       const limit = parseInt(String(req.query.limit || '20'));
       const chatId = String(req.params.chat_id);
-      const history = await CallService.getCallHistory(req.user_id!, chat_id, page, limit);
+      const history = await CallService.getCallHistory(req.user_id!, chatId, page, limit);
       res.json(history);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

@@ -201,7 +201,7 @@ export class ChamaFinanceService {
     approverId: string,
     chama_id: string,
     payout_id: string,
-    decision: 'APPROVED' | 'REJECTED',
+    decision: 'APPROVE' | 'REJECT',
     reason?: string
   ) {
     return prisma.$transaction(async (tx) => {
@@ -234,7 +234,7 @@ export class ChamaFinanceService {
       const chama = await tx.chama.findUnique({ where: { id: chama_id } });
       if (!chama) throw new Error('Chama not found');
 
-      if (decision === 'REJECTED') {
+      if (decision === 'REJECT') {
         await tx.chamaPayout.update({
           where: { id: payout_id },
           data: { status: 'REJECTED' },
@@ -255,7 +255,7 @@ export class ChamaFinanceService {
       }
 
       // Count approvals
-      const totalApprovals = payout.approvals.filter((a: any) => a.decision === 'APPROVED').length + 1;
+      const totalApprovals = payout.approvals.filter((a: any) => a.decision === 'APPROVE').length + 1;
 
       if (totalApprovals >= chama.min_approvals) {
         // Auto-disburse
@@ -326,7 +326,7 @@ export class ChamaFinanceService {
     });
 
     // Record in user's personal transaction history
-    await tx.transaction.create({
+    await tx.transactions.create({
       data: {
         user_id: payout.recipient_id,
         type: 'chama_payout',

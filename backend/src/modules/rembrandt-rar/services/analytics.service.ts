@@ -12,26 +12,26 @@ export class AnalyticsService {
       prisma.user.count(),
       prisma.user.count({ where: { account_type: 'CREATOR' } }),
       prisma.user.count({ where: { account_type: 'BUSINESS' } }),
-      prisma.short.count(),
+      prisma.shorts.count(),
       prisma.post.count(),
       prisma.contest.count(),
       prisma.story.count(),
       prisma.contest.count({ where: { status: 'ACTIVE' } }),
-      prisma.transaction.count(),
+      prisma.transactions.count(),
       prisma.user.count({ where: { isSuspended: true } }),
       prisma.user.count({ where: { is_verified: true } }),
-      prisma.withdrawalRequest.count({ where: { status: 'PENDING' } }),
-      prisma.product.count(),
+      prisma.withdrawal_requests.count({ where: { status: 'PENDING' } }),
+      prisma.products.count(),
     ]);
 
     // Revenue: sum of platform_fee transactions
-    const revenueResult = await prisma.transaction.aggregate({
+    const revenueResult = await prisma.transactions.aggregate({
       where: { type: 'platform_fee', status: 'completed' },
       _sum: { amount_kr: true },
     });
 
     // Platform wallet balance
-    const platformWallet = await prisma.platformWallet.findFirst({ where: { label: 'main' } });
+    const platformWallet = await prisma.platform_wallet.findFirst({ where: { label: 'main' } });
 
     // Users created in last 24h, 7d, 30d
     const now = new Date();
@@ -86,7 +86,7 @@ export class AnalyticsService {
 
   static async getRevenueChart(days = 30) {
     const since = new Date(Date.now() - days * 86400000);
-    const txns = await prisma.transaction.findMany({
+    const txns = await prisma.transactions.findMany({
       where: { type: 'platform_fee', status: 'completed', created_at: { gte: since } },
       select: { amount_kr: true, created_at: true },
       orderBy: { created_at: 'asc' },
@@ -107,8 +107,8 @@ export class AnalyticsService {
     const week = new Date(now.getTime() - 7 * 86400000);
 
     const [shortsToday, shortsWeek, postsToday, postsWeek, contestsToday] = await Promise.all([
-      prisma.short.count({ where: { created_at: { gte: today } } }),
-      prisma.short.count({ where: { created_at: { gte: week } } }),
+      prisma.shorts.count({ where: { created_at: { gte: today } } }),
+      prisma.shorts.count({ where: { created_at: { gte: week } } }),
       prisma.post.count({ where: { created_at: { gte: today } } }),
       prisma.post.count({ where: { created_at: { gte: week } } }),
       prisma.contest.count({ where: { created_at: { gte: today } } }),
@@ -124,11 +124,12 @@ export class AnalyticsService {
   static async getTopCreators(limit = 10) {
     return prisma.user.findMany({
       where: { account_type: 'CREATOR' },
-      orderBy: { admirers: { _count: 'desc' } },
+      orderBy: { admirers_count: 'desc' },
       take: limit,
       select: {
         id: true, username: true, display_name: true, avatar_url: true, is_verified: true,
-        _count: { select: { admirers: true, shorts: true, contestsCreated: true } },
+        admirers_count: true,
+        _count: { select: { shorts: true, Contest: true } },
       },
     });
   }

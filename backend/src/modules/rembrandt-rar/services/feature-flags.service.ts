@@ -23,8 +23,8 @@ export class FeatureFlagService {
     featureKey: string,
     context: { userId?: string; country?: string; city?: string; region?: string; continent?: string }
   ): Promise<boolean> {
-    const flags = await prisma.featureFlag.findMany({
-      where: { featureKey },
+    const flags = await prisma.feature_flags.findMany({
+      where: { key: featureKey },
       orderBy: { priority: 'desc' },
     });
 
@@ -39,28 +39,28 @@ export class FeatureFlagService {
 
       switch (flag.scope) {
         case 'GLOBAL':
-          matches = !flag.scopeValue;
+          matches = !flag.scope_value;
           break;
         case 'USER':
-          matches = flag.scopeValue === context.user_id;
+          matches = flag.scope_value === context.userId;
           break;
         case 'CITY':
-          matches = flag.scopeValue === context.city;
+          matches = flag.scope_value === context.city;
           break;
         case 'REGION':
-          matches = flag.scopeValue === context.region;
+          matches = flag.scope_value === context.region;
           break;
         case 'COUNTRY':
-          matches = flag.scopeValue === context.country;
+          matches = flag.scope_value === context.country;
           break;
         case 'CONTINENT':
-          matches = flag.scopeValue === context.continent ||
-            (context.country ? this.isCountryInContinent(context.country, flag.scopeValue ?? '') : false);
+          matches = flag.scope_value === context.continent ||
+            (context.country ? this.isCountryInContinent(context.country, flag.scope_value ?? '') : false);
           break;
       }
 
       if (matches && (!bestMatch || priority > bestMatch.priority)) {
-        bestMatch = { isEnabled: flag.isEnabled, priority };
+        bestMatch = { isEnabled: flag.is_enabled, priority };
       }
     }
 
@@ -75,15 +75,15 @@ export class FeatureFlagService {
   }) {
     const { page = 1, limit = 50, featureKey, scope } = options;
     const where: any = {};
-    if (featureKey) where.featureKey = featureKey;
+    if (featureKey) where.key = featureKey;
     if (scope) where.scope = scope;
 
     const [items, total] = await Promise.all([
-      prisma.featureFlag.findMany({
-        where, orderBy: [{ featureKey: 'asc' }, { priority: 'desc' }],
+      prisma.feature_flags.findMany({
+        where, orderBy: [{ key: 'asc' }, { priority: 'desc' }],
         take: limit, skip: (page - 1) * limit,
       }),
-      prisma.featureFlag.count({ where }),
+      prisma.feature_flags.count({ where }),
     ]);
 
     return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
@@ -100,24 +100,24 @@ export class FeatureFlagService {
     const scopeValue = data.scopeValue || null;
     const priority = SCOPE_PRIORITY[data.scope] ?? 0;
 
-    const flag = await prisma.featureFlag.upsert({
+    const flag = await prisma.feature_flags.upsert({
       where: {
         featureKey_scope_scopeValue: {
-          featureKey: data.featureKey,
+          key: data.featureKey,
           scope: data.scope,
-          scopeValue: scopeValue ?? '',
+          scope_value: scopeValue ?? '',
         }
       },
       create: {
-        featureKey: data.featureKey,
-        isEnabled: data.isEnabled,
+        key: data.featureKey,
+        name: data.featureKey,
+        is_enabled: data.isEnabled,
         scope: data.scope,
-        scopeValue: scopeValue,
+        scope_value: scopeValue,
         priority,
-        createdBy: adminId,
       },
       update: {
-        isEnabled: data.isEnabled,
+        is_enabled: data.isEnabled,
         priority,
       },
     });
@@ -155,9 +155,9 @@ export class FeatureFlagService {
    * Delete a specific flag.
    */
   static async deleteFlag(adminId: string, flagId: string, ip?: string, ua?: string) {
-    const flag = await prisma.featureFlag.delete({ where: { id: flagId } });
+    const flag = await prisma.feature_flags.delete({ where: { id: flagId } });
     await AuditService.log(adminId, ADMIN_ACTIONS.FEATURE_FLAG_UPDATE, 'feature_flag', flagId, {
-      deleted: true, featureKey: flag.featureKey
+      deleted: true, featureKey: flag.key
     }, ip, ua);
     return { success: true };
   }
@@ -166,17 +166,17 @@ export class FeatureFlagService {
    * Get a summary: for each feature, its global status + override count.
    */
   static async getFeatureSummary() {
-    const allFlags = await prisma.featureFlag.findMany({
-      orderBy: [{ featureKey: 'asc' }, { priority: 'desc' }],
+    const allFlags = await prisma.feature_flags.findMany({
+      orderBy: [{ key: 'asc' }, { priority: 'desc' }],
     });
 
     const summary: Record<string, { globalEnabled: boolean; overrides: number }> = {};
 
     for (const feature of PLATFORM_FEATURES) {
-      const flags = allFlags.filter((f: any) => f.featureKey === feature);
+      const flags = allFlags.filter((f: any) => f.key === feature);
       const globalFlag = flags.find(f => f.scope === 'GLOBAL');
       summary[feature] = {
-        globalEnabled: globalFlag?.isEnabled ?? true,
+        globalEnabled: globalFlag?.is_enabled ?? true,
         overrides: flags.filter((f: any) => f.scope !== 'GLOBAL').length,
       };
     }
@@ -187,22 +187,22 @@ export class FeatureFlagService {
   // ─── PLATFORM CONFIG ────────────────────────────────────
 
   static async getConfig(key: string) {
-    const config = await prisma.platformConfig.findUnique({ where: { key } });
+    const config = await prisma.platform_config.findUnique({ where: { key } });
     return config?.value ?? null;
   }
 
-  static async setConfig(adminId: string, key: string, value: any, ip?: string, ua?: string) {
-    const config = await prisma.platformConfig.upsert({
+  static async setConfig(_adminId: string, key: string, value: any, ip?: string, ua?: string) {
+    const config = await prisma.platform_config.upsert({
       where: { key },
-      create: { key, value, updatedBy: adminId },
-      update: { value, updatedBy: adminId },
+      create: { key, value },
+      update: { value },
     });
-    await AuditService.log(adminId, ADMIN_ACTIONS.CONFIG_UPDATE, 'config', key, { value }, ip, ua);
+    await AuditService.log(_adminId, ADMIN_ACTIONS.CONFIG_UPDATE, 'config', key, { value }, ip, ua);
     return config;
   }
 
   static async getAllConfigs() {
-    return prisma.platformConfig.findMany({ orderBy: { key: 'asc' } });
+    return prisma.platform_config.findMany({ orderBy: { key: 'asc' } });
   }
 
   static async toggleMaintenance(adminId: string, enabled: boolean, ip?: string, ua?: string) {

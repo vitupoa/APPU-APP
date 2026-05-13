@@ -1,5 +1,4 @@
 import { prisma } from '../../../config/database.js';
-import { Prisma } from '@prisma/client';
 import { AuditService } from './audit.service.js';
 import { ADMIN_ACTIONS } from '../rembrandt-rar.types.js';
 import { EmailService } from '../../../shared/services/email.service.js';
@@ -15,7 +14,7 @@ export class UserManagementService {
     isSuspended?: boolean;
     isVerified?: boolean;
   }) {
-    const { page = 1, limit = 20, search, sort = 'createdAt', order = 'desc', account_type, isSuspended, is_verified } = options;
+    const { page = 1, limit = 20, search, sort = 'createdAt', order = 'desc', accountType, isSuspended, isVerified } = options;
     const where: any = {};
 
     if (search) {
@@ -37,7 +36,7 @@ export class UserManagementService {
           display_name: true, avatar_url: true, country: true, currency: true,
           account_type: true, is_admin: true, is_verified: true, isSuspended: true,
           is_wallet_unlocked: true, created_at: true, updated_at: true,
-          _count: { select: { shorts: true, contestsCreated: true, admirers: true, posts: true } },
+          _count: { select: { shorts: true, Post: true } },
           adminProfile: { select: { role: true, is_active: true } },
         },
         orderBy: { [sort]: order },
@@ -54,13 +53,15 @@ export class UserManagementService {
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
       include: {
-        wallet: { select: { kr_balance: true } },
+        wallets: { select: { kr_balance: true } },
         adminProfile: true,
         suspensions: { orderBy: { created_at: 'desc' }, take: 5 },
         _count: {
           select: {
-            shorts: true, posts: true, contestsCreated: true,
-            admirers: true, admiring: true, transactions: true, stories: true,
+            shorts: true, Post: true, Contest: true,
+            admires_admires_admired_idToUser: true,
+            admires_admires_admirer_idToUser: true,
+            transactions: true, stories: true,
           }
         },
       }
@@ -83,13 +84,13 @@ export class UserManagementService {
     }
 
     return prisma.$transaction(async (tx) => {
-      await tx.userSuspension.create({
+      await tx.user_suspensions.create({
         data: {
           user_id: targetUserId,
           reason: data.reason,
           suspendedBy: adminId,
           type: data.type,
-          expires_at: data.expires_at ? new Date(data.expires_at) : null,
+          expires_at: data.expiresAt ? new Date(data.expiresAt) : null,
         }
       });
 
@@ -99,7 +100,7 @@ export class UserManagementService {
       });
 
       await AuditService.log(adminId, ADMIN_ACTIONS.USER_SUSPEND, 'user', targetUserId, {
-        reason: data.reason, type: data.type, expires_at: data.expires_at
+        reason: data.reason, type: data.type, expires_at: data.expiresAt
       }, ip, ua);
 
       return { success: true, message: `User ${data.type.toLowerCase()} successfully` };
@@ -109,7 +110,7 @@ export class UserManagementService {
   static async unsuspendUser(adminId: string, targetUserId: string, ip?: string, ua?: string) {
     return prisma.$transaction(async (tx) => {
       // Lift active suspensions
-      await tx.userSuspension.updateMany({
+      await tx.user_suspensions.updateMany({
         where: { user_id: targetUserId, liftedAt: null },
         data: { liftedAt: new Date(), liftedBy: adminId }
       });
@@ -172,15 +173,14 @@ export class UserManagementService {
     if (existing) {
       await prisma.adminProfile.update({
         where: { id: existing.id },
-        data: { role: data.role as any, permissions: data.permissions ?? undefined, is_active: true }
+        data: { role: data.role as any, is_active: true }
       });
     } else {
       await prisma.adminProfile.create({
         data: {
           user_id: targetUserId,
           role: data.role as any,
-          permissions: data.permissions ?? undefined,
-          grantedBy: adminId,
+          granted_by: adminId,
         }
       });
     }
@@ -224,19 +224,19 @@ export class UserManagementService {
     ip?: string, ua?: string
   ) {
     const updateData: any = {};
-    if (data.first_name) updateData.first_name = data.first_name;
-    if (data.last_name) updateData.last_name = data.last_name;
-    if (data.display_name) updateData.display_name = data.display_name;
+    if (data.firstName) updateData.first_name = data.firstName;
+    if (data.lastName) updateData.last_name = data.lastName;
+    if (data.displayName) updateData.display_name = data.displayName;
     if (data.username) {
       // Check prohibited
-      const prohibited = await prisma.prohibitedName.findFirst({
-        where: { name: data.username.toLowerCase(), type: { in: ['username', 'both'] } }
+      const prohibited = await prisma.prohibited_names.findFirst({
+        where: { name: data.username.toLowerCase() }
       });
       if (prohibited) throw new Error(`Username "${data.username}" is prohibited: ${prohibited.reason}`);
 
       // Check reserved
-      const reserved = await prisma.reservedUsername.findFirst({
-        where: { username: data.username.toLowerCase(), reservedFor: { not: targetUserId } }
+      const reserved = await prisma.reserved_usernames.findFirst({
+        where: { username: data.username.toLowerCase(), reserved_for: { not: targetUserId } }
       });
       if (reserved) throw new Error(`Username "${data.username}" is reserved`);
 
@@ -255,7 +255,7 @@ export class UserManagementService {
 
     const user = await prisma.user.update({ where: { id: targetUserId }, data: { password_hash: hash } });
     // Revoke all refresh tokens to force re-login
-    await prisma.refresh_token.deleteMany({ where: { user_id: targetUserId } });
+    await prisma.refresh_tokens.deleteMany({ where: { user_id: targetUserId } });
 
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_RESET_PASSWORD, 'user', targetUserId, {}, ip, ua);
     
@@ -270,7 +270,7 @@ export class UserManagementService {
   static async changeUserPassword(adminId: string, targetUserId: string, newPassword: string, ip?: string, ua?: string) {
     const hash = await (await import('bcrypt')).hash(newPassword, 12);
     await prisma.user.update({ where: { id: targetUserId }, data: { password_hash: hash } });
-    await prisma.refresh_token.deleteMany({ where: { user_id: targetUserId } });
+    await prisma.refresh_tokens.deleteMany({ where: { user_id: targetUserId } });
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_RESET_PASSWORD, 'user', targetUserId, { method: 'manual' }, ip, ua);
     return { success: true, message: 'Password changed successfully.' };
   }
@@ -281,7 +281,7 @@ export class UserManagementService {
     ip?: string, ua?: string
   ) {
     const updateData: any = { ...data };
-    if (data.account_type) updateData.account_type = data.account_type;
+    if (data.accountType) updateData.account_type = data.accountType;
 
     await prisma.user.update({ where: { id: targetUserId }, data: updateData });
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_NAME_CHANGE, 'user', targetUserId, data, ip, ua);
@@ -290,7 +290,7 @@ export class UserManagementService {
 
   // ─── AUTO ADMIRE ───────────────────────────────────
   static async getAutoAdmireUsers() {
-    const config = await prisma.platformConfig.findUnique({ where: { key: 'AUTO_ADMIRE_USERS' } });
+    const config = await prisma.platform_config.findUnique({ where: { key: 'AUTO_ADMIRE_USERS' } });
     const userIds = (config?.value as string[]) || [];
     if (userIds.length === 0) return [];
 
@@ -300,77 +300,77 @@ export class UserManagementService {
     });
   }
 
-  static async addAutoAdmireUser(adminId: string, targetUserId: string) {
-    const config = await prisma.platformConfig.findUnique({ where: { key: 'AUTO_ADMIRE_USERS' } });
+  static async addAutoAdmireUser(_adminId: string, targetUserId: string) {
+    const config = await prisma.platform_config.findUnique({ where: { key: 'AUTO_ADMIRE_USERS' } });
     const userIds = (config?.value as string[]) || [];
     
     if (!userIds.includes(targetUserId)) {
       userIds.push(targetUserId);
-      await prisma.platformConfig.upsert({
+      await prisma.platform_config.upsert({
         where: { key: 'AUTO_ADMIRE_USERS' },
-        update: { value: userIds, updatedBy: adminId },
-        create: { key: 'AUTO_ADMIRE_USERS', value: userIds, updatedBy: adminId }
+        update: { value: userIds },
+        create: { key: 'AUTO_ADMIRE_USERS', value: userIds }
       });
-      await AuditService.log(adminId, 'AUTO_ADMIRE_ADD' as any, 'user', targetUserId);
+      await AuditService.log(_adminId, 'AUTO_ADMIRE_ADD' as any, 'user', targetUserId);
     }
     return { success: true, message: 'User added to Auto Admire list' };
   }
 
-  static async removeAutoAdmireUser(adminId: string, targetUserId: string) {
-    const config = await prisma.platformConfig.findUnique({ where: { key: 'AUTO_ADMIRE_USERS' } });
+  static async removeAutoAdmireUser(_adminId: string, targetUserId: string) {
+    const config = await prisma.platform_config.findUnique({ where: { key: 'AUTO_ADMIRE_USERS' } });
     let userIds = (config?.value as string[]) || [];
     
     if (userIds.includes(targetUserId)) {
       userIds = userIds.filter((id: any) => id !== targetUserId);
-      await prisma.platformConfig.update({
+      await prisma.platform_config.update({
         where: { key: 'AUTO_ADMIRE_USERS' },
-        data: { value: userIds, updatedBy: adminId }
+        data: { value: userIds }
       });
-      await AuditService.log(adminId, 'AUTO_ADMIRE_REMOVE' as any, 'user', targetUserId);
+      await AuditService.log(_adminId, 'AUTO_ADMIRE_REMOVE' as any, 'user', targetUserId);
     }
     return { success: true, message: 'User removed from Auto Admire list' };
   }
 
   // ─── NAME MANAGEMENT ───────────────────────────────────
 
-  static async addProhibitedName(adminId: string, data: { name: string; type: string; reason?: string }) {
-    const entry = await prisma.prohibitedName.create({
-      data: { name: data.name.toLowerCase(), type: data.type, reason: data.reason, addedBy: adminId }
+  static async addProhibitedName(adminId: string, data: { name: string; reason?: string }) {
+    const entry = await prisma.prohibited_names.create({
+      data: { name: data.name.toLowerCase(), reason: data.reason, added_by: adminId }
     });
     await AuditService.log(adminId, ADMIN_ACTIONS.NAME_PROHIBIT, 'prohibited_name', entry.id, data);
     return entry;
   }
 
   static async removeProhibitedName(adminId: string, nameId: string) {
-    await prisma.prohibitedName.delete({ where: { id: nameId } });
+    await prisma.prohibited_names.delete({ where: { id: nameId } });
     return { success: true };
   }
 
   static async listProhibitedNames(page = 1, limit = 50) {
     const [items, total] = await Promise.all([
-      prisma.prohibitedName.findMany({ orderBy: { created_at: 'desc' }, take: limit, skip: (page - 1) * limit }),
-      prisma.prohibitedName.count(),
+      prisma.prohibited_names.findMany({ orderBy: { created_at: 'desc' }, take: limit, skip: (page - 1) * limit }),
+      prisma.prohibited_names.count(),
     ]);
     return { items, total, page, limit };
   }
 
   static async reserveUsername(adminId: string, data: { username: string; reservedFor?: string; reason?: string }) {
-    const entry = await prisma.reservedUsername.create({
-      data: { username: data.username.toLowerCase(), reservedFor: data.reservedFor, reason: data.reason, reservedBy: adminId }
+    const entry = await prisma.reserved_usernames.create({
+      data: { username: data.username.toLowerCase(), reserved_for: data.reservedFor, reason: data.reason, reserved_by: adminId }
     });
     await AuditService.log(adminId, ADMIN_ACTIONS.USERNAME_RESERVE, 'reserved_username', entry.id, data);
     return entry;
   }
 
   static async releaseReservedUsername(adminId: string, usernameId: string) {
-    await prisma.reservedUsername.delete({ where: { id: usernameId } });
+    await prisma.reserved_usernames.delete({ where: { id: usernameId } });
     return { success: true };
   }
 
   static async listReservedUsernames(page = 1, limit = 50) {
     const [items, total] = await Promise.all([
-      prisma.reservedUsername.findMany({ orderBy: { created_at: 'desc' }, take: limit, skip: (page - 1) * limit }),
-      prisma.reservedUsername.count(),
+      prisma.reserved_usernames.findMany({ orderBy: { created_at: 'desc' }, take: limit, skip: (page - 1) * limit }),
+      prisma.reserved_usernames.count(),
     ]);
     return { items, total, page, limit };
   }

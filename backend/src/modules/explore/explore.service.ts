@@ -15,7 +15,7 @@ export class ExploreService {
         usageCount: true,
         _count: {
           select: {
-            content_tags: true
+            contentHashtags: true
           }
         }
       }
@@ -24,7 +24,7 @@ export class ExploreService {
     return hashtags.map((h: any) => ({
       tag: `#${h.tag}`,
       view_count: h.usageCount,
-      postCount: h._count.content_tags
+      postCount: h._count.contentHashtags
     }));
   }
 
@@ -46,12 +46,12 @@ export class ExploreService {
       where: whereClause,
       orderBy: [
         { views: 'desc' },
-        { likesCount: 'desc' }
+        { likes_count: 'desc' }
       ],
       take: limit,
       select: {
         id: true,
-        videoUrl: true,
+        video_url: true,
         views: true,
         user_id: true
       }
@@ -59,7 +59,7 @@ export class ExploreService {
 
     return shorts.map((s: any) => ({
       id: s.id,
-      thumbnailUrl: s.videoUrl,
+      thumbnailUrl: s.video_url,
       view_count: s.views,
       creatorUsername: '',
       creatorAvatar: ''
@@ -150,24 +150,24 @@ export class ExploreService {
     const contentDetails = await Promise.all(
       result.items.map(async (item) => {
         if (item.contentType === 'SHORT') {
-          const short = await prisma.short.findUnique({
+          const short = await prisma.shorts.findUnique({
             where: { id: item.content_id },
             select: {
               id: true,
-              videoUrl: true,
+              video_url: true,
               caption: true,
               views: true,
-              likesCount: true,
+              likes_count: true,
               user_id: true
             }
           });
           return short ? {
             type: 'SHORT',
             id: short.id,
-            videoUrl: short.videoUrl,
+            videoUrl: short.video_url,
             caption: short.caption,
             views: short.views,
-            likesCount: short.likesCount,
+            likesCount: short.likes_count,
             creator: { id: short.user_id, username: '', avatar_url: '' }
           } : null;
         } else if (item.contentType === 'POST') {

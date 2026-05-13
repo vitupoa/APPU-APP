@@ -77,7 +77,7 @@ router.get('/users', requirePermission('users.view') as any, async (req: RarRequ
     const { page, limit, search, sort, order } = paginationSchema.parse(req.query);
     const accountType = req.query.account_type as string | undefined;
     const isSuspended = req.query.isSuspended === 'true' ? true : req.query.isSuspended === 'false' ? false : undefined;
-    res.json(await UserManagementService.listUsers({ page, limit, search, sort, order, account_type, isSuspended })); return;
+    res.json(await UserManagementService.listUsers({ page, limit, search, sort, order, accountType, isSuspended })); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -170,7 +170,7 @@ router.get('/content/:type', requirePermission('content.view') as any, async (re
     const userId = req.query.user_id as string | undefined;
     const status = req.query.status as string | undefined;
     const type = req.params.type as any;
-    res.json(await ContentModerationService.listContent(type, { page, limit, search, user_id, status })); return;
+    res.json(await ContentModerationService.listContent(type, { page, limit, search, userId, status })); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -257,7 +257,7 @@ router.get('/withdrawals', requirePermission('withdrawals.view') as any, async (
     const { page, limit } = paginationSchema.parse(req.query);
     const status = req.query.status as string | undefined;
     const userId = req.query.user_id as string | undefined;
-    res.json(await FinancialService.listWithdrawals({ page, limit, status, user_id })); return;
+    res.json(await FinancialService.listWithdrawals({ page, limit, status, userId })); return;
   } catch (e: any) { res.status(500).json({ error: e.message }); return; }
 });
 
@@ -284,7 +284,7 @@ router.get('/transactions', requirePermission('transactions.view') as any, async
     const userId = req.query.user_id as string | undefined;
     const type = req.query.type as string | undefined;
     const status = req.query.status as string | undefined;
-    res.json(await FinancialService.listTransactions({ page, limit, user_id, type, status })); return;
+    res.json(await FinancialService.listTransactions({ page, limit, userId, type, status })); return;
   } catch (e: any) { res.status(500).json({ error: e.message }); return; }
 });
 
@@ -428,10 +428,10 @@ router.get('/announcements', requirePermission('announcements.send') as any, asy
   try {
     const { page, limit } = paginationSchema.parse(req.query);
     const [items, total] = await Promise.all([
-      prisma.platformAnnouncement.findMany({
+      prisma.platform_announcements.findMany({
         orderBy: { created_at: 'desc' }, take: limit, skip: (page - 1) * limit,
       }),
-      prisma.platformAnnouncement.count(),
+      prisma.platform_announcements.count(),
     ]);
     res.json({ items, total, page, limit }); return;
   } catch (e: any) { res.status(500).json({ error: e.message }); return; }
@@ -440,10 +440,10 @@ router.get('/announcements', requirePermission('announcements.send') as any, asy
 router.post('/announcements', requirePermission('announcements.send') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = announcementSchema.parse(req.body);
-    const announcement = await prisma.platformAnnouncement.create({
+    const announcement = await prisma.platform_announcements.create({
       data: {
         ...data,
-        createdBy: req.user_id!,
+        created_by: req.user_id!,
         expires_at: data.expires_at ? new Date(data.expires_at) : null,
       }
     });
@@ -454,7 +454,7 @@ router.post('/announcements', requirePermission('announcements.send') as any, as
 
 router.delete('/announcements/:id', requirePermission('announcements.send') as any, async (req: RarRequest, res: Response) => {
   try {
-    await prisma.platformAnnouncement.delete({ where: { id: req.params.id as string } });
+    await prisma.platform_announcements.delete({ where: { id: req.params.id as string } });
     res.json({ success: true }); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
@@ -487,7 +487,7 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
     const { email, username, first_name, last_name, password, role } = req.body;
 
     // Validate required fields
-    if (!email || !username || !firstName || !lastName || !password || !role) {
+    if (!email || !username || !first_name || !last_name || !password || !role) {
       res.status(400).json({ error: 'All fields are required' });
       return;
     }
@@ -527,10 +527,11 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
           first_name,
           last_name,
           display_name: `${first_name} ${last_name}`,
-          password_hash,
+          password_hash: passwordHash,
           country: 'KE',
           currency: 'KES',
           is_admin: true,
+          updated_at: new Date(),
         },
       });
 
@@ -538,13 +539,13 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
         data: {
           user_id: user.id,
           role,
-          grantedBy: req.user_id!,
+          granted_by: req.user_id!,
           is_active: true,
         },
       });
 
       // Create wallet
-      await tx.wallet.create({
+      await tx.wallets.create({
         data: {
           user_id: user.id,
           kr_balance: 0,

@@ -21,7 +21,7 @@ async function creditOperationalFee(tx: any, fiatAmount: number, currency: strin
     if (feeKr > 0) {
       const opsUser = await tx.user.findFirst({ where: { username: 'JohnOyugi' } });
       if (opsUser) {
-        await tx.wallet.upsert({
+        await tx.wallets.upsert({
           where: { user_id: opsUser.id },
           create: { user_id: opsUser.id, kr_balance: new Prisma.Decimal(feeKr) },
           update: { kr_balance: { increment: new Prisma.Decimal(feeKr) } },
@@ -87,7 +87,7 @@ router.post('/topup', authMiddleware, async (req: AuthRequest, res: Response) =>
     }
 
     // Record pending transaction
-    await prisma.transaction.create({
+    await prisma.transactions.create({
       data: {
         user_id,
         type: 'topup',
@@ -119,7 +119,7 @@ router.post('/mpesa/callback', async (req: Request, res: Response) => {
     const parsed = MpesaService.parseCallback(req.body);
 
     // Find the pending transaction
-    const tx = await prisma.transaction.findFirst({
+    const tx = await prisma.transactions.findFirst({
       where: {
         provider: 'mpesa',
         status: 'pending',
@@ -139,7 +139,7 @@ router.post('/mpesa/callback', async (req: Request, res: Response) => {
       const krAmount = new Prisma.Decimal(parsed.amount / rate);
 
       await prisma.$transaction(async (dbTx) => {
-        await dbTx.transaction.update({
+        await dbtx.transactions.update({
           where: { id: tx.id },
           data: {
             status: 'completed',
@@ -148,7 +148,7 @@ router.post('/mpesa/callback', async (req: Request, res: Response) => {
           }
         });
 
-        await dbTx.wallet.upsert({
+        await dbtx.wallets.upsert({
           where: { user_id: tx.user_id },
           create: { user_id: tx.user_id, kr_balance: krAmount },
           update: { kr_balance: { increment: krAmount } }
@@ -164,7 +164,7 @@ router.post('/mpesa/callback', async (req: Request, res: Response) => {
         await creditOperationalFee(dbTx, parsed.amount!, 'KES');
       });
     } else {
-      await prisma.transaction.update({
+      await prisma.transactions.update({
         where: { id: tx.id },
         data: { status: 'failed' }
       });
@@ -198,13 +198,13 @@ router.post('/paypal/capture', authMiddleware, async (req: AuthRequest, res: Res
 
       await prisma.$transaction(async (dbTx) => {
         // Find pending tx
-        const tx = await dbTx.transaction.findFirst({
+        const tx = await dbtx.transactions.findFirst({
           where: { user_id: req.user_id!, provider: 'paypal', status: 'pending' },
           orderBy: { created_at: 'desc' }
         });
 
         if (tx) {
-          await dbTx.transaction.update({
+          await dbtx.transactions.update({
             where: { id: tx.id },
             data: {
               status: 'completed',
@@ -214,7 +214,7 @@ router.post('/paypal/capture', authMiddleware, async (req: AuthRequest, res: Res
           });
         }
 
-        await dbTx.wallet.upsert({
+        await dbtx.wallets.upsert({
           where: { user_id: req.user_id! },
           create: { user_id: req.user_id!, kr_balance: krAmount },
           update: { kr_balance: { increment: krAmount } }
@@ -255,7 +255,7 @@ router.post('/paystack/webhook', async (req: Request, res: Response) => {
     const parsed = PaystackService.parseWebhook(req.body);
 
     if (parsed.event === 'charge.success') {
-      const tx = await prisma.transaction.findFirst({
+      const tx = await prisma.transactions.findFirst({
         where: { reference: parsed.reference, status: 'pending' }
       });
 
@@ -264,12 +264,12 @@ router.post('/paystack/webhook', async (req: Request, res: Response) => {
         const krAmount = new Prisma.Decimal(parsed.amount / rate);
 
         await prisma.$transaction(async (dbTx) => {
-          await dbTx.transaction.update({
+          await dbtx.transactions.update({
             where: { id: tx.id },
             data: { status: 'completed', amount_kr: krAmount }
           });
 
-          await dbTx.wallet.upsert({
+          await dbtx.wallets.upsert({
             where: { user_id: tx.user_id },
             create: { user_id: tx.user_id, kr_balance: krAmount },
             update: { kr_balance: { increment: krAmount } }
@@ -364,7 +364,7 @@ router.post('/withdraw', authMiddleware, async (req: AuthRequest, res: Response)
     }
 
     // Create withdrawal request
-    await prisma.withdrawalRequest.create({
+    await prisma.withdrawal_requests.create({
       data: {
         user_id,
         amount_kr: new Prisma.Decimal(data.krAmount),
@@ -482,13 +482,13 @@ router.post('/mpesa/b2c/result', async (req: Request, res: Response) => {
     const reference = result.TransactionID;
     const resultCode = result.ResultCode;
 
-    const withdrawal = await prisma.withdrawalRequest.findFirst({
+    const withdrawal = await prisma.withdrawal_requests.findFirst({
       where: { provider: 'mpesa', status: 'PENDING' },
       orderBy: { created_at: 'desc' }
     });
 
     if (withdrawal) {
-      await prisma.withdrawalRequest.update({
+      await prisma.withdrawal_requests.update({
         where: { id: withdrawal.id },
         data: {
           status: resultCode === 0 ? 'COMPLETED' : 'FAILED'
