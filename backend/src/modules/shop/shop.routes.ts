@@ -3,13 +3,13 @@ import { authMiddleware, optionalAuth, AuthRequest } from '../../middleware/auth
 import { ShopService } from './shop.service.js';
 import { ReviewService, WishlistService, CartService, GiftService } from './social-shop.service.js';
 import { FlashSaleService, GroupBuyService, DealAlertService } from './deals.service.js';
-import { GarageService, ImporterService, LogisticsService, LiveShoppingService, PremiumService, ProductShareService } from './verticals.service.js';
+import { GarageService, ImporterService, LogisticsService, PremiumService, ProductShareService } from './verticals.service.js';
 import {
   createProductSchema, updateProductSchema, productFilterSchema,
   createReviewSchema, createWishlistSchema, addWishlistItemSchema,
   addToCartSchema, createFlashSaleSchema, createGroupBuySchema,
   createGarageProfileSchema, createBookingSchema, createImporterProfileSchema,
-  createImportRequestSchema, createLiveSessionSchema, createDealAlertSchema,
+  createImportRequestSchema, createDealAlertSchema,
   createPremiumListingSchema, createProductShareSchema, sendGiftSchema,
   createShippingJobSchema, createLogisticsProfileSchema, createDiscountSchema,
   priceCalculatorSchema, vehicleFavoriteSchema,
@@ -171,7 +171,7 @@ router.get('/wishlists', authMiddleware, async (req: AuthRequest, res: Response)
 
 router.get('/wishlists/public/:userId', async (req: AuthRequest, res: Response) => {
   try {
-    const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
+    const userId = Array.isArray(req.params.user_id) ? req.params.user_id[0] : req.params.user_id;
     const wishlists = await WishlistService.getPublicWishlists(userId);
     res.json(wishlists);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -236,7 +236,7 @@ router.post('/cart', authMiddleware, async (req: AuthRequest, res: Response) => 
 
 router.delete('/cart/:productId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const productId = Array.isArray(req.params.productId) ? req.params.productId[0] : req.params.productId;
+    const productId = Array.isArray(req.params.product_id) ? req.params.product_id[0] : req.params.product_id;
     await CartService.removeFromCart(req.userId!, productId);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
@@ -296,7 +296,11 @@ router.get('/flash-sales/upcoming', async (_req: AuthRequest, res: Response) => 
 router.post('/flash-sales', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createFlashSaleSchema.parse(req.body);
-    const sale = await FlashSaleService.createFlashSale(data);
+    const sale = await FlashSaleService.createFlashSale({
+      ...data,
+      startTime: data.start_time,
+      endTime: data.end_time,
+    });
     res.status(201).json(sale);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -317,7 +321,10 @@ router.get('/group-buys', async (req: AuthRequest, res: Response) => {
 router.post('/group-buys', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createGroupBuySchema.parse(req.body);
-    const gb = await GroupBuyService.createGroupBuy(req.userId!, data);
+    const gb = await GroupBuyService.createGroupBuy(req.userId!, {
+      ...data,
+      expiresAt: data.expires_at,
+    });
     res.status(201).json(gb);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -416,7 +423,7 @@ router.post('/garages/:id/reviews', authMiddleware, async (req: AuthRequest, res
   try {
     const garageId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const review = await GarageService.createReview(req.userId!, {
-      garageId, rating: req.body.rating, text: req.body.text
+      garage_id: garageId, rating: req.body.rating, text: req.body.text
     });
     res.status(201).json(review);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
@@ -510,46 +517,7 @@ router.post('/shipping-jobs', authMiddleware, async (req: AuthRequest, res: Resp
 });
 
 // ═══════════════════════════════════════════════════════════
-// LIVE SHOPPING
-// ═══════════════════════════════════════════════════════════
 
-router.get('/live-sessions/active', async (_req: AuthRequest, res: Response) => {
-  try {
-    const sessions = await LiveShoppingService.getActiveSessions();
-    res.json(sessions);
-  } catch (e: any) { res.status(500).json({ error: e.message }); }
-});
-
-router.get('/live-sessions/upcoming', async (_req: AuthRequest, res: Response) => {
-  try {
-    const sessions = await LiveShoppingService.getUpcomingSessions();
-    res.json(sessions);
-  } catch (e: any) { res.status(500).json({ error: e.message }); }
-});
-
-router.post('/live-sessions', authMiddleware, async (req: AuthRequest, res: Response) => {
-  try {
-    const data = createLiveSessionSchema.parse(req.body);
-    const session = await LiveShoppingService.createSession(req.userId!, data);
-    res.status(201).json(session);
-  } catch (e: any) { res.status(400).json({ error: e.message }); }
-});
-
-router.post('/live-sessions/:id/start', authMiddleware, async (req: AuthRequest, res: Response) => {
-  try {
-    const sessionId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const session = await LiveShoppingService.startSession(sessionId, req.userId!);
-    res.json(session);
-  } catch (e: any) { res.status(400).json({ error: e.message }); }
-});
-
-router.post('/live-sessions/:id/end', authMiddleware, async (req: AuthRequest, res: Response) => {
-  try {
-    const sessionId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const session = await LiveShoppingService.endSession(sessionId, req.userId!);
-    res.json(session);
-  } catch (e: any) { res.status(400).json({ error: e.message }); }
-});
 
 // ═══════════════════════════════════════════════════════════
 // PREMIUM LISTINGS
@@ -584,7 +552,7 @@ router.post('/tags', authMiddleware, async (req: AuthRequest, res: Response) => 
 
 router.get('/tags/:contentType/:contentId', async (req: AuthRequest, res: Response) => {
   try {
-    const contentId = Array.isArray(req.params.contentId) ? req.params.contentId[0] : req.params.contentId;
+    const contentId = Array.isArray(req.params.content_id) ? req.params.content_id[0] : req.params.content_id;
     const contentType = Array.isArray(req.params.contentType) ? req.params.contentType[0] : req.params.contentType;
     const tags = await ProductShareService.getProductTags(contentId, contentType);
     res.json(tags);
@@ -599,7 +567,11 @@ router.post('/products/:id/discounts', authMiddleware, async (req: AuthRequest, 
   try {
     const data = createDiscountSchema.parse(req.body);
     const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const discount = await DiscountService.createDiscount(req.userId!, productId, data);
+    const discount = await DiscountService.createDiscount(req.userId!, productId, {
+      ...data,
+      startDate: data.start_date,
+      endDate: data.end_date,
+    });
     res.status(201).json(discount);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -667,7 +639,7 @@ router.patch('/orders/:id/status', authMiddleware, async (req: AuthRequest, res:
 
 router.post('/orders/:orderId/items/:itemId/confirm-delivery', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const orderId = Array.isArray(req.params.orderId) ? req.params.orderId[0] : req.params.orderId;
+    const orderId = Array.isArray(req.params.order_id) ? req.params.order_id[0] : req.params.order_id;
     const itemId = Array.isArray(req.params.itemId) ? req.params.itemId[0] : req.params.itemId;
     const result = await OrderService.confirmDelivery(orderId, itemId, req.userId!);
     res.json(result);
@@ -709,14 +681,14 @@ router.get('/analytics/categories', async (_req: AuthRequest, res: Response) => 
 router.post('/vehicles/favorites', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = vehicleFavoriteSchema.parse(req.body);
-    const favorite = await ShopService.addVehicleFavorite(req.userId!, data.productId);
+    const favorite = await ShopService.addVehicleFavorite(req.userId!, data.product_id);
     res.status(201).json(favorite);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
 
 router.delete('/vehicles/favorites/:productId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const productId = Array.isArray(req.params.productId) ? req.params.productId[0] : req.params.productId;
+    const productId = Array.isArray(req.params.product_id) ? req.params.product_id[0] : req.params.product_id;
     await ShopService.removeVehicleFavorite(req.userId!, productId);
     res.json({ success: true });
   } catch (e: any) { res.status(400).json({ error: e.message }); }
@@ -762,3 +734,4 @@ router.get('/recommendations/friends', authMiddleware, async (req: AuthRequest, 
 });
 
 export default router;
+

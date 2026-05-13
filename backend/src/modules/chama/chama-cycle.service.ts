@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 export class ChamaCycleService {
   /**
@@ -9,7 +10,7 @@ export class ChamaCycleService {
     return prisma.$transaction(async (tx) => {
       // 1. Verify admin
       const adminMember = await tx.chamaMember.findUnique({
-        where: { chamaId_userId: { chamaId, userId: adminId } },
+        where: { chama_id_user_id: { chama_id: chamaId, user_id: adminId } },
       });
       if (!adminMember || adminMember.role !== 'ADMIN') {
         throw new Error('Only Admin can open cycles');
@@ -17,9 +18,6 @@ export class ChamaCycleService {
 
       const chama = await tx.chama.findUnique({ where: { id: chamaId } });
       if (!chama) throw new Error('Chama not found');
-      if (chama.type !== 'ROTATING') {
-        throw new Error('Cycles are only applicable to ROTATING chamas');
-      }
       if (chama.status !== 'ACTIVE') {
         throw new Error('Chama must be ACTIVE to start a cycle');
       }
@@ -27,73 +25,70 @@ export class ChamaCycleService {
       // 2. Check for existing OPEN or COLLECTING cycle
       const activeCycle = await tx.chamaCycle.findFirst({
         where: {
-          chamaId,
-          status: { in: ['OPEN', 'COLLECTING', 'DISBURSING'] }
+          chama_id: chamaId,
+          status: { in: ['OPEN', 'COLLECTING'] }
         }
       });
       if (activeCycle) {
-        throw new Error(`Cycle #${activeCycle.cycleNumber} is still active (${activeCycle.status})`);
+        throw new Error(`Cycle #${activeCycle.cycle_number} is still active (${activeCycle.status})`);
       }
 
       // 3. Determine next cycle number
-      const nextCycleNumber = (chama.currentCycleNumber || 0) + 1;
+      const nextCycleNumber = (chama.current_cycle_number || 0) + 1;
 
-      // 4. Identify recipient for this cycle based on rotation number
-      // We cycle through members ordered by rotationNumber
+      // 4. Identify recipient for this cycle based on member order
+      // We cycle through members ordered by created_at
       const members = await tx.chamaMember.findMany({
-        where: { chamaId, status: 'ACTIVE' },
-        orderBy: { rotationNumber: 'asc' },
+        where: { chama_id: chamaId, status: 'ACTIVE' },
+        orderBy: { created_at: 'asc' },
       });
 
       if (members.length === 0) throw new Error('No active members to assign recipient');
 
-      // The recipient is the member whose rotationNumber matches (nextCycleNumber % memberCount),
-      // with a slight adjustment for 1-based indexing.
+      // The recipient is the member whose index matches (nextCycleNumber % memberCount)
       // If cycle is 1, index is 0. If cycle is 2, index is 1.
       const recipientIndex = (nextCycleNumber - 1) % members.length;
       const recipient = members[recipientIndex];
 
       // 5. Calculate target amount
       // Total amount expected = contributionAmountKr * (members.length)
-      const targetAmountKr = new Prisma.Decimal(Number(chama.contributionAmountKr) * members.length);
+      const targetAmountKr = new Prisma.Decimal(Number(chama.contribution_amount_kr) * members.length);
 
       // 6. Set dates
       const startDate = new Date();
       const endDate = new Date();
-      // Add days based on frequency
-      if (chama.contributionFrequency === 'DAILY') endDate.setDate(endDate.getDate() + 1);
-      else if (chama.contributionFrequency === 'WEEKLY') endDate.setDate(endDate.getDate() + 7);
-      else if (chama.contributionFrequency === 'BIWEEKLY') endDate.setDate(endDate.getDate() + 14);
-      else if (chama.contributionFrequency === 'MONTHLY') endDate.setMonth(endDate.getMonth() + 1);
-      else endDate.setMonth(endDate.getMonth() + 1); // fallback
+      // Default to monthly cycle
+      endDate.setMonth(endDate.getMonth() + 1);
 
       // 7. Create cycle
       const cycle = await tx.chamaCycle.create({
         data: {
-          chamaId,
-          cycleNumber: nextCycleNumber,
-          recipientId: recipient.userId,
-          targetAmountKr,
-          startDate,
-          endDate,
-          status: 'COLLECTING' // Start collecting immediately
+          id: randomUUID(),
+          chama_id: chamaId,
+          cycle_number: nextCycleNumber,
+          target_amount_kr: targetAmountKr,
+          start_date: startDate,
+          end_date: endDate,
+          status: 'COLLECTING', // Start collecting immediately
+          updated_at: new Date()
         }
       });
 
       // 8. Update chama's current cycle number
       await tx.chama.update({
         where: { id: chamaId },
-        data: { currentCycleNumber: nextCycleNumber }
+        data: { current_cycle_number: nextCycleNumber }
       });
 
       // 9. Send system message
-      const recipientUser = await tx.user.findUnique({ select: { displayName: true }, where: { id: recipient.userId } });
-      await tx.message.create({
+      const recipientUser = await tx.user.findUnique({ select: { display_name: true }, where: { id: recipient.user_id } });
+      await tx.messages.create({
         data: {
-          chatId: chama.chatId,
-          senderId: adminId,
-          payload: `🔄 Cycle #${nextCycleNumber} has started! The recipient for this cycle is ${recipientUser?.displayName}. Target: ${targetAmountKr} Kr.`,
-          isSystemEvent: true,
+          id: randomUUID(),
+          chat_id: chama.chat_id,
+          sender_id: adminId,
+          payload: `🔄 Cycle #${nextCycleNumber} has started! The recipient for this cycle is ${recipientUser?.display_name}. Target: ${targetAmountKr} Kr.`,
+          is_system_event: true,
           status: 'sent',
         },
       });
@@ -109,72 +104,84 @@ export class ChamaCycleService {
     return prisma.$transaction(async (tx) => {
       // 1. Verify admin
       const adminMember = await tx.chamaMember.findUnique({
-        where: { chamaId_userId: { chamaId, userId: adminId } },
+        where: { chama_id_user_id: { chama_id: chamaId, user_id: adminId } },
       });
       if (!adminMember || adminMember.role !== 'ADMIN') {
         throw new Error('Only Admin can disburse cycle funds');
       }
 
       const cycle = await tx.chamaCycle.findUnique({ where: { id: cycleId } });
-      if (!cycle || cycle.chamaId !== chamaId) throw new Error('Cycle not found');
+      if (!cycle || cycle.chama_id !== chamaId) throw new Error('Cycle not found');
       if (cycle.status !== 'COLLECTING' && cycle.status !== 'OPEN') {
         throw new Error(`Cycle is not in a disbursable state (current: ${cycle.status})`);
       }
-      if (!cycle.recipientId) throw new Error('No recipient assigned to this cycle');
 
-      const chama = await tx.chama.findUnique({ where: { id: chamaId }, include: { chamaWallet: true } });
-      if (!chama || !chama.chamaWallet) throw new Error('Chama wallet not found');
+      const chama = await tx.chama.findUnique({ where: { id: chamaId }, include: { chama_wallet: true } });
+      if (!chama || !chama.chama_wallet) throw new Error('Chama wallet not found');
 
       // Allow partial disbursements, but normally we check if collectedAmount >= targetAmount
       // For flexibility, we just take the currently collected amount or wallet balance.
-      const amountToDisburse = cycle.collectedAmountKr;
+      const amountToDisburse = cycle.collected_amount_kr;
       if (Number(amountToDisburse) <= 0) throw new Error('No funds collected for this cycle yet');
-      if (Number(chama.chamaWallet.krBalance) < Number(amountToDisburse)) {
+      if (Number(chama.chama_wallet.kr_balance) < Number(amountToDisburse)) {
         throw new Error('Chama wallet has insufficient funds to cover the collected amount');
       }
 
-      // 2. Transfer funds: Chama Wallet -> Recipient Wallet
+      // 2. Get the next member in rotation to receive payout
+      const members = await tx.chamaMember.findMany({
+        where: { chama_id: chamaId, status: 'ACTIVE' },
+        orderBy: { created_at: 'asc' },
+      });
+
+      if (members.length === 0) throw new Error('No active members for payout');
+
+      const recipientIndex = (cycle.cycle_number - 1) % members.length;
+      const recipient = members[recipientIndex];
+
+      // 3. Transfer funds: Chama Wallet -> Recipient Wallet
       await tx.chamaWallet.update({
-        where: { chamaId },
-        data: { krBalance: { decrement: amountToDisburse } }
+        where: { chama_id: chamaId },
+        data: { kr_balance: { decrement: amountToDisburse } }
       });
 
-      await tx.wallet.update({
-        where: { userId: cycle.recipientId },
-        data: { krBalance: { increment: amountToDisburse } }
+      await tx.wallets.update({
+        where: { user_id: recipient.user_id },
+        data: { kr_balance: { increment: amountToDisburse } }
       });
 
-      // 3. Record transaction
+      // 4. Record transaction
       await tx.chamaTransaction.create({
         data: {
-          chamaId,
-          userId: cycle.recipientId,
+          id: randomUUID(),
+          chama_id: chamaId,
+          user_id: recipient.user_id,
           type: 'PAYOUT',
-          amountKr: amountToDisburse,
-          description: `Cycle #${cycle.cycleNumber} payout`,
+          amount_kr: amountToDisburse,
+          description: `Cycle #${cycle.cycle_number} payout`,
         }
       });
 
-      // 4. Update member stats
+      // 5. Update member stats
       await tx.chamaMember.updateMany({
-        where: { chamaId, userId: cycle.recipientId },
-        data: { totalReceived: { increment: amountToDisburse } }
+        where: { chama_id: chamaId, user_id: recipient.user_id },
+        data: { total_received: { increment: amountToDisburse } }
       });
 
-      // 5. Mark cycle completed
+      // 6. Mark cycle as OPEN (completed collection, ready for next cycle)
       const updatedCycle = await tx.chamaCycle.update({
         where: { id: cycleId },
-        data: { status: 'COMPLETED' }
+        data: { status: 'OPEN' }
       });
 
-      // 6. Send system message
-      const recipientUser = await tx.user.findUnique({ select: { displayName: true }, where: { id: cycle.recipientId } });
-      await tx.message.create({
+      // 7. Send system message
+      const recipientUser = await tx.user.findUnique({ select: { display_name: true }, where: { id: recipient.user_id } });
+      await tx.messages.create({
         data: {
-          chatId: chama.chatId,
-          senderId: adminId,
-          payload: `💰 Payout of ${amountToDisburse} Kr for Cycle #${cycle.cycleNumber} has been disbursed to ${recipientUser?.displayName}.`,
-          isSystemEvent: true,
+          id: randomUUID(),
+          chat_id: chama.chat_id,
+          sender_id: adminId,
+          payload: `💰 Payout of ${amountToDisburse} Kr for Cycle #${cycle.cycle_number} has been disbursed to ${recipientUser?.display_name}.`,
+          is_system_event: true,
           status: 'sent',
         },
       });
@@ -188,8 +195,8 @@ export class ChamaCycleService {
    */
   static async getCycles(chamaId: string) {
     return prisma.chamaCycle.findMany({
-      where: { chamaId },
-      orderBy: { cycleNumber: 'desc' },
+      where: { chama_id: chamaId },
+      orderBy: { cycle_number: 'desc' },
       include: {
         chama: { select: { name: true } }
       }

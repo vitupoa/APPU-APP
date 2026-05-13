@@ -30,7 +30,7 @@ export class AuditService {
     startDate?: Date;
     endDate?: Date;
   }) {
-    const { page = 1, limit = 50, adminId, action, targetType, targetId, startDate, endDate } = options;
+    const { page = 1, limit = 50, adminId, action, targetType, targetId, start_date, end_date } = options;
     const where: any = {};
 
     if (adminId) where.adminId = adminId;
@@ -38,15 +38,15 @@ export class AuditService {
     if (targetType) where.targetType = targetType;
     if (targetId) where.targetId = targetId;
     if (startDate || endDate) {
-      where.createdAt = {};
-      if (startDate) where.createdAt.gte = startDate;
-      if (endDate) where.createdAt.lte = endDate;
+      where.created_at = {};
+      if (startDate) where.created_at.gte = startDate;
+      if (endDate) where.created_at.lte = endDate;
     }
 
     const [items, total] = await Promise.all([
       prisma.auditLog.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         take: limit,
         skip: (page - 1) * limit,
       }),

@@ -12,7 +12,7 @@ const router = Router();
  * Zod schema for vote validation with required fingerprint and IP tracking
  */
 const VoteSchema = z.object({
-    submissionId: z.string().uuid(),
+    submission_id: z.string().uuid(),
     fingerprint: z.string().min(1, 'Device fingerprint is required')
 });
 
@@ -27,17 +27,17 @@ router.post('/vote',
   validateRequest(VoteSchema), 
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { submissionId, fingerprint } = req.body;
+        const { submission_id, fingerprint } = req.body;
         const voterId = req.userId!;
         const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
 
         // 1. Check for duplicate votes by IP or fingerprint to prevent bot abuse
-        const duplicateVote = await prisma.contestVote.findFirst({
+        const duplicateVote = await prisma.contest_votes.findFirst({
             where: {
-                submissionId,
+                submission_id,
                 OR: [
-                    { voterId },
-                    { ipAddress },
+                    { voter_id: voterId },
+                    { ip_address: ipAddress },
                     { fingerprint }
                 ]
             }
@@ -51,18 +51,18 @@ router.post('/vote',
         // 2. Register vote with required IP and fingerprint tracking
         await prisma.$transaction(async (tx: any) => {
             // Log vote with required tracking fields
-            await tx.contestVote.create({
+            await tx.contest_votes.create({
                 data: {
-                    submissionId,
-                    voterId,
-                    ipAddress,
+                    submission_id,
+                    voter_id: voterId,
+                    ip_address: ipAddress,
                     fingerprint
                 }
             });
 
             // Increment public tracker implicitly
             await tx.contestSubmission.update({
-                where: { id: submissionId },
+                where: { id: submission_id },
                 data: {
                     votesCount: {
                         increment: 1

@@ -1,9 +1,10 @@
-import { Client, OrdersController, Environment } from '@paypal/paypal-server-sdk';
+import { Client, OrdersController, PaymentsController, Environment } from '@paypal/paypal-server-sdk';
 import { env } from '../../config/env.js';
 
 export class PaypalService {
   private static client: Client;
   private static ordersController: OrdersController;
+  private static paymentsController: PaymentsController;
 
   private static initClient() {
     if (!this.client) {
@@ -20,6 +21,7 @@ export class PaypalService {
       });
 
       this.ordersController = new OrdersController(this.client);
+      this.paymentsController = new PaymentsController(this.client);
     }
   }
 
@@ -32,7 +34,7 @@ export class PaypalService {
     currency: string;
     description: string;
     referenceId: string;
-  }): Promise<{ orderId: string; approvalUrl: string }> {
+  }): Promise<{ order_id: string; approvalUrl: string }> {
     this.initClient();
 
     const response = await this.ordersController.createOrder({
@@ -61,7 +63,7 @@ export class PaypalService {
     );
 
     return {
-      orderId: response.result.id!,
+      order_id: response.result.id!,
       approvalUrl: approvalLink?.href || ''
     };
   }
@@ -175,5 +177,31 @@ export class PaypalService {
       accountName: email,
       verified: false
     };
+  }
+
+  /**
+   * Verify webhook signature
+   */
+  static async verifyWebhook(headers: any, body: any): Promise<boolean> {
+    try {
+      this.initClient();
+      
+      const response = await (this.paymentsController as any).verifyWebhookSignature({
+        body: {
+          authAlgo: headers['paypal-auth-algo'],
+          certUrl: headers['paypal-cert-url'],
+          transmissionId: headers['paypal-transmission-id'],
+          transmissionSig: headers['paypal-transmission-sig'],
+          transmissionTime: headers['paypal-transmission-time'],
+          webhookId: process.env.PAYPAL_WEBHOOK_ID || '',
+          webhookEvent: body,
+        },
+      });
+
+      return response.result.verificationStatus === 'SUCCESS';
+    } catch (error) {
+      console.error('PayPal webhook verification error:', error);
+      return false;
+    }
   }
 }

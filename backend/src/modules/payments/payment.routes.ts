@@ -22,9 +22,9 @@ async function creditOperationalFee(tx: any, fiatAmount: number, currency: strin
       const opsUser = await tx.user.findFirst({ where: { username: 'JohnOyugi' } });
       if (opsUser) {
         await tx.wallet.upsert({
-          where: { userId: opsUser.id },
-          create: { userId: opsUser.id, krBalance: new Prisma.Decimal(feeKr) },
-          update: { krBalance: { increment: new Prisma.Decimal(feeKr) } },
+          where: { user_id: opsUser.id },
+          create: { user_id: opsUser.id, kr_balance: new Prisma.Decimal(feeKr) },
+          update: { kr_balance: { increment: new Prisma.Decimal(feeKr) } },
         });
       }
     }
@@ -42,8 +42,8 @@ const router = Router();
 router.post('/topup', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = topupInitiateSchema.parse(req.body);
-    const userId = req.userId!;
-    const reference = `topup_${userId}_${Date.now()}`;
+    const userId = req.user_id!;
+    const reference = `topup_${user_id}_${Date.now()}`;
 
     let result: any;
 
@@ -66,7 +66,7 @@ router.post('/topup', authMiddleware, async (req: AuthRequest, res: Response) =>
           amount: data.fiatAmount,
           currency: data.currency,
           description: 'Krieta Wallet Top-Up',
-          referenceId: reference
+          reference_id: reference
         });
         break;
       }
@@ -89,10 +89,10 @@ router.post('/topup', authMiddleware, async (req: AuthRequest, res: Response) =>
     // Record pending transaction
     await prisma.transaction.create({
       data: {
-        userId,
+        user_id,
         type: 'topup',
-        amountFiat: data.fiatAmount,
-        amountKr: new Prisma.Decimal(0), // Calculated on confirmation
+        amount_fiat: data.fiatAmount,
+        amount_kr: new Prisma.Decimal(0), // Calculated on confirmation
         currency: data.currency,
         status: 'pending',
         provider: data.provider,
@@ -126,7 +126,7 @@ router.post('/mpesa/callback', async (req: Request, res: Response) => {
         // M-Pesa doesn't give us our reference back in callback,
         // so we match by the most recent pending mpesa tx
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     });
 
     if (!tx) {
@@ -143,21 +143,21 @@ router.post('/mpesa/callback', async (req: Request, res: Response) => {
           where: { id: tx.id },
           data: {
             status: 'completed',
-            amountKr: krAmount,
+            amount_kr: krAmount,
             reference: parsed.mpesaReceiptNumber || tx.reference
           }
         });
 
         await dbTx.wallet.upsert({
-          where: { userId: tx.userId },
-          create: { userId: tx.userId, krBalance: krAmount },
-          update: { krBalance: { increment: krAmount } }
+          where: { user_id: tx.user_id },
+          create: { user_id: tx.user_id, kr_balance: krAmount },
+          update: { kr_balance: { increment: krAmount } }
         });
 
         // Unlock wallet identity on first inflow
         await dbTx.user.update({
-          where: { id: tx.userId },
-          data: { isWalletUnlocked: true }
+          where: { id: tx.user_id },
+          data: { is_wallet_unlocked: true }
         });
 
         // Credit platform revenue wallet with exchange fee
@@ -184,7 +184,7 @@ router.post('/mpesa/callback', async (req: Request, res: Response) => {
  */
 router.post('/paypal/capture', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { orderId } = req.body;
+    const { order_id } = req.body;
     if (!orderId) {
       res.status(400).json({ error: 'orderId is required' });
       return;
@@ -199,8 +199,8 @@ router.post('/paypal/capture', authMiddleware, async (req: AuthRequest, res: Res
       await prisma.$transaction(async (dbTx) => {
         // Find pending tx
         const tx = await dbTx.transaction.findFirst({
-          where: { userId: req.userId!, provider: 'paypal', status: 'pending' },
-          orderBy: { createdAt: 'desc' }
+          where: { user_id: req.user_id!, provider: 'paypal', status: 'pending' },
+          orderBy: { created_at: 'desc' }
         });
 
         if (tx) {
@@ -208,21 +208,21 @@ router.post('/paypal/capture', authMiddleware, async (req: AuthRequest, res: Res
             where: { id: tx.id },
             data: {
               status: 'completed',
-              amountKr: krAmount,
+              amount_kr: krAmount,
               reference: capture.captureId
             }
           });
         }
 
         await dbTx.wallet.upsert({
-          where: { userId: req.userId! },
-          create: { userId: req.userId!, krBalance: krAmount },
-          update: { krBalance: { increment: krAmount } }
+          where: { user_id: req.user_id! },
+          create: { user_id: req.user_id!, kr_balance: krAmount },
+          update: { kr_balance: { increment: krAmount } }
         });
 
         await dbTx.user.update({
-          where: { id: req.userId! },
-          data: { isWalletUnlocked: true }
+          where: { id: req.user_id! },
+          data: { is_wallet_unlocked: true }
         });
 
         // Credit platform revenue wallet with exchange fee
@@ -266,18 +266,18 @@ router.post('/paystack/webhook', async (req: Request, res: Response) => {
         await prisma.$transaction(async (dbTx) => {
           await dbTx.transaction.update({
             where: { id: tx.id },
-            data: { status: 'completed', amountKr: krAmount }
+            data: { status: 'completed', amount_kr: krAmount }
           });
 
           await dbTx.wallet.upsert({
-            where: { userId: tx.userId },
-            create: { userId: tx.userId, krBalance: krAmount },
-            update: { krBalance: { increment: krAmount } }
+            where: { user_id: tx.user_id },
+            create: { user_id: tx.user_id, kr_balance: krAmount },
+            update: { kr_balance: { increment: krAmount } }
           });
 
           await dbTx.user.update({
-            where: { id: tx.userId },
-            data: { isWalletUnlocked: true }
+            where: { id: tx.user_id },
+            data: { is_wallet_unlocked: true }
           });
 
           // Credit platform revenue wallet with exchange fee
@@ -300,12 +300,12 @@ router.post('/paystack/webhook', async (req: Request, res: Response) => {
 router.post('/withdraw', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = withdrawInitiateSchema.parse(req.body);
-    const userId = req.userId!;
-    const reference = `withdraw_${userId}_${Date.now()}`;
+    const userId = req.user_id!;
+    const reference = `withdraw_${user_id}_${Date.now()}`;
 
     // Check wallet balance
-    const wallet = await prisma.wallet.findUnique({ where: { userId } });
-    if (!wallet || wallet.krBalance.lessThan(data.krAmount)) {
+    const wallet = await prisma.wallet.findUnique({ where: { user_id } });
+    if (!wallet || wallet.kr_balance.lessThan(data.krAmount)) {
       res.status(400).json({ error: 'Insufficient balance' });
       return;
     }
@@ -366,9 +366,9 @@ router.post('/withdraw', authMiddleware, async (req: AuthRequest, res: Response)
     // Create withdrawal request
     await prisma.withdrawalRequest.create({
       data: {
-        userId,
-        amountKr: new Prisma.Decimal(data.krAmount),
-        amountFiat: fiatAmount,
+        user_id,
+        amount_kr: new Prisma.Decimal(data.krAmount),
+        amount_fiat: fiatAmount,
         currency: data.currency,
         provider: data.provider,
         accountName: data.accountName || '',
@@ -379,8 +379,8 @@ router.post('/withdraw', authMiddleware, async (req: AuthRequest, res: Response)
 
     // Deduct from wallet
     await prisma.wallet.update({
-      where: { userId },
-      data: { krBalance: { decrement: new Prisma.Decimal(data.krAmount) } }
+      where: { user_id },
+      data: { kr_balance: { decrement: new Prisma.Decimal(data.krAmount) } }
     });
 
     res.status(200).json({ reference, ...result });
@@ -484,7 +484,7 @@ router.post('/mpesa/b2c/result', async (req: Request, res: Response) => {
 
     const withdrawal = await prisma.withdrawalRequest.findFirst({
       where: { provider: 'mpesa', status: 'PENDING' },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     });
 
     if (withdrawal) {
@@ -498,8 +498,8 @@ router.post('/mpesa/b2c/result', async (req: Request, res: Response) => {
       // If failed, refund to wallet
       if (resultCode !== 0) {
         await prisma.wallet.update({
-          where: { userId: withdrawal.userId },
-          data: { krBalance: { increment: withdrawal.amountKr } }
+          where: { user_id: withdrawal.user_id },
+          data: { kr_balance: { increment: withdrawal.amount_kr } }
         });
       }
     }

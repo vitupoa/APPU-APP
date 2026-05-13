@@ -20,13 +20,13 @@ export const createChamaSchema = z.object({
 export const updateChamaSchema = z.object({
   name: z.string().min(2).max(100).optional(),
   description: z.string().optional(),
-  avatarUrl: z.string().url().optional(),
+  avatar_url: z.string().url().optional(),
   maxMembers: z.number().int().min(2).optional(),
   isLocked: z.boolean().optional(),
   autoLockOnFull: z.boolean().optional(),
   penaltyAmountKr: z.number().positive().optional(),
   gracePeriodDays: z.number().int().min(0).optional(),
-  minApprovals: z.number().int().min(2).optional(),
+  min_approvals: z.number().int().min(2).optional(),
   allowMidTermVoteOut: z.boolean().optional(),
   status: z.enum(['SETUP', 'ACTIVE', 'PAUSED', 'COMPLETED', 'DISSOLVED']).optional(),
 });
@@ -38,13 +38,13 @@ export const removeMemberSchema = z.object({
 });
 
 export const contributeSchema = z.object({
-  amountKr: z.number().positive(),
+  amount_kr: z.number().positive(),
 });
 
 export const requestPayoutSchema = z.object({
   recipientUserId: z.string().uuid(),
-  amountKr: z.number().positive(),
-  cycleId: z.string().uuid().optional(),
+  amount_kr: z.number().positive(),
+  cycle_id: z.string().uuid().optional(),
 });
 
 export const approvePayoutSchema = z.object({

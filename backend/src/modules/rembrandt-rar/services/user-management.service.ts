@@ -15,30 +15,30 @@ export class UserManagementService {
     isSuspended?: boolean;
     isVerified?: boolean;
   }) {
-    const { page = 1, limit = 20, search, sort = 'createdAt', order = 'desc', accountType, isSuspended, isVerified } = options;
+    const { page = 1, limit = 20, search, sort = 'createdAt', order = 'desc', account_type, isSuspended, is_verified } = options;
     const where: any = {};
 
     if (search) {
       where.OR = [
         { username: { contains: search, mode: 'insensitive' } },
-        { displayName: { contains: search, mode: 'insensitive' } },
+        { display_name: { contains: search, mode: 'insensitive' } },
         { email: { contains: search, mode: 'insensitive' } },
       ];
     }
-    if (accountType) where.accountType = accountType;
+    if (accountType) where.account_type = accountType;
     if (isSuspended !== undefined) where.isSuspended = isSuspended;
-    if (isVerified !== undefined) where.isVerified = isVerified;
+    if (isVerified !== undefined) where.is_verified = isVerified;
 
     const [users, total] = await Promise.all([
       prisma.user.findMany({
         where,
         select: {
-          id: true, username: true, email: true, firstName: true, lastName: true,
-          displayName: true, avatarUrl: true, country: true, currency: true,
-          accountType: true, isAdmin: true, isVerified: true, isSuspended: true,
-          isWalletUnlocked: true, createdAt: true, updatedAt: true,
+          id: true, username: true, email: true, first_name: true, last_name: true,
+          display_name: true, avatar_url: true, country: true, currency: true,
+          account_type: true, is_admin: true, is_verified: true, isSuspended: true,
+          is_wallet_unlocked: true, created_at: true, updated_at: true,
           _count: { select: { shorts: true, contestsCreated: true, admirers: true, posts: true } },
-          adminProfile: { select: { role: true, isActive: true } },
+          adminProfile: { select: { role: true, is_active: true } },
         },
         orderBy: { [sort]: order },
         take: limit,
@@ -54,9 +54,9 @@ export class UserManagementService {
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
       include: {
-        wallet: { select: { krBalance: true } },
+        wallet: { select: { kr_balance: true } },
         adminProfile: true,
-        suspensions: { orderBy: { createdAt: 'desc' }, take: 5 },
+        suspensions: { orderBy: { created_at: 'desc' }, take: 5 },
         _count: {
           select: {
             shorts: true, posts: true, contestsCreated: true,
@@ -77,7 +77,7 @@ export class UserManagementService {
     if (adminId === targetUserId) throw new Error('Cannot suspend yourself');
 
     // Prevent suspending another super admin
-    const targetProfile = await prisma.adminProfile.findUnique({ where: { userId: targetUserId } });
+    const targetProfile = await prisma.adminProfile.findUnique({ where: { user_id: targetUserId } });
     if (targetProfile?.role === 'SUPER_ADMIN') {
       throw new Error('Cannot suspend a Super Admin');
     }
@@ -85,11 +85,11 @@ export class UserManagementService {
     return prisma.$transaction(async (tx) => {
       await tx.userSuspension.create({
         data: {
-          userId: targetUserId,
+          user_id: targetUserId,
           reason: data.reason,
           suspendedBy: adminId,
           type: data.type,
-          expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
+          expires_at: data.expires_at ? new Date(data.expires_at) : null,
         }
       });
 
@@ -99,7 +99,7 @@ export class UserManagementService {
       });
 
       await AuditService.log(adminId, ADMIN_ACTIONS.USER_SUSPEND, 'user', targetUserId, {
-        reason: data.reason, type: data.type, expiresAt: data.expiresAt
+        reason: data.reason, type: data.type, expires_at: data.expires_at
       }, ip, ua);
 
       return { success: true, message: `User ${data.type.toLowerCase()} successfully` };
@@ -110,7 +110,7 @@ export class UserManagementService {
     return prisma.$transaction(async (tx) => {
       // Lift active suspensions
       await tx.userSuspension.updateMany({
-        where: { userId: targetUserId, liftedAt: null },
+        where: { user_id: targetUserId, liftedAt: null },
         data: { liftedAt: new Date(), liftedBy: adminId }
       });
 
@@ -127,7 +127,7 @@ export class UserManagementService {
   static async verifyUser(adminId: string, targetUserId: string, ip?: string, ua?: string) {
     await prisma.user.update({
       where: { id: targetUserId },
-      data: { isVerified: true }
+      data: { is_verified: true }
     });
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_VERIFY, 'user', targetUserId, {}, ip, ua);
     return { success: true, message: 'User verified' };
@@ -136,7 +136,7 @@ export class UserManagementService {
   static async deleteUser(adminId: string, targetUserId: string, ip?: string, ua?: string) {
     if (adminId === targetUserId) throw new Error('Cannot delete yourself');
 
-    const targetProfile = await prisma.adminProfile.findUnique({ where: { userId: targetUserId } });
+    const targetProfile = await prisma.adminProfile.findUnique({ where: { user_id: targetUserId } });
     if (targetProfile?.role === 'SUPER_ADMIN') {
       throw new Error('Cannot delete a Super Admin');
     }
@@ -152,7 +152,7 @@ export class UserManagementService {
     ip?: string, ua?: string
   ) {
     // Only super admins can assign roles
-    const adminProfile = await prisma.adminProfile.findUnique({ where: { userId: adminId } });
+    const adminProfile = await prisma.adminProfile.findUnique({ where: { user_id: adminId } });
     if (adminProfile?.role !== 'SUPER_ADMIN') {
       throw new Error('Only Super Admins can assign roles');
     }
@@ -160,24 +160,24 @@ export class UserManagementService {
     // Self-protection: can't remove own SUPER_ADMIN if last one
     if (adminId === targetUserId && data.role !== 'SUPER_ADMIN') {
       const superAdminCount = await prisma.adminProfile.count({
-        where: { role: 'SUPER_ADMIN', isActive: true }
+        where: { role: 'SUPER_ADMIN', is_active: true }
       });
       if (superAdminCount <= 1) {
         throw new Error('Cannot remove last Super Admin role');
       }
     }
 
-    const existing = await prisma.adminProfile.findUnique({ where: { userId: targetUserId } });
+    const existing = await prisma.adminProfile.findUnique({ where: { user_id: targetUserId } });
 
     if (existing) {
       await prisma.adminProfile.update({
         where: { id: existing.id },
-        data: { role: data.role as any, permissions: data.permissions ?? undefined, isActive: true }
+        data: { role: data.role as any, permissions: data.permissions ?? undefined, is_active: true }
       });
     } else {
       await prisma.adminProfile.create({
         data: {
-          userId: targetUserId,
+          user_id: targetUserId,
           role: data.role as any,
           permissions: data.permissions ?? undefined,
           grantedBy: adminId,
@@ -185,7 +185,7 @@ export class UserManagementService {
       });
     }
 
-    await prisma.user.update({ where: { id: targetUserId }, data: { isAdmin: true } });
+    await prisma.user.update({ where: { id: targetUserId }, data: { is_admin: true } });
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_ROLE_ASSIGN, 'user', targetUserId, { role: data.role }, ip, ua);
     return { success: true, message: `Role ${data.role} assigned` };
   }
@@ -193,27 +193,27 @@ export class UserManagementService {
   static async revokeRole(adminId: string, targetUserId: string, ip?: string, ua?: string) {
     if (adminId === targetUserId) {
       const superAdminCount = await prisma.adminProfile.count({
-        where: { role: 'SUPER_ADMIN', isActive: true }
+        where: { role: 'SUPER_ADMIN', is_active: true }
       });
       if (superAdminCount <= 1) {
         throw new Error('Cannot revoke last Super Admin');
       }
     }
 
-    const targetProfile = await prisma.adminProfile.findUnique({ where: { userId: targetUserId } });
+    const targetProfile = await prisma.adminProfile.findUnique({ where: { user_id: targetUserId } });
     if (!targetProfile) throw new Error('User has no admin role');
 
     // Non-super-admins can't revoke super admin
-    const adminSelf = await prisma.adminProfile.findUnique({ where: { userId: adminId } });
+    const adminSelf = await prisma.adminProfile.findUnique({ where: { user_id: adminId } });
     if (targetProfile.role === 'SUPER_ADMIN' && adminSelf?.role !== 'SUPER_ADMIN') {
       throw new Error('Cannot revoke Super Admin role');
     }
 
     await prisma.adminProfile.update({
       where: { id: targetProfile.id },
-      data: { isActive: false }
+      data: { is_active: false }
     });
-    await prisma.user.update({ where: { id: targetUserId }, data: { isAdmin: false } });
+    await prisma.user.update({ where: { id: targetUserId }, data: { is_admin: false } });
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_ROLE_REVOKE, 'user', targetUserId, {}, ip, ua);
     return { success: true, message: 'Admin role revoked' };
   }
@@ -224,9 +224,9 @@ export class UserManagementService {
     ip?: string, ua?: string
   ) {
     const updateData: any = {};
-    if (data.firstName) updateData.firstName = data.firstName;
-    if (data.lastName) updateData.lastName = data.lastName;
-    if (data.displayName) updateData.displayName = data.displayName;
+    if (data.first_name) updateData.first_name = data.first_name;
+    if (data.last_name) updateData.last_name = data.last_name;
+    if (data.display_name) updateData.display_name = data.display_name;
     if (data.username) {
       // Check prohibited
       const prohibited = await prisma.prohibitedName.findFirst({
@@ -253,9 +253,9 @@ export class UserManagementService {
     const tempPassword = `Krieta_${Math.random().toString(36).substring(2, 10)}!`;
     const hash = await (await import('bcrypt')).hash(tempPassword, 12);
 
-    const user = await prisma.user.update({ where: { id: targetUserId }, data: { passwordHash: hash } });
+    const user = await prisma.user.update({ where: { id: targetUserId }, data: { password_hash: hash } });
     // Revoke all refresh tokens to force re-login
-    await prisma.refreshToken.deleteMany({ where: { userId: targetUserId } });
+    await prisma.refresh_token.deleteMany({ where: { user_id: targetUserId } });
 
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_RESET_PASSWORD, 'user', targetUserId, {}, ip, ua);
     
@@ -269,8 +269,8 @@ export class UserManagementService {
 
   static async changeUserPassword(adminId: string, targetUserId: string, newPassword: string, ip?: string, ua?: string) {
     const hash = await (await import('bcrypt')).hash(newPassword, 12);
-    await prisma.user.update({ where: { id: targetUserId }, data: { passwordHash: hash } });
-    await prisma.refreshToken.deleteMany({ where: { userId: targetUserId } });
+    await prisma.user.update({ where: { id: targetUserId }, data: { password_hash: hash } });
+    await prisma.refresh_token.deleteMany({ where: { user_id: targetUserId } });
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_RESET_PASSWORD, 'user', targetUserId, { method: 'manual' }, ip, ua);
     return { success: true, message: 'Password changed successfully.' };
   }
@@ -281,7 +281,7 @@ export class UserManagementService {
     ip?: string, ua?: string
   ) {
     const updateData: any = { ...data };
-    if (data.accountType) updateData.accountType = data.accountType;
+    if (data.account_type) updateData.account_type = data.account_type;
 
     await prisma.user.update({ where: { id: targetUserId }, data: updateData });
     await AuditService.log(adminId, ADMIN_ACTIONS.USER_NAME_CHANGE, 'user', targetUserId, data, ip, ua);
@@ -296,7 +296,7 @@ export class UserManagementService {
 
     return prisma.user.findMany({
       where: { id: { in: userIds } },
-      select: { id: true, username: true, displayName: true, accountType: true }
+      select: { id: true, username: true, display_name: true, account_type: true }
     });
   }
 
@@ -348,7 +348,7 @@ export class UserManagementService {
 
   static async listProhibitedNames(page = 1, limit = 50) {
     const [items, total] = await Promise.all([
-      prisma.prohibitedName.findMany({ orderBy: { createdAt: 'desc' }, take: limit, skip: (page - 1) * limit }),
+      prisma.prohibitedName.findMany({ orderBy: { created_at: 'desc' }, take: limit, skip: (page - 1) * limit }),
       prisma.prohibitedName.count(),
     ]);
     return { items, total, page, limit };
@@ -369,7 +369,7 @@ export class UserManagementService {
 
   static async listReservedUsernames(page = 1, limit = 50) {
     const [items, total] = await Promise.all([
-      prisma.reservedUsername.findMany({ orderBy: { createdAt: 'desc' }, take: limit, skip: (page - 1) * limit }),
+      prisma.reservedUsername.findMany({ orderBy: { created_at: 'desc' }, take: limit, skip: (page - 1) * limit }),
       prisma.reservedUsername.count(),
     ]);
     return { items, total, page, limit };

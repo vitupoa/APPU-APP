@@ -33,17 +33,6 @@ data class TrendingCreator(
     val bio: String?
 )
 
-data class LiveStream(
-    val id: String,
-    val creatorId: String,
-    val creatorUsername: String,
-    val creatorAvatar: String?,
-    val thumbnailUrl: String,
-    val viewerCount: Int,
-    val title: String,
-    val category: String
-)
-
 enum class ContentCategory(val displayName: String, val emoji: String) {
     ALL("All", "🌟"),
     COMEDY("Comedy", "😂"),

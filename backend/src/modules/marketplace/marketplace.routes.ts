@@ -86,7 +86,7 @@ const createCampaignSchema = z.object({
   contentGuidelines: z.string().optional(),
   hashtags: z.array(z.string()).optional(),
   mentions: z.array(z.string()).optional(),
-  contestId: z.string().uuid().optional(),
+  contest_id: z.string().uuid().optional(),
   applicationDeadline: z.string().datetime().optional(),
   campaignStartDate: z.string().datetime(),
   campaignEndDate: z.string().datetime()
@@ -98,11 +98,28 @@ router.post('/campaigns', authMiddleware, async (req: AuthRequest, res: Response
     const data = createCampaignSchema.parse(req.body);
     
     const campaign = await BrandMarketplaceService.createCampaign({
-      brandId: req.userId!,
-      ...data,
-      applicationDeadline: data.applicationDeadline ? new Date(data.applicationDeadline) : undefined,
-      campaignStartDate: new Date(data.campaignStartDate),
-      campaignEndDate: new Date(data.campaignEndDate)
+      brand_id: req.user_id!,
+      title: data.title,
+      description: data.description,
+      type: data.type,
+      target_tiers: data.targetTiers,
+      target_categories: data.targetCategories,
+      min_followers: data.minFollowers,
+      min_engagement_rate: data.minEngagementRate,
+      target_geos: data.targetGeos,
+      budget_kr: data.budgetKr,
+      compensation_per_influencer: data.compensationPerInfluencer,
+      max_influencers: data.maxInfluencers,
+      required_posts: data.requiredPosts,
+      required_videos: data.requiredVideos,
+      required_stories: data.requiredStories,
+      content_guidelines: data.contentGuidelines,
+      hashtags: data.hashtags,
+      mentions: data.mentions,
+      contest_id: data.contest_id,
+      application_deadline: data.applicationDeadline ? new Date(data.applicationDeadline) : undefined,
+      campaign_start_date: new Date(data.campaignStartDate),
+      campaign_end_date: new Date(data.campaignEndDate)
     });
 
     res.status(201).json(campaign);
@@ -118,7 +135,7 @@ router.post('/campaigns', authMiddleware, async (req: AuthRequest, res: Response
 // POST /api/v1/marketplace/campaigns/:id/publish - Publish campaign
 router.post('/campaigns/:id/publish', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const campaign = await BrandMarketplaceService.publishCampaign(String(req.params.id), req.userId!);
+    const campaign = await BrandMarketplaceService.publishCampaign(String(req.params.id), req.user_id!);
     res.json(campaign);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
@@ -162,8 +179,11 @@ router.post('/campaigns/:id/apply', authMiddleware, async (req: AuthRequest, res
     const data = schema.parse(req.body);
     
     const application = await BrandMarketplaceService.applyToCampaign({
-      campaignId: String(req.params.id),
-      ...data
+      campaign_id: String(req.params.id),
+      influencer_id: data.influencerId,
+      pitch: data.pitch,
+      proposed_rate: data.proposedRate,
+      availability: data.availability
     });
 
     res.status(201).json(application);
@@ -188,7 +208,7 @@ router.post('/applications/:id/review', authMiddleware, async (req: AuthRequest,
     
     const result = await BrandMarketplaceService.reviewApplication({
       applicationId: String(req.params.id),
-      brandId: req.userId!,
+      brand_id: req.user_id!,
       ...data
     });
 
@@ -216,7 +236,7 @@ router.get('/contests', authMiddleware, async (req: AuthRequest, res: Response) 
 
     const result = await BrandMarketplaceService.browseSponsorableContests({
       category,
-      minParticipants,
+      min_participants: minParticipants,
       cursor,
       limit
     });
@@ -237,18 +257,23 @@ router.post('/contests/:id/sponsor', authMiddleware, async (req: AuthRequest, re
       logoUrl: z.string().url().optional(),
       brandMessage: z.string().max(500).optional(),
       websiteUrl: z.string().url().optional(),
-      startDate: z.string().datetime(),
-      endDate: z.string().datetime()
+      start_date: z.string().datetime(),
+      end_date: z.string().datetime()
     });
 
     const data = schema.parse(req.body);
     
     const sponsorship = await BrandMarketplaceService.sponsorContest({
-      contestId: String(req.params.id),
-      brandId: req.userId!,
-      ...data,
-      startDate: new Date(data.startDate),
-      endDate: new Date(data.endDate)
+      contest_id: String(req.params.id),
+      brand_id: req.user_id!,
+      type: data.type,
+      sponsorship_kr: data.sponsorshipKr,
+      benefits: data.benefits,
+      logo_url: data.logoUrl,
+      brand_message: data.brandMessage,
+      website_url: data.websiteUrl,
+      start_date: new Date(data.start_date),
+      end_date: new Date(data.end_date)
     });
 
     res.status(201).json(sponsorship);
@@ -269,7 +294,7 @@ router.post('/contests/:id/sponsor', authMiddleware, async (req: AuthRequest, re
 router.post('/contests/:id/track-purchase', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const schema = z.object({
-      orderId: z.string().uuid(),
+      order_id: z.string().uuid(),
       purchaseAmount: z.number().positive(),
       productIds: z.array(z.string().uuid())
     });
@@ -277,14 +302,16 @@ router.post('/contests/:id/track-purchase', authMiddleware, async (req: AuthRequ
     const data = schema.parse(req.body);
     
     const entry = await SalesFunnelService.trackPurchaseEntry({
-      contestId: String(req.params.id),
-      userId: req.userId!,
-      ...data
+      contest_id: String(req.params.id),
+      userId: req.user_id!,
+      orderId: data.order_id,
+      purchaseAmount: data.purchaseAmount,
+      productIds: data.productIds
     });
 
     // Award points for purchase
     await SalesFunnelService.awardPoints({
-      userId: req.userId!,
+      user_id: req.user_id!,
       activityType: 'PURCHASE_TO_ENTER',
       category: 'SALES',
       pointsEarned: Math.floor(data.purchaseAmount / 10), // 1 point per Kr.10
@@ -315,14 +342,17 @@ router.post('/contests/:id/track-action', authMiddleware, async (req: AuthReques
     const data = schema.parse(req.body);
     
     const action = await SalesFunnelService.trackEngagementAction({
-      contestId: String(req.params.id),
-      userId: req.userId!,
-      ...data
+      contest_id: String(req.params.id),
+      userId: req.user_id!,
+      actionType: data.actionType,
+      targetUrl: data.targetUrl,
+      proofUrl: data.proofUrl,
+      metadata: data.metadata
     });
 
     // Award points for engagement
     await SalesFunnelService.awardPoints({
-      userId: req.userId!,
+      user_id: req.user_id!,
       activityType: data.actionType,
       category: 'ENGAGEMENT',
       pointsEarned: 10,
@@ -356,9 +386,14 @@ router.post('/contests/:id/conversion-campaign', authMiddleware, async (req: Aut
     const data = schema.parse(req.body);
     
     const campaign = await SalesFunnelService.createConversionCampaign({
-      contestId: String(req.params.id),
-      brandId: req.userId,
-      ...data,
+      contest_id: String(req.params.id),
+      brandId: req.user_id,
+      type: data.type,
+      title: data.title,
+      description: data.description,
+      targetSegment: data.targetSegment,
+      discountPercent: data.discountPercent,
+      discountCode: data.discountCode,
       offerExpiresAt: data.offerExpiresAt ? new Date(data.offerExpiresAt) : undefined
     });
 
@@ -377,16 +412,18 @@ router.post('/conversion-campaigns/:id/track', authMiddleware, async (req: AuthR
   try {
     const schema = z.object({
       action: z.enum(['OPENED', 'CLICKED', 'CONVERTED']),
-      orderId: z.string().uuid().optional(),
+      order_id: z.string().uuid().optional(),
       revenueKr: z.number().positive().optional()
     });
 
     const data = schema.parse(req.body);
     
     await SalesFunnelService.trackCampaignInteraction({
-      campaignId: String(req.params.id),
-      userId: req.userId!,
-      ...data
+      campaign_id: String(req.params.id),
+      userId: req.user_id!,
+      action: data.action,
+      orderId: data.order_id,
+      revenueKr: data.revenueKr
     });
 
     res.json({ success: true });
@@ -426,7 +463,7 @@ router.get('/contests/:id/roi', authMiddleware, async (req: AuthRequest, res: Re
 // GET /api/v1/marketplace/gamification/me - Get my gamification stats
 router.get('/gamification/me', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const stats = await SalesFunnelService.getUserGamificationStats(req.userId!);
+    const stats = await SalesFunnelService.getUserGamificationStats(req.user_id!);
     res.json(stats);
   } catch (error: any) {
     res.status(500).json({ error: error.message });

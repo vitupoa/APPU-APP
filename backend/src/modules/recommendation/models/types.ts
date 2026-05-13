@@ -45,7 +45,7 @@ export interface CreatorAdvantages {
 }
 
 export interface UserInteractionSignal {
-  userId: string;
+  user_id: string;
   contentId: string;
   contentType: 'SHORT' | 'POST';
   signalType: 'VIEW' | 'LIKE' | 'SHARE' | 'COMMENT' | 'REWATCH' | 'SKIP' | 'NOT_INTERESTED' | 'HIDE' | 'ADMIRE' | 'UNADMIRE';

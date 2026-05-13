@@ -1,7 +1,4 @@
 import { prisma } from '../../config/database.js';
-import { Prisma } from '@prisma/client';
-
-const SUBSCRIPTION_PLATFORM_FEE = 0.15; // 15%
 
 export class UserService {
   /**
@@ -11,30 +8,30 @@ export class UserService {
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
       include: {
-        bioLinks: { orderBy: { sortOrder: 'asc' } },
+        bio_links: { orderBy: { sort_order: 'asc' } },
         _count: {
           select: {
-            admirers: true,
-            admiring: true,
-            contestWins: true
+            admires_admires_admired_idToUser: true,
+            admires_admires_admirer_idToUser: true,
+            contest_winners: true
           }
         }
       }
     });
 
     // Compute lovers count (mutual admires)
-    const loversCount = await prisma.admire.count({
-      where: { admirerId: userId, isLovers: true }
+    const loversCount = await prisma.admires.count({
+      where: { admirer_id: userId, is_lovers: true }
     });
 
     // Determine relationship status with viewer
     let relationshipStatus = 'NONE';
     if (viewerId && viewerId !== userId) {
-      const iAdmireThem = await prisma.admire.findUnique({
-        where: { admirerId_admiredId: { admirerId: viewerId, admiredId: userId } }
+      const iAdmireThem = await prisma.admires.findUnique({
+        where: { admirer_id_admired_id: { admirer_id: viewerId, admired_id: userId } }
       });
-      const theyAdmireMe = await prisma.admire.findUnique({
-        where: { admirerId_admiredId: { admirerId: userId, admiredId: viewerId } }
+      const theyAdmireMe = await prisma.admires.findUnique({
+        where: { admirer_id_admired_id: { admirer_id: userId, admired_id: viewerId } }
       });
 
       if (iAdmireThem && theyAdmireMe) {
@@ -50,24 +47,24 @@ export class UserService {
     const baseProfile = {
       id: user.id,
       username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      displayName: user.displayName,
-      avatarUrl: user.avatarUrl,
-      coverPhotoUrl: user.coverPhotoUrl,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      display_name: user.display_name,
+      avatar_url: user.avatar_url,
+      cover_photo_url: user.cover_photo_url,
       bio: user.bio,
       country: user.country,
-      accountType: user.accountType,
-      isVerified: user.isVerified,
-      bioLinks: user.bioLinks,
+      account_type: user.account_type,
+      is_verified: user.is_verified,
+      bioLinks: user.bio_links,
       stats: {
-        admirers: user._count.admirers,
-        admiring: user._count.admiring,
+        admirers: user._count.admires_admires_admired_idToUser,
+        admiring: user._count.admires_admires_admirer_idToUser,
         lovers: loversCount,
-        contestsWon: user._count.contestWins
+        contestsWon: user._count.contest_winners
       },
       relationshipStatus,
-      createdAt: user.createdAt.toISOString()
+      created_at: user.created_at.toISOString()
     };
 
     // Only include sensitive data for own profile
@@ -75,8 +72,7 @@ export class UserService {
       return {
         ...baseProfile,
         currency: user.currency,
-        isWalletUnlocked: user.isWalletUnlocked,
-        kycStatus: user.kycStatus
+        is_wallet_unlocked: user.is_wallet_unlocked
       };
     }
 
@@ -87,31 +83,31 @@ export class UserService {
    * Update own profile. Rejects name/username changes if wallet is unlocked.
    */
   static async updateProfile(userId: string, data: {
-    firstName?: string;
-    lastName?: string;
-    displayName?: string;
+    first_name?: string;
+    last_name?: string;
+    display_name?: string;
     username?: string;
     bio?: string;
-    avatarUrl?: string;
-    coverPhotoUrl?: string;
+    avatar_url?: string;
+    cover_photo_url?: string;
   }) {
     const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
     // Identity lock check — reject name/username changes when wallet is unlocked
-    if (user.isWalletUnlocked) {
-      if (data.firstName || data.lastName || data.displayName || data.username) {
+    if (user.is_wallet_unlocked) {
+      if (data.first_name || data.last_name || data.display_name || data.username) {
         throw new Error('Name and username are permanently locked after wallet activation');
       }
     }
 
     const updateData: any = {};
     if (data.bio !== undefined) updateData.bio = data.bio;
-    if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
-    if (data.coverPhotoUrl !== undefined) updateData.coverPhotoUrl = data.coverPhotoUrl;
-    if (!user.isWalletUnlocked) {
-      if (data.firstName) updateData.firstName = data.firstName;
-      if (data.lastName) updateData.lastName = data.lastName;
-      if (data.displayName) updateData.displayName = data.displayName;
+    if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url;
+    if (data.cover_photo_url !== undefined) updateData.cover_photo_url = data.cover_photo_url;
+    if (!user.is_wallet_unlocked) {
+      if (data.first_name) updateData.first_name = data.first_name;
+      if (data.last_name) updateData.last_name = data.last_name;
+      if (data.display_name) updateData.display_name = data.display_name;
       if (data.username) updateData.username = data.username;
     }
 
@@ -126,19 +122,19 @@ export class UserService {
 
     return prisma.$transaction(async (tx) => {
       // Create the admire record
-      const admire = await tx.admire.create({
-        data: { admirerId, admiredId }
+      const admire = await tx.admires.create({
+        data: { admirer_id: admirerId, admired_id: admiredId }
       });
 
       // Check if the other person already admires back → mutual = lovers
-      const reverse = await tx.admire.findUnique({
-        where: { admirerId_admiredId: { admirerId: admiredId, admiredId: admirerId } }
+      const reverse = await tx.admires.findUnique({
+        where: { admirer_id_admired_id: { admirer_id: admiredId, admired_id: admirerId } }
       });
 
       if (reverse) {
         // Set both to lovers
-        await tx.admire.update({ where: { id: admire.id }, data: { isLovers: true } });
-        await tx.admire.update({ where: { id: reverse.id }, data: { isLovers: true } });
+        await tx.admires.update({ where: { id: admire.id }, data: { is_lovers: true } });
+        await tx.admires.update({ where: { id: reverse.id }, data: { is_lovers: true } });
       }
 
       return { admired: true, isLovers: !!reverse };
@@ -150,20 +146,20 @@ export class UserService {
    */
   static async unadmire(admirerId: string, admiredId: string) {
     return prisma.$transaction(async (tx) => {
-      const admire = await tx.admire.findUnique({
-        where: { admirerId_admiredId: { admirerId, admiredId } }
+      const admire = await tx.admires.findUnique({
+        where: { admirer_id_admired_id: { admirer_id: admirerId, admired_id: admiredId } }
       });
       if (!admire) throw new Error('Not admiring this user');
 
       // If they were lovers, remove lover status from the reverse record too
-      if (admire.isLovers) {
-        await tx.admire.updateMany({
-          where: { admirerId: admiredId, admiredId: admirerId },
-          data: { isLovers: false }
+      if (admire.is_lovers) {
+        await tx.admires.updateMany({
+          where: { admirer_id: admiredId, admired_id: admirerId },
+          data: { is_lovers: false }
         });
       }
 
-      await tx.admire.delete({ where: { id: admire.id } });
+      await tx.admires.delete({ where: { id: admire.id } });
 
       return { admired: false };
     });
@@ -174,18 +170,18 @@ export class UserService {
    */
   static async unlove(admirerId: string, admiredId: string) {
     return prisma.$transaction(async (tx) => {
-      const admire = await tx.admire.findUnique({
-        where: { admirerId_admiredId: { admirerId, admiredId } }
+      const admire = await tx.admires.findUnique({
+        where: { admirer_id_admired_id: { admirer_id: admirerId, admired_id: admiredId } }
       });
-      if (!admire || !admire.isLovers) throw new Error('Not lovers with this user');
+      if (!admire || !admire.is_lovers) throw new Error('Not lovers with this user');
 
       // Unloving means completely breaking the admire link from this side
-      await tx.admire.updateMany({
-        where: { admirerId: admiredId, admiredId: admirerId },
-        data: { isLovers: false }
+      await tx.admires.updateMany({
+        where: { admirer_id: admiredId, admired_id: admirerId },
+        data: { is_lovers: false }
       });
 
-      await tx.admire.delete({ where: { id: admire.id } });
+      await tx.admires.delete({ where: { id: admire.id } });
 
       return { isLovers: false };
     });
@@ -195,14 +191,14 @@ export class UserService {
    * Get paginated list of users who admire the given userId.
    */
   static async getAdmirers(userId: string, cursor?: string, limit = 20) {
-    const records = await prisma.admire.findMany({
-      where: { admiredId: userId },
+    const records = await prisma.admires.findMany({
+      where: { admired_id: userId },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       include: {
-        admirer: {
-          select: { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true }
+        User_admires_admirer_idToUser: {
+          select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true }
         }
       }
     });
@@ -210,7 +206,7 @@ export class UserService {
     const hasMore = records.length > limit;
     const items = hasMore ? records.slice(0, limit) : records;
     return {
-      items: items.map((r) => ({ ...r.admirer, isLovers: r.isLovers })),
+      items: items.map((r: any) => ({ ...r.User_admires_admirer_idToUser, isLovers: r.is_lovers })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
   }
@@ -219,22 +215,22 @@ export class UserService {
    * Get paginated list of users the given userId admires.
    */
   static async getAdmiring(userId: string, cursor?: string, limit = 20) {
-    const records = await prisma.admire.findMany({
+    const records = await prisma.admires.findMany({
       where: {
         OR: [
-          { admirerId: userId },
-          { admiredId: userId, isLovers: true }
+          { admirer_id: userId },
+          { admired_id: userId, is_lovers: true }
         ]
       },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       include: {
-        admired: {
-          select: { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true }
+        User_admires_admired_idToUser: {
+          select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true }
         },
-        admirer: {
-          select: { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true }
+        User_admires_admirer_idToUser: {
+          select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true }
         }
       }
     });
@@ -242,9 +238,9 @@ export class UserService {
     const hasMore = records.length > limit;
     const items = hasMore ? records.slice(0, limit) : records;
     return {
-      items: items.map((r) => {
-        const otherUser = r.admirerId === userId ? r.admired : r.admirer;
-        return { ...otherUser, isLovers: r.isLovers };
+      items: items.map((r: any) => {
+        const otherUser = r.admirer_id === userId ? r.User_admires_admired_idToUser : r.User_admires_admirer_idToUser;
+        return { ...otherUser, isLovers: r.is_lovers };
       }),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
@@ -254,14 +250,14 @@ export class UserService {
    * Get mutual admirers (lovers).
    */
   static async getLovers(userId: string, cursor?: string, limit = 20) {
-    const records = await prisma.admire.findMany({
-      where: { admirerId: userId, isLovers: true },
+    const records = await prisma.admires.findMany({
+      where: { admirer_id: userId, is_lovers: true },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       include: {
-        admired: {
-          select: { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true }
+        User_admires_admired_idToUser: {
+          select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true }
         }
       }
     });
@@ -269,7 +265,7 @@ export class UserService {
     const hasMore = records.length > limit;
     const items = hasMore ? records.slice(0, limit) : records;
     return {
-      items: items.map((r) => r.admired),
+      items: items.map((r: any) => r.User_admires_admired_idToUser),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
   }
@@ -280,25 +276,25 @@ export class UserService {
   static async searchCreatorsByAdmireCount(minAdmirers?: number, cursor?: string, limit = 20) {
     const users = await prisma.user.findMany({
       where: {
-        accountType: 'CREATOR',
-        admirers: minAdmirers ? { some: {} } : undefined
+        account_type: 'CREATOR',
+        admires_admires_admired_idToUser: minAdmirers ? { some: {} } : undefined
       },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { admirers: { _count: 'desc' } },
+      orderBy: { admires_admires_admired_idToUser: { _count: 'desc' } },
       select: {
         id: true,
         username: true,
-        displayName: true,
-        avatarUrl: true,
+        display_name: true,
+        avatar_url: true,
         bio: true,
-        isVerified: true,
-        _count: { select: { admirers: true } }
+        is_verified: true,
+        _count: { select: { admires_admires_admired_idToUser: true } }
       }
     });
 
     const filteredUsers = minAdmirers 
-      ? users.filter((u: any) => u._count.admirers >= minAdmirers)
+      ? users.filter((u: any) => u._count.admires_admires_admired_idToUser >= minAdmirers)
       : users;
 
     const hasMore = filteredUsers.length > limit;
@@ -308,11 +304,11 @@ export class UserService {
       items: items.map((u: any) => ({
         id: u.id,
         username: u.username,
-        displayName: u.displayName,
-        avatarUrl: u.avatarUrl,
+        display_name: u.display_name,
+        avatar_url: u.avatar_url,
         bio: u.bio,
-        isVerified: u.isVerified,
-        admirersCount: u._count.admirers
+        is_verified: u.is_verified,
+        admirersCount: u._count.admires_admires_admired_idToUser
       })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
@@ -322,53 +318,53 @@ export class UserService {
 
   static async updateBioLinks(userId: string, links: { label: string; url: string; icon?: string }[]) {
     return prisma.$transaction(async (tx) => {
-      await tx.bioLink.deleteMany({ where: { userId } });
+      await tx.bio_links.deleteMany({ where: { user_id: userId } });
       if (links.length > 0) {
-        await tx.bioLink.createMany({
+        await tx.bio_links.createMany({
           data: links.map((l, i) => ({
-            userId,
+            user_id: userId,
             label: l.label,
             url: l.url,
             icon: l.icon,
-            sortOrder: i
+            sort_order: i
           }))
         });
       }
-      return tx.bioLink.findMany({ where: { userId }, orderBy: { sortOrder: 'asc' } });
+      return tx.bio_links.findMany({ where: { user_id: userId }, orderBy: { sort_order: 'asc' } });
     });
   }
 
   // ─── MILESTONES ────────────────────────────────────
 
   static async getMilestones() {
-    return prisma.milestone.findMany({
+    return prisma.milestones.findMany({
       include: {
-        completions: {
-          include: { user: { select: { id: true, username: true, displayName: true } } }
+        milestone_completions: {
+          include: { User: { select: { id: true, username: true, display_name: true } } }
         }
       }
     });
   }
 
   static async getUserMilestoneProgress(userId: string) {
-    const milestones = await prisma.milestone.findMany({
+    const milestones = await prisma.milestones.findMany({
       include: {
-        completions: {
-          where: { userId },
-          include: { user: { select: { id: true, username: true, displayName: true } } }
+        milestone_completions: {
+          where: { user_id: userId },
+          include: { User: { select: { id: true, username: true, display_name: true } } }
         }
       }
     });
 
-    return milestones.map((m) => ({
+    return milestones.map((m: any) => ({
       id: m.id,
       title: m.title,
       description: m.description,
-      requirementType: m.requirementType,
-      requirementValue: m.requirementValue,
-      rewardKr: Number(m.rewardKr),
-      isCompleted: m.completions.length > 0,
-      completedBy: m.completions[0]?.user ?? null
+      requirement_type: m.requirement_type,
+      requirement_value: m.requirement_value,
+      reward_kr: Number(m.reward_kr),
+      isCompleted: m.milestone_completions.length > 0,
+      completedBy: m.milestone_completions[0]?.User ?? null
     }));
   }
 }

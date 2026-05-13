@@ -56,11 +56,11 @@ export class HashtagService {
         where: {
           hashtagId_contentId_contentType: {
             hashtagId: hashtag.id,
-            contentId,
+            content_id: contentId,
             contentType
           }
         },
-        create: { hashtagId: hashtag.id, contentId, contentType },
+        create: { hashtagId: hashtag.id, content_id: contentId, contentType },
         update: {}
       });
     }
@@ -88,11 +88,11 @@ export class HashtagService {
         where: {
           mentionedUserId_contentId_contentType: {
             mentionedUserId: user.id,
-            contentId,
+            content_id: contentId,
             contentType
           }
         },
-        create: { mentionedUserId: user.id, contentId, contentType },
+        create: { mentionedUserId: user.id, content_id: contentId, contentType },
         update: {}
       });
     }
@@ -140,8 +140,8 @@ export class HashtagService {
       where: whereClause,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
-      select: { id: true, contentId: true, contentType: true, createdAt: true }
+      orderBy: { created_at: 'desc' },
+      select: { id: true, content_id: true, contentType: true, created_at: true }
     });
 
     const hasMore = items.length > limit;

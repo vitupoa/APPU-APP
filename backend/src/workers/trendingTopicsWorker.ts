@@ -36,20 +36,19 @@ async function analyzeTrendingTopics() {
         // Calculate trending score (engagement count with time decay)
         const trendingScore = engagement_count * 1.0; // Simple score for now
 
-        await prisma.trendingTopic.upsert({
+        await prisma.trending_topics.upsert({
           where: { topic: tag },
           create: {
             topic: tag,
-            engagementCount: engagement_count,
-            trendingScore,
-            isActive: true,
-            startedAt: new Date(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+            engagement: engagement_count,
+            trend_score: trendingScore,
+            is_active: true
           },
           update: {
-            engagementCount: engagement_count,
-            trendingScore,
-            isActive: true
+            engagement: engagement_count,
+            trend_score: trendingScore,
+            is_active: true,
+            last_updated: new Date()
           }
         });
       } catch (error) {
@@ -57,14 +56,14 @@ async function analyzeTrendingTopics() {
       }
     }
 
-    // Expire old trending topics
-    const expired = await prisma.trendingTopic.updateMany({
+    // Expire old trending topics (not updated in last 7 days)
+    const expired = await prisma.trending_topics.updateMany({
       where: {
-        expiresAt: { lt: new Date() },
-        isActive: true
+        last_updated: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+        is_active: true
       },
       data: {
-        isActive: false
+        is_active: false
       }
     });
 

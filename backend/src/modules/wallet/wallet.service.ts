@@ -2,8 +2,8 @@ import { prisma } from '../../config/database.js';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
 import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
-import PayPalService from '../../services/payment/paypal.service.js';
-import PaystackService from '../../services/payment/paystack.service.js';
+import { PaypalService } from '../../services/payments/paypal.service.js';
+import { PaystackService } from '../../services/payments/paystack.service.js';
 import { MpesaService } from '../../services/payments/mpesa.service.js';
 import { lockWalletForUpdate, lockWalletsForUpdate, withDeadlockRetry } from '../../utils/databaseLocks.js';
 
@@ -12,31 +12,36 @@ export class WalletService {
    * Retrieves the wallet balance ensuring a wallet exists.
    */
   static async getBalance(userId: string, targetCurrency?: string) {
-    let wallet = await prisma.wallet.findUnique({
-      where: { userId },
-      include: { user: { select: { isWalletUnlocked: true, currency: true } } }
+    let wallet = await prisma.wallets.findUnique({
+      where: { user_id: userId },
+      include: { User: { select: { is_wallet_unlocked: true, currency: true } } }
     });
 
     if (!wallet) {
-      wallet = await prisma.wallet.create({
-        data: { userId },
-        include: { user: { select: { isWalletUnlocked: true, currency: true } } }
+      wallet = await prisma.wallets.create({
+        data: { 
+          User: {
+            connect: { id: userId }
+          },
+          updated_at: new Date()
+        },
+        include: { User: { select: { is_wallet_unlocked: true, currency: true } } }
       });
     }
 
-    const currencyToUse = targetCurrency || wallet.user.currency;
+    const currencyToUse = targetCurrency || wallet.User.currency;
 
     // Convert Kr balance to user fiat equivalent using display-adjusted rate
     // 1 Kr = $0.01 USD. Apply the display rate (with silent platform adjustment)
     const fiatRate = await ExchangeService.getDisplayRate(currencyToUse);
-    const baseUsd = Number(wallet.krBalance) / 100;
+    const baseUsd = Number(wallet.kr_balance) / 100;
     const fiatEquivalent = baseUsd * fiatRate;
 
     return {
-      krBalance: wallet.krBalance,
+      kr_balance: wallet.kr_balance,
       fiatEquivalent,
       currency: currencyToUse,
-      isWalletUnlocked: wallet.user.isWalletUnlocked
+      is_wallet_unlocked: wallet.User.is_wallet_unlocked
     };
   }
 
@@ -78,44 +83,50 @@ export class WalletService {
         }
 
         // Deduct Full Amount Sender (-100%)
-        await tx.wallet.update({
-          where: { userId: senderId },
-          data: { krBalance: { decrement: krDecimal } }
+        await tx.wallets.update({
+          where: { user_id: senderId },
+          data: { kr_balance: { decrement: krDecimal } }
         });
 
         // Credit Recipient (-15% Platform cut applied -> 85%)
-        const recipientWallet = await tx.wallet.upsert({
-          where: { userId: recipientId },
-          create: { userId: recipientId, krBalance: recipientReceiveAmount },
-          update: { krBalance: { increment: recipientReceiveAmount } }
+        const recipientWallet = await tx.wallets.upsert({
+          where: { user_id: recipientId },
+          create: { 
+            User: {
+              connect: { id: recipientId }
+            },
+            kr_balance: recipientReceiveAmount,
+            updated_at: new Date()
+          },
+          update: { kr_balance: { increment: recipientReceiveAmount } }
         });
 
         // Record Transactions accurately outlining Revenue Velocity
-        await tx.transaction.createMany({
+        await tx.transactions.createMany({
           data: [
             {
-              userId: senderId,
-              counterpartyId: recipientId,
+              user_id: senderId,
+              counterparty_id: recipientId,
               type: 'tip_sent',
-              amountKr: krDecimal,
-              amountFiat: fiatAmount,
+              amount_kr: krDecimal,
+              amount_fiat: fiatAmount,
               currency: senderCurrency,
               status: 'completed',
               provider: 'platform'
             },
             {
-              userId: recipientId,
-              counterpartyId: senderId,
+              user_id: recipientId,
+              counterparty_id: senderId,
               type: 'tip_received',
-              amountKr: recipientReceiveAmount,
+              amount_kr: recipientReceiveAmount,
               status: 'completed',
               provider: 'platform'
             },
             {
-              userId: senderId, // Associated essentially with the action
-              counterpartyId: 'PLATFORM_REVENUE',
+              user_id: senderId, // Associated essentially with the action
+              counterparty_id: 'PLATFORM_REVENUE',
               type: 'platform_fee',
-              amountKr: platformCutDecimal,
+              amount_kr: platformCutDecimal,
               status: 'completed',
               provider: 'platform_engine'
             }
@@ -124,10 +135,10 @@ export class WalletService {
 
         // Unlock Recipient Identity if this is their first inflow!
         const recipientUser = await tx.user.findUnique({ where: { id: recipientId } });
-        if (recipientUser && !recipientUser.isWalletUnlocked) {
+        if (recipientUser && !recipientUser.is_wallet_unlocked) {
           await tx.user.update({
             where: { id: recipientId },
-            data: { isWalletUnlocked: true }
+            data: { is_wallet_unlocked: true }
           });
         }
 
@@ -145,9 +156,9 @@ export class WalletService {
   }
 
   static async getTransactions(userId: string, limit: number = 20, offset: number = 0) {
-    const transactions = await prisma.transaction.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
+    const transactions = await prisma.transactions.findMany({
+      where: { user_id: userId },
+      orderBy: { created_at: 'desc' },
       take: limit,
       skip: offset
     });
@@ -165,16 +176,16 @@ export class WalletService {
       where: {
         OR: [
           { username: { contains: query, mode: 'insensitive' } },
-          { displayName: { contains: query, mode: 'insensitive' } }
+          { display_name: { contains: query, mode: 'insensitive' } }
         ]
       },
       take: 20,
       select: {
         id: true,
         username: true,
-        displayName: true,
-        avatarUrl: true,
-        isVerified: true
+        display_name: true,
+        avatar_url: true,
+        is_verified: true
       }
     });
 
@@ -232,11 +243,11 @@ export class WalletService {
     }
 
     // SECURITY: Rate limiting - check recent transactions
-    const recentTransactions = await prisma.transaction.count({
+    const recentTransactions = await prisma.transactions.count({
       where: {
-        userId,
+        user_id: userId,
         type: 'topup',
-        createdAt: {
+        created_at: {
           gte: new Date(Date.now() - 60000) // Last 1 minute
         }
       }
@@ -271,12 +282,12 @@ export class WalletService {
     const reference = `TOPUP_${Date.now()}_${crypto.randomBytes(8).toString('hex').toUpperCase()}`;
 
     // SECURITY: Create pending transaction with exact amounts (immutable record)
-    const transaction = await prisma.transaction.create({
+    const transaction = await prisma.transactions.create({
       data: {
-        userId,
+        user_id: userId,
         type: 'topup',
-        amountKr: new Prisma.Decimal(krAmount),
-        amountFiat: fiatAmount,
+        amount_kr: new Prisma.Decimal(krAmount),
+        amount_fiat: fiatAmount,
         currency,
         provider,
         status: 'pending',
@@ -316,7 +327,7 @@ export class WalletService {
           };
           
           // Store M-Pesa checkout request ID in metadata
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: {
               metadata: { 
@@ -328,7 +339,7 @@ export class WalletService {
           });
         } catch (error: any) {
           // Mark transaction as failed
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: { status: 'failed' }
           });
@@ -341,28 +352,33 @@ export class WalletService {
           throw new Error('Email required for PayPal');
         }
         try {
-          const paypalOrder = await PayPalService.createOrder(fiatAmount, currency, reference, email);
+          const paypalOrder = await PaypalService.createOrder({ 
+            amount: fiatAmount, 
+            currency, 
+            description: `Krieta Wallet Top-up - ${krAmount} Kr`, 
+            referenceId: reference 
+          });
           paymentInstructions = {
             provider: 'paypal',
             amount: fiatAmount,
             currency,
             paymentUrl: paypalOrder.approvalUrl,
-            orderId: paypalOrder.orderId,
+            order_id: paypalOrder.order_id,
             instructions: 'Click "Continue to Payment" to complete your payment via PayPal. You can pay with your PayPal balance, linked bank account, or credit/debit card.'
           };
           
           // Store PayPal order ID in metadata
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: {
               metadata: { 
                 ...transaction.metadata as any,
-                paypalOrderId: paypalOrder.orderId
+                paypalOrderId: paypalOrder.order_id
               }
             }
           });
         } catch (error: any) {
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: { status: 'failed' }
           });
@@ -375,12 +391,13 @@ export class WalletService {
           throw new Error('Email required for Paystack');
         }
         try {
-          const paystackTx = await PaystackService.initializeTransaction(
-            fiatAmount,
-            currency,
+          const paystackTx = await PaystackService.initializeTransaction({
             email,
-            reference
-          );
+            amount: fiatAmount,
+            currency,
+            reference,
+            callbackUrl: `${process.env.BACKEND_URL}/api/v1/wallet/topup/paystack/callback`
+          });
           
           // Get mobile money providers if applicable
           const mobileMoneyProviders = PaystackService.getMobileMoneyProviders(currency.substring(0, 2));
@@ -412,7 +429,7 @@ export class WalletService {
           };
           
           // Store Paystack access code in metadata
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: {
               metadata: { 
@@ -423,7 +440,7 @@ export class WalletService {
             }
           });
         } catch (error: any) {
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: { status: 'failed' }
           });
@@ -435,7 +452,7 @@ export class WalletService {
     // SECURITY: Return only necessary data, never expose sensitive metadata
     return {
       success: true,
-      transactionId: transaction.id,
+      transaction_id: transaction.id,
       reference,
       krAmount,
       fiatAmount,
@@ -463,7 +480,7 @@ export class WalletService {
     }
 
     // SECURITY: Fetch transaction with lock to prevent race conditions
-    const transaction = await prisma.transaction.findUnique({
+    const transaction = await prisma.transactions.findUnique({
       where: { id: transactionId }
     });
 
@@ -472,7 +489,7 @@ export class WalletService {
     }
 
     // SECURITY: Verify transaction belongs to user
-    if (transaction.userId !== userId) {
+    if (transaction.user_id !== userId) {
       throw new Error('Unauthorized: Transaction does not belong to user');
     }
 
@@ -483,9 +500,9 @@ export class WalletService {
     }
 
     // SECURITY: Verify transaction is not expired (30 minutes timeout)
-    const transactionAge = Date.now() - transaction.createdAt.getTime();
+    const transactionAge = Date.now() - transaction.created_at.getTime();
     if (transactionAge > 30 * 60 * 1000) {
-      await prisma.transaction.update({
+      await prisma.transactions.update({
         where: { id: transactionId },
         data: { status: 'expired' }
       });
@@ -494,11 +511,11 @@ export class WalletService {
 
     // SECURITY: If verified amount provided, ensure it matches transaction amount
     if (verifiedAmount !== undefined) {
-      const transactionAmount = typeof transaction.amountFiat === 'number' ? transaction.amountFiat : 0;
+      const transactionAmount = typeof transaction.amount_fiat === 'number' ? transaction.amount_fiat : 0;
       const amountMatch = Math.abs(verifiedAmount - transactionAmount) < 0.01;
       if (!amountMatch) {
-        console.error(`Amount mismatch: Expected ${transaction.amountFiat}, got ${verifiedAmount}`);
-        await prisma.transaction.update({
+        console.error(`Amount mismatch: Expected ${transaction.amount_fiat}, got ${verifiedAmount}`);
+        await prisma.transactions.update({
           where: { id: transactionId },
           data: { status: 'failed', metadata: { ...transaction.metadata as any, error: 'Amount mismatch' } }
         });
@@ -509,7 +526,7 @@ export class WalletService {
     // SECURITY: If verified currency provided, ensure it matches
     if (verifiedCurrency && verifiedCurrency !== transaction.currency) {
       console.error(`Currency mismatch: Expected ${transaction.currency}, got ${verifiedCurrency}`);
-      await prisma.transaction.update({
+      await prisma.transactions.update({
         where: { id: transactionId },
         data: { status: 'failed', metadata: { ...transaction.metadata as any, error: 'Currency mismatch' } }
       });
@@ -523,7 +540,7 @@ export class WalletService {
         await lockWalletForUpdate(tx, userId);
         
         // Double-check status within transaction
-        const txCheck = await tx.transaction.findUnique({
+        const txCheck = await tx.transactions.findUnique({
           where: { id: transactionId }
         });
 
@@ -532,14 +549,14 @@ export class WalletService {
         }
 
         // Update transaction status
-        await tx.transaction.update({
+        await tx.transactions.update({
           where: { id: transactionId },
           data: {
             status: 'completed',
             metadata: {
               ...(transaction.metadata as any),
               paymentReference,
-              completedAt: new Date().toISOString(),
+              completed_at: new Date().toISOString(),
               verifiedAmount,
               verifiedCurrency
             }
@@ -547,32 +564,35 @@ export class WalletService {
         });
 
         // SECURITY: Credit wallet with EXACT amount from transaction record (not from parameters)
-        await tx.wallet.upsert({
-          where: { userId },
+        await tx.wallets.upsert({
+          where: { user_id: userId },
           create: {
-            userId,
-            krBalance: transaction.amountKr
+            User: {
+              connect: { id: userId }
+            },
+            kr_balance: transaction.amount_kr,
+            updated_at: new Date()
           },
           update: {
-            krBalance: { increment: transaction.amountKr }
+            kr_balance: { increment: transaction.amount_kr }
           }
         });
 
         // Unlock wallet if first topup
         const user = await tx.user.findUnique({ where: { id: userId } });
-        if (user && !user.isWalletUnlocked) {
+        if (user && !user.is_wallet_unlocked) {
           await tx.user.update({
             where: { id: userId },
-            data: { isWalletUnlocked: true }
+            data: { is_wallet_unlocked: true }
           });
         }
 
-        console.log(`✅ Top-up confirmed: User ${userId}, Transaction ${transactionId}, Amount ${transaction.amountKr} Kr`);
+        console.log(`✅ Top-up confirmed: User ${userId}, Transaction ${transactionId}, Amount ${transaction.amount_kr} Kr`);
 
         return {
           success: true,
-          transactionId,
-          krAmount: transaction.amountKr.toNumber(),
+          transaction_id: transactionId,
+          krAmount: transaction.amount_kr.toNumber(),
           status: 'completed'
         };
       }, {
@@ -589,7 +609,7 @@ export class WalletService {
     try {
       // For now, we'll use Paystack's account verification for supported countries
       if (country === 'NG' || country === 'GH' || country === 'ZA') {
-        const verification = await PaystackService.verifyAccount(accountNumber, bankCode);
+        const verification = await PaystackService.verifyAccountName({ accountNumber, bankCode, country });
         return {
           success: true,
           accountName: verification.accountName
@@ -662,10 +682,10 @@ export class WalletService {
    */
   static async getCountries() {
     return [
-      { code: 'KE', name: 'Kenya', currency: 'KES', accountType: 'bank_account' },
-      { code: 'NG', name: 'Nigeria', currency: 'NGN', accountType: 'nuban' },
-      { code: 'GH', name: 'Ghana', currency: 'GHS', accountType: 'mobile_money' },
-      { code: 'ZA', name: 'South Africa', currency: 'ZAR', accountType: 'bank_account' }
+      { code: 'KE', name: 'Kenya', currency: 'KES', account_type: 'bank_account' },
+      { code: 'NG', name: 'Nigeria', currency: 'NGN', account_type: 'nuban' },
+      { code: 'GH', name: 'Ghana', currency: 'GHS', account_type: 'mobile_money' },
+      { code: 'ZA', name: 'South Africa', currency: 'ZAR', account_type: 'bank_account' }
     ];
   }
 }

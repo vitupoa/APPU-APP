@@ -15,7 +15,7 @@ export class ExploreService {
         usageCount: true,
         _count: {
           select: {
-            contentTags: true
+            content_tags: true
           }
         }
       }
@@ -23,8 +23,8 @@ export class ExploreService {
 
     return hashtags.map((h: any) => ({
       tag: `#${h.tag}`,
-      viewCount: h.usageCount,
-      postCount: h._count.contentTags
+      view_count: h.usageCount,
+      postCount: h._count.content_tags
     }));
   }
 
@@ -42,7 +42,7 @@ export class ExploreService {
       };
     }
 
-    const shorts = await prisma.short.findMany({
+    const shorts = await prisma.shorts.findMany({
       where: whereClause,
       orderBy: [
         { views: 'desc' },
@@ -53,14 +53,14 @@ export class ExploreService {
         id: true,
         videoUrl: true,
         views: true,
-        userId: true
+        user_id: true
       }
     });
 
     return shorts.map((s: any) => ({
       id: s.id,
       thumbnailUrl: s.videoUrl,
-      viewCount: s.views,
+      view_count: s.views,
       creatorUsername: '',
       creatorAvatar: ''
     }));
@@ -75,16 +75,16 @@ export class ExploreService {
         status: 'ACTIVE'
       },
       orderBy: [
-        { totalParticipants: 'desc' },
-        { prizeTotalKr: 'desc' }
+        { total_participants: 'desc' },
+        { prize_total_kr: 'desc' }
       ],
       take: limit,
       select: {
         id: true,
         title: true,
-        coverMediaUrl: true,
-        prizeTotalKr: true,
-        totalParticipants: true,
+        cover_media_url: true,
+        prize_total_kr: true,
+        total_participants: true,
         category: true
       }
     });
@@ -92,9 +92,9 @@ export class ExploreService {
     return contests.map((c: any) => ({
       id: c.id,
       title: c.title,
-      thumbnailUrl: c.coverMediaUrl,
-      prizeTotalKr: c.prizeTotalKr,
-      totalParticipants: c.totalParticipants,
+      thumbnailUrl: c.cover_media_url,
+      prizeTotalKr: c.prize_total_kr,
+      totalParticipants: c.total_participants,
       category: c.category
     }));
   }
@@ -105,21 +105,21 @@ export class ExploreService {
   static async getTrendingCreators(limit: number = 10) {
     const creators = await prisma.user.findMany({
       where: {
-        admirersCount: {
+        admirers_count: {
           gte: 100 // Minimum 100 followers to be considered trending
         }
       },
       orderBy: [
-        { admirersCount: 'desc' }
+        { admirers_count: 'desc' }
       ],
       take: limit,
       select: {
         id: true,
         username: true,
-        displayName: true,
-        avatarUrl: true,
-        admirersCount: true,
-        isVerified: true,
+        display_name: true,
+        avatar_url: true,
+        admirers_count: true,
+        is_verified: true,
         bio: true
       }
     });
@@ -127,62 +127,12 @@ export class ExploreService {
     return creators.map((c: any) => ({
       id: c.id,
       username: c.username,
-      displayName: c.displayName,
-      avatarUrl: c.avatarUrl,
-      followerCount: c.admirersCount,
-      isVerified: c.isVerified || false,
+      display_name: c.display_name,
+      avatar_url: c.avatar_url,
+      follower_count: c.admirers_count,
+      is_verified: c.is_verified || false,
       bio: c.bio
     }));
-  }
-
-  /**
-   * Get active live streams
-   */
-  static async getLiveStreams(limit: number = 20) {
-    const streams = await prisma.liveStream.findMany({
-      where: {
-        status: 'LIVE'
-      },
-      orderBy: {
-        viewerCount: 'desc'
-      },
-      take: limit,
-      select: {
-        id: true,
-        title: true,
-        thumbnailUrl: true,
-        viewerCount: true,
-        category: true,
-        createdAt: true,
-        hostId: true
-      }
-    });
-
-    return streams.map((s: any) => ({
-      id: s.id,
-      creatorId: s.hostId,
-      creatorUsername: '',
-      creatorAvatar: '',
-      thumbnailUrl: s.thumbnailUrl || '',
-      viewerCount: s.viewerCount,
-      title: s.title,
-      category: s.category || this.inferCategory(s.title)
-    }));
-  }
-
-  /**
-   * Infer category from stream title (temporary until category field is added)
-   */
-  private static inferCategory(title: string): string {
-    const lowerTitle = title.toLowerCase();
-    if (lowerTitle.includes('game') || lowerTitle.includes('gaming') || lowerTitle.includes('play')) return 'Gaming';
-    if (lowerTitle.includes('music') || lowerTitle.includes('sing') || lowerTitle.includes('song')) return 'Music';
-    if (lowerTitle.includes('chat') || lowerTitle.includes('talk') || lowerTitle.includes('q&a')) return 'Chat';
-    if (lowerTitle.includes('sport') || lowerTitle.includes('fitness') || lowerTitle.includes('workout')) return 'Sports';
-    if (lowerTitle.includes('art') || lowerTitle.includes('draw') || lowerTitle.includes('paint')) return 'Art';
-    if (lowerTitle.includes('cook') || lowerTitle.includes('recipe') || lowerTitle.includes('food')) return 'Cooking';
-    if (lowerTitle.includes('tech') || lowerTitle.includes('code') || lowerTitle.includes('programming')) return 'Tech';
-    return 'Chat'; // Default category
   }
 
   /**
@@ -201,14 +151,14 @@ export class ExploreService {
       result.items.map(async (item) => {
         if (item.contentType === 'SHORT') {
           const short = await prisma.short.findUnique({
-            where: { id: item.contentId },
+            where: { id: item.content_id },
             select: {
               id: true,
               videoUrl: true,
               caption: true,
               views: true,
               likesCount: true,
-              userId: true
+              user_id: true
             }
           });
           return short ? {
@@ -218,28 +168,28 @@ export class ExploreService {
             caption: short.caption,
             views: short.views,
             likesCount: short.likesCount,
-            creator: { id: short.userId, username: '', avatarUrl: '' }
+            creator: { id: short.user_id, username: '', avatar_url: '' }
           } : null;
         } else if (item.contentType === 'POST') {
           const post = await prisma.post.findUnique({
-            where: { id: item.contentId },
+            where: { id: item.content_id },
             select: {
               id: true,
               caption: true,
-              imageUrls: true,
-              likesCount: true,
-              commentsCount: true,
-              userId: true
+              image_urls: true,
+              likes_count: true,
+              comments_count: true,
+              user_id: true
             }
           });
           return post ? {
             type: 'POST',
             id: post.id,
             caption: post.caption,
-            mediaUrls: post.imageUrls,
-            likesCount: post.likesCount,
-            commentsCount: post.commentsCount,
-            creator: { id: post.userId, username: '', avatarUrl: '' }
+            mediaUrls: post.image_urls,
+            likesCount: post.likes_count,
+            commentsCount: post.comments_count,
+            creator: { id: post.user_id, username: '', avatar_url: '' }
           } : null;
         }
         return null;

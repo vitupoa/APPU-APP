@@ -14,27 +14,27 @@ export class FinancialService {
   static async ensurePlatformWallet(label = 'main') {
     return prisma.platformWallet.upsert({
       where: { label },
-      create: { label, krBalance: 0 },
+      create: { label, kr_balance: 0 },
       update: {},
     });
   }
 
   static async platformWalletAction(
     adminId: string,
-    data: { amountKr: number; action: 'topup' | 'withdraw'; reason: string },
+    data: { amount_kr: number; action: 'topup' | 'withdraw'; reason: string },
     ip?: string, ua?: string
   ) {
     const wallet = await this.ensurePlatformWallet('main');
-    const amount = new Prisma.Decimal(data.amountKr);
+    const amount = new Prisma.Decimal(data.amount_kr);
 
-    if (data.action === 'withdraw' && wallet.krBalance.lessThan(amount)) {
+    if (data.action === 'withdraw' && wallet.kr_balance.lessThan(amount)) {
       throw new Error('Insufficient platform wallet balance');
     }
 
     const updated = await prisma.platformWallet.update({
       where: { label: 'main' },
       data: {
-        krBalance: data.action === 'topup'
+        kr_balance: data.action === 'topup'
           ? { increment: amount }
           : { decrement: amount }
       }
@@ -45,32 +45,32 @@ export class FinancialService {
       : ADMIN_ACTIONS.PLATFORM_WALLET_WITHDRAW;
 
     await AuditService.log(adminId, auditAction, 'platform_wallet', 'main', {
-      amountKr: data.amountKr, reason: data.reason
+      amount_kr: data.amount_kr, reason: data.reason
     }, ip, ua);
 
-    return { success: true, newBalance: updated.krBalance, action: data.action };
+    return { success: true, newBalance: updated.kr_balance, action: data.action };
   }
 
   // ─── USER WALLET TOPUP ──────────────────────────────────
 
   static async topupUserWallet(
     adminId: string,
-    data: { userId: string; amountKr: number; reason: string },
+    data: { user_id: string; amountKr: number; reason: string },
     ip?: string, ua?: string
   ) {
-    const amount = new Prisma.Decimal(data.amountKr);
+    const amount = new Prisma.Decimal(data.amount_kr);
 
     const wallet = await prisma.wallet.upsert({
-      where: { userId: data.userId },
-      create: { userId: data.userId, krBalance: amount },
-      update: { krBalance: { increment: amount } },
+      where: { user_id: data.user_id },
+      create: { user_id: data.user_id, kr_balance: amount },
+      update: { kr_balance: { increment: amount } },
     });
 
     await prisma.transaction.create({
       data: {
-        userId: data.userId,
+        user_id: data.user_id,
         type: 'admin_topup',
-        amountKr: amount,
+        amount_kr: amount,
         status: 'completed',
         provider: 'platform_admin',
         counterpartyId: adminId,
@@ -78,11 +78,11 @@ export class FinancialService {
       }
     });
 
-    await AuditService.log(adminId, ADMIN_ACTIONS.USER_WALLET_TOPUP, 'user', data.userId, {
-      amountKr: data.amountKr, reason: data.reason
+    await AuditService.log(adminId, ADMIN_ACTIONS.USER_WALLET_TOPUP, 'user', data.user_id, {
+      amount_kr: data.amount_kr, reason: data.reason
     }, ip, ua);
 
-    return { success: true, newBalance: wallet.krBalance };
+    return { success: true, newBalance: wallet.kr_balance };
   }
 
   // ─── WITHDRAWALS ────────────────────────────────────────
@@ -90,18 +90,18 @@ export class FinancialService {
   static async listWithdrawals(options: {
     page?: number; limit?: number; status?: string; userId?: string;
   }) {
-    const { page = 1, limit = 20, status, userId } = options;
+    const { page = 1, limit = 20, status, user_id } = options;
     const where: any = {};
     if (status) where.status = status;
-    if (userId) where.userId = userId;
+    if (userId) where.user_id = userId;
 
     const [items, total] = await Promise.all([
       prisma.withdrawalRequest.findMany({
         where,
         include: {
-          user: { select: { id: true, username: true, displayName: true, firstName: true, lastName: true } }
+          user: { select: { id: true, username: true, display_name: true, first_name: true, last_name: true } }
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
       prisma.withdrawalRequest.count({ where }),
@@ -115,8 +115,8 @@ export class FinancialService {
       include: {
         user: {
           select: {
-            id: true, username: true, displayName: true,
-            firstName: true, lastName: true, email: true, country: true
+            id: true, username: true, display_name: true,
+            first_name: true, last_name: true, email: true, country: true
           }
         }
       }
@@ -130,7 +130,7 @@ export class FinancialService {
   ) {
     const withdrawal = await prisma.withdrawalRequest.findUniqueOrThrow({
       where: { id: withdrawalId },
-      include: { user: { select: { firstName: true, lastName: true, displayName: true } } }
+      include: { user: { select: { first_name: true, last_name: true, display_name: true } } }
     });
 
     if (withdrawal.status !== 'PENDING' && withdrawal.status !== 'FLAGGED') {
@@ -138,7 +138,7 @@ export class FinancialService {
     }
 
     // Name matching check
-    const krietaName = `${withdrawal.user.firstName} ${withdrawal.user.lastName}`.toLowerCase().trim();
+    const krietaName = `${withdrawal.user.first_name} ${withdrawal.user.last_name}`.toLowerCase().trim();
     const accountName = withdrawal.accountName.toLowerCase().trim();
     const nameMatch = this.fuzzyNameMatch(krietaName, accountName);
 
@@ -149,7 +149,7 @@ export class FinancialService {
           return {
             success: false,
             warning: 'NAME_MISMATCH',
-            message: `Account name "${withdrawal.accountName}" does not match Krieta name "${withdrawal.user.firstName} ${withdrawal.user.lastName}"`,
+            message: `Account name "${withdrawal.accountName}" does not match Krieta name "${withdrawal.user.first_name} ${withdrawal.user.last_name}"`,
             similarity: nameMatch.similarity,
             requiresOverride: true,
           };
@@ -170,20 +170,20 @@ export class FinancialService {
 
         // Calculate invisible withdrawal fee (KES 1 → Kr)
         const withdrawalFeeKr = await ExchangeService.getWithdrawalFeeKr();
-        const totalDeduction = withdrawal.amountKr.add(new Prisma.Decimal(withdrawalFeeKr));
+        const totalDeduction = withdrawal.amount_kr.add(new Prisma.Decimal(withdrawalFeeKr));
 
         // Deduct from user wallet (withdrawal amount + invisible fee)
         await tx.wallet.update({
-          where: { userId: withdrawal.userId },
-          data: { krBalance: { decrement: totalDeduction } }
+          where: { user_id: withdrawal.user_id },
+          data: { kr_balance: { decrement: totalDeduction } }
         });
 
         await tx.transaction.create({
           data: {
-            userId: withdrawal.userId,
+            user_id: withdrawal.user_id,
             type: 'withdraw',
-            amountKr: withdrawal.amountKr,
-            amountFiat: withdrawal.amountFiat,
+            amount_kr: withdrawal.amount_kr,
+            amount_fiat: withdrawal.amount_fiat,
             currency: withdrawal.currency,
             status: 'completed',
             provider: withdrawal.provider,
@@ -196,16 +196,16 @@ export class FinancialService {
           const opsUser = await tx.user.findFirst({ where: { username: 'JohnOyugi' } });
           if (opsUser) {
             await tx.wallet.upsert({
-              where: { userId: opsUser.id },
-              create: { userId: opsUser.id, krBalance: new Prisma.Decimal(withdrawalFeeKr) },
-              update: { krBalance: { increment: new Prisma.Decimal(withdrawalFeeKr) } },
+              where: { user_id: opsUser.id },
+              create: { user_id: opsUser.id, kr_balance: new Prisma.Decimal(withdrawalFeeKr) },
+              update: { kr_balance: { increment: new Prisma.Decimal(withdrawalFeeKr) } },
             });
           }
         }
       });
 
       await AuditService.log(adminId, ADMIN_ACTIONS.WITHDRAWAL_APPROVE, 'withdrawal', withdrawalId, {
-        amountKr: withdrawal.amountKr.toString(), note: data.note
+        amount_kr: withdrawal.amount_kr.toString(), note: data.note
       }, ip, ua);
 
       return { success: true, message: 'Withdrawal approved' };
@@ -242,15 +242,15 @@ export class FinancialService {
   static async listTransactions(options: {
     page?: number; limit?: number; userId?: string; type?: string; status?: string;
   }) {
-    const { page = 1, limit = 50, userId, type, status } = options;
+    const { page = 1, limit = 50, user_id, type, status } = options;
     const where: any = {};
-    if (userId) where.userId = userId;
+    if (userId) where.user_id = userId;
     if (type) where.type = type;
     if (status) where.status = status;
 
     const [items, total] = await Promise.all([
       prisma.transaction.findMany({
-        where, orderBy: { createdAt: 'desc' },
+        where, orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
       prisma.transaction.count({ where }),
@@ -269,10 +269,10 @@ export class FinancialService {
       prisma.escrow.findMany({
         where,
         include: {
-          user: { select: { id: true, username: true, displayName: true } },
+          user: { select: { id: true, username: true, display_name: true } },
           contest: { select: { id: true, title: true } },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
       prisma.escrow.count({ where }),
@@ -280,25 +280,25 @@ export class FinancialService {
     return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  static async releaseEscrow(adminId: string, escrowId: string, ip?: string, ua?: string) {
+  static async releaseEscrow(adminId: string, escrow_id: string, ip?: string, ua?: string) {
     const escrow = await prisma.escrow.findUniqueOrThrow({ where: { id: escrowId } });
     if (escrow.status !== 'held') throw new Error('Escrow not in held status');
 
     await prisma.$transaction(async (tx) => {
       await tx.escrow.update({ where: { id: escrowId }, data: { status: 'released' } });
       await tx.wallet.update({
-        where: { userId: escrow.userId },
-        data: { krBalance: { increment: escrow.prizeAmountKr } }
+        where: { user_id: escrow.user_id },
+        data: { kr_balance: { increment: escrow.prizeAmountKr } }
       });
     });
 
-    await AuditService.log(adminId, ADMIN_ACTIONS.ESCROW_RELEASE, 'escrow', escrowId, {
-      amountKr: escrow.prizeAmountKr.toString()
+    await AuditService.log(adminId, ADMIN_ACTIONS.ESCROW_RELEASE, 'escrow', escrow_id, {
+      amount_kr: escrow.prizeAmountKr.toString()
     }, ip, ua);
     return { success: true, message: 'Escrow released' };
   }
 
-  static async refundEscrow(adminId: string, escrowId: string, ip?: string, ua?: string) {
+  static async refundEscrow(adminId: string, escrow_id: string, ip?: string, ua?: string) {
     const escrow = await prisma.escrow.findUniqueOrThrow({ where: { id: escrowId } });
     if (escrow.status !== 'held') throw new Error('Escrow not in held status');
 
@@ -306,12 +306,12 @@ export class FinancialService {
       await tx.escrow.update({ where: { id: escrowId }, data: { status: 'refunded' } });
       const totalRefund = escrow.prizeAmountKr.add(escrow.feeAmountKr);
       await tx.wallet.update({
-        where: { userId: escrow.userId },
-        data: { krBalance: { increment: totalRefund } }
+        where: { user_id: escrow.user_id },
+        data: { kr_balance: { increment: totalRefund } }
       });
     });
 
-    await AuditService.log(adminId, ADMIN_ACTIONS.ESCROW_REFUND, 'escrow', escrowId, {}, ip, ua);
+    await AuditService.log(adminId, ADMIN_ACTIONS.ESCROW_REFUND, 'escrow', escrow_id, {}, ip, ua);
     return { success: true, message: 'Escrow refunded' };
   }
 
@@ -363,9 +363,9 @@ export class FinancialService {
     const matchingWallets = await prisma.wallet.findMany({
       where: {
         user: { currency: { equals: currency, mode: 'insensitive' } },
-        krBalance: { gte: krDecimal }
+        kr_balance: { gte: krDecimal }
       },
-      select: { userId: true, krBalance: true }
+      select: { user_id: true, kr_balance: true }
     });
 
     if (matchingWallets.length === 0) {
@@ -381,8 +381,8 @@ export class FinancialService {
       await prisma.$transaction(
         batch.map((w: any) =>
           prisma.wallet.update({
-            where: { userId: w.userId },
-            data: { krBalance: { decrement: krDecimal } }
+            where: { user_id: w.user_id },
+            data: { kr_balance: { decrement: krDecimal } }
           })
         )
       );
@@ -393,9 +393,9 @@ export class FinancialService {
     const opsUser = await prisma.user.findFirst({ where: { username: 'JohnOyugi' } });
     if (opsUser) {
       await prisma.wallet.upsert({
-        where: { userId: opsUser.id },
-        create: { userId: opsUser.id, krBalance: totalDeducted },
-        update: { krBalance: { increment: totalDeducted } },
+        where: { user_id: opsUser.id },
+        create: { user_id: opsUser.id, kr_balance: totalDeducted },
+        update: { kr_balance: { increment: totalDeducted } },
       });
     }
 

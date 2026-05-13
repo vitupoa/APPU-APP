@@ -44,7 +44,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createShortSchema.parse(req.body);
     const short = await ShortsService.createShort({
-      creatorId: req.userId!,
+      creator_id: req.userId!,
       ...(data as any)
     });
     return res.status(201).json(short);

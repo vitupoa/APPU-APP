@@ -4,16 +4,10 @@
  */
 
 // Import Prisma-generated enums
-import { SponsoredContentStatus, PricingModel } from '@prisma/client';
+import { SponsoredContentStatus, PricingModel, SponsoredContentType } from '@prisma/client';
 
 // Re-export for convenience
-export { SponsoredContentStatus, PricingModel };
-
-export enum SponsoredContentType {
-  SHORT = 'short',
-  POST = 'post',
-  STORY = 'story'
-}
+export { SponsoredContentStatus, PricingModel, SponsoredContentType };
 
 export enum TargetingCriteria {
   AGE = 'age',

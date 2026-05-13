@@ -7,5 +7,4 @@ interface ExploreRepository {
     suspend fun getTrendingShorts(category: ContentCategory? = null, limit: Int = 20): List<TrendingShort>
     suspend fun getTrendingContests(limit: Int = 10): List<TrendingContest>
     suspend fun getTrendingCreators(limit: Int = 10): List<TrendingCreator>
-    suspend fun getLiveStreams(limit: Int = 20): List<LiveStream>
 }

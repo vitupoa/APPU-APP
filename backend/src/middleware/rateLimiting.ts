@@ -12,8 +12,8 @@ function makeStore(prefix: string) {
   });
 }
 
-const keyGen = (req: any): string => (req.userId ?? req.ip ?? 'unknown') as string;
-const skipAdmin = (req: any): boolean => req.user?.isAdmin === true;
+const keyGen = (req: any): string => (req.user_id ?? req.ip ?? 'unknown') as string;
+const skipAdmin = (req: any): boolean => req.user?.is_admin === true;
 
 export const unlockRateLimiter = rateLimit({
   store: makeStore('rl:unlock:'),

@@ -22,8 +22,8 @@ export class DisplayAdCampaignService {
       placements,
       chatNiches,
       locations,
-      startDate,
-      endDate,
+      start_date,
+      end_date,
     } = data;
 
     const minBudget = await this.calculateMinimumBudget(locations, budgetType);
@@ -38,35 +38,35 @@ export class DisplayAdCampaignService {
       throw new Error(`Target CPM must be between KES ${cpmRanges.min} and KES ${cpmRanges.max}`);
     }
 
-    const campaign = await prisma.displayAdCampaign.create({
+    const campaign = await prisma.display_ad_campaigns.create({
       data: {
-        brandId,
-        campaignName,
-        campaignObjective,
-        adTitle,
-        adDescription,
-        primaryImageUrl,
-        ctaText,
-        ctaUrl,
-        budgetType,
-        dailyBudgetKes: budgetType === 'DAILY' ? dailyBudgetKes : null,
-        lifetimeBudgetKes: budgetType === 'LIFETIME' ? lifetimeBudgetKes : null,
-        biddingStrategy,
-        targetCpm,
-        targetAgeMin,
-        targetAgeMax,
-        targetGenders,
-        targetInterests,
+        brand_id: brandId,
+        campaign_name: campaignName,
+        campaign_objective: campaignObjective,
+        ad_title: adTitle,
+        ad_description: adDescription,
+        primary_image_url: primaryImageUrl,
+        cta_text: ctaText,
+        cta_url: ctaUrl,
+        budget_type: budgetType,
+        daily_budget_kes: budgetType === 'DAILY' ? dailyBudgetKes : null,
+        lifetime_budget_kes: budgetType === 'LIFETIME' ? lifetimeBudgetKes : null,
+        bidding_strategy: biddingStrategy,
+        target_cpm: targetCpm,
+        target_age_min: targetAgeMin,
+        target_age_max: targetAgeMax,
+        target_genders: targetGenders,
+        target_interests: targetInterests,
         placements,
-        chatNiches,
-        startDate: new Date(startDate),
-        endDate: endDate ? new Date(endDate) : null,
+        chat_niches: chatNiches,
+        start_date: new Date(start_date),
+        end_date: end_date ? new Date(end_date) : null,
         status: 'PENDING',
-        locations: {
+        ad_campaign_locations: {
           create: locations.map((loc: any) => ({
             scope: loc.scope,
-            scopeValue: loc.scopeValue,
-            scopeDisplayName: loc.displayName,
+            scope_value: loc.scopeValue,
+            scope_display_name: loc.display_name,
             continent: loc.continent,
             country: loc.country,
             region: loc.region,
@@ -74,16 +74,16 @@ export class DisplayAdCampaignService {
             town: loc.town,
             road: loc.road,
             landmark: loc.landmark,
-            shoppingCenter: loc.shoppingCenter,
+            shopping_center: loc.shoppingCenter,
             latitude: loc.latitude,
             longitude: loc.longitude,
-            radiusKm: loc.radiusKm,
-            isExcluded: loc.isExcluded || false,
+            radius_km: loc.radiusKm,
+            is_excluded: loc.isExcluded || false,
           })),
         },
       },
       include: {
-        locations: true,
+        ad_campaign_locations: true,
       },
     });
 
@@ -91,25 +91,25 @@ export class DisplayAdCampaignService {
   }
 
   async getBrandCampaigns(brandId: string) {
-    return prisma.displayAdCampaign.findMany({
-      where: { brandId },
+    return prisma.display_ad_campaigns.findMany({
+      where: { brand_id: brandId },
       include: {
-        locations: true,
-        analytics: {
+        ad_campaign_locations: true,
+        display_ad_analytics: {
           orderBy: { date: 'desc' },
           take: 30,
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
     });
   }
 
   async getCampaignById(campaignId: string) {
-    return prisma.displayAdCampaign.findUnique({
+    return prisma.display_ad_campaigns.findUnique({
       where: { id: campaignId },
       include: {
-        locations: true,
-        analytics: {
+        ad_campaign_locations: true,
+        display_ad_analytics: {
           orderBy: { date: 'desc' },
         },
       },
@@ -117,14 +117,14 @@ export class DisplayAdCampaignService {
   }
 
   async updateCampaign(campaignId: string, data: any) {
-    return prisma.displayAdCampaign.update({
+    return prisma.display_ad_campaigns.update({
       where: { id: campaignId },
       data,
     });
   }
 
   async toggleCampaign(campaignId: string) {
-    const campaign = await prisma.displayAdCampaign.findUnique({
+    const campaign = await prisma.display_ad_campaigns.findUnique({
       where: { id: campaignId },
     });
 
@@ -132,19 +132,19 @@ export class DisplayAdCampaignService {
 
     const newStatus = campaign.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
 
-    return prisma.displayAdCampaign.update({
+    return prisma.display_ad_campaigns.update({
       where: { id: campaignId },
       data: { status: newStatus },
     });
   }
 
-  async getCampaignAnalytics(campaignId: string, startDate: string, endDate: string) {
-    return prisma.displayAdAnalytics.findMany({
+  async getCampaignAnalytics(campaignId: string, start_date: string, end_date: string) {
+    return prisma.display_ad_analytics.findMany({
       where: {
-        campaignId,
+        campaign_id: campaignId,
         date: {
-          gte: new Date(startDate),
-          lte: new Date(endDate),
+          gte: new Date(start_date),
+          lte: new Date(end_date),
         },
       },
       orderBy: { date: 'asc' },
@@ -152,14 +152,14 @@ export class DisplayAdCampaignService {
   }
 
   async searchLocations(query: string, scope?: string) {
-    return prisma.locationMaster.findMany({
+    return prisma.location_master.findMany({
       where: {
-        displayName: {
+        display_name: {
           contains: query,
           mode: 'insensitive',
         },
         scope: scope as any,
-        isActive: true,
+        is_active: true,
       },
       take: 20,
     });
@@ -174,52 +174,52 @@ export class DisplayAdCampaignService {
   }
 
   async getPendingCampaigns() {
-    return prisma.displayAdCampaign.findMany({
+    return prisma.display_ad_campaigns.findMany({
       where: { status: 'PENDING' },
       include: {
-        locations: true,
+        ad_campaign_locations: true,
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { created_at: 'asc' },
     });
   }
 
   async approveCampaign(campaignId: string, adminId: string) {
-    return prisma.displayAdCampaign.update({
+    return prisma.display_ad_campaigns.update({
       where: { id: campaignId },
       data: {
         status: 'APPROVED',
-        approvedBy: adminId,
-        approvedAt: new Date(),
+        approved_by: adminId,
+        approved_at: new Date(),
       },
     });
   }
 
   async rejectCampaign(campaignId: string, adminId: string, reason: string) {
-    return prisma.displayAdCampaign.update({
+    return prisma.display_ad_campaigns.update({
       where: { id: campaignId },
       data: {
         status: 'REJECTED',
-        rejectionReason: reason,
-        approvedBy: adminId,
-        approvedAt: new Date(),
+        rejection_reason: reason,
+        approved_by: adminId,
+        approved_at: new Date(),
       },
     });
   }
 
   async getPlatformSettings(scope?: string, scopeValue?: string) {
     if (scope && scopeValue) {
-      return prisma.adPlatformSettings.findUnique({
+      return prisma.ad_platform_settings.findUnique({
         where: {
-          scope_scopeValue: {
+          scope_scope_value: {
             scope: scope as any,
-            scopeValue,
+            scope_value: scopeValue,
           },
         },
       });
     }
 
-    return prisma.adPlatformSettings.findMany({
-      where: { isActive: true },
+    return prisma.ad_platform_settings.findMany({
+      where: { is_active: true },
       orderBy: { priority: 'desc' },
     });
   }
@@ -230,8 +230,6 @@ export class DisplayAdCampaignService {
       scopeValue,
       minDailyBudgetKes,
       minLifetimeBudgetKes,
-      liveStreamMinCpm,
-      liveStreamMaxCpm,
       contestMinCpm,
       contestMaxCpm,
       discoverMinCpm,
@@ -250,61 +248,57 @@ export class DisplayAdCampaignService {
       priority,
     } = data;
 
-    return prisma.adPlatformSettings.upsert({
+    return prisma.ad_platform_settings.upsert({
       where: {
-        scope_scopeValue: {
+        scope_scope_value: {
           scope,
-          scopeValue: scopeValue || '',
+          scope_value: scopeValue || '',
         },
       },
       create: {
         scope,
-        scopeValue,
-        minDailyBudgetKes,
-        minLifetimeBudgetKes,
-        liveStreamMinCpm,
-        liveStreamMaxCpm,
-        contestMinCpm,
-        contestMaxCpm,
-        discoverMinCpm,
-        discoverMaxCpm,
-        admiringMinCpm,
-        admiringMaxCpm,
-        dripsMinCpm,
-        dripsMaxCpm,
-        storiesMinCpm,
-        storiesMaxCpm,
-        groupChatMinCpm,
-        groupChatMaxCpm,
-        chamaChatMinCpm,
-        chamaChatMaxCpm,
-        targetingMultiplier,
+        scope_value: scopeValue,
+        min_daily_budget_kes: minDailyBudgetKes,
+        min_lifetime_budget_kes: minLifetimeBudgetKes,
+        contest_min_cpm: contestMinCpm,
+        contest_max_cpm: contestMaxCpm,
+        discover_min_cpm: discoverMinCpm,
+        discover_max_cpm: discoverMaxCpm,
+        admiring_min_cpm: admiringMinCpm,
+        admiring_max_cpm: admiringMaxCpm,
+        drips_min_cpm: dripsMinCpm,
+        drips_max_cpm: dripsMaxCpm,
+        stories_min_cpm: storiesMinCpm,
+        stories_max_cpm: storiesMaxCpm,
+        group_chat_min_cpm: groupChatMinCpm,
+        group_chat_max_cpm: groupChatMaxCpm,
+        chama_chat_min_cpm: chamaChatMinCpm,
+        chama_chat_max_cpm: chamaChatMaxCpm,
+        targeting_multiplier: targetingMultiplier,
         priority,
-        createdBy: adminId,
-        updatedBy: adminId,
+        created_by: adminId,
+        updated_by: adminId,
       },
       update: {
-        minDailyBudgetKes,
-        minLifetimeBudgetKes,
-        liveStreamMinCpm,
-        liveStreamMaxCpm,
-        contestMinCpm,
-        contestMaxCpm,
-        discoverMinCpm,
-        discoverMaxCpm,
-        admiringMinCpm,
-        admiringMaxCpm,
-        dripsMinCpm,
-        dripsMaxCpm,
-        storiesMinCpm,
-        storiesMaxCpm,
-        groupChatMinCpm,
-        groupChatMaxCpm,
-        chamaChatMinCpm,
-        chamaChatMaxCpm,
-        targetingMultiplier,
+        min_daily_budget_kes: minDailyBudgetKes,
+        min_lifetime_budget_kes: minLifetimeBudgetKes,
+        contest_min_cpm: contestMinCpm,
+        contest_max_cpm: contestMaxCpm,
+        discover_min_cpm: discoverMinCpm,
+        discover_max_cpm: discoverMaxCpm,
+        admiring_min_cpm: admiringMinCpm,
+        admiring_max_cpm: admiringMaxCpm,
+        drips_min_cpm: dripsMinCpm,
+        drips_max_cpm: dripsMaxCpm,
+        stories_min_cpm: storiesMinCpm,
+        stories_max_cpm: storiesMaxCpm,
+        group_chat_min_cpm: groupChatMinCpm,
+        group_chat_max_cpm: groupChatMaxCpm,
+        chama_chat_min_cpm: chamaChatMinCpm,
+        chama_chat_max_cpm: chamaChatMaxCpm,
+        targeting_multiplier: targetingMultiplier,
         priority,
-        updatedBy: adminId,
+        updated_by: adminId,
       },
     });
   }
@@ -318,8 +312,8 @@ export class DisplayAdCampaignService {
     placements.forEach((placement) => {
       const placementKey = this.getPlacementKey(placement);
       settings.forEach((setting: any) => {
-        const min = setting[`${placementKey}MinCpm`];
-        const max = setting[`${placementKey}MaxCpm`];
+        const min = setting[`${placementKey}_min_cpm`];
+        const max = setting[`${placementKey}_max_cpm`];
         if (min < minCpm) minCpm = min;
         if (max > maxCpm) maxCpm = max;
       });
@@ -332,7 +326,7 @@ export class DisplayAdCampaignService {
     const settings = await this.getApplicableSettings(locations);
     
     let maxMinBudget = 0;
-    const budgetKey = budgetType === 'DAILY' ? 'minDailyBudgetKes' : 'minLifetimeBudgetKes';
+    const budgetKey = budgetType === 'DAILY' ? 'min_daily_budget_kes' : 'min_lifetime_budget_kes';
 
     settings.forEach((setting: any) => {
       const minBudget = parseFloat(setting[budgetKey]);
@@ -346,16 +340,16 @@ export class DisplayAdCampaignService {
     const scopes = locations.map((loc) => loc.scope);
     const scopeValues = locations.map((loc) => loc.scopeValue);
 
-    const settings = await prisma.adPlatformSettings.findMany({
+    const settings = await prisma.ad_platform_settings.findMany({
       where: {
         OR: [
           { scope: 'GLOBAL' },
           {
             scope: { in: scopes as any[] },
-            scopeValue: { in: scopeValues },
+            scope_value: { in: scopeValues },
           },
         ],
-        isActive: true,
+        is_active: true,
       },
       orderBy: { priority: 'desc' },
     });
@@ -364,34 +358,32 @@ export class DisplayAdCampaignService {
   }
 
   private async getGlobalSettings() {
-    let global = await prisma.adPlatformSettings.findFirst({
+    let global = await prisma.ad_platform_settings.findFirst({
       where: { scope: 'GLOBAL' },
     });
 
     if (!global) {
-      global = await prisma.adPlatformSettings.create({
+      global = await prisma.ad_platform_settings.create({
         data: {
           scope: 'GLOBAL',
-          scopeValue: null,
-          minDailyBudgetKes: 1000,
-          minLifetimeBudgetKes: 5000,
-          liveStreamMinCpm: 40,
-          liveStreamMaxCpm: 150,
-          contestMinCpm: 50,
-          contestMaxCpm: 180,
-          discoverMinCpm: 45,
-          discoverMaxCpm: 160,
-          admiringMinCpm: 45,
-          admiringMaxCpm: 160,
-          dripsMinCpm: 40,
-          dripsMaxCpm: 150,
-          storiesMinCpm: 80,
-          storiesMaxCpm: 200,
-          groupChatMinCpm: 60,
-          groupChatMaxCpm: 180,
-          chamaChatMinCpm: 70,
-          chamaChatMaxCpm: 200,
-          targetingMultiplier: 1.0,
+          scope_value: null,
+          min_daily_budget_kes: 1000,
+          min_lifetime_budget_kes: 5000,
+          contest_min_cpm: 50,
+          contest_max_cpm: 180,
+          discover_min_cpm: 45,
+          discover_max_cpm: 160,
+          admiring_min_cpm: 45,
+          admiring_max_cpm: 160,
+          drips_min_cpm: 40,
+          drips_max_cpm: 150,
+          stories_min_cpm: 80,
+          stories_max_cpm: 200,
+          group_chat_min_cpm: 60,
+          group_chat_max_cpm: 180,
+          chama_chat_min_cpm: 70,
+          chama_chat_max_cpm: 200,
+          targeting_multiplier: 1.0,
           priority: 0,
         },
       });
@@ -402,15 +394,14 @@ export class DisplayAdCampaignService {
 
   private getPlacementKey(placement: string): string {
     const map: Record<string, string> = {
-      LIVE_STREAMS: 'liveStream',
       CONTESTS: 'contest',
       DISCOVER_SHORTS: 'discover',
       ADMIRING_SHORTS: 'admiring',
       DRIPS_FEED: 'drips',
       STORIES: 'stories',
-      GROUP_CHATS: 'groupChat',
-      CHAMA_CHATS: 'chamaChat',
+      GROUP_CHATS: 'group_chat',
+      CHAMA_CHATS: 'chama_chat',
     };
-    return map[placement] || 'liveStream';
+    return map[placement] || 'contest';
   }
 }

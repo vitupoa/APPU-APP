@@ -30,12 +30,12 @@ export class ContentDistributionService {
     if (!creator) throw new Error('Creator not found');
 
     // Create distribution record
-    const distribution = await prisma.contentDistribution.create({
+    const distribution = await prisma.content_distribution.create({
       data: {
-        contentId,
-        contentType,
-        distributionTier: 'TEST',
-        targetAudienceSize: TEST_AUDIENCE_CONFIG.totalSize
+        content_id: contentId,
+        content_type: contentType,
+        distribution_tier: 'TEST',
+        target_audience_size: TEST_AUDIENCE_CONFIG.totalSize
       }
     });
 
@@ -87,16 +87,16 @@ export class ContentDistributionService {
   }
 
   private async getAdmirers(creatorId: string, count: number, country?: string) {
-    const admirers = await prisma.admire.findMany({
+    const admirers = await prisma.admires.findMany({
       where: { 
-        admiredId: creatorId,
+        admired_id: creatorId,
         ...(country && { admirer: { country } })
       },
-      select: { admirerId: true },
+      select: { admirer_id: true },
       take: count,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     });
-    return admirers.map((a: any) => a.admirerId);
+    return admirers.map((a: any) => a.admirer_id);
   }
 
   private async getSimilarInterestUsers(hashtags: string[], count: number, country?: string) {
@@ -144,27 +144,27 @@ export class ContentDistributionService {
 
   private async scheduleContentDelivery(contentId: string, contentType: string, userIds: string[]) {
     const deliveries = userIds.map((userId: any) => ({
-      userId,
-      contentId,
-      contentType,
-      deliveredAt: new Date() // In production, randomize over 24-48 hours
+      user_id: userId,
+      content_id: contentId,
+      content_type: contentType,
+      delivered_at: new Date() // In production, randomize over 24-48 hours
     }));
 
-    await prisma.userContentDelivery.createMany({
+    await prisma.user_content_delivery.createMany({
       data: deliveries,
       skipDuplicates: true
     });
   }
 
   async evaluatePerformance(contentId: string, contentType: string) {
-    const distribution = await prisma.contentDistribution.findUnique({
-      where: { contentId_contentType: { contentId, contentType } }
+    const distribution = await prisma.content_distribution.findUnique({
+      where: { contentId_contentType: { content_id: contentId, content_type: contentType } }
     });
 
     if (!distribution) throw new Error('Distribution not found');
 
-    const deliveries = await prisma.userContentDelivery.findMany({
-      where: { contentId, contentType, viewed: true }
+    const deliveries = await prisma.user_content_delivery.findMany({
+      where: { content_id: contentId, content_type: contentType, viewed: true }
     });
 
     const totalViews = deliveries.length;
@@ -174,7 +174,7 @@ export class ContentDistributionService {
     const liked = deliveries.filter((d: any) => d.liked).length;
     const shared = deliveries.filter((d: any) => d.shared).length;
     const commented = deliveries.filter((d: any) => d.commented).length;
-    const rewatched = deliveries.filter((d: any) => d.rewatchedCount > 0).length;
+    const rewatched = deliveries.filter((d: any) => d.rewatched_count > 0).length;
 
     const completionRate = completed / totalViews;
     const likeRate = liked / totalViews;
@@ -190,29 +190,29 @@ export class ContentDistributionService {
       rewatchRate * 0.05
     );
 
-    const thresholds = this.getThresholds(distribution.distributionTier);
+    const thresholds = this.getThresholds(distribution.distribution_tier);
     const shouldAmplify = engagementScore >= thresholds.threshold;
 
-    await prisma.contentDistribution.update({
+    await prisma.content_distribution.update({
       where: { id: distribution.id },
       data: {
-        completionRate,
-        likeRate,
-        shareRate,
-        commentRate,
-        rewatchRate,
-        engagementScore,
-        shouldAmplify,
-        lastEvaluatedAt: new Date()
+        completion_rate: completionRate,
+        like_rate: likeRate,
+        share_rate: shareRate,
+        comment_rate: commentRate,
+        rewatch_rate: rewatchRate,
+        engagement_score: engagementScore,
+        should_amplify: shouldAmplify,
+        last_evaluated_at: new Date()
       }
     });
 
     if (shouldAmplify) {
-      const nextTier = this.getNextTier(distribution.distributionTier);
+      const nextTier = this.getNextTier(distribution.distribution_tier);
       await this.amplifyToNextTier(contentId, contentType, nextTier);
     }
 
-    return { shouldAmplify, engagementScore, nextTier: shouldAmplify ? this.getNextTier(distribution.distributionTier) : null };
+    return { shouldAmplify, engagementScore, nextTier: shouldAmplify ? this.getNextTier(distribution.distribution_tier) : null };
   }
 
   private getThresholds(tier: string) {
@@ -272,11 +272,11 @@ export class ContentDistributionService {
       VIRAL: 5000000
     };
 
-    await prisma.contentDistribution.update({
-      where: { contentId_contentType: { contentId, contentType } },
+    await prisma.content_distribution.update({
+      where: { contentId_contentType: { content_id: contentId, content_type: contentType } },
       data: {
-        distributionTier: nextTier as any,
-        targetAudienceSize: tierSizes[nextTier]
+        distribution_tier: nextTier as any,
+        target_audience_size: tierSizes[nextTier]
       }
     });
 

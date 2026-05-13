@@ -10,7 +10,7 @@ const router = Router();
 // ─── VALIDATION SCHEMAS ────────────────────────────────────
 
 const createContestPayoutApprovalSchema = z.object({
-  contestId: z.string().uuid(),
+  contest_id: z.string().uuid(),
   winnerId: z.string().uuid(),
   prizeAmount: z.number().positive()
 });
@@ -45,10 +45,10 @@ router.post(
       const data = createContestPayoutApprovalSchema.parse(req.body);
       
       const approvalId = await EscrowApprovalManager.createContestPayoutApproval(
-        data.contestId,
+        data.contest_id,
         data.winnerId,
         data.prizeAmount,
-        req.userId!
+        req.user_id!
       );
 
       res.status(201).json({
@@ -76,7 +76,7 @@ router.post(
       const data = createWithdrawalApprovalSchema.parse(req.body);
       
       const approvalId = await EscrowApprovalManager.createWithdrawalApproval(
-        req.userId!,
+        req.user_id!,
         data.amount,
         data.withdrawalDetails
       );
@@ -109,7 +109,7 @@ router.get(
     try {
       // Verify super admin
       const user = await prisma.user.findUnique({
-        where: { id: req.userId },
+        where: { id: req.user_id },
         include: { adminProfile: true }
       });
 
@@ -118,7 +118,7 @@ router.get(
         return;
       }
 
-      const pendingApprovals = await EscrowApprovalManager.getPendingApprovals(req.userId!);
+      const pendingApprovals = await EscrowApprovalManager.getPendingApprovals(req.user_id!);
 
       res.json({
         success: true,
@@ -180,7 +180,7 @@ router.post(
 
       // Verify super admin
       const user = await prisma.user.findUnique({
-        where: { id: req.userId },
+        where: { id: req.user_id },
         include: { adminProfile: true }
       });
 
@@ -191,7 +191,7 @@ router.post(
 
       const result = await EscrowApprovalManager.submitApproval(
         approvalId,
-        req.userId!,
+        req.user_id!,
         data.decision,
         data.reason
       );
@@ -219,7 +219,7 @@ router.post(
   async (req: AuthRequest, res: Response) => {
     try {
       const user = await prisma.user.findUnique({
-        where: { id: req.userId },
+        where: { id: req.user_id },
         include: { adminProfile: true }
       });
 

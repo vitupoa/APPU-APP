@@ -1,6 +1,7 @@
 import { Router, Response } from 'express';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { SponsoredContentService } from './sponsored.service.js';
+import { SponsoredContentType } from './sponsored.types.js';
 
 const router = Router();
 
@@ -17,10 +18,10 @@ router.post('/campaigns', authMiddleware, async (req: AuthRequest, res: Response
 // GET /api/v1/sponsored/feed — Get sponsored content for user's feed
 router.get('/feed', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { contentType = 'short' } = req.query;
+    const { contentType = 'SHORT' } = req.query;
     const sponsored = await SponsoredContentService.getSponsoredContentForUser(
       req.userId!,
-      contentType as string
+      contentType as SponsoredContentType
     );
     res.json(sponsored);
   } catch (error: any) {
@@ -31,8 +32,8 @@ router.get('/feed', authMiddleware, async (req: AuthRequest, res: Response) => {
 // POST /api/v1/sponsored/impression — Record impression
 router.post('/impression', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { campaignId } = req.body;
-    await SponsoredContentService.recordImpression(campaignId, req.userId!);
+    const { campaign_id } = req.body;
+    await SponsoredContentService.recordImpression(campaign_id, req.userId!);
     res.json({ recorded: true });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -42,8 +43,8 @@ router.post('/impression', authMiddleware, async (req: AuthRequest, res: Respons
 // POST /api/v1/sponsored/view — Record view (3+ seconds)
 router.post('/view', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { campaignId, watchTimeSeconds } = req.body;
-    await SponsoredContentService.recordView(campaignId, req.userId!, watchTimeSeconds);
+    const { campaign_id, watchTimeSeconds } = req.body;
+    await SponsoredContentService.recordView(campaign_id, req.userId!, watchTimeSeconds);
     res.json({ recorded: true });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -53,8 +54,8 @@ router.post('/view', authMiddleware, async (req: AuthRequest, res: Response) => 
 // POST /api/v1/sponsored/engagement — Record engagement
 router.post('/engagement', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { campaignId, type } = req.body;
-    await SponsoredContentService.recordEngagement(campaignId, req.userId!, type);
+    const { campaign_id, type } = req.body;
+    await SponsoredContentService.recordEngagement(campaign_id, req.userId!, type);
     res.json({ recorded: true });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

@@ -6,8 +6,8 @@ export class StoriesController {
   static async createStory(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId!;
-      const { mediaUrl, mediaType, text, privacy, expiresInHours } = req.body;
-      const story = await StoriesService.createStory(userId, mediaUrl, mediaType, text, privacy, expiresInHours);
+      const { media_url, media_type, text, privacy, expiresInHours } = req.body;
+      const story = await StoriesService.createStory(userId, media_url, media_type, text, privacy, expiresInHours);
       res.status(201).json({ success: true, story });
     } catch (error) {
       next(error);
@@ -71,8 +71,8 @@ export class StoriesController {
     try {
       const userId = req.userId!;
       const storyId = String(req.params.storyId);
-      const { amountKr, currency } = req.body;
-      const result = await StoriesService.tipStory(userId, storyId, Number(amountKr), currency);
+      const { amount_kr, currency } = req.body;
+      const result = await StoriesService.tipStory(userId, storyId, Number(amount_kr), currency);
       res.json(result);
     } catch (error) {
       next(error);

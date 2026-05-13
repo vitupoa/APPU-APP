@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { io } from '../../shared/gateway/socket.js';
+import { randomUUID } from 'crypto';
 
 export class ChamaRiskService {
   /**
@@ -11,10 +12,10 @@ export class ChamaRiskService {
     const activeCycles = await prisma.chamaCycle.findMany({
       where: {
         status: { in: ['COLLECTING', 'OPEN'] },
-        endDate: { lt: new Date() } // Past due
+        end_date: { lt: new Date() } // Past due
       },
       include: {
-        chama: { include: { members: { where: { status: 'ACTIVE' } } } }
+        chama: { include: { chama_members: { where: { status: 'ACTIVE' } } } }
       }
     });
 
@@ -23,44 +24,46 @@ export class ChamaRiskService {
     for (const cycle of activeCycles) {
       const chama = cycle.chama;
 
-      for (const member of chama.members) {
+      for (const member of chama.chama_members) {
         // Did they contribute this cycle?
         const contribution = await prisma.chamaContribution.findFirst({
           where: {
-            chamaId: chama.id,
-            userId: member.userId,
-            cycleNumber: cycle.cycleNumber
+            chama_id: chama.id,
+            user_id: member.user_id,
+            cycle_number: cycle.cycle_number
           }
         });
 
-        if (!contribution || Number(contribution.amountKr) < Number(chama.contributionAmountKr)) {
+        if (!contribution || Number(contribution.amount_kr) < Number(chama.contribution_amount_kr)) {
           // Flag as defaulter
-          const owed = Number(chama.contributionAmountKr) - (contribution ? Number(contribution.amountKr) : 0);
-          const penalty = chama.penaltyAmountKr ? Number(chama.penaltyAmountKr) : 0;
+          const owed = Number(chama.contribution_amount_kr) - (contribution ? Number(contribution.amount_kr) : 0);
+          const penalty = chama.penalty_amount_kr ? Number(chama.penalty_amount_kr) : 0;
 
           const defaulter = await prisma.chamaDefaulter.create({
             data: {
-              userId: member.userId,
-              chamaId: chama.id,
-              chamaName: chama.name,
-              amountOwedKr: new Prisma.Decimal(owed),
-              fineAmountKr: new Prisma.Decimal(penalty),
+              id: randomUUID(),
+              user_id: member.user_id,
+              chama_id: chama.id,
+              chama_name: chama.name,
+              amount_owed_kr: new Prisma.Decimal(owed),
+              fine_amount_kr: new Prisma.Decimal(penalty),
             }
           });
 
           // Mark member
           await prisma.chamaMember.update({
             where: { id: member.id },
-            data: { isDefaulter: true }
+            data: { is_defaulter: true }
           });
 
           // System message
-          await prisma.message.create({
+          await prisma.messages.create({
             data: {
-              chatId: chama.chatId,
-              senderId: member.userId,
-              payload: `⚠️ System Notice: Member has been flagged as a defaulter for missing Cycle #${cycle.cycleNumber} contribution. Owed: ${owed} Kr. Penalty: ${penalty} Kr.`,
-              isSystemEvent: true,
+              id: randomUUID(),
+              chat_id: chama.chat_id,
+              sender_id: member.user_id,
+              payload: `⚠️ System Notice: Member has been flagged as a defaulter for missing Cycle #${cycle.cycle_number} contribution. Owed: ${owed} Kr. Penalty: ${penalty} Kr.`,
+              is_system_event: true,
               status: 'sent',
             },
           });
@@ -69,7 +72,7 @@ export class ChamaRiskService {
         }
       }
 
-      // Mark cycle as overdue/disbursing
+      // Mark cycle as disbursing
       await prisma.chamaCycle.update({
         where: { id: cycle.id },
         data: { status: 'DISBURSING' }
@@ -82,44 +85,46 @@ export class ChamaRiskService {
   /**
    * Flag a member as a defaulter manually (Admin only).
    */
-  static async flagDefaulter(adminId: string, chamaId: string, targetUserId: string, amountOwed: number) {
+  static async flagDefaulter(adminId: string, chama_id: string, targetUserId: string, amountOwed: number) {
     return prisma.$transaction(async (tx) => {
       const admin = await tx.chamaMember.findUnique({
-        where: { chamaId_userId: { chamaId, userId: adminId } },
+        where: { chama_id_user_id: { chama_id, user_id: adminId } },
       });
       if (!admin || admin.role !== 'ADMIN') throw new Error('Only Admin can flag defaulters');
 
       const target = await tx.chamaMember.findUnique({
-        where: { chamaId_userId: { chamaId, userId: targetUserId } },
+        where: { chama_id_user_id: { chama_id, user_id: targetUserId } },
       });
       if (!target || target.status !== 'ACTIVE') throw new Error('Target is not an active member');
 
-      const chama = await tx.chama.findUnique({ where: { id: chamaId } });
+      const chama = await tx.chama.findUnique({ where: { id: chama_id } });
       if (!chama) throw new Error('Chama not found');
 
       const defaulter = await tx.chamaDefaulter.create({
         data: {
-          userId: targetUserId,
-          chamaId,
-          chamaName: chama.name,
-          amountOwedKr: new Prisma.Decimal(amountOwed),
-          fineAmountKr: chama.penaltyAmountKr || 0,
+          id: randomUUID(),
+          user_id: targetUserId,
+          chama_id,
+          chama_name: chama.name,
+          amount_owed_kr: new Prisma.Decimal(amountOwed),
+          fine_amount_kr: chama.penalty_amount_kr || 0,
         }
       });
 
       await tx.chamaMember.update({
         where: { id: target.id },
-        data: { isDefaulter: true }
+        data: { is_defaulter: true }
       });
 
       // System message
-      const targetUser = await tx.user.findUnique({ select: { displayName: true }, where: { id: targetUserId } });
-      await tx.message.create({
+      const targetUser = await tx.user.findUnique({ select: { display_name: true }, where: { id: targetUserId } });
+      await tx.messages.create({
         data: {
-          chatId: chama.chatId,
-          senderId: adminId,
-          payload: `⚠️ System Notice: ${targetUser?.displayName} has been flagged as a defaulter by Admin.`,
-          isSystemEvent: true,
+          id: randomUUID(),
+          chat_id: chama.chat_id,
+          sender_id: adminId,
+          payload: `⚠️ System Notice: ${targetUser?.display_name} has been flagged as a defaulter by Admin.`,
+          is_system_event: true,
           status: 'sent',
         },
       });
@@ -131,37 +136,38 @@ export class ChamaRiskService {
   /**
    * Send payment reminder to a member (push notification + system message).
    */
-  static async sendReminder(chamaId: string, userId: string, cycleNumber: number) {
+  static async sendReminder(chamaId: string, user_id: string, cycle_number: number) {
     const chama = await prisma.chama.findUnique({ where: { id: chamaId } });
     if (!chama) throw new Error('Chama not found');
 
     const member = await prisma.chamaMember.findUnique({
-      where: { chamaId_userId: { chamaId, userId } },
+      where: { chama_id_user_id: { chama_id: chamaId, user_id } },
     });
     if (!member || member.status !== 'ACTIVE') throw new Error('Member not found');
 
     const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { displayName: true },
+      where: { id: user_id },
+      select: { display_name: true },
     });
 
     // System message in chat
-    await prisma.message.create({
+    await prisma.messages.create({
       data: {
-        chatId: chama.chatId,
-        senderId: userId,
-        payload: `⏰ Reminder: ${user?.displayName}, your contribution for Cycle #${cycleNumber} is due. Amount: ${chama.contributionAmountKr} Kr.`,
-        isSystemEvent: true,
+        id: randomUUID(),
+        chat_id: chama.chat_id,
+        sender_id: user_id,
+        payload: `⏰ Reminder: ${user?.display_name}, your contribution for Cycle #${cycle_number} is due. Amount: ${chama.contribution_amount_kr} Kr.`,
+        is_system_event: true,
         status: 'sent',
       },
     });
 
     // Emit push notification event (to be handled by notification service)
-    io.to(`user:${userId}`).emit('notification:payment_reminder', {
-      chamaId,
+    io.to(`user:${user_id}`).emit('notification:payment_reminder', {
+      chama_id: chamaId,
       chamaName: chama.name,
-      cycleNumber,
-      amountKr: Number(chama.contributionAmountKr),
+      cycle_number,
+      amount_kr: Number(chama.contribution_amount_kr),
       message: `Your contribution for ${chama.name} is due!`,
     });
 
@@ -173,7 +179,7 @@ export class ChamaRiskService {
    */
   static async warnGroups(userId: string, targetChamaId: string) {
     const activeDefaults = await prisma.chamaDefaulter.findMany({
-      where: { userId, isResolved: false },
+      where: { user_id: userId, is_resolved: false },
       include: { chama: { select: { name: true } } },
     });
 
@@ -184,56 +190,58 @@ export class ChamaRiskService {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { displayName: true },
+      select: { display_name: true },
     });
 
     // Send warning message to target chama
     const warningText = activeDefaults
-      .map((d: any) => `${d.chama.name} (${Number(d.amountOwedKr)} Kr owed)`)
+      .map((d) => `${d.chama.name} (${Number(d.amount_owed_kr)} Kr owed)`)
       .join(', ');
 
-    await prisma.message.create({
+    await prisma.messages.create({
       data: {
-        chatId: targetChama.chatId,
-        senderId: userId,
-        payload: `⚠️ DEFAULTER WARNING: ${user?.displayName} has ${activeDefaults.length} unresolved default(s) in: ${warningText}`,
-        isSystemEvent: true,
+        id: randomUUID(),
+        chat_id: targetChama.chat_id,
+        sender_id: userId,
+        payload: `⚠️ DEFAULTER WARNING: ${user?.display_name} has ${activeDefaults.length} unresolved default(s) in: ${warningText}`,
+        is_system_event: true,
         status: 'sent',
       },
     });
 
-    return { warnings: activeDefaults.length, chamas: activeDefaults.map((d: any) => d.chamaName) };
+    return { warnings: activeDefaults.length, chamas: activeDefaults.map((d) => d.chama_name) };
   }
 
   /**
    * Apply penalty to a defaulting member.
    */
-  static async applyPenalty(adminId: string, chamaId: string, targetUserId: string) {
+  static async applyPenalty(adminId: string, chama_id: string, targetUserId: string) {
     return prisma.$transaction(async (tx) => {
       const admin = await tx.chamaMember.findUnique({
-        where: { chamaId_userId: { chamaId, userId: adminId } },
+        where: { chama_id_user_id: { chama_id, user_id: adminId } },
       });
       if (!admin || admin.role !== 'ADMIN') throw new Error('Only Admin can apply penalties');
 
-      const chama = await tx.chama.findUnique({ where: { id: chamaId } });
-      if (!chama || !chama.penaltyAmountKr) throw new Error('No penalty configured for this Chama');
+      const chama = await tx.chama.findUnique({ where: { id: chama_id } });
+      if (!chama || !chama.penalty_amount_kr) throw new Error('No penalty configured for this Chama');
 
       const target = await tx.chamaMember.findUnique({
-        where: { chamaId_userId: { chamaId, userId: targetUserId } },
+        where: { chama_id_user_id: { chama_id, user_id: targetUserId } },
       });
       if (!target || target.status !== 'ACTIVE') throw new Error('Target is not an active member');
 
       // Check if user has wallet balance
-      const wallet = await tx.wallet.findUnique({ where: { userId: targetUserId } });
-      if (!wallet || Number(wallet.krBalance) < Number(chama.penaltyAmountKr)) {
+      const wallet = await tx.wallets.findUnique({ where: { user_id: targetUserId } });
+      if (!wallet || Number(wallet.kr_balance) < Number(chama.penalty_amount_kr)) {
         // Flag as defaulter if can't pay penalty
         await tx.chamaDefaulter.create({
           data: {
-            userId: targetUserId,
-            chamaId,
-            chamaName: chama.name,
-            amountOwedKr: 0,
-            fineAmountKr: chama.penaltyAmountKr,
+            id: randomUUID(),
+            user_id: targetUserId,
+            chama_id,
+            chama_name: chama.name,
+            amount_owed_kr: 0,
+            fine_amount_kr: chama.penalty_amount_kr,
           },
         });
 
@@ -241,24 +249,25 @@ export class ChamaRiskService {
       }
 
       // Debit user wallet
-      await tx.wallet.update({
-        where: { userId: targetUserId },
-        data: { krBalance: { decrement: chama.penaltyAmountKr } },
+      await tx.wallets.update({
+        where: { user_id: targetUserId },
+        data: { kr_balance: { decrement: chama.penalty_amount_kr } },
       });
 
       // Credit chama wallet
       await tx.chamaWallet.update({
-        where: { chamaId },
-        data: { krBalance: { increment: chama.penaltyAmountKr } },
+        where: { chama_id },
+        data: { kr_balance: { increment: chama.penalty_amount_kr } },
       });
 
       // Record transaction
       await tx.chamaTransaction.create({
         data: {
-          chamaId,
-          userId: targetUserId,
+          id: randomUUID(),
+          chama_id,
+          user_id: targetUserId,
           type: 'PENALTY',
-          amountKr: chama.penaltyAmountKr,
+          amount_kr: chama.penalty_amount_kr,
           description: 'Late payment penalty',
         },
       });
@@ -266,19 +275,20 @@ export class ChamaRiskService {
       // System message
       const targetUser = await tx.user.findUnique({
         where: { id: targetUserId },
-        select: { displayName: true },
+        select: { display_name: true },
       });
-      await tx.message.create({
+      await tx.messages.create({
         data: {
-          chatId: chama.chatId,
-          senderId: adminId,
-          payload: `💸 Penalty of ${chama.penaltyAmountKr} Kr applied to ${targetUser?.displayName} for late payment.`,
-          isSystemEvent: true,
+          id: randomUUID(),
+          chat_id: chama.chat_id,
+          sender_id: adminId,
+          payload: `💸 Penalty of ${chama.penalty_amount_kr} Kr applied to ${targetUser?.display_name} for late payment.`,
+          is_system_event: true,
           status: 'sent',
         },
       });
 
-      return { success: true, penaltyAmount: Number(chama.penaltyAmountKr) };
+      return { success: true, penaltyAmount: Number(chama.penalty_amount_kr) };
     });
   }
 
@@ -287,14 +297,14 @@ export class ChamaRiskService {
    */
   static async getUserDefaultStatus(userId: string) {
     const defaults = await prisma.chamaDefaulter.findMany({
-      where: { userId, isResolved: false },
+      where: { user_id: userId, is_resolved: false },
       include: {
-        chama: { select: { name: true, avatarUrl: true } },
+        chama: { select: { name: true } },
       },
     });
 
     const totalOwed = defaults.reduce(
-      (sum, d) => sum + Number(d.amountOwedKr) + Number(d.fineAmountKr),
+      (sum: number, d) => sum + Number(d.amount_owed_kr) + Number(d.fine_amount_kr),
       0
     );
 

@@ -14,8 +14,8 @@ export function startDailyPrizeWorker() {
             const activeContests = await prisma.contest.findMany({
                 where: {
                     status: 'ACTIVE',
-                    allowDailyPrizes: true,
-                    dailyPrizeKr: { not: null }
+                    allow_daily_prizes: true,
+                    daily_prize_kr: { not: null }
                 }
             });
 
@@ -23,15 +23,15 @@ export function startDailyPrizeWorker() {
             yesterday.setHours(yesterday.getHours() - 24);
 
             for (const contest of activeContests) {
-                if (!contest.dailyPrizeKr || contest.dailyPrizeKr.toNumber() <= 0) continue;
+                if (!contest.daily_prize_kr || contest.daily_prize_kr.toNumber() <= 0) continue;
 
                 // Find all unique submissions submitted strictly within the last 24 hours
                 const eligibleSubmissions = await prisma.contestSubmission.findMany({
                     where: {
-                        contestId: contest.id,
-                        submittedAt: { gte: yesterday }
+                        contest_id: contest.id,
+                        submitted_at: { gte: yesterday }
                     },
-                    select: { id: true, userId: true }
+                    select: { id: true, user_id: true }
                 });
 
                 if (eligibleSubmissions.length === 0) {
@@ -47,10 +47,10 @@ export function startDailyPrizeWorker() {
                 await prisma.$transaction(async (tx: any) => {
                     // Update user's actual KR balance cleanly
                     await tx.wallet.update({
-                        where: { userId: winner.userId },
+                        where: { user_id: winner.user_id },
                         data: {
-                            krBalance: {
-                                increment: contest.dailyPrizeKr!
+                            kr_balance: {
+                                increment: contest.daily_prize_kr!
                             }
                         }
                     });
@@ -58,9 +58,9 @@ export function startDailyPrizeWorker() {
                     // Log the transaction preventing phantom money creation natively
                     await tx.transaction.create({
                         data: {
-                            userId: winner.userId,
+                            user_id: winner.user_id,
                             type: 'contest_prize', // Specific enumeration
-                            amountKr: contest.dailyPrizeKr!,
+                            amountKr: contest.daily_prize_kr!,
                             reference: `Daily Sweepstakes Win [Contest: ${contest.id}]`,
                             status: 'completed'
                         }
@@ -69,13 +69,13 @@ export function startDailyPrizeWorker() {
 
                 // Emit live Firebase/WebSocket Socket notification universally triggering FOMO!
                 const notificationPayload = JSON.stringify({
-                    userId: winner.userId,
-                    message: `You won the ${contest.dailyPrizeKr} Kr Daily Random Drop for Contest: ${contest.title}!`,
-                    amount: contest.dailyPrizeKr
+                    user_id: winner.user_id,
+                    message: `You won the ${contest.daily_prize_kr} Kr Daily Random Drop for Contest: ${contest.title}!`,
+                    amount: contest.daily_prize_kr
                 });
 
-                pubClient.publish(`${RedisChannels.NOTIFICATIONS}:${winner.userId}`, notificationPayload);
-                console.log(`[Worker] Rewarded User ${winner.userId} ${contest.dailyPrizeKr} Kr successfully.`);
+                pubClient.publish(`${RedisChannels.NOTIFICATIONS}:${winner.user_id}`, notificationPayload);
+                console.log(`[Worker] Rewarded User ${winner.user_id} ${contest.daily_prize_kr} Kr successfully.`);
             }
             
         } catch (error) {

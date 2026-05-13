@@ -14,25 +14,25 @@ export class NotificationService {
   /**
    * Send judge invitation notification
    */
-  static async sendJudgeInvite(judgeId: string, contestId: string, inviteId: string) {
+  static async sendJudgeInvite(judgeId: string, contest_id: string, inviteId: string) {
     try {
       const [judge, contest] = await Promise.all([
         prisma.user.findUnique({ 
           where: { id: judgeId },
           select: { 
             id: true, 
-            displayName: true, 
+            display_name: true, 
             email: true, 
             fcmToken: true 
           }
         }),
         prisma.contest.findUnique({ 
-          where: { id: contestId },
+          where: { id: contest_id },
           include: { 
-            creator: { 
+            User: { 
               select: { 
                 id: true, 
-                displayName: true, 
+                display_name: true, 
                 username: true 
               } 
             } 
@@ -52,8 +52,8 @@ export class NotificationService {
           ${judgeId},
           'JUDGE_INVITE',
           'Judge Invitation',
-          ${`${contest.creator.displayName} invited you to judge "${contest.title}"`},
-          ${JSON.stringify({ contestId, inviteId, creatorId: contest.creator.id })}::jsonb,
+          ${`${contest.User.display_name} invited you to judge "${contest.title}"`},
+          ${JSON.stringify({ contest_id, inviteId, creator_id: contest.User.id })}::jsonb,
           false,
           NOW()
         )
@@ -66,14 +66,14 @@ export class NotificationService {
           body: `You've been invited to judge "${contest.title}"`,
           data: {
             type: 'JUDGE_INVITE',
-            contestId,
+            contest_id,
             inviteId,
             screen: 'ContestJudgeInvite'
           }
         });
       }
 
-      console.log(`[NotificationService] Judge invite sent to ${judge.displayName} for contest ${contest.title}`);
+      console.log(`[NotificationService] Judge invite sent to ${judge.display_name} for contest ${contest.title}`);
     } catch (error) {
       console.error('[NotificationService] Failed to send judge invite:', error);
       // Don't throw - notification failure shouldn't break the invite flow
@@ -88,11 +88,11 @@ export class NotificationService {
       const [contest, judge] = await Promise.all([
         prisma.contest.findUnique({
           where: { id: contestId },
-          include: { creator: { select: { id: true, displayName: true, fcmToken: true } } }
+          include: { User: { select: { id: true, display_name: true, fcmToken: true } } }
         }),
         prisma.user.findUnique({
           where: { id: judgeId },
-          select: { displayName: true }
+          select: { display_name: true }
         })
       ]);
 
@@ -103,22 +103,22 @@ export class NotificationService {
         INSERT INTO notifications (id, user_id, type, title, message, data, is_read, created_at)
         VALUES (
           gen_random_uuid(),
-          ${contest.creatorId},
+          ${contest.creator_id},
           'JUDGE_ACCEPTED',
           'Judge Accepted',
-          ${`${judge.displayName} accepted your invitation to judge "${contest.title}"`},
-          ${JSON.stringify({ contestId, judgeId })}::jsonb,
+          ${`${judge.display_name} accepted your invitation to judge "${contest.title}"`},
+          ${JSON.stringify({ contest_id: contestId, judgeId })}::jsonb,
           false,
           NOW()
         )
       `;
 
       // Send push notification
-      if (contest.creator.fcmToken) {
-        await this.sendPushNotification(contest.creator.fcmToken, {
+      if (contest.User.fcmToken) {
+        await this.sendPushNotification(contest.User.fcmToken, {
           title: 'Judge Accepted',
-          body: `${judge.displayName} will judge your contest`,
-          data: { type: 'JUDGE_ACCEPTED', contestId, judgeId }
+          body: `${judge.display_name} will judge your contest`,
+          data: { type: 'JUDGE_ACCEPTED', contest_id: contestId, judgeId }
         });
       }
     } catch (error) {
@@ -134,11 +134,11 @@ export class NotificationService {
       const [contest, judge] = await Promise.all([
         prisma.contest.findUnique({
           where: { id: contestId },
-          include: { creator: { select: { id: true, displayName: true, fcmToken: true } } }
+          include: { User: { select: { id: true, display_name: true, fcmToken: true } } }
         }),
         prisma.user.findUnique({
           where: { id: judgeId },
-          select: { displayName: true }
+          select: { display_name: true }
         })
       ]);
 
@@ -149,22 +149,22 @@ export class NotificationService {
         INSERT INTO notifications (id, user_id, type, title, message, data, is_read, created_at)
         VALUES (
           gen_random_uuid(),
-          ${contest.creatorId},
+          ${contest.creator_id},
           'JUDGE_DECLINED',
           'Judge Declined',
-          ${`${judge.displayName} declined your invitation to judge "${contest.title}"`},
-          ${JSON.stringify({ contestId, judgeId })}::jsonb,
+          ${`${judge.display_name} declined your invitation to judge "${contest.title}"`},
+          ${JSON.stringify({ contest_id: contestId, judgeId })}::jsonb,
           false,
           NOW()
         )
       `;
 
       // Send push notification
-      if (contest.creator.fcmToken) {
-        await this.sendPushNotification(contest.creator.fcmToken, {
+      if (contest.User.fcmToken) {
+        await this.sendPushNotification(contest.User.fcmToken, {
           title: 'Judge Declined',
-          body: `${judge.displayName} declined to judge your contest`,
-          data: { type: 'JUDGE_DECLINED', contestId, judgeId }
+          body: `${judge.display_name} declined to judge your contest`,
+          data: { type: 'JUDGE_DECLINED', contest_id: contestId, judgeId }
         });
       }
     } catch (error) {
@@ -228,11 +228,11 @@ export class NotificationService {
   /**
    * Send contest winner notification
    */
-  static async notifyContestWinner(userId: string, contestId: string, rank: number, prizeKr: number) {
+  static async notifyContestWinner(userId: string, contest_id: string, rank: number, prizeKr: number) {
     try {
       const [user, contest] = await Promise.all([
         prisma.user.findUnique({ where: { id: userId }, select: { fcmToken: true } }),
-        prisma.contest.findUnique({ where: { id: contestId }, select: { title: true } })
+        prisma.contest.findUnique({ where: { id: contest_id }, select: { title: true } })
       ]);
 
       if (!user || !contest) return;
@@ -246,7 +246,7 @@ export class NotificationService {
           'CONTEST_WINNER',
           'Congratulations! 🎉',
           ${`You won ${rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} place in "${contest.title}" and earned Kr.${prizeKr}!`},
-          ${JSON.stringify({ contestId, rank, prizeKr })}::jsonb,
+          ${JSON.stringify({ contest_id, rank, prizeKr })}::jsonb,
           false,
           NOW()
         )
@@ -257,7 +257,7 @@ export class NotificationService {
         await this.sendPushNotification(user.fcmToken, {
           title: 'You Won! 🎉',
           body: `Congratulations! You won Kr.${prizeKr} in "${contest.title}"`,
-          data: { type: 'CONTEST_WINNER', contestId, rank: rank.toString() }
+          data: { type: 'CONTEST_WINNER', contest_id, rank: rank.toString() }
         });
       }
     } catch (error) {
@@ -268,11 +268,11 @@ export class NotificationService {
   /**
    * Send new admirer notification
    */
-  static async notifyNewAdmirer(admiredId: string, admirerId: string) {
+  static async notifyNewAdmirer(admiredId: string, admirer_id: string) {
     try {
       const [admired, admirer] = await Promise.all([
         prisma.user.findUnique({ where: { id: admiredId }, select: { fcmToken: true } }),
-        prisma.user.findUnique({ where: { id: admirerId }, select: { displayName: true, username: true } })
+        prisma.user.findUnique({ where: { id: admirer_id }, select: { display_name: true, username: true } })
       ]);
 
       if (!admired || !admirer) return;
@@ -285,8 +285,8 @@ export class NotificationService {
           ${admiredId},
           'NEW_ADMIRER',
           'New Admirer',
-          ${`${admirer.displayName} started admiring you`},
-          ${JSON.stringify({ admirerId, username: admirer.username })}::jsonb,
+          ${`${admirer.display_name} started admiring you`},
+          ${JSON.stringify({ admirer_id, username: admirer.username })}::jsonb,
           false,
           NOW()
         )
@@ -296,8 +296,8 @@ export class NotificationService {
       if (admired.fcmToken) {
         await this.sendPushNotification(admired.fcmToken, {
           title: 'New Admirer',
-          body: `${admirer.displayName} started admiring you`,
-          data: { type: 'NEW_ADMIRER', admirerId }
+          body: `${admirer.display_name} started admiring you`,
+          data: { type: 'NEW_ADMIRER', admirer_id }
         });
       }
     } catch (error) {
@@ -308,11 +308,11 @@ export class NotificationService {
   /**
    * Send tip received notification
    */
-  static async notifyTipReceived(recipientId: string, senderId: string, amountKr: number, message?: string) {
+  static async notifyTipReceived(recipientId: string, sender_id: string, amount_kr: number, message?: string) {
     try {
       const [recipient, sender] = await Promise.all([
         prisma.user.findUnique({ where: { id: recipientId }, select: { fcmToken: true } }),
-        prisma.user.findUnique({ where: { id: senderId }, select: { displayName: true } })
+        prisma.user.findUnique({ where: { id: sender_id }, select: { display_name: true } })
       ]);
 
       if (!recipient || !sender) return;
@@ -325,8 +325,8 @@ export class NotificationService {
           ${recipientId},
           'TIP_RECEIVED',
           'Tip Received',
-          ${`${sender.displayName} sent you Kr.${amountKr}${message ? `: "${message}"` : ''}`},
-          ${JSON.stringify({ senderId, amountKr, message })}::jsonb,
+          ${`${sender.display_name} sent you Kr.${amount_kr}${message ? `: "${message}"` : ''}`},
+          ${JSON.stringify({ sender_id, amount_kr, message })}::jsonb,
           false,
           NOW()
         )
@@ -336,8 +336,8 @@ export class NotificationService {
       if (recipient.fcmToken) {
         await this.sendPushNotification(recipient.fcmToken, {
           title: 'Tip Received 💰',
-          body: `${sender.displayName} sent you Kr.${amountKr}`,
-          data: { type: 'TIP_RECEIVED', senderId, amount: amountKr.toString() }
+          body: `${sender.display_name} sent you Kr.${amount_kr}`,
+          data: { type: 'TIP_RECEIVED', sender_id, amount: amount_kr.toString() }
         });
       }
     } catch (error) {

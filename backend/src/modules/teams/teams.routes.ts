@@ -7,12 +7,12 @@ const router = Router();
 
 const createTeamSchema = z.object({
   name: z.string().min(3).max(50),
-  avatarUrl: z.string().url().optional(),
+  avatar_url: z.string().url().optional(),
   maxMembers: z.number().int().min(2).max(10),
 });
 
 const inviteMemberSchema = z.object({
-  userId: z.string().uuid(),
+  user_id: z.string().uuid(),
 });
 
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
@@ -43,11 +43,11 @@ router.get('/my-teams', authMiddleware, async (req: AuthRequest, res: Response) 
 
 router.post('/:teamId/invite', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = inviteMemberSchema.parse(req.body);
+    const { user_id } = inviteMemberSchema.parse(req.body);
     const invitation = await TeamsService.inviteMember(
       String(req.params.teamId),
       req.userId!,
-      userId
+      user_id
     );
     res.status(201).json(invitation);
   } catch (error: any) {
@@ -79,8 +79,8 @@ router.post('/invitations/:invitationId/reject', authMiddleware, async (req: Aut
 
 router.post('/:teamId/register-contest', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { contestId } = z.object({ contestId: z.string().uuid() }).parse(req.body);
-    await TeamsService.registerTeamForContest(contestId, String(req.params.teamId), req.userId!);
+    const { contest_id } = z.object({ contest_id: z.string().uuid() }).parse(req.body);
+    await TeamsService.registerTeamForContest(contest_id, String(req.params.teamId), req.userId!);
     res.json({ success: true });
   } catch (error: any) {
     if (error.name === 'ZodError') {
@@ -94,17 +94,21 @@ router.post('/:teamId/register-contest', authMiddleware, async (req: AuthRequest
 router.post('/:teamId/submit', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = z.object({
-      contestId: z.string().uuid(),
-      mediaUrl: z.string().url(),
-      mediaType: z.enum(['photo', 'video']),
+      contest_id: z.string().uuid(),
+      media_url: z.string().url(),
+      media_type: z.enum(['photo', 'video']),
       caption: z.string().optional(),
       contributors: z.array(z.string().uuid()),
     }).parse(req.body);
 
     const submission = await TeamsService.submitTeamEntry({
-      ...data,
+      contest_id: data.contest_id,
       teamId: String(req.params.teamId),
       userId: req.userId!,
+      mediaUrl: data.media_url,
+      mediaType: data.media_type,
+      caption: data.caption,
+      contributors: data.contributors,
     });
 
     res.status(201).json(submission);

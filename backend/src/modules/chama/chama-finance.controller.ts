@@ -8,7 +8,7 @@ export class ChamaFinanceController {
     try {
       const chamaId = String(req.params.id);
       const parsed = contributeSchema.parse(req.body);
-      const result = await ChamaFinanceService.contribute(req.userId!, chamaId, parsed.amountKr);
+      const result = await ChamaFinanceService.contribute(req.userId!, chamaId, parsed.amount_kr);
       res.json(result);
     } catch (e: any) {
       res.status(400).json({ success: false, error: e.message });
@@ -20,7 +20,7 @@ export class ChamaFinanceController {
       const chamaId = String(req.params.id);
       const parsed = requestPayoutSchema.parse(req.body);
       const result = await ChamaFinanceService.requestPayout(
-        req.userId!, chamaId, parsed.recipientUserId, parsed.amountKr, parsed.cycleId
+        req.userId!, chamaId, parsed.recipientUserId, parsed.amount_kr, parsed.cycle_id
       );
       res.json(result);
     } catch (e: any) {
@@ -67,9 +67,9 @@ export class ChamaFinanceController {
   static async uploadReceipt(req: AuthRequest, res: Response) {
     try {
       const chamaId = String(req.params.id);
-      const { description, receiptUrl, amountKr } = req.body;
+      const { description, receipt_url, amount_kr } = req.body;
       const result = await ChamaFinanceService.uploadReceipt(
-        req.userId!, chamaId, description, receiptUrl, amountKr
+        req.userId!, chamaId, description, receipt_url, amount_kr
       );
       res.json(result);
     } catch (e: any) {

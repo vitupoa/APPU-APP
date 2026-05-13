@@ -33,7 +33,7 @@ export class FacebookService {
     });
 
     return {
-      accessToken: response.data.access_token,
+      access_token: response.data.access_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -52,7 +52,7 @@ export class FacebookService {
     });
 
     return {
-      accessToken: response.data.access_token,
+      access_token: response.data.access_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -70,8 +70,8 @@ export class FacebookService {
 
     return {
       id: response.data.id,
-      displayName: response.data.name,
-      followerCount: response.data.followers_count || 0,
+      display_name: response.data.name,
+      follower_count: response.data.followers_count || 0,
       profileImageUrl: response.data.picture?.data?.url
     };
   }
@@ -90,7 +90,7 @@ export class FacebookService {
     return response.data.data.map((page: any) => ({
       id: page.id,
       name: page.name,
-      followerCount: page.followers_count || page.fan_count || 0
+      follower_count: page.followers_count || page.fan_count || 0
     }));
   }
 

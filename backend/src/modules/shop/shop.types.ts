@@ -224,7 +224,7 @@ export const productFilterSchema = z.object({
   category: ProductCategoryEnum.optional(),
   subcategory: z.string().optional(),
   q: z.string().optional(),
-  sellerId: z.string().optional(),
+  seller_id: z.string().optional(),
   condition: ProductConditionEnum.optional(),
   minPrice: z.coerce.number().optional(),
   maxPrice: z.coerce.number().optional(),
@@ -260,7 +260,7 @@ export const productFilterSchema = z.object({
 // ─── REVIEW SCHEMA ──────────────────────────────────────
 
 export const createReviewSchema = z.object({
-  productId: z.string().uuid(),
+  product_id: z.string().uuid(),
   rating: z.number().int().min(1).max(5),
   title: z.string().max(200).optional(),
   text: z.string().max(2000).optional(),
@@ -279,7 +279,7 @@ export const createWishlistSchema = z.object({
 });
 
 export const addWishlistItemSchema = z.object({
-  productId: z.string().uuid(),
+  product_id: z.string().uuid(),
   quantity: z.number().int().min(1).optional(),
   priority: z.number().int().min(0).max(5).optional(),
   notes: z.string().max(500).optional(),
@@ -288,7 +288,7 @@ export const addWishlistItemSchema = z.object({
 // ─── CART SCHEMA ────────────────────────────────────────
 
 export const addToCartSchema = z.object({
-  productId: z.string().uuid(),
+  product_id: z.string().uuid(),
   quantity: z.number().int().min(1).optional(),
   bargainPrice: z.number().positive().optional(),
 });
@@ -299,10 +299,10 @@ export const createFlashSaleSchema = z.object({
   title: z.string().min(2).max(200),
   description: z.string().optional(),
   type: z.enum(['FLASH', 'LIGHTNING', 'DAILY_FEATURED', 'CLEARANCE']),
-  startTime: z.string(),
-  endTime: z.string(),
+  start_time: z.string(),
+  end_time: z.string(),
   products: z.array(z.object({
-    productId: z.string().uuid(),
+    product_id: z.string().uuid(),
     salePrice: z.number().positive(),
     stockLimit: z.number().int().optional(),
     perUserLimit: z.number().int().optional(),
@@ -312,12 +312,12 @@ export const createFlashSaleSchema = z.object({
 // ─── GROUP BUY SCHEMA ───────────────────────────────────
 
 export const createGroupBuySchema = z.object({
-  productId: z.string().uuid(),
+  product_id: z.string().uuid(),
   title: z.string().min(2).max(200),
   description: z.string().optional(),
   targetParticipants: z.number().int().min(2),
   discountPercent: z.number().min(1).max(90),
-  expiresAt: z.string(),
+  expires_at: z.string(),
 });
 
 // ─── GARAGE SCHEMAS ─────────────────────────────────────
@@ -335,7 +335,7 @@ export const createGarageProfileSchema = z.object({
 });
 
 export const createBookingSchema = z.object({
-  garageId: z.string().uuid(),
+  garage_id: z.string().uuid(),
   serviceType: z.string(),
   scheduledDate: z.string(),
   notes: z.string().optional(),
@@ -363,19 +363,10 @@ export const createImportRequestSchema = z.object({
   requirements: z.string().optional(),
 });
 
-// ─── LIVE SESSION SCHEMA ────────────────────────────────
-
-export const createLiveSessionSchema = z.object({
-  title: z.string().min(2).max(200),
-  description: z.string().optional(),
-  scheduledStart: z.string(),
-  productIds: z.array(z.string().uuid()).optional(),
-});
-
 // ─── DEAL ALERT SCHEMA ──────────────────────────────────
 
 export const createDealAlertSchema = z.object({
-  productId: z.string().uuid().optional(),
+  product_id: z.string().uuid().optional(),
   category: ProductCategoryEnum.optional(),
   maxPriceKr: z.number().positive().optional(),
   keywords: z.array(z.string()).optional(),
@@ -384,7 +375,7 @@ export const createDealAlertSchema = z.object({
 // ─── PREMIUM LISTING SCHEMA ────────────────────────────
 
 export const createPremiumListingSchema = z.object({
-  productId: z.string().uuid(),
+  product_id: z.string().uuid(),
   type: z.enum(['FEATURED', 'PROMOTED', 'TOP_SPOT']),
   days: z.number().int().min(1).max(30),
 });
@@ -392,8 +383,8 @@ export const createPremiumListingSchema = z.object({
 // ─── PRODUCT SHARE SCHEMA ──────────────────────────────
 
 export const createProductShareSchema = z.object({
-  productId: z.string().uuid(),
-  contentId: z.string().optional(),
+  product_id: z.string().uuid(),
+  content_id: z.string().optional(),
   contentType: z.enum(['POST', 'SHORT', 'STORY']).optional(),
   caption: z.string().optional(),
 });
@@ -401,8 +392,8 @@ export const createProductShareSchema = z.object({
 // ─── GIFT SCHEMA ────────────────────────────────────────
 
 export const sendGiftSchema = z.object({
-  recipientId: z.string().uuid(),
-  productId: z.string().uuid(),
+  recipient_id: z.string().uuid(),
+  product_id: z.string().uuid(),
   message: z.string().max(500).optional(),
 });
 
@@ -418,7 +409,7 @@ export const createShippingJobSchema = z.object({
 // ─── LOGISTICS SCHEMA ──────────────────────────────────
 
 export const createLogisticsProfileSchema = z.object({
-  companyName: z.string().min(2).max(200),
+  company_name: z.string().min(2).max(200),
   description: z.string().optional(),
   serviceTypes: z.array(z.string()).min(1),
   coverageAreas: z.array(z.string()).min(1),
@@ -441,8 +432,8 @@ export const createDiscountSchema = z.object({
   discountType: z.enum(['percentage', 'fixed']),
   discountValue: z.number().positive(),
   minQuantity: z.number().int().min(1).optional(),
-  startDate: z.string(),
-  endDate: z.string(),
+  start_date: z.string(),
+  end_date: z.string(),
 });
 
 // ─── PRICE CALCULATOR SCHEMA ───────────────────────────
@@ -458,5 +449,5 @@ export const priceCalculatorSchema = z.object({
 // ─── VEHICLE FAVORITE SCHEMA ───────────────────────────
 
 export const vehicleFavoriteSchema = z.object({
-  productId: z.string().uuid(),
+  product_id: z.string().uuid(),
 });

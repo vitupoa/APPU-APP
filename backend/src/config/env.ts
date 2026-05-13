@@ -36,6 +36,7 @@ const envSchema = z.object({
   PAYPAL_CLIENT_ID: z.string().optional(),
   PAYPAL_CLIENT_SECRET: z.string().optional(),
   PAYPAL_MODE: z.enum(['sandbox', 'live']).default('sandbox'),
+  PAYPAL_WEBHOOK_ID: z.string().optional(),
 
   // Paystack
   PAYSTACK_SECRET_KEY: z.string().optional(),

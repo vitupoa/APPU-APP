@@ -17,12 +17,12 @@ import { Prisma } from '@prisma/client';
  * Lock types
  */
 export enum LockType {
-  WALLET = 'wallet',
-  TRANSACTION = 'transaction',
-  ESCROW = 'escrow',
-  CONTEST = 'contest',
-  CHAMA = 'chama',
-  ORDER = 'order'
+  WALLET = 'wallets',
+  TRANSACTION = 'transactions',
+  ESCROW = 'escrows',
+  CONTEST = 'contests',
+  CHAMA = 'chamas',
+  ORDER = 'orders'
 }
 
 /**
@@ -126,8 +126,12 @@ export async function lockWalletForUpdate(
   
   if (!wallet || wallet.length === 0) {
     // Create wallet if it doesn't exist
-    return await tx.wallet.create({
-      data: { userId, krBalance: new Prisma.Decimal(0) }
+    return await tx.wallets.create({
+      data: { 
+        user_id: userId, 
+        kr_balance: new Prisma.Decimal(0),
+        updated_at: new Date()
+      }
     });
   }
   
@@ -156,8 +160,12 @@ export async function lockWalletsForUpdate(
   const missingIds = sortedIds.filter(id => !existingIds.includes(id));
   
   for (const userId of missingIds) {
-    const newWallet = await tx.wallet.create({
-      data: { userId, krBalance: new Prisma.Decimal(0) }
+    const newWallet = await tx.wallets.create({
+      data: { 
+        user_id: userId, 
+        kr_balance: new Prisma.Decimal(0),
+        updated_at: new Date()
+      }
     });
     wallets.push(newWallet);
   }
@@ -172,7 +180,7 @@ export async function lockWalletsForUpdate(
  */
 export async function safeWalletTransfer(
   senderId: string,
-  recipientId: string,
+  recipient_id: string,
   amount: Prisma.Decimal,
   transactionType: string,
   metadata?: any
@@ -181,7 +189,7 @@ export async function safeWalletTransfer(
     // Lock both wallets (ordered to prevent deadlocks)
     const [senderWallet, recipientWallet] = await lockWalletsForUpdate(
       tx,
-      [senderId, recipientId]
+      [senderId, recipient_id]
     );
     
     // Verify sender has sufficient balance
@@ -190,34 +198,34 @@ export async function safeWalletTransfer(
     }
     
     // Deduct from sender
-    await tx.wallet.update({
-      where: { userId: senderId },
-      data: { krBalance: { decrement: amount } }
+    await tx.wallets.update({
+      where: { user_id: senderId },
+      data: { kr_balance: { decrement: amount } }
     });
     
     // Credit recipient
-    await tx.wallet.update({
-      where: { userId: recipientId },
-      data: { krBalance: { increment: amount } }
+    await tx.wallets.update({
+      where: { user_id: recipient_id },
+      data: { kr_balance: { increment: amount } }
     });
     
     // Record transactions
-    await tx.transaction.createMany({
+    await tx.transactions.createMany({
       data: [
         {
-          userId: senderId,
-          counterpartyId: recipientId,
+          user_id: senderId,
+          counterparty_id: recipient_id,
           type: `${transactionType}_sent`,
-          amountKr: amount,
+          amount_kr: amount,
           status: 'completed',
           provider: 'platform',
           metadata
         },
         {
-          userId: recipientId,
-          counterpartyId: senderId,
+          user_id: recipient_id,
+          counterparty_id: senderId,
           type: `${transactionType}_received`,
-          amountKr: amount,
+          amount_kr: amount,
           status: 'completed',
           provider: 'platform',
           metadata
@@ -241,11 +249,11 @@ export async function safeWalletTransfer(
  */
 export async function lockEscrowForUpdate(
   tx: Prisma.TransactionClient,
-  escrowId: string
+  escrow_id: string
 ) {
   const escrow = await tx.$queryRaw<any[]>`
     SELECT * FROM escrows
-    WHERE id = ${escrowId}
+    WHERE id = ${escrow_id}
     FOR UPDATE
   `;
   
@@ -261,11 +269,11 @@ export async function lockEscrowForUpdate(
  */
 export async function lockContestForUpdate(
   tx: Prisma.TransactionClient,
-  contestId: string
+  contest_id: string
 ) {
   const contest = await tx.$queryRaw<any[]>`
     SELECT * FROM contests
-    WHERE id = ${contestId}
+    WHERE id = ${contest_id}
     FOR UPDATE
   `;
   
@@ -281,11 +289,11 @@ export async function lockContestForUpdate(
  */
 export async function lockChamaWalletForUpdate(
   tx: Prisma.TransactionClient,
-  chamaId: string
+  chama_id: string
 ) {
   const wallet = await tx.$queryRaw<any[]>`
     SELECT * FROM chama_wallets
-    WHERE chama_id = ${chamaId}
+    WHERE chama_id = ${chama_id}
     FOR UPDATE
   `;
   
@@ -301,11 +309,11 @@ export async function lockChamaWalletForUpdate(
  */
 export async function lockOrderForUpdate(
   tx: Prisma.TransactionClient,
-  orderId: string
+  order_id: string
 ) {
   const order = await tx.$queryRaw<any[]>`
     SELECT * FROM orders
-    WHERE id = ${orderId}
+    WHERE id = ${order_id}
     FOR UPDATE
   `;
   

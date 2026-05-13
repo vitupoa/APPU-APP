@@ -16,15 +16,15 @@ export class AdsService {
     const amount = new Prisma.Decimal(rewardKr);
 
     await prisma.$transaction([
-      prisma.wallet.update({
-        where: { userId },
-        data: { krBalance: { increment: amount } }
+      prisma.wallets.update({
+        where: { user_id: userId },
+        data: { kr_balance: { increment: amount } }
       }),
-      prisma.transaction.create({
+      prisma.transactions.create({
         data: {
-          userId,
+          user_id: userId,
           type: 'ad_revenue',
-          amountKr: amount,
+          amount_kr: amount,
           status: 'completed',
           provider: 'platform',
           reference: `rewarded_ad_${Date.now()}`
@@ -48,19 +48,19 @@ export class AdsService {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      await prisma.dailyStat.upsert({
-        where: { userId_date: { userId: data.userId, date: today } },
+      await prisma.daily_stats.upsert({
+        where: { user_id_date: { user_id: data.userId, date: today } },
         create: {
-          userId: data.userId,
+          user_id: data.userId,
           date: today,
           views: 0,
           likes: 0,
-          newAdmirers: 0,
-          krEarned: data.adType === 'rewarded' ? 0.5 : 0,
-          krSpent: 0
+          new_admirers: 0,
+          kr_earned: data.adType === 'rewarded' ? 0.5 : 0,
+          kr_spent: 0
         },
         update: {
-          krEarned: { increment: data.adType === 'rewarded' ? 0.5 : 0 }
+          kr_earned: { increment: data.adType === 'rewarded' ? 0.5 : 0 }
         }
       }).catch(() => {});
     }

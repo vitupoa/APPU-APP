@@ -25,7 +25,7 @@ export class InstagramService {
    * Exchanges authorization code for short-lived access token.
    */
   static async getShortLivedToken(code: string, redirectUri: string): Promise<{
-    accessToken: string;
+    access_token: string;
     userId: string;
   }> {
     const formData = new URLSearchParams({
@@ -41,7 +41,7 @@ export class InstagramService {
     });
 
     return {
-      accessToken: response.data.access_token,
+      access_token: response.data.access_token,
       userId: response.data.user_id
     };
   }
@@ -50,7 +50,7 @@ export class InstagramService {
    * Exchanges short-lived token for long-lived token (60 days).
    */
   static async getLongLivedToken(shortLivedToken: string): Promise<{
-    accessToken: string;
+    access_token: string;
     expiresIn: number;
   }> {
     const response = await axios.get(`${INSTAGRAM_GRAPH_URL}/access_token`, {
@@ -62,7 +62,7 @@ export class InstagramService {
     });
 
     return {
-      accessToken: response.data.access_token,
+      access_token: response.data.access_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -71,7 +71,7 @@ export class InstagramService {
    * Refreshes long-lived token (extends by 60 days).
    */
   static async refreshAccessToken(accessToken: string): Promise<{
-    accessToken: string;
+    access_token: string;
     expiresIn: number;
   }> {
     const response = await axios.get(`${INSTAGRAM_GRAPH_URL}/refresh_access_token`, {
@@ -82,7 +82,7 @@ export class InstagramService {
     });
 
     return {
-      accessToken: response.data.access_token,
+      access_token: response.data.access_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -141,12 +141,12 @@ export class InstagramService {
       media: response.data.data.map((m: any) => ({
         id: m.id,
         caption: m.caption || '',
-        mediaType: m.media_type,
-        mediaUrl: m.media_url,
+        media_type: m.media_type,
+        media_url: m.media_url,
         thumbnailUrl: m.thumbnail_url,
         permalink: m.permalink,
         timestamp: m.timestamp,
-        likeCount: m.like_count,
+        like_count: m.like_count,
         commentsCount: m.comments_count
       })),
       paging: response.data.paging
@@ -156,13 +156,13 @@ export class InstagramService {
   /**
    * Fetches user insights (requires Business/Creator account).
    */
-  static async getInsights(accessToken: string, userId: string): Promise<{
-    followerCount: number;
+  static async getInsights(accessToken: string, user_id: string): Promise<{
+    follower_count: number;
     impressions: number;
     reach: number;
     profileViews: number;
   }> {
-    const response = await axios.get(`${INSTAGRAM_GRAPH_URL}/${userId}/insights`, {
+    const response = await axios.get(`${INSTAGRAM_GRAPH_URL}/${user_id}/insights`, {
       params: {
         metric: 'follower_count,impressions,reach,profile_views',
         period: 'day',
@@ -172,7 +172,7 @@ export class InstagramService {
 
     const data = response.data.data;
     return {
-      followerCount: data.find((d: any) => d.name === 'follower_count')?.values[0]?.value || 0,
+      follower_count: data.find((d: any) => d.name === 'follower_count')?.values[0]?.value || 0,
       impressions: data.find((d: any) => d.name === 'impressions')?.values[0]?.value || 0,
       reach: data.find((d: any) => d.name === 'reach')?.values[0]?.value || 0,
       profileViews: data.find((d: any) => d.name === 'profile_views')?.values[0]?.value || 0

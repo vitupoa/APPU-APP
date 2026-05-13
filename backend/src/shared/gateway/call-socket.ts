@@ -92,8 +92,8 @@ export function initializeCallSocket(io: SocketServer) {
     }) => {
       // Broadcast to all participants in the call room
       socket.to(`call:${data.callId}`).emit('call:media_toggled', {
-        userId: data.userId,
-        mediaType: data.mediaType,
+        user_id: data.userId,
+        media_type: data.mediaType,
         enabled: data.enabled,
       });
     });

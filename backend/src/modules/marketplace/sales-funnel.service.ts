@@ -17,75 +17,75 @@ export class SalesFunnelService {
    * LEGAL: Purchase is for product, contest entry is bonus (not primary value)
    */
   static async trackPurchaseEntry(data: {
-    contestId: string;
+    contest_id: string;
     userId: string;
     orderId: string;
     purchaseAmount: number;
     productIds: string[];
   }) {
     const contest = await prisma.contest.findUniqueOrThrow({
-      where: { id: data.contestId }
+      where: { id: data.contest_id }
     });
 
     // Verify contest allows purchase entries
-    if (!contest.entryFeeKr || contest.entryFeeKr.equals(0)) {
+    if (!contest.entry_fee_kr || contest.entry_fee_kr.equals(0)) {
       throw new Error('Contest does not have purchase-to-enter enabled');
     }
 
     // Check if purchase meets minimum
-    const minPurchase = Number(contest.entryFeeKr);
+    const minPurchase = Number(contest.entry_fee_kr);
     if (data.purchaseAmount < minPurchase) {
       throw new Error(`Purchase must be at least Kr.${minPurchase}`);
     }
 
     return prisma.$transaction(async (tx) => {
       // Record purchase entry
-      const entry = await tx.contestPurchaseEntry.create({
+      const entry = await tx.contest_purchase_entries.create({
         data: {
-          contestId: data.contestId,
-          userId: data.userId,
-          orderId: data.orderId,
-          purchaseAmount: new Prisma.Decimal(data.purchaseAmount),
-          productIds: data.productIds,
-          isEligible: true,
-          autoEntered: true
+          contest_id: data.contest_id,
+          user_id: data.userId,
+          order_id: data.orderId,
+          purchase_amount: new Prisma.Decimal(data.purchaseAmount),
+          product_ids: data.productIds,
+          is_eligible: true,
+          auto_entered: true
         }
       });
 
       // Auto-join contest if not already joined
-      const participant = await tx.contestParticipant.findUnique({
+      const participant = await tx.contest_participants.findUnique({
         where: {
-          contestId_userId: {
-            contestId: data.contestId,
-            userId: data.userId
+          contest_id_user_id: {
+            contest_id: data.contest_id,
+            user_id: data.userId
           }
         }
       });
 
       if (!participant) {
-        await tx.contestParticipant.create({
+        await tx.contest_participants.create({
           data: {
-            contestId: data.contestId,
-            userId: data.userId
+            contest_id: data.contest_id,
+            user_id: data.userId
           }
         });
 
         await tx.contest.update({
-          where: { id: data.contestId },
-          data: { totalParticipants: { increment: 1 } }
+          where: { id: data.contest_id },
+          data: { total_participants: { increment: 1 } }
         });
       }
 
       // Track funnel event
       await this.trackFunnelEvent({
-        userId: data.userId,
-        contestId: data.contestId,
+        user_id: data.userId,
+        contestId: data.contest_id,
         stage: 'CONVERSION',
         eventType: 'purchase_to_enter',
         sourceType: 'contest',
-        sourceId: data.contestId,
+        sourceId: data.contest_id,
         metadata: {
-          orderId: data.orderId,
+          order_id: data.orderId,
           amount: data.purchaseAmount
         }
       });
@@ -99,34 +99,34 @@ export class SalesFunnelService {
    * Examples: Follow brand, visit shop, watch video
    */
   static async trackEngagementAction(data: {
-    contestId: string;
+    contest_id: string;
     userId: string;
     actionType: string;
     targetUrl?: string;
     proofUrl?: string;
     metadata?: any;
   }) {
-    const action = await prisma.contestEngagementAction.create({
+    const action = await prisma.contest_engagement_actions.create({
       data: {
-        contestId: data.contestId,
-        userId: data.userId,
-        actionType: data.actionType,
-        targetUrl: data.targetUrl,
-        proofUrl: data.proofUrl,
+        contest_id: data.contest_id,
+        user_id: data.userId,
+        action_type: data.actionType,
+        target_url: data.targetUrl,
+        proof_url: data.proofUrl,
         metadata: data.metadata,
-        isCompleted: true,
-        completedAt: new Date()
+        is_completed: true,
+        completed_at: new Date()
       }
     });
 
     // Track funnel event
     await this.trackFunnelEvent({
-      userId: data.userId,
-      contestId: data.contestId,
+      user_id: data.userId,
+      contestId: data.contest_id,
       stage: 'ENGAGEMENT',
       eventType: data.actionType,
       sourceType: 'contest',
-      sourceId: data.contestId,
+      sourceId: data.contest_id,
       metadata: data.metadata
     });
 
@@ -142,7 +142,7 @@ export class SalesFunnelService {
    * Winners → Advocates, Losers → Customers
    */
   static async createConversionCampaign(data: {
-    contestId: string;
+    contest_id: string;
     brandId?: string;
     type: string;
     title: string;
@@ -153,43 +153,43 @@ export class SalesFunnelService {
     offerExpiresAt?: Date;
   }) {
     const contest = await prisma.contest.findUniqueOrThrow({
-      where: { id: data.contestId }
+      where: { id: data.contest_id }
     });
 
     if (contest.status !== 'COMPLETED' && contest.status !== 'JUDGING') {
       throw new Error('Contest must be completed to create conversion campaign');
     }
 
-    const campaign = await prisma.conversionCampaign.create({
+    const campaign = await prisma.conversion_campaigns.create({
       data: {
-        contestId: data.contestId,
-        brandId: data.brandId,
+        contest_id: data.contest_id,
+        brand_id: data.brandId,
         type: data.type as any,
         title: data.title,
         description: data.description,
-        targetSegment: data.targetSegment,
-        discountPercent: data.discountPercent ? new Prisma.Decimal(data.discountPercent) : null,
-        discountCode: data.discountCode,
-        offerExpiresAt: data.offerExpiresAt,
-        isActive: true
+        target_segment: data.targetSegment,
+        discount_percent: data.discountPercent ? new Prisma.Decimal(data.discountPercent) : null,
+        discount_code: data.discountCode,
+        offer_expires_at: data.offerExpiresAt,
+        is_active: true
       }
     });
 
     // Get target users based on segment
-    const targetUsers = await this.getTargetSegment(data.contestId, data.targetSegment);
+    const targetUsers = await this.getTargetSegment(data.contest_id, data.targetSegment);
 
     // Create recipients
-    const recipients = await prisma.conversionCampaignRecipient.createMany({
+    const recipients = await prisma.conversion_campaign_recipients.createMany({
       data: targetUsers.map((userId: any) => ({
-        campaignId: campaign.id,
-        userId
+        campaign_id: campaign.id,
+        user_id: userId
       }))
     });
 
     // Update total sent count
-    await prisma.conversionCampaign.update({
+    await prisma.conversion_campaigns.update({
       where: { id: campaign.id },
-      data: { totalSent: targetUsers.length }
+      data: { total_sent: targetUsers.length }
     });
 
     return {
@@ -208,48 +208,48 @@ export class SalesFunnelService {
     switch (segment) {
       case 'LOSERS': {
         // All participants who didn't win
-        const winners = await prisma.contestWinner.findMany({
-          where: { contestId },
-          select: { userId: true }
+        const winners = await prisma.contest_winners.findMany({
+          where: { contest_id: contestId },
+          select: { user_id: true }
         });
-        const winnerIds = winners.map((w: any) => w.userId);
+        const winnerIds = winners.map((w: any) => w.user_id);
 
-        const participants = await prisma.contestParticipant.findMany({
+        const participants = await prisma.contest_participants.findMany({
           where: {
-            contestId,
-            userId: { notIn: winnerIds }
+            contest_id: contestId,
+            user_id: { notIn: winnerIds }
           },
-          select: { userId: true }
+          select: { user_id: true }
         });
 
-        return participants.map((p: any) => p.userId);
+        return participants.map((p: any) => p.user_id);
       }
 
       case 'WINNERS': {
-        const winners = await prisma.contestWinner.findMany({
-          where: { contestId },
-          select: { userId: true }
+        const winners = await prisma.contest_winners.findMany({
+          where: { contest_id: contestId },
+          select: { user_id: true }
         });
-        return winners.map((w: any) => w.userId);
+        return winners.map((w: any) => w.user_id);
       }
 
       case 'HIGH_ENGAGERS': {
         // Users who voted, shared, or completed actions
-        const engagers = await prisma.contestEngagementAction.findMany({
-          where: { contestId, isCompleted: true },
-          select: { userId: true },
-          distinct: ['userId']
+        const engagers = await prisma.contest_engagement_actions.findMany({
+          where: { contest_id: contestId, is_completed: true },
+          select: { user_id: true },
+          distinct: ['user_id']
         });
-        return engagers.map((e: any) => e.userId);
+        return engagers.map((e: any) => e.user_id);
       }
 
       case 'ALL_PARTICIPANTS':
       default: {
-        const participants = await prisma.contestParticipant.findMany({
-          where: { contestId },
-          select: { userId: true }
+        const participants = await prisma.contest_participants.findMany({
+          where: { contest_id: contestId },
+          select: { user_id: true }
         });
-        return participants.map((p: any) => p.userId);
+        return participants.map((p: any) => p.user_id);
       }
     }
   }
@@ -258,17 +258,17 @@ export class SalesFunnelService {
    * Track conversion campaign interaction
    */
   static async trackCampaignInteraction(data: {
-    campaignId: string;
+    campaign_id: string;
     userId: string;
     action: 'OPENED' | 'CLICKED' | 'CONVERTED';
     orderId?: string;
     revenueKr?: number;
   }) {
-    const recipient = await prisma.conversionCampaignRecipient.findUniqueOrThrow({
+    const recipient = await prisma.conversion_campaign_recipients.findUniqueOrThrow({
       where: {
-        campaignId_userId: {
-          campaignId: data.campaignId,
-          userId: data.userId
+        campaign_id_user_id: {
+          campaign_id: data.campaign_id,
+          user_id: data.userId
         }
       }
     });
@@ -278,20 +278,20 @@ export class SalesFunnelService {
 
     switch (data.action) {
       case 'OPENED':
-        updateData.openedAt = new Date();
-        campaignUpdate.totalOpened = { increment: 1 };
+        updateData.opened_at = new Date();
+        campaignUpdate.total_opened = { increment: 1 };
         break;
       case 'CLICKED':
-        updateData.clickedAt = new Date();
-        campaignUpdate.totalClicked = { increment: 1 };
+        updateData.clicked_at = new Date();
+        campaignUpdate.total_clicked = { increment: 1 };
         break;
       case 'CONVERTED':
-        updateData.convertedAt = new Date();
-        updateData.orderId = data.orderId;
-        updateData.revenueKr = data.revenueKr ? new Prisma.Decimal(data.revenueKr) : null;
-        campaignUpdate.totalConverted = { increment: 1 };
+        updateData.converted_at = new Date();
+        updateData.order_id = data.orderId;
+        updateData.revenue_kr = data.revenueKr ? new Prisma.Decimal(data.revenueKr) : null;
+        campaignUpdate.total_converted = { increment: 1 };
         if (data.revenueKr) {
-          campaignUpdate.revenueGenerated = {
+          campaignUpdate.revenue_generated = {
             increment: new Prisma.Decimal(data.revenueKr)
           };
         }
@@ -299,17 +299,17 @@ export class SalesFunnelService {
     }
 
     await prisma.$transaction([
-      prisma.conversionCampaignRecipient.update({
+      prisma.conversion_campaign_recipients.update({
         where: {
-          campaignId_userId: {
-            campaignId: data.campaignId,
-            userId: data.userId
+          campaign_id_user_id: {
+            campaign_id: data.campaign_id,
+            user_id: data.userId
           }
         },
         data: updateData
       }),
-      prisma.conversionCampaign.update({
-        where: { id: data.campaignId },
+      prisma.conversion_campaigns.update({
+        where: { id: data.campaign_id },
         data: campaignUpdate
       })
     ]);
@@ -324,7 +324,7 @@ export class SalesFunnelService {
    * Stages: AWARENESS → INTEREST → CONSIDERATION → CONVERSION → RETENTION → ADVOCACY
    */
   static async trackFunnelEvent(data: {
-    userId: string;
+    user_id: string;
     contestId?: string;
     campaignId?: string;
     stage: string;
@@ -333,15 +333,15 @@ export class SalesFunnelService {
     sourceId?: string;
     metadata?: any;
   }) {
-    return prisma.salesFunnelEvent.create({
+    return prisma.sales_funnel_events.create({
       data: {
-        userId: data.userId,
-        contestId: data.contestId,
-        campaignId: data.campaignId,
+        user_id: data.user_id,
+        contest_id: data.contestId,
+        campaign_id: data.campaignId,
         stage: data.stage as any,
-        eventType: data.eventType,
-        sourceType: data.sourceType,
-        sourceId: data.sourceId,
+        event_type: data.eventType,
+        source_type: data.sourceType,
+        source_id: data.sourceId,
         metadata: data.metadata
       }
     });
@@ -351,10 +351,10 @@ export class SalesFunnelService {
    * Get funnel analytics for contest
    */
   static async getContestFunnelAnalytics(contestId: string) {
-    const events = await prisma.salesFunnelEvent.groupBy({
+    const events = await prisma.sales_funnel_events.groupBy({
       by: ['stage'],
-      where: { contestId },
-      _count: { userId: true }
+      where: { contest_id: contestId },
+      _count: { user_id: true }
     });
 
     const stages = {
@@ -367,7 +367,7 @@ export class SalesFunnelService {
     };
 
     events.forEach((e: any) => {
-      stages[e.stage as keyof typeof stages] = e._count.userId;
+      stages[e.stage as keyof typeof stages] = e._count.user_id;
     });
 
     // Calculate conversion rates
@@ -394,31 +394,31 @@ export class SalesFunnelService {
     const contest = await prisma.contest.findUniqueOrThrow({
       where: { id: contestId },
       include: {
-        sponsorships: true,
-        purchaseEntries: true
+        contest_sponsorships: true,
+        contest_purchase_entries: true
       }
     });
 
     // Calculate total investment
-    const prizeCost = Number(contest.prizeTotalKr);
-    const platformFee = Number(contest.platformFeeKr);
-    const sponsorshipRevenue = contest.sponsorships.reduce(
-      (sum, s) => sum + Number(s.sponsorshipKr),
+    const prizeCost = Number(contest.prize_total_kr);
+    const platformFee = Number(contest.platform_fee_kr);
+    const sponsorshipRevenue = contest.contest_sponsorships.reduce(
+      (sum, s) => sum + Number(s.sponsorship_kr),
       0
     );
 
     // Calculate revenue from purchases
-    const purchaseRevenue = contest.purchaseEntries.reduce(
-      (sum, p) => sum + Number(p.purchaseAmount),
+    const purchaseRevenue = contest.contest_purchase_entries.reduce(
+      (sum, p) => sum + Number(p.purchase_amount),
       0
     );
 
     // Get conversion campaign revenue
-    const conversionCampaigns = await prisma.conversionCampaign.findMany({
-      where: { contestId }
+    const conversionCampaigns = await prisma.conversion_campaigns.findMany({
+      where: { contest_id: contestId }
     });
     const conversionRevenue = conversionCampaigns.reduce(
-      (sum, c) => sum + Number(c.revenueGenerated),
+      (sum, c) => sum + Number(c.revenue_generated),
       0
     );
 
@@ -442,10 +442,10 @@ export class SalesFunnelService {
       metrics: {
         netProfit,
         roi: roi.toFixed(2),
-        participants: contest.totalParticipants,
-        submissions: contest.totalSubmissions,
-        revenuePerParticipant: contest.totalParticipants > 0 
-          ? (totalRevenue / contest.totalParticipants).toFixed(2) 
+        participants: contest.total_participants,
+        submissions: contest.total_submissions,
+        revenuePerParticipant: contest.total_participants > 0 
+          ? (totalRevenue / contest.total_participants).toFixed(2) 
           : 0
       }
     };
@@ -459,7 +459,7 @@ export class SalesFunnelService {
    * Award gamification points for activities
    */
   static async awardPoints(data: {
-    userId: string;
+    user_id: string;
     activityType: string;
     category: 'ENGAGEMENT' | 'MARKETING' | 'SALES';
     pointsEarned: number;
@@ -469,54 +469,57 @@ export class SalesFunnelService {
   }) {
     return prisma.$transaction(async (tx) => {
       // Record activity
-      await tx.gamificationActivity.create({
+      await tx.gamification_activities.create({
         data: {
-          userId: data.userId,
-          activityType: data.activityType,
+          user_id: data.user_id,
+          activity_type: data.activityType,
           category: data.category,
-          pointsEarned: data.pointsEarned,
-          referenceType: data.referenceType,
-          referenceId: data.referenceId,
+          points_earned: data.pointsEarned,
+          reference_type: data.referenceType,
+          reference_id: data.referenceId,
           description: data.description
         }
       });
 
       // Update user points
-      const points = await tx.gamificationPoints.upsert({
-        where: { userId: data.userId },
+      const points = await tx.gamification_points.upsert({
+        where: { user_id: data.user_id },
         create: {
-          userId: data.userId,
-          engagementPoints: data.category === 'ENGAGEMENT' ? data.pointsEarned : 0,
-          marketingPoints: data.category === 'MARKETING' ? data.pointsEarned : 0,
-          salesPoints: data.category === 'SALES' ? data.pointsEarned : 0,
-          totalPoints: data.pointsEarned,
-          currentLevel: 1,
-          nextLevelAt: 1000
+          user_id: data.user_id,
+          engagement_points: data.category === 'ENGAGEMENT' ? data.pointsEarned : 0,
+          marketing_points: data.category === 'MARKETING' ? data.pointsEarned : 0,
+          sales_points: data.category === 'SALES' ? data.pointsEarned : 0,
+          total_points: data.pointsEarned,
+          current_level: 1,
+          next_level_at: 1000,
+          updated_at: new Date()
         },
         update: {
-          engagementPoints: data.category === 'ENGAGEMENT' 
+          engagement_points: data.category === 'ENGAGEMENT' 
             ? { increment: data.pointsEarned } 
             : undefined,
-          marketingPoints: data.category === 'MARKETING' 
+          marketing_points: data.category === 'MARKETING' 
             ? { increment: data.pointsEarned } 
             : undefined,
-          salesPoints: data.category === 'SALES' 
+          sales_points: data.category === 'SALES' 
             ? { increment: data.pointsEarned } 
             : undefined,
-          totalPoints: { increment: data.pointsEarned }
+          total_points: { increment: data.pointsEarned },
+          updated_at: new Date()
         }
       });
 
       // Check for level up
-      if (points.totalPoints >= points.nextLevelAt) {
-        const newLevel = points.currentLevel + 1;
+      if (points.total_points >= points.next_level_at) {
+        const newLevel = points.current_level + 1;
         const nextLevelAt = newLevel * 1000; // Simple progression
 
-        await tx.gamificationPoints.update({
-          where: { userId: data.userId },
+        await tx.gamification_points.update({
+          where: { user_id: data.user_id },
           data: {
-            currentLevel: newLevel,
-            nextLevelAt
+            current_level: newLevel,
+            next_level_at: nextLevelAt,
+            updated_at: new Date()
           }
         });
       }
@@ -529,8 +532,8 @@ export class SalesFunnelService {
    * Get user gamification stats
    */
   static async getUserGamificationStats(userId: string) {
-    const points = await prisma.gamificationPoints.findUnique({
-      where: { userId }
+    const points = await prisma.gamification_points.findUnique({
+      where: { user_id: userId }
     });
 
     if (!points) {
@@ -546,28 +549,28 @@ export class SalesFunnelService {
       };
     }
 
-    const recentActivities = await prisma.gamificationActivity.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
+    const recentActivities = await prisma.gamification_activities.findMany({
+      where: { user_id: userId },
+      orderBy: { created_at: 'desc' },
       take: 10
     });
 
     return {
-      totalPoints: points.totalPoints,
-      currentLevel: points.currentLevel,
-      nextLevelAt: points.nextLevelAt,
-      progressToNextLevel: ((points.totalPoints / points.nextLevelAt) * 100).toFixed(2),
+      totalPoints: points.total_points,
+      currentLevel: points.current_level,
+      nextLevelAt: points.next_level_at,
+      progressToNextLevel: ((points.total_points / points.next_level_at) * 100).toFixed(2),
       breakdown: {
-        engagement: points.engagementPoints,
-        marketing: points.marketingPoints,
-        sales: points.salesPoints
+        engagement: points.engagement_points,
+        marketing: points.marketing_points,
+        sales: points.sales_points
       },
       recentActivities: recentActivities.map((a: any) => ({
-        type: a.activityType,
+        type: a.activity_type,
         category: a.category,
-        points: a.pointsEarned,
+        points: a.points_earned,
         description: a.description,
-        createdAt: a.createdAt.toISOString()
+        created_at: a.created_at.toISOString()
       }))
     };
   }
@@ -577,31 +580,32 @@ export class SalesFunnelService {
    * Winners with multiple wins get invited to influencer program
    */
   static async checkInfluencerTransition(userId: string) {
-    const winCount = await prisma.contestWinner.count({
-      where: { userId }
+    const winCount = await prisma.contest_winners.count({
+      where: { user_id: userId }
     });
 
     // If user has 3+ wins, invite to influencer program
     if (winCount >= 3) {
-      const existingProfile = await prisma.influencerProfile.findUnique({
-        where: { userId }
+      const existingProfile = await prisma.influencer_profiles.findUnique({
+        where: { user_id: userId }
       });
 
       if (!existingProfile) {
         // Create basic influencer profile
-        await prisma.influencerProfile.create({
+        await prisma.influencer_profiles.create({
           data: {
-            userId,
+            user_id: userId,
             tier: 'NANO',
             categories: [],
-            isAvailable: true,
-            isVerified: false
+            is_available: true,
+            is_verified: false,
+            updated_at: new Date()
           }
         });
 
         // Award points for becoming influencer
         await this.awardPoints({
-          userId,
+          user_id: userId,
           activityType: 'INFLUENCER_TRANSITION',
           category: 'MARKETING',
           pointsEarned: 500,

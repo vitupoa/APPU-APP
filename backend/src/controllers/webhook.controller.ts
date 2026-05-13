@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { WalletService } from '../modules/wallet/wallet.service.js';
-import PayPalService from '../services/payment/paypal.service.js';
-import PaystackService from '../services/payment/paystack.service.js';
+import { PaypalService } from '../services/payments/paypal.service.js';
+import { PaystackService } from '../services/payments/paystack.service.js';
 import { MpesaService } from '../services/payments/mpesa.service.js';
 import { prisma } from '../config/database.js';
 import { Prisma } from '@prisma/client';
@@ -13,7 +13,7 @@ export class WebhookController {
   static async handlePayPalWebhook(req: Request, res: Response): Promise<void> {
     try {
       // SECURITY: Verify webhook signature
-      const isValid = await PayPalService.verifyWebhook(req.headers, req.body);
+      const isValid = await PaypalService.verifyWebhook(req.headers, req.body);
       
       if (!isValid) {
         console.error('Invalid PayPal webhook signature');
@@ -35,7 +35,7 @@ export class WebhookController {
         const currency = resource.amount?.currency_code;
 
         // SECURITY: Find transaction by PayPal order ID
-        const transaction = await prisma.transaction.findFirst({
+        const transaction = await prisma.transactions.findFirst({
           where: {
             metadata: {
               path: ['paypalOrderId'],
@@ -54,18 +54,18 @@ export class WebhookController {
         }
 
         // SECURITY: Verify amount matches
-        const transactionAmount = typeof transaction.amountFiat === 'number' ? transaction.amountFiat : 0;
+        const transactionAmount = typeof transaction.amount_fiat === 'number' ? transaction.amount_fiat : 0;
         const amountMatch = Math.abs(amount - transactionAmount) < 0.01;
         if (!amountMatch) {
-          console.error(`PayPal amount mismatch: Expected ${transaction.amountFiat}, got ${amount}`);
-          await prisma.transaction.update({
+          console.error(`PayPal amount mismatch: Expected ${transaction.amount_fiat}, got ${amount}`);
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: { 
               status: 'failed',
               metadata: {
                 ...(transaction.metadata as any),
                 error: 'Amount mismatch',
-                expectedAmount: transaction.amountFiat,
+                expectedAmount: transaction.amount_fiat,
                 receivedAmount: amount
               }
             }
@@ -77,7 +77,7 @@ export class WebhookController {
         // SECURITY: Verify currency matches
         if (currency !== transaction.currency) {
           console.error(`PayPal currency mismatch: Expected ${transaction.currency}, got ${currency}`);
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: { 
               status: 'failed',
@@ -92,7 +92,7 @@ export class WebhookController {
         }
 
         await WalletService.confirmTopup(
-          transaction.userId, 
+          transaction.user_id, 
           transaction.id, 
           captureId,
           amount,
@@ -106,7 +106,7 @@ export class WebhookController {
         const resource = event.resource;
         const orderId = resource.supplementary_data?.related_ids?.order_id;
 
-        const transaction = await prisma.transaction.findFirst({
+        const transaction = await prisma.transactions.findFirst({
           where: {
             metadata: {
               path: ['paypalOrderId'],
@@ -118,7 +118,7 @@ export class WebhookController {
         });
 
         if (transaction) {
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: { 
               status: 'cancelled',
@@ -177,7 +177,7 @@ export class WebhookController {
         const paystackTxId = data.id;
 
         // SECURITY: Find transaction by reference
-        const transaction = await prisma.transaction.findFirst({
+        const transaction = await prisma.transactions.findFirst({
           where: {
             reference,
             status: 'pending',
@@ -193,18 +193,18 @@ export class WebhookController {
         }
 
         // SECURITY: Verify amount matches
-        const transactionAmount2 = typeof transaction.amountFiat === 'number' ? transaction.amountFiat : 0;
+        const transactionAmount2 = typeof transaction.amount_fiat === 'number' ? transaction.amount_fiat : 0;
         const amountMatch = Math.abs(amount - transactionAmount2) < 0.01;
         if (!amountMatch) {
-          console.error(`Paystack amount mismatch: Expected ${transaction.amountFiat}, got ${amount}`);
-          await prisma.transaction.update({
+          console.error(`Paystack amount mismatch: Expected ${transaction.amount_fiat}, got ${amount}`);
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: { 
               status: 'failed',
               metadata: {
                 ...(transaction.metadata as any),
                 error: 'Amount mismatch',
-                expectedAmount: transaction.amountFiat,
+                expectedAmount: transaction.amount_fiat,
                 receivedAmount: amount
               }
             }
@@ -216,7 +216,7 @@ export class WebhookController {
         // SECURITY: Verify currency matches
         if (currency !== transaction.currency) {
           console.error(`Paystack currency mismatch: Expected ${transaction.currency}, got ${currency}`);
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: { 
               status: 'failed',
@@ -231,7 +231,7 @@ export class WebhookController {
         }
 
         // Update metadata with payment channel
-        await prisma.transaction.update({
+        await prisma.transactions.update({
           where: { id: transaction.id },
           data: {
             metadata: {
@@ -244,7 +244,7 @@ export class WebhookController {
         });
 
         await WalletService.confirmTopup(
-          transaction.userId, 
+          transaction.user_id, 
           transaction.id, 
           reference,
           amount,
@@ -258,7 +258,7 @@ export class WebhookController {
         const data = event.data;
         const reference = data.reference;
 
-        const transaction = await prisma.transaction.findFirst({
+        const transaction = await prisma.transactions.findFirst({
           where: {
             reference,
             status: 'pending',
@@ -267,7 +267,7 @@ export class WebhookController {
         });
 
         if (transaction) {
-          await prisma.transaction.update({
+          await prisma.transactions.update({
             where: { id: transaction.id },
             data: { 
               status: 'cancelled',
@@ -301,11 +301,11 @@ export class WebhookController {
       }
 
       // SECURITY: Capture and verify the payment with PayPal
-      const captureResult = await PayPalService.captureOrder(token as string);
+      const captureResult = await PaypalService.captureOrder(token as string);
       
-      if (captureResult.status === 'COMPLETED') {
+      if (captureResult.success) {
         // SECURITY: Find transaction by PayPal order ID
-        const transaction = await prisma.transaction.findFirst({
+        const transaction = await prisma.transactions.findFirst({
           where: {
             metadata: {
               path: ['paypalOrderId'],
@@ -319,11 +319,11 @@ export class WebhookController {
 
         if (transaction) {
           // SECURITY: Verify amount from PayPal response
-          const paidAmount = parseFloat(captureResult.amount?.value ?? '0');
-          const paidCurrency = captureResult.amount?.currencyCode ?? '';
+          const paidAmount = captureResult.amount;
+          const paidCurrency = captureResult.currency;
 
           await WalletService.confirmTopup(
-            transaction.userId, 
+            transaction.user_id, 
             transaction.id, 
             token as string,
             paidAmount,
@@ -366,7 +366,7 @@ export class WebhookController {
       
       if (verifyResult.success) {
         // SECURITY: Find transaction by reference
-        const transaction = await prisma.transaction.findFirst({
+        const transaction = await prisma.transactions.findFirst({
           where: {
             reference: reference as string,
             status: 'pending',
@@ -378,7 +378,7 @@ export class WebhookController {
         if (transaction) {
           // SECURITY: Verify amount and currency from Paystack response
           await WalletService.confirmTopup(
-            transaction.userId, 
+            transaction.user_id, 
             transaction.id, 
             reference as string,
             verifyResult.amount,
@@ -414,7 +414,7 @@ export class WebhookController {
       const callbackData = MpesaService.parseCallback(req.body);
       
       // SECURITY: Find transaction by checkout request ID with strict matching
-      const transaction = await prisma.transaction.findFirst({
+      const transaction = await prisma.transactions.findFirst({
         where: {
           metadata: {
             path: ['checkoutRequestId'],
@@ -435,18 +435,18 @@ export class WebhookController {
       if (callbackData.success) {
         // SECURITY: Verify amount matches (M-Pesa returns amount in callback)
         if (callbackData.amount) {
-          const transactionAmount3 = typeof transaction.amountFiat === 'number' ? transaction.amountFiat : 0;
+          const transactionAmount3 = typeof transaction.amount_fiat === 'number' ? transaction.amount_fiat : 0;
           const amountMatch = Math.abs(callbackData.amount - transactionAmount3) < 0.01;
           if (!amountMatch) {
-            console.error(`M-Pesa amount mismatch: Expected ${transaction.amountFiat}, got ${callbackData.amount}`);
-            await prisma.transaction.update({
+            console.error(`M-Pesa amount mismatch: Expected ${transaction.amount_fiat}, got ${callbackData.amount}`);
+            await prisma.transactions.update({
               where: { id: transaction.id },
               data: { 
                 status: 'failed',
                 metadata: {
                   ...(transaction.metadata as any),
                   error: 'Amount mismatch',
-                  expectedAmount: transaction.amountFiat,
+                  expectedAmount: transaction.amount_fiat,
                   receivedAmount: callbackData.amount
                 }
               }
@@ -457,7 +457,7 @@ export class WebhookController {
         }
 
         // Update metadata with M-Pesa receipt
-        await prisma.transaction.update({
+        await prisma.transactions.update({
           where: { id: transaction.id },
           data: {
             metadata: {
@@ -471,7 +471,7 @@ export class WebhookController {
 
         // SECURITY: Confirm with verified amount
         await WalletService.confirmTopup(
-          transaction.userId,
+          transaction.user_id,
           transaction.id,
           callbackData.mpesaReceiptNumber ?? undefined,
           callbackData.amount,
@@ -480,7 +480,7 @@ export class WebhookController {
         console.log(`✅ M-Pesa payment confirmed for transaction ${transaction.id}`);
       } else {
         // SECURITY: Mark transaction as cancelled, never credit wallet
-        await prisma.transaction.update({
+        await prisma.transactions.update({
           where: { id: transaction.id },
           data: { 
             status: 'cancelled',
@@ -502,3 +502,4 @@ export class WebhookController {
     }
   }
 }
+

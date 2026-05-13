@@ -31,16 +31,16 @@ export class ShopNotificationService {
     );
   }
 
-  static async notifyOrderPlaced(buyerId: string, orderId: string, totalKr: number) {
+  static async notifyOrderPlaced(buyerId: string, order_id: string, totalKr: number) {
     await send(
       buyerId,
       '🛍️ Order placed!',
       `Your order of Kr ${totalKr.toFixed(2)} has been placed successfully.`,
-      { type: 'order_placed', orderId }
+      { type: 'order_placed', order_id }
     );
   }
 
-  static async notifyOrderStatusUpdate(buyerId: string, orderId: string, status: string) {
+  static async notifyOrderStatusUpdate(buyerId: string, order_id: string, status: string) {
     const messages: Record<string, string> = {
       CONFIRMED: 'Your order has been confirmed by the seller.',
       SHIPPED: 'Your order is on its way!',
@@ -48,26 +48,26 @@ export class ShopNotificationService {
       CANCELLED: 'Your order has been cancelled.',
     };
     const body = messages[status] || `Your order status updated to ${status}.`;
-    await send(buyerId, '📦 Order Update', body, { type: 'order_status', orderId, status });
+    await send(buyerId, '📦 Order Update', body, { type: 'order_status', order_id, status });
   }
 
   static async notifyFlashSaleStarted(productIds: string[], saleTitle: string) {
     // Notify users who have deal alerts matching these products
-    const alerts = await prisma.dealAlert.findMany({
+    const alerts = await prisma.deal_alerts.findMany({
       where: {
-        isActive: true,
+        is_active: true,
         OR: [
-          { productId: { in: productIds } },
-          { productId: null }, // category/keyword alerts
+          { product_id: { in: productIds } },
+          { product_id: null }, // category/keyword alerts
         ]
       },
-      select: { userId: true, productId: true }
+      select: { user_id: true, product_id: true }
     });
 
-    const userIds = [...new Set(alerts.map((a: any) => a.userId))];
+    const userIds = [...new Set(alerts.map((a: any) => a.user_id))];
     for (const userId of userIds) {
       await send(
-        userId,
+        userId as string,
         '⚡ Flash Sale Started!',
         `"${saleTitle}" is now live — limited time only!`,
         { type: 'flash_sale_started', saleTitle }
@@ -77,18 +77,18 @@ export class ShopNotificationService {
 
   static async notifyWishlistItemOnSale(productId: string, productTitle: string, salePrice: number) {
     // Find all users who have this product in a wishlist
-    const wishlistItems = await prisma.wishlistItem.findMany({
-      where: { productId, isPurchased: false },
-      include: { wishlist: { select: { userId: true } } }
+    const wishlistItems = await prisma.wishlist_items.findMany({
+      where: { product_id: productId, is_purchased: false },
+      include: { wishlists: { select: { user_id: true } } }
     });
 
-    const userIds = [...new Set(wishlistItems.map((i: any) => i.wishlist.userId))];
+    const userIds = [...new Set(wishlistItems.map((i: any) => i.wishlists.user_id))];
     for (const userId of userIds) {
       await send(
-        userId,
+        userId as string,
         '🔖 Wishlist item on sale!',
         `"${productTitle}" is now on sale for Kr ${salePrice.toFixed(2)}`,
-        { type: 'wishlist_on_sale', productId, productTitle }
+        { type: 'wishlist_on_sale', product_id: productId, productTitle }
       );
     }
   }

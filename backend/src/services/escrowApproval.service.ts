@@ -33,7 +33,7 @@ interface ApprovalRequest {
 }
 
 interface ApprovalDecision {
-  approverId: string;
+  approver_id: string;
   decision: 'APPROVE' | 'REJECT';
   reason?: string;
   timestamp: Date;
@@ -72,7 +72,7 @@ export class EscrowApprovalManager {
 
     // Verify escrow exists and has sufficient funds
     const escrow = contest.escrows.find(e => e.status === 'held');
-    if (!escrow || Number(escrow.prizeAmountKr) < prizeAmount) {
+    if (!escrow || Number(escrow.prize_amount_kr) < prizeAmount) {
       throw new Error('Insufficient escrow funds');
     }
 
@@ -82,19 +82,19 @@ export class EscrowApprovalManager {
       id: approvalId,
       type: ApprovalType.CONTEST_PAYOUT,
       amount: prizeAmount,
-      recipientId: winnerId,
+      recipient_id: winnerId,
       requesterId,
       metadata: {
         contestId,
-        escrowId: escrow.id,
+        escrow_id: escrow.id,
         contestTitle: contest.title
       },
       status: ApprovalStatus.PENDING,
       requiredApprovals: this.MIN_SUPER_ADMIN_APPROVALS,
       currentApprovals: 0,
       approvals: [],
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + this.APPROVAL_TIMEOUT_HOURS * 60 * 60 * 1000)
+      created_at: new Date(),
+      expires_at: new Date(Date.now() + this.APPROVAL_TIMEOUT_HOURS * 60 * 60 * 1000)
     };
 
     // Store in platform config
@@ -112,11 +112,11 @@ export class EscrowApprovalManager {
     withdrawalDetails: any
   ): Promise<string> {
     // Check user wallet balance
-    const wallet = await prisma.wallet.findUnique({
-      where: { userId }
+    const wallet = await prisma.wallets.findUnique({
+      where: { user_id: userId }
     });
 
-    if (!wallet || Number(wallet.krBalance) < amount) {
+    if (!wallet || Number(wallet.kr_balance) < amount) {
       throw new Error('Insufficient wallet balance');
     }
 
@@ -125,18 +125,18 @@ export class EscrowApprovalManager {
       id: approvalId,
       type: ApprovalType.WITHDRAWAL,
       amount,
-      recipientId: userId,
+      recipient_id: userId,
       requesterId: userId,
       metadata: {
         withdrawalDetails,
-        currentBalance: Number(wallet.krBalance)
+        currentBalance: Number(wallet.kr_balance)
       },
       status: ApprovalStatus.PENDING,
       requiredApprovals: amount > 10000 ? this.MIN_SUPER_ADMIN_APPROVALS : 1,
       currentApprovals: 0,
       approvals: [],
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + this.APPROVAL_TIMEOUT_HOURS * 60 * 60 * 1000)
+      created_at: new Date(),
+      expires_at: new Date(Date.now() + this.APPROVAL_TIMEOUT_HOURS * 60 * 60 * 1000)
     };
 
     await this.storeApprovalRequest(approvalRequest);
@@ -159,7 +159,7 @@ export class EscrowApprovalManager {
       include: { adminProfile: true }
     });
 
-    if (!approver?.isAdmin || approver.adminProfile?.role !== 'SUPER_ADMIN') {
+    if (!approver?.is_admin || approver.adminProfile?.role !== 'SUPER_ADMIN') {
       throw new Error('Only super admins can approve payouts');
     }
 
@@ -175,14 +175,14 @@ export class EscrowApprovalManager {
     }
 
     // Check if expired
-    if (new Date() > new Date(approvalRequest.expiresAt)) {
+    if (new Date() > new Date(approvalRequest.expires_at)) {
       await this.updateApprovalStatus(approvalId, ApprovalStatus.CANCELLED);
       throw new Error('Approval request has expired');
     }
 
     // Check if approver already voted
     const existingApproval = approvalRequest.approvals.find(
-      (a: any) => a.approverId === approverId
+      (a: any) => a.approver_id === approverId
     );
 
     if (existingApproval) {
@@ -191,7 +191,7 @@ export class EscrowApprovalManager {
 
     // Add approval decision
     const approvalDecision: ApprovalDecision = {
-      approverId,
+      approver_id: approverId,
       decision,
       reason,
       timestamp: new Date()
@@ -258,37 +258,37 @@ export class EscrowApprovalManager {
    * Execute contest payout
    */
   private static async executeContestPayout(approvalRequest: any): Promise<void> {
-    const { contestId, escrowId } = approvalRequest.metadata;
+    const { contestId, escrow_id } = approvalRequest.metadata;
 
     await prisma.$transaction(async (tx) => {
       // Release escrow
-      await tx.escrow.update({
-        where: { id: escrowId },
+      await tx.escrows.update({
+        where: { id: escrow_id },
         data: { status: 'released' }
       });
 
       // Credit winner wallet
-      await tx.wallet.update({
-        where: { userId: approvalRequest.recipientId },
+      await tx.wallets.update({
+        where: { user_id: approvalRequest.recipient_id },
         data: {
-          krBalance: {
+          kr_balance: {
             increment: approvalRequest.amount
           }
         }
       });
 
       // Create transaction record
-      await tx.transaction.create({
+      await tx.transactions.create({
         data: {
-          userId: approvalRequest.recipientId,
+          user_id: approvalRequest.recipient_id,
           type: 'contest_prize',
-          amountKr: approvalRequest.amount,
+          amount_kr: approvalRequest.amount,
           status: 'completed',
           reference: `contest_${contestId}`,
           metadata: {
             approvalId: approvalRequest.id,
             contestId,
-            escrowId
+            escrow_id
           }
         }
       });
@@ -307,21 +307,21 @@ export class EscrowApprovalManager {
   private static async executeWithdrawal(approvalRequest: any): Promise<void> {
     await prisma.$transaction(async (tx) => {
       // Deduct from wallet
-      await tx.wallet.update({
-        where: { userId: approvalRequest.recipientId },
+      await tx.wallets.update({
+        where: { user_id: approvalRequest.recipient_id },
         data: {
-          krBalance: {
+          kr_balance: {
             decrement: approvalRequest.amount
           }
         }
       });
 
       // Create transaction record
-      await tx.transaction.create({
+      await tx.transactions.create({
         data: {
-          userId: approvalRequest.recipientId,
+          user_id: approvalRequest.recipient_id,
           type: 'withdraw',
-          amountKr: approvalRequest.amount,
+          amount_kr: approvalRequest.amount,
           status: 'completed',
           metadata: {
             approvalId: approvalRequest.id,
@@ -331,16 +331,16 @@ export class EscrowApprovalManager {
       });
 
       // Update withdrawal request status
-      const withdrawalRequest = await tx.withdrawalRequest.findFirst({
+      const withdrawalRequest = await tx.withdrawal_requests.findFirst({
         where: {
-          userId: approvalRequest.recipientId,
+          user_id: approvalRequest.recipient_id,
           status: 'PENDING'
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { created_at: 'desc' }
       });
 
       if (withdrawalRequest) {
-        await tx.withdrawalRequest.update({
+        await tx.withdrawal_requests.update({
           where: { id: withdrawalRequest.id },
           data: { status: 'APPROVED' }
         });
@@ -352,18 +352,18 @@ export class EscrowApprovalManager {
    * Execute escrow release
    */
   private static async executeEscrowRelease(approvalRequest: any): Promise<void> {
-    const { escrowId } = approvalRequest.metadata;
+    const { escrow_id } = approvalRequest.metadata;
 
     await prisma.$transaction(async (tx) => {
-      await tx.escrow.update({
-        where: { id: escrowId },
+      await tx.escrows.update({
+        where: { id: escrow_id },
         data: { status: 'released' }
       });
 
-      await tx.wallet.update({
-        where: { userId: approvalRequest.recipientId },
+      await tx.wallets.update({
+        where: { user_id: approvalRequest.recipient_id },
         data: {
-          krBalance: {
+          kr_balance: {
             increment: approvalRequest.amount
           }
         }
@@ -375,7 +375,7 @@ export class EscrowApprovalManager {
    * Get pending approvals for admin
    */
   static async getPendingApprovals(adminId: string): Promise<any[]> {
-    const config = await prisma.platformConfig.findUnique({
+    const config = await prisma.platform_config.findUnique({
       where: { key: 'escrow_approvals' }
     });
 
@@ -385,7 +385,7 @@ export class EscrowApprovalManager {
     
     return approvals.filter((a: any) => 
       a.status === ApprovalStatus.PENDING &&
-      !a.approvals.some((ap: any) => ap.approverId === adminId)
+      !a.approvals.some((ap: any) => ap.approver_id === adminId)
     );
   }
 
@@ -393,7 +393,7 @@ export class EscrowApprovalManager {
    * Get approval request details
    */
   static async getApprovalRequest(approvalId: string): Promise<any> {
-    const config = await prisma.platformConfig.findUnique({
+    const config = await prisma.platform_config.findUnique({
       where: { key: 'escrow_approvals' }
     });
 
@@ -407,14 +407,14 @@ export class EscrowApprovalManager {
    * Store approval request
    */
   private static async storeApprovalRequest(approvalRequest: any): Promise<void> {
-    const config = await prisma.platformConfig.findUnique({
+    const config = await prisma.platform_config.findUnique({
       where: { key: 'escrow_approvals' }
     });
 
     const approvals = config ? ((config.value as any).approvals || []) : [];
     approvals.push(approvalRequest);
 
-    await prisma.platformConfig.upsert({
+    await prisma.platform_config.upsert({
       where: { key: 'escrow_approvals' },
       create: {
         key: 'escrow_approvals',
@@ -430,7 +430,7 @@ export class EscrowApprovalManager {
    * Update approval request
    */
   private static async updateApprovalRequest(approvalRequest: any): Promise<void> {
-    const config = await prisma.platformConfig.findUnique({
+    const config = await prisma.platform_config.findUnique({
       where: { key: 'escrow_approvals' }
     });
 
@@ -443,7 +443,7 @@ export class EscrowApprovalManager {
 
     approvals[index] = approvalRequest;
 
-    await prisma.platformConfig.update({
+    await prisma.platform_config.update({
       where: { key: 'escrow_approvals' },
       data: { value: { approvals } }
     });
@@ -467,7 +467,7 @@ export class EscrowApprovalManager {
    * Cancel expired approvals (cron job)
    */
   static async cancelExpiredApprovals(): Promise<number> {
-    const config = await prisma.platformConfig.findUnique({
+    const config = await prisma.platform_config.findUnique({
       where: { key: 'escrow_approvals' }
     });
 
@@ -480,7 +480,7 @@ export class EscrowApprovalManager {
     for (const approval of approvals) {
       if (
         approval.status === ApprovalStatus.PENDING &&
-        new Date(approval.expiresAt) < now
+        new Date(approval.expires_at) < now
       ) {
         approval.status = ApprovalStatus.CANCELLED;
         cancelledCount++;
@@ -488,7 +488,7 @@ export class EscrowApprovalManager {
     }
 
     if (cancelledCount > 0) {
-      await prisma.platformConfig.update({
+      await prisma.platform_config.update({
         where: { key: 'escrow_approvals' },
         data: { value: { approvals } }
       });

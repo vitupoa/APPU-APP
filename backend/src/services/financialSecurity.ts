@@ -15,7 +15,7 @@ const prisma = new PrismaClient();
  * Generate a cryptographically secure 256-bit session secret
  * Called on login/register
  */
-export async function generateSessionSecret(userId: string, deviceId: string) {
+export async function generateSessionSecret(userId: string, device_id: string) {
   // Generate 256-bit (32 bytes) cryptographically secure secret
   const secret = crypto.randomBytes(32);
   
@@ -23,19 +23,19 @@ export async function generateSessionSecret(userId: string, deviceId: string) {
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
   
   // Deactivate old secrets for this user
-  await prisma.userSessionSecret.updateMany({
-    where: { userId, isActive: true },
-    data: { isActive: false }
+  await prisma.user_session_secrets.updateMany({
+    where: { user_id: userId, is_active: true },
+    data: { is_active: false }
   });
   
   // Store new secret
-  await prisma.userSessionSecret.create({
+  await prisma.user_session_secrets.create({
     data: {
-      userId,
+      user_id: userId,
       secret,
-      expiresAt,
-      deviceId,
-      isActive: true
+      expires_at: expiresAt,
+      device_id,
+      is_active: true
     }
   });
   
@@ -52,13 +52,13 @@ export async function generateSessionSecret(userId: string, deviceId: string) {
  * Get user's active session secret
  */
 async function getUserSessionSecret(userId: string): Promise<Buffer | null> {
-  const sessionSecret = await prisma.userSessionSecret.findFirst({
+  const sessionSecret = await prisma.user_session_secrets.findFirst({
     where: {
-      userId,
-      isActive: true,
-      expiresAt: { gt: new Date() }
+      user_id: userId,
+      is_active: true,
+      expires_at: { gt: new Date() }
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { created_at: 'desc' }
   });
   
   if (!sessionSecret) {
@@ -66,16 +66,16 @@ async function getUserSessionSecret(userId: string): Promise<Buffer | null> {
     return null;
   }
   
-  return sessionSecret.secret;
+  return Buffer.from(sessionSecret.secret);
 }
 
 /**
  * Cleanup expired session secrets (run periodically)
  */
 export async function cleanupExpiredSecrets() {
-  const result = await prisma.userSessionSecret.deleteMany({
+  const result = await prisma.user_session_secrets.deleteMany({
     where: {
-      expiresAt: { lt: new Date() }
+      expires_at: { lt: new Date() }
     }
   });
   
@@ -112,7 +112,7 @@ function verifySignature(message: string, signature: string, secret: Buffer): bo
  * Verify tip transaction signature
  */
 async function verifyTipSignature(data: {
-  senderId: string;
+  sender_id: string;
   recipientId: string;
   krAmount: number;
   nonce: string;
@@ -120,13 +120,13 @@ async function verifyTipSignature(data: {
   signature: string;
 }): Promise<boolean> {
   // Get user's session secret
-  const secret = await getUserSessionSecret(data.senderId);
+  const secret = await getUserSessionSecret(data.sender_id);
   if (!secret) {
     throw new Error('Session expired or invalid');
   }
   
   // Reconstruct canonical string (MUST match client exactly)
-  const canonical = `TIP|senderId=${data.senderId}&recipientId=${data.recipientId}&krAmount=${data.krAmount}&nonce=${data.nonce}&timestamp=${data.timestamp}`;
+  const canonical = `TIP|senderId=${data.sender_id}&recipientId=${data.recipientId}&krAmount=${data.krAmount}&nonce=${data.nonce}&timestamp=${data.timestamp}`;
   
   // Verify signature
   return verifySignature(canonical, data.signature, secret);
@@ -136,7 +136,7 @@ async function verifyTipSignature(data: {
  * Verify withdrawal transaction signature
  */
 async function verifyWithdrawalSignature(data: {
-  userId: string;
+  user_id: string;
   krAmount: number;
   provider: string;
   currency: string;
@@ -144,12 +144,12 @@ async function verifyWithdrawalSignature(data: {
   timestamp: number;
   signature: string;
 }): Promise<boolean> {
-  const secret = await getUserSessionSecret(data.userId);
+  const secret = await getUserSessionSecret(data.user_id);
   if (!secret) {
     throw new Error('Session expired or invalid');
   }
   
-  const canonical = `WITHDRAW|userId=${data.userId}&krAmount=${data.krAmount}&provider=${data.provider}&currency=${data.currency}&nonce=${data.nonce}&timestamp=${data.timestamp}`;
+  const canonical = `WITHDRAW|userId=${data.user_id}&krAmount=${data.krAmount}&provider=${data.provider}&currency=${data.currency}&nonce=${data.nonce}&timestamp=${data.timestamp}`;
   
   return verifySignature(canonical, data.signature, secret);
 }
@@ -158,7 +158,7 @@ async function verifyWithdrawalSignature(data: {
  * Verify top-up transaction signature
  */
 async function verifyTopUpSignature(data: {
-  userId: string;
+  user_id: string;
   amount: number;
   currency: string;
   paymentMethod: string;
@@ -166,12 +166,12 @@ async function verifyTopUpSignature(data: {
   timestamp: number;
   signature: string;
 }): Promise<boolean> {
-  const secret = await getUserSessionSecret(data.userId);
+  const secret = await getUserSessionSecret(data.user_id);
   if (!secret) {
     throw new Error('Session expired or invalid');
   }
   
-  const canonical = `TOPUP|userId=${data.userId}&amount=${data.amount}&currency=${data.currency}&paymentMethod=${data.paymentMethod}&nonce=${data.nonce}&timestamp=${data.timestamp}`;
+  const canonical = `TOPUP|userId=${data.user_id}&amount=${data.amount}&currency=${data.currency}&paymentMethod=${data.paymentMethod}&nonce=${data.nonce}&timestamp=${data.timestamp}`;
   
   return verifySignature(canonical, data.signature, secret);
 }
@@ -184,7 +184,7 @@ async function verifyTopUpSignature(data: {
  * Check if nonce has been used
  */
 async function isNonceUsed(nonce: string): Promise<boolean> {
-  const existing = await prisma.transactionNonce.findUnique({
+  const existing = await prisma.transaction_nonces.findUnique({
     where: { nonce }
   });
   
@@ -203,12 +203,12 @@ async function storeNonce(
   // Nonces expire after 10 minutes
   const expiresAt = new Date(timestamp + 10 * 60 * 1000);
   
-  await prisma.transactionNonce.create({
+  await prisma.transaction_nonces.create({
     data: {
       nonce,
-      userId,
+      user_id: userId,
       transactionType,
-      expiresAt
+      expires_at: expiresAt
     }
   });
   
@@ -235,9 +235,9 @@ function isTimestampValid(timestamp: number): boolean {
  * Cleanup expired nonces (run periodically)
  */
 export async function cleanupExpiredNonces() {
-  const result = await prisma.transactionNonce.deleteMany({
+  const result = await prisma.transaction_nonces.deleteMany({
     where: {
-      expiresAt: { lt: new Date() }
+      expires_at: { lt: new Date() }
     }
   });
   
@@ -269,13 +269,13 @@ async function logFinancialTransaction(data: {
   status: string;
   errorMessage?: string;
 }) {
-  await prisma.financialTransactionLog.create({
+  await prisma.financial_transaction_logs.create({
     data: {
-      transactionId: data.transactionId,
-      userId: data.userId,
+      transaction_id: data.transactionId,
+      user_id: data.userId,
       transactionType: data.transactionType,
-      amountKr: data.amountKr,
-      amountFiat: data.amountFiat,
+      amount_kr: data.amountKr,
+      amount_fiat: data.amountFiat,
       currency: data.currency,
       provider: data.provider,
       counterpartyId: data.counterpartyId,
@@ -284,7 +284,7 @@ async function logFinancialTransaction(data: {
       timestamp: BigInt(data.timestamp),
       ipAddress: data.ipAddress,
       userAgent: data.userAgent,
-      deviceId: data.deviceId,
+      device_id: data.deviceId,
       status: data.status,
       errorMessage: data.errorMessage
     }
@@ -309,11 +309,11 @@ async function checkRateLimit(
   const windowStart = new Date(Date.now() - windowSeconds * 1000);
   
   // Count recent attempts
-  const recentAttempts = await prisma.financialTransactionLog.count({
+  const recentAttempts = await prisma.financial_transaction_logs.count({
     where: {
-      userId,
+      user_id: userId,
       transactionType: action.toUpperCase(),
-      createdAt: { gte: windowStart }
+      created_at: { gte: windowStart }
     }
   });
   
@@ -334,17 +334,17 @@ async function checkRateLimit(
 async function detectSuspiciousActivity(userId: string) {
   // Check for rapid transactions (>20 in 5 minutes)
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-  const recentCount = await prisma.financialTransactionLog.count({
+  const recentCount = await prisma.financial_transaction_logs.count({
     where: {
-      userId,
-      createdAt: { gte: fiveMinutesAgo }
+      user_id: userId,
+      created_at: { gte: fiveMinutesAgo }
     }
   });
   
   if (recentCount > 20) {
-    await prisma.suspiciousActivityLog.create({
+    await prisma.suspicious_activity_logs.create({
       data: {
-        userId,
+        user_id: userId,
         activityType: 'RAPID_TRANSACTIONS',
         description: `${recentCount} transactions in 5 minutes`,
         severity: 'HIGH',
@@ -357,20 +357,20 @@ async function detectSuspiciousActivity(userId: string) {
   
   // Check for large amounts (>50,000 Kr in 1 hour)
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-  const result = await prisma.financialTransactionLog.aggregate({
+  const result = await prisma.financial_transaction_logs.aggregate({
     where: {
-      userId,
-      createdAt: { gte: oneHourAgo },
+      user_id: userId,
+      created_at: { gte: oneHourAgo },
       status: 'COMPLETED'
     },
-    _sum: { amountKr: true }
+    _sum: { amount_kr: true }
   });
   
-  const totalAmount = result._sum.amountKr || 0;
+  const totalAmount = result._sum.amount_kr || 0;
   if (Number(totalAmount) > 50000) {
-    await prisma.suspiciousActivityLog.create({
+    await prisma.suspicious_activity_logs.create({
       data: {
-        userId,
+        user_id: userId,
         activityType: 'LARGE_AMOUNT',
         description: `${totalAmount} Kr in 1 hour`,
         severity: 'MEDIUM',
@@ -390,7 +390,7 @@ async function detectSuspiciousActivity(userId: string) {
  * Process tip transaction with full security checks
  */
 export async function processTipTransaction(data: {
-  senderId: string;
+  sender_id: string;
   recipientId: string;
   krAmount: number;
   currency: string;
@@ -409,7 +409,7 @@ export async function processTipTransaction(data: {
     // 1. Verify signature
     console.log('1️⃣ Verifying signature...');
     const isValidSignature = await verifyTipSignature({
-      senderId: data.senderId,
+      sender_id: data.sender_id,
       recipientId: data.recipientId,
       krAmount: data.krAmount,
       nonce: data.nonce,
@@ -438,7 +438,7 @@ export async function processTipTransaction(data: {
     
     // 4. Check rate limit (10 tips per minute)
     console.log('4️⃣ Checking rate limit...');
-    await checkRateLimit(data.senderId, 'tip', 10, 60);
+    await checkRateLimit(data.sender_id, 'tip', 10, 60);
     console.log('✅ Rate limit OK');
     
     // 5. Validate amount
@@ -450,11 +450,11 @@ export async function processTipTransaction(data: {
     
     // 6. Check sender balance
     console.log('6️⃣ Checking sender balance...');
-    const senderWallet = await prisma.wallet.findUnique({
-      where: { userId: data.senderId }
+    const senderWallet = await prisma.wallets.findUnique({
+      where: { user_id: data.sender_id }
     });
     
-    if (!senderWallet || Number(senderWallet.krBalance) < data.krAmount) {
+    if (!senderWallet || Number(senderWallet.kr_balance) < data.krAmount) {
       throw new Error('Insufficient balance');
     }
     console.log('✅ Balance sufficient');
@@ -463,37 +463,37 @@ export async function processTipTransaction(data: {
     console.log('7️⃣ Processing transaction...');
     await prisma.$transaction(async (tx) => {
       // Deduct from sender
-      await tx.wallet.update({
-        where: { userId: data.senderId },
-        data: { krBalance: { decrement: data.krAmount } }
+      await tx.wallets.update({
+        where: { user_id: data.sender_id },
+        data: { kr_balance: { decrement: data.krAmount } }
       });
       
       // Add to recipient
-      await tx.wallet.update({
-        where: { userId: data.recipientId },
-        data: { krBalance: { increment: data.krAmount } }
+      await tx.wallets.update({
+        where: { user_id: data.recipientId },
+        data: { kr_balance: { increment: data.krAmount } }
       });
       
       // Record transaction
-      await tx.transaction.create({
+      await tx.transactions.create({
         data: {
           id: transactionId,
-          userId: data.senderId,
+          user_id: data.sender_id,
           type: 'TIP',
-          amountKr: data.krAmount,
+          amount_kr: data.krAmount,
           currency: data.currency,
-          counterpartyId: data.recipientId,
+          counterparty_id: data.recipientId,
           status: 'COMPLETED'
         }
       });
       
       // Store nonce
-      await tx.transactionNonce.create({
+      await tx.transaction_nonces.create({
         data: {
           nonce: data.nonce,
-          userId: data.senderId,
+          user_id: data.sender_id,
           transactionType: 'TIP',
-          expiresAt: new Date(data.timestamp + 10 * 60 * 1000)
+          expires_at: new Date(data.timestamp + 10 * 60 * 1000)
         }
       });
     });
@@ -502,7 +502,7 @@ export async function processTipTransaction(data: {
     // 8. Log transaction
     await logFinancialTransaction({
       transactionId,
-      userId: data.senderId,
+      userId: data.sender_id,
       transactionType: 'TIP',
       amountKr: data.krAmount,
       currency: data.currency,
@@ -517,7 +517,7 @@ export async function processTipTransaction(data: {
     });
     
     // 9. Check for suspicious activity
-    await detectSuspiciousActivity(data.senderId);
+    await detectSuspiciousActivity(data.sender_id);
     
     console.log(`✅ Tip transaction ${transactionId} completed successfully`);
     
@@ -533,7 +533,7 @@ export async function processTipTransaction(data: {
     // Log failed transaction
     await logFinancialTransaction({
       transactionId,
-      userId: data.senderId,
+      userId: data.sender_id,
       transactionType: 'TIP',
       amountKr: data.krAmount,
       currency: data.currency,

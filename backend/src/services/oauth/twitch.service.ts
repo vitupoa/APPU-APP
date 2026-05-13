@@ -36,8 +36,8 @@ export class TwitchService {
     );
 
     return {
-      accessToken: response.data.access_token,
-      refreshToken: response.data.refresh_token,
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -57,8 +57,8 @@ export class TwitchService {
     );
 
     return {
-      accessToken: response.data.access_token,
-      refreshToken: response.data.refresh_token,
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -96,10 +96,10 @@ export class TwitchService {
     return {
       id: user.id,
       username: user.login,
-      displayName: user.display_name,
+      display_name: user.display_name,
       followerCount,
       profileImageUrl: user.profile_image_url,
-      viewCount: user.view_count
+      view_count: user.view_count
     };
   }
 
@@ -121,8 +121,8 @@ export class TwitchService {
     return response.data.data.map((video: any) => ({
       id: video.id,
       title: video.title,
-      viewCount: video.view_count,
-      createdAt: video.created_at,
+      view_count: video.view_count,
+      created_at: video.created_at,
       duration: video.duration,
       thumbnailUrl: video.thumbnail_url
     }));

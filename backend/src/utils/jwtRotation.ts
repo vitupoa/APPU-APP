@@ -31,7 +31,7 @@ export class JwtSecretManager {
    * Initialize secrets from database
    */
   async initialize(): Promise<void> {
-    const config = await prisma.platformConfig.findUnique({
+    const config = await prisma.platform_config.findUnique({
       where: { key: 'jwt_secrets' }
     });
 
@@ -43,8 +43,8 @@ export class JwtSecretManager {
         this.secrets.set(secret.version, {
           version: secret.version,
           secret: secret.secret,
-          createdAt: new Date(secret.createdAt),
-          expiresAt: new Date(secret.expiresAt)
+          createdAt: new Date(secret.created_at),
+          expiresAt: new Date(secret.expires_at)
         });
       }
     } else {
@@ -139,11 +139,11 @@ export class JwtSecretManager {
     const secretsArray = Array.from(this.secrets.values()).map(s => ({
       version: s.version,
       secret: s.secret,
-      createdAt: s.createdAt.toISOString(),
-      expiresAt: s.expiresAt.toISOString()
+      created_at: s.createdAt.toISOString(),
+      expires_at: s.expiresAt.toISOString()
     }));
 
-    await prisma.platformConfig.upsert({
+    await prisma.platform_config.upsert({
       where: { key: 'jwt_secrets' },
       create: {
         key: 'jwt_secrets',

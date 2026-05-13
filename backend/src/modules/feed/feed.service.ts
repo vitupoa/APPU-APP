@@ -14,16 +14,16 @@ export class FeedService {
     const posts = await prisma.post.findMany({
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' as const },
+      orderBy: { created_at: 'desc' as const },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
-            accountType: true
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
+            account_type: true
           }
         }
       }
@@ -36,27 +36,27 @@ export class FeedService {
     // Check liked status if user is authenticated
     const likedIds = new Set<string>();
     if (userId) {
-      const liked = await prisma.postLike.findMany({
-        where: { userId, postId: { in: items.map((p) => p.id) } },
-        select: { postId: true }
+      const liked = await prisma.post_likes.findMany({
+        where: { user_id: userId, post_id: { in: items.map((p) => p.id) } },
+        select: { post_id: true }
       });
-      liked.forEach((l) => likedIds.add(l.postId));
+      liked.forEach((l: any) => likedIds.add(l.post_id));
     }
 
     // Check access for locked content
     const accessChecks = await Promise.all(
       items.map(async (p: any) => {
-        if (!p.isLocked) return { id: p.id, hasAccess: true };
+        if (!p.is_locked) return { id: p.id, hasAccess: true };
         if (!userId) return { id: p.id, hasAccess: false };
         
         const access = await ContentLockService.checkAccess(
           userId,
           p.id,
           'POST',
-          p.userId,
-          p.isLocked,
-          p.requiredTier,
-          p.unlockAmountKr ? Number(p.unlockAmountKr) : undefined
+          p.user_id,
+          p.is_locked,
+          p.required_tier,
+          p.unlock_amount_kr ? Number(p.unlock_amount_kr) : undefined
         );
         return { id: p.id, ...access };
       })
@@ -64,24 +64,24 @@ export class FeedService {
     const accessMap = new Map(accessChecks.map(a => [a.id, a]));
 
     return {
-      items: items.map((p) => {
+      items: items.map((p: any) => {
         const access = accessMap.get(p.id) || { hasAccess: true };
         return {
           id: p.id,
-          creator: p.user,
-          imageUrls: access.hasAccess ? p.imageUrls : [],
+          creator: p.User,
+          imageUrls: access.hasAccess ? p.image_urls : [],
           caption: p.caption,
-          isLocked: p.isLocked,
-          requiredTier: p.requiredTier,
-          unlockAmountKr: (p as any).unlockAmountKr ? Number((p as any).unlockAmountKr) : undefined,
+          isLocked: p.is_locked,
+          requiredTier: p.required_tier,
+          unlockAmountKr: p.unlock_amount_kr ? Number(p.unlock_amount_kr) : undefined,
           hasAccess: access.hasAccess,
           requiresSubscription: (access as any).requiresSubscription,
           requiresUnlock: (access as any).requiresUnlock,
-          likesCount: p.likesCount,
-          commentsCount: p.commentsCount,
+          likesCount: p.likes_count,
+          commentsCount: p.comments_count,
           isLiked: likedIds.has(p.id),
           commentsEnabled: (p as any).commentsEnabled ?? true,
-          createdAt: p.createdAt.toISOString()
+          created_at: p.created_at.toISOString()
         };
       }),
       nextCursor
@@ -89,7 +89,7 @@ export class FeedService {
   }
 
   static async createPost(data: {
-    userId: string;
+    user_id: string;
     imageUrls: string[];
     caption: string;
     isLocked: boolean;
@@ -98,15 +98,15 @@ export class FeedService {
   }) {
     const post = await prisma.post.create({
       data: {
-        userId: data.userId,
-        imageUrls: data.imageUrls,
+        user_id: data.user_id,
+        image_urls: data.imageUrls,
         caption: data.caption ?? '',
-        isLocked: data.isLocked,
-        requiredTier: data.requiredTier as any,
-        unlockAmountKr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
+        is_locked: data.isLocked,
+        required_tier: data.requiredTier as any,
+        unlock_amount_kr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
       } as any,
       include: {
-        user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+        User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
       }
     });
 
@@ -117,45 +117,45 @@ export class FeedService {
 
     return {
       ...post,
-      creator: (post as any).user,
-      createdAt: post.createdAt.toISOString()
+      creator: (post as any).User,
+      created_at: post.created_at.toISOString()
     };
   }
 
-  static async toggleLike(userId: string, postId: string) {
-    const existing = await prisma.postLike.findUnique({
-      where: { postId_userId: { postId, userId } }
+  static async toggleLike(userId: string, post_id: string) {
+    const existing = await prisma.post_likes.findUnique({
+      where: { post_id_user_id: { post_id, user_id: userId } }
     });
 
     if (existing) {
       await prisma.$transaction([
-        prisma.postLike.delete({ where: { id: existing.id } }),
-        prisma.post.update({ where: { id: postId }, data: { likesCount: { decrement: 1 } } })
+        prisma.post_likes.delete({ where: { id: existing.id } }),
+        prisma.post.update({ where: { id: post_id }, data: { likes_count: { decrement: 1 } } })
       ]);
       return { liked: false };
     } else {
       await prisma.$transaction([
-        prisma.postLike.create({ data: { userId, postId } }),
-        prisma.post.update({ where: { id: postId }, data: { likesCount: { increment: 1 } } })
+        prisma.post_likes.create({ data: { user_id: userId, post_id } }),
+        prisma.post.update({ where: { id: post_id }, data: { likes_count: { increment: 1 } } })
       ]);
       return { liked: true };
     }
   }
 
-  static async addComment(userId: string, postId: string, text: string) {
+  static async addComment(userId: string, post_id: string, text: string) {
     const [comment] = await prisma.$transaction([
-      prisma.postComment.create({
-        data: { userId, postId, text },
+      prisma.post_comments.create({
+        data: { user_id: userId, post_id, text },
         include: {
-          user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+          User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
         }
       }),
-      prisma.post.update({ where: { id: postId }, data: { commentsCount: { increment: 1 } } })
+      prisma.post.update({ where: { id: post_id }, data: { comments_count: { increment: 1 } } })
     ]);
 
     return {
       ...comment,
-      createdAt: comment.createdAt.toISOString()
+      created_at: comment.created_at.toISOString()
     };
   }
 }

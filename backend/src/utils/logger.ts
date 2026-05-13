@@ -70,7 +70,7 @@ export class Logger {
    * Log API request
    */
   logRequest(method: string, path: string, userId?: string, duration?: number): void {
-    this.info(`${method} ${path}`, { userId, duration });
+    this.info(`${method} ${path}`, { user_id: userId, duration });
   }
 
   /**
@@ -78,7 +78,7 @@ export class Logger {
    */
   logApiError(method: string, path: string, error: Error, userId?: string): void {
     this.error(`${method} ${path} failed`, {
-      userId,
+      user_id: userId,
       error: error.message,
       stack: error.stack,
     });
@@ -87,15 +87,15 @@ export class Logger {
   /**
    * Log conversion event
    */
-  logConversion(type: string, userId: string, value?: number, metadata?: any): void {
-    this.info(`Conversion: ${type}`, { userId, value, ...metadata });
+  logConversion(type: string, user_id: string, value?: number, metadata?: any): void {
+    this.info(`Conversion: ${type}`, { user_id, value, ...metadata });
   }
 
   /**
    * Log security event
    */
   logSecurity(event: string, userId?: string, ipAddress?: string, metadata?: any): void {
-    this.warn(`Security: ${event}`, { userId, ipAddress, ...metadata });
+    this.warn(`Security: ${event}`, { user_id: userId, ipAddress, ...metadata });
   }
 
   /**

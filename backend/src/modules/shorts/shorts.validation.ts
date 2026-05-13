@@ -5,7 +5,7 @@ export const createShortSchema = z.object({
   thumbnailUrl: z.string().url().optional(),
   caption: z.string().max(500, 'Caption must be under 500 characters'),
   musicTrack: z.string().optional(),
-  contestId: z.string().uuid().optional(),
+  contest_id: z.string().uuid().optional(),
   collectionId: z.string().uuid().optional(),
   linkedProductId: z.string().uuid().optional(),
   isLocked: z.boolean().default(false),

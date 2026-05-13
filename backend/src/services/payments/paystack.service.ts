@@ -280,4 +280,38 @@ export class PaystackService {
       }
     ];
   }
+
+  /**
+   * Get supported payment channels for a country
+   */
+  static getSupportedChannels(countryCode: string): string[] {
+    const channelsByCountry: Record<string, string[]> = {
+      NG: ['card', 'bank', 'ussd', 'bank_transfer', 'qr'], // Nigeria
+      GH: ['card', 'mobile_money', 'bank'], // Ghana - MTN, Vodafone, AirtelTigo
+      KE: ['card', 'mobile_money', 'bank'], // Kenya - M-Pesa, Airtel Money
+      ZA: ['card', 'bank', 'eft'], // South Africa
+      RW: ['card', 'mobile_money'], // Rwanda - MTN, Airtel
+      TZ: ['card', 'mobile_money'], // Tanzania - M-Pesa, Airtel, Tigo
+      UG: ['card', 'mobile_money'], // Uganda - MTN, Airtel
+      ZM: ['card', 'mobile_money'], // Zambia - MTN, Airtel
+    };
+
+    return channelsByCountry[countryCode] || ['card', 'bank'];
+  }
+
+  /**
+   * Get mobile money providers for a country
+   */
+  static getMobileMoneyProviders(countryCode: string): string[] {
+    const providers: Record<string, string[]> = {
+      GH: ['MTN', 'Vodafone', 'AirtelTigo'],
+      KE: ['M-Pesa', 'Airtel Money'],
+      RW: ['MTN Mobile Money', 'Airtel Money'],
+      TZ: ['M-Pesa', 'Airtel Money', 'Tigo Pesa'],
+      UG: ['MTN Mobile Money', 'Airtel Money'],
+      ZM: ['MTN Mobile Money', 'Airtel Money'],
+    };
+
+    return providers[countryCode] || [];
+  }
 }

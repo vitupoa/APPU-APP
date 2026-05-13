@@ -1,19 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { env } from '../config/env.js';
 import { jwtSecretManager } from '../utils/jwtRotation.js';
 import { prisma } from '../config/database.js';
 
 export interface AuthRequest extends Request {
   userId?: string;
+  user_id?: string;  // Alias for compatibility
   deviceId?: string;
   isAdmin?: boolean;
+  is_admin?: boolean;  // Alias for compatibility
   isWalletUnlocked?: boolean;
   accountType?: 'CREATOR' | 'BUSINESS';
 }
 
 export interface JwtPayload {
-  userId: string;
+  user_id: string;
   deviceId: string;
   isAdmin: boolean;
   isWalletUnlocked: boolean;
@@ -41,15 +42,17 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
   try {
     // Use JWT rotation manager for verification
     const decoded = jwtSecretManager.verifyToken(token) as JwtPayload;
-    req.userId = decoded.userId;
+    req.userId = decoded.user_id;
+    req.user_id = decoded.user_id;  // Set both for compatibility
     req.deviceId = decoded.deviceId;
     req.isAdmin = decoded.isAdmin;
+    req.is_admin = decoded.isAdmin;  // Set both for compatibility
     req.isWalletUnlocked = decoded.isWalletUnlocked;
     req.accountType = decoded.accountType;
 
     // Set RLS context for database security
     try {
-      await prisma.$executeRaw`SELECT set_config('app.current_user_id', ${decoded.userId}, false)`;
+      await prisma.$executeRaw`SELECT set_config('app.current_user_id', ${decoded.user_id}, false)`;
       
       if (decoded.isAdmin) {
         await prisma.$executeRaw`SELECT set_config('app.is_admin', 'true', false)`;
@@ -98,15 +101,17 @@ export async function optionalAuth(req: AuthRequest, res: Response, next: NextFu
       const token = authHeader.split(' ')[1];
       // Use JWT rotation manager for verification
       const decoded = jwtSecretManager.verifyToken(token) as JwtPayload;
-      req.userId = decoded.userId;
+      req.userId = decoded.user_id;
+      req.user_id = decoded.user_id;  // Set both for compatibility
       req.deviceId = decoded.deviceId;
       req.isAdmin = decoded.isAdmin;
+      req.is_admin = decoded.isAdmin;  // Set both for compatibility
       req.isWalletUnlocked = decoded.isWalletUnlocked;
       req.accountType = decoded.accountType;
 
       // Set RLS context for authenticated users
       try {
-        await prisma.$executeRaw`SELECT set_config('app.current_user_id', ${decoded.userId}, false)`;
+        await prisma.$executeRaw`SELECT set_config('app.current_user_id', ${decoded.user_id}, false)`;
         
         if (decoded.isAdmin) {
           await prisma.$executeRaw`SELECT set_config('app.is_admin', 'true', false)`;

@@ -14,8 +14,8 @@ export class KYCService {
     selfieUrl: string
   ) {
     // Check if user already has approved KYC
-    const existingKYC = await prisma.kYCDocument.findFirst({
-      where: { userId, status: 'APPROVED' }
+    const existingKYC = await prisma.kyc_documents.findFirst({
+      where: { user_id: userId, status: 'APPROVED' }
     });
 
     if (existingKYC) {
@@ -23,13 +23,13 @@ export class KYCService {
     }
 
     // Create KYC document
-    const kycDocument = await prisma.kYCDocument.create({
+    const kycDocument = await prisma.kyc_documents.create({
       data: {
-        userId,
-        documentType,
-        frontImageUrl,
-        backImageUrl,
-        selfieUrl,
+        user_id: userId,
+        document_type: documentType,
+        front_image_url: frontImageUrl,
+        back_image_url: backImageUrl,
+        selfie_url: selfieUrl,
         status: 'PENDING'
       }
     });
@@ -37,7 +37,7 @@ export class KYCService {
     // Update user KYC status
     await prisma.user.update({
       where: { id: userId },
-      data: { kycStatus: 'PENDING' }
+      data: { kyc_status: 'PENDING' }
     });
 
     return kycDocument;
@@ -48,24 +48,24 @@ export class KYCService {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
-        kycStatus: true
+        kyc_status: true
       }
     });
 
-    const kycDocuments = await prisma.kYCDocument.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' }
+    const kycDocuments = await prisma.kyc_documents.findMany({
+      where: { user_id: userId },
+      orderBy: { created_at: 'desc' }
     });
 
-    const withdrawalLimit = await prisma.withdrawalLimit.findUnique({
-      where: { userId }
+    const withdrawalLimit = await prisma.withdrawal_limits.findUnique({
+      where: { user_id: userId }
     });
 
     // SECURITY: Don't expose daily limit to prevent users from gaming the system
     return {
-      kycStatus: user?.kycStatus || 'NOT_STARTED',
+      kycStatus: user?.kyc_status || 'NOT_STARTED',
       documents: kycDocuments,
-      withdrawnToday: withdrawalLimit?.withdrawnTodayKr || 0
+      withdrawnToday: withdrawalLimit?.withdrawn_today_kr || 0
     };
   }
 
@@ -79,9 +79,8 @@ export class KYCService {
     nameMatches?: boolean,
     nameMatchScore?: number
   ) {
-    const document = await prisma.kYCDocument.findUnique({
-      where: { id: documentId },
-      include: { user: true }
+    const document = await prisma.kyc_documents.findUnique({
+      where: { id: documentId }
     });
 
     if (!document) {
@@ -91,58 +90,58 @@ export class KYCService {
     const status: KYCStatus = approved ? 'APPROVED' : 'REJECTED';
 
     // Update KYC document
-    const updatedDocument = await prisma.kYCDocument.update({
+    const updatedDocument = await prisma.kyc_documents.update({
       where: { id: documentId },
       data: {
         status,
-        verifiedBy: adminId,
-        verificationNote,
-        rejectionReason,
-        nameMatches: nameMatches ?? false,
-        nameMatchScore: nameMatchScore ? nameMatchScore : undefined,
-        verifiedAt: new Date()
+        verified_by: adminId,
+        verification_note: verificationNote,
+        rejection_reason: rejectionReason,
+        name_matches: nameMatches ?? false,
+        name_match_score: nameMatchScore ? nameMatchScore : undefined,
+        verified_at: new Date()
       }
     });
 
     // If approved, upgrade user to APPROVED status
     if (approved) {
       await prisma.user.update({
-        where: { id: document.userId },
+        where: { id: document.user_id },
         data: {
-          kycStatus: 'APPROVED'
+          kyc_status: 'APPROVED'
         }
       });
 
       // Update withdrawal limit
-      await prisma.withdrawalLimit.upsert({
-        where: { userId: document.userId },
+      await prisma.withdrawal_limits.upsert({
+        where: { user_id: document.user_id },
         create: {
-          userId: document.userId,
-          dailyLimitKr: DAILY_WITHDRAWAL_LIMIT,
-          withdrawnTodayKr: 0,
-          lastResetDate: new Date()
+          user_id: document.user_id,
+          daily_limit_kr: DAILY_WITHDRAWAL_LIMIT,
+          withdrawn_today_kr: 0,
+          last_reset_date: new Date()
         },
         update: {
-          dailyLimitKr: DAILY_WITHDRAWAL_LIMIT
+          daily_limit_kr: DAILY_WITHDRAWAL_LIMIT
         }
       });
     } else {
       await prisma.user.update({
-        where: { id: document.userId },
-        data: { kycStatus: 'REJECTED' }
+        where: { id: document.user_id },
+        data: { kyc_status: 'REJECTED' }
       });
     }
 
     // Log audit
-    await prisma.auditLog.create({
+    await prisma.audit_logs.create({
       data: {
-        adminId,
+        admin_id: adminId,
         action: approved ? 'KYC_APPROVED' : 'KYC_REJECTED',
-        targetType: 'KYC_DOCUMENT',
-        targetId: documentId,
+        target_type: 'KYC_DOCUMENT',
+        target_id: documentId,
         details: {
-          userId: document.userId,
-          documentType: document.documentType,
+          user_id: document.user_id,
+          documentType: document.document_type,
           verificationNote,
           rejectionReason,
           nameMatches,
@@ -156,26 +155,14 @@ export class KYCService {
 
   // Get pending KYC documents for review
   async getPendingKYC(limit: number = 50, offset: number = 0) {
-    const documents = await prisma.kYCDocument.findMany({
+    const documents = await prisma.kyc_documents.findMany({
       where: { status: 'PENDING' },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            createdAt: true
-          }
-        }
-      },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { created_at: 'asc' },
       take: limit,
       skip: offset
     });
 
-    const total = await prisma.kYCDocument.count({
+    const total = await prisma.kyc_documents.count({
       where: { status: 'PENDING' }
     });
 
@@ -186,26 +173,26 @@ export class KYCService {
   async hasCompletedKYC(userId: string): Promise<boolean> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { kycStatus: true }
+      select: { kyc_status: true }
     });
 
-    return user?.kycStatus === 'APPROVED';
+    return user?.kyc_status === 'APPROVED';
   }
 
   // Initialize withdrawal limit for new user
   async initializeWithdrawalLimit(userId: string) {
-    const existing = await prisma.withdrawalLimit.findUnique({
-      where: { userId }
+    const existing = await prisma.withdrawal_limits.findUnique({
+      where: { user_id: userId }
     });
 
     if (existing) return existing;
 
-    return await prisma.withdrawalLimit.create({
+    return await prisma.withdrawal_limits.create({
       data: {
-        userId,
-        dailyLimitKr: DAILY_WITHDRAWAL_LIMIT,
-        withdrawnTodayKr: 0,
-        lastResetDate: new Date()
+        user_id: userId,
+        daily_limit_kr: DAILY_WITHDRAWAL_LIMIT,
+        withdrawn_today_kr: 0,
+        last_reset_date: new Date()
       }
     });
   }
@@ -215,15 +202,15 @@ export class KYCService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    await prisma.withdrawalLimit.updateMany({
+    await prisma.withdrawal_limits.updateMany({
       where: {
-        lastResetDate: {
+        last_reset_date: {
           lt: today
         }
       },
       data: {
-        withdrawnTodayKr: 0,
-        lastResetDate: today
+        withdrawn_today_kr: 0,
+        last_reset_date: today
       }
     });
   }

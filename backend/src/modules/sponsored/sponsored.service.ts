@@ -1,6 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
-import { CreateSponsoredContentRequest, SponsoredContentStatus, PricingModel } from './sponsored.types.js';
+import { CreateSponsoredContentRequest, SponsoredContentStatus, PricingModel, SponsoredContentType } from './sponsored.types.js';
 
 /**
  * Sponsored Content Service - Native Ad Marketplace
@@ -15,46 +15,47 @@ export class SponsoredContentService {
     const { contentType, contentId, campaignName, budget, pricingModel, bidAmount, startDate, endDate, targeting } = data;
 
     // Verify brand has sufficient balance
-    const wallet = await prisma.wallet.findUnique({ where: { userId: brandUserId } });
-    if (!wallet || wallet.krBalance.lt(budget)) {
+    const wallet = await prisma.wallets.findUnique({ where: { user_id: brandUserId } });
+    if (!wallet || wallet.kr_balance.lt(budget)) {
       throw new Error('Insufficient balance');
     }
 
     // Create campaign and escrow funds atomically
     const campaign = await prisma.$transaction(async (tx) => {
       // Deduct budget from wallet
-      await tx.wallet.update({
-        where: { userId: brandUserId },
-        data: { krBalance: { decrement: new Prisma.Decimal(budget) } }
+      await tx.wallets.update({
+        where: { user_id: brandUserId },
+        data: { kr_balance: { decrement: new Prisma.Decimal(budget) } }
       });
 
       // Create escrow
-      const escrow = await tx.escrow.create({
+      const escrow = await tx.escrows.create({
         data: {
-          userId: brandUserId,
-          contestId: contentId, // Reuse contestId field temporarily
-          prizeAmountKr: new Prisma.Decimal(budget),
-          feeAmountKr: new Prisma.Decimal(0),
+          user_id: brandUserId,
+          contest_id: contentId, // Reuse contestId field temporarily
+          prize_amount_kr: new Prisma.Decimal(budget),
+          fee_amount_kr: new Prisma.Decimal(0),
           status: 'held'
         }
       });
 
       // Create sponsored campaign
-      return await tx.sponsoredContent.create({
+      return await tx.sponsored_content.create({
         data: {
-          brandUserId,
-          contentType,
-          contentId,
-          campaignName,
+          brand_user_id: brandUserId,
+          content_type: contentType,
+          content_id: contentId,
+          campaign_name: campaignName,
           budget: new Prisma.Decimal(budget),
           spent: new Prisma.Decimal(0),
-          pricingModel,
-          bidAmount: new Prisma.Decimal(bidAmount),
-          startDate: new Date(startDate),
-          endDate: new Date(endDate),
+          pricing_model: pricingModel,
+          bid_amount: new Prisma.Decimal(bidAmount),
+          start_date: new Date(startDate),
+          end_date: new Date(endDate),
           targeting: targeting || {},
-          status: 'PENDING_REVIEW',
-          escrowId: escrow.id
+          status: SponsoredContentStatus.PENDING_REVIEW,
+          escrow_id: escrow.id,
+          updated_at: new Date()
         }
       });
     });
@@ -66,20 +67,20 @@ export class SponsoredContentService {
    * Get sponsored content for feed insertion
    * Returns sponsored shorts that match user's profile
    */
-  static async getSponsoredContentForUser(userId: string, contentType: string = 'short') {
+  static async getSponsoredContentForUser(userId: string, contentType: SponsoredContentType = SponsoredContentType.SHORT) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return null;
 
     const now = new Date();
 
     // Find active campaigns matching user profile
-    const campaigns = await prisma.sponsoredContent.findMany({
+    const campaigns = await prisma.sponsored_content.findMany({
       where: {
-        contentType,
-        status: 'ACTIVE',
-        startDate: { lte: now },
-        endDate: { gte: now },
-        spent: { lt: prisma.sponsoredContent.fields.budget }
+        content_type: contentType,
+        status: SponsoredContentStatus.ACTIVE,
+        start_date: { lte: now },
+        end_date: { gte: now },
+        spent: { lt: prisma.sponsored_content.fields.budget }
       },
       take: 5
     });
@@ -97,22 +98,22 @@ export class SponsoredContentService {
     });
 
     // Return highest bidder
-    return matched.sort((a, b) => b.bidAmount.toNumber() - a.bidAmount.toNumber())[0] || null;
+    return matched.sort((a: any, b: any) => b.bid_amount.toNumber() - a.bid_amount.toNumber())[0] || null;
   }
 
   /**
    * Record impression when sponsored content is shown
    */
-  static async recordImpression(campaignId: string, userId: string) {
+  static async recordImpression(campaignId: string, user_id: string) {
     await prisma.$transaction([
-      prisma.sponsoredContent.update({
+      prisma.sponsored_content.update({
         where: { id: campaignId },
         data: { impressions: { increment: 1 } }
       }),
-      prisma.sponsoredImpression.create({
+      prisma.sponsored_impressions.create({
         data: {
-          campaignId,
-          userId,
+          campaign_id: campaignId,
+          user_id,
           type: 'impression'
         }
       })
@@ -122,24 +123,24 @@ export class SponsoredContentService {
   /**
    * Record view (3+ seconds watch time)
    */
-  static async recordView(campaignId: string, userId: string, watchTimeSeconds: number) {
-    const campaign = await prisma.sponsoredContent.findUnique({ where: { id: campaignId } });
-    if (!campaign || campaign.pricingModel !== 'CPV') return;
+  static async recordView(campaignId: string, user_id: string, _watchTimeSeconds: number) {
+    const campaign = await prisma.sponsored_content.findUnique({ where: { id: campaignId } });
+    if (!campaign || campaign.pricing_model !== PricingModel.CPV) return;
 
-    const cost = campaign.bidAmount;
+    const cost = campaign.bid_amount;
 
     await prisma.$transaction([
-      prisma.sponsoredContent.update({
+      prisma.sponsored_content.update({
         where: { id: campaignId },
         data: {
           views: { increment: 1 },
           spent: { increment: cost }
         }
       }),
-      prisma.sponsoredImpression.create({
+      prisma.sponsored_impressions.create({
         data: {
-          campaignId,
-          userId,
+          campaign_id: campaignId,
+          user_id,
           type: 'view',
           cost
         }
@@ -150,24 +151,24 @@ export class SponsoredContentService {
   /**
    * Record engagement (like/comment/share)
    */
-  static async recordEngagement(campaignId: string, userId: string, engagementType: string) {
-    const campaign = await prisma.sponsoredContent.findUnique({ where: { id: campaignId } });
-    if (!campaign || campaign.pricingModel !== 'CPE') return;
+  static async recordEngagement(campaignId: string, user_id: string, engagementType: string) {
+    const campaign = await prisma.sponsored_content.findUnique({ where: { id: campaignId } });
+    if (!campaign || campaign.pricing_model !== PricingModel.CPE) return;
 
-    const cost = campaign.bidAmount;
+    const cost = campaign.bid_amount;
 
     await prisma.$transaction([
-      prisma.sponsoredContent.update({
+      prisma.sponsored_content.update({
         where: { id: campaignId },
         data: {
           engagements: { increment: 1 },
           spent: { increment: cost }
         }
       }),
-      prisma.sponsoredImpression.create({
+      prisma.sponsored_impressions.create({
         data: {
-          campaignId,
-          userId,
+          campaign_id: campaignId,
+          user_id,
           type: engagementType,
           cost
         }
@@ -179,14 +180,14 @@ export class SponsoredContentService {
    * Get campaign analytics
    */
   static async getCampaignAnalytics(campaignId: string) {
-    const campaign = await prisma.sponsoredContent.findUnique({
+    const campaign = await prisma.sponsored_content.findUnique({
       where: { id: campaignId },
       include: {
-        impressionLog: {
+        sponsored_impressions: {
           select: {
             type: true,
             cost: true,
-            createdAt: true
+            created_at: true
           }
         }
       }
@@ -194,13 +195,13 @@ export class SponsoredContentService {
 
     if (!campaign) throw new Error('Campaign not found');
 
-    const impressions = campaign.impressionLog.filter((i: any) => i.type === 'impression').length;
-    const views = campaign.impressionLog.filter((i: any) => i.type === 'view').length;
-    const engagements = campaign.impressionLog.filter((i: any) => ['like', 'comment', 'share'].includes(i.type)).length;
-    const clicks = campaign.impressionLog.filter((i: any) => i.type === 'click').length;
+    const impressions = campaign.sponsored_impressions.filter((i: any) => i.type === 'impression').length;
+    const views = campaign.sponsored_impressions.filter((i: any) => i.type === 'view').length;
+    const engagements = campaign.sponsored_impressions.filter((i: any) => ['like', 'comment', 'share'].includes(i.type)).length;
+    const clicks = campaign.sponsored_impressions.filter((i: any) => i.type === 'click').length;
 
     return {
-      campaignName: campaign.campaignName,
+      campaignName: campaign.campaign_name,
       status: campaign.status,
       budget: campaign.budget.toNumber(),
       spent: campaign.spent.toNumber(),
@@ -210,7 +211,7 @@ export class SponsoredContentService {
       clicks,
       cpm: impressions > 0 ? (campaign.spent.toNumber() / impressions) * 1000 : 0,
       ctr: impressions > 0 ? (clicks / impressions) * 100 : 0,
-      engagementRate: views > 0 ? (engagements / views) * 100 : 0
+      engagement_rate: views > 0 ? (engagements / views) * 100 : 0
     };
   }
 
@@ -218,9 +219,9 @@ export class SponsoredContentService {
    * Approve campaign (admin action)
    */
   static async approveCampaign(campaignId: string) {
-    return await prisma.sponsoredContent.update({
+    return await prisma.sponsored_content.update({
       where: { id: campaignId },
-      data: { status: 'ACTIVE' }
+      data: { status: SponsoredContentStatus.ACTIVE }
     });
   }
 
@@ -228,16 +229,16 @@ export class SponsoredContentService {
    * Pause/Resume campaign
    */
   static async toggleCampaign(campaignId: string, brandUserId: string) {
-    const campaign = await prisma.sponsoredContent.findUnique({ where: { id: campaignId } });
-    if (!campaign || campaign.brandUserId !== brandUserId) {
+    const campaign = await prisma.sponsored_content.findUnique({ where: { id: campaignId } });
+    if (!campaign || campaign.brand_user_id !== brandUserId) {
       throw new Error('Unauthorized');
     }
 
-    const newStatus = campaign.status === 'ACTIVE'
-      ? 'PAUSED'
-      : 'ACTIVE';
+    const newStatus = campaign.status === SponsoredContentStatus.ACTIVE
+      ? SponsoredContentStatus.PAUSED
+      : SponsoredContentStatus.ACTIVE;
 
-    return await prisma.sponsoredContent.update({
+    return await prisma.sponsored_content.update({
       where: { id: campaignId },
       data: { status: newStatus }
     });
@@ -247,9 +248,9 @@ export class SponsoredContentService {
    * Get my campaigns
    */
   static async getMyCampaigns(brandUserId: string) {
-    return await prisma.sponsoredContent.findMany({
-      where: { brandUserId },
-      orderBy: { createdAt: 'desc' }
+    return await prisma.sponsored_content.findMany({
+      where: { brand_user_id: brandUserId },
+      orderBy: { created_at: 'desc' }
     });
   }
 
@@ -257,10 +258,10 @@ export class SponsoredContentService {
    * Get pending campaigns (admin)
    */
   static async getPendingCampaigns() {
-    return await prisma.sponsoredContent.findMany({
-      where: { status: 'PENDING_REVIEW' },
-      include: { brand: { select: { username: true, displayName: true } } },
-      orderBy: { createdAt: 'desc' }
+    return await prisma.sponsored_content.findMany({
+      where: { status: SponsoredContentStatus.PENDING_REVIEW },
+      include: { User: { select: { username: true, display_name: true } } },
+      orderBy: { created_at: 'desc' }
     });
   }
 
@@ -268,9 +269,9 @@ export class SponsoredContentService {
    * Get all campaigns (admin)
    */
   static async getAllCampaigns() {
-    return await prisma.sponsoredContent.findMany({
-      include: { brand: { select: { username: true, displayName: true } } },
-      orderBy: { createdAt: 'desc' }
+    return await prisma.sponsored_content.findMany({
+      include: { User: { select: { username: true, display_name: true } } },
+      orderBy: { created_at: 'desc' }
     });
   }
 
@@ -278,9 +279,9 @@ export class SponsoredContentService {
    * Reject campaign (admin)
    */
   static async rejectCampaign(campaignId: string) {
-    return await prisma.sponsoredContent.update({
+    return await prisma.sponsored_content.update({
       where: { id: campaignId },
-      data: { status: 'REJECTED' }
+      data: { status: SponsoredContentStatus.REJECTED }
     });
   }
 }

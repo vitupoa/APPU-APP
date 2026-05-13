@@ -15,7 +15,7 @@ export function startStoryCleanupWorker() {
       // Delete from database
       const dbResult = await prisma.story.deleteMany({
         where: {
-          expiresAt: { lt: now },
+          expires_at: { lt: now },
         },
       });
 

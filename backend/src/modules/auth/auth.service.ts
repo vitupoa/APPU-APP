@@ -34,12 +34,12 @@ export class AuthService {
     
     const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL);
 
-    await prisma.refreshToken.create({
+    await prisma.refresh_tokens.create({
       data: {
-        userId,
-        deviceId,
-        tokenHash,
-        expiresAt
+        user_id: userId,
+        device_id: deviceId,
+        token_hash: tokenHash,
+        expires_at: expiresAt
       }
     });
 
@@ -47,7 +47,7 @@ export class AuthService {
   }
 
   /**
-   * Generates a username suggestion based on firstName, lastName, or email.
+   * Generates a username suggestion based on firstName, last_name, or email.
    * Checks database to ensure it's available.
    */
   static async suggestUsernames(base: string): Promise<string[]> {
@@ -84,15 +84,15 @@ export class AuthService {
 
   static async processAutoAdmire(newUserId: string) {
     try {
-      const config = await prisma.platformConfig.findUnique({ where: { key: 'AUTO_ADMIRE_USERS' } });
+      const config = await prisma.platform_config.findUnique({ where: { key: 'AUTO_ADMIRE_USERS' } });
       if (config && Array.isArray(config.value)) {
         const userIds = config.value as string[];
         if (userIds.length > 0) {
           const admireRecords = userIds.map((admiredId: any) => ({
-            admirerId: newUserId,
-            admiredId
+            admirer_id: newUserId,
+            admired_id: admiredId
           }));
-          await prisma.admire.createMany({
+          await prisma.admires.createMany({
             data: admireRecords,
             skipDuplicates: true
           });
@@ -115,49 +115,50 @@ export class AuthService {
     }
 
     const passwordHash = await bcrypt.hash(data.password, 12);
-    const displayName = `${data.firstName} ${data.lastName}`;
+    const displayName = `${data.first_name} ${data.last_name}`;
 
     const user = await prisma.user.create({
       data: {
         email: data.email,
-        passwordHash,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        displayName,
+        password_hash: passwordHash,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        display_name: displayName,
         username: data.username,
-        accountType: data.accountType,
+        account_type: data.account_type,
         country: data.country,
         currency: data.currency,
+        updated_at: new Date()
       }
     });
 
     await this.processAutoAdmire(user.id);
 
     const payload: JwtPayload = {
-      userId: user.id,
-      deviceId: data.deviceId,
-      isAdmin: user.isAdmin,
-      isWalletUnlocked: user.isWalletUnlocked,
-      accountType: user.accountType
+      user_id: user.id,
+      deviceId: data.device_id,
+      is_admin: user.is_admin,
+      is_wallet_unlocked: user.is_wallet_unlocked,
+      account_type: user.account_type
     };
 
     const accessToken = generateAccessToken(payload);
-    const refreshToken = await this.createRefreshToken(user.id, data.deviceId);
+    const refreshToken = await this.createRefreshToken(user.id, data.device_id);
 
     return {
       user: {
         id: user.id,
         username: user.username,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        displayName: user.displayName,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        display_name: user.display_name,
         country: user.country,
         currency: user.currency,
-        accountType: user.accountType,
-        isVerified: user.isVerified,
-        isWalletUnlocked: user.isWalletUnlocked,
-        createdAt: user.createdAt
+        account_type: user.account_type,
+        is_verified: user.is_verified,
+        is_wallet_unlocked: user.is_wallet_unlocked,
+        created_at: user.created_at
       },
       accessToken,
       refreshToken
@@ -180,46 +181,46 @@ export class AuthService {
              await prisma.user.findUnique({ where: { username: data.username } });
     }
 
-    if (!user || !user.passwordHash) {
+    if (!user || !user.password_hash) {
       throw new Error('Invalid credentials');
     }
 
-    const isValid = await bcrypt.compare(data.password, user.passwordHash);
+    const isValid = await bcrypt.compare(data.password, user.password_hash);
     if (!isValid) {
       throw new Error('Invalid credentials');
     }
 
     const payload: JwtPayload = {
-      userId: user.id,
-      deviceId: data.deviceId,
-      isAdmin: user.isAdmin,
-      isWalletUnlocked: user.isWalletUnlocked,
-      accountType: user.accountType
+      user_id: user.id,
+      deviceId: data.device_id,
+      is_admin: user.is_admin,
+      is_wallet_unlocked: user.is_wallet_unlocked,
+      account_type: user.account_type
     };
 
     const accessToken = generateAccessToken(payload);
     
     // Revoke old tokens for this specific device
-    await prisma.refreshToken.deleteMany({
-      where: { userId: user.id, deviceId: data.deviceId }
+    await prisma.refresh_tokens.deleteMany({
+      where: { user_id: user.id, device_id: data.device_id }
     });
 
-    const refreshToken = await this.createRefreshToken(user.id, data.deviceId);
+    const refreshToken = await this.createRefreshToken(user.id, data.device_id);
 
     return {
       user: {
         id: user.id,
         username: user.username,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        displayName: user.displayName,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        display_name: user.display_name,
         country: user.country,
         currency: user.currency,
-        accountType: user.accountType,
-        isVerified: user.isVerified,
-        isWalletUnlocked: user.isWalletUnlocked,
-        createdAt: user.createdAt
+        account_type: user.account_type,
+        is_verified: user.is_verified,
+        is_wallet_unlocked: user.is_wallet_unlocked,
+        created_at: user.created_at
       },
       accessToken,
       refreshToken
@@ -233,7 +234,7 @@ export class AuthService {
     const providerId = data.token.substring(0, 20); // Placeholder
 
     let user = await prisma.user.findFirst({
-      where: data.provider === 'google' ? { googleId: providerId } : { appleId: providerId }
+      where: data.provider === 'google' ? { google_id: providerId } : { apple_id: providerId }
     });
 
     let isNewUser = false;
@@ -242,9 +243,9 @@ export class AuthService {
       // Setup new OAuth User
       isNewUser = true;
 
-      if (!data.username || !data.country || !data.currency || !data.firstName || !data.lastName) {
+      if (!data.username || !data.country || !data.currency || !data.first_name || !data.last_name) {
         // Needs to suggest usernames and prompt frontend to complete signup
-        const suggestions = await this.suggestUsernames(data.firstName || providerEmail.split('@')[0]);
+        const suggestions = await this.suggestUsernames(data.first_name || providerEmail.split('@')[0]);
         throw new Error(JSON.stringify({ 
           error: 'Missing required OAuth registration data', 
           code: 'OAUTH_INCOMPLETE', 
@@ -262,19 +263,20 @@ export class AuthService {
         }));
       }
 
-      const displayName = `${data.firstName} ${data.lastName}`;
+      const displayName = `${data.first_name} ${data.last_name}`;
       user = await prisma.user.create({
         data: {
           email: providerEmail, // The real verified email from Google/Apple
-          googleId: data.provider === 'google' ? providerId : null,
-          appleId: data.provider === 'apple' ? providerId : null,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          displayName,
+          google_id: data.provider === 'google' ? providerId : null,
+          apple_id: data.provider === 'apple' ? providerId : null,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          display_name: displayName,
           username: data.username,
-          accountType: data.accountType || 'CREATOR',
+          account_type: data.account_type || 'CREATOR',
           country: data.country,
           currency: data.currency,
+          updated_at: new Date()
           // passwordHash is optional
         }
       });
@@ -282,29 +284,29 @@ export class AuthService {
     }
 
     const payload: JwtPayload = {
-      userId: user.id,
-      deviceId: data.deviceId,
-      isAdmin: user.isAdmin,
-      isWalletUnlocked: user.isWalletUnlocked,
-      accountType: user.accountType
+      user_id: user.id,
+      deviceId: data.device_id,
+      is_admin: user.is_admin,
+      is_wallet_unlocked: user.is_wallet_unlocked,
+      account_type: user.account_type
     };
 
     const accessToken = generateAccessToken(payload);
     
-    await prisma.refreshToken.deleteMany({
-      where: { userId: user.id, deviceId: data.deviceId }
+    await prisma.refresh_tokens.deleteMany({
+      where: { user_id: user.id, device_id: data.device_id }
     });
 
-    const refreshToken = await this.createRefreshToken(user.id, data.deviceId);
+    const refreshToken = await this.createRefreshToken(user.id, data.device_id);
 
     return {
       user: {
         id: user.id,
         username: user.username,
         email: user.email,
-        displayName: user.displayName,
-        accountType: user.accountType,
-        isWalletUnlocked: user.isWalletUnlocked
+        display_name: user.display_name,
+        account_type: user.account_type,
+        is_wallet_unlocked: user.is_wallet_unlocked
       },
       accessToken,
       refreshToken,
@@ -312,36 +314,36 @@ export class AuthService {
     };
   }
 
-  static async refreshToken(data: { refreshToken: string; deviceId: string }) {
-    const tokenHash = crypto.createHash('sha256').update(data.refreshToken).digest('hex');
+  static async refreshToken(data: { refresh_token: string; deviceId: string }) {
+    const tokenHash = crypto.createHash('sha256').update(data.refresh_token).digest('hex');
     
     // Find the token
-    const tokenRecord = await prisma.refreshToken.findFirst({
-      where: { tokenHash, deviceId: data.deviceId },
-      include: { user: true }
+    const tokenRecord = await prisma.refresh_tokens.findFirst({
+      where: { token_hash: tokenHash, device_id: data.deviceId },
+      include: { User: true }
     });
 
     if (!tokenRecord) {
       throw new Error('Invalid refresh token');
     }
 
-    if (tokenRecord.expiresAt.getTime() < Date.now()) {
-      await prisma.refreshToken.delete({ where: { id: tokenRecord.id } });
+    if (tokenRecord.expires_at.getTime() < Date.now()) {
+      await prisma.refresh_tokens.delete({ where: { id: tokenRecord.id } });
       throw new Error('Refresh token expired');
     }
 
-    const { user } = tokenRecord;
+    const { User: user } = tokenRecord;
 
     // Remove old token (Refresh Token Rotation)
-    await prisma.refreshToken.delete({ where: { id: tokenRecord.id } });
+    await prisma.refresh_tokens.delete({ where: { id: tokenRecord.id } });
 
     // Generate new set
     const payload: JwtPayload = {
-      userId: user.id,
+      user_id: user.id,
       deviceId: data.deviceId,
-      isAdmin: user.isAdmin,
-      isWalletUnlocked: user.isWalletUnlocked,
-      accountType: user.accountType
+      is_admin: user.is_admin,
+      is_wallet_unlocked: user.is_wallet_unlocked,
+      account_type: user.account_type
     };
 
     const accessToken = generateAccessToken(payload);
@@ -353,10 +355,10 @@ export class AuthService {
     };
   }
 
-  static async logout(data: { refreshToken: string; deviceId: string }) {
-    const tokenHash = crypto.createHash('sha256').update(data.refreshToken).digest('hex');
-    await prisma.refreshToken.deleteMany({
-      where: { tokenHash, deviceId: data.deviceId }
+  static async logout(data: { refresh_token: string; deviceId: string }) {
+    const tokenHash = crypto.createHash('sha256').update(data.refresh_token).digest('hex');
+    await prisma.refresh_tokens.deleteMany({
+      where: { token_hash: tokenHash, device_id: data.deviceId }
     });
     return { success: true };
   }

@@ -49,14 +49,14 @@ export class WithdrawalService {
     
     // SECURITY: Get current user balance for validation
     const wallet = await prisma.wallet.findUnique({
-      where: { userId }
+      where: { user_id }
     });
     
     if (!wallet) {
       throw new Error('Wallet not found');
     }
     
-    const currentBalance = Number(wallet.krBalance);
+    const currentBalance = Number(wallet.kr_balance);
     
     // SECURITY: Validate withdrawal amount constraints
     const amountValidation = WithdrawalSecurityValidator.validateWithdrawalAmount(
@@ -119,8 +119,8 @@ export class WithdrawalService {
     };
     // Step 1: Verify transaction signature
     const payload: TransactionPayload = {
-      userId,
-      amountKr: finalAmount,
+      user_id,
+      amount_kr: finalAmount,
       provider,
       accountName: accountName || 'N/A',
       accountDetails,
@@ -152,10 +152,10 @@ export class WithdrawalService {
       where: { id: userId },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        first_name: true,
+        last_name: true,
         kycStatus: true,
-        createdAt: true
+        created_at: true
       }
     });
 
@@ -169,7 +169,7 @@ export class WithdrawalService {
     if (!hasKYC) {
       // Check if user has submitted KYC documents
       const kycDocuments = await prisma.kYCDocument.findMany({
-        where: { userId, status: { in: ['PENDING', 'APPROVED'] } }
+        where: { user_id, status: { in: ['PENDING', 'APPROVED'] } }
       });
 
       if (kycDocuments.length === 0) {
@@ -182,7 +182,7 @@ export class WithdrawalService {
     }
 
     // Check wallet balance (double-check after security validation)
-    if (Number(wallet.krBalance) < finalAmount) {
+    if (Number(wallet.kr_balance) < finalAmount) {
       throw new Error('Insufficient balance');
     }
 
@@ -191,7 +191,7 @@ export class WithdrawalService {
 
     // Check daily withdrawal limit
     const withdrawalLimit = await prisma.withdrawalLimit.findUnique({
-      where: { userId }
+      where: { user_id }
     });
 
     if (!withdrawalLimit) {
@@ -213,14 +213,14 @@ export class WithdrawalService {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const hourlyWithdrawals = await prisma.withdrawalRequest.aggregate({
       where: {
-        userId,
-        createdAt: { gte: oneHourAgo },
+        user_id,
+        created_at: { gte: oneHourAgo },
         status: { in: ['PENDING', 'APPROVED', 'PROCESSING', 'COMPLETED'] }
       },
-      _sum: { amountKr: true }
+      _sum: { amount_kr: true }
     });
 
-    const withdrawnThisHour = Number(hourlyWithdrawals._sum.amountKr || 0);
+    const withdrawnThisHour = Number(hourlyWithdrawals._sum.amount_kr || 0);
     const newHourlyTotal = withdrawnThisHour + finalAmount;
 
     if (newHourlyTotal > HOURLY_WITHDRAWAL_LIMIT) {
@@ -239,7 +239,7 @@ export class WithdrawalService {
 
     if (today > lastReset) {
       await prisma.withdrawalLimit.update({
-        where: { userId },
+        where: { user_id },
         data: {
           withdrawnTodayKr: 0,
           lastResetDate: today
@@ -265,7 +265,7 @@ export class WithdrawalService {
 
     // Detect suspicious patterns
     const suspiciousFlags = await this.detectSuspiciousPatterns(userId, finalAmount);
-    const riskScore = this.calculateRiskScore(suspiciousFlags, user.createdAt, finalAmount, metadata);
+    const riskScore = this.calculateRiskScore(suspiciousFlags, user.created_at, finalAmount, metadata);
 
     // Determine initial status
     let status: WithdrawalStatus = 'PENDING';
@@ -277,7 +277,7 @@ export class WithdrawalService {
 
     // Get KYC document IDs
     const kycDocumentIds = (await prisma.kYCDocument.findMany({
-      where: { userId, status: 'APPROVED' },
+      where: { user_id, status: 'APPROVED' },
       select: { id: true }
     })).map((doc: { id: string }) => doc.id);
 
@@ -285,15 +285,15 @@ export class WithdrawalService {
     const withdrawalRequest = await prisma.$transaction(async (tx: any) => {
       // SECURITY: Lock wallet row to prevent race conditions
       const lockedWallet = await tx.wallet.findUnique({
-        where: { userId },
-        select: { krBalance: true }
+        where: { user_id },
+        select: { kr_balance: true }
       });
 
       if (!lockedWallet) {
         throw new Error('Wallet not found');
       }
 
-      const currentLockedBalance = Number(lockedWallet.krBalance);
+      const currentLockedBalance = Number(lockedWallet.kr_balance);
 
       // SECURITY: Re-validate balance after lock (prevent TOCTOU attacks)
       if (currentLockedBalance < finalAmount) {
@@ -302,21 +302,21 @@ export class WithdrawalService {
 
       // Deduct from wallet
       const updatedWallet = await tx.wallet.update({
-        where: { userId },
+        where: { user_id },
         data: {
-          krBalance: { decrement: finalAmount }
+          kr_balance: { decrement: finalAmount }
         },
-        select: { krBalance: true }
+        select: { kr_balance: true }
       });
 
       // SECURITY: Verify balance didn't go negative (double-check)
-      if (Number(updatedWallet.krBalance) < 0) {
+      if (Number(updatedWallet.kr_balance) < 0) {
         throw new Error('Transaction would result in negative balance - operation aborted');
       }
 
       // Update withdrawal limit
       await tx.withdrawalLimit.update({
-        where: { userId },
+        where: { user_id },
         data: {
           withdrawnTodayKr: { increment: finalAmount }
         }
@@ -325,8 +325,8 @@ export class WithdrawalService {
       // Create withdrawal request
       const request = await tx.withdrawalRequest.create({
         data: {
-          userId,
-          amountKr: finalAmount,
+          user_id,
+          amount_kr: finalAmount,
           provider,
           accountName: accountName || 'N/A',
           accountDetails,
@@ -352,9 +352,9 @@ export class WithdrawalService {
       // Create transaction record
       await tx.transaction.create({
         data: {
-          userId,
+          user_id,
           type: 'withdraw',
-          amountKr: finalAmount,
+          amount_kr: finalAmount,
           currency,
           provider,
           status: 'pending',
@@ -382,15 +382,15 @@ export class WithdrawalService {
   }
 
   // Detect suspicious patterns
-  private async detectSuspiciousPatterns(userId: string, amountKr: number) {
+  private async detectSuspiciousPatterns(userId: string, amount_kr: number) {
     const flags: any = {};
 
     // Check rapid withdrawals (3+ in 24 hours)
     const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const recentWithdrawals = await prisma.withdrawalRequest.count({
       where: {
-        userId,
-        createdAt: { gte: last24Hours }
+        user_id,
+        created_at: { gte: last24Hours }
       }
     });
 
@@ -404,11 +404,11 @@ export class WithdrawalService {
     // Check if new account
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { createdAt: true }
+      select: { created_at: true }
     });
 
     if (user) {
-      const accountAgeDays = Math.floor((Date.now() - user.createdAt.getTime()) / (1000 * 60 * 60 * 24));
+      const accountAgeDays = Math.floor((Date.now() - user.created_at.getTime()) / (1000 * 60 * 60 * 24));
       if (accountAgeDays < NEW_ACCOUNT_DAYS) {
         flags.newAccount = {
           accountAgeDays,
@@ -420,23 +420,23 @@ export class WithdrawalService {
     // Check unusual amount (> 10x average)
     const avgWithdrawal = await prisma.withdrawalRequest.aggregate({
       where: {
-        userId,
+        user_id,
         status: { in: ['COMPLETED', 'PROCESSING'] }
       },
-      _avg: { amountKr: true }
+      _avg: { amount_kr: true }
     });
 
-    if (avgWithdrawal._avg.amountKr && amountKr > Number(avgWithdrawal._avg.amountKr) * 10) {
+    if (avgWithdrawal._avg.amount_kr && amountKr > Number(avgWithdrawal._avg.amount_kr) * 10) {
       flags.unusualAmount = {
         amount: amountKr,
-        average: avgWithdrawal._avg.amountKr,
-        multiplier: amountKr / Number(avgWithdrawal._avg.amountKr)
+        average: avgWithdrawal._avg.amount_kr,
+        multiplier: amountKr / Number(avgWithdrawal._avg.amount_kr)
       };
     }
 
     // Check if first withdrawal is large (> 50000)
     const withdrawalCount = await prisma.withdrawalRequest.count({
-      where: { userId }
+      where: { user_id }
     });
 
     if (withdrawalCount === 0 && amountKr > LARGE_FIRST_WITHDRAWAL_THRESHOLD) {
@@ -474,7 +474,7 @@ export class WithdrawalService {
   private calculateRiskScore(
     flags: any, 
     accountCreatedAt: Date, 
-    amountKr: number,
+    amount_kr: number,
     securityMetadata?: WithdrawalSecurityMetadata
   ): number {
     let score = 0;
@@ -507,7 +507,7 @@ export class WithdrawalService {
 
     await prisma.suspiciousActivity.create({
       data: {
-        userId,
+        user_id,
         activityType: 'withdrawal_request',
         description: `Suspicious withdrawal patterns detected: ${Object.keys(flags).join(', ')}`,
         severity,
@@ -527,17 +527,17 @@ export class WithdrawalService {
           select: {
             id: true,
             username: true,
-            firstName: true,
-            lastName: true,
+            first_name: true,
+            last_name: true,
             email: true,
             kycStatus: true,
-            createdAt: true
+            created_at: true
           }
         }
       },
       orderBy: [
         { riskScore: 'desc' },
-        { createdAt: 'asc' }
+        { created_at: 'asc' }
       ],
       take: limit,
       skip: offset
@@ -598,19 +598,19 @@ export class WithdrawalService {
 
       // If rejected, refund to wallet
       if (!approved && !flagReason) {
-        const refundAmount = Number(request.amountKr);
-        const withdrawnAmount = Number(request.amountKr);
+        const refundAmount = Number(request.amount_kr);
+        const withdrawnAmount = Number(request.amount_kr);
         
         await tx.wallet.update({
-          where: { userId: request.userId },
+          where: { user_id: request.user_id },
           data: {
-            krBalance: { increment: refundAmount }
+            kr_balance: { increment: refundAmount }
           }
         });
 
         // Update withdrawal limit
         await tx.withdrawalLimit.update({
-          where: { userId: request.userId },
+          where: { user_id: request.user_id },
           data: {
             withdrawnTodayKr: { decrement: withdrawnAmount }
           }
@@ -619,9 +619,9 @@ export class WithdrawalService {
         // Create refund transaction
         await tx.transaction.create({
           data: {
-            userId: request.userId,
+            user_id: request.user_id,
             type: 'withdrawal_refund',
-            amountKr: refundAmount,
+            amount_kr: refundAmount,
             currency: request.currency,
             status: 'completed',
             reference: requestId,
@@ -641,8 +641,8 @@ export class WithdrawalService {
         targetType: 'WITHDRAWAL_REQUEST',
         targetId: requestId,
         details: {
-          userId: request.userId,
-          amount: request.amountKr,
+          user_id: request.user_id,
+          amount: request.amount_kr,
           reviewNote,
           flagReason
         }
@@ -658,7 +658,7 @@ export class WithdrawalService {
       where: { isResolved: resolved },
       orderBy: [
         { severity: 'desc' },
-        { createdAt: 'desc' }
+        { created_at: 'desc' }
       ],
       take: limit,
       skip: offset

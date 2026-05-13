@@ -118,7 +118,7 @@ export const clearRLSContext = async (
  * // For authenticated routes:
  * router.get('/profile', authMiddleware, async (req, res) => {
  *   // RLS context is automatically set by authMiddleware
- *   const user = await prisma.user.findUnique({ where: { id: req.userId } });
+ *   const user = await prisma.user.findUnique({ where: { id: req.user_id } });
  *   res.json(user);
  * });
  * 
@@ -132,7 +132,7 @@ export const clearRLSContext = async (
  * 
  * // For admin operations on behalf of users:
  * router.post('/admin/update-user/:userId', authMiddleware, adminAuth, async (req, res) => {
- *   await withUserContext(req.params.userId, async () => {
+ *   await withUserContext(req.params.user_id, async () => {
  *     // This runs as the target user
  *     await prisma.user.update({ ... });
  *   });

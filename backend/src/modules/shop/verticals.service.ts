@@ -1,36 +1,36 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 
-const USER_SELECT = { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true };
+const USER_SELECT = { id: true, username: true, display_name: true, avatar_url: true, is_verified: true };
 
 export class GarageService {
 
   static async createProfile(userId: string, data: any) {
-    return prisma.garageProfile.create({
+    return prisma.garage_profiles.create({
       data: {
-        userId,
-        businessName: data.businessName,
+        user_id: userId,
+        business_name: data.businessName,
         description: data.description,
-        serviceTypes: data.serviceTypes,
+        service_types: data.serviceTypes,
         certifications: data.certifications || [],
         location: data.location,
         latitude: data.latitude ? new Prisma.Decimal(data.latitude) : undefined,
         longitude: data.longitude ? new Prisma.Decimal(data.longitude) : undefined,
-        serviceArea: data.serviceArea,
-        offersOnSite: data.offersOnSite || false,
+        service_area: data.serviceArea,
+        offers_on_site: data.offersOnSite || false,
       },
-      include: { user: { select: USER_SELECT } }
+      include: { User: { select: USER_SELECT } }
     });
   }
 
   static async getProfile(garageId: string) {
-    return prisma.garageProfile.findUniqueOrThrow({
+    return prisma.garage_profiles.findUniqueOrThrow({
       where: { id: garageId },
       include: {
-        user: { select: USER_SELECT },
-        reviews: {
-          include: { user: { select: USER_SELECT } },
-          orderBy: { createdAt: 'desc' },
+        User: { select: USER_SELECT },
+        garage_reviews: {
+          include: { User: { select: USER_SELECT } },
+          orderBy: { created_at: 'desc' },
           take: 10
         }
       }
@@ -41,13 +41,13 @@ export class GarageService {
     const limit = params.limit || 20;
     const where: any = {};
     if (params.location) where.location = { contains: params.location, mode: 'insensitive' };
-    if (params.serviceType) where.serviceTypes = { has: params.serviceType };
+    if (params.serviceType) where.service_types = { has: params.serviceType };
 
-    const garages = await prisma.garageProfile.findMany({
+    const garages = await prisma.garage_profiles.findMany({
       where, take: limit + 1,
       ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
-      orderBy: { avgRating: 'desc' },
-      include: { user: { select: USER_SELECT } }
+      orderBy: { avg_rating: 'desc' },
+      include: { User: { select: USER_SELECT } }
     });
 
     const hasMore = garages.length > limit;
@@ -56,59 +56,59 @@ export class GarageService {
   }
 
   static async createBooking(userId: string, data: any) {
-    return prisma.garageBooking.create({
+    return prisma.garage_bookings.create({
       data: {
-        garageId: data.garageId,
-        userId,
-        serviceType: data.serviceType,
-        scheduledDate: new Date(data.scheduledDate),
+        garage_id: data.garage_id,
+        user_id: userId,
+        service_type: data.serviceType,
+        scheduled_date: new Date(data.scheduledDate),
         notes: data.notes,
-        isOnSite: data.isOnSite || false,
+        is_on_site: data.isOnSite || false,
         location: data.location,
         status: 'PENDING',
       },
-      include: { garage: { include: { user: { select: USER_SELECT } } } }
+      include: { garage_profiles: { include: { User: { select: USER_SELECT } } } }
     });
   }
 
   static async updateBookingStatus(bookingId: string, garageUserId: string, status: string) {
-    const booking = await prisma.garageBooking.findUniqueOrThrow({
+    const booking = await prisma.garage_bookings.findUniqueOrThrow({
       where: { id: bookingId },
-      include: { garage: true }
+      include: { garage_profiles: true }
     });
-    if (booking.garage.userId !== garageUserId) throw new Error('Not your garage');
-    return prisma.garageBooking.update({ where: { id: bookingId }, data: { status: status as any } });
+    if (booking.garage_profiles.user_id !== garageUserId) throw new Error('Not your garage');
+    return prisma.garage_bookings.update({ where: { id: bookingId }, data: { status: status as any } });
   }
 
   static async getUserBookings(userId: string) {
-    return prisma.garageBooking.findMany({
-      where: { userId },
-      include: { garage: { include: { user: { select: USER_SELECT } } } },
-      orderBy: { scheduledDate: 'desc' }
+    return prisma.garage_bookings.findMany({
+      where: { user_id: userId },
+      include: { garage_profiles: { include: { User: { select: USER_SELECT } } } },
+      orderBy: { scheduled_date: 'desc' }
     });
   }
 
   static async getGarageBookings(garageId: string) {
-    return prisma.garageBooking.findMany({
-      where: { garageId },
-      include: { user: { select: USER_SELECT } },
-      orderBy: { scheduledDate: 'desc' }
+    return prisma.garage_bookings.findMany({
+      where: { garage_id: garageId },
+      include: { User: { select: USER_SELECT } },
+      orderBy: { scheduled_date: 'desc' }
     });
   }
 
-  static async createReview(userId: string, data: { garageId: string; rating: number; text?: string }) {
-    const review = await prisma.garageReview.create({
-      data: { garageId: data.garageId, userId, rating: data.rating, text: data.text },
-      include: { user: { select: USER_SELECT } }
+  static async createReview(userId: string, data: { garage_id: string; rating: number; text?: string }) {
+    const review = await prisma.garage_reviews.create({
+      data: { garage_id: data.garage_id, user_id: userId, rating: data.rating, text: data.text },
+      include: { User: { select: USER_SELECT } }
     });
 
-    const agg = await prisma.garageReview.aggregate({
-      where: { garageId: data.garageId },
+    const agg = await prisma.garage_reviews.aggregate({
+      where: { garage_id: data.garage_id },
       _avg: { rating: true }, _count: true,
     });
-    await prisma.garageProfile.update({
-      where: { id: data.garageId },
-      data: { avgRating: agg._avg.rating || 0, reviewCount: agg._count }
+    await prisma.garage_profiles.update({
+      where: { id: data.garage_id },
+      data: { avg_rating: agg._avg.rating || 0, review_count: agg._count }
     });
 
     return review;
@@ -118,29 +118,29 @@ export class GarageService {
 export class ImporterService {
 
   static async createProfile(userId: string, data: any) {
-    return prisma.importerProfile.create({
+    return prisma.importer_profiles.create({
       data: {
-        userId,
-        businessName: data.businessName,
+        user_id: userId,
+        business_name: data.businessName,
         description: data.description,
-        countriesServed: data.countriesServed,
+        countries_served: data.countriesServed,
         specialization: data.specialization,
-        yearsExperience: data.yearsExperience,
+        years_experience: data.yearsExperience,
       },
-      include: { user: { select: USER_SELECT } }
+      include: { User: { select: USER_SELECT } }
     });
   }
 
   static async listImporters(params: { country?: string; cursor?: string; limit?: number }) {
     const limit = params.limit || 20;
     const where: any = {};
-    if (params.country) where.countriesServed = { has: params.country };
+    if (params.country) where.countries_served = { has: params.country };
 
-    const importers = await prisma.importerProfile.findMany({
+    const importers = await prisma.importer_profiles.findMany({
       where, take: limit + 1,
       ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
-      orderBy: { totalImports: 'desc' },
-      include: { user: { select: USER_SELECT } }
+      orderBy: { total_imports: 'desc' },
+      include: { User: { select: USER_SELECT } }
     });
 
     const hasMore = importers.length > limit;
@@ -149,14 +149,14 @@ export class ImporterService {
   }
 
   static async createImportRequest(userId: string, data: any) {
-    return prisma.importRequest.create({
+    return prisma.import_requests.create({
       data: {
-        userId,
+        user_id: userId,
         make: data.make,
         model: data.model,
-        yearFrom: data.yearFrom,
-        yearTo: data.yearTo,
-        countryOfOrigin: data.countryOfOrigin,
+        year_from: data.yearFrom,
+        year_to: data.yearTo,
+        country_of_origin: data.countryOfOrigin,
         budget: data.budget ? new Prisma.Decimal(data.budget) : undefined,
         requirements: data.requirements,
         status: 'PENDING',
@@ -165,21 +165,21 @@ export class ImporterService {
   }
 
   static async getImportRequests(userId: string) {
-    return prisma.importRequest.findMany({
-      where: { userId },
-      include: { quotes: { include: { importer: { include: { user: { select: USER_SELECT } } } } } },
-      orderBy: { createdAt: 'desc' }
+    return prisma.import_requests.findMany({
+      where: { user_id: userId },
+      include: { import_quotes: { include: { importer_profiles: { include: { User: { select: USER_SELECT } } } } } },
+      orderBy: { created_at: 'desc' }
     });
   }
 
   static async submitQuote(importerId: string, data: { requestId: string; quoteAmountKr: number; estimatedDays?: number; notes?: string }) {
-    const profile = await prisma.importerProfile.findUniqueOrThrow({ where: { userId: importerId } });
-    return prisma.importQuote.create({
+    const profile = await prisma.importer_profiles.findUniqueOrThrow({ where: { user_id: importerId } });
+    return prisma.import_quotes.create({
       data: {
-        requestId: data.requestId,
-        importerId: profile.id,
-        quoteAmountKr: new Prisma.Decimal(data.quoteAmountKr),
-        estimatedDays: data.estimatedDays,
+        request_id: data.requestId,
+        importer_id: profile.id,
+        quote_amount_kr: new Prisma.Decimal(data.quoteAmountKr),
+        estimated_days: data.estimatedDays,
         notes: data.notes,
         status: 'pending',
       }
@@ -187,12 +187,12 @@ export class ImporterService {
   }
 
   static async acceptQuote(requestId: string, quoteId: string, userId: string) {
-    const request = await prisma.importRequest.findUniqueOrThrow({ where: { id: requestId } });
-    if (request.userId !== userId) throw new Error('Not your request');
+    const request = await prisma.import_requests.findUniqueOrThrow({ where: { id: requestId } });
+    if (request.user_id !== userId) throw new Error('Not your request');
 
     return prisma.$transaction([
-      prisma.importQuote.update({ where: { id: quoteId }, data: { status: 'accepted' } }),
-      prisma.importRequest.update({ where: { id: requestId }, data: { status: 'ACCEPTED' } }),
+      prisma.import_quotes.update({ where: { id: quoteId }, data: { status: 'accepted' } }),
+      prisma.import_requests.update({ where: { id: requestId }, data: { status: 'ACCEPTED' } }),
     ]);
   }
 }
@@ -200,29 +200,29 @@ export class ImporterService {
 export class LogisticsService {
 
   static async createProfile(userId: string, data: any) {
-    return prisma.logisticsCompany.create({
+    return prisma.logistics_companies.create({
       data: {
-        userId,
-        companyName: data.companyName,
+        user_id: userId,
+        company_name: data.company_name,
         description: data.description,
-        serviceTypes: data.serviceTypes,
-        coverageAreas: data.coverageAreas,
-        vehicleTypes: data.vehicleTypes || [],
+        service_types: data.serviceTypes,
+        coverage_areas: data.coverageAreas,
+        vehicle_types: data.vehicleTypes || [],
       },
-      include: { user: { select: USER_SELECT } }
+      include: { User: { select: USER_SELECT } }
     });
   }
 
   static async listCompanies(params: { area?: string; serviceType?: string; cursor?: string; limit?: number }) {
     const limit = params.limit || 20;
     const where: any = {};
-    if (params.area) where.coverageAreas = { has: params.area };
-    if (params.serviceType) where.serviceTypes = { has: params.serviceType };
+    if (params.area) where.coverage_areas = { has: params.area };
+    if (params.serviceType) where.service_types = { has: params.serviceType };
 
-    const companies = await prisma.logisticsCompany.findMany({
+    const companies = await prisma.logistics_companies.findMany({
       where, take: limit + 1,
       ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
-      include: { user: { select: USER_SELECT } }
+      include: { User: { select: USER_SELECT } }
     });
 
     const hasMore = companies.length > limit;
@@ -231,13 +231,13 @@ export class LogisticsService {
   }
 
   static async createShippingJob(requesterId: string, data: any) {
-    return prisma.shippingJob.create({
+    return prisma.shipping_jobs.create({
       data: {
-        requesterId,
-        pickupLocation: data.pickupLocation,
-        deliveryLocation: data.deliveryLocation,
-        jobType: data.jobType,
-        vehicleDesc: data.vehicleDesc,
+        requester_id: requesterId,
+        pickup_location: data.pickupLocation,
+        delivery_location: data.deliveryLocation,
+        job_type: data.jobType,
+        vehicle_desc: data.vehicleDesc,
         status: 'open',
       }
     });
@@ -248,79 +248,10 @@ export class LogisticsService {
     const where: any = {};
     if (params.status) where.status = params.status;
 
-    return prisma.shippingJob.findMany({
+    return prisma.shipping_jobs.findMany({
       where, take: limit,
-      orderBy: { createdAt: 'desc' },
-      include: { requester: { select: USER_SELECT }, logistics: true }
-    });
-  }
-}
-
-export class LiveShoppingService {
-
-  static async createSession(hostId: string, data: any) {
-    const session = await prisma.liveSession.create({
-      data: {
-        hostId,
-        title: data.title,
-        description: data.description,
-        scheduledStart: new Date(data.scheduledStart),
-        status: 'SCHEDULED',
-      }
-    });
-
-    if (data.productIds?.length) {
-      await prisma.liveSessionProduct.createMany({
-        data: data.productIds.map((pid: string, i: number) => ({
-          sessionId: session.id, productId: pid, sortOrder: i,
-        }))
-      });
-    }
-
-    return prisma.liveSession.findUnique({
-      where: { id: session.id },
-      include: {
-        host: { select: USER_SELECT },
-        products: { include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true } } } }
-      }
-    });
-  }
-
-  static async startSession(sessionId: string, hostId: string) {
-    const session = await prisma.liveSession.findUniqueOrThrow({ where: { id: sessionId } });
-    if (session.hostId !== hostId) throw new Error('Not your session');
-    return prisma.liveSession.update({
-      where: { id: sessionId },
-      data: { status: 'LIVE', actualStart: new Date() }
-    });
-  }
-
-  static async endSession(sessionId: string, hostId: string) {
-    const session = await prisma.liveSession.findUniqueOrThrow({ where: { id: sessionId } });
-    if (session.hostId !== hostId) throw new Error('Not your session');
-    return prisma.liveSession.update({
-      where: { id: sessionId },
-      data: { status: 'ENDED', endedAt: new Date() }
-    });
-  }
-
-  static async getActiveSessions() {
-    return prisma.liveSession.findMany({
-      where: { status: 'LIVE' },
-      include: {
-        host: { select: USER_SELECT },
-        products: { include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true } } } }
-      },
-      orderBy: { viewerCount: 'desc' }
-    });
-  }
-
-  static async getUpcomingSessions(limit = 10) {
-    return prisma.liveSession.findMany({
-      where: { status: 'SCHEDULED', scheduledStart: { gt: new Date() } },
-      include: { host: { select: USER_SELECT } },
-      orderBy: { scheduledStart: 'asc' },
-      take: limit
+      orderBy: { created_at: 'desc' },
+      include: { User: { select: USER_SELECT }, logistics_companies: true }
     });
   }
 }
@@ -333,9 +264,9 @@ export class PremiumService {
     TOP_SPOT: 50,
   };
 
-  static async createListing(sellerId: string, data: { productId: string; type: string; days: number }) {
-    const product = await prisma.product.findUniqueOrThrow({ where: { id: data.productId } });
-    if (product.sellerId !== sellerId) throw new Error('Not your product');
+  static async createListing(sellerId: string, data: { product_id: string; type: string; days: number }) {
+    const product = await prisma.products.findUniqueOrThrow({ where: { id: data.product_id } });
+    if (product.seller_id !== sellerId) throw new Error('Not your product');
 
     const dailyRate = this.DAILY_RATES[data.type] || 10;
     const totalCost = dailyRate * data.days;
@@ -344,24 +275,24 @@ export class PremiumService {
 
     // Update product flags
     const updateData: any = {};
-    if (data.type === 'FEATURED') { updateData.isFeatured = true; updateData.featuredUntil = endDate; }
-    if (data.type === 'PROMOTED') { updateData.isPromoted = true; updateData.promotedUntil = endDate; }
-    if (data.type === 'TOP_SPOT') { updateData.isTopSpot = true; updateData.topSpotUntil = endDate; }
+    if (data.type === 'FEATURED') { updateData.is_featured = true; updateData.featured_until = endDate; }
+    if (data.type === 'PROMOTED') { updateData.is_promoted = true; updateData.promoted_until = endDate; }
+    if (data.type === 'TOP_SPOT') { updateData.is_top_spot = true; updateData.top_spot_until = endDate; }
 
     const [listing] = await prisma.$transaction([
-      prisma.premiumListing.create({
+      prisma.premium_listings.create({
         data: {
-          productId: data.productId,
-          sellerId,
+          product_id: data.product_id,
+          seller_id: sellerId,
           type: data.type as any,
-          dailyRateKr: new Prisma.Decimal(dailyRate),
-          totalPaidKr: new Prisma.Decimal(totalCost),
-          startDate,
-          endDate,
-          isActive: true,
+          daily_rate_kr: new Prisma.Decimal(dailyRate),
+          total_paid_kr: new Prisma.Decimal(totalCost),
+          start_date: startDate,
+          end_date: endDate,
+          is_active: true,
         }
       }),
-      prisma.product.update({ where: { id: data.productId }, data: updateData }),
+      prisma.products.update({ where: { id: data.product_id }, data: updateData }),
     ]);
 
     return { listing, totalCostKr: totalCost };
@@ -371,39 +302,39 @@ export class PremiumService {
 export class ProductShareService {
 
   static async shareProduct(userId: string, data: {
-    productId: string; contentId?: string; contentType?: string; caption?: string;
+    product_id: string; contentId?: string; contentType?: string; caption?: string;
   }) {
-    return prisma.productShare.create({
+    return prisma.product_shares.create({
       data: {
-        productId: data.productId,
-        userId,
-        contentId: data.contentId,
-        contentType: data.contentType,
+        product_id: data.product_id,
+        user_id: userId,
+        content_id: data.contentId,
+        content_type: data.contentType,
         caption: data.caption,
       }
     });
   }
 
   static async tagProduct(data: {
-    productId: string; contentId: string; contentType: string;
+    product_id: string; contentId: string; contentType: string;
     positionX?: number; positionY?: number; timestamp?: number;
   }) {
-    return prisma.productTag.create({
+    return prisma.product_tags.create({
       data: {
-        productId: data.productId,
-        contentId: data.contentId,
-        contentType: data.contentType,
-        positionX: data.positionX ? new Prisma.Decimal(data.positionX) : undefined,
-        positionY: data.positionY ? new Prisma.Decimal(data.positionY) : undefined,
+        product_id: data.product_id,
+        content_id: data.contentId,
+        content_type: data.contentType,
+        position_x: data.positionX ? new Prisma.Decimal(data.positionX) : undefined,
+        position_y: data.positionY ? new Prisma.Decimal(data.positionY) : undefined,
         timestamp: data.timestamp,
       }
     });
   }
 
   static async getProductTags(contentId: string, contentType: string) {
-    return prisma.productTag.findMany({
-      where: { contentId, contentType },
-      include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true } } }
+    return prisma.product_tags.findMany({
+      where: { content_id: contentId, content_type: contentType },
+      include: { products: { select: { id: true, title: true, image_urls: true, price_kr: true } } }
     });
   }
 }

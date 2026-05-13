@@ -15,7 +15,6 @@ data class ExploreState(
     val trendingShorts: List<TrendingShort> = emptyList(),
     val trendingContests: List<TrendingContest> = emptyList(),
     val trendingCreators: List<TrendingCreator> = emptyList(),
-    val liveStreams: List<LiveStream> = emptyList(),
     val selectedCategory: ContentCategory = ContentCategory.ALL,
     val error: String? = null
 )
@@ -39,15 +38,13 @@ class ExploreViewModel(
                 val shorts = repository.getTrendingShorts(_state.value.selectedCategory)
                 val contests = repository.getTrendingContests()
                 val creators = repository.getTrendingCreators()
-                val lives = repository.getLiveStreams()
                 
                 _state.value = _state.value.copy(
                     isLoading = false,
                     trendingHashtags = hashtags,
                     trendingShorts = shorts,
                     trendingContests = contests,
-                    trendingCreators = creators,
-                    liveStreams = lives
+                    trendingCreators = creators
                 )
             } catch (e: Exception) {
                 _state.value = _state.value.copy(

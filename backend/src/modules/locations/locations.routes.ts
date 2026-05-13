@@ -1,4 +1,4 @@
-import { Router, Response, NextFunction } from 'express';
+import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../../middleware/auth.js';
 import { prisma } from '../../config/database.js';
 import { getQueryString } from '../../utils/queryParams.js';
@@ -15,11 +15,11 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<
     const {
       scope,
       scopeValue,
-      displayName,
-      parentId,
+      display_name,
+      parent_id,
       continent,
       country,
-      countryCode,
+      country_code,
       region,
       city,
       latitude,
@@ -27,22 +27,21 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<
       population,
     } = req.body;
 
-    const location = await prisma.locationMaster.create({
+    const location = await prisma.location_master.create({
       data: {
         scope,
-        scopeValue,
-        displayName,
-        parentId,
+        scope_value: scopeValue,
+        display_name,
+        parent_id,
         continent,
         country,
-        countryCode,
+        country_code,
         region,
         city,
         latitude: latitude ? parseFloat(latitude) : null,
         longitude: longitude ? parseFloat(longitude) : null,
         population: population ? parseInt(population) : null,
-        isActive: true,
-        createdBy: req.userId!,
+        is_active: true,
       },
     });
 
@@ -54,23 +53,23 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<
 
 router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { scope, parentId, search, countryCode } = req.query;
+    const { scope, parent_id, search, country_code } = req.query;
 
-    const where: any = { isActive: true };
+    const where: any = { is_active: true };
 
     if (scope) where.scope = getQueryString(scope);
-    if (parentId) where.parentId = getQueryString(parentId);
-    if (countryCode) where.countryCode = getQueryString(countryCode);
+    if (parent_id) where.parent_id = getQueryString(parent_id);
+    if (country_code) where.country_code = getQueryString(country_code);
     if (search) {
-      where.displayName = {
+      where.display_name = {
         contains: getQueryString(search),
         mode: 'insensitive',
       };
     }
 
-    const locations = await prisma.locationMaster.findMany({
+    const locations = await prisma.location_master.findMany({
       where,
-      orderBy: { displayName: 'asc' },
+      orderBy: { display_name: 'asc' },
     });
 
     res.json(locations);
@@ -82,7 +81,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<v
 
 router.get('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const location = await prisma.locationMaster.findUnique({
+    const location = await prisma.location_master.findUnique({
       where: { id: req.params.id as string },
     });
 
@@ -100,12 +99,12 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response): Promis
 
 router.patch('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.isAdmin) {
+    if (!req.is_admin) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
-    const location = await prisma.locationMaster.update({
+    const location = await prisma.location_master.update({
       where: { id: req.params.id as string },
       data: req.body,
     });
@@ -119,14 +118,14 @@ router.patch('/:id', authenticate, async (req: AuthRequest, res: Response): Prom
 
 router.delete('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.isAdmin) {
+    if (!req.is_admin) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
-    await prisma.locationMaster.update({
+    await prisma.location_master.update({
       where: { id: req.params.id as string },
-      data: { isActive: false },
+      data: { is_active: false },
     });
 
     res.json({ message: 'Location deleted' });
@@ -138,12 +137,12 @@ router.delete('/:id', authenticate, async (req: AuthRequest, res: Response): Pro
 
 router.get('/hierarchy/:countryCode', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const hierarchy = await prisma.locationMaster.findMany({
+    const hierarchy = await prisma.location_master.findMany({
       where: {
-        countryCode: req.params.countryCode as string,
-        isActive: true,
+        country_code: req.params.countryCode as string,
+        is_active: true,
       },
-      orderBy: [{ scope: 'asc' }, { displayName: 'asc' }],
+      orderBy: [{ scope: 'asc' }, { display_name: 'asc' }],
     });
 
     res.json(hierarchy);

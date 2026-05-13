@@ -4,12 +4,6 @@ import rateLimit from 'express-rate-limit';
 import { contentDistributionService } from './services/contentDistribution.service.js';
 import { feedGenerationService } from './services/feedGeneration.service.js';
 
-
-// Helper to safely extract string from query parameter
-function getQueryParam(param: string | string[] | undefined): string | undefined {
-  if (Array.isArray(param)) return param[0];
-  return param;
-}
 const router = Router();
 
 // Apply authentication to all routes
@@ -51,10 +45,10 @@ router.get('/feed/admiring', authenticate, async (req: AuthRequest, res) => {
 router.post('/interactions/track', authenticate, interactionRateLimiter, async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
-    const { contentId, contentType, signalType, watchDuration, totalDuration } = req.body;
+    const { content_id, contentType, signalType, watchDuration, totalDuration } = req.body;
 
     // Input validation
-    if (!contentId || !contentType || !signalType) {
+    if (!content_id || !contentType || !signalType) {
       res.status(400).json({ error: 'Missing required fields' });
       return;
     }
@@ -71,7 +65,7 @@ router.post('/interactions/track', authenticate, interactionRateLimiter, async (
       return;
     }
 
-    await feedGenerationService.trackInteraction(userId, contentId, contentType, {
+    await feedGenerationService.trackInteraction(userId, content_id, contentType, {
       signalType,
       watchDuration,
       totalDuration
@@ -86,11 +80,11 @@ router.post('/interactions/track', authenticate, interactionRateLimiter, async (
 // Initialize content distribution (called when content is uploaded)
 router.post('/distribution/initialize', authenticate, async (req: AuthRequest, res) => {
   try {
-    const { contentId, contentType, hashtags, location } = req.body;
+    const { content_id, contentType, hashtags, location } = req.body;
     const creatorId = req.userId!;
 
     // Input validation
-    if (!contentId || !contentType) {
+    if (!content_id || !contentType) {
       res.status(400).json({ error: 'Missing required fields' });
       return;
     }
@@ -102,7 +96,7 @@ router.post('/distribution/initialize', authenticate, async (req: AuthRequest, r
     }
 
     const result = await contentDistributionService.initializeDistribution(
-      contentId,
+      content_id,
       contentType,
       creatorId,
       { hashtags, location }
@@ -117,9 +111,9 @@ router.post('/distribution/initialize', authenticate, async (req: AuthRequest, r
 // Evaluate content performance
 router.post('/distribution/evaluate', authenticate, async (req, res) => {
   try {
-    const { contentId, contentType } = req.body;
+    const { content_id, contentType } = req.body;
 
-    const result = await contentDistributionService.evaluatePerformance(contentId, contentType);
+    const result = await contentDistributionService.evaluatePerformance(content_id, contentType);
 
     res.json(result); return;
   } catch (error: any) {

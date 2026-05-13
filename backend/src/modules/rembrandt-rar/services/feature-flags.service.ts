@@ -42,7 +42,7 @@ export class FeatureFlagService {
           matches = !flag.scopeValue;
           break;
         case 'USER':
-          matches = flag.scopeValue === context.userId;
+          matches = flag.scopeValue === context.user_id;
           break;
         case 'CITY':
           matches = flag.scopeValue === context.city;
@@ -206,7 +206,7 @@ export class FeatureFlagService {
   }
 
   static async toggleMaintenance(adminId: string, enabled: boolean, ip?: string, ua?: string) {
-    await this.setConfig(adminId, 'maintenance_mode', { enabled, updatedAt: new Date().toISOString() }, ip, ua);
+    await this.setConfig(adminId, 'maintenance_mode', { enabled, updated_at: new Date().toISOString() }, ip, ua);
     await AuditService.log(adminId, ADMIN_ACTIONS.MAINTENANCE_TOGGLE, 'config', 'maintenance_mode', { enabled }, ip, ua);
     return { success: true, maintenanceMode: enabled };
   }

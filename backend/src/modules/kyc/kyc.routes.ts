@@ -21,7 +21,7 @@ const router = Router();
 // Submit KYC documents
 router.post('/submit', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const userId = req.userId as string;
+    const userId = req.user_id as string;
     const { documentType, frontImageUrl, backImageUrl, selfieUrl } = req.body;
 
     if (!documentType || !frontImageUrl || !selfieUrl) {
@@ -49,7 +49,7 @@ router.post('/submit', authenticateToken, async (req: AuthRequest, res) => {
 // Get KYC status
 router.get('/status', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const userId = req.userId as string;
+    const userId = req.user_id as string;
     const status = await kycService.getKYCStatus(userId);
     res.json(status); return;
   } catch (error: any) {
@@ -64,7 +64,7 @@ router.post('/withdraw',
   sanitizePaymentInput,
   async (req: AuthRequest, res) => {
   try {
-    const userId = req.userId as string;
+    const userId = req.user_id as string;
     const { 
       provider,
       krAmount,
@@ -145,7 +145,7 @@ router.post('/withdraw',
 
     res.json({
       success: true,
-      transactionId: withdrawal.id,
+      transaction_id: withdrawal.id,
       message: 'Withdrawal request submitted successfully',
       processingTime: withdrawal.processingTime
     }); return;
@@ -178,7 +178,7 @@ router.post('/withdraw',
 // Get user's withdrawal history
 router.get('/withdrawal/history', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.user_id;
     const limit = parseInt(req.query.limit as string) || 20;
     const offset = parseInt(req.query.offset as string) || 0;
 
@@ -189,7 +189,7 @@ router.get('/withdrawal/history', authenticateToken, async (req: AuthRequest, re
     );
 
     // Filter to only user's withdrawals
-    const userWithdrawals = withdrawals.requests.filter((w: any) => w.userId === userId);
+    const userWithdrawals = withdrawals.requests.filter((w: any) => w.user_id === userId);
 
     res.json({
       withdrawals: userWithdrawals,
@@ -205,13 +205,13 @@ router.get('/withdrawal/history', authenticateToken, async (req: AuthRequest, re
 // Get pending KYC documents
 router.get('/admin/kyc/pending', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (!req.isAdmin) {
+    if (!req.is_admin) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
     const adminProfile = await prisma.adminProfile.findUnique({
-      where: { userId: req.userId },
+      where: { user_id: req.user_id },
       select: { role: true }
     });
 
@@ -233,13 +233,13 @@ router.get('/admin/kyc/pending', authenticateToken, async (req: AuthRequest, res
 // Verify KYC document
 router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (!req.isAdmin) {
+    if (!req.is_admin) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
     const adminProfile = await prisma.adminProfile.findUnique({
-      where: { userId: req.userId },
+      where: { user_id: req.user_id },
       select: { role: true }
     });
 
@@ -249,7 +249,7 @@ router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req: Auth
     }
 
     const documentId = req.params.documentId;
-    const adminId = req.userId as string;
+    const adminId = req.user_id as string;
     const { approved, verificationNote, rejectionReason, nameMatches, nameMatchScore } = req.body;
 
     const document = await kycService.verifyKYC(
@@ -274,13 +274,13 @@ router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req: Auth
 // Get pending withdrawals
 router.get('/admin/withdrawal/pending', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (!req.isAdmin) {
+    if (!req.is_admin) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
     const adminProfile = await prisma.adminProfile.findUnique({
-      where: { userId: req.userId },
+      where: { user_id: req.user_id },
       select: { role: true }
     });
 
@@ -303,13 +303,13 @@ router.get('/admin/withdrawal/pending', authenticateToken, async (req: AuthReque
 // Review withdrawal
 router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (!req.isAdmin) {
+    if (!req.is_admin) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
     const adminProfile = await prisma.adminProfile.findUnique({
-      where: { userId: req.userId },
+      where: { user_id: req.user_id },
       select: { role: true }
     });
 
@@ -319,7 +319,7 @@ router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req
     }
 
     const requestId = req.params.requestId;
-    const adminId = req.userId as string;
+    const adminId = req.user_id as string;
     const { approved, reviewNote, flagReason } = req.body;
 
     const withdrawal = await withdrawalService.reviewWithdrawal(
@@ -342,13 +342,13 @@ router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req
 // Get suspicious activities
 router.get('/admin/suspicious', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (!req.isAdmin) {
+    if (!req.is_admin) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
     const adminProfile = await prisma.adminProfile.findUnique({
-      where: { userId: req.userId },
+      where: { user_id: req.user_id },
       select: { role: true }
     });
 
@@ -371,13 +371,13 @@ router.get('/admin/suspicious', authenticateToken, async (req: AuthRequest, res)
 // Resolve suspicious activity
 router.post('/admin/suspicious/resolve/:activityId', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    if (!req.isAdmin) {
+    if (!req.is_admin) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
 
     const adminProfile = await prisma.adminProfile.findUnique({
-      where: { userId: req.userId },
+      where: { user_id: req.user_id },
       select: { role: true }
     });
 
@@ -387,7 +387,7 @@ router.post('/admin/suspicious/resolve/:activityId', authenticateToken, async (r
     }
 
     const activityId = req.params.activityId;
-    const adminId = req.userId as string;
+    const adminId = req.user_id as string;
     const { resolutionNote } = req.body;
 
     const activity = await withdrawalService.resolveSuspiciousActivity(

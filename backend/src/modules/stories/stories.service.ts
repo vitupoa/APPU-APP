@@ -10,8 +10,8 @@ export class StoriesService {
    */
   static async createStory(
     creatorId: string,
-    mediaUrl: string,
-    mediaType: string,
+    media_url: string,
+    media_type: string,
     text?: string,
     privacy: StoryPrivacy = StoryPrivacy.PUBLIC,
     expiresInHours: number = 24
@@ -21,12 +21,12 @@ export class StoriesService {
 
     const story = await prisma.story.create({
       data: {
-        creatorId,
-        mediaUrl,
-        mediaType,
+        creator_id: creatorId,
+        media_url,
+        media_type,
         text,
         privacy,
-        expiresAt,
+        expires_at: expiresAt,
       },
     });
 
@@ -44,34 +44,34 @@ export class StoriesService {
     const now = new Date();
 
     // Find who the user admires and loves
-    const admires = await prisma.admire.findMany({
-      where: { admirerId: userId },
-      select: { admiredId: true, isLovers: true },
+    const admires = await prisma.admires.findMany({
+      where: { admirer_id: userId },
+      select: { admired_id: true, is_lovers: true },
     });
 
-    const admiredIds = admires.map((c: any) => c.admiredId);
-    const lovedIds = admires.filter((c: any) => c.isLovers).map((c: any) => c.admiredId);
+    const admiredIds = admires.map((c: any) => c.admired_id);
+    const lovedIds = admires.filter((c: any) => c.is_lovers).map((c: any) => c.admired_id);
 
     // Fetch active stories from these users (or public stories)
     const activeStories = await prisma.story.findMany({
       where: {
-        expiresAt: { gt: now },
+        expires_at: { gt: now },
         OR: [
-          { creatorId: userId }, // Own stories
+          { creator_id: userId }, // Own stories
           { privacy: StoryPrivacy.PUBLIC },
           {
             privacy: StoryPrivacy.ADMIRERS,
-            creatorId: { in: admiredIds },
+            creator_id: { in: admiredIds },
           },
           {
             privacy: StoryPrivacy.LOVERS,
-            creatorId: { in: lovedIds },
+            creator_id: { in: lovedIds },
           },
           // Specific users logic:
           {
             privacy: StoryPrivacy.SPECIFIC_USERS,
             creator: {
-              storyViewerPreferences: {
+              story_viewer_preferences: {
                 some: { preferredViewerId: userId },
               },
             },
@@ -80,19 +80,19 @@ export class StoriesService {
       },
       include: {
         creator: {
-          select: { id: true, username: true, displayName: true, avatarUrl: true },
+          select: { id: true, username: true, display_name: true, avatar_url: true },
         },
         views: {
           where: { viewerId: userId },
           select: { id: true },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
     });
 
     // Group stories by creator
     const grouped = activeStories.reduce((acc, story) => {
-      const creatorId = story.creatorId;
+      const creatorId = story.creator_id;
       if (!acc[creatorId]) {
         acc[creatorId] = {
           creator: story.creator,
@@ -102,11 +102,11 @@ export class StoriesService {
       
       acc[creatorId].stories.push({
         id: story.id,
-        mediaUrl: story.mediaUrl,
-        mediaType: story.mediaType,
+        media_url: story.media_url,
+        media_type: story.media_type,
         text: story.text,
-        createdAt: story.createdAt,
-        expiresAt: story.expiresAt,
+        created_at: story.created_at,
+        expires_at: story.expires_at,
         isViewed: story.views.length > 0,
       });
 
@@ -123,13 +123,13 @@ export class StoriesService {
     const now = new Date();
     return prisma.story.findMany({
       where: {
-        creatorId: userId,
-        expiresAt: { gt: now },
+        creator_id: userId,
+        expires_at: { gt: now },
       },
       include: {
         _count: { select: { views: true } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
     });
   }
 
@@ -152,19 +152,19 @@ export class StoriesService {
   static async tipStory(
     viewerId: string,
     storyId: string,
-    amountKr: number,
+    amount_kr: number,
     currency: string
   ) {
     const story = await prisma.story.findUnique({
       where: { id: storyId },
-      include: { creator: { select: { id: true, displayName: true } } },
+      include: { creator: { select: { id: true, display_name: true } } },
     });
 
     if (!story) throw new Error('Story not found');
-    if (story.creatorId === viewerId) throw new Error('Cannot tip your own story');
+    if (story.creator_id === viewerId) throw new Error('Cannot tip your own story');
 
     // Execute tip
-    const tipResult = await WalletService.sendTip(viewerId, story.creatorId, amountKr, currency);
+    const tipResult = await WalletService.sendTip(viewerId, story.creator_id, amount_kr, currency);
 
     // Update story view with tip info
     await prisma.storyView.upsert({
@@ -175,18 +175,18 @@ export class StoriesService {
         storyId,
         viewerId,
         isTipped: true,
-        tipAmount: new Prisma.Decimal(amountKr),
+        tip_amount: new Prisma.Decimal(amount_kr),
       },
       update: {
         isTipped: true,
-        tipAmount: { increment: new Prisma.Decimal(amountKr) },
+        tip_amount: { increment: new Prisma.Decimal(amount_kr) },
       },
     });
 
     return {
       success: true,
       tipResult,
-      creatorName: story.creator.displayName,
+      creatorName: story.creator.display_name,
     };
   }
 
@@ -196,7 +196,7 @@ export class StoriesService {
   static async deleteStory(userId: string, storyId: string) {
     const story = await prisma.story.findUnique({ where: { id: storyId } });
     if (!story) throw new Error('Story not found');
-    if (story.creatorId !== userId) throw new Error('Not authorized to delete this story');
+    if (story.creator_id !== userId) throw new Error('Not authorized to delete this story');
 
     return prisma.story.delete({ where: { id: storyId } });
   }

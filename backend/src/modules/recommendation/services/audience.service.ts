@@ -8,13 +8,13 @@ export class AudienceSelectionService {
    */
   static async getInitialTestAudience(
     creatorId: string,
-    contentId: string,
+    content_id: string,
     location?: string,
     hashtags: string[] = []
   ): Promise<string[]> {
     const creator = await prisma.user.findUnique({
       where: { id: creatorId },
-      select: { admirersCount: true, country: true }
+      select: { admirers_count: true, country: true }
     });
 
     if (!creator) return [];
@@ -78,14 +78,14 @@ export class AudienceSelectionService {
    * Get creator's admirers
    */
   private static async getCreatorAdmirers(creatorId: string, limit: number): Promise<string[]> {
-    const admirers = await prisma.admire.findMany({
-      where: { admiredId: creatorId },
-      select: { admirerId: true },
+    const admirers = await prisma.admires.findMany({
+      where: { admired_id: creatorId },
+      select: { admirer_id: true },
       take: limit,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     });
 
-    return admirers.map((a: any) => a.admirerId);
+    return admirers.map((a: any) => a.admirer_id);
   }
 
   /**
@@ -122,7 +122,7 @@ export class AudienceSelectionService {
       where: isLocal ? { country } : { country: { not: country } },
       select: { id: true },
       take: limit,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     });
 
     return users.map((u: any) => u.id);
@@ -161,8 +161,8 @@ export class AudienceSelectionService {
     
     // Get content details
     const content = contentType === 'SHORT'
-      ? await prisma.short.findUnique({ where: { id: contentId }, select: { caption: true, userId: true } })
-      : await prisma.post.findUnique({ where: { id: contentId }, select: { caption: true, userId: true } });
+      ? await prisma.shorts.findUnique({ where: { id: contentId }, select: { caption: true, user_id: true } })
+      : await prisma.post.findUnique({ where: { id: contentId }, select: { caption: true, user_id: true } });
 
     if (!content) return [];
 

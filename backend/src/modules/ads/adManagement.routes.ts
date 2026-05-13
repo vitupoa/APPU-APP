@@ -11,10 +11,10 @@ const adminMiddleware = async (req: AuthRequest, res: Response, next: NextFuncti
     const { prisma } = await import('../../config/database.js');
     const user = await prisma.user.findUnique({
       where: { id: req.userId },
-      select: { isAdmin: true }
+      select: { is_admin: true }
     });
 
-    if (!user?.isAdmin) {
+    if (!user?.is_admin) {
       res.status(403).json({ error: 'Admin access required' });
       return;
     }
@@ -141,10 +141,10 @@ router.put('/config/toggle-max-load', authMiddleware, adminMiddleware, async (re
 // GET /api/v1/admin/ads/campaigns - Get all campaigns with filters
 router.get('/campaigns', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { status, brandId, adType, page, limit } = req.query;
+    const { status, brand_id, adType, page, limit } = req.query;
     const result = await AdManagementService.getCampaigns({
       status: getQueryString(status),
-      brandId: getQueryString(brandId),
+      brandId: getQueryString(brand_id),
       adType: getQueryString(adType),
       page: getQueryNumber(page),
       limit: getQueryNumber(limit)
@@ -223,11 +223,11 @@ router.delete('/campaigns/:id', authMiddleware, adminMiddleware, async (req: Aut
 // GET /api/v1/admin/ads/sponsored-posts - Get all sponsored posts with filters
 router.get('/sponsored-posts', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { status, brandId, creatorId, page, limit } = req.query;
+    const { status, brand_id, creator_id, page, limit } = req.query;
     const result = await AdManagementService.getSponsoredPosts({
       status: getQueryString(status),
-      brandId: getQueryString(brandId),
-      creatorId: getQueryString(creatorId),
+      brandId: getQueryString(brand_id),
+      creatorId: getQueryString(creator_id),
       page: getQueryNumber(page),
       limit: getQueryNumber(limit)
     });
@@ -279,10 +279,10 @@ router.post('/sponsored-posts/:id/release-payment', authMiddleware, adminMiddlew
 // GET /api/v1/admin/ads/analytics - Get analytics for date range
 router.get('/analytics', authMiddleware, adminMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { startDate, endDate } = req.query;
+    const { start_date, end_date } = req.query;
     
-    const start = getQueryDate(startDate);
-    const end = getQueryDate(endDate);
+    const start = getQueryDate(start_date);
+    const end = getQueryDate(end_date);
     
     if (!start || !end) {
       res.status(400).json({ error: 'startDate and endDate are required' });

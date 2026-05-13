@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const initiateCallSchema = z.object({
-  chatId: z.string().uuid(),
+  chat_id: z.string().uuid(),
   type: z.enum(['VOICE', 'VIDEO']),
 });
 

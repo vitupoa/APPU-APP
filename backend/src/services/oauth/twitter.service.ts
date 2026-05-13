@@ -51,8 +51,8 @@ export class TwitterService {
     );
 
     return {
-      accessToken: response.data.access_token,
-      refreshToken: response.data.refresh_token,
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -77,8 +77,8 @@ export class TwitterService {
     );
 
     return {
-      accessToken: response.data.access_token,
-      refreshToken: response.data.refresh_token,
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -98,9 +98,9 @@ export class TwitterService {
     return {
       id: user.id,
       username: user.username,
-      displayName: user.name,
+      display_name: user.name,
       verified: user.verified,
-      followerCount: user.public_metrics.followers_count,
+      follower_count: user.public_metrics.followers_count,
       followingCount: user.public_metrics.following_count,
       tweetCount: user.public_metrics.tweet_count,
       profileImageUrl: user.profile_image_url
@@ -122,7 +122,7 @@ export class TwitterService {
     return response.data.data.map((tweet: any) => ({
       id: tweet.id,
       text: tweet.text,
-      createdAt: tweet.created_at,
+      created_at: tweet.created_at,
       likes: tweet.public_metrics.like_count,
       retweets: tweet.public_metrics.retweet_count,
       replies: tweet.public_metrics.reply_count,

@@ -6,7 +6,7 @@ const router = Router();
 
 // Get boost settings
 router.get('/settings', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
-  const settings = await prisma.creatorBoostSettings.findUnique({
+  const settings = await prisma.creator_boost_global_settings.findUnique({
     where: { id: '00000000-0000-0000-0000-000000000001' }
   });
   res.json(settings);
@@ -16,7 +16,7 @@ router.get('/settings', authenticate, async (req: AuthRequest, res: Response): P
 router.patch('/settings', authenticate, requireAdmin, async (req: AuthRequest, res: Response): Promise<void> => {
   const { minBoostAmountKes, shortCpmKes, postCpmKes, liveCpmKes } = req.body;
   
-  const settings = await prisma.creatorBoostSettings.upsert({
+  const settings = await prisma.creator_boost_global_settings.upsert({
     where: { id: '00000000-0000-0000-0000-000000000001' },
     update: {
       minBoostAmountKes,

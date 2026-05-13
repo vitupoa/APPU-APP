@@ -42,7 +42,6 @@ import com.krieta.feature.profile.domain.model.SocialUser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.krieta.feature.explore.presentation.screen.HashtagFeedScreen
-import com.krieta.feature.live.presentation.screen.LiveDiscoveryScreen
 
 // ─── HOME TAB ─────────────────────────────────────────────────────
 object HomeTab : Tab {
@@ -221,24 +220,6 @@ class ExploreScreen : Screen {
                         Spacer(Modifier.height(16.dp))
                     }
 
-                    // Trending Live Streams
-                    item {
-                        if (exploreState.liveStreams.isNotEmpty()) {
-                            SectionHeader("🔴 Trending Live")
-                            androidx.compose.foundation.lazy.LazyRow(
-                                contentPadding = PaddingValues(horizontal = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                items(exploreState.liveStreams) { live ->
-                                    LiveStreamCard(live, onClick = {
-                                        navigator.push(com.krieta.feature.live.presentation.screen.ViewerLiveScreen(live.id))
-                                    })
-                                }
-                            }
-                            Spacer(Modifier.height(16.dp))
-                        }
-                    }
-
                     // Trending Shorts
                     item {
                         if (exploreState.trendingShorts.isNotEmpty()) {
@@ -310,22 +291,20 @@ class ExploreScreen : Screen {
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             ExploreCard(
-                                emoji = "🔴",
-                                title = "Live",
-                                subtitle = "Watch live streams now",
-                                gradient = listOf(androidx.compose.ui.graphics.Color(0xFFE53935).copy(alpha = 0.8f), androidx.compose.ui.graphics.Color(0xFFC62828)),
-                                modifier = Modifier.weight(1f),
-                                onClick = { 
-                                    navigator.push(LiveDiscoveryScreen())
-                                }
-                            )
-                            ExploreCard(
                                 emoji = "🏆",
                                 title = "Contests",
                                 subtitle = "Compete, win prizes & grow",
                                 gradient = listOf(KrietaColors.Warning.copy(alpha = 0.8f), KrietaColors.Warning),
                                 modifier = Modifier.weight(1f),
                                 onClick = { navigator.push(com.krieta.feature.contests.presentation.screen.ContestFeedScreen()) }
+                            )
+                            ExploreCard(
+                                emoji = "🛒",
+                                title = "Marketplace",
+                                subtitle = "Brand partnerships & deals",
+                                gradient = listOf(androidx.compose.ui.graphics.Color(0xFF9C27B0).copy(alpha = 0.8f), androidx.compose.ui.graphics.Color(0xFF7B1FA2)),
+                                modifier = Modifier.weight(1f),
+                                onClick = { navigator.push(com.krieta.feature.marketplace.presentation.screen.MarketplaceHomeScreen()) }
                             )
                         }
                         Spacer(Modifier.height(16.dp))
@@ -336,15 +315,7 @@ class ExploreScreen : Screen {
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             ExploreCard(
-                                emoji = "🛒",
-                                title = "Marketplace",
-                                subtitle = "Brand partnerships & deals",
-                                gradient = listOf(androidx.compose.ui.graphics.Color(0xFF9C27B0).copy(alpha = 0.8f), androidx.compose.ui.graphics.Color(0xFF7B1FA2)),
-                                modifier = Modifier.weight(1f),
-                                onClick = { navigator.push(com.krieta.feature.marketplace.presentation.screen.MarketplaceHomeScreen()) }
-                            )
-                            ExploreCard(
-                                emoji = "🛍️",
+                                emoji = "�️",
                                 title = "Shop",
                                 subtitle = "Browse creator products",
                                 gradient = listOf(KrietaColors.Accent.copy(alpha = 0.8f), KrietaColors.AccentDark),
@@ -513,83 +484,7 @@ private fun CategoryPill(
     )
 }
 
-@Composable
-private fun LiveStreamCard(
-    live: com.krieta.feature.explore.domain.model.LiveStream,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.width(160.dp).height(220.dp),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            coil3.compose.AsyncImage(
-                model = live.thumbnailUrl,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop
-            )
-            
-            // Live badge
-            Surface(
-                modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
-                color = androidx.compose.ui.graphics.Color.Red,
-                shape = RoundedCornerShape(4.dp)
-            ) {
-                Text(
-                    "🔴 LIVE",
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    color = androidx.compose.ui.graphics.Color.White,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            
-            // Viewer count
-            Surface(
-                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
-                color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f),
-                shape = RoundedCornerShape(4.dp)
-            ) {
-                Text(
-                    "${formatCount(live.viewerCount.toLong())}",
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
-                    color = androidx.compose.ui.graphics.Color.White,
-                    fontSize = 10.sp
-                )
-            }
-            
-            // Creator info
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(androidx.compose.ui.graphics.Color.Transparent, androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.7f))
-                        )
-                    )
-                    .padding(8.dp)
-            ) {
-                Text(
-                    live.title,
-                    color = androidx.compose.ui.graphics.Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    "@${live.creatorUsername}",
-                    color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f),
-                    fontSize = 11.sp
-                )
-            }
-        }
-    }
-}
+
 
 @Composable
 private fun ShortThumbnail(

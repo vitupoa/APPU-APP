@@ -3,13 +3,13 @@ import { io } from './socket.js';
 /**
  * Emit vote update to all connected clients
  */
-export function emitVoteUpdate(submissionId: string, votes: number, userId: string) {
+export function emitVoteUpdate(submissionId: string, votes: number, user_id: string) {
   if (!io) return;
   
   io.emit('vote_update', {
-    submissionId,
+    submission_id: submissionId,
     votes,
-    userId
+    user_id
   });
 }
 
@@ -20,7 +20,7 @@ export function emitContestUpdate(contestId: string, status: string, participant
   if (!io) return;
   
   io.emit('contest_update', {
-    contestId,
+    contest_id: contestId,
     status,
     participantsCount
   });
@@ -33,7 +33,7 @@ export function emitLikeUpdate(contentId: string, contentType: string, likesCoun
   if (!io) return;
   
   io.emit('like_update', {
-    contentId,
+    content_id: contentId,
     contentType,
     likesCount
   });
@@ -82,7 +82,7 @@ export function emitChatMessage(participantUserIds: string[], message: any) {
 /**
  * Emit typing indicator to chat participants
  */
-export function emitChatTyping(participantUserIds: string[], data: { chatId: string; userId: string; username: string; isTyping: boolean }) {
+export function emitChatTyping(participantUserIds: string[], data: { chat_id: string; userId: string; username: string; isTyping: boolean }) {
   if (!io) return;
 
   participantUserIds.forEach(uid => {
@@ -95,7 +95,7 @@ export function emitChatTyping(participantUserIds: string[], data: { chatId: str
 /**
  * Emit read receipt to chat participants
  */
-export function emitChatReadReceipt(participantUserIds: string[], data: { chatId: string; userId: string; lastRead: string }) {
+export function emitChatReadReceipt(participantUserIds: string[], data: { chat_id: string; userId: string; lastRead: string }) {
   if (!io) return;
 
   participantUserIds.forEach(uid => {

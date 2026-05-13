@@ -55,17 +55,6 @@ router.get('/trending/creators', optionalAuth, async (req: AuthRequest, res: Res
   }
 });
 
-// GET /api/v1/explore/live
-router.get('/live', optionalAuth, async (req: AuthRequest, res: Response) => {
-  try {
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
-    const streams = await ExploreService.getLiveStreams(limit);
-    res.status(200).json(streams);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // GET /api/v1/explore/hashtag/:tag
 router.get('/hashtag/:tag', optionalAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {

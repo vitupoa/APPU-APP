@@ -16,62 +16,62 @@ export class ShortsService {
 
     if (type === 'admiring' && userId) {
       // Get list of users the current user is admiring, or mutual lovers
-      const admiringList = await prisma.admire.findMany({
+      const admiringList = await prisma.admires.findMany({
         where: {
           OR: [
-            { admirerId: userId },
-            { admiredId: userId, isLovers: true }
+            { admirer_id: userId },
+            { admired_id: userId, is_lovers: true }
           ]
         },
-        select: { admiredId: true, admirerId: true }
+        select: { admired_id: true, admirer_id: true }
       });
-      const admiringIds = admiringList.map((a: any) => a.admirerId === userId ? a.admiredId : a.admirerId);
+      const admiringIds = admiringList.map((a: { admirer_id: string; admired_id: string }) => a.admirer_id === userId ? a.admired_id : a.admirer_id);
 
       if (admiringIds.length === 0) {
         return { items: [], nextCursor: null };
       }
 
-      whereClause.userId = { in: admiringIds };
+      whereClause.user_id = { in: admiringIds };
     } else if (type === 'discover' && userId) {
       // Get list of users the current user is admiring, or mutual lovers
-      const admiringList = await prisma.admire.findMany({
+      const admiringList = await prisma.admires.findMany({
         where: {
           OR: [
-            { admirerId: userId },
-            { admiredId: userId, isLovers: true }
+            { admirer_id: userId },
+            { admired_id: userId, is_lovers: true }
           ]
         },
-        select: { admiredId: true, admirerId: true }
+        select: { admired_id: true, admirer_id: true }
       });
-      const admiringIds = admiringList.map((a: any) => a.admirerId === userId ? a.admiredId : a.admirerId);
+      const admiringIds = admiringList.map((a: { admirer_id: string; admired_id: string }) => a.admirer_id === userId ? a.admired_id : a.admirer_id);
 
       // Exclude admiring users and self
-      whereClause.userId = {
+      whereClause.user_id = {
         notIn: [...admiringIds, userId]
       };
     }
 
-    const shorts = await prisma.short.findMany({
+    const shorts = await prisma.shorts.findMany({
       where: whereClause,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true
+            display_name: true,
+            avatar_url: true,
+            is_verified: true
           }
         },
-        linkedProduct: {
+        products: {
           select: {
             id: true,
             title: true,
-            priceKr: true,
-            imageUrls: true
+            price_kr: true,
+            image_urls: true
           }
         }
       }
@@ -83,14 +83,14 @@ export class ShortsService {
     // Check if user has liked each short
     const likedIds = new Set<string>();
     if (userId) {
-      const likes = await prisma.shortLike.findMany({
+      const likes = await prisma.short_likes.findMany({
         where: {
-          userId,
-          shortId: { in: items.map((s: any) => s.id) }
+          user_id: userId,
+          short_id: { in: items.map((s: any) => s.id) }
         },
-        select: { shortId: true }
+        select: { short_id: true }
       });
-      likes.forEach((l: { shortId: string }) => likedIds.add(l.shortId));
+      likes.forEach((l: { short_id: string }) => likedIds.add(l.short_id));
     }
 
     // Check access for locked content
@@ -103,7 +103,7 @@ export class ShortsService {
           userId,
           s.id,
           'SHORT',
-          s.userId,
+          s.user_id,
           s.isLocked,
           s.requiredTier,
           s.unlockAmountKr ? Number(s.unlockAmountKr) : undefined
@@ -115,34 +115,34 @@ export class ShortsService {
 
     return {
       items: items.map((s: any) => {
-        const access = accessMap.get(s.id) || { hasAccess: true };
+        const access = accessMap.get(s.id) || { hasAccess: true, requiresSubscription: false, requiresUnlock: false };
         return {
           id: s.id,
-          creator: s.user,
-          videoUrl: access.hasAccess ? s.videoUrl : null,
-          thumbnailUrl: s.thumbnailUrl,
-          mediaType: s.mediaType,
-          aspectRatio: s.aspectRatio,
-          mediaUrls: access.hasAccess ? s.mediaUrls : [],
+          creator: s.User,
+          videoUrl: access.hasAccess ? s.video_url : null,
+          thumbnailUrl: s.thumbnail_url,
+          media_type: s.media_type,
+          aspectRatio: s.aspect_ratio,
+          mediaUrls: access.hasAccess ? s.media_urls : [],
           caption: s.caption || '',
-          musicTrack: s.musicTitle ? `${s.musicTitle}${s.musicArtist ? ' - ' + s.musicArtist : ''}` : null,
-          likesCount: s.likesCount,
-          commentsCount: s.commentsCount,
+          musicTrack: s.music_title ? `${s.music_title}${s.music_artist ? ' - ' + s.music_artist : ''}` : null,
+          likesCount: s.likes_count,
+          commentsCount: s.comments_count,
           isLiked: likedIds.has(s.id),
-          isLocked: s.isLocked,
-          requiredTier: s.requiredTier,
-          unlockAmountKr: s.unlockAmountKr ? Number(s.unlockAmountKr) : undefined,
+          isLocked: s.is_locked,
+          requiredTier: s.required_tier,
+          unlockAmountKr: s.unlock_amount_kr ? Number(s.unlock_amount_kr) : undefined,
           hasAccess: access.hasAccess,
           requiresSubscription: (access as any).requiresSubscription,
           requiresUnlock: (access as any).requiresUnlock,
           commentsEnabled: s.commentsEnabled ?? true,
-          linkedProduct: s.linkedProduct ? {
-            id: s.linkedProduct.id,
-            title: s.linkedProduct.title,
-            priceKr: Number(s.linkedProduct.priceKr),
-            imageUrl: s.linkedProduct.imageUrls[0] || null
+          linkedProduct: s.products ? {
+            id: s.products.id,
+            title: s.products.title,
+            priceKr: Number(s.products.price_kr),
+            imageUrl: s.products.image_urls[0] || null
           } : null,
-          createdAt: s.createdAt.toISOString()
+          created_at: s.created_at.toISOString()
         };
       }),
       nextCursor: hasMore ? items[items.length - 1].id : null
@@ -153,7 +153,7 @@ export class ShortsService {
    * Create a new short
    */
   static async createShort(data: {
-    creatorId: string;
+    creator_id: string;
     videoUrl: string;
     thumbnailUrl?: string;
     mediaType?: string;
@@ -175,29 +175,29 @@ export class ShortsService {
       musicArtist = parts[1];
     }
 
-    const short = await prisma.short.create({
+    const short = await prisma.shorts.create({
       data: {
-        userId: data.creatorId,
-        videoUrl: data.videoUrl,
-        thumbnailUrl: data.thumbnailUrl,
-        mediaType: data.mediaType || 'VIDEO',
-        aspectRatio: data.aspectRatio,
-        mediaUrls: data.mediaUrls || [],
+        user_id: data.creator_id,
+        video_url: data.videoUrl,
+        thumbnail_url: data.thumbnailUrl,
+        media_type: data.mediaType || 'VIDEO',
+        aspect_ratio: data.aspectRatio,
+        media_urls: data.mediaUrls || [],
         caption: data.caption,
-        musicTitle,
-        musicArtist,
-        linkedProductId: data.linkedProductId,
-        isLocked: data.isLocked || false,
-        requiredTier: data.requiredTier,
-        unlockAmountKr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
+        music_title: musicTitle,
+        music_artist: musicArtist,
+        linked_product_id: data.linkedProductId,
+        is_locked: data.isLocked || false,
+        required_tier: data.requiredTier,
+        unlock_amount_kr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
       } as any,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
+            display_name: true,
+            avatar_url: true,
             country: true
           }
         }
@@ -214,27 +214,27 @@ export class ShortsService {
     contentDistributionService.initializeDistribution(
       short.id,
       'SHORT',
-      data.creatorId,
-      { hashtags, location: short.user.country }
+      data.creator_id,
+      { hashtags, location: short.User.country }
     ).catch(err => console.error('Failed to initialize distribution:', err));
 
     return {
       id: short.id,
-      creator: short.user,
-      videoUrl: short.videoUrl,
-      thumbnailUrl: short.thumbnailUrl,
-      mediaType: short.mediaType,
-      aspectRatio: short.aspectRatio,
-      mediaUrls: short.mediaUrls,
+      creator: short.User,
+      videoUrl: short.video_url,
+      thumbnailUrl: short.thumbnail_url,
+      media_type: short.media_type,
+      aspectRatio: short.aspect_ratio,
+      mediaUrls: short.media_urls,
       caption: short.caption,
-      musicTrack: short.musicTitle ? `${short.musicTitle}${short.musicArtist ? ' - ' + short.musicArtist : ''}` : null,
+      musicTrack: short.music_title ? `${short.music_title}${short.music_artist ? ' - ' + short.music_artist : ''}` : null,
       likesCount: 0,
       commentsCount: 0,
       isLiked: false,
-      isLocked: short.isLocked,
-      requiredTier: short.requiredTier,
-        unlockAmountKr: (short as any).unlockAmountKr ? Number((short as any).unlockAmountKr) : undefined,
-      createdAt: short.createdAt.toISOString()
+      isLocked: short.is_locked,
+      requiredTier: short.required_tier,
+      unlockAmountKr: short.unlock_amount_kr ? Number(short.unlock_amount_kr) : undefined,
+      created_at: short.created_at.toISOString()
     };
   }
 
@@ -251,44 +251,44 @@ export class ShortsService {
    * Toggle like on a short
    */
   static async toggleLike(userId: string, shortId: string) {
-    const short = await prisma.short.findUniqueOrThrow({ where: { id: shortId } });
+    const short = await prisma.shorts.findUniqueOrThrow({ where: { id: shortId } });
 
     return prisma.$transaction(async (tx) => {
-      const existingLike = await tx.shortLike.findUnique({
+      const existingLike = await tx.short_likes.findUnique({
         where: {
-          shortId_userId: {
-            userId,
-            shortId
+          short_id_user_id: {
+            user_id: userId,
+            short_id: shortId
           }
         }
       });
 
       if (existingLike) {
         // Unlike
-        await tx.shortLike.delete({ where: { id: existingLike.id } });
-        await tx.short.update({
+        await tx.short_likes.delete({ where: { id: existingLike.id } });
+        await tx.shorts.update({
           where: { id: shortId },
-          data: { likesCount: { decrement: 1 } }
+          data: { likes_count: { decrement: 1 } }
         });
         
-        const newCount = short.likesCount - 1;
+        const newCount = short.likes_count - 1;
         emitLikeUpdate(shortId, 'SHORT', newCount);
         
         return { liked: false, likesCount: newCount };
       } else {
         // Like
-        await tx.shortLike.create({
+        await tx.short_likes.create({
           data: {
-            userId,
-            shortId
+            user_id: userId,
+            short_id: shortId
           }
         });
-        await tx.short.update({
+        await tx.shorts.update({
           where: { id: shortId },
-          data: { likesCount: { increment: 1 } }
+          data: { likes_count: { increment: 1 } }
         });
         
-        const newCount = short.likesCount + 1;
+        const newCount = short.likes_count + 1;
         emitLikeUpdate(shortId, 'SHORT', newCount);
         
         return { liked: true, likesCount: newCount };
@@ -300,7 +300,7 @@ export class ShortsService {
    * Increment view count
    */
   static async incrementView(shortId: string, userId?: string) {
-    await prisma.short.update({
+    await prisma.shorts.update({
       where: { id: shortId },
       data: { views: { increment: 1 } }
     });

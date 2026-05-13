@@ -27,7 +27,7 @@ export class YouTubeService {
    * Exchanges authorization code for access token.
    */
   static async getAccessToken(code: string, redirectUri: string): Promise<{
-    accessToken: string;
+    access_token: string;
     refreshToken: string;
     expiresIn: number;
   }> {
@@ -42,7 +42,7 @@ export class YouTubeService {
     });
 
     return {
-      accessToken: response.data.access_token,
+      access_token: response.data.access_token,
       refreshToken: response.data.refresh_token,
       expiresIn: response.data.expires_in
     };
@@ -52,7 +52,7 @@ export class YouTubeService {
    * Refreshes access token using refresh token.
    */
   static async refreshAccessToken(refreshToken: string): Promise<{
-    accessToken: string;
+    access_token: string;
     expiresIn: number;
   }> {
     const response = await axios.post(YOUTUBE_TOKEN_URL, {
@@ -65,7 +65,7 @@ export class YouTubeService {
     });
 
     return {
-      accessToken: response.data.access_token,
+      access_token: response.data.access_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -158,9 +158,9 @@ export class YouTubeService {
         description: item.snippet.description,
         thumbnailUrl: item.snippet.thumbnails.high.url,
         publishedAt: item.snippet.publishedAt,
-        viewCount: parseInt(stats.viewCount || 0),
-        likeCount: parseInt(stats.likeCount || 0),
-        commentCount: parseInt(stats.commentCount || 0)
+        view_count: parseInt(stats.view_count || 0),
+        like_count: parseInt(stats.like_count || 0),
+        comment_count: parseInt(stats.comment_count || 0)
       };
     });
 

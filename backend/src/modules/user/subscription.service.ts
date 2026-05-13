@@ -9,7 +9,7 @@ export class SubscriptionService {
    */
   static async getCreatorTiers(creatorId: string) {
     return prisma.subscriptionTier.findMany({
-      where: { creatorId },
+      where: { creator_id: creatorId },
       orderBy: { tier: 'asc' }
     });
   }
@@ -19,7 +19,7 @@ export class SubscriptionService {
    */
   static async getAvailableTiers(creatorId: string) {
     return prisma.subscriptionTier.findMany({
-      where: { creatorId, isEnabled: true },
+      where: { creator_id: creatorId, is_enabled: true },
       orderBy: { tier: 'asc' }
     });
   }
@@ -36,22 +36,22 @@ export class SubscriptionService {
     return prisma.$transaction(async (tx) => {
       for (const t of tiers) {
         await tx.subscriptionTier.upsert({
-          where: { creatorId_tier: { creatorId, tier: t.tier as any } },
+          where: { creator_id_tier: { creator_id: creatorId, tier: t.tier as any } },
           create: {
-            creatorId,
+            creator_id: creatorId,
             tier: t.tier as any,
-            krAmount: new Prisma.Decimal(t.krAmount),
+            kr_amount: new Prisma.Decimal(t.krAmount),
             benefits: t.benefits,
-            isEnabled: t.isEnabled
+            is_enabled: t.isEnabled
           },
           update: {
-            krAmount: new Prisma.Decimal(t.krAmount),
+            kr_amount: new Prisma.Decimal(t.krAmount),
             benefits: t.benefits,
-            isEnabled: t.isEnabled
+            is_enabled: t.isEnabled
           }
         });
       }
-      return tx.subscriptionTier.findMany({ where: { creatorId }, orderBy: { tier: 'asc' } });
+      return tx.subscriptionTier.findMany({ where: { creator_id: creatorId }, orderBy: { tier: 'asc' } });
     });
   }
 
@@ -63,59 +63,59 @@ export class SubscriptionService {
 
     return prisma.$transaction(async (tx) => {
       const tier = await tx.subscriptionTier.findUniqueOrThrow({
-        where: { creatorId_tier: { creatorId, tier: tierType as any } }
+        where: { creator_id_tier: { creator_id: creatorId, tier: tierType as any } }
       });
-      if (!tier.isEnabled) throw new Error('This tier is not available');
+      if (!tier.is_enabled) throw new Error('This tier is not available');
 
       // Check subscriber balance
-      const subscriberWallet = await tx.wallet.findUnique({ where: { userId: subscriberId } });
-      if (!subscriberWallet || subscriberWallet.krBalance.lessThan(tier.krAmount)) {
-        throw new Error(`Insufficient balance. Need Kr.${tier.krAmount.toFixed(2)}`);
+      const subscriberWallet = await tx.wallets.findUnique({ where: { user_id: subscriberId } });
+      if (!subscriberWallet || subscriberWallet.kr_balance.lessThan(tier.kr_amount)) {
+        throw new Error(`Insufficient balance. Need Kr.${tier.kr_amount.toFixed(2)}`);
       }
 
       // Check for existing active subscription
-      const existing = await tx.subscription.findUnique({
-        where: { subscriberId_creatorId: { subscriberId, creatorId } }
+      const existing = await tx.subscriptions.findUnique({
+        where: { subscriber_id_creator_id: { subscriber_id: subscriberId, creator_id: creatorId } }
       });
       if (existing && existing.status === 'active') {
         throw new Error('Already subscribed to this creator');
       }
 
-      const platformFee = tier.krAmount.mul(SUBSCRIPTION_PLATFORM_FEE);
-      const creatorCredit = tier.krAmount.sub(platformFee);
+      const platformFee = tier.kr_amount.mul(SUBSCRIPTION_PLATFORM_FEE);
+      const creatorCredit = tier.kr_amount.sub(platformFee);
 
       // Deduct from subscriber
-      await tx.wallet.update({
-        where: { userId: subscriberId },
-        data: { krBalance: { decrement: tier.krAmount } }
+      await tx.wallets.update({
+        where: { user_id: subscriberId },
+        data: { kr_balance: { decrement: tier.kr_amount } }
       });
 
       // Credit creator (minus platform fee)
-      await tx.wallet.upsert({
-        where: { userId: creatorId },
-        create: { userId: creatorId, krBalance: creatorCredit },
-        update: { krBalance: { increment: creatorCredit } }
+      await tx.wallets.upsert({
+        where: { user_id: creatorId },
+        create: { user_id: creatorId, kr_balance: creatorCredit, updated_at: new Date() },
+        update: { kr_balance: { increment: creatorCredit } }
       });
 
       // Record transactions
-      await tx.transaction.createMany({
+      await tx.transactions.createMany({
         data: [
           {
-            userId: subscriberId,
+            user_id: subscriberId,
             type: 'subscription_paid',
-            amountKr: tier.krAmount,
+            amount_kr: tier.kr_amount,
             status: 'completed',
             provider: 'platform',
-            counterpartyId: creatorId,
+            counterparty_id: creatorId,
             reference: tier.id
           },
           {
-            userId: creatorId,
+            user_id: creatorId,
             type: 'subscription_earned',
-            amountKr: creatorCredit,
+            amount_kr: creatorCredit,
             status: 'completed',
             provider: 'platform',
-            counterpartyId: subscriberId,
+            counterparty_id: subscriberId,
             reference: tier.id
           }
         ]
@@ -124,7 +124,7 @@ export class SubscriptionService {
       // Unlock wallet on first income
       await tx.user.update({
         where: { id: creatorId },
-        data: { isWalletUnlocked: true }
+        data: { is_wallet_unlocked: true }
       });
 
       // Create subscription record
@@ -132,24 +132,24 @@ export class SubscriptionService {
       const nextBilling = new Date(now);
       nextBilling.setMonth(nextBilling.getMonth() + 1);
 
-      const subscription = await tx.subscription.upsert({
-        where: { subscriberId_creatorId: { subscriberId, creatorId } },
+      const subscription = await tx.subscriptions.upsert({
+        where: { subscriber_id_creator_id: { subscriber_id: subscriberId, creator_id: creatorId } },
         create: {
-          subscriberId,
-          creatorId,
-          tierId: tier.id,
+          subscriber_id: subscriberId,
+          creator_id: creatorId,
+          tier_id: tier.id,
           tier: tierType as any,
-          krAmount: tier.krAmount,
+          kr_amount: tier.kr_amount,
           status: 'active',
-          nextBillingAt: nextBilling
+          next_billing_at: nextBilling
         },
         update: {
-          tierId: tier.id,
+          tier_id: tier.id,
           tier: tierType as any,
-          krAmount: tier.krAmount,
+          kr_amount: tier.kr_amount,
           status: 'active',
-          nextBillingAt: nextBilling,
-          cancelledAt: null
+          next_billing_at: nextBilling,
+          cancelled_at: null
         }
       });
 
@@ -161,16 +161,16 @@ export class SubscriptionService {
    * Unsubscribe from a creator.
    */
   static async unsubscribe(subscriberId: string, creatorId: string) {
-    const subscription = await prisma.subscription.findUnique({
-      where: { subscriberId_creatorId: { subscriberId, creatorId } }
+    const subscription = await prisma.subscriptions.findUnique({
+      where: { subscriber_id_creator_id: { subscriber_id: subscriberId, creator_id: creatorId } }
     });
     if (!subscription || subscription.status !== 'active') {
       throw new Error('No active subscription found');
     }
 
-    return prisma.subscription.update({
+    return prisma.subscriptions.update({
       where: { id: subscription.id },
-      data: { status: 'cancelled', cancelledAt: new Date() }
+      data: { status: 'cancelled', cancelled_at: new Date() }
     });
   }
 
@@ -181,8 +181,8 @@ export class SubscriptionService {
     const tierOrder = ['TOP_FUN', 'REAL_FAN', 'TRUE_FAN', 'SUPER_FAN'];
     const requiredIndex = tierOrder.indexOf(requiredTier);
 
-    const subscription = await prisma.subscription.findUnique({
-      where: { subscriberId_creatorId: { subscriberId, creatorId } }
+    const subscription = await prisma.subscriptions.findUnique({
+      where: { subscriber_id_creator_id: { subscriber_id: subscriberId, creator_id: creatorId } }
     });
 
     if (!subscription || subscription.status !== 'active') return false;

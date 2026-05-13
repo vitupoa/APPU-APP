@@ -7,7 +7,7 @@ export class TeamsService {
   static async createTeam(data: {
     leaderId: string;
     name: string;
-    avatarUrl?: string;
+    avatar_url?: string;
     maxMembers: number;
   }) {
     if (data.maxMembers < 2 || data.maxMembers > 10) {
@@ -18,16 +18,17 @@ export class TeamsService {
       const team = await tx.team.create({
         data: {
           name: data.name,
-          avatarUrl: data.avatarUrl,
-          leaderId: data.leaderId,
-          maxMembers: data.maxMembers,
+          avatar_url: data.avatar_url,
+          leader_id: data.leaderId,
+          max_members: data.maxMembers,
+          updated_at: new Date(),
         },
       });
 
-      await tx.teamMember.create({
+      await tx.team_members.create({
         data: {
-          teamId: team.id,
-          userId: data.leaderId,
+          team_id: team.id,
+          user_id: data.leaderId,
           role: 'LEADER',
         },
       });
@@ -39,64 +40,64 @@ export class TeamsService {
   static async inviteMember(teamId: string, inviterId: string, inviteeId: string) {
     const team = await prisma.team.findUnique({
       where: { id: teamId },
-      include: { members: true },
+      include: { team_members: true },
     });
 
     if (!team) throw new Error('Team not found');
 
-    const inviterMember = team.members.find((m) => m.userId === inviterId);
+    const inviterMember = team.team_members.find((m) => m.user_id === inviterId);
     if (!inviterMember || (inviterMember.role !== 'LEADER' && inviterMember.role !== 'CO_LEADER')) {
       throw new Error('Only leaders can invite members');
     }
 
-    if (team.members.length >= team.maxMembers) {
+    if (team.team_members.length >= team.max_members) {
       throw new Error('Team is full');
     }
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    return prisma.teamInvitation.create({
+    return prisma.team_invitations.create({
       data: {
-        teamId,
-        inviterId,
-        inviteeId,
-        expiresAt,
+        team_id: teamId,
+        inviter_id: inviterId,
+        invitee_id: inviteeId,
+        expires_at: expiresAt,
       },
     });
   }
 
   static async respondToInvitation(invitationId: string, userId: string, accept: boolean) {
-    const invitation = await prisma.teamInvitation.findUnique({
+    const invitation = await prisma.team_invitations.findUnique({
       where: { id: invitationId },
-      include: { team: { include: { members: true } } },
+      include: { Team: { include: { team_members: true } } },
     });
 
     if (!invitation) throw new Error('Invitation not found');
-    if (invitation.inviteeId !== userId) throw new Error('Not authorized');
+    if (invitation.invitee_id !== userId) throw new Error('Not authorized');
     if (invitation.status !== 'PENDING') throw new Error('Invitation already processed');
-    if (new Date() > invitation.expiresAt) throw new Error('Invitation expired');
+    if (new Date() > invitation.expires_at) throw new Error('Invitation expired');
 
     if (accept) {
-      if (invitation.team.members.length >= invitation.team.maxMembers) {
+      if (invitation.Team.team_members.length >= invitation.Team.max_members) {
         throw new Error('Team is full');
       }
 
       return prisma.$transaction([
-        prisma.teamInvitation.update({
+        prisma.team_invitations.update({
           where: { id: invitationId },
           data: { status: 'ACCEPTED' },
         }),
-        prisma.teamMember.create({
+        prisma.team_members.create({
           data: {
-            teamId: invitation.teamId,
-            userId,
+            team_id: invitation.team_id,
+            user_id: userId,
             role: 'MEMBER',
           },
         }),
       ]);
     } else {
-      return prisma.teamInvitation.update({
+      return prisma.team_invitations.update({
         where: { id: invitationId },
         data: { status: 'REJECTED' },
       });
@@ -107,49 +108,49 @@ export class TeamsService {
     const contest = await prisma.contest.findUnique({ where: { id: contestId } });
     if (!contest) throw new Error('Contest not found');
 
-    if (contest.participationType === 'INDIVIDUAL_ONLY') {
+    if (contest.participation_type === 'INDIVIDUAL_ONLY') {
       throw new Error('This contest is for individuals only');
     }
 
     const team = await prisma.team.findUnique({
       where: { id: teamId },
-      include: { members: true },
+      include: { team_members: true },
     });
 
     if (!team) throw new Error('Team not found');
 
-    const member = team.members.find((m) => m.userId === userId);
+    const member = team.team_members.find((m) => m.user_id === userId);
     if (!member || member.role === 'MEMBER') {
       throw new Error('Only team leaders can register');
     }
 
-    if (contest.teamSize && team.members.length !== contest.teamSize) {
-      throw new Error(`Team must have exactly ${contest.teamSize} members`);
+    if (contest.team_size && team.team_members.length !== contest.team_size) {
+      throw new Error(`Team must have exactly ${contest.team_size} members`);
     }
 
-    if (contest.entryFeeKr) {
-      const entryFeePerMember = Number(contest.entryFeeKr);
-      const totalEntryFee = entryFeePerMember * team.members.length;
+    if (contest.entry_fee_kr) {
+      const entryFeePerMember = Number(contest.entry_fee_kr);
+      const totalEntryFee = entryFeePerMember * team.team_members.length;
       const platformFee = totalEntryFee * PLATFORM_FEE_RATE;
       const prizePoolAddition = totalEntryFee - platformFee;
 
       return prisma.$transaction(async (tx) => {
-        for (const member of team.members) {
-          const wallet = await tx.wallet.findUnique({ where: { userId: member.userId } });
-          if (!wallet || wallet.krBalance.lessThan(entryFeePerMember)) {
-            throw new Error(`${member.userId} has insufficient balance`);
+        for (const member of team.team_members) {
+          const wallet = await tx.wallets.findUnique({ where: { user_id: member.user_id } });
+          if (!wallet || wallet.kr_balance.lessThan(entryFeePerMember)) {
+            throw new Error(`${member.user_id} has insufficient balance`);
           }
 
-          await tx.wallet.update({
-            where: { userId: member.userId },
-            data: { krBalance: { decrement: entryFeePerMember } },
+          await tx.wallets.update({
+            where: { user_id: member.user_id },
+            data: { kr_balance: { decrement: entryFeePerMember } },
           });
 
-          await tx.transaction.create({
+          await tx.transactions.create({
             data: {
-              userId: member.userId,
+              user_id: member.user_id,
               type: 'contest_entry_fee',
-              amountKr: new Prisma.Decimal(entryFeePerMember),
+              amount_kr: new Prisma.Decimal(entryFeePerMember),
               status: 'completed',
               provider: 'platform',
               reference: contestId,
@@ -160,24 +161,24 @@ export class TeamsService {
         await tx.contest.update({
           where: { id: contestId },
           data: {
-            prizeTotalKr: { increment: prizePoolAddition },
-            platformFeeKr: { increment: platformFee },
+            prize_total_kr: { increment: prizePoolAddition },
+            platform_fee_kr: { increment: platformFee },
           },
         });
 
-        return tx.teamContestRegistration.create({
-          data: { contestId, teamId },
+        return tx.team_contest_registrations.create({
+          data: { contest_id: contestId, team_id: teamId },
         });
       });
     }
 
-    return prisma.teamContestRegistration.create({
-      data: { contestId, teamId },
+    return prisma.team_contest_registrations.create({
+      data: { contest_id: contestId, team_id: teamId },
     });
   }
 
   static async submitTeamEntry(data: {
-    contestId: string;
+    contest_id: string;
     teamId: string;
     userId: string;
     mediaUrl: string;
@@ -187,33 +188,33 @@ export class TeamsService {
   }) {
     const team = await prisma.team.findUnique({
       where: { id: data.teamId },
-      include: { members: true },
+      include: { team_members: true },
     });
 
     if (!team) throw new Error('Team not found');
 
-    const member = team.members.find((m) => m.userId === data.userId);
+    const member = team.team_members.find((m) => m.user_id === data.userId);
     if (!member || member.role === 'MEMBER') {
       throw new Error('Only team leaders can submit');
     }
 
-    const registration = await prisma.teamContestRegistration.findUnique({
+    const registration = await prisma.team_contest_registrations.findUnique({
       where: {
-        contestId_teamId: {
-          contestId: data.contestId,
-          teamId: data.teamId,
+        contest_id_team_id: {
+          contest_id: data.contest_id,
+          team_id: data.teamId,
         },
       },
     });
 
     if (!registration) throw new Error('Team not registered for this contest');
 
-    return prisma.teamSubmission.create({
+    return prisma.team_submissions.create({
       data: {
-        contestId: data.contestId,
-        teamId: data.teamId,
-        mediaUrl: data.mediaUrl,
-        mediaType: data.mediaType,
+        contest_id: data.contest_id,
+        team_id: data.teamId,
+        media_url: data.mediaUrl,
+        media_type: data.mediaType,
         caption: data.caption,
         contributors: data.contributors,
       },
@@ -221,19 +222,19 @@ export class TeamsService {
   }
 
   static async getMyTeams(userId: string) {
-    const memberships = await prisma.teamMember.findMany({
-      where: { userId },
+    const memberships = await prisma.team_members.findMany({
+      where: { user_id: userId },
       include: {
-        team: {
+        Team: {
           include: {
-            members: {
+            team_members: {
               include: {
-                user: {
+                User: {
                   select: {
                     id: true,
                     username: true,
-                    displayName: true,
-                    avatarUrl: true,
+                    display_name: true,
+                    avatar_url: true,
                   },
                 },
               },
@@ -243,12 +244,12 @@ export class TeamsService {
       },
     });
 
-    return memberships.map((m) => m.team);
+    return memberships.map((m) => m.Team);
   }
 
   static async getTeamStats(teamId: string) {
-    const submissions = await prisma.teamSubmission.findMany({
-      where: { teamId },
+    const submissions = await prisma.team_submissions.findMany({
+      where: { team_id: teamId },
     });
 
     const wins = submissions.filter((s) => s.rank === 1).length;
@@ -257,11 +258,11 @@ export class TeamsService {
     const team = await prisma.team.findUnique({ where: { id: teamId } });
 
     return {
-      teamId,
+      team_id: teamId,
       totalContests: submissions.length,
       wins,
       topThree,
-      totalPrizes: Number(team?.totalPrizes || 0),
+      totalPrizes: Number(team?.total_prizes || 0),
       winRate: submissions.length > 0 ? wins / submissions.length : 0,
       averageRank: submissions.length > 0
         ? submissions.reduce((sum, s) => sum + (s.rank || 999), 0) / submissions.length

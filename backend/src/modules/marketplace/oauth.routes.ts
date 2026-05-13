@@ -19,7 +19,7 @@ const router = Router();
 router.get('/:platform/authorize', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { platform } = req.params;
-    const userId = req.userId!;
+    const userId = req.user_id!;
     const state = crypto.randomBytes(16).toString('hex');
     const redirectUri = `${process.env.FRONTEND_URL}/oauth/${platform}/callback`;
 
@@ -74,7 +74,7 @@ router.post('/:platform/callback', authMiddleware, async (req: AuthRequest, res:
   try {
     const { platform } = req.params;
     const { code, state } = req.body;
-    const userId = req.userId!;
+    const userId = req.user_id!;
 
     // Verify state
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -90,59 +90,59 @@ router.post('/:platform/callback', authMiddleware, async (req: AuthRequest, res:
     switch (platform) {
       case 'tiktok': {
         const tokens = await TikTokService.getAccessToken(code, redirectUri);
-        const userInfo = await TikTokService.getUserInfo(tokens.accessToken);
+        const userInfo = await TikTokService.getUserInfo(tokens.access_token);
         
         accountData = {
           platform: 'TIKTOK',
           username: userInfo.username,
-          displayName: userInfo.displayName,
+          display_name: userInfo.displayName,
           profileUrl: `https://www.tiktok.com/@${userInfo.username}`,
-          followerCount: userInfo.followerCount,
-          videoCount: userInfo.videoCount,
-          totalViews: 0,
-          avgViews: 0,
-          avgLikes: userInfo.likesCount / userInfo.videoCount,
-          engagementRate: 0,
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          tokenExpiresAt: new Date(Date.now() + tokens.expiresIn * 1000)
+          follower_count: userInfo.followerCount,
+          video_count: userInfo.videoCount,
+          total_views: 0,
+          avg_views: 0,
+          avg_likes: userInfo.likesCount / userInfo.videoCount,
+          engagement_rate: 0,
+          access_token: tokens.access_token,
+          refresh_token: tokens.refreshToken,
+          token_expires_at: new Date(Date.now() + tokens.expiresIn * 1000)
         };
         break;
       }
       case 'instagram': {
         const shortToken = await InstagramService.getShortLivedToken(code, redirectUri);
-        const longToken = await InstagramService.getLongLivedToken(shortToken.accessToken);
-        const userInfo = await InstagramService.getUserInfo(longToken.accessToken);
+        const longToken = await InstagramService.getLongLivedToken(shortToken.access_token);
+        const userInfo = await InstagramService.getUserInfo(longToken.access_token);
         
         accountData = {
           platform: 'INSTAGRAM',
           username: userInfo.username,
-          displayName: userInfo.username,
+          display_name: userInfo.username,
           profileUrl: `https://www.instagram.com/${userInfo.username}`,
-          followerCount: 0,
-          videoCount: userInfo.mediaCount,
-          accessToken: longToken.accessToken,
-          tokenExpiresAt: new Date(Date.now() + longToken.expiresIn * 1000)
+          follower_count: 0,
+          video_count: userInfo.mediaCount,
+          access_token: longToken.access_token,
+          token_expires_at: new Date(Date.now() + longToken.expiresIn * 1000)
         };
         break;
       }
       case 'youtube': {
         const tokens = await YouTubeService.getAccessToken(code, redirectUri);
-        const channelInfo = await YouTubeService.getChannelInfo(tokens.accessToken);
+        const channelInfo = await YouTubeService.getChannelInfo(tokens.access_token);
         
         accountData = {
           platform: 'YOUTUBE',
           username: channelInfo.customUrl,
-          displayName: channelInfo.title,
+          display_name: channelInfo.title,
           profileUrl: `https://www.youtube.com/${channelInfo.customUrl}`,
-          followerCount: channelInfo.subscriberCount,
+          follower_count: channelInfo.subscriberCount,
           subscriberCount: channelInfo.subscriberCount,
-          videoCount: channelInfo.videoCount,
-          totalViews: channelInfo.viewCount,
-          avgViews: channelInfo.viewCount / channelInfo.videoCount,
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          tokenExpiresAt: new Date(Date.now() + tokens.expiresIn * 1000)
+          video_count: channelInfo.videoCount,
+          total_views: channelInfo.viewCount,
+          avg_views: channelInfo.viewCount / channelInfo.videoCount,
+          access_token: tokens.access_token,
+          refresh_token: tokens.refreshToken,
+          token_expires_at: new Date(Date.now() + tokens.expiresIn * 1000)
         };
         break;
       }
@@ -154,84 +154,84 @@ router.post('/:platform/callback', authMiddleware, async (req: AuthRequest, res:
           return;
         }
         const tokens = await TwitterService.getAccessToken(code, redirectUri, codeVerifier);
-        const userInfo = await TwitterService.getUserInfo(tokens.accessToken);
+        const userInfo = await TwitterService.getUserInfo(tokens.access_token);
         
         accountData = {
           platform: 'TWITTER',
           username: userInfo.username,
-          displayName: userInfo.displayName,
+          display_name: userInfo.display_name,
           profileUrl: `https://twitter.com/${userInfo.username}`,
-          followerCount: userInfo.followerCount,
-          videoCount: 0,
-          totalViews: 0,
-          avgViews: 0,
-          avgLikes: 0,
-          engagementRate: 0,
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          tokenExpiresAt: new Date(Date.now() + tokens.expiresIn * 1000)
+          follower_count: userInfo.follower_count,
+          video_count: 0,
+          total_views: 0,
+          avg_views: 0,
+          avg_likes: 0,
+          engagement_rate: 0,
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+          token_expires_at: new Date(Date.now() + tokens.expiresIn * 1000)
         };
         break;
       }
       case 'facebook': {
         const shortToken = await FacebookService.getAccessToken(code, redirectUri);
-        const longToken = await FacebookService.getLongLivedToken(shortToken.accessToken);
-        const userInfo = await FacebookService.getUserInfo(longToken.accessToken);
+        const longToken = await FacebookService.getLongLivedToken(shortToken.access_token);
+        const userInfo = await FacebookService.getUserInfo(longToken.access_token);
         
         accountData = {
           platform: 'FACEBOOK',
           username: userInfo.id,
-          displayName: userInfo.displayName,
+          display_name: userInfo.display_name,
           profileUrl: `https://facebook.com/${userInfo.id}`,
-          followerCount: userInfo.followerCount,
-          videoCount: 0,
-          totalViews: 0,
-          avgViews: 0,
-          avgLikes: 0,
-          engagementRate: 0,
-          accessToken: longToken.accessToken,
-          tokenExpiresAt: new Date(Date.now() + longToken.expiresIn * 1000)
+          follower_count: userInfo.follower_count,
+          video_count: 0,
+          total_views: 0,
+          avg_views: 0,
+          avg_likes: 0,
+          engagement_rate: 0,
+          access_token: longToken.access_token,
+          token_expires_at: new Date(Date.now() + longToken.expiresIn * 1000)
         };
         break;
       }
       case 'linkedin': {
         const tokens = await LinkedInService.getAccessToken(code, redirectUri);
-        const userInfo = await LinkedInService.getUserInfo(tokens.accessToken);
+        const userInfo = await LinkedInService.getUserInfo(tokens.access_token);
         
         accountData = {
           platform: 'LINKEDIN',
           username: userInfo.id,
-          displayName: userInfo.displayName,
+          display_name: userInfo.display_name,
           profileUrl: `https://linkedin.com/in/${userInfo.id}`,
-          followerCount: userInfo.followerCount,
-          videoCount: 0,
-          totalViews: 0,
-          avgViews: 0,
-          avgLikes: 0,
-          engagementRate: 0,
-          accessToken: tokens.accessToken,
-          tokenExpiresAt: new Date(Date.now() + tokens.expiresIn * 1000)
+          follower_count: userInfo.followerCount,
+          video_count: 0,
+          total_views: 0,
+          avg_views: 0,
+          avg_likes: 0,
+          engagement_rate: 0,
+          access_token: tokens.access_token,
+          token_expires_at: new Date(Date.now() + tokens.expiresIn * 1000)
         };
         break;
       }
       case 'twitch': {
         const tokens = await TwitchService.getAccessToken(code, redirectUri);
-        const userInfo = await TwitchService.getUserInfo(tokens.accessToken);
+        const userInfo = await TwitchService.getUserInfo(tokens.access_token);
         
         accountData = {
           platform: 'TWITCH',
           username: userInfo.username,
-          displayName: userInfo.displayName,
+          display_name: userInfo.display_name,
           profileUrl: `https://twitch.tv/${userInfo.username}`,
-          followerCount: userInfo.followerCount,
-          videoCount: 0,
-          totalViews: userInfo.viewCount,
-          avgViews: 0,
-          avgLikes: 0,
-          engagementRate: 0,
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          tokenExpiresAt: new Date(Date.now() + tokens.expiresIn * 1000)
+          follower_count: userInfo.followerCount,
+          video_count: 0,
+          total_views: userInfo.view_count,
+          avg_views: 0,
+          avg_likes: 0,
+          engagement_rate: 0,
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+          token_expires_at: new Date(Date.now() + tokens.expiresIn * 1000)
         };
         break;
       }
@@ -241,42 +241,40 @@ router.post('/:platform/callback', authMiddleware, async (req: AuthRequest, res:
     }
 
     // Get or create influencer profile
-    let influencerProfile = await prisma.influencerProfile.findUnique({
-      where: { userId }
+    let influencerProfile = await prisma.influencer_profiles.findUnique({
+      where: { user_id: userId }
     });
 
     if (!influencerProfile) {
-      influencerProfile = await prisma.influencerProfile.create({
+      influencerProfile = await prisma.influencer_profiles.create({
         data: {
-          userId,
+          user_id: userId,
           tier: 'NANO',
           categories: [],
-          instagramFollowers: 0,
-          tiktokFollowers: 0,
-          youtubeSubscribers: 0
+          updated_at: new Date()
         }
       });
     }
 
     // Create or update social media account
-    await prisma.socialMediaAccount.upsert({
+    await prisma.social_media_accounts.upsert({
       where: {
-        influencerId_platform: {
-          influencerId: influencerProfile.id,
+        influencer_id_platform: {
+          influencer_id: influencerProfile.id,
           platform: accountData.platform
         }
       },
       create: {
-        influencerId: influencerProfile.id,
+        influencer_id: influencerProfile.id,
         ...accountData,
-        isVerified: true,
-        lastSyncedAt: new Date(),
-        syncStatus: 'completed'
+        is_verified: true,
+        last_synced_at: new Date(),
+        sync_status: 'completed'
       },
       update: {
         ...accountData,
-        lastSyncedAt: new Date(),
-        syncStatus: 'completed'
+        last_synced_at: new Date(),
+        sync_status: 'completed'
       }
     });
 
@@ -292,11 +290,11 @@ router.post('/:platform/callback', authMiddleware, async (req: AuthRequest, res:
  */
 router.get('/accounts', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.userId!;
+    const userId = req.user_id!;
 
-    const influencerProfile = await prisma.influencerProfile.findUnique({
-      where: { userId },
-      include: { socialAccounts: true }
+    const influencerProfile = await prisma.influencer_profiles.findUnique({
+      where: { user_id: userId },
+      include: { social_media_accounts: true }
     });
 
     if (!influencerProfile) {
@@ -304,7 +302,7 @@ router.get('/accounts', authMiddleware, async (req: AuthRequest, res: Response) 
       return;
     }
 
-    res.status(200).json({ accounts: influencerProfile.socialAccounts });
+    res.status(200).json({ accounts: influencerProfile.social_media_accounts });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -317,10 +315,10 @@ router.get('/accounts', authMiddleware, async (req: AuthRequest, res: Response) 
 router.delete('/:platform/disconnect', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { platform } = req.params;
-    const userId = req.userId!;
+    const userId = req.user_id!;
 
-    const influencerProfile = await prisma.influencerProfile.findUnique({
-      where: { userId }
+    const influencerProfile = await prisma.influencer_profiles.findUnique({
+      where: { user_id: userId }
     });
 
     if (!influencerProfile) {
@@ -329,10 +327,10 @@ router.delete('/:platform/disconnect', authMiddleware, async (req: AuthRequest, 
     }
 
     const platformUpper = (platform as string).toUpperCase();
-    await prisma.socialMediaAccount.delete({
+    await prisma.social_media_accounts.delete({
       where: {
-        influencerId_platform: {
-          influencerId: influencerProfile.id,
+        influencer_id_platform: {
+          influencer_id: influencerProfile.id,
           platform: platformUpper as any
         }
       }

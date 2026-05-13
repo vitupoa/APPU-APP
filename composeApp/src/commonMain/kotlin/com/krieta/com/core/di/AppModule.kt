@@ -19,7 +19,6 @@ import com.krieta.feature.shorts.di.shortsModule
 import com.krieta.feature.wallet.di.walletModule
 import com.krieta.feature.profile.di.profileModule
 import com.krieta.feature.shop.di.shopModule
-import com.krieta.feature.live.di.liveModule
 import com.krieta.feature.analytics.di.analyticsModule
 import com.krieta.feature.comments.di.commentsModule
 import com.krieta.feature.marketplace.di.marketplaceModule
@@ -72,5 +71,4 @@ val appModules: List<Module>
         com.krieta.feature.chama.di.chamaModule,
         com.krieta.feature.sponsored.di.sponsoredModule,
         marketplaceModule,
-        liveModule,
     )

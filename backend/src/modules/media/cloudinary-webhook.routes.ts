@@ -12,7 +12,7 @@ const router = Router();
  * 
  * Setup in Cloudinary Dashboard:
  * Settings > Webhooks > Add Notification URL
- * URL: https://your-domain.com/api/v1/media/cloudinary-webhook
+ * URL: https://appu-app-production.up.railway.app/api/v1/media/cloudinary-webhook
  * Events: upload, delete
  */
 
@@ -95,7 +95,7 @@ router.post('/cloudinary-webhook', async (req: Request, res: Response) => {
       
       // Track upload in database (optional)
       try {
-        await prisma.platformConfig.upsert({
+        await prisma.platform_config.upsert({
           where: { key: 'cloudinary_uploads' },
           create: {
             key: 'cloudinary_uploads',
@@ -149,7 +149,7 @@ router.post('/cloudinary-webhook', async (req: Request, res: Response) => {
  */
 router.get('/cloudinary-stats', async (req: Request, res: Response) => {
   try {
-    const config = await prisma.platformConfig.findUnique({
+    const config = await prisma.platform_config.findUnique({
       where: { key: 'cloudinary_uploads' }
     });
 

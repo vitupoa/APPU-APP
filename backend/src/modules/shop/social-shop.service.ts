@@ -4,34 +4,34 @@ import { ShopNotificationService } from './notifications.service.js';
 export class ReviewService {
 
   static async createReview(userId: string, data: {
-    productId: string; rating: number; title?: string;
+    product_id: string; rating: number; title?: string;
     text?: string; videoUrl?: string; imageUrls?: string[];
   }) {
-    const review = await prisma.productReview.create({
+    const review = await prisma.product_reviews.create({
       data: {
-        productId: data.productId,
-        userId,
+        product_id: data.product_id,
+        user_id: userId,
         rating: data.rating,
         title: data.title,
         text: data.text,
-        videoUrl: data.videoUrl,
-        imageUrls: data.imageUrls || [],
+        video_url: data.videoUrl,
+        image_urls: data.imageUrls || [],
       },
-      include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } }
+      include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } }
     });
 
     // Update product average rating
-    const agg = await prisma.productReview.aggregate({
-      where: { productId: data.productId },
+    const agg = await prisma.product_reviews.aggregate({
+      where: { product_id: data.product_id },
       _avg: { rating: true },
       _count: true,
     });
 
-    await prisma.product.update({
-      where: { id: data.productId },
+    await prisma.products.update({
+      where: { id: data.product_id },
       data: {
-        avgRating: agg._avg.rating || 0,
-        reviewCount: agg._count,
+        avg_rating: agg._avg.rating || 0,
+        review_count: agg._count,
       }
     });
 
@@ -39,12 +39,12 @@ export class ReviewService {
   }
 
   static async getProductReviews(productId: string, cursor?: string, limit = 20) {
-    const reviews = await prisma.productReview.findMany({
-      where: { productId },
+    const reviews = await prisma.product_reviews.findMany({
+      where: { product_id: productId },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
-      include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } }
+      orderBy: { created_at: 'desc' },
+      include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } }
     });
 
     const hasMore = reviews.length > limit;
@@ -57,20 +57,20 @@ export class ReviewService {
   }
 
   static async deleteReview(reviewId: string, userId: string) {
-    const review = await prisma.productReview.findUniqueOrThrow({ where: { id: reviewId } });
-    if (review.userId !== userId) throw new Error('You can only delete your own reviews');
+    const review = await prisma.product_reviews.findUniqueOrThrow({ where: { id: reviewId } });
+    if (review.user_id !== userId) throw new Error('You can only delete your own reviews');
 
-    await prisma.productReview.delete({ where: { id: reviewId } });
+    await prisma.product_reviews.delete({ where: { id: reviewId } });
 
     // Recalculate avg
-    const agg = await prisma.productReview.aggregate({
-      where: { productId: review.productId },
+    const agg = await prisma.product_reviews.aggregate({
+      where: { product_id: review.product_id },
       _avg: { rating: true },
       _count: true,
     });
-    await prisma.product.update({
-      where: { id: review.productId },
-      data: { avgRating: agg._avg.rating || 0, reviewCount: agg._count }
+    await prisma.products.update({
+      where: { id: review.product_id },
+      data: { avg_rating: agg._avg.rating || 0, review_count: agg._count }
     });
   }
 }
@@ -81,38 +81,38 @@ export class WishlistService {
     name: string; isPublic?: boolean; isRegistry?: boolean;
     eventType?: string; eventDate?: string;
   }) {
-    return prisma.wishlist.create({
+    return prisma.wishlists.create({
       data: {
-        userId,
+        user_id: userId,
         name: data.name,
-        isPublic: data.isPublic || false,
-        isRegistry: data.isRegistry || false,
-        eventType: data.eventType,
-        eventDate: data.eventDate ? new Date(data.eventDate) : undefined,
+        is_public: data.isPublic || false,
+        is_registry: data.isRegistry || false,
+        event_type: data.eventType,
+        event_date: data.eventDate ? new Date(data.eventDate) : undefined,
       },
-      include: { items: { include: { product: true } } }
+      include: { wishlist_items: { include: { products: true } } }
     });
   }
 
   static async getUserWishlists(userId: string) {
-    return prisma.wishlist.findMany({
-      where: { userId },
+    return prisma.wishlists.findMany({
+      where: { user_id: userId },
       include: {
-        items: {
-          include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true, status: true } } },
+        wishlist_items: {
+          include: { products: { select: { id: true, title: true, image_urls: true, price_kr: true, status: true } } },
           orderBy: { priority: 'desc' }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     });
   }
 
   static async getPublicWishlists(userId: string) {
-    return prisma.wishlist.findMany({
-      where: { userId, isPublic: true },
+    return prisma.wishlists.findMany({
+      where: { user_id: userId, is_public: true },
       include: {
-        items: {
-          include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true, status: true } } },
+        wishlist_items: {
+          include: { products: { select: { id: true, title: true, image_urls: true, price_kr: true, status: true } } },
           orderBy: { priority: 'desc' }
         }
       }
@@ -120,62 +120,62 @@ export class WishlistService {
   }
 
   static async addItem(wishlistId: string, userId: string, data: {
-    productId: string; quantity?: number; priority?: number; notes?: string;
+    product_id: string; quantity?: number; priority?: number; notes?: string;
   }) {
-    const wishlist = await prisma.wishlist.findUniqueOrThrow({ where: { id: wishlistId } });
-    if (wishlist.userId !== userId) throw new Error('Not your wishlist');
+    const wishlist = await prisma.wishlists.findUniqueOrThrow({ where: { id: wishlistId } });
+    if (wishlist.user_id !== userId) throw new Error('Not your wishlist');
 
-    return prisma.wishlistItem.create({
+    return prisma.wishlist_items.create({
       data: {
-        wishlistId,
-        productId: data.productId,
+        wishlist_id: wishlistId,
+        product_id: data.product_id,
         quantity: data.quantity || 1,
         priority: data.priority || 0,
         notes: data.notes,
       },
-      include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true } } }
+      include: { products: { select: { id: true, title: true, image_urls: true, price_kr: true } } }
     });
   }
 
   static async removeItem(wishlistId: string, itemId: string, userId: string) {
-    const wishlist = await prisma.wishlist.findUniqueOrThrow({ where: { id: wishlistId } });
-    if (wishlist.userId !== userId) throw new Error('Not your wishlist');
-    await prisma.wishlistItem.delete({ where: { id: itemId } });
+    const wishlist = await prisma.wishlists.findUniqueOrThrow({ where: { id: wishlistId } });
+    if (wishlist.user_id !== userId) throw new Error('Not your wishlist');
+    await prisma.wishlist_items.delete({ where: { id: itemId } });
   }
 
   static async deleteWishlist(wishlistId: string, userId: string) {
-    const wishlist = await prisma.wishlist.findUniqueOrThrow({ where: { id: wishlistId } });
-    if (wishlist.userId !== userId) throw new Error('Not your wishlist');
-    await prisma.wishlist.delete({ where: { id: wishlistId } });
+    const wishlist = await prisma.wishlists.findUniqueOrThrow({ where: { id: wishlistId } });
+    if (wishlist.user_id !== userId) throw new Error('Not your wishlist');
+    await prisma.wishlists.delete({ where: { id: wishlistId } });
   }
 }
 
 export class CartService {
 
   static async addToCart(userId: string, data: {
-    productId: string; quantity?: number; bargainPrice?: number;
+    product_id: string; quantity?: number; bargainPrice?: number;
   }) {
-    const product = await prisma.product.findUniqueOrThrow({ where: { id: data.productId } });
+    const product = await prisma.products.findUniqueOrThrow({ where: { id: data.product_id } });
     if (product.status !== 'active') throw new Error('Product not available');
 
-    return prisma.cartItem.upsert({
-      where: { userId_productId: { userId, productId: data.productId } },
+    return prisma.cart_items.upsert({
+      where: { user_id_product_id: { user_id: userId, product_id: data.product_id } },
       create: {
-        userId,
-        productId: data.productId,
+        user_id: userId,
+        product_id: data.product_id,
         quantity: data.quantity || 1,
-        bargainPrice: data.bargainPrice ? data.bargainPrice : undefined,
+        bargain_price: data.bargainPrice ? data.bargainPrice : undefined,
       },
       update: {
         quantity: data.quantity || 1,
-        bargainPrice: data.bargainPrice ? data.bargainPrice : undefined,
+        bargain_price: data.bargainPrice ? data.bargainPrice : undefined,
       },
       include: {
-        product: {
+        products: {
           select: {
-            id: true, title: true, imageUrls: true, priceKr: true,
-            wholesalePrice: true, wholesaleMinQty: true, stock: true, status: true,
-            seller: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+            id: true, title: true, image_urls: true, price_kr: true,
+            wholesale_price: true, wholesale_min_qty: true, stock: true, status: true,
+            User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
           }
         }
       }
@@ -183,85 +183,85 @@ export class CartService {
   }
 
   static async getCart(userId: string) {
-    const items = await prisma.cartItem.findMany({
-      where: { userId },
+    const items = await prisma.cart_items.findMany({
+      where: { user_id: userId },
       include: {
-        product: {
+        products: {
           select: {
-            id: true, title: true, imageUrls: true, priceKr: true,
-            wholesalePrice: true, wholesaleMinQty: true, stock: true, status: true,
-            seller: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+            id: true, title: true, image_urls: true, price_kr: true,
+            wholesale_price: true, wholesale_min_qty: true, stock: true, status: true,
+            User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
           }
         }
       },
-      orderBy: { addedAt: 'desc' }
+      orderBy: { added_at: 'desc' }
     });
 
     // Calculate totals
     let totalKr = 0;
     const formatted = items.map((item: any) => {
-      const price = item.bargainPrice
-        ? Number(item.bargainPrice)
-        : (item.product.wholesalePrice && item.quantity >= (item.product.wholesaleMinQty || 999))
-          ? Number(item.product.wholesalePrice)
-          : Number(item.product.priceKr);
+      const price = item.bargain_price
+        ? Number(item.bargain_price)
+        : (item.products.wholesale_price && item.quantity >= (item.products.wholesale_min_qty || 999))
+          ? Number(item.products.wholesale_price)
+          : Number(item.products.price_kr);
       const lineTotal = price * item.quantity;
       totalKr += lineTotal;
 
       return {
         id: item.id,
         product: {
-          ...item.product,
-          priceKr: Number(item.product.priceKr),
-          wholesalePrice: item.product.wholesalePrice ? Number(item.product.wholesalePrice) : null,
+          ...item.products,
+          price_kr: Number(item.products.price_kr),
+          wholesale_price: item.products.wholesale_price ? Number(item.products.wholesale_price) : null,
         },
         quantity: item.quantity,
         unitPrice: price,
         lineTotal,
-        bargainPrice: item.bargainPrice ? Number(item.bargainPrice) : null,
+        bargain_price: item.bargain_price ? Number(item.bargain_price) : null,
       };
     });
 
     return { items: formatted, totalKr, itemCount: items.length };
   }
 
-  static async removeFromCart(userId: string, productId: string) {
-    await prisma.cartItem.delete({
-      where: { userId_productId: { userId, productId } }
+  static async removeFromCart(userId: string, product_id: string) {
+    await prisma.cart_items.delete({
+      where: { user_id_product_id: { user_id: userId, product_id } }
     });
   }
 
   static async clearCart(userId: string) {
-    await prisma.cartItem.deleteMany({ where: { userId } });
+    await prisma.cart_items.deleteMany({ where: { user_id: userId } });
   }
 }
 
 export class GiftService {
 
   static async sendGift(senderId: string, data: {
-    recipientId: string; productId: string; message?: string;
+    recipient_id: string; product_id: string; message?: string;
   }) {
-    const product = await prisma.product.findUniqueOrThrow({ where: { id: data.productId } });
+    const product = await prisma.products.findUniqueOrThrow({ where: { id: data.product_id } });
     const sender = await prisma.user.findUniqueOrThrow({
       where: { id: senderId },
-      select: { displayName: true, username: true }
+      select: { display_name: true, username: true }
     });
 
-    const gift = await prisma.gift.create({
+    const gift = await prisma.gifts.create({
       data: {
-        senderId,
-        recipientId: data.recipientId,
-        productId: data.productId,
+        sender_id: senderId,
+        recipient_id: data.recipient_id,
+        product_id: data.product_id,
         message: data.message,
-        amountKr: product.priceKr,
+        amount_kr: product.price_kr,
         status: 'pending',
-        escrowStatus: 'held',
+        escrow_status: 'held',
       }
     });
 
     await ShopNotificationService.notifyGiftReceived(
-      data.recipientId,
-      sender.displayName || sender.username,
+      data.recipient_id,
+      sender.display_name || sender.username,
       product.title,
       data.message
     ).catch(() => {});
@@ -270,19 +270,19 @@ export class GiftService {
   }
 
   static async getReceivedGifts(userId: string) {
-    return prisma.gift.findMany({
-      where: { recipientId: userId },
+    return prisma.gifts.findMany({
+      where: { recipient_id: userId },
       include: {
-        sender: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        User_gifts_sender_idToUser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     });
   }
 
   static async getSentGifts(userId: string) {
-    return prisma.gift.findMany({
-      where: { senderId: userId },
-      orderBy: { createdAt: 'desc' }
+    return prisma.gifts.findMany({
+      where: { sender_id: userId },
+      orderBy: { created_at: 'desc' }
     });
   }
 }
@@ -290,13 +290,13 @@ export class GiftService {
 function formatReview(r: any) {
   return {
     id: r.id,
-    user: r.user,
+    user: r.User,
     rating: r.rating,
     title: r.title,
     text: r.text,
-    videoUrl: r.videoUrl,
-    imageUrls: r.imageUrls,
-    isVerified: r.isVerified,
-    createdAt: r.createdAt?.toISOString(),
+    video_url: r.video_url,
+    image_urls: r.image_urls,
+    is_verified: r.is_verified,
+    created_at: r.created_at?.toISOString(),
   };
 }

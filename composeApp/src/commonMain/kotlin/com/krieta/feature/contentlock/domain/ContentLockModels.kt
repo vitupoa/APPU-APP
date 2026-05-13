@@ -17,7 +17,7 @@ data class UnlockPrice(
 )
 
 enum class ContentType {
-    SHORT, POST, LIVE;
+    SHORT, POST;
     
     override fun toString(): String = name
 }

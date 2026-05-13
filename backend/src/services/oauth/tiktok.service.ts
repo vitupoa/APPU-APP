@@ -25,7 +25,7 @@ export class TikTokService {
    * Exchanges authorization code for access token.
    */
   static async getAccessToken(code: string, redirectUri: string): Promise<{
-    accessToken: string;
+    access_token: string;
     refreshToken: string;
     expiresIn: number;
     openId: string;
@@ -42,7 +42,7 @@ export class TikTokService {
 
     const data = response.data.data;
     return {
-      accessToken: data.access_token,
+      access_token: data.access_token,
       refreshToken: data.refresh_token,
       expiresIn: data.expires_in,
       openId: data.open_id
@@ -53,7 +53,7 @@ export class TikTokService {
    * Refreshes access token using refresh token.
    */
   static async refreshAccessToken(refreshToken: string): Promise<{
-    accessToken: string;
+    access_token: string;
     refreshToken: string;
     expiresIn: number;
   }> {
@@ -68,7 +68,7 @@ export class TikTokService {
 
     const data = response.data.data;
     return {
-      accessToken: data.access_token,
+      access_token: data.access_token,
       refreshToken: data.refresh_token,
       expiresIn: data.expires_in
     };
@@ -134,10 +134,10 @@ export class TikTokService {
         id: v.id,
         title: v.title,
         coverUrl: v.cover_image_url,
-        viewCount: v.view_count,
-        likeCount: v.like_count,
-        commentCount: v.comment_count,
-        shareCount: v.share_count
+        view_count: v.view_count,
+        like_count: v.like_count,
+        comment_count: v.comment_count,
+        share_count: v.share_count
       })),
       cursor: data.cursor,
       hasMore: data.has_more

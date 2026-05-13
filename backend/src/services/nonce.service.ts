@@ -9,7 +9,7 @@ export class NonceService {
    * Returns true if nonce is fresh (not used)
    */
   async isNonceFresh(nonce: string, userId: string): Promise<boolean> {
-    const existing = await prisma.transactionNonce.findUnique({
+    const existing = await prisma.transaction_nonces.findUnique({
       where: { nonce }
     });
 
@@ -28,11 +28,11 @@ export class NonceService {
   async markNonceUsed(nonce: string, userId: string): Promise<void> {
     const expiresAt = new Date(Date.now() + NONCE_EXPIRY_MS);
 
-    await prisma.transactionNonce.create({
+    await prisma.transaction_nonces.create({
       data: {
         nonce,
-        userId,
-        expiresAt
+        user_id: userId,
+        expires_at: expiresAt
       }
     });
   }
@@ -41,9 +41,9 @@ export class NonceService {
    * Clean up expired nonces (run periodically)
    */
   async cleanupExpiredNonces(): Promise<number> {
-    const result = await prisma.transactionNonce.deleteMany({
+    const result = await prisma.transaction_nonces.deleteMany({
       where: {
-        expiresAt: {
+        expires_at: {
           lt: new Date()
         }
       }

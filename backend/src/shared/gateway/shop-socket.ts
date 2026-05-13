@@ -34,6 +34,6 @@ export function emitProductUpdated(io: SocketServer, product: any) {
 /**
  * Emit product deleted event to all connected clients
  */
-export function emitProductDeleted(io: SocketServer, productId: string) {
-  io.to('shop:products').emit('shop:product_deleted', { productId });
+export function emitProductDeleted(io: SocketServer, product_id: string) {
+  io.to('shop:products').emit('shop:product_deleted', { product_id });
 }

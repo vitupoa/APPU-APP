@@ -100,28 +100,28 @@ export class BrandMarketplaceService {
         break;
     }
 
-    const influencers = await prisma.influencerProfile.findMany({
+    const influencers = await prisma.influencer_profiles.findMany({
       where,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
             _count: {
               select: {
-                admirers: true,
-                subscribers: true
+                admires_admires_admired_idToUser: true,
+                subscriptions_subscriptions_creator_idToUser: true
               }
             }
           }
         },
-        portfolio: {
+        influencer_portfolio: {
           take: 3,
           orderBy: { views: 'desc' }
         }
@@ -129,8 +129,8 @@ export class BrandMarketplaceService {
     });
 
     const filteredInfluencers = influencers.filter((inf: any) => {
-      if (minAdmirers && inf.user._count.admirers < minAdmirers) return false;
-      if (minSubscribers && inf.user._count.subscribers < minSubscribers) return false;
+      if (minAdmirers && inf.User._count.admirers_admires_admired_idToUser < minAdmirers) return false;
+      if (minSubscribers && inf.User._count.subscriptions_subscriptions_creator_idToUser < minSubscribers) return false;
       return true;
     });
 
@@ -141,9 +141,9 @@ export class BrandMarketplaceService {
       items: items.map((inf: any) => ({
         id: inf.id,
         user: {
-          ...inf.user,
-          admirersCount: inf.user._count.admirers,
-          subscribersCount: inf.user._count.subscribers
+          ...inf.User,
+          admirersCount: inf.User._count.admirers_admires_admired_idToUser,
+          subscribersCount: inf.User._count.subscriptions_subscriptions_creator_idToUser
         },
         tier: inf.tier,
         bio: inf.bio,
@@ -163,21 +163,21 @@ export class BrandMarketplaceService {
           }
         },
         metrics: {
-          avgEngagementRate: Number(inf.avgEngagementRate),
-          avgViews: inf.avgViews,
-          avgRating: Number(inf.avgRating),
-          totalCampaigns: inf.totalCampaigns,
-          admirersCount: inf.user._count.admirers,
-          subscribersCount: inf.user._count.subscribers
+          avgEngagementRate: Number(inf.avg_engagement_rate),
+          avg_views: inf.avg_views,
+          avgRating: Number(inf.avg_rating),
+          totalCampaigns: inf.total_campaigns,
+          admirersCount: inf.User._count.admirers_admires_admired_idToUser,
+          subscribersCount: inf.User._count.subscriptions_subscriptions_creator_idToUser
         },
         rates: {
-          perPost: inf.ratePerPost ? Number(inf.ratePerPost) : null,
-          perVideo: inf.ratePerVideo ? Number(inf.ratePerVideo) : null,
-          perStory: inf.ratePerStory ? Number(inf.ratePerStory) : null
+          perPost: inf.rate_per_post ? Number(inf.rate_per_post) : null,
+          perVideo: inf.rate_per_video ? Number(inf.rate_per_video) : null,
+          perStory: inf.rate_per_story ? Number(inf.rate_per_story) : null
         },
-        portfolio: inf.portfolio,
-        isAvailable: inf.isAvailable,
-        isVerified: inf.isVerified
+        portfolio: inf.influencer_portfolio,
+        isAvailable: inf.is_available,
+        is_verified: inf.is_verified
       })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
@@ -187,37 +187,37 @@ export class BrandMarketplaceService {
    * Get influencer profile details
    */
   static async getInfluencerProfile(influencerId: string) {
-    const profile = await prisma.influencerProfile.findUniqueOrThrow({
+    const profile = await prisma.influencer_profiles.findUniqueOrThrow({
       where: { id: influencerId },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
+            display_name: true,
+            avatar_url: true,
             bio: true,
-            isVerified: true
+            is_verified: true
           }
         },
-        portfolio: {
+        influencer_portfolio: {
           orderBy: { views: 'desc' }
         },
-        reviews: {
+        influencer_reviews: {
           take: 10,
-          orderBy: { createdAt: 'desc' }
+          orderBy: { created_at: 'desc' }
         }
       }
     });
 
     return {
       ...profile,
-      avgRating: Number(profile.avgRating),
-      avgEngagementRate: Number(profile.avgEngagementRate),
-      totalEarningsKr: Number(profile.totalEarningsKr),
-      ratePerPost: profile.ratePerPost ? Number(profile.ratePerPost) : null,
-      ratePerVideo: profile.ratePerVideo ? Number(profile.ratePerVideo) : null,
-      ratePerStory: profile.ratePerStory ? Number(profile.ratePerStory) : null
+      avg_rating: Number(profile.avg_rating),
+      avg_engagement_rate: Number(profile.avg_engagement_rate),
+      total_earnings_kr: Number(profile.total_earnings_kr),
+      rate_per_post: profile.rate_per_post ? Number(profile.rate_per_post) : null,
+      rate_per_video: profile.rate_per_video ? Number(profile.rate_per_video) : null,
+      rate_per_story: profile.rate_per_story ? Number(profile.rate_per_story) : null
     };
   }
 
@@ -229,91 +229,91 @@ export class BrandMarketplaceService {
    * Create influencer marketing campaign
    */
   static async createCampaign(data: {
-    brandId: string;
+    brand_id: string;
     title: string;
     description: string;
     type: string;
-    targetTiers: string[];
-    targetCategories: string[];
-    minFollowers?: number;
-    minEngagementRate?: number;
-    targetGeos?: string[];
-    budgetKr: number;
-    compensationPerInfluencer: number;
-    maxInfluencers: number;
-    requiredPosts?: number;
-    requiredVideos?: number;
-    requiredStories?: number;
-    contentGuidelines?: string;
+    target_tiers: string[];
+    target_categories: string[];
+    min_followers?: number;
+    min_engagement_rate?: number;
+    target_geos?: string[];
+    budget_kr: number;
+    compensation_per_influencer: number;
+    max_influencers: number;
+    required_posts?: number;
+    required_videos?: number;
+    required_stories?: number;
+    content_guidelines?: string;
     hashtags?: string[];
     mentions?: string[];
-    contestId?: string;
-    applicationDeadline?: Date;
-    campaignStartDate: Date;
-    campaignEndDate: Date;
+    contest_id?: string;
+    application_deadline?: Date;
+    campaign_start_date: Date;
+    campaign_end_date: Date;
   }) {
     // Verify brand has sufficient balance
-    const wallet = await prisma.wallet.findUnique({
-      where: { userId: data.brandId }
+    const wallet = await prisma.wallets.findUnique({
+      where: { user_id: data.brand_id }
     });
 
-    const totalBudget = new Prisma.Decimal(data.budgetKr);
-    if (!wallet || wallet.krBalance.lessThan(totalBudget)) {
+    const totalBudget = new Prisma.Decimal(data.budget_kr);
+    if (!wallet || wallet.kr_balance.lessThan(totalBudget)) {
       throw new Error(`Insufficient balance. Need Kr.${totalBudget.toFixed(2)}`);
     }
 
     return prisma.$transaction(async (tx) => {
       // Deduct budget from brand wallet (escrow)
-      await tx.wallet.update({
-        where: { userId: data.brandId },
-        data: { krBalance: { decrement: totalBudget } }
+      await tx.wallets.update({
+        where: { user_id: data.brand_id },
+        data: { kr_balance: { decrement: totalBudget } }
       });
 
       // Create campaign
-      const campaign = await tx.brandCampaign.create({
+      const campaign = await tx.brand_campaigns.create({
         data: {
-          brandId: data.brandId,
+          brand_id: data.brand_id,
           title: data.title,
           description: data.description,
           type: data.type as any,
           status: 'DRAFT',
-          targetTiers: data.targetTiers as any[],
-          targetCategories: data.targetCategories,
-          minFollowers: data.minFollowers,
-          minEngagementRate: data.minEngagementRate ? new Prisma.Decimal(data.minEngagementRate) : null,
-          targetGeos: data.targetGeos || [],
-          budgetKr: totalBudget,
-          compensationPerInfluencer: new Prisma.Decimal(data.compensationPerInfluencer),
-          maxInfluencers: data.maxInfluencers,
-          requiredPosts: data.requiredPosts || 0,
-          requiredVideos: data.requiredVideos || 0,
-          requiredStories: data.requiredStories || 0,
-          contentGuidelines: data.contentGuidelines,
+          target_tiers: data.target_tiers as any[],
+          target_categories: data.target_categories,
+          min_followers: data.min_followers,
+          min_engagement_rate: data.min_engagement_rate ? new Prisma.Decimal(data.min_engagement_rate) : null,
+          target_geos: data.target_geos || [],
+          budget_kr: totalBudget,
+          compensation_per_influencer: new Prisma.Decimal(data.compensation_per_influencer),
+          max_influencers: data.max_influencers,
+          required_posts: data.required_posts || 0,
+          required_videos: data.required_videos || 0,
+          required_stories: data.required_stories || 0,
+          content_guidelines: data.content_guidelines,
           hashtags: data.hashtags || [],
           mentions: data.mentions || [],
-          contestId: data.contestId,
-          applicationDeadline: data.applicationDeadline,
-          campaignStartDate: data.campaignStartDate,
-          campaignEndDate: data.campaignEndDate
+          contest_id: data.contest_id,
+          application_deadline: data.application_deadline,
+          campaign_start_date: data.campaign_start_date,
+          campaign_end_date: data.campaign_end_date
         },
         include: {
-          brand: {
+          User: {
             select: {
               id: true,
               username: true,
-              displayName: true,
-              avatarUrl: true
+              display_name: true,
+              avatar_url: true
             }
           }
         }
       });
 
       // Record transaction
-      await tx.transaction.create({
+      await tx.transactions.create({
         data: {
-          userId: data.brandId,
+          user_id: data.brand_id,
           type: 'campaign_escrow',
-          amountKr: totalBudget,
+          amount_kr: totalBudget,
           status: 'completed',
           provider: 'platform',
           reference: campaign.id
@@ -327,12 +327,12 @@ export class BrandMarketplaceService {
   /**
    * Publish campaign (make it visible to influencers)
    */
-  static async publishCampaign(campaignId: string, brandId: string) {
-    const campaign = await prisma.brandCampaign.findUniqueOrThrow({
+  static async publishCampaign(campaignId: string, brand_id: string) {
+    const campaign = await prisma.brand_campaigns.findUniqueOrThrow({
       where: { id: campaignId }
     });
 
-    if (campaign.brandId !== brandId) {
+    if (campaign.brand_id !== brand_id) {
       throw new Error('Unauthorized');
     }
 
@@ -340,7 +340,7 @@ export class BrandMarketplaceService {
       throw new Error('Campaign already published');
     }
 
-    return prisma.brandCampaign.update({
+    return prisma.brand_campaigns.update({
       where: { id: campaignId },
       data: { status: 'OPEN' }
     });
@@ -378,7 +378,7 @@ export class BrandMarketplaceService {
 
     // If influencer is viewing, filter by their tier/categories
     if (influencerId) {
-      const influencer = await prisma.influencerProfile.findUnique({
+      const influencer = await prisma.influencer_profiles.findUnique({
         where: { id: influencerId }
       });
 
@@ -395,26 +395,26 @@ export class BrandMarketplaceService {
       }
     }
 
-    const campaigns = await prisma.brandCampaign.findMany({
+    const campaigns = await prisma.brand_campaigns.findMany({
       where,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       include: {
-        brand: {
+        User: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true
+            display_name: true,
+            avatar_url: true,
+            is_verified: true
           }
         },
-        contest: {
+        Contest: {
           select: {
             id: true,
             title: true,
-            prizeTotalKr: true,
+            prize_total_kr: true,
             deadline: true
           }
         }
@@ -427,29 +427,29 @@ export class BrandMarketplaceService {
     return {
       items: items.map((c: any) => ({
         id: c.id,
-        brand: c.brand,
+        brand: c.User,
         title: c.title,
         description: c.description,
         type: c.type,
-        compensationKr: Number(c.compensationPerInfluencer),
+        compensationKr: Number(c.compensation_per_influencer),
         deliverables: {
-          posts: c.requiredPosts,
-          videos: c.requiredVideos,
-          stories: c.requiredStories
+          posts: c.required_posts,
+          videos: c.required_videos,
+          stories: c.required_stories
         },
         timeline: {
-          applicationDeadline: c.applicationDeadline?.toISOString(),
-          startDate: c.campaignStartDate.toISOString(),
-          endDate: c.campaignEndDate.toISOString()
+          applicationDeadline: c.application_deadline?.toISOString(),
+          start_date: c.campaign_start_date.toISOString(),
+          end_date: c.campaign_end_date.toISOString()
         },
-        contest: c.contest ? {
-          id: c.contest.id,
-          title: c.contest.title,
-          prizeTotalKr: Number(c.contest.prizeTotalKr),
-          deadline: c.contest.deadline.toISOString()
+        contest: c.Contest ? {
+          id: c.Contest.id,
+          title: c.Contest.title,
+          prizeTotalKr: Number(c.Contest.prize_total_kr),
+          deadline: c.Contest.deadline.toISOString()
         } : null,
-        spotsAvailable: c.maxInfluencers - c.acceptedInfluencers,
-        createdAt: c.createdAt.toISOString()
+        spotsAvailable: c.max_influencers - c.accepted_influencers,
+        created_at: c.created_at.toISOString()
       })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
@@ -459,30 +459,30 @@ export class BrandMarketplaceService {
    * Apply to campaign (Influencer applies)
    */
   static async applyToCampaign(data: {
-    campaignId: string;
-    influencerId: string;
+    campaign_id: string;
+    influencer_id: string;
     pitch: string;
-    proposedRate?: number;
+    proposed_rate?: number;
     availability?: string;
   }) {
-    const campaign = await prisma.brandCampaign.findUniqueOrThrow({
-      where: { id: data.campaignId }
+    const campaign = await prisma.brand_campaigns.findUniqueOrThrow({
+      where: { id: data.campaign_id }
     });
 
     if (campaign.status !== 'OPEN') {
       throw new Error('Campaign is not accepting applications');
     }
 
-    if (campaign.acceptedInfluencers >= campaign.maxInfluencers) {
+    if (campaign.accepted_influencers >= campaign.max_influencers) {
       throw new Error('Campaign is full');
     }
 
     // Check if already applied
-    const existing = await prisma.campaignApplication.findUnique({
+    const existing = await prisma.campaign_applications.findUnique({
       where: {
-        campaignId_influencerId: {
-          campaignId: data.campaignId,
-          influencerId: data.influencerId
+        campaign_id_influencer_id: {
+          campaign_id: data.campaign_id,
+          influencer_id: data.influencer_id
         }
       }
     });
@@ -491,24 +491,24 @@ export class BrandMarketplaceService {
       throw new Error('Already applied to this campaign');
     }
 
-    const application = await prisma.campaignApplication.create({
+    const application = await prisma.campaign_applications.create({
       data: {
-        campaignId: data.campaignId,
-        influencerId: data.influencerId,
+        campaign_id: data.campaign_id,
+        influencer_id: data.influencer_id,
         pitch: data.pitch,
-        proposedRate: data.proposedRate ? new Prisma.Decimal(data.proposedRate) : null,
+        proposed_rate: data.proposed_rate ? new Prisma.Decimal(data.proposed_rate) : null,
         availability: data.availability,
         status: 'PENDING'
       },
       include: {
-        influencer: {
+        influencer_profiles: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 username: true,
-                displayName: true,
-                avatarUrl: true
+                display_name: true,
+                avatar_url: true
               }
             }
           }
@@ -517,9 +517,9 @@ export class BrandMarketplaceService {
     });
 
     // Increment application count
-    await prisma.brandCampaign.update({
-      where: { id: data.campaignId },
-      data: { totalApplications: { increment: 1 } }
+    await prisma.brand_campaigns.update({
+      where: { id: data.campaign_id },
+      data: { total_applications: { increment: 1 } }
     });
 
     return application;
@@ -530,16 +530,16 @@ export class BrandMarketplaceService {
    */
   static async reviewApplication(data: {
     applicationId: string;
-    brandId: string;
+    brand_id: string;
     decision: 'ACCEPTED' | 'REJECTED';
-    responseNote?: string;
+    response_note?: string;
   }) {
-    const application = await prisma.campaignApplication.findUniqueOrThrow({
+    const application = await prisma.campaign_applications.findUniqueOrThrow({
       where: { id: data.applicationId },
-      include: { campaign: true }
+      include: { brand_campaigns: true }
     });
 
-    if (application.campaign.brandId !== data.brandId) {
+    if (application.brand_campaigns.brand_id !== data.brand_id) {
       throw new Error('Unauthorized');
     }
 
@@ -548,29 +548,29 @@ export class BrandMarketplaceService {
     }
 
     return prisma.$transaction(async (tx) => {
-      const updated = await tx.campaignApplication.update({
+      const updated = await tx.campaign_applications.update({
         where: { id: data.applicationId },
         data: {
           status: data.decision,
-          responseNote: data.responseNote,
-          respondedAt: new Date()
+          response_note: data.response_note,
+          responded_at: new Date()
         }
       });
 
       if (data.decision === 'ACCEPTED') {
-        await tx.brandCampaign.update({
-          where: { id: application.campaignId },
-          data: { acceptedInfluencers: { increment: 1 } }
+        await tx.brand_campaigns.update({
+          where: { id: application.campaign_id },
+          data: { accepted_influencers: { increment: 1 } }
         });
 
         // If campaign is full, close it
-        const campaign = await tx.brandCampaign.findUnique({
-          where: { id: application.campaignId }
+        const campaign = await tx.brand_campaigns.findUnique({
+          where: { id: application.campaign_id }
         });
 
-        if (campaign && campaign.acceptedInfluencers + 1 >= campaign.maxInfluencers) {
-          await tx.brandCampaign.update({
-            where: { id: application.campaignId },
+        if (campaign && campaign.accepted_influencers + 1 >= campaign.max_influencers) {
+          await tx.brand_campaigns.update({
+            where: { id: application.campaign_id },
             data: { status: 'IN_PROGRESS' }
           });
         }
@@ -588,19 +588,19 @@ export class BrandMarketplaceService {
    * Sponsor an existing contest
    */
   static async sponsorContest(data: {
-    contestId: string;
-    brandId: string;
+    contest_id: string;
+    brand_id: string;
     type: string;
-    sponsorshipKr: number;
+    sponsorship_kr: number;
     benefits: string[];
-    logoUrl?: string;
-    brandMessage?: string;
-    websiteUrl?: string;
-    startDate: Date;
-    endDate: Date;
+    logo_url?: string;
+    brand_message?: string;
+    website_url?: string;
+    start_date: Date;
+    end_date: Date;
   }) {
     const contest = await prisma.contest.findUniqueOrThrow({
-      where: { id: data.contestId }
+      where: { id: data.contest_id }
     });
 
     if (contest.status !== 'ACTIVE') {
@@ -608,45 +608,45 @@ export class BrandMarketplaceService {
     }
 
     // Verify brand has sufficient balance
-    const wallet = await prisma.wallet.findUnique({
-      where: { userId: data.brandId }
+    const wallet = await prisma.wallets.findUnique({
+      where: { user_id: data.brand_id }
     });
 
-    const sponsorshipAmount = new Prisma.Decimal(data.sponsorshipKr);
-    if (!wallet || wallet.krBalance.lessThan(sponsorshipAmount)) {
+    const sponsorshipAmount = new Prisma.Decimal(data.sponsorship_kr);
+    if (!wallet || wallet.kr_balance.lessThan(sponsorshipAmount)) {
       throw new Error(`Insufficient balance. Need Kr.${sponsorshipAmount.toFixed(2)}`);
     }
 
     return prisma.$transaction(async (tx) => {
       // Deduct from brand wallet
-      await tx.wallet.update({
-        where: { userId: data.brandId },
-        data: { krBalance: { decrement: sponsorshipAmount } }
+      await tx.wallets.update({
+        where: { user_id: data.brand_id },
+        data: { kr_balance: { decrement: sponsorshipAmount } }
       });
 
       // Create sponsorship
-      const sponsorship = await tx.contestSponsorship.create({
+      const sponsorship = await tx.contest_sponsorships.create({
         data: {
-          contestId: data.contestId,
-          brandId: data.brandId,
+          contest_id: data.contest_id,
+          brand_id: data.brand_id,
           type: data.type as any,
-          sponsorshipKr: sponsorshipAmount,
+          sponsorship_kr: sponsorshipAmount,
           benefits: data.benefits,
-          logoUrl: data.logoUrl,
-          brandMessage: data.brandMessage,
-          websiteUrl: data.websiteUrl,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          isActive: true
+          logo_url: data.logo_url,
+          brand_message: data.brand_message,
+          website_url: data.website_url,
+          start_date: data.start_date,
+          end_date: data.end_date,
+          is_active: true
         }
       });
 
       // Record transaction
-      await tx.transaction.create({
+      await tx.transactions.create({
         data: {
-          userId: data.brandId,
+          user_id: data.brand_id,
           type: 'contest_sponsorship',
-          amountKr: sponsorshipAmount,
+          amount_kr: sponsorshipAmount,
           status: 'completed',
           provider: 'platform',
           reference: sponsorship.id
@@ -656,9 +656,9 @@ export class BrandMarketplaceService {
       // Add sponsorship amount to contest prize pool (if type is CONTEST_PRIZE)
       if (data.type === 'CONTEST_PRIZE') {
         await tx.contest.update({
-          where: { id: data.contestId },
+          where: { id: data.contest_id },
           data: {
-            prizeTotalKr: { increment: sponsorshipAmount }
+            prize_total_kr: { increment: sponsorshipAmount }
           }
         });
       }
@@ -672,11 +672,11 @@ export class BrandMarketplaceService {
    */
   static async browseSponsorableContests(params: {
     category?: string;
-    minParticipants?: number;
+    min_participants?: number;
     cursor?: string;
     limit?: number;
   }) {
-    const { category, minParticipants, cursor, limit = 20 } = params;
+    const { category, min_participants, cursor, limit = 20 } = params;
 
     const where: any = {
       status: 'ACTIVE',
@@ -687,26 +687,26 @@ export class BrandMarketplaceService {
       where.category = category;
     }
 
-    if (minParticipants) {
-      where.totalParticipants = { gte: minParticipants };
+    if (min_participants) {
+      where.total_participants = { gte: min_participants };
     }
 
     const contests = await prisma.contest.findMany({
       where,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { totalParticipants: 'desc' },
+      orderBy: { total_participants: 'desc' },
       include: {
-        creator: {
+        User: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true
+            display_name: true,
+            avatar_url: true
           }
         },
-        sponsorships: {
-          where: { isActive: true }
+        contest_sponsorships: {
+          where: { is_active: true }
         }
       }
     });
@@ -717,18 +717,18 @@ export class BrandMarketplaceService {
     return {
       items: items.map((c: any) => ({
         id: c.id,
-        creator: c.creator,
+        creator: c.User,
         title: c.title,
         description: c.description,
         category: c.category,
-        prizeTotalKr: Number(c.prizeTotalKr),
-        participants: c.totalParticipants,
-        submissions: c.totalSubmissions,
+        prizeTotalKr: Number(c.prize_total_kr),
+        participants: c.total_participants,
+        submissions: c.total_submissions,
         deadline: c.deadline.toISOString(),
-        coverMediaUrl: c.coverMediaUrl,
-        currentSponsors: c.sponsorships.length,
-        estimatedReach: c.totalParticipants * 10, // Rough estimate
-        createdAt: c.createdAt.toISOString()
+        coverMediaUrl: c.cover_media_url,
+        currentSponsors: c.contest_sponsorships.length,
+        estimatedReach: c.total_participants * 10, // Rough estimate
+        createdAt: c.created_at.toISOString()
       })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };

@@ -209,15 +209,6 @@ private fun CreateBottomSheet(onDismiss: () -> Unit) {
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                CreateOption("Live", "📹", Color(0xFFFF1744)) {
-                    navigator.push(com.krieta.feature.live.presentation.screen.StartLiveScreen())
-                    onDismiss()
-                }
-            }
         }
     }
 }

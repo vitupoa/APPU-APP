@@ -5,7 +5,7 @@ const SIGNATURE_ALGORITHM = 'sha256';
 const SIGNATURE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 
 export interface TransactionPayload {
-  userId: string;
+  user_id: string;
   amountKr: number;
   provider: string;
   accountName: string;
@@ -92,7 +92,7 @@ export class TransactionSigner {
    */
   private createCanonicalString(payload: TransactionPayload): string {
     return [
-      payload.userId,
+      payload.user_id,
       payload.amountKr.toString(),
       payload.provider,
       payload.accountName,

@@ -49,12 +49,12 @@ export class SocialMediaSyncWorker {
    * Refreshes tokens that are expiring within 7 days.
    */
   private static async refreshTokens() {
-    const expiringAccounts = await prisma.socialMediaAccount.findMany({
+    const expiringAccounts = await prisma.social_media_accounts.findMany({
       where: {
-        tokenExpiresAt: {
+        token_expires_at: {
           lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         },
-        refreshToken: { not: null }
+        refresh_token: { not: null }
       }
     });
 
@@ -66,46 +66,46 @@ export class SocialMediaSyncWorker {
 
         switch (account.platform) {
           case 'TIKTOK':
-            newTokens = await TikTokService.refreshAccessToken(account.refreshToken!);
+            newTokens = await TikTokService.refreshAccessToken(account.refresh_token!);
             break;
           case 'INSTAGRAM':
-            newTokens = await InstagramService.refreshAccessToken(account.accessToken!);
+            newTokens = await InstagramService.refreshAccessToken(account.access_token!);
             break;
           case 'YOUTUBE':
-            newTokens = await YouTubeService.refreshAccessToken(account.refreshToken!);
+            newTokens = await YouTubeService.refreshAccessToken(account.refresh_token!);
             break;
           case 'TWITTER':
-            newTokens = await TwitterService.refreshAccessToken(account.refreshToken!);
+            newTokens = await TwitterService.refreshAccessToken(account.refresh_token!);
             break;
           case 'FACEBOOK':
-            newTokens = await FacebookService.refreshAccessToken(account.accessToken!);
+            newTokens = await FacebookService.refreshAccessToken(account.access_token!);
             break;
           case 'TWITCH':
-            newTokens = await TwitchService.refreshAccessToken(account.refreshToken!);
+            newTokens = await TwitchService.refreshAccessToken(account.refresh_token!);
             break;
           default:
             console.log(`[SocialMediaSyncWorker] Unsupported platform for token refresh: ${account.platform}`);
             continue;
         }
 
-        await prisma.socialMediaAccount.update({
+        await prisma.social_media_accounts.update({
           where: { id: account.id },
           data: {
-            accessToken: newTokens.accessToken,
-            refreshToken: newTokens.refreshToken || account.refreshToken,
-            tokenExpiresAt: new Date(Date.now() + newTokens.expiresIn * 1000),
-            syncStatus: 'completed'
+            access_token: newTokens.access_token,
+            refresh_token: newTokens.refresh_token || account.refresh_token,
+            token_expires_at: new Date(Date.now() + newTokens.expiresIn * 1000),
+            sync_status: 'completed'
           }
         });
 
         console.log(`[SocialMediaSyncWorker] Refreshed token for ${account.platform} account ${account.id}`);
       } catch (error: any) {
         console.error(`[SocialMediaSyncWorker] Failed to refresh token for ${account.id}:`, error.message);
-        await prisma.socialMediaAccount.update({
+        await prisma.social_media_accounts.update({
           where: { id: account.id },
           data: {
-            syncStatus: 'failed',
-            syncError: error.message
+            sync_status: 'failed',
+            sync_error: error.message
           }
         });
       }
@@ -116,10 +116,10 @@ export class SocialMediaSyncWorker {
    * Syncs follower counts for all connected accounts.
    */
   private static async syncFollowerCounts() {
-    const accounts = await prisma.socialMediaAccount.findMany({
+    const accounts = await prisma.social_media_accounts.findMany({
       where: {
-        syncStatus: { not: 'failed' },
-        tokenExpiresAt: { gt: new Date() }
+        sync_status: { not: 'failed' },
+        token_expires_at: { gt: new Date() }
       }
     });
 
@@ -127,83 +127,83 @@ export class SocialMediaSyncWorker {
 
     for (const account of accounts) {
       try {
-        const followersBefore = account.followerCount;
+        const followersBefore = account.follower_count;
         let followersAfter = followersBefore;
 
         switch (account.platform) {
           case 'TIKTOK': {
-            const userInfo = await TikTokService.getUserInfo(account.accessToken!);
+            const userInfo = await TikTokService.getUserInfo(account.access_token!);
             followersAfter = userInfo.followerCount;
-            await prisma.socialMediaAccount.update({
+            await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                followerCount: userInfo.followerCount,
-                videoCount: userInfo.videoCount,
-                lastSyncedAt: new Date()
+                follower_count: userInfo.followerCount,
+                video_count: userInfo.videoCount,
+                last_synced_at: new Date()
               }
             });
             break;
           }
           case 'INSTAGRAM': {
-            const userInfo = await InstagramService.getUserInfo(account.accessToken!);
-            await prisma.socialMediaAccount.update({
+            const userInfo = await InstagramService.getUserInfo(account.access_token!);
+            await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                videoCount: userInfo.mediaCount,
-                lastSyncedAt: new Date()
+                video_count: userInfo.mediaCount,
+                last_synced_at: new Date()
               }
             });
             break;
           }
           case 'YOUTUBE': {
-            const channelInfo = await YouTubeService.getChannelInfo(account.accessToken!);
+            const channelInfo = await YouTubeService.getChannelInfo(account.access_token!);
             followersAfter = channelInfo.subscriberCount;
-            await prisma.socialMediaAccount.update({
+            await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                followerCount: channelInfo.subscriberCount,
-                subscriberCount: channelInfo.subscriberCount,
-                videoCount: channelInfo.videoCount,
-                totalViews: BigInt(channelInfo.viewCount),
-                avgViews: Math.floor(channelInfo.viewCount / channelInfo.videoCount),
-                lastSyncedAt: new Date()
+                follower_count: channelInfo.subscriberCount,
+                subscriber_count: channelInfo.subscriberCount,
+                video_count: channelInfo.videoCount,
+                total_views: BigInt(channelInfo.viewCount),
+                avg_views: Math.floor(channelInfo.viewCount / channelInfo.videoCount),
+                last_synced_at: new Date()
               }
             });
             break;
           }
           case 'TWITTER': {
-            const userInfo = await TwitterService.getUserInfo(account.accessToken!);
-            followersAfter = userInfo.followerCount;
-            await prisma.socialMediaAccount.update({
+            const userInfo = await TwitterService.getUserInfo(account.access_token!);
+            followersAfter = userInfo.follower_count;
+            await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                followerCount: userInfo.followerCount,
-                lastSyncedAt: new Date()
+                follower_count: userInfo.follower_count,
+                last_synced_at: new Date()
               }
             });
             break;
           }
           case 'FACEBOOK': {
-            const userInfo = await FacebookService.getUserInfo(account.accessToken!);
-            followersAfter = userInfo.followerCount;
-            await prisma.socialMediaAccount.update({
+            const userInfo = await FacebookService.getUserInfo(account.access_token!);
+            followersAfter = userInfo.follower_count;
+            await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                followerCount: userInfo.followerCount,
-                lastSyncedAt: new Date()
+                follower_count: userInfo.follower_count,
+                last_synced_at: new Date()
               }
             });
             break;
           }
           case 'TWITCH': {
-            const userInfo = await TwitchService.getUserInfo(account.accessToken!);
-            followersAfter = userInfo.followerCount;
-            await prisma.socialMediaAccount.update({
+            const userInfo = await TwitchService.getUserInfo(account.access_token!);
+            followersAfter = userInfo.follower_count;
+            await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                followerCount: userInfo.followerCount,
-                totalViews: BigInt(userInfo.viewCount),
-                lastSyncedAt: new Date()
+                follower_count: userInfo.follower_count,
+                total_views: BigInt(userInfo.view_count),
+                last_synced_at: new Date()
               }
             });
             break;
@@ -211,31 +211,31 @@ export class SocialMediaSyncWorker {
         }
 
         // Log sync
-        await prisma.socialMediaSyncLog.create({
+        await prisma.social_media_sync_logs.create({
           data: {
-            accountId: account.id,
-            syncType: 'follower_count',
+            account_id: account.id,
+            sync_type: 'follower_count',
             status: 'success',
-            followersBefore,
-            followersAfter,
-            followerChange: followersAfter - followersBefore,
-            durationMs: 0
+            followers_before: followersBefore,
+            followers_after: followersAfter,
+            follower_change: followersAfter - followersBefore,
+            duration_ms: 0
           }
         });
 
         console.log(`[SocialMediaSyncWorker] Synced ${account.platform} account ${account.id}: ${followersBefore} -> ${followersAfter}`);
       } catch (error: any) {
         console.error(`[SocialMediaSyncWorker] Failed to sync ${account.id}:`, error.message);
-        await prisma.socialMediaSyncLog.create({
+        await prisma.social_media_sync_logs.create({
           data: {
-            accountId: account.id,
-            syncType: 'follower_count',
+            account_id: account.id,
+            sync_type: 'follower_count',
             status: 'failed',
-            followersBefore: account.followerCount,
-            followersAfter: account.followerCount,
-            followerChange: 0,
-            errorMessage: error.message,
-            durationMs: 0
+            followers_before: account.follower_count,
+            followers_after: account.follower_count,
+            follower_change: 0,
+            error_message: error.message,
+            duration_ms: 0
           }
         });
       }
@@ -246,10 +246,10 @@ export class SocialMediaSyncWorker {
    * Syncs engagement metrics (views, likes, comments).
    */
   private static async syncEngagementMetrics() {
-    const accounts = await prisma.socialMediaAccount.findMany({
+    const accounts = await prisma.social_media_accounts.findMany({
       where: {
-        syncStatus: { not: 'failed' },
-        tokenExpiresAt: { gt: new Date() }
+        sync_status: { not: 'failed' },
+        token_expires_at: { gt: new Date() }
       }
     });
 
@@ -259,55 +259,55 @@ export class SocialMediaSyncWorker {
       try {
         switch (account.platform) {
           case 'TIKTOK': {
-            const videos = await TikTokService.getVideos(account.accessToken!);
+            const videos = await TikTokService.getVideos(account.access_token!);
             const totalViews = videos.videos.reduce((sum, v) => sum + v.viewCount, 0);
             const totalLikes = videos.videos.reduce((sum, v) => sum + v.likeCount, 0);
             const avgViews = Math.floor(totalViews / videos.videos.length);
             const avgLikes = Math.floor(totalLikes / videos.videos.length);
             const engagementRate = (totalLikes / totalViews) * 100;
 
-            await prisma.socialMediaAccount.update({
+            await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                totalViews: BigInt(totalViews),
-                avgViews,
-                avgLikes,
-                engagementRate
+                total_views: BigInt(totalViews),
+                avg_views: avgViews,
+                avg_likes: avgLikes,
+                engagement_rate: engagementRate
               }
             });
             break;
           }
           case 'INSTAGRAM': {
-            const media = await InstagramService.getMedia(account.accessToken!);
+            const media = await InstagramService.getMedia(account.access_token!);
             const totalLikes = media.media.reduce((sum, m) => sum + (m.likeCount || 0), 0);
             const totalComments = media.media.reduce((sum, m) => sum + (m.commentsCount || 0), 0);
             const avgLikes = Math.floor(totalLikes / media.media.length);
-            const engagementRate = ((totalLikes + totalComments) / (account.followerCount * media.media.length)) * 100;
+            const engagementRate = ((totalLikes + totalComments) / (account.follower_count * media.media.length)) * 100;
 
-            await prisma.socialMediaAccount.update({
+            await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                avgLikes,
-                engagementRate
+                avg_likes: avgLikes,
+                engagement_rate: engagementRate
               }
             });
             break;
           }
           case 'YOUTUBE': {
-            const videos = await YouTubeService.getVideos(account.accessToken!);
+            const videos = await YouTubeService.getVideos(account.access_token!);
             const totalViews = videos.videos.reduce((sum, v) => sum + v.viewCount, 0);
             const totalLikes = videos.videos.reduce((sum, v) => sum + v.likeCount, 0);
             const avgViews = Math.floor(totalViews / videos.videos.length);
             const avgLikes = Math.floor(totalLikes / videos.videos.length);
             const engagementRate = (totalLikes / totalViews) * 100;
 
-            await prisma.socialMediaAccount.update({
+            await prisma.social_media_accounts.update({
               where: { id: account.id },
               data: {
-                totalViews: BigInt(totalViews),
-                avgViews,
-                avgLikes,
-                engagementRate
+                total_views: BigInt(totalViews),
+                avg_views: avgViews,
+                avg_likes: avgLikes,
+                engagement_rate: engagementRate
               }
             });
             break;

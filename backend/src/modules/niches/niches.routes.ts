@@ -7,7 +7,7 @@ const router = Router();
 
 // Get all niches (predefined + custom)
 router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
-  const niches = await prisma.creatorNiche.findMany({
+  const niches = await prisma.creator_niche.findMany({
     orderBy: [
       { isCustom: 'asc' },
       { usageCount: 'desc' }
@@ -20,12 +20,12 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<v
 router.post('/custom', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   const { name } = req.body;
   
-  const existing = await prisma.creatorNiche.findUnique({
+  const existing = await prisma.creator_niche.findUnique({
     where: { name: name.toLowerCase() }
   });
   
   if (existing) {
-    await prisma.creatorNiche.update({
+    await prisma.creator_niche.update({
       where: { id: existing.id },
       data: { usageCount: { increment: 1 } }
     });
@@ -33,7 +33,7 @@ router.post('/custom', authenticate, async (req: AuthRequest, res: Response): Pr
     return;
   }
   
-  const niche = await prisma.creatorNiche.create({
+  const niche = await prisma.creator_niche.create({
     data: {
       name: name.toLowerCase(),
       isCustom: true,

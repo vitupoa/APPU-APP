@@ -3,14 +3,14 @@ import axios from 'axios';
 import { encrypt, decrypt } from '../../utils/encryption.js';
 
 interface SocialMetrics {
-  followerCount: number;
-  subscriberCount?: number;
-  videoCount?: number;
-  totalViews?: number;
-  avgViews?: number;
-  avgLikes?: number;
-  engagementRate?: number;
-  isVerified?: boolean;
+  follower_count: number;
+  subscriber_count?: number;
+  video_count?: number;
+  total_views?: number;
+  avg_views?: number;
+  avg_likes?: number;
+  engagement_rate?: number;
+  is_verified?: boolean;
 }
 
 export class SocialMediaService {
@@ -28,14 +28,14 @@ export class SocialMediaService {
     // Encrypt access token before storing
     const encryptedToken = accessToken ? encrypt(accessToken) : null;
     
-    const account = await prisma.socialMediaAccount.create({
+    const account = await prisma.social_media_accounts.create({
       data: {
-        influencerId,
+        influencer_id: influencerId,
         platform: platform as any,
         username,
-        profileUrl,
-        accessToken: encryptedToken,
-        syncStatus: 'pending',
+        profile_url: profileUrl,
+        access_token: encryptedToken,
+        sync_status: 'pending',
       },
     });
     
@@ -50,73 +50,73 @@ export class SocialMediaService {
   async syncAccountMetrics(accountId: string) {
     const startTime = Date.now();
     
-    const account = await prisma.socialMediaAccount.findUnique({
+    const account = await prisma.social_media_accounts.findUnique({
       where: { id: accountId },
     });
     
     if (!account) throw new Error('Account not found');
     
-    const followersBefore = account.followerCount;
+    const followersBefore = account.follower_count;
     
     try {
       // Decrypt access token before use
-      const decryptedToken = account.accessToken ? decrypt(account.accessToken) : null;
+      const decryptedToken = account.access_token ? decrypt(account.access_token) : null;
       const metrics = await this.fetchMetrics(account.platform, account.username, decryptedToken);
       
-      const updatedAccount = await prisma.socialMediaAccount.update({
+      const updatedAccount = await prisma.social_media_accounts.update({
         where: { id: accountId },
         data: {
-          followerCount: metrics.followerCount,
-          subscriberCount: metrics.subscriberCount || 0,
-          videoCount: metrics.videoCount || 0,
-          totalViews: metrics.totalViews || 0,
-          avgViews: metrics.avgViews || 0,
-          avgLikes: metrics.avgLikes || 0,
-          engagementRate: metrics.engagementRate || 0,
-          isVerified: metrics.isVerified || false,
-          lastSyncedAt: new Date(),
-          syncStatus: 'success',
-          syncError: null,
+          follower_count: metrics.follower_count,
+          subscriber_count: metrics.subscriber_count || 0,
+          video_count: metrics.video_count || 0,
+          total_views: metrics.total_views || 0,
+          avg_views: metrics.avg_views || 0,
+          avg_likes: metrics.avg_likes || 0,
+          engagement_rate: metrics.engagement_rate || 0,
+          is_verified: metrics.is_verified || false,
+          last_synced_at: new Date(),
+          sync_status: 'success',
+          sync_error: null,
         },
       });
       
       // Log sync
-      await prisma.socialMediaSyncLog.create({
+      await prisma.social_media_sync_logs.create({
         data: {
-          accountId,
-          syncType: 'manual',
+          account_id: accountId,
+          sync_type: 'manual',
           status: 'success',
-          followersBefore,
-          followersAfter: metrics.followerCount,
-          followerChange: metrics.followerCount - followersBefore,
-          durationMs: Date.now() - startTime,
+          followers_before: followersBefore,
+          followers_after: metrics.follower_count,
+          follower_change: metrics.follower_count - followersBefore,
+          duration_ms: Date.now() - startTime,
         },
       });
       
       // Update influencer tier based on total followers
-      await this.updateInfluencerTier(account.influencerId);
+      await this.updateInfluencerTier(account.influencer_id);
       
       return updatedAccount;
       
     } catch (error: any) {
-      await prisma.socialMediaAccount.update({
+      await prisma.social_media_accounts.update({
         where: { id: accountId },
         data: {
-          syncStatus: 'failed',
-          syncError: error.message,
+          sync_status: 'failed',
+          sync_error: error.message,
         },
       });
       
-      await prisma.socialMediaSyncLog.create({
+      await prisma.social_media_sync_logs.create({
         data: {
-          accountId,
-          syncType: 'manual',
+          account_id: accountId,
+          sync_type: 'manual',
           status: 'failed',
-          followersBefore,
-          followersAfter: followersBefore,
-          followerChange: 0,
-          errorMessage: error.message,
-          durationMs: Date.now() - startTime,
+          followers_before: followersBefore,
+          followers_after: followersBefore,
+          follower_change: 0,
+          error_message: error.message,
+          duration_ms: Date.now() - startTime,
         },
       });
       
@@ -168,11 +168,11 @@ export class SocialMediaService {
     const data = response.data.data.user;
     
     return {
-      followerCount: data.follower_count,
-      videoCount: data.video_count,
-      avgLikes: Math.floor(data.likes_count / data.video_count),
-      isVerified: data.is_verified,
-      engagementRate: this.calculateEngagementRate(data.likes_count, data.follower_count, data.video_count),
+      follower_count: data.follower_count,
+      video_count: data.video_count,
+      avg_likes: Math.floor(data.likes_count / data.video_count),
+      is_verified: data.is_verified,
+      engagement_rate: this.calculateEngagementRate(data.likes_count, data.follower_count, data.video_count),
     };
   }
   
@@ -197,11 +197,11 @@ export class SocialMediaService {
     const user = response.data.data.user;
     
     return {
-      followerCount: user.followerCount || 0,
-      videoCount: user.videoCount || 0,
-      totalViews: user.totalViews || 0,
-      isVerified: user.verified || false,
-      engagementRate: 0, // Calculate from recent videos if needed
+      follower_count: user.follower_count || 0,
+      video_count: user.video_count || 0,
+      total_views: user.total_views || 0,
+      is_verified: user.verified || false,
+      engagement_rate: 0, // Calculate from recent videos if needed
     };
   }
   
@@ -231,12 +231,12 @@ export class SocialMediaService {
     const stats = channel.statistics;
     
     return {
-      followerCount: parseInt(stats.subscriberCount) || 0,
-      subscriberCount: parseInt(stats.subscriberCount) || 0,
-      videoCount: parseInt(stats.videoCount) || 0,
-      totalViews: parseInt(stats.viewCount) || 0,
-      avgViews: Math.floor(parseInt(stats.viewCount) / parseInt(stats.videoCount)),
-      isVerified: channel.snippet.customUrl ? true : false,
+      follower_count: parseInt(stats.subscriberCount) || 0,
+      subscriber_count: parseInt(stats.subscriberCount) || 0,
+      video_count: parseInt(stats.videoCount) || 0,
+      total_views: parseInt(stats.viewCount) || 0,
+      avg_views: Math.floor(parseInt(stats.viewCount) / parseInt(stats.videoCount)),
+      is_verified: channel.snippet.customUrl ? true : false,
     };
   }
   
@@ -274,11 +274,11 @@ export class SocialMediaService {
     const engagementRate = (avgEngagement / data.followers_count) * 100;
     
     return {
-      followerCount: data.followers_count,
-      videoCount: data.media_count,
-      avgLikes: Math.floor(totalEngagement / recentMedia.length),
-      engagementRate,
-      isVerified: data.is_verified || false,
+      follower_count: data.followers_count,
+      video_count: data.media_count,
+      avg_likes: Math.floor(totalEngagement / recentMedia.length),
+      engagement_rate: engagementRate,
+      is_verified: data.is_verified || false,
     };
   }
   
@@ -300,8 +300,8 @@ export class SocialMediaService {
     const data = response.data;
     
     return {
-      followerCount: data.followers_count || data.fan_count || 0,
-      isVerified: data.verification_status === 'blue_verified',
+      follower_count: data.followers_count || data.fan_count || 0,
+      is_verified: data.verification_status === 'blue_verified',
     };
   }
   
@@ -328,9 +328,9 @@ export class SocialMediaService {
     const metrics = user.public_metrics;
     
     return {
-      followerCount: metrics.followers_count,
-      videoCount: metrics.tweet_count,
-      isVerified: user.verified,
+      follower_count: metrics.followers_count,
+      video_count: metrics.tweet_count,
+      is_verified: user.verified,
     };
   }
   
@@ -360,11 +360,11 @@ export class SocialMediaService {
   // ─── UPDATE INFLUENCER TIER ────────────────────────────────
   
   private async updateInfluencerTier(influencerId: string) {
-    const accounts = await prisma.socialMediaAccount.findMany({
-      where: { influencerId },
+    const accounts = await prisma.social_media_accounts.findMany({
+      where: { influencer_id: influencerId },
     });
     
-    const totalFollowers = accounts.reduce((sum: number, acc) => sum + acc.followerCount, 0);
+    const totalFollowers = accounts.reduce((sum, acc) => sum + acc.follower_count, 0);
     
     let tier: 'NANO' | 'MICRO' | 'MID' | 'MACRO' | 'MEGA' = 'NANO';
     if (totalFollowers >= 1000000) tier = 'MEGA';
@@ -372,13 +372,13 @@ export class SocialMediaService {
     else if (totalFollowers >= 100000) tier = 'MID';
     else if (totalFollowers >= 10000) tier = 'MICRO';
     
-    const avgEngagement = accounts.reduce((sum: number, acc) => sum + Number(acc.engagementRate), 0) / accounts.length;
+    const avgEngagement = accounts.reduce((sum, acc) => sum + Number(acc.engagement_rate), 0) / accounts.length;
     
-    await prisma.influencerProfile.update({
+    await prisma.influencer_profiles.update({
       where: { id: influencerId },
       data: {
         tier,
-        avgEngagementRate: avgEngagement,
+        avg_engagement_rate: avgEngagement,
       },
     });
   }
@@ -386,11 +386,11 @@ export class SocialMediaService {
   // ─── GET ALL ACCOUNTS FOR INFLUENCER ───────────────────────
   
   async getInfluencerSocialAccounts(influencerId: string) {
-    return prisma.socialMediaAccount.findMany({
-      where: { influencerId },
+    return prisma.social_media_accounts.findMany({
+      where: { influencer_id: influencerId },
       orderBy: [
-        { isPrimary: 'desc' },
-        { followerCount: 'desc' },
+        { is_primary: 'desc' },
+        { follower_count: 'desc' },
       ],
     });
   }
@@ -399,22 +399,22 @@ export class SocialMediaService {
   
   async setPrimaryAccount(accountId: string, influencerId: string) {
     // Remove primary from all accounts
-    await prisma.socialMediaAccount.updateMany({
-      where: { influencerId },
-      data: { isPrimary: false },
+    await prisma.social_media_accounts.updateMany({
+      where: { influencer_id: influencerId },
+      data: { is_primary: false },
     });
     
     // Set new primary
-    return prisma.socialMediaAccount.update({
+    return prisma.social_media_accounts.update({
       where: { id: accountId },
-      data: { isPrimary: true },
+      data: { is_primary: true },
     });
   }
   
   // ─── DELETE ACCOUNT ────────────────────────────────────────
   
   async deleteSocialAccount(accountId: string) {
-    return prisma.socialMediaAccount.delete({
+    return prisma.social_media_accounts.delete({
       where: { id: accountId },
     });
   }
@@ -422,11 +422,11 @@ export class SocialMediaService {
   // ─── SYNC ALL ACCOUNTS (CRON JOB) ─────────────────────────
   
   async syncAllAccounts() {
-    const accounts = await prisma.socialMediaAccount.findMany({
+    const accounts = await prisma.social_media_accounts.findMany({
       where: {
         OR: [
-          { lastSyncedAt: null },
-          { lastSyncedAt: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } }, // 24 hours ago
+          { last_synced_at: null },
+          { last_synced_at: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } }, // 24 hours ago
         ],
       },
     });
@@ -436,9 +436,9 @@ export class SocialMediaService {
     for (const account of accounts) {
       try {
         await this.syncAccountMetrics(account.id);
-        results.push({ accountId: account.id, status: 'success' });
+        results.push({ account_id: account.id, status: 'success' });
       } catch (error: any) {
-        results.push({ accountId: account.id, status: 'failed', error: error.message });
+        results.push({ account_id: account.id, status: 'failed', error: error.message });
       }
     }
     

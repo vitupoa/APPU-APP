@@ -223,7 +223,7 @@ export function sanitizeProfileUpdate(
   next: NextFunction
 ): void {
   try {
-    const { username, email, firstName, lastName, displayName, bio } = req.body;
+    const { username, email, first_name, last_name, display_name, bio } = req.body;
     
     if (username !== undefined) {
       req.body.username = sanitizeUsername(username);
@@ -233,23 +233,23 @@ export function sanitizeProfileUpdate(
       req.body.email = sanitizeEmail(email);
     }
     
-    if (firstName !== undefined) {
-      req.body.firstName = sanitizeString(firstName);
-      if (req.body.firstName.length > 50) {
+    if (first_name !== undefined) {
+      req.body.first_name = sanitizeString(first_name);
+      if (req.body.first_name.length > 50) {
         throw new Error('First name too long');
       }
     }
     
-    if (lastName !== undefined) {
-      req.body.lastName = sanitizeString(lastName);
-      if (req.body.lastName.length > 50) {
+    if (last_name !== undefined) {
+      req.body.last_name = sanitizeString(last_name);
+      if (req.body.last_name.length > 50) {
         throw new Error('Last name too long');
       }
     }
     
-    if (displayName !== undefined) {
-      req.body.displayName = sanitizeString(displayName);
-      if (req.body.displayName.length > 50) {
+    if (display_name !== undefined) {
+      req.body.display_name = sanitizeString(display_name);
+      if (req.body.display_name.length > 50) {
         throw new Error('Display name too long');
       }
     }

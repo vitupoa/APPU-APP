@@ -13,11 +13,11 @@ export class ChatMediaController {
     try {
       const userId = req.userId!;
       const chatId = String(req.params.chatId);
-      const { mediaType, resourceType } = req.body;
+      const { media_type, resourceType } = req.body;
 
       // Verify user is participant in chat
       const participant = await prisma.chatParticipant.findUnique({
-        where: { chatId_userId: { chatId, userId } },
+        where: { chatId_userId: { chat_id: chatId, user_id: userId } },
       });
 
       if (!participant) {
@@ -78,10 +78,10 @@ export class ChatMediaController {
    */
   static async validateMedia(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const { mediaUrl, mediaType } = req.body;
+      const { media_url, media_type } = req.body;
 
       // Validate media URL
-      const validation = validateMediaUrl(mediaUrl);
+      const validation = validateMediaUrl(media_url);
 
       if (!validation.isValid) {
         res.status(400).json({
@@ -102,7 +102,7 @@ export class ChatMediaController {
       ];
 
       const isFromAllowedFolder = allowedFolders.some(folder => 
-        mediaUrl.includes(folder.replace('Krieta/', ''))
+        media_url.includes(folder.replace('Krieta/', ''))
       );
 
       if (!isFromAllowedFolder) {
@@ -116,7 +116,7 @@ export class ChatMediaController {
       res.json({
         success: true,
         sanitizedUrl: validation.sanitizedUrl,
-        mediaType,
+        media_type,
       });
     } catch (error) {
       next(error);
@@ -170,7 +170,7 @@ export class ChatMediaController {
         return;
       }
 
-      const participant = chat.participants.find(p => p.userId === userId);
+      const participant = chat.participants.find((p: any) => p.user_id === userId);
       if (!participant || participant.role !== 'admin') {
         res.status(403).json({ 
           success: false, 

@@ -200,10 +200,10 @@ export function validateExternalLink(url: string): MediaValidationResult {
 /**
  * Generate a secure hash for media verification
  */
-export function generateMediaHash(url: string, userId: string): string {
+export function generateMediaHash(url: string, user_id: string): string {
   return crypto
     .createHash('sha256')
-    .update(`${url}:${userId}:${Date.now()}`)
+    .update(`${url}:${user_id}:${Date.now()}`)
     .digest('hex');
 }
 

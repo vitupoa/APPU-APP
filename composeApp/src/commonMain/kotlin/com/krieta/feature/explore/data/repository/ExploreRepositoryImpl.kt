@@ -53,14 +53,5 @@ class ExploreRepositoryImpl(
             emptyList()
         }
     }
-    
-    override suspend fun getLiveStreams(limit: Int): List<LiveStream> {
-        return try {
-            httpClient.get("$baseUrl/live") {
-                parameter("limit", limit)
-            }.body()
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
+}
 }

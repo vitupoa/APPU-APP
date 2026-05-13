@@ -5,7 +5,7 @@ import { z } from 'zod';
 export const suspendUserSchema = z.object({
   reason: z.string().min(5).max(500),
   type: z.enum(['SUSPENDED', 'BANNED', 'BLOCKED']),
-  expiresAt: z.string().datetime().optional(),
+  expires_at: z.string().datetime().optional(),
 });
 
 export const assignRoleSchema = z.object({
@@ -18,9 +18,9 @@ export const assignRoleSchema = z.object({
 });
 
 export const userNameChangeSchema = z.object({
-  firstName: z.string().min(2).max(50).optional(),
-  lastName: z.string().min(2).max(50).optional(),
-  displayName: z.string().min(2).max(100).optional(),
+  first_name: z.string().min(2).max(50).optional(),
+  last_name: z.string().min(2).max(50).optional(),
+  display_name: z.string().min(2).max(100).optional(),
   username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/).optional(),
 });
 
@@ -34,8 +34,8 @@ export const moderateContentSchema = z.object({
 // ─── FINANCIAL ────────────────────────────────────────────
 
 export const walletTopupSchema = z.object({
-  userId: z.string().uuid(),
-  amountKr: z.number().int('Amount must be a whole number').positive(),
+  user_id: z.string().uuid(),
+  amount_kr: z.number().int('Amount must be a whole number').positive(),
   reason: z.string().min(3).max(500),
 });
 
@@ -45,7 +45,7 @@ export const withdrawalReviewSchema = z.object({
 });
 
 export const platformWalletActionSchema = z.object({
-  amountKr: z.number().int('Amount must be a whole number').positive(),
+  amount_kr: z.number().int('Amount must be a whole number').positive(),
   action: z.enum(['topup', 'withdraw']),
   reason: z.string().min(3).max(500),
 });
@@ -94,7 +94,7 @@ export const announcementSchema = z.object({
   message: z.string().min(10).max(5000),
   type: z.enum(['banner', 'push', 'email', 'in_app']),
   targetScope: z.string().max(200).default('all'),
-  expiresAt: z.string().datetime().optional(),
+  expires_at: z.string().datetime().optional(),
 });
 
 // ─── PLATFORM CONFIG ──────────────────────────────────────
@@ -117,5 +117,5 @@ export const paginationSchema = z.object({
 export const contentFilterSchema = z.object({
   type: z.enum(['short', 'post', 'contest', 'comment', 'product', 'story']).optional(),
   status: z.string().optional(),
-  userId: z.string().uuid().optional(),
+  user_id: z.string().uuid().optional(),
 });

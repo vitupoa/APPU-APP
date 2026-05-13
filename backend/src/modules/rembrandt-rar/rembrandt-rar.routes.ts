@@ -75,9 +75,9 @@ router.get('/dashboard/top-creators', requirePermission('analytics.view') as any
 router.get('/users', requirePermission('users.view') as any, async (req: RarRequest, res: Response) => {
   try {
     const { page, limit, search, sort, order } = paginationSchema.parse(req.query);
-    const accountType = req.query.accountType as string | undefined;
+    const accountType = req.query.account_type as string | undefined;
     const isSuspended = req.query.isSuspended === 'true' ? true : req.query.isSuspended === 'false' ? false : undefined;
-    res.json(await UserManagementService.listUsers({ page, limit, search, sort, order, accountType, isSuspended })); return;
+    res.json(await UserManagementService.listUsers({ page, limit, search, sort, order, account_type, isSuspended })); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -89,59 +89,59 @@ router.get('/users/:id', requirePermission('users.view') as any, async (req: Rar
 router.post('/users/:id/suspend', requirePermission('users.suspend') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = suspendUserSchema.parse(req.body);
-    res.json(await UserManagementService.suspendUser(req.userId!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await UserManagementService.suspendUser(req.user_id!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/users/:id/unsuspend', requirePermission('users.suspend') as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await UserManagementService.unsuspendUser(req.userId!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
+  try { res.json(await UserManagementService.unsuspendUser(req.user_id!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/users/:id/verify', requirePermission('users.verify') as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await UserManagementService.verifyUser(req.userId!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
+  try { res.json(await UserManagementService.verifyUser(req.user_id!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.delete('/users/:id', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await UserManagementService.deleteUser(req.userId!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
+  try { res.json(await UserManagementService.deleteUser(req.user_id!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/users/:id/role', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
     const data = assignRoleSchema.parse(req.body);
-    res.json(await UserManagementService.assignRole(req.userId!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await UserManagementService.assignRole(req.user_id!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.delete('/users/:id/role', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await UserManagementService.revokeRole(req.userId!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
+  try { res.json(await UserManagementService.revokeRole(req.user_id!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.put('/users/:id/name', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
     const data = userNameChangeSchema.parse(req.body);
-    res.json(await UserManagementService.changeUserName(req.userId!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await UserManagementService.changeUserName(req.user_id!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/users/:id/reset-password', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await UserManagementService.resetUserPassword(req.userId!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
+  try { res.json(await UserManagementService.resetUserPassword(req.user_id!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.put('/users/:id/password', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
     const { password } = req.body;
-    res.json(await UserManagementService.changeUserPassword(req.userId!, req.params.id as string, password, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await UserManagementService.changeUserPassword(req.user_id!, req.params.id as string, password, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.put('/users/:id/profile', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
-    res.json(await UserManagementService.updateUserProfile(req.userId!, req.params.id as string, req.body, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await UserManagementService.updateUserProfile(req.user_id!, req.params.id as string, req.body, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -151,12 +151,12 @@ router.get('/auto-admire', requireSuperAdmin as any, async (req: RarRequest, res
 });
 
 router.post('/auto-admire', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await UserManagementService.addAutoAdmireUser(req.userId!, req.body.userId)); return; }
+  try { res.json(await UserManagementService.addAutoAdmireUser(req.user_id!, req.body.user_id)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.delete('/auto-admire/:id', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await UserManagementService.removeAutoAdmireUser(req.userId!, req.params.id as string)); return; }
+  try { res.json(await UserManagementService.removeAutoAdmireUser(req.user_id!, req.params.id as string)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -167,38 +167,38 @@ router.delete('/auto-admire/:id', requireSuperAdmin as any, async (req: RarReque
 router.get('/content/:type', requirePermission('content.view') as any, async (req: RarRequest, res: Response) => {
   try {
     const { page, limit, search } = paginationSchema.parse(req.query);
-    const userId = req.query.userId as string | undefined;
+    const userId = req.query.user_id as string | undefined;
     const status = req.query.status as string | undefined;
     const type = req.params.type as any;
-    res.json(await ContentModerationService.listContent(type, { page, limit, search, userId, status })); return;
+    res.json(await ContentModerationService.listContent(type, { page, limit, search, user_id, status })); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/content/short/:id/moderate', requirePermission('content.hide', 'content.delete') as any, async (req: RarRequest, res: Response) => {
   try {
     const { action, reason } = moderateContentSchema.parse(req.body);
-    res.json(await ContentModerationService.moderateShort(req.userId!, req.params.id as string, action, reason, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await ContentModerationService.moderateShort(req.user_id!, req.params.id as string, action, reason, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/content/post/:id/moderate', requirePermission('content.hide', 'content.delete') as any, async (req: RarRequest, res: Response) => {
   try {
     const { action, reason } = moderateContentSchema.parse(req.body);
-    res.json(await ContentModerationService.moderatePost(req.userId!, req.params.id as string, action, reason, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await ContentModerationService.moderatePost(req.user_id!, req.params.id as string, action, reason, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/content/contest/:id/moderate', requirePermission('content.hide', 'content.delete') as any, async (req: RarRequest, res: Response) => {
   try {
     const { action, reason } = moderateContentSchema.parse(req.body);
-    res.json(await ContentModerationService.moderateContest(req.userId!, req.params.id as string, action, reason, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await ContentModerationService.moderateContest(req.user_id!, req.params.id as string, action, reason, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/content/story/:id/moderate', requirePermission('content.hide', 'content.delete') as any, async (req: RarRequest, res: Response) => {
   try {
     const { action, reason } = moderateContentSchema.parse(req.body);
-    res.json(await ContentModerationService.moderateStory(req.userId!, req.params.id as string, action, reason, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await ContentModerationService.moderateStory(req.user_id!, req.params.id as string, action, reason, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -222,14 +222,14 @@ router.get('/wallet/platform', requirePermission('platform_wallet.view') as any,
 router.post('/wallet/platform', requirePermission('platform_wallet.manage') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = platformWalletActionSchema.parse(req.body);
-    res.json(await FinancialService.platformWalletAction(req.userId!, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FinancialService.platformWalletAction(req.user_id!, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/wallet/topup-user', requirePermission('wallet.topup') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = walletTopupSchema.parse(req.body);
-    res.json(await FinancialService.topupUserWallet(req.userId!, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FinancialService.topupUserWallet(req.user_id!, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -246,7 +246,7 @@ router.post('/wallet/bulk-deduct', requireSuperAdmin as any, async (req: RarRequ
       return;
     }
     res.json(await FinancialService.bulkCurrencyDeduction(
-      req.userId!, { fiatAmount: amount, currency, reason: reason || 'Platform deduction' },
+      req.user_id!, { fiatAmount: amount, currency, reason: reason || 'Platform deduction' },
       req.ip, req.headers['user-agent'] as string | undefined
     )); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
@@ -256,8 +256,8 @@ router.get('/withdrawals', requirePermission('withdrawals.view') as any, async (
   try {
     const { page, limit } = paginationSchema.parse(req.query);
     const status = req.query.status as string | undefined;
-    const userId = req.query.userId as string | undefined;
-    res.json(await FinancialService.listWithdrawals({ page, limit, status, userId })); return;
+    const userId = req.query.user_id as string | undefined;
+    res.json(await FinancialService.listWithdrawals({ page, limit, status, user_id })); return;
   } catch (e: any) { res.status(500).json({ error: e.message }); return; }
 });
 
@@ -269,22 +269,22 @@ router.get('/withdrawals/:id', requirePermission('withdrawals.view') as any, asy
 router.post('/withdrawals/:id/review', requirePermission('withdrawals.approve', 'withdrawals.reject') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = withdrawalReviewSchema.parse(req.body);
-    res.json(await FinancialService.reviewWithdrawal(req.userId!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FinancialService.reviewWithdrawal(req.user_id!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/withdrawals/:id/override-name', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await FinancialService.overrideNameMatch(req.userId!, req.params.id as string)); return; }
+  try { res.json(await FinancialService.overrideNameMatch(req.user_id!, req.params.id as string)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.get('/transactions', requirePermission('transactions.view') as any, async (req: RarRequest, res: Response) => {
   try {
     const { page, limit } = paginationSchema.parse(req.query);
-    const userId = req.query.userId as string | undefined;
+    const userId = req.query.user_id as string | undefined;
     const type = req.query.type as string | undefined;
     const status = req.query.status as string | undefined;
-    res.json(await FinancialService.listTransactions({ page, limit, userId, type, status })); return;
+    res.json(await FinancialService.listTransactions({ page, limit, user_id, type, status })); return;
   } catch (e: any) { res.status(500).json({ error: e.message }); return; }
 });
 
@@ -297,12 +297,12 @@ router.get('/escrows', requirePermission('escrow.view') as any, async (req: RarR
 });
 
 router.post('/escrows/:id/release', requirePermission('escrow.release') as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await FinancialService.releaseEscrow(req.userId!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
+  try { res.json(await FinancialService.releaseEscrow(req.user_id!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/escrows/:id/refund', requirePermission('escrow.refund') as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await FinancialService.refundEscrow(req.userId!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
+  try { res.json(await FinancialService.refundEscrow(req.user_id!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -314,7 +314,7 @@ router.get('/fees', requirePermission('fees.configure') as any, async (_req: Rar
 router.put('/fees', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
     const data = feeConfigSchema.parse(req.body);
-    res.json(await FinancialService.updateFeeConfig(req.userId!, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FinancialService.updateFeeConfig(req.user_id!, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -339,19 +339,19 @@ router.get('/feature-flags/summary', requireSuperAdmin as any, async (_req: RarR
 router.post('/feature-flags', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
     const data = featureFlagSchema.parse(req.body);
-    res.json(await FeatureFlagService.setFlag(req.userId!, data as any, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FeatureFlagService.setFlag(req.user_id!, data as any, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/feature-flags/bulk', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
     const data = bulkFeatureFlagSchema.parse(req.body);
-    res.json(await FeatureFlagService.bulkToggle(req.userId!, data as any, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FeatureFlagService.bulkToggle(req.user_id!, data as any, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.delete('/feature-flags/:id', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await FeatureFlagService.deleteFlag(req.userId!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
+  try { res.json(await FeatureFlagService.deleteFlag(req.user_id!, req.params.id as string, req.ip, req.headers['user-agent'] as string | undefined)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -369,12 +369,12 @@ router.get('/names/prohibited', requirePermission('names.manage') as any, async 
 router.post('/names/prohibited', requirePermission('names.manage') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = prohibitedNameSchema.parse(req.body);
-    res.json(await UserManagementService.addProhibitedName(req.userId!, data)); return;
+    res.json(await UserManagementService.addProhibitedName(req.user_id!, data)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.delete('/names/prohibited/:id', requirePermission('names.manage') as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await UserManagementService.removeProhibitedName(req.userId!, req.params.id as string)); return; }
+  try { res.json(await UserManagementService.removeProhibitedName(req.user_id!, req.params.id as string)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -388,12 +388,12 @@ router.get('/names/reserved', requirePermission('names.manage') as any, async (r
 router.post('/names/reserved', requirePermission('names.manage') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = reservedUsernameSchema.parse(req.body);
-    res.json(await UserManagementService.reserveUsername(req.userId!, data)); return;
+    res.json(await UserManagementService.reserveUsername(req.user_id!, data)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.delete('/names/reserved/:id', requirePermission('names.manage') as any, async (req: RarRequest, res: Response) => {
-  try { res.json(await UserManagementService.releaseReservedUsername(req.userId!, req.params.id as string)); return; }
+  try { res.json(await UserManagementService.releaseReservedUsername(req.user_id!, req.params.id as string)); return; }
   catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -409,14 +409,14 @@ router.get('/settings', requireSuperAdmin as any, async (_req: RarRequest, res: 
 router.put('/settings', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
     const data = platformConfigSchema.parse(req.body);
-    res.json(await FeatureFlagService.setConfig(req.userId!, data.key, data.value, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FeatureFlagService.setConfig(req.user_id!, data.key, data.value, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/settings/maintenance', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
     const { enabled } = req.body;
-    res.json(await FeatureFlagService.toggleMaintenance(req.userId!, !!enabled, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FeatureFlagService.toggleMaintenance(req.user_id!, !!enabled, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -429,7 +429,7 @@ router.get('/announcements', requirePermission('announcements.send') as any, asy
     const { page, limit } = paginationSchema.parse(req.query);
     const [items, total] = await Promise.all([
       prisma.platformAnnouncement.findMany({
-        orderBy: { createdAt: 'desc' }, take: limit, skip: (page - 1) * limit,
+        orderBy: { created_at: 'desc' }, take: limit, skip: (page - 1) * limit,
       }),
       prisma.platformAnnouncement.count(),
     ]);
@@ -443,11 +443,11 @@ router.post('/announcements', requirePermission('announcements.send') as any, as
     const announcement = await prisma.platformAnnouncement.create({
       data: {
         ...data,
-        createdBy: req.userId!,
-        expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
+        createdBy: req.user_id!,
+        expires_at: data.expires_at ? new Date(data.expires_at) : null,
       }
     });
-    await AuditService.log(req.userId!, 'announcement.create', 'announcement', announcement.id, data, req.ip, req.headers['user-agent'] as string | undefined);
+    await AuditService.log(req.user_id!, 'announcement.create', 'announcement', announcement.id, data, req.ip, req.headers['user-agent'] as string | undefined);
     res.status(201).json(announcement); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
@@ -484,7 +484,7 @@ router.get('/team', requireSuperAdmin as any, async (_req: RarRequest, res: Resp
 
 router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: Response): Promise<void> => {
   try {
-    const { email, username, firstName, lastName, password, role } = req.body;
+    const { email, username, first_name, last_name, password, role } = req.body;
 
     // Validate required fields
     if (!email || !username || !firstName || !lastName || !password || !role) {
@@ -524,30 +524,30 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
         data: {
           email: email.toLowerCase(),
           username: username.toLowerCase(),
-          firstName,
-          lastName,
-          displayName: `${firstName} ${lastName}`,
-          passwordHash,
+          first_name,
+          last_name,
+          display_name: `${first_name} ${last_name}`,
+          password_hash,
           country: 'KE',
           currency: 'KES',
-          isAdmin: true,
+          is_admin: true,
         },
       });
 
       const adminProfile = await tx.adminProfile.create({
         data: {
-          userId: user.id,
+          user_id: user.id,
           role,
-          grantedBy: req.userId!,
-          isActive: true,
+          grantedBy: req.user_id!,
+          is_active: true,
         },
       });
 
       // Create wallet
       await tx.wallet.create({
         data: {
-          userId: user.id,
-          krBalance: 0,
+          user_id: user.id,
+          kr_balance: 0,
         },
       });
 
@@ -556,7 +556,7 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
 
     // Log audit
     await AuditService.log(
-      req.userId!,
+      req.user_id!,
       'admin.create',
       'user',
       newAdmin.id,
@@ -571,7 +571,7 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
         id: newAdmin.id,
         email: newAdmin.email,
         username: newAdmin.username,
-        displayName: newAdmin.displayName,
+        display_name: newAdmin.display_name,
         role: newAdmin.adminProfile.role,
       },
     }); return;

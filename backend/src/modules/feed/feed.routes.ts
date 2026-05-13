@@ -38,7 +38,7 @@ router.get('/', optionalAuth, async (req: AuthRequest, res: Response) => {
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createPostSchema.parse(req.body);
-    const post = await FeedService.createPost({ userId: req.userId!, ...data });
+    const post = await FeedService.createPost({ user_id: req.userId!, ...data });
     res.status(201).json(post);
   } catch (error: any) {
     if (error.name === 'ZodError') {

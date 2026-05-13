@@ -2,12 +2,12 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import { env } from '../config/env.js';
 
 export interface JwtPayload {
-  userId: string;
+  user_id: string;
   role?: string;
-  isWalletUnlocked: boolean;
-  isAdmin: boolean;
+  is_wallet_unlocked: boolean;
+  is_admin: boolean;
   deviceId: string;
-  accountType: string;
+  account_type: string;
 }
 
 export const generateAccessToken = (payload: JwtPayload): string => {

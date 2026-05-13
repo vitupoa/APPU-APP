@@ -10,8 +10,8 @@ export class AnalyticsService {
       pendingWithdrawals, totalProducts,
     ] = await Promise.all([
       prisma.user.count(),
-      prisma.user.count({ where: { accountType: 'CREATOR' } }),
-      prisma.user.count({ where: { accountType: 'BUSINESS' } }),
+      prisma.user.count({ where: { account_type: 'CREATOR' } }),
+      prisma.user.count({ where: { account_type: 'BUSINESS' } }),
       prisma.short.count(),
       prisma.post.count(),
       prisma.contest.count(),
@@ -19,7 +19,7 @@ export class AnalyticsService {
       prisma.contest.count({ where: { status: 'ACTIVE' } }),
       prisma.transaction.count(),
       prisma.user.count({ where: { isSuspended: true } }),
-      prisma.user.count({ where: { isVerified: true } }),
+      prisma.user.count({ where: { is_verified: true } }),
       prisma.withdrawalRequest.count({ where: { status: 'PENDING' } }),
       prisma.product.count(),
     ]);
@@ -27,7 +27,7 @@ export class AnalyticsService {
     // Revenue: sum of platform_fee transactions
     const revenueResult = await prisma.transaction.aggregate({
       where: { type: 'platform_fee', status: 'completed' },
-      _sum: { amountKr: true },
+      _sum: { amount_kr: true },
     });
 
     // Platform wallet balance
@@ -36,9 +36,9 @@ export class AnalyticsService {
     // Users created in last 24h, 7d, 30d
     const now = new Date();
     const [usersToday, usersWeek, usersMonth] = await Promise.all([
-      prisma.user.count({ where: { createdAt: { gte: new Date(now.getTime() - 86400000) } } }),
-      prisma.user.count({ where: { createdAt: { gte: new Date(now.getTime() - 7 * 86400000) } } }),
-      prisma.user.count({ where: { createdAt: { gte: new Date(now.getTime() - 30 * 86400000) } } }),
+      prisma.user.count({ where: { created_at: { gte: new Date(now.getTime() - 86400000) } } }),
+      prisma.user.count({ where: { created_at: { gte: new Date(now.getTime() - 7 * 86400000) } } }),
+      prisma.user.count({ where: { created_at: { gte: new Date(now.getTime() - 30 * 86400000) } } }),
     ]);
 
     return {
@@ -59,8 +59,8 @@ export class AnalyticsService {
       },
       financial: {
         totalTransactions,
-        platformRevenue: revenueResult._sum.amountKr?.toString() ?? '0',
-        platformWalletBalance: platformWallet?.krBalance?.toString() ?? '0',
+        platformRevenue: revenueResult._sum.amount_kr?.toString() ?? '0',
+        platformWalletBalance: platformWallet?.kr_balance?.toString() ?? '0',
         pendingWithdrawals,
       },
     };
@@ -69,15 +69,15 @@ export class AnalyticsService {
   static async getUserGrowthChart(days = 30) {
     const since = new Date(Date.now() - days * 86400000);
     const users = await prisma.user.findMany({
-      where: { createdAt: { gte: since } },
-      select: { createdAt: true },
-      orderBy: { createdAt: 'asc' },
+      where: { created_at: { gte: since } },
+      select: { created_at: true },
+      orderBy: { created_at: 'asc' },
     });
 
     // Group by date
     const grouped: Record<string, number> = {};
     for (const u of users) {
-      const date = u.createdAt.toISOString().split('T')[0];
+      const date = u.created_at.toISOString().split('T')[0];
       grouped[date] = (grouped[date] || 0) + 1;
     }
 
@@ -87,18 +87,18 @@ export class AnalyticsService {
   static async getRevenueChart(days = 30) {
     const since = new Date(Date.now() - days * 86400000);
     const txns = await prisma.transaction.findMany({
-      where: { type: 'platform_fee', status: 'completed', createdAt: { gte: since } },
-      select: { amountKr: true, createdAt: true },
-      orderBy: { createdAt: 'asc' },
+      where: { type: 'platform_fee', status: 'completed', created_at: { gte: since } },
+      select: { amount_kr: true, created_at: true },
+      orderBy: { created_at: 'asc' },
     });
 
     const grouped: Record<string, number> = {};
     for (const t of txns) {
-      const date = t.createdAt.toISOString().split('T')[0];
-      grouped[date] = (grouped[date] || 0) + Number(t.amountKr);
+      const date = t.created_at.toISOString().split('T')[0];
+      grouped[date] = (grouped[date] || 0) + Number(t.amount_kr);
     }
 
-    return Object.entries(grouped).map(([date, amount]) => ({ date, amountKr: amount }));
+    return Object.entries(grouped).map(([date, amount]) => ({ date, amount_kr: amount }));
   }
 
   static async getContentStats() {
@@ -107,11 +107,11 @@ export class AnalyticsService {
     const week = new Date(now.getTime() - 7 * 86400000);
 
     const [shortsToday, shortsWeek, postsToday, postsWeek, contestsToday] = await Promise.all([
-      prisma.short.count({ where: { createdAt: { gte: today } } }),
-      prisma.short.count({ where: { createdAt: { gte: week } } }),
-      prisma.post.count({ where: { createdAt: { gte: today } } }),
-      prisma.post.count({ where: { createdAt: { gte: week } } }),
-      prisma.contest.count({ where: { createdAt: { gte: today } } }),
+      prisma.short.count({ where: { created_at: { gte: today } } }),
+      prisma.short.count({ where: { created_at: { gte: week } } }),
+      prisma.post.count({ where: { created_at: { gte: today } } }),
+      prisma.post.count({ where: { created_at: { gte: week } } }),
+      prisma.contest.count({ where: { created_at: { gte: today } } }),
     ]);
 
     return {
@@ -123,11 +123,11 @@ export class AnalyticsService {
 
   static async getTopCreators(limit = 10) {
     return prisma.user.findMany({
-      where: { accountType: 'CREATOR' },
+      where: { account_type: 'CREATOR' },
       orderBy: { admirers: { _count: 'desc' } },
       take: limit,
       select: {
-        id: true, username: true, displayName: true, avatarUrl: true, isVerified: true,
+        id: true, username: true, display_name: true, avatar_url: true, is_verified: true,
         _count: { select: { admirers: true, shorts: true, contestsCreated: true } },
       },
     });
@@ -137,10 +137,10 @@ export class AnalyticsService {
     return prisma.adminProfile.findMany({
       include: {
         user: {
-          select: { id: true, username: true, displayName: true, avatarUrl: true, email: true }
+          select: { id: true, username: true, display_name: true, avatar_url: true, email: true }
         }
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { created_at: 'asc' },
     });
   }
 }

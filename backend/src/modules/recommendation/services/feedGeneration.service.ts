@@ -68,12 +68,12 @@ export class FeedGenerationService {
     }
 
     // Get creators user admires
-    const admiringRelations = await prisma.admire.findMany({
-      where: { admirerId: userId },
-      select: { admiredId: true }
+    const admiringRelations = await prisma.admires.findMany({
+      where: { admirer_id: userId },
+      select: { admired_id: true }
     });
 
-    const creatorIds = admiringRelations.map((a: any) => a.admiredId);
+    const creatorIds = admiringRelations.map((a: any) => a.admired_id);
     if (creatorIds.length === 0) return { content: [] };
 
     // Calculate split: 90% unseen, 7% trending, 3% favorites
@@ -165,8 +165,8 @@ export class FeedGenerationService {
 
     if (interests.length === 0) {
       // Get user's micro-interests from DB
-      interests = await prisma.userMicroInterest.findMany({
-        where: { userId },
+      interests = await prisma.user_micro_interests.findMany({
+        where: { user_id: userId },
         orderBy: { affinity: 'desc' },
         take: 10
       });
@@ -202,13 +202,13 @@ export class FeedGenerationService {
   }
 
   private async getAdmiringContent(userId: string, count: number) {
-    const admiringRelations = await prisma.admire.findMany({
-      where: { admirerId: userId },
-      select: { admiredId: true },
+    const admiringRelations = await prisma.admires.findMany({
+      where: { admirer_id: userId },
+      select: { admired_id: true },
       take: 20
     });
 
-    const creatorIds = admiringRelations.map((a: any) => a.admiredId);
+    const creatorIds = admiringRelations.map((a: any) => a.admired_id);
     if (creatorIds.length === 0) return [];
 
     const content = await prisma.$queryRaw<any[]>`
@@ -297,20 +297,20 @@ export class FeedGenerationService {
     return shuffled;
   }
 
-  async trackInteraction(userId: string, contentId: string, contentType: string, interaction: {
+  async trackInteraction(userId: string, content_id: string, contentType: string, interaction: {
     signalType: string;
     watchDuration?: number;
     totalDuration?: number;
   }) {
     // Track interaction signal
-    await prisma.userInteractionSignal.create({
+    await prisma.user_interaction_signals.create({
       data: {
-        userId,
-        contentId,
-        contentType,
-        signalType: interaction.signalType,
-        watchDuration: interaction.watchDuration || 0,
-        totalDuration: interaction.totalDuration || 0,
+        user_id: userId,
+        content_id,
+        content_type: contentType,
+        signal_type: interaction.signalType,
+        watch_duration: interaction.watchDuration || 0,
+        total_duration: interaction.totalDuration || 0,
         weight: this.getSignalWeight(interaction.signalType)
       }
     });
@@ -319,7 +319,7 @@ export class FeedGenerationService {
     const updates: any = {};
     if (interaction.signalType === 'VIEW') {
       updates.viewed = true;
-      updates.viewDuration = interaction.watchDuration;
+      updates.view_duration = interaction.watchDuration;
       if (interaction.watchDuration && interaction.totalDuration) {
         updates.completed = interaction.watchDuration >= interaction.totalDuration * 0.9;
       }
@@ -330,16 +330,16 @@ export class FeedGenerationService {
     } else if (interaction.signalType === 'COMMENT') {
       updates.commented = true;
     } else if (interaction.signalType === 'REWATCH') {
-      updates.rewatchedCount = { increment: 1 };
+      updates.rewatched_count = { increment: 1 };
     }
 
-    await prisma.userContentDelivery.updateMany({
-      where: { userId, contentId, contentType },
+    await prisma.user_content_delivery.updateMany({
+      where: { user_id: userId, content_id, content_type: contentType },
       data: updates
     });
 
     // Update micro-interests based on interaction
-    await this.updateMicroInterests(userId, contentId, contentType, interaction.signalType);
+    await this.updateMicroInterests(userId, content_id, contentType, interaction.signalType);
 
     // Invalidate user's feed cache
     try {
@@ -371,7 +371,7 @@ export class FeedGenerationService {
     return weights[signalType] || 1.0;
   }
 
-  private async updateMicroInterests(userId: string, contentId: string, contentType: string, signalType: string) {
+  private async updateMicroInterests(userId: string, content_id: string, contentType: string, signalType: string) {
     // Extract categories/hashtags from content and update user interests
     // This is a simplified version - in production, use NLP/ML for better categorization
     const weight = this.getSignalWeight(signalType);
@@ -381,35 +381,36 @@ export class FeedGenerationService {
     const hashtags = await prisma.$queryRaw<{ tag: string }[]>`
       SELECT h.tag FROM hashtags h
       INNER JOIN content_hashtags ch ON h.id = ch.hashtag_id
-      WHERE ch.content_id = ${contentId} AND ch.content_type = ${contentType}
+      WHERE ch.content_id = ${content_id} AND ch.content_type = ${contentType}
     `;
 
     for (const { tag } of hashtags) {
       // Check if interest exists
-      const existing = await prisma.userMicroInterest.findFirst({
+      const existing = await prisma.user_micro_interests.findFirst({
         where: {
-          userId,
+          user_id: userId,
           category: tag
         }
       });
 
       if (existing) {
-        await prisma.userMicroInterest.update({
+        await prisma.user_micro_interests.update({
           where: { id: existing.id },
           data: {
             affinity: {
               increment: Math.min(0.05 * weight, 0.2)
             },
-            lastEngagedAt: new Date()
+            last_engaged_at: new Date()
           }
         });
       } else {
-        await prisma.userMicroInterest.create({
+        await prisma.user_micro_interests.create({
           data: {
-            userId,
+            user_id: userId,
+            interest: tag,
             category: tag,
             affinity: Math.min(0.1 * weight, 1.0),
-            lastEngagedAt: new Date()
+            last_engaged_at: new Date()
           }
         });
       }

@@ -16,7 +16,7 @@ const router = Router();
 const createContestSchema = z.object({
   title: z.string().min(5).max(100),
   description: z.string().min(10).max(2000),
-  mediaType: z.enum(['PHOTO', 'VIDEO', 'PHOTO_AND_VIDEO']),
+  media_type: z.enum(['PHOTO', 'VIDEO', 'PHOTO_AND_VIDEO']),
   category: z.enum(['DANCE', 'CHALLENGE', 'PROMOTION', 'CREATIVE', 'ART', 'MUSIC']),
   prizeTotalKr: z.number().positive('Prize must be positive'),
   requiredActions: z.array(z.object({
@@ -53,8 +53,8 @@ const createContestSchema = z.object({
 });
 
 const submitEntrySchema = z.object({
-  mediaUrl: z.string().url('Invalid media URL'),
-  mediaType: z.enum(['PHOTO', 'VIDEO']),
+  media_url: z.string().url('Invalid media URL'),
+  media_type: z.enum(['PHOTO', 'VIDEO']),
   proofUrls: z.array(z.string().url()).optional()
 });
 
@@ -84,13 +84,14 @@ router.post('/',
   try {
     const data = createContestSchema.parse(req.body);
     const contest = await ContestService.createContest({
-      creatorId: req.userId!,
+      creator_id: req.userId!,
       ...data,
+      mediaType: data.media_type,
       deadline: new Date(data.deadline)
     });
     // Return only contestId and message as expected by frontend
     res.status(201).json({ 
-      contestId: contest.contestId,
+      contest_id: contest.contest_id,
       message: 'Contest created successfully' 
     });
   } catch (error: any) {
@@ -151,9 +152,11 @@ router.post('/:id/submit',
   try {
     const data = submitEntrySchema.parse(req.body);
     const submission = await ContestService.submitEntry({
-      userId: req.userId!,
+      user_id: req.userId!,
       contestId: String(req.params.id),
-      ...data
+      mediaUrl: data.media_url,
+      mediaType: data.media_type,
+      proofUrls: data.proofUrls
     });
     res.status(201).json(submission);
   } catch (error: any) {
@@ -196,7 +199,7 @@ router.post('/submissions/:submissionId/vote',
   async (req: AuthRequest, res: Response) => {
   try {
     const { voteType } = z.object({ voteType: z.enum(['UPVOTE', 'DOWNVOTE']) }).parse(req.body);
-    const result = await ContestService.voteOnSubmission(req.userId!, String(req.params.submissionId), voteType);
+    const result = await ContestService.voteOnSubmission(req.userId!, String(req.params.submission_id), voteType);
     res.status(200).json(result);
   } catch (error: any) {
     if (error.name === 'ZodError') {

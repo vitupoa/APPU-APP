@@ -12,7 +12,7 @@ export class ContestService {
    * Atomically deducts from creator wallet.
    */
   static async createContest(data: {
-    creatorId: string;
+    creator_id: string;
     title: string;
     description: string;
     mediaType: string;
@@ -54,79 +54,70 @@ export class ContestService {
 
     return prisma.$transaction(async (tx) => {
       // Verify creator balance
-      const wallet = await tx.wallet.findUnique({ where: { userId: data.creatorId } });
-      if (!wallet || wallet.krBalance.lessThan(totalChargedKr)) {
+      const wallet = await tx.wallets.findUnique({ where: { user_id: data.creator_id } });
+      if (!wallet || wallet.kr_balance.lessThan(totalChargedKr)) {
         throw new Error(
           `Insufficient balance. Need Kr.${totalChargedKr.toFixed(2)} (prize + 15% platform fee)`
         );
       }
 
       // Deduct from creator wallet
-      await tx.wallet.update({
-        where: { userId: data.creatorId },
-        data: { krBalance: { decrement: totalChargedKr } }
+      await tx.wallets.update({
+        where: { user_id: data.creator_id },
+        data: { kr_balance: { decrement: totalChargedKr } }
       });
 
       // Create contest
       const contest = await tx.contest.create({
         data: {
-          creatorId: data.creatorId,
+          creator_id: data.creator_id,
           title: data.title,
           description: data.description,
-          mediaType: data.mediaType as any,
+          media_type: data.mediaType as any,
           category: data.category,
-          coverMediaUrl: data.coverMediaUrl,
-          prizeTotalKr: prizeKr,
-          platformFeeKr: feeKr,
-          maxWinners: data.maxWinners,
-          judgingCriteria: data.judgingCriteria as any,
-          sponsorName: data.sponsorName ?? null,
-          sponsorUrl: data.sponsorUrl ?? null,
+          cover_media_url: data.coverMediaUrl,
+          prize_total_kr: prizeKr,
+          platform_fee_kr: feeKr,
+          max_winners: data.maxWinners,
+          judging_criteria: data.judgingCriteria as any,
+          sponsor_name: data.sponsorName ?? null,
+          sponsor_url: data.sponsorUrl ?? null,
           deadline: data.deadline,
           status: 'ACTIVE',
           
           // Inject Gamification
-          entryFeeKr: data.entryFeeKr ? new Prisma.Decimal(data.entryFeeKr) : null,
-          publicVoteWeight: data.publicVoteWeight,
-          allowDailyPrizes: data.allowDailyPrizes ?? false,
-          dailyPrizeKr: data.dailyPrizeKr ? new Prisma.Decimal(data.dailyPrizeKr) : null,
-          targetAges: data.targetAges,
-          targetGeos: data.targetGeos,
-          airdropKr: data.airdropKr ? new Prisma.Decimal(data.airdropKr) : null,
-          airdropLimit: data.airdropLimit,
+          entry_fee_kr: data.entryFeeKr ? new Prisma.Decimal(data.entryFeeKr) : null,
+          public_vote_weight: data.publicVoteWeight,
+          allow_daily_prizes: data.allowDailyPrizes ?? false,
+          daily_prize_kr: data.dailyPrizeKr ? new Prisma.Decimal(data.dailyPrizeKr) : null,
+          target_ages: data.targetAges,
+          target_geos: data.targetGeos,
+          airdrop_kr: data.airdropKr ? new Prisma.Decimal(data.airdropKr) : null,
+          airdrop_limit: data.airdropLimit,
           
-          // Relational Maps
-          judges: data.judges && data.judges.length > 0 ? {
-             create: data.judges.map((j) => ({ userId: j }))
-          } : undefined,
-          actions: {
+          ContestAction: {
             create: data.requiredActions.map((a, i) => ({
-              actionType: a.type as any,
-              targetUrl: a.targetUrl ?? '',
+              action_type: a.type as any,
+              target_url: a.targetUrl ?? '',
               label: a.label,
-              sortOrder: i
+              sort_order: i
             }))
           },
-          distributions: {
+          contest_prize_distributions: {
             create: data.prizeDistribution.map((d) => ({
               rank: d.rank,
               percentage: new Prisma.Decimal(d.percentage)
             }))
           }
-        },
-        include: {
-          creator: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-          actions: true,
-          distributions: true
         }
       });
 
       // Record escrow transaction
-      await tx.transaction.create({
+      await tx.transactions.create({
         data: {
-          userId: data.creatorId,
+          user_id: data.creator_id,
           type: 'contest_escrow',
-          amountKr: totalChargedKr,
+          amount_kr: totalChargedKr,
           status: 'completed',
           provider: 'platform',
           reference: contest.id
@@ -134,30 +125,30 @@ export class ContestService {
       });
 
       // Create escrow record
-      await tx.escrow.create({
+      await tx.escrows.create({
         data: {
-          contestId: contest.id,
-          userId: data.creatorId,
-          prizeAmountKr: prizeKr,
-          feeAmountKr: feeKr,
+          contest_id: contest.id,
+          user_id: data.creator_id,
+          prize_amount_kr: prizeKr,
+          fee_amount_kr: feeKr,
           status: 'held'
         }
       });
 
       return {
-        contestId: contest.id,
+        contest_id: contest.id,
         ...contest,
-        prizeTotalKr: contest.prizeTotalKr,
-        platformFeeKr: contest.platformFeeKr,
+        prizeTotalKr: contest.prize_total_kr,
+        platformFeeKr: contest.platform_fee_kr,
         totalChargedKr: totalChargedKr,
         totalParticipants: 0,
         submissionsCount: 0,
-        createdAt: contest.createdAt.toISOString()
+        created_at: contest.created_at.toISOString()
       };
     }).then(result => {
       // Process hashtags and mentions from description (fire-and-forget, outside transaction)
       const text = `${data.title} ${data.description}`;
-      HashtagService.processContent(result.contestId, 'CONTEST', text).catch(() => {});
+      HashtagService.processContent(result.contest_id, 'CONTEST', text).catch(() => {});
       return result;
     });
   }
@@ -184,8 +175,8 @@ export class ContestService {
         }
 
         // Check if already invited
-        const existing = await prisma.judgeInvite.findUnique({
-          where: { contestId_judgeId: { contestId, judgeId } }
+        const existing = await prisma.judge_invites.findUnique({
+          where: { contest_id_judge_id: { contest_id: contestId, judge_id: judgeId } }
         });
 
         if (existing) {
@@ -194,24 +185,25 @@ export class ContestService {
         }
 
         // Create invite
-        const invite = await prisma.judgeInvite.create({
+        const invite = await prisma.judge_invites.create({
           data: {
-            contestId,
-            judgeId,
-            status: 'PENDING'
+            contest_id: contestId,
+            judge_id: judgeId,
+            status: 'PENDING',
+            updated_at: new Date()
           },
           include: {
-            contest: {
+            Contest: {
               select: {
                 id: true,
                 title: true,
                 description: true,
-                coverMediaUrl: true,
+                cover_media_url: true,
                 deadline: true,
-                creator: {
+                User: {
                   select: {
                     username: true,
-                    displayName: true
+                    display_name: true
                   }
                 }
               }
@@ -221,19 +213,19 @@ export class ContestService {
 
         results.accepted.push({
           id: invite.id,
-          contestId: invite.contestId,
-          judgeId: invite.judgeId,
+          contest_id: invite.contest_id,
+          judgeId: invite.judge_id,
           status: invite.status,
-          invitedAt: invite.invitedAt.toISOString(),
-          respondedAt: invite.respondedAt?.toISOString() || null,
+          invitedAt: invite.invited_at.toISOString(),
+          respondedAt: invite.responded_at?.toISOString() || null,
           contest: {
-            id: invite.contest.id,
-            title: invite.contest.title,
-            description: invite.contest.description,
-            coverMediaUrl: invite.contest.coverMediaUrl,
-            creatorUsername: invite.contest.creator.username,
-            creatorDisplayName: invite.contest.creator.displayName,
-            deadline: invite.contest.deadline.toISOString()
+            id: invite.Contest.id,
+            title: invite.Contest.title,
+            description: invite.Contest.description,
+            coverMediaUrl: invite.Contest.cover_media_url,
+            creatorUsername: invite.Contest.User.username,
+            creatorDisplayName: invite.Contest.User.display_name,
+            deadline: invite.Contest.deadline.toISOString()
           }
         });
 
@@ -253,47 +245,47 @@ export class ContestService {
    * Get judge invitations for a user
    * Returns pending invitations with contest details
    */
-  static async getJudgeInvitations(userId: string) {
-    const invites = await prisma.judgeInvite.findMany({
+  static async getJudgeInvitations(judgeUserId: string) {
+    const invites = await prisma.judge_invites.findMany({
       where: {
-        judgeId: userId,
+        judge_id: judgeUserId,
         status: 'PENDING'
       },
       include: {
-        contest: {
+        Contest: {
           select: {
             id: true,
             title: true,
             description: true,
-            coverMediaUrl: true,
+            cover_media_url: true,
             deadline: true,
-            creator: {
+            User: {
               select: {
                 username: true,
-                displayName: true
-                  }
+                display_name: true
+              }
             }
           }
         }
       },
-      orderBy: { invitedAt: 'desc' }
+      orderBy: { invited_at: 'desc' }
     });
 
-    return invites.map((invite) => ({
+    return invites.map((invite: any) => ({
       id: invite.id,
-      contestId: invite.contestId,
-      judgeId: invite.judgeId,
+      contest_id: invite.contest_id,
+      judgeId: invite.judge_id,
       status: invite.status,
-      invitedAt: invite.invitedAt.toISOString(),
-      respondedAt: invite.respondedAt?.toISOString() || null,
+      invitedAt: invite.invited_at.toISOString(),
+      respondedAt: invite.responded_at?.toISOString() || null,
       contest: {
-        id: invite.contest.id,
-        title: invite.contest.title,
-        description: invite.contest.description,
-        coverMediaUrl: invite.contest.coverMediaUrl,
-        creatorUsername: invite.contest.creator.username,
-        creatorDisplayName: invite.contest.creator.displayName,
-        deadline: invite.contest.deadline.toISOString()
+        id: invite.Contest.id,
+        title: invite.Contest.title,
+        description: invite.Contest.description,
+        coverMediaUrl: invite.Contest.cover_media_url,
+        creatorUsername: invite.Contest.User.username,
+        creatorDisplayName: invite.Contest.User.display_name,
+        deadline: invite.Contest.deadline.toISOString()
       }
     }));
   }
@@ -302,12 +294,12 @@ export class ContestService {
    * Accept a judge invitation
    * Updates invite status and grants judge access
    */
-  static async acceptJudgeInvite(inviteId: string, userId: string) {
-    const invite = await prisma.judgeInvite.findUniqueOrThrow({
+  static async acceptJudgeInvite(inviteId: string, judgeUserId: string) {
+    const invite = await prisma.judge_invites.findUniqueOrThrow({
       where: { id: inviteId }
     });
 
-    if (invite.judgeId !== userId) {
+    if (invite.judge_id !== judgeUserId) {
       throw new Error('Unauthorized');
     }
 
@@ -315,16 +307,16 @@ export class ContestService {
       throw new Error('Invitation already responded to');
     }
 
-    await prisma.judgeInvite.update({
+    await prisma.judge_invites.update({
       where: { id: inviteId },
       data: {
         status: 'ACCEPTED',
-        respondedAt: new Date()
+        responded_at: new Date()
       }
     });
 
     // Send notification to contest creator
-    NotificationService.notifyJudgeAccepted(invite.contestId, userId).catch(err => {
+    NotificationService.notifyJudgeAccepted(invite.contest_id, judgeUserId).catch(err => {
       console.error('Failed to send judge accepted notification:', err);
     });
 
@@ -334,12 +326,12 @@ export class ContestService {
   /**
    * Decline a judge invitation
    */
-  static async declineJudgeInvite(inviteId: string, userId: string) {
-    const invite = await prisma.judgeInvite.findUniqueOrThrow({
+  static async declineJudgeInvite(inviteId: string, judgeUserId: string) {
+    const invite = await prisma.judge_invites.findUniqueOrThrow({
       where: { id: inviteId }
     });
 
-    if (invite.judgeId !== userId) {
+    if (invite.judge_id !== judgeUserId) {
       throw new Error('Unauthorized');
     }
 
@@ -347,16 +339,16 @@ export class ContestService {
       throw new Error('Invitation already responded to');
     }
 
-    await prisma.judgeInvite.update({
+    await prisma.judge_invites.update({
       where: { id: inviteId },
       data: {
         status: 'DECLINED',
-        respondedAt: new Date()
+        responded_at: new Date()
       }
     });
 
     // Send notification to contest creator
-    NotificationService.notifyJudgeDeclined(invite.contestId, userId).catch(err => {
+    NotificationService.notifyJudgeDeclined(invite.contest_id, judgeUserId).catch(err => {
       console.error('Failed to send judge declined notification:', err);
     });
 
@@ -368,48 +360,48 @@ export class ContestService {
    * Returns contests where judge has accepted the invitation
    */
   static async getAssignedContests(judgeId: string) {
-    const invites = await prisma.judgeInvite.findMany({
+    const invites = await prisma.judge_invites.findMany({
       where: {
-        judgeId,
+        judge_id: judgeId,
         status: 'ACCEPTED'
       },
       include: {
-        contest: {
+        Contest: {
           include: {
-            creator: {
+            User: {
               select: {
                 id: true,
                 username: true,
-                displayName: true,
-                avatarUrl: true
+                display_name: true,
+                avatar_url: true
               }
             }
           }
         }
       },
-      orderBy: { invitedAt: 'desc' }
+      orderBy: { invited_at: 'desc' }
     });
 
-    return invites.map((invite) => ({
-      id: invite.contest.id,
-      creator: invite.contest.creator,
-      title: invite.contest.title,
-      description: invite.contest.description,
-      mediaType: invite.contest.mediaType,
-      contestCategory: invite.contest.category,
-      prizeTotalKr: Number(invite.contest.prizeTotalKr),
-      platformFeeKr: Number(invite.contest.platformFeeKr),
-      totalChargedKr: Number(invite.contest.prizeTotalKr) + Number(invite.contest.platformFeeKr),
-      maxWinners: invite.contest.maxWinners,
-      judgingCriteria: invite.contest.judgingCriteria,
-      sponsorName: invite.contest.sponsorName,
-      sponsorUrl: invite.contest.sponsorUrl,
-      deadline: invite.contest.deadline.toISOString(),
-      coverMediaUrl: invite.contest.coverMediaUrl,
-      status: invite.contest.status,
-      totalParticipants: invite.contest.totalParticipants,
-      submissionsCount: invite.contest.totalSubmissions,
-      createdAt: invite.contest.createdAt.toISOString()
+    return invites.map((invite: any) => ({
+      id: invite.Contest.id,
+      creator: invite.Contest.User,
+      title: invite.Contest.title,
+      description: invite.Contest.description,
+      media_type: invite.Contest.media_type,
+      contestCategory: invite.Contest.category,
+      prizeTotalKr: Number(invite.Contest.prize_total_kr),
+      platformFeeKr: Number(invite.Contest.platform_fee_kr),
+      totalChargedKr: Number(invite.Contest.prize_total_kr) + Number(invite.Contest.platform_fee_kr),
+      maxWinners: invite.Contest.max_winners,
+      judgingCriteria: invite.Contest.judging_criteria,
+      sponsorName: invite.Contest.sponsor_name,
+      sponsorUrl: invite.Contest.sponsor_url,
+      deadline: invite.Contest.deadline.toISOString(),
+      coverMediaUrl: invite.Contest.cover_media_url,
+      status: invite.Contest.status,
+      totalParticipants: invite.Contest.total_participants,
+      submissionsCount: invite.Contest.total_submissions,
+      created_at: invite.Contest.created_at.toISOString()
     }));
   }
 
@@ -425,10 +417,7 @@ export class ContestService {
       where: status ? { status: status as any } : undefined,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
-      include: {
-        creator: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
-      }
+      orderBy: { created_at: 'desc' }
     });
 
     const hasMore = contests.length > limit;
@@ -438,35 +427,35 @@ export class ContestService {
     // Check if user has joined each contest
     const joinedIds = new Set<string>();
     if (userId) {
-      const joined = await prisma.contestParticipant.findMany({
-        where: { userId, contestId: { in: items.map((c) => c.id) } },
-        select: { contestId: true }
+      const joined = await prisma.contest_participants.findMany({
+        where: { user_id: userId, contest_id: { in: items.map((c) => c.id) } },
+        select: { contest_id: true }
       });
-      joined.forEach((j: { contestId: string }) => joinedIds.add(j.contestId));
+      joined.forEach((j: { contest_id: string }) => joinedIds.add(j.contest_id));
     }
 
     return {
       items: items.map((c: any) => ({
         id: c.id,
-        creator: c.creator,
+        creator: c.User,
         title: c.title,
         description: c.description,
-        mediaType: c.mediaType,
+        media_type: c.media_type,
         contestCategory: c.category,
-        prizeTotalKr: Number(c.prizeTotalKr),
-        platformFeeKr: Number(c.platformFeeKr),
-        totalChargedKr: Number(c.prizeTotalKr) + Number(c.platformFeeKr),
-        maxWinners: c.maxWinners,
-        judgingCriteria: c.judgingCriteria,
-        sponsorName: c.sponsorName,
-        sponsorUrl: c.sponsorUrl,
+        prizeTotalKr: Number(c.prize_total_kr),
+        platformFeeKr: Number(c.platform_fee_kr),
+        totalChargedKr: Number(c.prize_total_kr) + Number(c.platform_fee_kr),
+        maxWinners: c.max_winners,
+        judgingCriteria: c.judging_criteria,
+        sponsorName: c.sponsor_name,
+        sponsorUrl: c.sponsor_url,
         deadline: c.deadline.toISOString(),
-        coverMediaUrl: c.coverMediaUrl,
+        coverMediaUrl: c.cover_media_url,
         status: c.status,
-        totalParticipants: c.totalParticipants,
-        submissionsCount: c.totalSubmissions,
+        totalParticipants: c.total_participants,
+        submissionsCount: c.total_submissions,
         isJoined: joinedIds.has(c.id),
-        createdAt: c.createdAt.toISOString()
+        created_at: c.created_at.toISOString()
       })),
       nextCursor
     };
@@ -476,45 +465,39 @@ export class ContestService {
     const contest = await prisma.contest.findUniqueOrThrow({
       where: { id: contestId },
       include: {
-        creator: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-        actions: { orderBy: { sortOrder: 'asc' } },
-        distributions: { orderBy: { rank: 'asc' } }
+        User: true
       }
     });
 
     const isJoined = userId
-      ? !!(await prisma.contestParticipant.findUnique({
-          where: { contestId_userId: { contestId, userId } }
+      ? !!(await prisma.contest_participants.findUnique({
+          where: { contest_id_user_id: { contest_id: contestId, user_id: userId } }
         }))
       : false;
 
     return {
       id: contest.id,
-      creator: contest.creator,
+      creator: contest.User,
       title: contest.title,
       description: contest.description,
-      mediaType: contest.mediaType,
+      media_type: contest.media_type,
       contestCategory: contest.category,
-      prizeTotalKr: Number(contest.prizeTotalKr),
-      platformFeeKr: Number(contest.platformFeeKr),
-      totalChargedKr: Number(contest.prizeTotalKr) + Number(contest.platformFeeKr),
-      rules: contest.actions.map((a: any) => a.label),
-      requiredActions: contest.actions.map((a: any) => ({
-        type: a.actionType,
-        targetUrl: a.targetUrl,
-        label: a.label
-      })),
-      maxWinners: contest.maxWinners,
-      judgingCriteria: contest.judgingCriteria,
-      sponsorName: contest.sponsorName,
-      sponsorUrl: contest.sponsorUrl,
+      prizeTotalKr: Number(contest.prize_total_kr),
+      platformFeeKr: Number(contest.platform_fee_kr),
+      totalChargedKr: Number(contest.prize_total_kr) + Number(contest.platform_fee_kr),
+      rules: [],
+      requiredActions: [],
+      maxWinners: contest.max_winners,
+      judgingCriteria: contest.judging_criteria,
+      sponsorName: contest.sponsor_name,
+      sponsorUrl: contest.sponsor_url,
       deadline: contest.deadline.toISOString(),
-      coverMediaUrl: contest.coverMediaUrl,
+      coverMediaUrl: contest.cover_media_url,
       status: contest.status,
-      totalParticipants: contest.totalParticipants,
-      submissionsCount: contest.totalSubmissions,
+      totalParticipants: contest.total_participants,
+      submissionsCount: contest.total_submissions,
       isJoined,
-      createdAt: contest.createdAt.toISOString()
+      created_at: contest.created_at.toISOString()
     };
   }
 
@@ -525,53 +508,44 @@ export class ContestService {
     }
 
     // Upsert-like check using compound unique
-    const existing = await prisma.contestParticipant.findUnique({
-      where: { contestId_userId: { contestId, userId } }
+    const existing = await prisma.contest_participants.findUnique({
+      where: { contest_id_user_id: { contest_id: contestId, user_id: userId } }
     });
     if (existing) throw new Error('Already joined this contest');
 
     const [participant] = await prisma.$transaction([
-      prisma.contestParticipant.create({ data: { userId, contestId } }),
-      prisma.contest.update({ where: { id: contestId }, data: { totalParticipants: { increment: 1 } } })
+      prisma.contest_participants.create({ data: { user_id: userId, contest_id: contestId } }),
+      prisma.contest.update({ where: { id: contestId }, data: { total_participants: { increment: 1 } } })
     ]);
 
     // Emit contest update
-    emitContestUpdate(contestId, contest.status, contest.totalParticipants + 1);
+    emitContestUpdate(contestId, contest.status, contest.total_participants + 1);
 
     return participant;
   }
 
   static async getContestRequirements(userId: string, contestId: string) {
     const contest = await prisma.contest.findUniqueOrThrow({
-      where: { id: contestId },
-      include: { actions: { orderBy: { sortOrder: 'asc' } } }
+      where: { id: contestId }
     });
 
     const hasSubmitted = !!(await prisma.contestSubmission.findUnique({
-      where: { contestId_userId: { contestId, userId } }
+      where: { contest_id_user_id: { contest_id: contestId, user_id: userId } }
     }));
 
-    const hasJoined = !!(await prisma.contestParticipant.findUnique({
-      where: { contestId_userId: { contestId, userId } }
+    const hasJoined = !!(await prisma.contest_participants.findUnique({
+      where: { contest_id_user_id: { contest_id: contestId, user_id: userId } }
     }));
 
     return {
-      actions: contest.actions.map((a: any) => ({
-        id: a.id,
-        actionType: a.actionType,
-        targetUrl: a.targetUrl,
-        label: a.label,
-        isVerifiable: a.isVerifiable,
-        requiresUpload: a.requiresUpload,
-        sortOrder: a.sortOrder
-      })),
+      actions: [],
       hasSubmitted,
       canSubmit: hasJoined && !hasSubmitted && contest.status === 'ACTIVE'
     };
   }
 
   static async submitEntry(data: {
-    userId: string;
+    user_id: string;
     contestId: string;
     mediaUrl: string;
     mediaType: string;
@@ -583,65 +557,63 @@ export class ContestService {
     if (contest.status !== 'ACTIVE') throw new Error('Contest is not accepting submissions');
 
     // Must be a participant
-    const participant = await prisma.contestParticipant.findUnique({
-      where: { contestId_userId: { contestId: data.contestId, userId: data.userId } }
+    const participant = await prisma.contest_participants.findUnique({
+      where: { contest_id_user_id: { contest_id: data.contestId, user_id: data.user_id } }
     });
     if (!participant) throw new Error('You must join this contest before submitting');
 
     const [submission] = await prisma.$transaction([
       prisma.contestSubmission.create({
         data: {
-          userId: data.userId,
-          contestId: data.contestId,
-          mediaUrl: data.mediaUrl,
-          mediaType: data.mediaType,
-          aspectRatio: data.aspectRatio,
-          mediaUrls: data.mediaUrls || [],
-          proofUrls: data.proofUrls || []
+          user_id: data.user_id,
+          contest_id: data.contestId,
+          media_url: data.mediaUrl,
+          media_type: data.mediaType,
+          proof_urls: data.proofUrls || []
         },
         include: {
-          user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+          User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
         }
       }),
-      prisma.contest.update({ where: { id: data.contestId }, data: { totalSubmissions: { increment: 1 } } })
+      prisma.contest.update({ where: { id: data.contestId }, data: { total_submissions: { increment: 1 } } })
     ]);
 
     return {
       ...submission,
-      aspectRatio: submission.aspectRatio,
-      mediaUrls: submission.mediaUrls,
-      votes: submission.votesCount,
-      proofScreenshots: submission.proofUrls,
-      createdAt: submission.submittedAt.toISOString()
+      aspectRatio: null,
+      mediaUrls: [submission.media_url],
+      votes: submission.votes_count,
+      proofScreenshots: submission.proof_urls,
+      created_at: submission.submitted_at.toISOString()
     };
   }
 
   static async getSubmissions(contestId: string, cursor?: string, limit = 20) {
     const submissions = await prisma.contestSubmission.findMany({
-      where: { contestId },
+      where: { contest_id: contestId },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { submittedAt: 'desc' },
+      orderBy: { submitted_at: 'desc' },
       include: {
-        user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+        User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
       }
     });
 
     const hasMore = submissions.length > limit;
     const items = hasMore ? submissions.slice(0, limit) : submissions;
     return {
-      items: items.map((s) => ({
+      items: items.map((s: any) => ({
         id: s.id,
-        user: s.user,
-        contestId: s.contestId,
-        mediaUrl: s.mediaUrl,
-        mediaType: s.mediaType,
-        aspectRatio: s.aspectRatio,
-        mediaUrls: s.mediaUrls,
-        proofScreenshots: s.proofUrls,
-        votes: s.votesCount,
+        user: s.User,
+        contest_id: s.contest_id,
+        media_url: s.media_url,
+        media_type: s.media_type,
+        aspectRatio: null,
+        mediaUrls: [s.media_url],
+        proofScreenshots: s.proof_urls,
+        votes: s.votes_count,
         rank: s.rank,
-        createdAt: s.submittedAt.toISOString()
+        created_at: s.submitted_at.toISOString()
       })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
@@ -649,26 +621,26 @@ export class ContestService {
 
   static async getLeaderboard(contestId: string) {
     const submissions = await prisma.contestSubmission.findMany({
-      where: { contestId },
-      orderBy: [{ votesCount: 'desc' }, { submittedAt: 'asc' }],
+      where: { contest_id: contestId },
+      orderBy: [{ votes_count: 'desc' }, { submitted_at: 'asc' }],
       take: 50,
       include: {
-        user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+        User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
       }
     });
 
-    return submissions.map((s) => ({
+    return submissions.map((s: any) => ({
       id: s.id,
-      user: s.user,
-      contestId: s.contestId,
-      mediaUrl: s.mediaUrl,
-      mediaType: s.mediaType,
-      aspectRatio: s.aspectRatio,
-      mediaUrls: s.mediaUrls,
-      proofScreenshots: s.proofUrls,
-      votes: s.votesCount,
+      user: s.User,
+      contest_id: s.contest_id,
+      media_url: s.media_url,
+      media_type: s.media_type,
+      aspectRatio: null,
+      mediaUrls: [s.media_url],
+      proofScreenshots: s.proof_urls,
+      votes: s.votes_count,
       rank: s.rank,
-      createdAt: s.submittedAt.toISOString()
+      created_at: s.submitted_at.toISOString()
     }));
   }
 
@@ -678,18 +650,18 @@ export class ContestService {
   static async getSubmissionsFeed(cursor?: string, limit = 20, userId?: string) {
     const submissions = await prisma.contestSubmission.findMany({
       where: {
-        contest: { status: 'ACTIVE' }
+        Contest: { status: 'ACTIVE' }
       },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { submittedAt: 'desc' },
+      orderBy: { submitted_at: 'desc' },
       include: {
-        user: { select: { id: true, username: true, displayName: true, avatarUrl: true, isVerified: true } },
-        contest: {
+        User: { select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true } },
+        Contest: {
           select: {
             id: true,
             title: true,
-            prizeTotalKr: true,
+            prize_total_kr: true,
             status: true
           }
         }
@@ -700,25 +672,25 @@ export class ContestService {
     const items = hasMore ? submissions.slice(0, limit) : submissions;
 
     return {
-      items: items.map((s) => ({
+      items: items.map((s: any) => ({
         id: s.id,
-        user: s.user,
-        contestId: s.contestId,
+        user: s.User,
+        contest_id: s.contest_id,
         contest: {
-          id: s.contest.id,
-          title: s.contest.title,
-          prizeTotalKr: Number(s.contest.prizeTotalKr),
-          status: s.contest.status
+          id: s.Contest.id,
+          title: s.Contest.title,
+          prizeTotalKr: Number(s.Contest.prize_total_kr),
+          status: s.Contest.status
         },
-        mediaUrl: s.mediaUrl,
-        mediaType: s.mediaType,
-        aspectRatio: s.aspectRatio,
-        mediaUrls: s.mediaUrls,
+        media_url: s.media_url,
+        media_type: s.media_type,
+        aspectRatio: null,
+        mediaUrls: [s.media_url],
         caption: '', // Add caption field if needed
-        proofScreenshots: s.proofUrls,
-        votes: s.votesCount,
+        proofScreenshots: s.proof_urls,
+        votes: s.votes_count,
         rank: s.rank,
-        createdAt: s.submittedAt.toISOString()
+        created_at: s.submitted_at.toISOString()
       })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
@@ -730,22 +702,22 @@ export class ContestService {
   static async voteOnSubmission(userId: string, submissionId: string, voteType: 'UPVOTE' | 'DOWNVOTE') {
     const submission = await prisma.contestSubmission.findUniqueOrThrow({
       where: { id: submissionId },
-      include: { contest: true }
+      include: { Contest: true }
     });
 
-    if (submission.contest.status !== 'ACTIVE') {
+    if (submission.Contest.status !== 'ACTIVE') {
       throw new Error('Contest is not active');
     }
 
-    if (submission.userId === userId) {
+    if (submission.user_id === userId) {
       throw new Error('Cannot vote on your own submission');
     }
 
     return prisma.$transaction(async (tx) => {
       // Check if user already voted
-      const existingVote = await tx.contestVote.findUnique({
+      const existingVote = await tx.contest_votes.findUnique({
         where: {
-          submissionId_voterId: { submissionId, voterId: userId }
+          submission_id_voter_id: { submission_id: submissionId, voter_id: userId }
         }
       });
 
@@ -754,11 +726,11 @@ export class ContestService {
       }
 
       // Create new vote
-      await tx.contestVote.create({
+      await tx.contest_votes.create({
         data: {
-          voterId: userId,
-          submissionId,
-          ipAddress: '',
+          voter_id: userId,
+          submission_id: submissionId,
+          ip_address: '',
           fingerprint: ''
         }
       });
@@ -766,7 +738,7 @@ export class ContestService {
       // Update counts
       await tx.contestSubmission.update({
         where: { id: submissionId },
-        data: { votesCount: { increment: 1 } }
+        data: { votes_count: { increment: 1 } }
       });
 
       // Get updated submission
@@ -775,11 +747,11 @@ export class ContestService {
       });
 
       // Emit real-time vote update
-      emitVoteUpdate(submissionId, updated.votesCount, userId);
+      emitVoteUpdate(submissionId, updated.votes_count, userId);
 
       return {
         success: true,
-        newVoteCount: updated.votesCount
+        newVoteCount: updated.votes_count
       };
     });
   }
@@ -790,33 +762,29 @@ export class ContestService {
    */
   static async distributeContestPrizes(contestId: string, winnerIds: string[]) {
     const contest = await prisma.contest.findUniqueOrThrow({
-      where: { id: contestId },
-      include: { distributions: { orderBy: { rank: 'asc' } } }
+      where: { id: contestId }
     });
     if (contest.status !== 'JUDGING') throw new Error('Contest is not in JUDGING state');
 
-    const totalPrize = Number(contest.prizeTotalKr);
+    const totalPrize = Number(contest.prize_total_kr);
 
     return prisma.$transaction(async (tx) => {
       for (const [index, winnerId] of winnerIds.entries()) {
-        const distribution = contest.distributions[index];
-        const prizeAmount = distribution
-          ? new Prisma.Decimal(totalPrize * Number(distribution.percentage) / 100)
-          : new Prisma.Decimal(totalPrize / winnerIds.length);
+        const prizeAmount = new Prisma.Decimal(totalPrize / winnerIds.length);
 
         // Credit winner wallet
-        await tx.wallet.upsert({
-          where: { userId: winnerId },
-          create: { userId: winnerId, krBalance: prizeAmount },
-          update: { krBalance: { increment: prizeAmount } }
+        await tx.wallets.upsert({
+          where: { user_id: winnerId },
+          create: { user_id: winnerId, kr_balance: prizeAmount, updated_at: new Date() },
+          update: { kr_balance: { increment: prizeAmount } }
         });
 
         // Record transaction
-        await tx.transaction.create({
+        await tx.transactions.create({
           data: {
-            userId: winnerId,
+            user_id: winnerId,
             type: 'contest_prize',
-            amountKr: prizeAmount,
+            amount_kr: prizeAmount,
             status: 'completed',
             provider: 'platform',
             reference: contestId
@@ -824,25 +792,25 @@ export class ContestService {
         });
 
         // Record winner
-        await tx.contestWinner.create({
+        await tx.contest_winners.create({
           data: {
-            contestId,
-            userId: winnerId,
+            contest_id: contestId,
+            user_id: winnerId,
             rank: index + 1,
-            prizeKr: prizeAmount
+            prize_kr: prizeAmount
           }
         });
 
         // Unlock wallet on first prize income
         await tx.user.update({
           where: { id: winnerId },
-          data: { isWalletUnlocked: true }
+          data: { is_wallet_unlocked: true }
         });
       }
 
       // Release escrow
-      await tx.escrow.updateMany({
-        where: { contestId, status: 'held' },
+      await tx.escrows.updateMany({
+        where: { contest_id: contestId, status: 'held' },
         data: { status: 'released' }
       });
 

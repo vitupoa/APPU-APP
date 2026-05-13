@@ -8,7 +8,7 @@ const commentsService = new CommentsService();
 
 const getCommentsSchema = z.object({
   contentType: z.enum(['post', 'short', 'contest_submission']),
-  contentId: z.string().uuid(),
+  content_id: z.string().uuid(),
   sortBy: z.enum(['latest', 'top', 'oldest']).optional().default('latest'),
   cursor: z.string().uuid().optional(),
   limit: z.coerce.number().min(1).max(50).optional().default(20),
@@ -21,7 +21,7 @@ const getRepliesSchema = z.object({
 
 const createCommentSchema = z.object({
   text: z.string().min(1).max(500),
-  parentId: z.string().uuid().optional(),
+  parent_id: z.string().uuid().optional(),
   replyToUserId: z.string().uuid().optional(),
 });
 
@@ -41,11 +41,11 @@ const updateSettingsSchema = z.object({
 // GET /api/v1/comments - Get comments for content
 router.get('/', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { contentType, contentId, sortBy, cursor, limit } = getCommentsSchema.parse(req.query);
+    const { contentType, content_id, sortBy, cursor, limit } = getCommentsSchema.parse(req.query);
 
     const result = await commentsService.getComments(
       contentType,
-      contentId,
+      content_id,
       sortBy,
       cursor || null,
       limit,
@@ -65,7 +65,7 @@ router.get('/', optionalAuth, async (req: AuthRequest, res: Response) => {
 // GET /api/v1/comments/:commentId/replies - Get replies for a comment
 router.get('/:commentId/replies', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.commentId);
+    const commentId = String(req.params.comment_id);
     const { cursor, limit } = getRepliesSchema.parse(req.query);
 
     const result = await commentsService.getReplies(
@@ -88,15 +88,15 @@ router.get('/:commentId/replies', optionalAuth, async (req: AuthRequest, res: Re
 // POST /api/v1/comments - Create a comment
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { contentType, contentId } = getCommentsSchema.pick({ contentType: true, contentId: true }).parse(req.query);
-    const { text, parentId, replyToUserId } = createCommentSchema.parse(req.body);
+    const { contentType, content_id } = getCommentsSchema.pick({ contentType: true, content_id: true }).parse(req.query);
+    const { text, parent_id, replyToUserId } = createCommentSchema.parse(req.body);
 
     const result = await commentsService.createComment(
       req.userId!,
       contentType,
-      contentId,
+      content_id,
       text,
-      parentId || null,
+      parent_id || null,
       replyToUserId || null
     );
 
@@ -113,7 +113,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 // PUT /api/v1/comments/:commentId - Update a comment
 router.put('/:commentId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.commentId);
+    const commentId = String(req.params.comment_id);
     const { text } = updateCommentSchema.parse(req.body);
 
     const result = await commentsService.updateComment(commentId, req.userId!, text);
@@ -131,7 +131,7 @@ router.put('/:commentId', authMiddleware, async (req: AuthRequest, res: Response
 // DELETE /api/v1/comments/:commentId - Delete a comment
 router.delete('/:commentId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.commentId);
+    const commentId = String(req.params.comment_id);
 
     const result = await commentsService.deleteComment(commentId, req.userId!);
 
@@ -144,7 +144,7 @@ router.delete('/:commentId', authMiddleware, async (req: AuthRequest, res: Respo
 // POST /api/v1/comments/:commentId/like - Like a comment
 router.post('/:commentId/like', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.commentId);
+    const commentId = String(req.params.comment_id);
 
     const result = await commentsService.likeComment(commentId, req.userId!);
 
@@ -157,7 +157,7 @@ router.post('/:commentId/like', authMiddleware, async (req: AuthRequest, res: Re
 // DELETE /api/v1/comments/:commentId/like - Unlike a comment
 router.delete('/:commentId/like', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.commentId);
+    const commentId = String(req.params.comment_id);
 
     const result = await commentsService.unlikeComment(commentId, req.userId!);
 
@@ -170,7 +170,7 @@ router.delete('/:commentId/like', authMiddleware, async (req: AuthRequest, res: 
 // POST /api/v1/comments/:commentId/pin - Pin a comment
 router.post('/:commentId/pin', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.commentId);
+    const commentId = String(req.params.comment_id);
 
     const result = await commentsService.pinComment(commentId, req.userId!);
 
@@ -183,7 +183,7 @@ router.post('/:commentId/pin', authMiddleware, async (req: AuthRequest, res: Res
 // DELETE /api/v1/comments/:commentId/pin - Unpin a comment
 router.delete('/:commentId/pin', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.commentId);
+    const commentId = String(req.params.comment_id);
 
     const result = await commentsService.unpinComment(commentId, req.userId!);
 
@@ -196,7 +196,7 @@ router.delete('/:commentId/pin', authMiddleware, async (req: AuthRequest, res: R
 // POST /api/v1/comments/:commentId/report - Report a comment
 router.post('/:commentId/report', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.commentId);
+    const commentId = String(req.params.comment_id);
     const { reason } = reportCommentSchema.parse(req.body);
 
     const result = await commentsService.reportComment(commentId, req.userId!, reason);
@@ -214,13 +214,13 @@ router.post('/:commentId/report', authMiddleware, async (req: AuthRequest, res: 
 // PUT /api/v1/comments/settings - Update comment settings
 router.put('/settings', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { contentType, contentId } = getCommentsSchema.pick({ contentType: true, contentId: true }).parse(req.query);
+    const { contentType, content_id } = getCommentsSchema.pick({ contentType: true, content_id: true }).parse(req.query);
     const { commentsEnabled, repliesEnabled } = updateSettingsSchema.parse(req.body);
 
     const result = await commentsService.updateCommentSettings(
       req.userId!,
       contentType,
-      contentId,
+      content_id,
       commentsEnabled,
       repliesEnabled
     );

@@ -8,12 +8,12 @@ export class ContentModerationService {
   static async listContent(type: ContentType, options: {
     page?: number; limit?: number; search?: string; userId?: string; status?: string;
   }) {
-    const { page = 1, limit = 20, search, userId, status } = options;
+    const { page = 1, limit = 20, search, user_id, status } = options;
 
     switch (type) {
       case 'short': return this.listShorts(page, limit, search, userId);
       case 'post': return this.listPosts(page, limit, search, userId);
-      case 'contest': return this.listContests(page, limit, search, userId, status);
+      case 'contest': return this.listContests(page, limit, search, user_id, status);
       case 'story': return this.listStories(page, limit, userId);
       default: throw new Error(`Unknown content type: ${type}`);
     }
@@ -21,14 +21,14 @@ export class ContentModerationService {
 
   private static async listShorts(page: number, limit: number, search?: string, userId?: string) {
     const where: any = {};
-    if (userId) where.userId = userId;
+    if (userId) where.user_id = userId;
     if (search) where.caption = { contains: search, mode: 'insensitive' };
 
     const [items, total] = await Promise.all([
       prisma.short.findMany({
         where,
-        include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
-        orderBy: { createdAt: 'desc' },
+        include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
       prisma.short.count({ where }),
@@ -38,14 +38,14 @@ export class ContentModerationService {
 
   private static async listPosts(page: number, limit: number, search?: string, userId?: string) {
     const where: any = {};
-    if (userId) where.userId = userId;
+    if (userId) where.user_id = userId;
     if (search) where.caption = { contains: search, mode: 'insensitive' };
 
     const [items, total] = await Promise.all([
       prisma.post.findMany({
         where,
-        include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
-        orderBy: { createdAt: 'desc' },
+        include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
       prisma.post.count({ where }),
@@ -55,15 +55,15 @@ export class ContentModerationService {
 
   private static async listContests(page: number, limit: number, search?: string, userId?: string, status?: string) {
     const where: any = {};
-    if (userId) where.creatorId = userId;
+    if (userId) where.creator_id = userId;
     if (search) where.title = { contains: search, mode: 'insensitive' };
     if (status) where.status = status;
 
     const [items, total] = await Promise.all([
       prisma.contest.findMany({
         where,
-        include: { creator: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
-        orderBy: { createdAt: 'desc' },
+        include: { creator: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
       prisma.contest.count({ where }),
@@ -73,13 +73,13 @@ export class ContentModerationService {
 
   private static async listStories(page: number, limit: number, userId?: string) {
     const where: any = {};
-    if (userId) where.creatorId = userId;
+    if (userId) where.creator_id = userId;
 
     const [items, total] = await Promise.all([
       prisma.story.findMany({
         where,
-        include: { creator: { select: { id: true, username: true, displayName: true, avatarUrl: true } } },
-        orderBy: { createdAt: 'desc' },
+        include: { creator: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
       prisma.story.count({ where }),
@@ -99,14 +99,14 @@ export class ContentModerationService {
     // For 'hide', we'd add a hidden flag — using delete as primary action for now
 
     await prisma.contentModerationLog.create({
-      data: { adminId, contentType: 'short', contentId: shortId, action, reason }
+      data: { adminId, contentType: 'short', content_id: shortId, action, reason }
     });
     await AuditService.log(adminId, `content.${action}`, 'short', shortId, { reason }, ip, ua);
     return { success: true, message: `Short ${action}d` };
   }
 
   static async moderatePost(
-    adminId: string, postId: string,
+    adminId: string, post_id: string,
     action: string, reason?: string, ip?: string, ua?: string
   ) {
     if (action === 'delete') {
@@ -114,14 +114,14 @@ export class ContentModerationService {
     }
 
     await prisma.contentModerationLog.create({
-      data: { adminId, contentType: 'post', contentId: postId, action, reason }
+      data: { adminId, contentType: 'post', content_id: postId, action, reason }
     });
-    await AuditService.log(adminId, `content.${action}`, 'post', postId, { reason }, ip, ua);
+    await AuditService.log(adminId, `content.${action}`, 'post', post_id, { reason }, ip, ua);
     return { success: true, message: `Post ${action}d` };
   }
 
   static async moderateContest(
-    adminId: string, contestId: string,
+    adminId: string, contest_id: string,
     action: string, reason?: string, ip?: string, ua?: string
   ) {
     if (action === 'delete') {
@@ -133,9 +133,9 @@ export class ContentModerationService {
     }
 
     await prisma.contentModerationLog.create({
-      data: { adminId, contentType: 'contest', contentId: contestId, action, reason }
+      data: { adminId, contentType: 'contest', content_id: contestId, action, reason }
     });
-    await AuditService.log(adminId, `content.${action}`, 'contest', contestId, { reason }, ip, ua);
+    await AuditService.log(adminId, `content.${action}`, 'contest', contest_id, { reason }, ip, ua);
     return { success: true, message: `Contest ${action}d` };
   }
 
@@ -148,7 +148,7 @@ export class ContentModerationService {
     }
 
     await prisma.contentModerationLog.create({
-      data: { adminId, contentType: 'story', contentId: storyId, action, reason }
+      data: { adminId, contentType: 'story', content_id: storyId, action, reason }
     });
     await AuditService.log(adminId, `content.${action}`, 'story', storyId, { reason }, ip, ua);
     return { success: true, message: `Story ${action}d` };
@@ -164,7 +164,7 @@ export class ContentModerationService {
 
     const [items, total] = await Promise.all([
       prisma.contentModerationLog.findMany({
-        where, orderBy: { createdAt: 'desc' },
+        where, orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
       prisma.contentModerationLog.count({ where }),

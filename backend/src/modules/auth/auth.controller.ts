@@ -64,7 +64,10 @@ export class AuthController {
   static async refreshToken(req: Request, res: Response) {
     try {
       const data = refreshTokenSchema.parse(req.body);
-      const result = await AuthService.refreshToken(data);
+      const result = await AuthService.refreshToken({
+        refresh_token: data.refresh_token,
+        deviceId: data.device_id
+      });
       res.status(200).json(result);
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -78,7 +81,10 @@ export class AuthController {
   static async logout(req: Request, res: Response) {
     try {
       const data = logoutSchema.parse(req.body);
-      await AuthService.logout(data);
+      await AuthService.logout({
+        refresh_token: data.refresh_token,
+        deviceId: data.device_id
+      });
       res.status(200).json({ success: true, message: 'Logged out successfully' });
     } catch (error: any) {
       if (error.name === 'ZodError') {

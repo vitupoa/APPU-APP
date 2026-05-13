@@ -12,7 +12,7 @@ export function startFinancialSecurityCleanupWorker() {
       await runCleanupJobs();
       logger.info('✅ Financial security cleanup completed');
     } catch (error) {
-      logger.error('❌ Financial security cleanup failed:', error);
+      logger.error('❌ Financial security cleanup failed:', { error: error instanceof Error ? error.message : String(error) });
     }
   });
   

@@ -21,7 +21,7 @@ export async function validateProfileOwnership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const targetUserId = (req.params.userId || req.body.userId) as string;
+  const targetUserId = (req.params.user_id || req.body.user_id) as string;
   const currentUserId = req.userId;
 
   if (!currentUserId) {
@@ -65,8 +65,8 @@ export async function validateWalletOwnership(
 
   // For wallet operations, always use authenticated user's ID
   // Never trust userId from request body/params
-  req.body.userId = currentUserId;
-  req.params.userId = currentUserId;
+  req.body.user_id = currentUserId;
+  req.params.user_id = currentUserId;
 
   next();
 }
@@ -80,7 +80,7 @@ export async function validateTransactionOwnership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const transactionId = req.params.transactionId as string;
+  const transactionId = req.params.transaction_id as string;
   const currentUserId = req.userId;
 
   if (!currentUserId) {
@@ -89,9 +89,9 @@ export async function validateTransactionOwnership(
   }
 
   try {
-    const transaction = await prisma.transaction.findUnique({
+    const transaction = await prisma.transactions.findUnique({
       where: { id: transactionId },
-      select: { userId: true }
+      select: { user_id: true }
     });
 
     if (!transaction) {
@@ -100,7 +100,7 @@ export async function validateTransactionOwnership(
     }
 
     // Allow if owns transaction
-    if (transaction.userId === currentUserId) {
+    if (transaction.user_id === currentUserId) {
       next();
       return;
     }
@@ -138,9 +138,9 @@ export async function validateWithdrawalOwnership(
   }
 
   try {
-    const withdrawal = await prisma.withdrawalRequest.findUnique({
+    const withdrawal = await prisma.withdrawal_requests.findUnique({
       where: { id: requestId },
-      select: { userId: true }
+      select: { user_id: true }
     });
 
     if (!withdrawal) {
@@ -149,7 +149,7 @@ export async function validateWithdrawalOwnership(
     }
 
     // Allow if owns withdrawal
-    if (withdrawal.userId === currentUserId) {
+    if (withdrawal.user_id === currentUserId) {
       next();
       return;
     }
@@ -178,7 +178,7 @@ export async function validateChamaMembership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const chamaId = req.params.chamaId as string;
+  const chamaId = req.params.chama_id as string;
   const currentUserId = req.userId;
 
   if (!currentUserId) {
@@ -189,9 +189,9 @@ export async function validateChamaMembership(
   try {
     const membership = await prisma.chamaMember.findUnique({
       where: {
-        chamaId_userId: {
-          chamaId,
-          userId: currentUserId
+        chama_id_user_id: {
+          chama_id: chamaId,
+          user_id: currentUserId
         }
       }
     });
@@ -222,7 +222,7 @@ export async function validateContentOwnership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const contentId = (req.params.shortId || req.params.postId || req.params.contentId) as string;
+  const contentId = (req.params.shortId || req.params.post_id || req.params.content_id) as string;
   const contentType = req.params.shortId ? 'short' : 'post';
   const currentUserId = req.userId;
 
@@ -234,14 +234,14 @@ export async function validateContentOwnership(
   try {
     let content;
     if (contentType === 'short') {
-      content = await prisma.short.findUnique({
+      content = await prisma.shorts.findUnique({
         where: { id: contentId },
-        select: { userId: true }
+        select: { user_id: true }
       });
     } else {
       content = await prisma.post.findUnique({
         where: { id: contentId },
-        select: { userId: true }
+        select: { user_id: true }
       });
     }
 
@@ -251,7 +251,7 @@ export async function validateContentOwnership(
     }
 
     // Allow if owns content
-    if (content.userId === currentUserId) {
+    if (content.user_id === currentUserId) {
       next();
       return;
     }
@@ -288,9 +288,9 @@ export async function verifyInfluencerOwnership(
   }
 
   try {
-    const influencer = await prisma.influencerProfile.findUnique({
+    const influencer = await prisma.influencer_profiles.findUnique({
       where: { id: influencerId },
-      select: { userId: true }
+      select: { user_id: true }
     });
 
     if (!influencer) {
@@ -298,7 +298,7 @@ export async function verifyInfluencerOwnership(
       return;
     }
 
-    if (influencer.userId === currentUserId || req.isAdmin) {
+    if (influencer.user_id === currentUserId || req.isAdmin) {
       next();
       return;
     }
@@ -320,7 +320,7 @@ export async function verifySocialAccountOwnership(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const accountId = req.params.accountId as string;
+  const accountId = req.params.account_id as string;
   const currentUserId = req.userId;
 
   if (!currentUserId) {
@@ -329,9 +329,9 @@ export async function verifySocialAccountOwnership(
   }
 
   try {
-    const account = await prisma.socialMediaAccount.findUnique({
+    const account = await prisma.social_media_accounts.findUnique({
       where: { id: accountId },
-      include: { influencer: { select: { userId: true } } }
+      include: { influencer_profiles: { select: { user_id: true } } }
     });
 
     if (!account) {
@@ -339,7 +339,7 @@ export async function verifySocialAccountOwnership(
       return;
     }
 
-    if (account.influencer.userId === currentUserId || req.isAdmin) {
+    if (account.influencer_profiles.user_id === currentUserId || req.isAdmin) {
       next();
       return;
     }

@@ -14,7 +14,8 @@ router.use((req: AuthRequest, res: Response, next: NextFunction) => setRLSContex
 
 router.post('/unlock', unlockRateLimiter, failedUnlockRateLimiter, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   const userId = req.userId!;
-  const { contentId, contentType } = req.body;
+  const { content_id, contentType } = req.body;
+  const contentId = content_id;
   try {
     if (!contentId || !contentType) { res.status(400).json({ error: 'contentId and contentType are required' }); return; }
     if (!['SHORT', 'POST', 'LIVE'].includes(contentType)) { res.status(400).json({ error: 'Invalid contentType' }); return; }
@@ -22,18 +23,18 @@ router.post('/unlock', unlockRateLimiter, failedUnlockRateLimiter, async (req: A
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { currency: true } });
     const amountKr = 0; // fraud check uses 0 as placeholder before actual unlock
 
-    const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(userId, 'unlock', { contentId, contentType, amountKr });
+    const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(userId, 'unlock', { content_id, contentType, amount_kr: amountKr });
     if (fraudCheck.shouldBlock) {
-      await AuditLogService.logFraudDetection(req, { userId, operationType: 'unlock', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
+      await AuditLogService.logFraudDetection(req, { user_id: userId, operationType: 'unlock', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
       res.status(403).json({ error: 'Operation blocked', message: 'Suspicious activity detected.', reasons: fraudCheck.reasons });
       return;
     }
 
-    const result = await ContentLockService.unlockContent(userId, contentId, contentType, user?.currency || 'USD');
-    await AuditLogService.logUnlock(req, { userId, contentId, contentType, amountKr: result.unlockAmountKr, success: true, fraudCheckResult: fraudCheck });
+    const result = await ContentLockService.unlockContent(userId, content_id, contentType, user?.currency || 'USD');
+    await AuditLogService.logUnlock(req, { user_id: userId, contentId, contentType, amountKr: result.unlockAmountKr, success: true, fraudCheckResult: fraudCheck });
     res.json(result);
   } catch (error: any) {
-    await AuditLogService.logUnlock(req, { userId, contentId, contentType, amountKr: 0, success: false, error: error.message });
+    await AuditLogService.logUnlock(req, { user_id: userId, contentId, contentType, amountKr: 0, success: false, error: error.message });
     next(error);
   }
 });
@@ -63,18 +64,17 @@ router.post('/convert-fiat', conversionRateLimiter, async (req: AuthRequest, res
 router.get('/check-access', accessCheckRateLimiter, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.userId!;
-    const { contentId, contentType } = req.query as { contentId: string; contentType: string };
+    const { content_id, contentType } = req.query as { content_id: string; contentType: string };
+    const contentId = content_id;
     if (!contentId || !contentType) { res.status(400).json({ error: 'contentId and contentType are required' }); return; }
 
-    type ContentRow = { user_id?: string; host_id?: string; is_locked?: boolean; required_tier?: string; unlock_amount_kr?: string | null };
+    type ContentRow = { user_id?: string; is_locked?: boolean; required_tier?: string; unlock_amount_kr?: string | null };
     let rows: ContentRow[] = [];
 
     if (contentType === 'SHORT') {
-      rows = await prisma.$queryRaw<ContentRow[]>`SELECT user_id, is_locked, required_tier, unlock_amount_kr FROM shorts WHERE id = ${contentId} LIMIT 1`;
+      rows = await prisma.$queryRaw<ContentRow[]>`SELECT user_id, is_locked, required_tier, unlock_amount_kr FROM shorts WHERE id = ${content_id} LIMIT 1`;
     } else if (contentType === 'POST') {
-      rows = await prisma.$queryRaw<ContentRow[]>`SELECT user_id, is_locked, required_tier, unlock_amount_kr FROM posts WHERE id = ${contentId} LIMIT 1`;
-    } else if (contentType === 'LIVE') {
-      rows = await prisma.$queryRaw<ContentRow[]>`SELECT host_id, unlock_amount_kr FROM live_streams WHERE id = ${contentId} LIMIT 1`;
+      rows = await prisma.$queryRaw<ContentRow[]>`SELECT user_id, is_locked, required_tier, unlock_amount_kr FROM posts WHERE id = ${content_id} LIMIT 1`;
     } else {
       res.status(400).json({ error: 'Invalid contentType' }); return;
     }
@@ -87,8 +87,8 @@ router.get('/check-access', accessCheckRateLimiter, async (req: AuthRequest, res
     const requiredTier = row.required_tier;
     const unlockAmountKr = row.unlock_amount_kr ? Number(row.unlock_amount_kr) : undefined;
 
-    const access = await ContentLockService.checkAccess(userId, contentId, contentType as any, creatorId, isLocked, requiredTier, unlockAmountKr);
-    await AuditLogService.logAccessCheck(req, { userId, contentId, contentType, hasAccess: access.hasAccess, accessReason: (access as any).reason });
+    const access = await ContentLockService.checkAccess(userId, content_id, contentType as any, creatorId, isLocked, requiredTier, unlockAmountKr);
+    await AuditLogService.logAccessCheck(req, { user_id: userId, contentId, contentType, hasAccess: access.hasAccess, accessReason: (access as any).reason });
     res.json(access);
   } catch (error) { next(error); }
 });

@@ -60,7 +60,7 @@ export function initializeDatabaseMonitorSocket(httpServer: HTTPServer) {
       
       // Check if user is super admin
       const user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
+        where: { id: decoded.user_id },
         include: { adminProfile: true },
       });
 
@@ -68,7 +68,7 @@ export function initializeDatabaseMonitorSocket(httpServer: HTTPServer) {
         return next(new Error('Super admin access required'));
       }
 
-      (socket as any).userId = decoded.userId;
+      (socket as any).user_id = decoded.user_id;
       (socket as any).user = user;
       
       next();
@@ -79,7 +79,7 @@ export function initializeDatabaseMonitorSocket(httpServer: HTTPServer) {
   });
 
   io.on('connection', (socket: Socket) => {
-    const userId = (socket as any).userId;
+    const userId = (socket as any).user_id;
     logger.info(`Super admin ${userId} connected to database monitor`);
 
     // Store connected admin with default alert config

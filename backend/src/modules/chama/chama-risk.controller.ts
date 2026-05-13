@@ -27,8 +27,8 @@ export class ChamaRiskController {
   static async sendReminder(req: AuthRequest, res: Response) {
     try {
       const chamaId = String(req.params.id);
-      const { userId, cycleNumber } = req.body;
-      const result = await ChamaRiskService.sendReminder(chamaId, userId, Number(cycleNumber));
+      const { user_id, cycle_number } = req.body;
+      const result = await ChamaRiskService.sendReminder(chamaId, user_id, Number(cycle_number));
       res.json(result);
     } catch (e: any) {
       res.status(400).json({ success: false, error: e.message });
@@ -48,7 +48,7 @@ export class ChamaRiskController {
 
   static async getUserDefaultStatus(req: AuthRequest, res: Response) {
     try {
-      const userId = req.query.userId ? String(req.query.userId) : req.userId!;
+      const userId = req.query.user_id ? String(req.query.user_id) : req.userId!;
       const result = await ChamaRiskService.getUserDefaultStatus(userId);
       res.json({ success: true, ...result });
     } catch (e: any) {

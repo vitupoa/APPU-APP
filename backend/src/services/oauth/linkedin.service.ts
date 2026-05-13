@@ -39,7 +39,7 @@ export class LinkedInService {
     );
 
     return {
-      accessToken: response.data.access_token,
+      access_token: response.data.access_token,
       expiresIn: response.data.expires_in
     };
   }
@@ -69,9 +69,9 @@ export class LinkedInService {
 
     return {
       id: profileResponse.data.id,
-      firstName: profileResponse.data.localizedFirstName,
-      lastName: profileResponse.data.localizedLastName,
-      displayName: `${profileResponse.data.localizedFirstName} ${profileResponse.data.localizedLastName}`,
+      first_name: profileResponse.data.localizedFirstName,
+      last_name: profileResponse.data.localizedLastName,
+      display_name: `${profileResponse.data.localizedFirstName} ${profileResponse.data.localizedLastName}`,
       followerCount,
       profileImageUrl: profileResponse.data.profilePicture?.displayImage
     };
@@ -93,10 +93,10 @@ export class LinkedInService {
     return response.data.elements.map((post: any) => ({
       id: post.id,
       text: post.text?.text,
-      createdAt: post.created?.time,
-      likes: post.totalShareStatistics?.likeCount || 0,
-      comments: post.totalShareStatistics?.commentCount || 0,
-      shares: post.totalShareStatistics?.shareCount || 0
+      created_at: post.created?.time,
+      likes: post.totalShareStatistics?.like_count || 0,
+      comments: post.totalShareStatistics?.comment_count || 0,
+      shares: post.totalShareStatistics?.share_count || 0
     }));
   }
 

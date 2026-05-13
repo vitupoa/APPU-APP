@@ -9,13 +9,13 @@ export class OrderService {
 
   // Create order from cart items
   static async createOrder(buyerId: string, notes?: string) {
-    const cartItems = await prisma.cartItem.findMany({
-      where: { userId: buyerId },
+    const cartItems = await prisma.cart_items.findMany({
+      where: { user_id: buyerId },
       include: {
-        product: {
+        products: {
           select: {
-            id: true, title: true, priceKr: true, wholesalePrice: true,
-            wholesaleMinQty: true, stock: true, status: true, sellerId: true,
+            id: true, title: true, price_kr: true, wholesale_price: true,
+            wholesale_min_qty: true, stock: true, status: true, seller_id: true,
           }
         }
       }
@@ -25,66 +25,67 @@ export class OrderService {
 
     // Validate all products are active and in stock
     for (const item of cartItems) {
-      if (item.product.status !== 'active') {
-        throw new Error(`Product "${item.product.title}" is no longer available`);
+      if (item.products.status !== 'active') {
+        throw new Error(`Product "${item.products.title}" is no longer available`);
       }
-      if (item.product.stock < item.quantity) {
-        throw new Error(`Insufficient stock for "${item.product.title}"`);
+      if (item.products.stock < item.quantity) {
+        throw new Error(`Insufficient stock for "${item.products.title}"`);
       }
     }
 
     // Calculate totals
     const lineItems = cartItems.map((item: any) => {
-      const unitPrice = item.bargainPrice
-        ? Number(item.bargainPrice)
-        : (item.product.wholesalePrice && item.quantity >= (item.product.wholesaleMinQty || 999))
-          ? Number(item.product.wholesalePrice)
-          : Number(item.product.priceKr);
+      const unitPrice = item.bargain_price
+        ? Number(item.bargain_price)
+        : (item.products.wholesale_price && item.quantity >= (item.products.wholesale_min_qty || 999))
+          ? Number(item.products.wholesale_price)
+          : Number(item.products.price_kr);
       return {
-        productId: item.productId,
-        sellerId: item.product.sellerId,
+        product_id: item.product_id,
+        seller_id: item.products.seller_id,
         quantity: item.quantity,
         unitPriceKr: unitPrice,
         totalPriceKr: unitPrice * item.quantity,
-        title: item.product.title,
+        title: item.products.title,
       };
     });
 
-    const totalKr = lineItems.reduce((s, i) => s + i.totalPriceKr, 0);
+    const totalKr = lineItems.reduce((s: number, i: any) => s + i.totalPriceKr, 0);
     const platformFeeKr = totalKr * PLATFORM_FEE_RATE;
 
     const order = await prisma.$transaction(async (tx) => {
-      const o = await tx.order.create({
+      const o = await tx.orders.create({
         data: {
-          buyerId,
-          totalKr: new Prisma.Decimal(totalKr),
-          platformFeeKr: new Prisma.Decimal(platformFeeKr),
+          buyer_id: buyerId,
+          total_kr: new Prisma.Decimal(totalKr),
+          platform_fee_kr: new Prisma.Decimal(platformFeeKr),
           status: 'PENDING',
           notes,
-          items: {
+          updated_at: new Date(),
+          order_items: {
             create: lineItems.map((i: any) => ({
-              productId: i.productId,
-              sellerId: i.sellerId,
+              product_id: i.product_id,
+              seller_id: i.seller_id,
               quantity: i.quantity,
-              unitPriceKr: new Prisma.Decimal(i.unitPriceKr),
-              totalPriceKr: new Prisma.Decimal(i.totalPriceKr),
-              escrowStatus: 'held',
+              unit_price_kr: new Prisma.Decimal(i.unitPriceKr),
+              total_price_kr: new Prisma.Decimal(i.totalPriceKr),
+              escrow_status: 'held',
             }))
           }
         },
         include: {
-          items: { include: { product: { select: { id: true, title: true, imageUrls: true } } } }
+          order_items: { include: { products: { select: { id: true, title: true, image_urls: true } } } }
         }
       });
 
       // Clear cart
-      await tx.cartItem.deleteMany({ where: { userId: buyerId } });
+      await tx.cart_items.deleteMany({ where: { user_id: buyerId } });
 
       // Record analytics per product
       for (const item of lineItems) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { salesCount: { increment: item.quantity } }
+        await tx.products.update({
+          where: { id: item.product_id },
+          data: { sales_count: { increment: item.quantity } }
         });
       }
 
@@ -93,7 +94,7 @@ export class OrderService {
 
     // Fire analytics events (outside transaction)
     for (const item of lineItems) {
-      await ShopAnalyticsService.recordEvent(item.productId, {
+      await ShopAnalyticsService.recordEvent(item.product_id, {
         purchases: item.quantity,
         revenue: item.totalPriceKr,
       }).catch(() => {});
@@ -107,14 +108,14 @@ export class OrderService {
 
   // Get buyer's orders
   static async getMyOrders(buyerId: string, cursor?: string, limit = 20) {
-    const orders = await prisma.order.findMany({
-      where: { buyerId },
+    const orders = await prisma.orders.findMany({
+      where: { buyer_id: buyerId },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       include: {
-        items: {
-          include: { product: { select: { id: true, title: true, imageUrls: true } } }
+        order_items: {
+          include: { products: { select: { id: true, title: true, image_urls: true } } }
         }
       }
     });
@@ -126,14 +127,14 @@ export class OrderService {
 
   // Get seller's incoming orders
   static async getSellerOrders(sellerId: string, cursor?: string, limit = 20) {
-    const orderItems = await prisma.orderItem.findMany({
-      where: { sellerId },
+    const orderItems = await prisma.order_items.findMany({
+      where: { seller_id: sellerId },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { order: { createdAt: 'desc' } },
+      orderBy: { orders: { created_at: 'desc' } },
       include: {
-        order: { include: { buyer: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } },
-        product: { select: { id: true, title: true, imageUrls: true } },
+        orders: { include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
+        products: { select: { id: true, title: true, image_urls: true } },
       }
     });
 
@@ -145,18 +146,18 @@ export class OrderService {
   // Update order status (seller confirms/ships)
   static async updateOrderStatus(orderId: string, sellerId: string, status: string) {
     // Verify seller has items in this order
-    const item = await prisma.orderItem.findFirst({ where: { orderId, sellerId } });
+    const item = await prisma.order_items.findFirst({ where: { order_id: orderId, seller_id: sellerId } });
     if (!item) throw new Error('No items in this order belong to you');
 
-    const order = await prisma.order.update({
+    const order = await prisma.orders.update({
       where: { id: orderId },
       data: { status: status as any },
-      include: { buyer: { select: { id: true } } }
+      include: { User: { select: { id: true } } }
     });
 
     // Notify buyer of status change
     await ShopNotificationService.notifyOrderStatusUpdate(
-      order.buyer.id, orderId, status
+      order.User.id, orderId, status
     ).catch(() => {});
 
     return formatOrder(order);
@@ -164,41 +165,41 @@ export class OrderService {
 
   // Confirm delivery & release escrow for a specific order item
   static async confirmDelivery(orderId: string, orderItemId: string, sellerId: string) {
-    const item = await prisma.orderItem.findUniqueOrThrow({ where: { id: orderItemId } });
-    if (item.sellerId !== sellerId) throw new Error('Not your order item');
-    if (item.escrowStatus !== 'held') throw new Error('Escrow already processed');
+    const item = await prisma.order_items.findUniqueOrThrow({ where: { id: orderItemId } });
+    if (item.seller_id !== sellerId) throw new Error('Not your order item');
+    if (item.escrow_status !== 'held') throw new Error('Escrow already processed');
 
-    const sellerPayout = Number(item.totalPriceKr) * (1 - PLATFORM_FEE_RATE);
+    const sellerPayout = Number(item.total_price_kr) * (1 - PLATFORM_FEE_RATE);
 
     await prisma.$transaction([
-      prisma.orderItem.update({
+      prisma.order_items.update({
         where: { id: orderItemId },
-        data: { escrowStatus: 'released', deliveredAt: new Date() }
+        data: { escrow_status: 'released', delivered_at: new Date() }
       }),
       // Credit seller wallet
-      prisma.wallet.upsert({
-        where: { userId: sellerId },
-        create: { userId: sellerId, krBalance: new Prisma.Decimal(sellerPayout) },
-        update: { krBalance: { increment: new Prisma.Decimal(sellerPayout) } }
+      prisma.wallets.upsert({
+        where: { user_id: sellerId },
+        create: { user_id: sellerId, kr_balance: new Prisma.Decimal(sellerPayout), updated_at: new Date() },
+        update: { kr_balance: { increment: new Prisma.Decimal(sellerPayout) }, updated_at: new Date() }
       }),
-      prisma.transaction.create({
+      prisma.transactions.create({
         data: {
-          userId: sellerId,
+          user_id: sellerId,
           type: 'shop_sale',
-          amountKr: new Prisma.Decimal(sellerPayout),
+          amount_kr: new Prisma.Decimal(sellerPayout),
           status: 'completed',
           reference: orderItemId,
-          metadata: { orderId, platformFee: Number(item.totalPriceKr) * PLATFORM_FEE_RATE },
+          metadata: { order_id: orderId, platformFee: Number(item.total_price_kr) * PLATFORM_FEE_RATE },
         }
       }),
     ]);
 
     // Check if all items delivered → mark order DELIVERED
-    const remaining = await prisma.orderItem.count({
-      where: { orderId, escrowStatus: 'held' }
+    const remaining = await prisma.order_items.count({
+      where: { order_id: orderId, escrow_status: 'held' }
     });
     if (remaining === 0) {
-      await prisma.order.update({ where: { id: orderId }, data: { status: 'DELIVERED' } });
+      await prisma.orders.update({ where: { id: orderId }, data: { status: 'DELIVERED' } });
     }
 
     return { success: true, sellerPayout };
@@ -206,19 +207,19 @@ export class OrderService {
 
   // Get single order
   static async getOrder(orderId: string, userId: string) {
-    const order = await prisma.order.findUniqueOrThrow({
+    const order = await prisma.orders.findUniqueOrThrow({
       where: { id: orderId },
       include: {
-        items: {
-          include: { product: { select: { id: true, title: true, imageUrls: true } } }
+        order_items: {
+          include: { products: { select: { id: true, title: true, image_urls: true } } }
         },
-        buyer: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
+        User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
       }
     });
 
     // Only buyer or a seller with items in this order can view
-    const isBuyer = order.buyerId === userId;
-    const isSeller = order.items.some(i => i.sellerId === userId);
+    const isBuyer = order.buyer_id === userId;
+    const isSeller = order.order_items.some((i: any) => i.seller_id === userId);
     if (!isBuyer && !isSeller) throw new Error('Access denied');
 
     return formatOrder(order);
@@ -231,71 +232,71 @@ export class DiscountService {
     discountType: string; discountValue: number; minQuantity?: number;
     startDate: string; endDate: string;
   }) {
-    const product = await prisma.product.findUniqueOrThrow({ where: { id: productId } });
-    if (product.sellerId !== sellerId) throw new Error('Not your product');
+    const product = await prisma.products.findUniqueOrThrow({ where: { id: productId } });
+    if (product.seller_id !== sellerId) throw new Error('Not your product');
 
-    return prisma.productDiscount.create({
+    return prisma.product_discounts.create({
       data: {
-        productId,
-        discountType: data.discountType,
-        discountValue: new Prisma.Decimal(data.discountValue),
-        minQuantity: data.minQuantity || 1,
-        startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
-        isActive: true,
+        product_id: productId,
+        discount_type: data.discountType,
+        discount_value: new Prisma.Decimal(data.discountValue),
+        min_quantity: data.minQuantity || 1,
+        start_date: new Date(data.startDate),
+        end_date: new Date(data.endDate),
+        is_active: true,
       }
     });
   }
 
   static async getProductDiscounts(productId: string) {
-    return prisma.productDiscount.findMany({
-      where: { productId, isActive: true, endDate: { gte: new Date() } },
-      orderBy: { startDate: 'asc' }
+    return prisma.product_discounts.findMany({
+      where: { product_id: productId, is_active: true, end_date: { gte: new Date() } },
+      orderBy: { start_date: 'asc' }
     });
   }
 
   static async deleteDiscount(discountId: string, sellerId: string) {
-    const discount = await prisma.productDiscount.findUniqueOrThrow({
+    const discount = await prisma.product_discounts.findUniqueOrThrow({
       where: { id: discountId },
-      include: { product: { select: { sellerId: true } } }
+      include: { products: { select: { seller_id: true } } }
     });
-    if (discount.product.sellerId !== sellerId) throw new Error('Not your product');
-    await prisma.productDiscount.update({ where: { id: discountId }, data: { isActive: false } });
+    if (discount.products.seller_id !== sellerId) throw new Error('Not your product');
+    await prisma.product_discounts.update({ where: { id: discountId }, data: { is_active: false } });
   }
 }
 
 function formatOrder(o: any) {
   return {
     id: o.id,
-    buyerId: o.buyerId,
-    buyer: o.buyer,
-    totalKr: Number(o.totalKr),
-    platformFeeKr: Number(o.platformFeeKr),
+    buyer_id: o.buyer_id,
+    buyer: o.User,
+    totalKr: Number(o.total_kr),
+    platformFeeKr: Number(o.platform_fee_kr),
     status: o.status,
     notes: o.notes,
-    createdAt: o.createdAt?.toISOString(),
-    updatedAt: o.updatedAt?.toISOString(),
-    items: o.items?.map(formatOrderItem) || [],
+    created_at: o.created_at?.toISOString(),
+    updated_at: o.updated_at?.toISOString(),
+    items: o.order_items?.map(formatOrderItem) || [],
   };
 }
 
 function formatOrderItem(i: any) {
   return {
     id: i.id,
-    orderId: i.orderId,
-    productId: i.productId,
-    product: i.product,
-    sellerId: i.sellerId,
+    order_id: i.order_id,
+    product_id: i.product_id,
+    product: i.products,
+    seller_id: i.seller_id,
     quantity: i.quantity,
-    unitPriceKr: Number(i.unitPriceKr),
-    totalPriceKr: Number(i.totalPriceKr),
-    escrowStatus: i.escrowStatus,
-    deliveredAt: i.deliveredAt?.toISOString() || null,
-    order: i.order ? {
-      id: i.order.id,
-      status: i.order.status,
-      createdAt: i.order.createdAt?.toISOString(),
-      buyer: i.order.buyer,
+    unitPriceKr: Number(i.unit_price_kr),
+    totalPriceKr: Number(i.total_price_kr),
+    escrowStatus: i.escrow_status,
+    deliveredAt: i.delivered_at?.toISOString() || null,
+    order: i.orders ? {
+      id: i.orders.id,
+      status: i.orders.status,
+      created_at: i.orders.created_at?.toISOString(),
+      buyer: i.orders.User,
     } : undefined,
   };
 }

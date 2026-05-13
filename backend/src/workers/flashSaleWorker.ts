@@ -8,38 +8,38 @@ export function startFlashSaleWorker() {
 
     try {
       // Activate scheduled flash sales
-      await prisma.flashSale.updateMany({
-        where: { status: 'SCHEDULED', startTime: { lte: now } },
+      await prisma.flash_sales.updateMany({
+        where: { status: 'SCHEDULED', start_time: { lte: now } },
         data: { status: 'ACTIVE' }
       });
 
       // End expired flash sales
-      await prisma.flashSale.updateMany({
-        where: { status: 'ACTIVE', endTime: { lte: now } },
+      await prisma.flash_sales.updateMany({
+        where: { status: 'ACTIVE', end_time: { lte: now } },
         data: { status: 'ENDED' }
       });
 
       // Expire premium listings
-      await prisma.product.updateMany({
-        where: { isFeatured: true, featuredUntil: { lte: now } },
-        data: { isFeatured: false }
+      await prisma.products.updateMany({
+        where: { is_featured: true, featured_until: { lte: now } },
+        data: { is_featured: false }
       });
-      await prisma.product.updateMany({
-        where: { isPromoted: true, promotedUntil: { lte: now } },
-        data: { isPromoted: false }
+      await prisma.products.updateMany({
+        where: { is_promoted: true, promoted_until: { lte: now } },
+        data: { is_promoted: false }
       });
-      await prisma.product.updateMany({
-        where: { isTopSpot: true, topSpotUntil: { lte: now } },
-        data: { isTopSpot: false }
+      await prisma.products.updateMany({
+        where: { is_top_spot: true, top_spot_until: { lte: now } },
+        data: { is_top_spot: false }
       });
-      await prisma.premiumListing.updateMany({
-        where: { isActive: true, endDate: { lte: now } },
-        data: { isActive: false }
+      await prisma.premium_listings.updateMany({
+        where: { is_active: true, end_date: { lte: now } },
+        data: { is_active: false }
       });
 
       // Expire group buys
-      await prisma.groupBuy.updateMany({
-        where: { status: 'OPEN', expiresAt: { lte: now } },
+      await prisma.group_buys.updateMany({
+        where: { status: 'OPEN', expires_at: { lte: now } },
         data: { status: 'CANCELLED' }
       });
     } catch (error) {

@@ -4,7 +4,7 @@ import { Logger } from '../utils/logger.js';
 const logger = new Logger('AnalyticsService');
 
 export interface AnalyticsEvent {
-  userId: string;
+  user_id: string;
   eventType: string;
   eventCategory: string;
   metadata?: Record<string, any>;
@@ -12,7 +12,7 @@ export interface AnalyticsEvent {
 }
 
 export interface ConversionEvent {
-  userId: string;
+  user_id: string;
   contentId?: string;
   contentType?: string;
   conversionType: string;
@@ -25,7 +25,7 @@ export class AnalyticsService {
    * Track user interaction signal for recommendation algorithm
    */
   async trackInteraction(data: {
-    userId: string;
+    user_id: string;
     contentId: string;
     contentType: 'SHORT' | 'POST';
     signalType: 'VIEW' | 'LIKE' | 'SHARE' | 'COMMENT' | 'REWATCH' | 'SKIP' | 'NOT_INTERESTED' | 'HIDE' | 'ADMIRE' | 'UNADMIRE';
@@ -35,19 +35,19 @@ export class AnalyticsService {
     try {
       const weight = this.calculateSignalWeight(data.signalType, data.watchDuration, data.totalDuration);
 
-      await prisma.userInteractionSignal.create({
+      await prisma.user_interaction_signals.create({
         data: {
-          userId: data.userId,
-          contentId: data.contentId,
-          contentType: data.contentType,
-          signalType: data.signalType,
-          watchDuration: data.watchDuration || 0,
-          totalDuration: data.totalDuration || 0,
+          user_id: data.user_id,
+          content_id: data.contentId,
+          content_type: data.contentType,
+          signal_type: data.signalType,
+          watch_duration: data.watchDuration || 0,
+          total_duration: data.totalDuration || 0,
           weight,
         },
       });
 
-      logger.info(`Tracked ${data.signalType} interaction for user ${data.userId} on ${data.contentType} ${data.contentId}`);
+      logger.info(`Tracked ${data.signalType} interaction for user ${data.user_id} on ${data.contentType} ${data.contentId}`);
     } catch (error) {
       logger.error('Failed to track interaction', { error, data });
     }
@@ -57,28 +57,28 @@ export class AnalyticsService {
    * Track content delivery to user
    */
   async trackContentDelivery(data: {
-    userId: string;
+    user_id: string;
     contentId: string;
     contentType: 'SHORT' | 'POST';
   }): Promise<void> {
     try {
-      await prisma.userContentDelivery.upsert({
+      await prisma.user_content_delivery.upsert({
         where: {
-          userId_contentId_contentType: {
-            userId: data.userId,
-            contentId: data.contentId,
-            contentType: data.contentType,
+          user_id_content_id_content_type: {
+            user_id: data.user_id,
+            content_id: data.contentId,
+            content_type: data.contentType,
           },
         },
         create: {
-          userId: data.userId,
-          contentId: data.contentId,
-          contentType: data.contentType,
+          user_id: data.user_id,
+          content_id: data.contentId,
+          content_type: data.contentType,
         },
         update: {},
       });
 
-      logger.debug(`Tracked content delivery: ${data.contentType} ${data.contentId} to user ${data.userId}`);
+      logger.debug(`Tracked content delivery: ${data.contentType} ${data.contentId} to user ${data.user_id}`);
     } catch (error) {
       logger.error('Failed to track content delivery', { error, data });
     }
@@ -88,7 +88,7 @@ export class AnalyticsService {
    * Update content engagement metrics
    */
   async updateContentEngagement(data: {
-    userId: string;
+    user_id: string;
     contentId: string;
     contentType: 'SHORT' | 'POST';
     viewed?: boolean;
@@ -110,11 +110,11 @@ export class AnalyticsService {
       if (data.commented !== undefined) updateData.commented = data.commented;
       if (data.rewatched) updateData.rewatchedCount = { increment: 1 };
 
-      await prisma.userContentDelivery.updateMany({
+      await prisma.user_content_delivery.updateMany({
         where: {
-          userId: data.userId,
-          contentId: data.contentId,
-          contentType: data.contentType,
+          user_id: data.user_id,
+          content_id: data.contentId,
+          content_type: data.contentType,
         },
         data: updateData,
       });
@@ -129,7 +129,7 @@ export class AnalyticsService {
    * Track sales funnel event
    */
   async trackFunnelEvent(data: {
-    userId: string;
+    user_id: string;
     contestId?: string;
     campaignId?: string;
     stage: 'AWARENESS' | 'INTEREST' | 'CONSIDERATION' | 'CONVERSION' | 'RETENTION' | 'ADVOCACY';
@@ -139,20 +139,20 @@ export class AnalyticsService {
     metadata?: Record<string, any>;
   }): Promise<void> {
     try {
-      await prisma.salesFunnelEvent.create({
+      await prisma.sales_funnel_events.create({
         data: {
-          userId: data.userId,
-          contestId: data.contestId,
-          campaignId: data.campaignId,
+          user_id: data.user_id,
+          contest_id: data.contestId,
+          campaign_id: data.campaignId,
           stage: data.stage,
-          eventType: data.eventType,
-          sourceType: data.sourceType,
-          sourceId: data.sourceId,
+          event_type: data.eventType,
+          source_type: data.sourceType,
+          source_id: data.sourceId,
           metadata: data.metadata,
         },
       });
 
-      logger.info(`Tracked funnel event: ${data.stage} - ${data.eventType} for user ${data.userId}`);
+      logger.info(`Tracked funnel event: ${data.stage} - ${data.eventType} for user ${data.user_id}`);
     } catch (error) {
       logger.error('Failed to track funnel event', { error, data });
     }
@@ -162,30 +162,30 @@ export class AnalyticsService {
    * Track product analytics
    */
   async trackProductView(data: {
-    productId: string;
+    product_id: string;
     userId?: string;
     source?: string;
   }): Promise<void> {
     try {
       // Increment product view count
-      await prisma.product.update({
-        where: { id: data.productId },
-        data: { viewCount: { increment: 1 } },
+      await prisma.products.update({
+        where: { id: data.product_id },
+        data: { view_count: { increment: 1 } },
       });
 
       // Update daily analytics
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      await prisma.productAnalytic.upsert({
+      await prisma.product_analytics.upsert({
         where: {
-          productId_date: {
-            productId: data.productId,
+          product_id_date: {
+            product_id: data.product_id,
             date: today,
           },
         },
         create: {
-          productId: data.productId,
+          product_id: data.product_id,
           date: today,
           views: 1,
         },
@@ -194,7 +194,7 @@ export class AnalyticsService {
         },
       });
 
-      logger.debug(`Tracked product view: ${data.productId}`);
+      logger.debug(`Tracked product view: ${data.product_id}`);
     } catch (error) {
       logger.error('Failed to track product view', { error, data });
     }
@@ -204,7 +204,7 @@ export class AnalyticsService {
    * Track contest analytics
    */
   async trackContestEvent(data: {
-    contestId: string;
+    contest_id: string;
     eventType: 'VIEW' | 'JOIN' | 'SUBMISSION' | 'VOTE' | 'SHARE' | 'SHOP_VISIT' | 'PRODUCT_VIEW' | 'ADD_TO_CART' | 'PURCHASE';
     userId?: string;
     value?: number;
@@ -246,15 +246,15 @@ export class AnalyticsService {
           break;
       }
 
-      await prisma.contestAnalytics.upsert({
+      await prisma.contest_analytics.upsert({
         where: {
-          contestId_date: {
-            contestId: data.contestId,
+          contest_id_date: {
+            contest_id: data.contest_id,
             date: today,
           },
         },
         create: {
-          contestId: data.contestId,
+          contest_id: data.contest_id,
           date: today,
           ...Object.fromEntries(
             Object.entries(updateData).map(([key, val]: [string, any]) => [key, val.increment || 0])
@@ -263,7 +263,7 @@ export class AnalyticsService {
         update: updateData,
       });
 
-      logger.debug(`Tracked contest event: ${data.eventType} for contest ${data.contestId}`);
+      logger.debug(`Tracked contest event: ${data.eventType} for contest ${data.contest_id}`);
     } catch (error) {
       logger.error('Failed to track contest event', { error, data });
     }
@@ -273,7 +273,7 @@ export class AnalyticsService {
    * Track campaign analytics
    */
   async trackCampaignEvent(data: {
-    campaignId: string;
+    campaign_id: string;
     eventType: 'IMPRESSION' | 'REACH' | 'ENGAGEMENT' | 'CLICK' | 'CONVERSION';
     userId?: string;
     value?: number;
@@ -303,15 +303,15 @@ export class AnalyticsService {
           break;
       }
 
-      await prisma.campaignAnalytics.upsert({
+      await prisma.campaign_analytics.upsert({
         where: {
-          campaignId_date: {
-            campaignId: data.campaignId,
+          campaign_id_date: {
+            campaign_id: data.campaign_id,
             date: today,
           },
         },
         create: {
-          campaignId: data.campaignId,
+          campaign_id: data.campaign_id,
           date: today,
           ...Object.fromEntries(
             Object.entries(updateData).map(([key, val]: [string, any]) => [key, val.increment || 0])
@@ -320,7 +320,7 @@ export class AnalyticsService {
         update: updateData,
       });
 
-      logger.debug(`Tracked campaign event: ${data.eventType} for campaign ${data.campaignId}`);
+      logger.debug(`Tracked campaign event: ${data.eventType} for campaign ${data.campaign_id}`);
     } catch (error) {
       logger.error('Failed to track campaign event', { error, data });
     }

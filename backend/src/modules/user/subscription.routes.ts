@@ -61,22 +61,22 @@ router.put('/tiers', subscriptionRateLimiter, async (req: AuthRequest, res, next
  */
 router.post('/subscribe', subscriptionRateLimiter, async (req: AuthRequest, res, next) => {
   const subscriberId = req.userId!;
-  const { creatorId, tierType } = req.body;
+  const { creator_id, tierType } = req.body;
   try {
-    if (!creatorId || !tierType) return res.status(400).json({ error: 'creatorId and tierType are required' });
-    const tier = await prisma.subscriptionTier.findUnique({ where: { creatorId_tier: { creatorId, tier: tierType } }, select: { krAmount: true } });
+    if (!creator_id || !tierType) return res.status(400).json({ error: 'creator_id and tierType are required' });
+    const tier = await prisma.subscriptionTier.findUnique({ where: { creator_id_tier: { creator_id, tier: tierType } }, select: { kr_amount: true } });
     if (!tier) return res.status(404).json({ error: 'Subscription tier not found' });
-    const amountKr = Number(tier.krAmount);
-    const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(subscriberId, 'subscription', { creatorId, tierType, amountKr });
+    const amountKr = Number(tier.kr_amount);
+    const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(subscriberId, 'subscription', { creator_id, tierType, amount_kr: amountKr });
     if (fraudCheck.shouldBlock) {
-      await AuditLogService.logFraudDetection(req, { userId: subscriberId, operationType: 'subscription', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
+      await AuditLogService.logFraudDetection(req, { user_id: subscriberId, operationType: 'subscription', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
       return res.status(403).json({ error: 'Operation blocked', message: 'Suspicious activity detected.', reasons: fraudCheck.reasons });
     }
-    const subscription = await SubscriptionService.subscribe(subscriberId, creatorId, tierType);
-    await AuditLogService.logSubscription(req, { subscriberId, creatorId, tierType, amountKr, operation: 'SUBSCRIBE', success: true, fraudCheckResult: fraudCheck });
+    const subscription = await SubscriptionService.subscribe(subscriberId, creator_id, tierType);
+    await AuditLogService.logSubscription(req, { subscriber_id: subscriberId, creatorId: creator_id, tierType, amountKr, operation: 'SUBSCRIBE', success: true, fraudCheckResult: fraudCheck });
     return res.json(subscription);
   } catch (error: any) {
-    await AuditLogService.logSubscription(req, { subscriberId, creatorId, tierType, amountKr: 0, operation: 'SUBSCRIBE', success: false, error: error.message });
+    await AuditLogService.logSubscription(req, { subscriber_id: subscriberId, creatorId: creator_id, tierType, amountKr: 0, operation: 'SUBSCRIBE', success: false, error: error.message });
     return next(error);
   }
 });
@@ -87,14 +87,14 @@ router.post('/subscribe', subscriptionRateLimiter, async (req: AuthRequest, res,
  */
 router.post('/unsubscribe', subscriptionRateLimiter, async (req: AuthRequest, res, next) => {
   const subscriberId = req.userId!;
-  const { creatorId } = req.body;
+  const { creator_id } = req.body;
   try {
-    if (!creatorId) return res.status(400).json({ error: 'creatorId is required' });
-    const result = await SubscriptionService.unsubscribe(subscriberId, creatorId);
-    await AuditLogService.logSubscription(req, { subscriberId, creatorId, tierType: 'N/A', amountKr: 0, operation: 'UNSUBSCRIBE', success: true });
+    if (!creator_id) return res.status(400).json({ error: 'creator_id is required' });
+    const result = await SubscriptionService.unsubscribe(subscriberId, creator_id);
+    await AuditLogService.logSubscription(req, { subscriber_id: subscriberId, creatorId: creator_id, tierType: 'N/A', amountKr: 0, operation: 'UNSUBSCRIBE', success: true });
     return res.json(result);
   } catch (error: any) {
-    await AuditLogService.logSubscription(req, { subscriberId, creatorId, tierType: 'N/A', amountKr: 0, operation: 'UNSUBSCRIBE', success: false, error: error.message });
+    await AuditLogService.logSubscription(req, { subscriber_id: subscriberId, creatorId: creator_id, tierType: 'N/A', amountKr: 0, operation: 'UNSUBSCRIBE', success: false, error: error.message });
     return next(error);
   }
 });
@@ -106,23 +106,23 @@ router.post('/unsubscribe', subscriptionRateLimiter, async (req: AuthRequest, re
 router.get('/my-subscriptions', async (req: AuthRequest, res, next) => {
   try {
     const userId = req.userId!;
-    const subscriptions = await prisma.subscription.findMany({
+    const subscriptions = await prisma.subscriptions.findMany({
       where: {
-        subscriberId: userId,
+        subscriber_id: userId,
         status: 'active',
       },
       include: {
-        creator: {
+        User_subscriptions_creator_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
+            display_name: true,
+            avatar_url: true,
           },
         },
-        subscriptionTier: true,
+        SubscriptionTier: true,
       },
-      orderBy: { startedAt: 'desc' },
+      orderBy: { started_at: 'desc' },
     });
 
     res.json(subscriptions);
@@ -138,23 +138,23 @@ router.get('/my-subscriptions', async (req: AuthRequest, res, next) => {
 router.get('/my-subscribers', async (req: AuthRequest, res, next) => {
   try {
     const creatorId = req.userId!;
-    const subscribers = await prisma.subscription.findMany({
+    const subscribers = await prisma.subscriptions.findMany({
       where: {
-        creatorId,
+        creator_id: creatorId,
         status: 'active',
       },
       include: {
-        subscriber: {
+        User_subscriptions_subscriber_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
+            display_name: true,
+            avatar_url: true,
           },
         },
-        subscriptionTier: true,
+        SubscriptionTier: true,
       },
-      orderBy: { startedAt: 'desc' },
+      orderBy: { started_at: 'desc' },
     });
 
     res.json(subscribers);

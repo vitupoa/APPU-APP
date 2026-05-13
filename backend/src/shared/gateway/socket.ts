@@ -22,10 +22,10 @@ export function initializeGateway(httpServer: HttpServer) {
 
     // Join secure room authenticated mapping
     socket.on('authenticate', (data) => {
-      // Expecting { userId: string } natively
-      if (data && data.userId) {
-        socket.join(`user:${data.userId}`);
-        console.log(`[Gateway] Socket ${socket.id} securely joined user channel: user:${data.userId}`);
+      // Expecting { user_id: string } natively
+      if (data && data.user_id) {
+        socket.join(`user:${data.user_id}`);
+        console.log(`[Gateway] Socket ${socket.id} securely joined user channel: user:${data.user_id}`);
       }
     });
 

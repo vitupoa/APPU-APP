@@ -21,17 +21,19 @@ export async function requireRarAccess(req: RarRequest, res: Response, next: Nex
     }
 
     const profile = await prisma.adminProfile.findUnique({
-      where: { userId: req.userId },
-      include: { user: { select: { isSuspended: true } } }
+      where: { user_id: req.userId },
+      select: {
+        id: true,
+        user_id: true,
+        role: true,
+        is_active: true,
+        created_at: true,
+        updated_at: true
+      }
     });
 
-    if (!profile || !profile.isActive) {
+    if (!profile || !profile.is_active) {
       res.status(403).json({ error: 'Access denied: No active admin privileges' });
-      return;
-    }
-
-    if (profile.user.isSuspended) {
-      res.status(403).json({ error: 'Account suspended' });
       return;
     }
 
@@ -41,7 +43,7 @@ export async function requireRarAccess(req: RarRequest, res: Response, next: Nex
     // Update last login timestamp (fire and forget)
     prisma.adminProfile.update({
       where: { id: profile.id },
-      data: { lastLoginAt: new Date() }
+      data: { last_login_at: new Date() }
     }).catch(() => {});
 
     next();
@@ -100,15 +102,15 @@ export async function logAuditAction(
   req?: RarRequest
 ): Promise<void> {
   try {
-    await prisma.auditLog.create({
+    await prisma.audit_logs.create({
       data: {
-        adminId,
+        admin_id: adminId,
         action,
-        targetType,
-        targetId,
+        target_type: targetType,
+        target_id: targetId,
         details: (details ?? undefined) as any,
-        ipAddress: req?.ip ?? req?.headers['x-forwarded-for']?.toString() ?? null,
-        userAgent: req?.headers['user-agent']?.toString() ?? null,
+        ip_address: req?.ip ?? req?.headers['x-forwarded-for']?.toString() ?? null,
+        user_agent: req?.headers['user-agent']?.toString() ?? null,
       }
     });
   } catch (error) {

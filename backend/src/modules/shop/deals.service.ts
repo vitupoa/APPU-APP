@@ -7,43 +7,43 @@ export class FlashSaleService {
   static async createFlashSale(data: {
     title: string; description?: string; type: string;
     startTime: string; endTime: string;
-    products: { productId: string; salePrice: number; stockLimit?: number; perUserLimit?: number }[];
+    products: { product_id: string; salePrice: number; stockLimit?: number; perUserLimit?: number }[];
   }) {
     const sale = await prisma.$transaction(async (tx) => {
-      const s = await tx.flashSale.create({
+      const s = await tx.flash_sales.create({
         data: {
           title: data.title,
           description: data.description,
           type: data.type as any,
           status: 'SCHEDULED',
-          startTime: new Date(data.startTime),
-          endTime: new Date(data.endTime),
+          start_time: new Date(data.startTime),
+          end_time: new Date(data.endTime),
         }
       });
 
-      await tx.flashSaleProduct.createMany({
+      await tx.flash_sale_products.createMany({
         data: data.products.map((p: any) => ({
-          flashSaleId: s.id,
-          productId: p.productId,
-          salePrice: new Prisma.Decimal(p.salePrice),
-          stockLimit: p.stockLimit,
-          perUserLimit: p.perUserLimit,
+          flash_sale_id: s.id,
+          product_id: p.product_id,
+          sale_price: new Prisma.Decimal(p.salePrice),
+          stock_limit: p.stockLimit,
+          per_user_limit: p.perUserLimit,
         }))
       });
 
-      return tx.flashSale.findUnique({
+      return tx.flash_sales.findUnique({
         where: { id: s.id },
-        include: { products: { include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true } } } } }
+        include: { flash_sale_products: { include: { products: { select: { id: true, title: true, image_urls: true, price_kr: true } } } } }
       });
     });
 
     // Notify deal alert users and wishlist holders (outside transaction)
-    const productIds = data.products.map((p: any) => p.productId);
+    const productIds = data.products.map((p: any) => p.product_id);
     await ShopNotificationService.notifyFlashSaleStarted(productIds, data.title).catch(() => {});
     for (const p of data.products) {
-      const product = await prisma.product.findUnique({ where: { id: p.productId }, select: { title: true } });
+      const product = await prisma.products.findUnique({ where: { id: p.product_id }, select: { title: true } });
       if (product) {
-        await ShopNotificationService.notifyWishlistItemOnSale(p.productId, product.title, p.salePrice).catch(() => {});
+        await ShopNotificationService.notifyWishlistItemOnSale(p.product_id, product.title, p.salePrice).catch(() => {});
       }
     }
 
@@ -52,20 +52,20 @@ export class FlashSaleService {
 
   static async getActiveFlashSales() {
     const now = new Date();
-    const sales = await prisma.flashSale.findMany({
+    const sales = await prisma.flash_sales.findMany({
       where: {
         status: 'ACTIVE',
-        startTime: { lte: now },
-        endTime: { gte: now },
+        start_time: { lte: now },
+        end_time: { gte: now },
       },
       include: {
-        products: {
+        flash_sale_products: {
           include: {
-            product: { select: { id: true, title: true, imageUrls: true, priceKr: true, stock: true } }
+            products: { select: { id: true, title: true, image_urls: true, price_kr: true, stock: true } }
           }
         }
       },
-      orderBy: { endTime: 'asc' }
+      orderBy: { end_time: 'asc' }
     });
 
     return sales.map((s: any) => ({
@@ -73,28 +73,28 @@ export class FlashSaleService {
       title: s.title,
       description: s.description,
       type: s.type,
-      startTime: s.startTime.toISOString(),
-      endTime: s.endTime.toISOString(),
-      timeRemaining: Math.max(0, s.endTime.getTime() - now.getTime()),
-      products: s.products.map((p: any) => ({
-        productId: p.productId,
-        salePrice: Number(p.salePrice),
-        originalPrice: Number(p.product.priceKr),
-        discount: Math.round((1 - Number(p.salePrice) / Number(p.product.priceKr)) * 100),
-        stockLimit: p.stockLimit,
-        soldCount: p.soldCount,
-        perUserLimit: p.perUserLimit,
-        product: { ...p.product, priceKr: Number(p.product.priceKr) },
+      start_time: s.start_time.toISOString(),
+      end_time: s.end_time.toISOString(),
+      timeRemaining: Math.max(0, s.end_time.getTime() - now.getTime()),
+      products: s.flash_sale_products.map((p: any) => ({
+        product_id: p.product_id,
+        salePrice: Number(p.sale_price),
+        originalPrice: Number(p.products.price_kr),
+        discount: Math.round((1 - Number(p.sale_price) / Number(p.products.price_kr)) * 100),
+        stockLimit: p.stock_limit,
+        soldCount: p.sold_count,
+        perUserLimit: p.per_user_limit,
+        product: { ...p.products, price_kr: Number(p.products.price_kr) },
       }))
     }));
   }
 
   static async getUpcomingFlashSales() {
     const now = new Date();
-    return prisma.flashSale.findMany({
-      where: { status: 'SCHEDULED', startTime: { gt: now } },
-      include: { products: { include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true } } } } },
-      orderBy: { startTime: 'asc' },
+    return prisma.flash_sales.findMany({
+      where: { status: 'SCHEDULED', start_time: { gt: now } },
+      include: { flash_sale_products: { include: { products: { select: { id: true, title: true, image_urls: true, price_kr: true } } } } },
+      orderBy: { start_time: 'asc' },
       take: 10
     });
   }
@@ -103,63 +103,63 @@ export class FlashSaleService {
 export class GroupBuyService {
 
   static async createGroupBuy(organizerId: string, data: {
-    productId: string; title: string; description?: string;
+    product_id: string; title: string; description?: string;
     targetParticipants: number; discountPercent: number; expiresAt: string;
   }) {
-    const product = await prisma.product.findUniqueOrThrow({ where: { id: data.productId } });
+    const product = await prisma.products.findUniqueOrThrow({ where: { id: data.product_id } });
     if (product.status !== 'active') throw new Error('Product not available');
 
-    const groupBuy = await prisma.groupBuy.create({
+    const groupBuy = await prisma.group_buys.create({
       data: {
-        productId: data.productId,
-        organizerId,
+        product_id: data.product_id,
+        organizer_id: organizerId,
         title: data.title,
         description: data.description,
-        targetParticipants: data.targetParticipants,
-        discountPercent: new Prisma.Decimal(data.discountPercent),
-        expiresAt: new Date(data.expiresAt),
+        target_participants: data.targetParticipants,
+        discount_percent: new Prisma.Decimal(data.discountPercent),
+        expires_at: new Date(data.expiresAt),
         status: 'OPEN',
       },
       include: {
-        product: { select: { id: true, title: true, imageUrls: true, priceKr: true } },
-        participants: { include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true } } } }
+        products: { select: { id: true, title: true, image_urls: true, price_kr: true } },
+        group_buy_participants: { include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } } }
       }
     });
 
-    await prisma.groupBuyParticipant.create({
-      data: { groupBuyId: groupBuy.id, userId: organizerId }
+    await prisma.group_buy_participants.create({
+      data: { group_buy_id: groupBuy.id, user_id: organizerId }
     });
 
     return formatGroupBuy(groupBuy);
   }
 
   static async joinGroupBuy(groupBuyId: string, userId: string) {
-    const groupBuy = await prisma.groupBuy.findUniqueOrThrow({ where: { id: groupBuyId } });
+    const groupBuy = await prisma.group_buys.findUniqueOrThrow({ where: { id: groupBuyId } });
     if (groupBuy.status !== 'OPEN') throw new Error('Group buy is not open');
-    if (new Date() > groupBuy.expiresAt) throw new Error('Group buy has expired');
+    if (new Date() > groupBuy.expires_at) throw new Error('Group buy has expired');
 
-    await prisma.groupBuyParticipant.create({ data: { groupBuyId, userId } });
+    await prisma.group_buy_participants.create({ data: { group_buy_id: groupBuyId, user_id: userId } });
 
-    const newCount = groupBuy.currentCount + 1;
-    const status = newCount >= groupBuy.targetParticipants ? 'THRESHOLD_MET' : 'OPEN';
+    const newCount = groupBuy.current_count + 1;
+    const status = newCount >= groupBuy.target_participants ? 'THRESHOLD_MET' : 'OPEN';
 
-    await prisma.groupBuy.update({
+    await prisma.group_buys.update({
       where: { id: groupBuyId },
-      data: { currentCount: newCount, status: status as any }
+      data: { current_count: newCount, status: status as any }
     });
 
-    return { joined: true, currentCount: newCount, targetParticipants: groupBuy.targetParticipants, status };
+    return { joined: true, currentCount: newCount, targetParticipants: groupBuy.target_participants, status };
   }
 
   static async getActiveGroupBuys(cursor?: string, limit = 20) {
-    const groupBuys = await prisma.groupBuy.findMany({
-      where: { status: 'OPEN', expiresAt: { gt: new Date() } },
+    const groupBuys = await prisma.group_buys.findMany({
+      where: { status: 'OPEN', expires_at: { gt: new Date() } },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       include: {
-        product: { select: { id: true, title: true, imageUrls: true, priceKr: true } },
-        participants: { include: { user: { select: { id: true, username: true, avatarUrl: true } } }, take: 5 }
+        products: { select: { id: true, title: true, image_urls: true, price_kr: true } },
+        group_buy_participants: { include: { User: { select: { id: true, username: true, avatar_url: true } } }, take: 5 }
       }
     });
 
@@ -174,30 +174,30 @@ export class DealAlertService {
   static async createAlert(userId: string, data: {
     productId?: string; category?: string; maxPriceKr?: number; keywords?: string[];
   }) {
-    return prisma.dealAlert.create({
+    return prisma.deal_alerts.create({
       data: {
-        userId,
-        productId: data.productId,
+        user_id: userId,
+        product_id: data.productId,
         category: data.category as any,
-        maxPriceKr: data.maxPriceKr ? new Prisma.Decimal(data.maxPriceKr) : undefined,
+        max_price_kr: data.maxPriceKr ? new Prisma.Decimal(data.maxPriceKr) : undefined,
         keywords: data.keywords || [],
-        isActive: true,
+        is_active: true,
       }
     });
   }
 
   static async getUserAlerts(userId: string) {
-    return prisma.dealAlert.findMany({
-      where: { userId, isActive: true },
-      include: { product: { select: { id: true, title: true, imageUrls: true, priceKr: true } } },
-      orderBy: { createdAt: 'desc' }
+    return prisma.deal_alerts.findMany({
+      where: { user_id: userId, is_active: true },
+      include: { products: { select: { id: true, title: true, image_urls: true, price_kr: true } } },
+      orderBy: { created_at: 'desc' }
     });
   }
 
   static async deleteAlert(alertId: string, userId: string) {
-    const alert = await prisma.dealAlert.findUniqueOrThrow({ where: { id: alertId } });
-    if (alert.userId !== userId) throw new Error('Not your alert');
-    await prisma.dealAlert.update({ where: { id: alertId }, data: { isActive: false } });
+    const alert = await prisma.deal_alerts.findUniqueOrThrow({ where: { id: alertId } });
+    if (alert.user_id !== userId) throw new Error('Not your alert');
+    await prisma.deal_alerts.update({ where: { id: alertId }, data: { is_active: false } });
   }
 }
 
@@ -206,14 +206,14 @@ function formatGroupBuy(gb: any) {
     id: gb.id,
     title: gb.title,
     description: gb.description,
-    targetParticipants: gb.targetParticipants,
-    currentCount: gb.currentCount,
-    discountPercent: Number(gb.discountPercent),
+    targetParticipants: gb.target_participants,
+    currentCount: gb.current_count,
+    discountPercent: Number(gb.discount_percent),
     status: gb.status,
-    expiresAt: gb.expiresAt?.toISOString(),
-    timeRemaining: Math.max(0, new Date(gb.expiresAt).getTime() - Date.now()),
-    product: gb.product ? { ...gb.product, priceKr: Number(gb.product.priceKr) } : null,
-    participants: gb.participants?.map((p: any) => p.user) || [],
-    createdAt: gb.createdAt?.toISOString(),
+    expires_at: gb.expires_at?.toISOString(),
+    timeRemaining: Math.max(0, new Date(gb.expires_at).getTime() - Date.now()),
+    product: gb.products ? { ...gb.products, price_kr: Number(gb.products.price_kr) } : null,
+    participants: gb.group_buy_participants?.map((p: any) => p.User) || [],
+    created_at: gb.created_at?.toISOString(),
   };
 }

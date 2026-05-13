@@ -7,16 +7,16 @@ export class NicheAdTargetingService {
     niche: string,
     confidence: number = 1.0
   ) {
-    return prisma.contentNicheTag.upsert({
+    return prisma.content_niche_tags.upsert({
       where: {
-        contentId_contentType_niche: {
-          contentId,
+        content_id_contentType_niche: {
+          content_id: contentId,
           contentType,
           niche: niche as any,
         },
       },
       create: {
-        contentId,
+        content_id: contentId,
         contentType,
         niche: niche as any,
         confidence,
@@ -33,9 +33,9 @@ export class NicheAdTargetingService {
     userId: string,
     placement: string
   ) {
-    const nicheTags = await prisma.contentNicheTag.findMany({
+    const nicheTags = await prisma.content_niche_tags.findMany({
       where: {
-        contentId,
+        content_id: contentId,
         contentType,
       },
       orderBy: { confidence: 'desc' },
@@ -45,24 +45,24 @@ export class NicheAdTargetingService {
       return this.getGeneralAds(userId, placement);
     }
 
-    const targetNiches = nicheTags.map((tag) => tag.niche);
+    const targetNiches = nicheTags.map((tag: any) => tag.niche);
 
-    const campaigns = await prisma.displayAdCampaign.findMany({
+    const campaigns = await prisma.display_ad_campaigns.findMany({
       where: {
         status: 'ACTIVE',
-        startDate: { lte: new Date() },
+        start_date: { lte: new Date() },
         OR: [
-          { endDate: null },
-          { endDate: { gte: new Date() } },
-          { targetContentNiches: { hasSome: targetNiches as any[] } },
-          { targetContentNiches: { isEmpty: true } },
+          { end_date: null },
+          { end_date: { gte: new Date() } },
+          { target_content_niches: { hasSome: targetNiches as any[] } },
+          { target_content_niches: { isEmpty: true } },
         ],
         placements: {
           has: placement as any,
         },
       },
       include: {
-        locations: true,
+        ad_campaign_locations: true,
       },
     });
 
@@ -71,46 +71,46 @@ export class NicheAdTargetingService {
       select: { country: true },
     });
 
-    const eligibleCampaigns = campaigns.filter((campaign) => {
-      if (campaign.locations.length === 0) return true;
+    const eligibleCampaigns = campaigns.filter((campaign: any) => {
+      if (campaign.ad_campaign_locations.length === 0) return true;
 
-      return campaign.locations.some(
-        (loc) =>
-          !loc.isExcluded &&
+      return campaign.ad_campaign_locations.some(
+        (loc: any) =>
+          !loc.is_excluded &&
           (loc.country === userProfile?.country || loc.scope === 'GLOBAL')
       );
     });
 
-    const recentImpressions = await prisma.adImpression.findMany({
+    const recentImpressions = await prisma.ad_impressions.findMany({
       where: {
-        userId,
-        createdAt: {
+        user_id: userId,
+        created_at: {
           gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
         },
       },
-      select: { campaignId: true },
+      select: { campaign_id: true },
     });
 
-    const impressionCounts = recentImpressions.reduce((acc, imp) => {
-      acc[imp.campaignId] = (acc[imp.campaignId] || 0) + 1;
+    const impressionCounts = recentImpressions.reduce((acc: any, imp: any) => {
+      acc[imp.campaign_id] = (acc[imp.campaign_id] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
     const sortedCampaigns = eligibleCampaigns
-      .filter((c) => (impressionCounts[c.id] || 0) < 3)
-      .sort((a, b) => {
-        const aNicheMatch = a.targetContentNiches.some((n) =>
+      .filter((c: any) => (impressionCounts[c.id] || 0) < 3)
+      .sort((a: any, b: any) => {
+        const aNicheMatch = a.target_content_niches.some((n: any) =>
           targetNiches.includes(n as any)
         );
-        const bNicheMatch = b.targetContentNiches.some((n) =>
+        const bNicheMatch = b.target_content_niches.some((n: any) =>
           targetNiches.includes(n as any)
         );
 
         if (aNicheMatch && !bNicheMatch) return -1;
         if (!aNicheMatch && bNicheMatch) return 1;
 
-        const aBid = parseFloat(a.targetCpm?.toString() || '0');
-        const bBid = parseFloat(b.targetCpm?.toString() || '0');
+        const aBid = parseFloat(a.target_cpm?.toString() || '0');
+        const bBid = parseFloat(b.target_cpm?.toString() || '0');
         return bBid - aBid;
       });
 
@@ -118,45 +118,45 @@ export class NicheAdTargetingService {
   }
 
   async getGeneralAds(userId: string, placement: string) {
-    const campaigns = await prisma.displayAdCampaign.findMany({
+    const campaigns = await prisma.display_ad_campaigns.findMany({
       where: {
         status: 'ACTIVE',
-        startDate: { lte: new Date() },
+        start_date: { lte: new Date() },
         OR: [
-          { endDate: null },
-          { endDate: { gte: new Date() } },
+          { end_date: null },
+          { end_date: { gte: new Date() } },
         ],
         placements: {
           has: placement as any,
         },
-        targetContentNiches: { isEmpty: true },
+        target_content_niches: { isEmpty: true },
       },
       include: {
-        locations: true,
+        ad_campaign_locations: true,
       },
       take: 10,
     });
 
-    const recentImpressions = await prisma.adImpression.findMany({
+    const recentImpressions = await prisma.ad_impressions.findMany({
       where: {
-        userId,
-        createdAt: {
+        user_id: userId,
+        created_at: {
           gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
         },
       },
-      select: { campaignId: true },
+      select: { campaign_id: true },
     });
 
-    const impressionCounts = recentImpressions.reduce((acc, imp) => {
-      acc[imp.campaignId] = (acc[imp.campaignId] || 0) + 1;
+    const impressionCounts = recentImpressions.reduce((acc: any, imp: any) => {
+      acc[imp.campaign_id] = (acc[imp.campaign_id] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
     return campaigns
-      .filter((c) => (impressionCounts[c.id] || 0) < 3)
-      .sort((a, b) => {
-        const aBid = parseFloat(a.targetCpm?.toString() || '0');
-        const bBid = parseFloat(b.targetCpm?.toString() || '0');
+      .filter((c: any) => (impressionCounts[c.id] || 0) < 3)
+      .sort((a: any, b: any) => {
+        const aBid = parseFloat(a.target_cpm?.toString() || '0');
+        const bBid = parseFloat(b.target_cpm?.toString() || '0');
         return bBid - aBid;
       })
       .slice(0, 3);
@@ -172,13 +172,13 @@ export class NicheAdTargetingService {
     chatId?: string,
     chatNiche?: string
   ) {
-    const campaign = await prisma.displayAdCampaign.findUnique({
+    const campaign = await prisma.display_ad_campaigns.findUnique({
       where: { id: campaignId },
     });
 
     if (!campaign) throw new Error('Campaign not found');
 
-    const cpm = parseFloat(campaign.targetCpm?.toString() || '50');
+    const cpm = parseFloat(campaign.target_cpm?.toString() || '50');
     const costKes = cpm / 1000;
 
     const user = await prisma.user.findUnique({
@@ -186,38 +186,38 @@ export class NicheAdTargetingService {
       select: { country: true },
     });
 
-    await prisma.adImpression.create({
+    await prisma.ad_impressions.create({
       data: {
-        campaignId,
-        userId,
+        campaign_id: campaignId,
+        user_id: userId,
         placement: placement as any,
-        contentId,
-        contentType,
-        contentNiche: contentNiche as any,
-        chatId,
-        chatNiche: chatNiche as any,
-        costKes,
-        userCountry: user?.country,
+        content_id: contentId,
+        content_type: contentType,
+        content_niche: contentNiche,
+        chat_id: chatId,
+        chat_niche: chatNiche as any,
+        cost_kes: costKes,
+        user_country: user?.country,
       },
     });
 
-    await prisma.displayAdCampaign.update({
+    await prisma.display_ad_campaigns.update({
       where: { id: campaignId },
       data: {
         impressions: { increment: 1 },
-        totalSpentKes: { increment: costKes },
+        total_spent_kes: { increment: costKes },
       },
     });
   }
 
   async recordAdClick(impressionId: string) {
-    const impression = await prisma.adImpression.update({
+    const impression = await prisma.ad_impressions.update({
       where: { id: impressionId },
-      data: { wasClicked: true },
+      data: { was_clicked: true },
     });
 
-    await prisma.displayAdCampaign.update({
-      where: { id: impression.campaignId },
+    await prisma.display_ad_campaigns.update({
+      where: { id: impression.campaign_id },
       data: { clicks: { increment: 1 } },
     });
   }

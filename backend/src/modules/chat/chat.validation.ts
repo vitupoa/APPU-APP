@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createDirectChatSchema = z.object({
   body: z.object({
-    recipientId: z.string().uuid('Invalid recipient ID'),
+    recipient_id: z.string().uuid('Invalid recipient ID'),
   }),
 });
 
@@ -17,23 +17,23 @@ export const createGroupChatSchema = z.object({
 export const sendMessageSchema = z.object({
   body: z.object({
     payload: z.string().min(1, 'Message cannot be empty').max(10000, 'Message too long'),
-    mediaUrl: z.string().url().optional(),
-    mediaType: z.enum(['image', 'video', 'document']).optional(),
+    media_url: z.string().url().optional(),
+    media_type: z.enum(['image', 'video', 'document']).optional(),
     replyToId: z.string().uuid().optional(),
   }),
 });
 
 export const mediaUploadSignatureSchema = z.object({
   body: z.object({
-    mediaType: z.enum(['image', 'video', 'document']),
+    media_type: z.enum(['image', 'video', 'document']),
     resourceType: z.enum(['image', 'video', 'raw']),
   }),
 });
 
 export const validateMediaSchema = z.object({
   body: z.object({
-    mediaUrl: z.string().url('Invalid media URL'),
-    mediaType: z.enum(['image', 'video', 'document']),
+    media_url: z.string().url('Invalid media URL'),
+    media_type: z.enum(['image', 'video', 'document']),
   }),
 });
 
@@ -47,13 +47,13 @@ export const updateGroupChatSchema = z.object({
   body: z.object({
     name: z.string().min(1).max(100).optional(),
     description: z.string().optional(),
-    avatarUrl: z.string().url().optional().nullable(),
+    avatar_url: z.string().url().optional().nullable(),
   }),
 });
 
 export const manageMemberSchema = z.object({
   body: z.object({
-    userId: z.string().uuid('Invalid user ID'),
+    user_id: z.string().uuid('Invalid user ID'),
     action: z.enum(['promote', 'demote', 'kick']),
   }),
 });

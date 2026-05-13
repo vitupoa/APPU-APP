@@ -14,21 +14,21 @@ async function updateMicroInterests() {
   try {
     console.log('[MicroInterestWorker] Updating user micro-interests...');
 
-    // Decay old interests (reduce affinity over time if not engaged)
+    // Decay old interests (reduce weight over time if not engaged)
     await prisma.$executeRaw`
       UPDATE user_micro_interests
-      SET affinity = GREATEST(0.1, affinity * 0.95)
-      WHERE last_engaged_at < NOW() - INTERVAL '7 days'
+      SET weight = GREATEST(0.1, weight * 0.95)
+      WHERE last_updated < NOW() - INTERVAL '7 days'
     `;
 
-    // Remove very low affinity interests
-    const deleted = await prisma.userMicroInterest.deleteMany({
+    // Remove very low weight interests
+    const deleted = await prisma.user_micro_interests.deleteMany({
       where: {
-        affinity: { lt: 0.1 }
+        weight: { lt: 0.1 }
       }
     });
 
-    console.log(`[MicroInterestWorker] Decayed old interests and removed ${deleted.count} low-affinity interests`);
+    console.log(`[MicroInterestWorker] Decayed old interests and removed ${deleted.count} low-weight interests`);
 
     // Update interests based on recent interactions
     const recentInteractions = await prisma.$queryRaw<{ user_id: string; content_id: string; content_type: string; signal_type: string }[]>`
@@ -57,32 +57,30 @@ async function updateMicroInterests() {
 
         for (const { tag } of hashtags) {
           // Check if exists first
-          const existing = await prisma.userMicroInterest.findFirst({
+          const existing = await prisma.user_micro_interests.findFirst({
             where: {
-              userId: interaction.user_id,
-              category: tag,
-              subcategory: null
+              user_id: interaction.user_id,
+              interest: tag
             }
           });
 
           if (existing) {
-            await prisma.userMicroInterest.update({
+            await prisma.user_micro_interests.update({
               where: { id: existing.id },
               data: {
-                affinity: {
+                weight: {
                   increment: Math.min(0.05 * weight, 0.2)
                 },
-                lastEngagedAt: new Date()
+                last_updated: new Date()
               }
             });
           } else {
-            await prisma.userMicroInterest.create({
+            await prisma.user_micro_interests.create({
               data: {
-                userId: interaction.user_id,
-                category: tag,
-                subcategory: null,
-                affinity: Math.min(0.1 * weight, 1.0),
-                lastEngagedAt: new Date()
+                user_id: interaction.user_id,
+                interest: tag,
+                weight: Math.min(0.1 * weight, 1.0),
+                last_updated: new Date()
               }
             });
           }

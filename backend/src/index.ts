@@ -42,7 +42,6 @@ import locationsRoutes from './modules/locations/locations.routes.js';
 import creatorBoostRoutes from './modules/creatorBoost/creatorBoost.routes.js';
 import nichesRoutes from './modules/niches/niches.routes.js';
 import { rembrandtRarRoutes } from './modules/rembrandt-rar/rembrandt-rar.routes.js';
-import liveRoutes from './modules/live/live.routes.js';
 import callsRoutes from './modules/calls/calls.routes.js';
 import exploreRoutes from './modules/explore/explore.routes.js';
 import recommendationRoutes from './modules/recommendation/recommendation.routes.js';
@@ -56,7 +55,6 @@ import { startStoryCleanupWorker } from './workers/storyCleanupWorker.js';
 import { startDailyPrizeWorker } from './workers/dailyPrizeWorker.js';
 import { startFlashSaleWorker } from './workers/flashSaleWorker.js';
 import { FCMService } from './services/fcm.service.js';
-import { initializeLiveSocket } from './shared/gateway/liveSocket.js';
 import { initializeCallSocket } from './shared/gateway/call-socket.js';
 import { initializeDatabaseMonitorSocket } from './shared/gateway/databaseMonitorSocket.js';
 import { initializeShopSocket } from './shared/gateway/shop-socket.js';
@@ -70,9 +68,6 @@ app.set('trust proxy', true);
 
 // Socket.io Redis Clustered Gateway for real-time features (milestones, contests, notifications)
 const io = initializeGateway(httpServer);
-
-// Initialize Live Streaming WebSocket
-const liveSocket = initializeLiveSocket(httpServer);
 
 // Initialize Call socket handlers
 initializeCallSocket(io);
@@ -117,7 +112,7 @@ app.use((req, res, next) => {
     // Log slow requests
     if (duration > 1000) {
       logger.warn(`[${requestId}] Slow request: ${req.method} ${req.path} took ${duration}ms`, {
-        userId,
+        user_id: userId,
         statusCode: res.statusCode,
       });
     }
@@ -182,7 +177,6 @@ app.use('/api/v1/notifications', notificationsRoutes);
 app.use('/api/v1/marketplace', marketplaceRoutes);
 app.use('/api/v1/oauth', oauthRoutes);
 app.use('/api/v1/rar', rembrandtRarRoutes);
-app.use('/api/v1/live', liveRoutes);
 app.use('/api/v1/calls', callsRoutes);
 app.use('/api/v1/explore', exploreRoutes);
 app.use('/api/v1/recommendation', recommendationRoutes);

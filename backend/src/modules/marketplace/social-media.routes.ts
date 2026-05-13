@@ -43,7 +43,7 @@ router.get('/social-accounts/:influencerId', authMiddleware, async (req, res) =>
 
 router.post('/social-accounts/:accountId/sync', authMiddleware, verifySocialAccountOwnership, async (req, res) => {
   try {
-    const accountId = Array.isArray(req.params.accountId) ? req.params.accountId[0] : req.params.accountId;
+    const accountId = Array.isArray(req.params.account_id) ? req.params.account_id[0] : req.params.account_id;
     
     const account = await socialMediaService.syncAccountMetrics(accountId);
     
@@ -57,7 +57,7 @@ router.post('/social-accounts/:accountId/sync', authMiddleware, verifySocialAcco
 
 router.patch('/social-accounts/:accountId/primary', authMiddleware, verifySocialAccountOwnership, async (req, res) => {
   try {
-    const accountId = Array.isArray(req.params.accountId) ? req.params.accountId[0] : req.params.accountId;
+    const accountId = Array.isArray(req.params.account_id) ? req.params.account_id[0] : req.params.account_id;
     const { influencerId } = req.body;
     
     const account = await socialMediaService.setPrimaryAccount(accountId, influencerId);
@@ -72,7 +72,7 @@ router.patch('/social-accounts/:accountId/primary', authMiddleware, verifySocial
 
 router.delete('/social-accounts/:accountId', authMiddleware, verifySocialAccountOwnership, async (req, res) => {
   try {
-    const accountId = Array.isArray(req.params.accountId) ? req.params.accountId[0] : req.params.accountId;
+    const accountId = Array.isArray(req.params.account_id) ? req.params.account_id[0] : req.params.account_id;
     
     await socialMediaService.deleteSocialAccount(accountId);
     

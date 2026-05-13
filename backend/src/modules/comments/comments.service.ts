@@ -4,95 +4,95 @@ import { io } from '../../shared/gateway/socket.js';
 export class CommentsService {
   async getComments(
     contentType: string,
-    contentId: string,
+    content_id: string,
     sortBy: string = 'latest',
     cursor: string | null,
     limit: number = 20,
-    userId: string | null
+    user_id: string | null
   ) {
-    const settings = await this.getCommentSettings(contentType, contentId);
+    const settings = await this.getCommentSettings(contentType, content_id);
 
     const where: any = {
-      contentType,
-      contentId,
-      parentId: null,
+      content_type: contentType,
+      content_id,
+      parent_id: null,
     };
 
     let orderBy: any = {};
     switch (sortBy) {
       case 'top':
-        orderBy = { likesCount: 'desc' };
+        orderBy = { likes_count: 'desc' };
         break;
       case 'oldest':
-        orderBy = { createdAt: 'asc' };
+        orderBy = { created_at: 'asc' };
         break;
       default:
-        orderBy = { createdAt: 'desc' };
+        orderBy = { created_at: 'desc' };
     }
 
     if (cursor) {
       where.id = { lt: cursor };
     }
 
-    const comments = await prisma.comment.findMany({
+    const comments = await prisma.comments.findMany({
       where,
-      orderBy: [{ isPinned: 'desc' }, orderBy],
+      orderBy: [{ is_pinned: 'desc' }, orderBy],
       take: limit,
       include: {
-        author: {
+        User_comments_user_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
           },
         },
-        replyToUser: {
+        User_comments_reply_to_user_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
           },
         },
       },
     });
 
-    const contentOwner = await this.getContentOwner(contentType, contentId);
+    const contentOwner = await this.getContentOwner(contentType, content_id);
 
-    const commentIds = comments.map((c) => c.id);
-    const userLikes = userId
-      ? await prisma.commentLike.findMany({
-          where: { commentId: { in: commentIds }, userId },
-          select: { commentId: true },
+    const commentIds = comments.map((c: any) => c.id);
+    const userLikes = user_id
+      ? await prisma.comment_likes.findMany({
+          where: { comment_id: { in: commentIds }, user_id },
+          select: { comment_id: true },
         })
       : [];
-    const likedCommentIds = new Set(userLikes.map((l) => l.commentId));
+    const likedCommentIds = new Set(userLikes.map((l: any) => l.comment_id));
 
-    const mappedComments = comments.map((comment) => ({
+    const mappedComments = comments.map((comment: any) => ({
       id: comment.id,
-      contentId: comment.contentId,
-      contentType: comment.contentType,
+      content_id: comment.content_id,
+      contentType: comment.content_type,
       author: {
-        ...comment.author,
-        isContentOwner: comment.author.id === contentOwner?.id,
+        ...comment.User_comments_user_idToUser,
+        isContentOwner: comment.User_comments_user_idToUser.id === contentOwner?.id,
       },
       text: comment.text,
-      parentId: comment.parentId,
-      replyToUser: comment.replyToUser,
-      likesCount: comment.likesCount,
-      repliesCount: comment.repliesCount,
+      parent_id: comment.parent_id,
+      replyToUser: comment.User_comments_reply_to_user_idToUser,
+      likesCount: comment.likes_count,
+      repliesCount: comment.replies_count,
       isLiked: likedCommentIds.has(comment.id),
-      isPinned: comment.isPinned,
-      isEdited: comment.isEdited,
-      canDelete: this.canDelete(comment, userId, contentOwner?.id),
-      canEdit: this.canEdit(comment, userId),
-      canPin: this.canPin(userId, contentOwner?.id) && !comment.parentId,
+      isPinned: comment.is_pinned,
+      isEdited: comment.is_edited,
+      canDelete: this.canDelete(comment, user_id, contentOwner?.id),
+      canEdit: this.canEdit(comment, user_id),
+      canPin: this.canPin(user_id, contentOwner?.id) && !comment.parent_id,
       canReply: settings.repliesEnabled,
-      createdAt: comment.createdAt.toISOString(),
-      editedAt: comment.editedAt?.toISOString() || null,
+      created_at: comment.created_at.toISOString(),
+      editedAt: comment.edited_at?.toISOString() || null,
     }));
 
     const nextCursor = comments.length === limit ? comments[comments.length - 1].id : null;
@@ -104,80 +104,80 @@ export class CommentsService {
     };
   }
 
-  async getReplies(commentId: string, cursor: string | null, limit: number = 10, userId: string | null) {
-    const parentComment = await prisma.comment.findUnique({
+  async getReplies(commentId: string, cursor: string | null, limit: number = 10, user_id: string | null) {
+    const parentComment = await prisma.comments.findUnique({
       where: { id: commentId },
-      select: { contentType: true, contentId: true },
+      select: { content_type: true, content_id: true },
     });
 
     if (!parentComment) {
       throw new Error('Comment not found');
     }
 
-    const where: any = { parentId: commentId };
+    const where: any = { parent_id: commentId };
     if (cursor) {
       where.id = { lt: cursor };
     }
 
-    const replies = await prisma.comment.findMany({
+    const replies = await prisma.comments.findMany({
       where,
-      orderBy: { createdAt: 'asc' },
+      orderBy: { created_at: 'asc' },
       take: limit,
       include: {
-        author: {
+        User_comments_user_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
           },
         },
-        replyToUser: {
+        User_comments_reply_to_user_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
           },
         },
       },
     });
 
-    const contentOwner = await this.getContentOwner(parentComment.contentType, parentComment.contentId);
+    const contentOwner = await this.getContentOwner(parentComment.content_type, parentComment.content_id);
 
-    const replyIds = replies.map((r) => r.id);
-    const userLikes = userId
-      ? await prisma.commentLike.findMany({
-          where: { commentId: { in: replyIds }, userId },
-          select: { commentId: true },
+    const replyIds = replies.map((r: any) => r.id);
+    const userLikes = user_id
+      ? await prisma.comment_likes.findMany({
+          where: { comment_id: { in: replyIds }, user_id },
+          select: { comment_id: true },
         })
       : [];
-    const likedReplyIds = new Set(userLikes.map((l) => l.commentId));
+    const likedReplyIds = new Set(userLikes.map((l: any) => l.comment_id));
 
-    const mappedReplies = replies.map((reply) => ({
+    const mappedReplies = replies.map((reply: any) => ({
       id: reply.id,
-      contentId: reply.contentId,
-      contentType: reply.contentType,
+      content_id: reply.content_id,
+      contentType: reply.content_type,
       author: {
-        ...reply.author,
-        isContentOwner: reply.author.id === contentOwner?.id,
+        ...reply.User_comments_user_idToUser,
+        isContentOwner: reply.User_comments_user_idToUser.id === contentOwner?.id,
       },
       text: reply.text,
-      parentId: reply.parentId,
-      replyToUser: reply.replyToUser,
-      likesCount: reply.likesCount,
-      repliesCount: reply.repliesCount,
+      parent_id: reply.parent_id,
+      replyToUser: reply.User_comments_reply_to_user_idToUser,
+      likesCount: reply.likes_count,
+      repliesCount: reply.replies_count,
       isLiked: likedReplyIds.has(reply.id),
-      isPinned: reply.isPinned,
-      isEdited: reply.isEdited,
-      canDelete: this.canDelete(reply, userId, contentOwner?.id),
-      canEdit: this.canEdit(reply, userId),
+      isPinned: reply.is_pinned,
+      isEdited: reply.is_edited,
+      canDelete: this.canDelete(reply, user_id, contentOwner?.id),
+      canEdit: this.canEdit(reply, user_id),
       canPin: false,
       canReply: true,
-      createdAt: reply.createdAt.toISOString(),
-      editedAt: reply.editedAt?.toISOString() || null,
+      created_at: reply.created_at.toISOString(),
+      editedAt: reply.edited_at?.toISOString() || null,
     }));
 
     const nextCursor = replies.length === limit ? replies[replies.length - 1].id : null;
@@ -192,224 +192,225 @@ export class CommentsService {
   async createComment(
     userId: string,
     contentType: string,
-    contentId: string,
+    content_id: string,
     text: string,
-    parentId: string | null,
+    parent_id: string | null,
     replyToUserId: string | null
   ) {
     if (text.length > 500) {
       throw new Error('Comment text must be 500 characters or less');
     }
 
-    const settings = await this.getCommentSettings(contentType, contentId);
+    const settings = await this.getCommentSettings(contentType, content_id);
     if (!settings.commentsEnabled) {
       throw new Error('Comments are disabled for this content');
     }
 
-    if (parentId && !settings.repliesEnabled) {
+    if (parent_id && !settings.repliesEnabled) {
       throw new Error('Replies are disabled for this content');
     }
 
     const [comment] = await prisma.$transaction(async (tx) => {
-      const newComment = await tx.comment.create({
+      const newComment = await tx.comments.create({
         data: {
-          userId,
-          contentType,
-          contentId,
+          user_id: userId,
+          content_type: contentType,
+          content_id,
           text,
-          parentId,
-          replyToUserId,
+          parent_id,
+          reply_to_user_id: replyToUserId,
         },
         include: {
-          author: {
+          User_comments_user_idToUser: {
             select: {
               id: true,
               username: true,
-              displayName: true,
-              avatarUrl: true,
-              isVerified: true,
+              display_name: true,
+              avatar_url: true,
+              is_verified: true,
             },
           },
-          replyToUser: {
+          User_comments_reply_to_user_idToUser: {
             select: {
               id: true,
               username: true,
-              displayName: true,
-              avatarUrl: true,
-              isVerified: true,
+              display_name: true,
+              avatar_url: true,
+              is_verified: true,
             },
           },
         },
       });
 
-      if (parentId) {
-        await tx.comment.update({
-          where: { id: parentId },
-          data: { repliesCount: { increment: 1 } },
+      if (parent_id) {
+        await tx.comments.update({
+          where: { id: parent_id },
+          data: { replies_count: { increment: 1 } },
         });
       }
 
-      await this.incrementContentCommentCountTx(tx, contentType, contentId);
+      await this.incrementContentCommentCountTx(tx, contentType, content_id);
 
       return [newComment];
     });
 
-    const contentOwner = await this.getContentOwner(contentType, contentId);
+    const contentOwner = await this.getContentOwner(contentType, content_id);
 
-    io.to(`content:${contentId}`).emit('comment_update', {
-      contentId,
+    io.to(`content:${content_id}`).emit('comment_update', {
+      content_id,
       contentType,
-      newCount: await this.getCommentCount(contentType, contentId),
+      newCount: await this.getCommentCount(contentType, content_id),
     });
 
     return {
       success: true,
       comment: {
         id: comment.id,
-        contentId: comment.contentId,
-        contentType: comment.contentType,
+        content_id: comment.content_id,
+        contentType: comment.content_type,
         author: {
-          ...comment.author,
-          isContentOwner: comment.author.id === contentOwner?.id,
+          ...comment.User_comments_user_idToUser,
+          isContentOwner: comment.User_comments_user_idToUser.id === contentOwner?.id,
         },
         text: comment.text,
-        parentId: comment.parentId,
-        replyToUser: comment.replyToUser,
-        likesCount: comment.likesCount,
-        repliesCount: comment.repliesCount,
+        parent_id: comment.parent_id,
+        replyToUser: comment.User_comments_reply_to_user_idToUser,
+        likesCount: comment.likes_count,
+        repliesCount: comment.replies_count,
         isLiked: false,
-        isPinned: comment.isPinned,
-        isEdited: comment.isEdited,
+        isPinned: comment.is_pinned,
+        isEdited: comment.is_edited,
         canDelete: true,
         canEdit: true,
         canPin: false,
         canReply: true,
-        createdAt: comment.createdAt.toISOString(),
+        created_at: comment.created_at.toISOString(),
         editedAt: null,
       },
     };
   }
 
-  async updateComment(commentId: string, userId: string, text: string) {
+  async updateComment(commentId: string, user_id: string, text: string) {
     if (text.length > 500) {
       throw new Error('Comment text must be 500 characters or less');
     }
 
-    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+    const comment = await prisma.comments.findUnique({ where: { id: commentId } });
     if (!comment) {
       throw new Error('Comment not found');
     }
 
-    if (!this.canEdit(comment, userId)) {
+    if (!this.canEdit(comment, user_id)) {
       throw new Error('Cannot edit this comment');
     }
 
-    const updated = await prisma.comment.update({
+    const updated = await prisma.comments.update({
       where: { id: commentId },
       data: {
         text,
-        isEdited: true,
-        editedAt: new Date(),
+        is_edited: true,
+        edited_at: new Date(),
       },
       include: {
-        author: {
+        User_comments_user_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
           },
         },
-        replyToUser: {
+        User_comments_reply_to_user_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
           },
         },
       },
     });
 
-    const contentOwner = await this.getContentOwner(updated.contentType, updated.contentId);
+    const contentOwner = await this.getContentOwner(updated.content_type, updated.content_id);
 
     return {
       success: true,
       comment: {
         id: updated.id,
-        contentId: updated.contentId,
-        contentType: updated.contentType,
+        content_id: updated.content_id,
+        contentType: updated.content_type,
         author: {
-          ...updated.author,
-          isContentOwner: updated.author.id === contentOwner?.id,
+          ...updated.User_comments_user_idToUser,
+          isContentOwner: updated.User_comments_user_idToUser.id === contentOwner?.id,
         },
         text: updated.text,
-        parentId: updated.parentId,
-        replyToUser: updated.replyToUser,
-        likesCount: updated.likesCount,
-        repliesCount: updated.repliesCount,
+        parent_id: updated.parent_id,
+        replyToUser: updated.User_comments_reply_to_user_idToUser,
+        likesCount: updated.likes_count,
+        repliesCount: updated.replies_count,
         isLiked: false,
-        isPinned: updated.isPinned,
-        isEdited: updated.isEdited,
-        canDelete: this.canDelete(updated, userId, contentOwner?.id),
-        canEdit: this.canEdit(updated, userId),
+        isPinned: updated.is_pinned,
+        isEdited: updated.is_edited,
+        canDelete: this.canDelete(updated, user_id, contentOwner?.id),
+        canEdit: this.canEdit(updated, user_id),
         canPin: false,
         canReply: true,
-        createdAt: updated.createdAt.toISOString(),
-        editedAt: updated.editedAt?.toISOString() || null,
+        created_at: updated.created_at.toISOString(),
+        editedAt: updated.edited_at?.toISOString() || null,
       },
     };
   }
 
-  async deleteComment(commentId: string, userId: string) {
-    const comment = await prisma.comment.findUnique({
+  async deleteComment(commentId: string, user_id: string) {
+    const comment = await prisma.comments.findUnique({
       where: { id: commentId },
-      include: { parent: true },
+      include: { comments: true },
     });
 
     if (!comment) {
       throw new Error('Comment not found');
     }
 
-    const contentOwner = await this.getContentOwner(comment.contentType, comment.contentId);
+    const contentOwner = await this.getContentOwner(comment.content_type, comment.content_id);
 
-    if (!this.canDelete(comment, userId, contentOwner?.id)) {
+    if (!this.canDelete(comment, user_id, contentOwner?.id)) {
       throw new Error('Cannot delete this comment');
     }
 
     await prisma.$transaction(async (tx) => {
-      await tx.comment.delete({ where: { id: commentId } });
+      await tx.comments.delete({ where: { id: commentId } });
 
-      if (comment.parentId) {
-        await tx.comment.update({
-          where: { id: comment.parentId },
-          data: { repliesCount: { decrement: 1 } },
+      if (comment.parent_id) {
+        await tx.comments.update({
+          where: { id: comment.parent_id },
+          data: { replies_count: { decrement: 1 } },
         });
       }
 
-      await this.decrementContentCommentCountTx(tx, comment.contentType, comment.contentId);
+      await this.decrementContentCommentCountTx(tx, comment.content_type, comment.content_id);
     });
 
-    io.to(`content:${comment.contentId}`).emit('comment_update', {
-      contentId: comment.contentId,
-      contentType: comment.contentType,
-      newCount: await this.getCommentCount(comment.contentType, comment.contentId),
+    io.to(`content:${comment.content_id}`).emit('comment_update', {
+      content_id: comment.content_id,
+      contentType: comment.content_type,
+      newCount: await this.getCommentCount(comment.content_type, comment.content_id),
     });
 
     return { success: true };
   }
 
-  async likeComment(commentId: string, userId: string) {
-    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+  async likeComment(commentId: string, user_id: string) {
+    const comment = await prisma.comments.findUnique({ where: { id: commentId } });
     if (!comment) {
       throw new Error('Comment not found');
     }
 
-    const existing = await prisma.commentLike.findUnique({
+    const comment_id = commentId;
+    const existing = await prisma.comment_likes.findUnique({
       where: {
-        commentId_userId: { commentId, userId },
+        comment_id_user_id: { comment_id, user_id },
       },
     });
 
@@ -418,89 +419,91 @@ export class CommentsService {
     }
 
     await prisma.$transaction([
-      prisma.commentLike.create({ data: { commentId, userId } }),
-      prisma.comment.update({
+      prisma.comment_likes.create({ data: { comment_id, user_id } }),
+      prisma.comments.update({
         where: { id: commentId },
-        data: { likesCount: { increment: 1 } },
+        data: { likes_count: { increment: 1 } },
       }),
     ]);
 
-    const updated = await this.getCommentById(commentId, userId);
+    const updated = await this.getCommentById(commentId, user_id);
     return { success: true, comment: updated };
   }
 
-  async unlikeComment(commentId: string, userId: string) {
-    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+  async unlikeComment(commentId: string, user_id: string) {
+    const comment = await prisma.comments.findUnique({ where: { id: commentId } });
     if (!comment) {
       throw new Error('Comment not found');
     }
 
+    const comment_id = commentId;
     await prisma.$transaction([
-      prisma.commentLike.delete({
+      prisma.comment_likes.delete({
         where: {
-          commentId_userId: { commentId, userId },
+          comment_id_user_id: { comment_id, user_id },
         },
       }),
-      prisma.comment.update({
+      prisma.comments.update({
         where: { id: commentId },
-        data: { likesCount: { decrement: 1 } },
+        data: { likes_count: { decrement: 1 } },
       }),
     ]);
 
-    const updated = await this.getCommentById(commentId, userId);
+    const updated = await this.getCommentById(commentId, user_id);
     return { success: true, comment: updated };
   }
 
-  async pinComment(commentId: string, userId: string) {
-    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+  async pinComment(commentId: string, user_id: string) {
+    const comment = await prisma.comments.findUnique({ where: { id: commentId } });
     if (!comment) {
       throw new Error('Comment not found');
     }
 
-    const contentOwner = await this.getContentOwner(comment.contentType, comment.contentId);
-    if (!this.canPin(userId, contentOwner?.id) || comment.parentId) {
+    const contentOwner = await this.getContentOwner(comment.content_type, comment.content_id);
+    if (!this.canPin(user_id, contentOwner?.id) || comment.parent_id) {
       throw new Error('Cannot pin this comment');
     }
 
-    await prisma.comment.update({
+    await prisma.comments.update({
       where: { id: commentId },
-      data: { isPinned: true },
+      data: { is_pinned: true },
     });
 
-    const updated = await this.getCommentById(commentId, userId);
+    const updated = await this.getCommentById(commentId, user_id);
     return { success: true, comment: updated };
   }
 
-  async unpinComment(commentId: string, userId: string) {
-    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+  async unpinComment(commentId: string, user_id: string) {
+    const comment = await prisma.comments.findUnique({ where: { id: commentId } });
     if (!comment) {
       throw new Error('Comment not found');
     }
 
-    const contentOwner = await this.getContentOwner(comment.contentType, comment.contentId);
-    if (!this.canPin(userId, contentOwner?.id)) {
+    const contentOwner = await this.getContentOwner(comment.content_type, comment.content_id);
+    if (!this.canPin(user_id, contentOwner?.id)) {
       throw new Error('Cannot unpin this comment');
     }
 
-    await prisma.comment.update({
+    await prisma.comments.update({
       where: { id: commentId },
-      data: { isPinned: false },
+      data: { is_pinned: false },
     });
 
-    const updated = await this.getCommentById(commentId, userId);
+    const updated = await this.getCommentById(commentId, user_id);
     return { success: true, comment: updated };
   }
 
-  async reportComment(commentId: string, userId: string, reason: string) {
-    const comment = await prisma.comment.findUnique({ where: { id: commentId } });
+  async reportComment(commentId: string, user_id: string, reason: string) {
+    const comment = await prisma.comments.findUnique({ where: { id: commentId } });
     if (!comment) {
       throw new Error('Comment not found');
     }
 
-    await prisma.commentReport.create({
+    const comment_id = commentId;
+    await prisma.comment_reports.create({
       data: {
-        commentId,
-        reporterId: userId,
+        comment_id,
+        reporter_id: user_id,
         reason,
       },
     });
@@ -511,112 +514,112 @@ export class CommentsService {
   async updateCommentSettings(
     userId: string,
     contentType: string,
-    contentId: string,
+    content_id: string,
     commentsEnabled: boolean,
     repliesEnabled: boolean
   ) {
-    const contentOwner = await this.getContentOwner(contentType, contentId);
+    const contentOwner = await this.getContentOwner(contentType, content_id);
     if (contentOwner?.id !== userId) {
       throw new Error('Only content owner can update settings');
     }
 
-    await prisma.commentSettings.upsert({
+    await prisma.comment_settings.upsert({
       where: {
-        contentId_contentType: { contentId, contentType },
+        content_id_content_type: { content_id, content_type: contentType },
       },
       create: {
-        contentId,
-        contentType,
-        commentsEnabled,
-        repliesEnabled,
+        content_id,
+        content_type: contentType,
+        comments_enabled: commentsEnabled,
+        replies_enabled: repliesEnabled,
       },
       update: {
-        commentsEnabled,
-        repliesEnabled,
+        comments_enabled: commentsEnabled,
+        replies_enabled: repliesEnabled,
       },
     });
 
     return { success: true };
   }
 
-  private async getCommentSettings(contentType: string, contentId: string) {
-    const settings = await prisma.commentSettings.findUnique({
+  private async getCommentSettings(contentType: string, content_id: string) {
+    const settings = await prisma.comment_settings.findUnique({
       where: {
-        contentId_contentType: { contentId, contentType },
+        content_id_content_type: { content_id, content_type: contentType },
       },
     });
 
-    const totalComments = await this.getCommentCount(contentType, contentId);
+    const totalComments = await this.getCommentCount(contentType, content_id);
 
     return {
-      commentsEnabled: settings?.commentsEnabled ?? true,
-      repliesEnabled: settings?.repliesEnabled ?? true,
+      commentsEnabled: settings?.comments_enabled ?? true,
+      repliesEnabled: settings?.replies_enabled ?? true,
       totalComments,
     };
   }
 
-  private async getContentOwner(contentType: string, contentId: string) {
+  private async getContentOwner(contentType: string, content_id: string) {
     let owner = null;
     switch (contentType) {
       case 'post':
         owner = await prisma.post.findUnique({
-          where: { id: contentId },
-          select: { userId: true },
+          where: { id: content_id },
+          select: { user_id: true },
         });
-        return owner ? { id: owner.userId } : null;
+        return owner ? { id: owner.user_id } : null;
       case 'short':
-        owner = await prisma.short.findUnique({
-          where: { id: contentId },
-          select: { userId: true },
+        owner = await prisma.shorts.findUnique({
+          where: { id: content_id },
+          select: { user_id: true },
         });
-        return owner ? { id: owner.userId } : null;
+        return owner ? { id: owner.user_id } : null;
       case 'contest_submission':
         owner = await prisma.contestSubmission.findUnique({
-          where: { id: contentId },
-          select: { userId: true },
+          where: { id: content_id },
+          select: { user_id: true },
         });
-        return owner ? { id: owner.userId } : null;
+        return owner ? { id: owner.user_id } : null;
       default:
         return null;
     }
   }
 
-  private async getCommentCount(contentType: string, contentId: string) {
-    return await prisma.comment.count({
-      where: { contentType, contentId },
+  private async getCommentCount(contentType: string, content_id: string) {
+    return await prisma.comments.count({
+      where: { content_type: contentType, content_id },
     });
   }
 
-  private canDelete(comment: any, userId: string | null, contentOwnerId: string | undefined) {
-    if (!userId) return false;
+  private canDelete(comment: any, user_id: string | null, contentOwnerId: string | undefined) {
+    if (!user_id) return false;
     return (
-      comment.userId === userId ||
-      contentOwnerId === userId ||
-      (comment.parentId && comment.parent?.userId === userId)
+      comment.user_id === user_id ||
+      contentOwnerId === user_id ||
+      (comment.parent_id && comment.comments?.user_id === user_id)
     );
   }
 
-  private canEdit(comment: any, userId: string | null) {
-    if (!userId || comment.userId !== userId) return false;
+  private canEdit(comment: any, user_id: string | null) {
+    if (!user_id || comment.user_id !== user_id) return false;
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    return new Date(comment.createdAt) > fiveMinutesAgo;
+    return new Date(comment.created_at) > fiveMinutesAgo;
   }
 
-  private canPin(userId: string | null, contentOwnerId: string | undefined) {
-    return userId === contentOwnerId;
+  private canPin(user_id: string | null, contentOwnerId: string | undefined) {
+    return user_id === contentOwnerId;
   }
 
-  private incrementContentCommentCountTx(tx: any, contentType: string, contentId: string) {
+  private incrementContentCommentCountTx(tx: any, contentType: string, content_id: string) {
     switch (contentType) {
       case 'post':
         return tx.post.update({
-          where: { id: contentId },
-          data: { commentsCount: { increment: 1 } },
+          where: { id: content_id },
+          data: { comments_count: { increment: 1 } },
         });
       case 'short':
-        return tx.short.update({
-          where: { id: contentId },
-          data: { commentsCount: { increment: 1 } },
+        return tx.shorts.update({
+          where: { id: content_id },
+          data: { comments_count: { increment: 1 } },
         });
       case 'contest_submission':
         return Promise.resolve();
@@ -625,17 +628,17 @@ export class CommentsService {
     }
   }
 
-  private decrementContentCommentCountTx(tx: any, contentType: string, contentId: string) {
+  private decrementContentCommentCountTx(tx: any, contentType: string, content_id: string) {
     switch (contentType) {
       case 'post':
         return tx.post.update({
-          where: { id: contentId },
-          data: { commentsCount: { decrement: 1 } },
+          where: { id: content_id },
+          data: { comments_count: { decrement: 1 } },
         });
       case 'short':
-        return tx.short.update({
-          where: { id: contentId },
-          data: { commentsCount: { decrement: 1 } },
+        return tx.shorts.update({
+          where: { id: content_id },
+          data: { comments_count: { decrement: 1 } },
         });
       case 'contest_submission':
         return Promise.resolve();
@@ -644,64 +647,26 @@ export class CommentsService {
     }
   }
 
-  private incrementContentCommentCount(contentType: string, contentId: string) {
-    switch (contentType) {
-      case 'post':
-        return prisma.post.update({
-          where: { id: contentId },
-          data: { commentsCount: { increment: 1 } },
-        });
-      case 'short':
-        return prisma.short.update({
-          where: { id: contentId },
-          data: { commentsCount: { increment: 1 } },
-        });
-      case 'contest_submission':
-        return Promise.resolve();
-      default:
-        return Promise.resolve();
-    }
-  }
-
-  private decrementContentCommentCount(contentType: string, contentId: string) {
-    switch (contentType) {
-      case 'post':
-        return prisma.post.update({
-          where: { id: contentId },
-          data: { commentsCount: { decrement: 1 } },
-        });
-      case 'short':
-        return prisma.short.update({
-          where: { id: contentId },
-          data: { commentsCount: { decrement: 1 } },
-        });
-      case 'contest_submission':
-        return Promise.resolve();
-      default:
-        return Promise.resolve();
-    }
-  }
-
-  private async getCommentById(commentId: string, userId: string | null) {
-    const comment = await prisma.comment.findUnique({
+  private async getCommentById(commentId: string, user_id: string | null) {
+    const comment = await prisma.comments.findUnique({
       where: { id: commentId },
       include: {
-        author: {
+        User_comments_user_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
           },
         },
-        replyToUser: {
+        User_comments_reply_to_user_idToUser: {
           select: {
             id: true,
             username: true,
-            displayName: true,
-            avatarUrl: true,
-            isVerified: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
           },
         },
       },
@@ -709,35 +674,36 @@ export class CommentsService {
 
     if (!comment) throw new Error('Comment not found');
 
-    const contentOwner = await this.getContentOwner(comment.contentType, comment.contentId);
-    const isLiked = userId
-      ? !!(await prisma.commentLike.findUnique({
-          where: { commentId_userId: { commentId, userId } },
+    const contentOwner = await this.getContentOwner(comment.content_type, comment.content_id);
+    const comment_id = commentId;
+    const isLiked = user_id
+      ? !!(await prisma.comment_likes.findUnique({
+          where: { comment_id_user_id: { comment_id, user_id } },
         }))
       : false;
 
     return {
       id: comment.id,
-      contentId: comment.contentId,
-      contentType: comment.contentType,
+      content_id: comment.content_id,
+      contentType: comment.content_type,
       author: {
-        ...comment.author,
-        isContentOwner: comment.author.id === contentOwner?.id,
+        ...comment.User_comments_user_idToUser,
+        isContentOwner: comment.User_comments_user_idToUser.id === contentOwner?.id,
       },
       text: comment.text,
-      parentId: comment.parentId,
-      replyToUser: comment.replyToUser,
-      likesCount: comment.likesCount,
-      repliesCount: comment.repliesCount,
+      parent_id: comment.parent_id,
+      replyToUser: comment.User_comments_reply_to_user_idToUser,
+      likesCount: comment.likes_count,
+      repliesCount: comment.replies_count,
       isLiked,
-      isPinned: comment.isPinned,
-      isEdited: comment.isEdited,
-      canDelete: this.canDelete(comment, userId, contentOwner?.id),
-      canEdit: this.canEdit(comment, userId),
-      canPin: this.canPin(userId, contentOwner?.id) && !comment.parentId,
+      isPinned: comment.is_pinned,
+      isEdited: comment.is_edited,
+      canDelete: this.canDelete(comment, user_id, contentOwner?.id),
+      canEdit: this.canEdit(comment, user_id),
+      canPin: this.canPin(user_id, contentOwner?.id) && !comment.parent_id,
       canReply: true,
-      createdAt: comment.createdAt.toISOString(),
-      editedAt: comment.editedAt?.toISOString() || null,
+      created_at: comment.created_at.toISOString(),
+      editedAt: comment.edited_at?.toISOString() || null,
     };
   }
 }

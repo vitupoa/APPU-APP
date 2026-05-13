@@ -19,20 +19,20 @@ export class AuditLogService {
    */
   static async log(data: AuditLogData): Promise<void> {
     try {
-      await prisma.auditLog.create({
+      await prisma.audit_logs.create({
         data: {
-          adminId: data.userId || 'SYSTEM',
+          admin_id: data.userId || 'SYSTEM',
           action: data.action,
-          targetType: data.targetType || 'UNKNOWN',
-          targetId: data.targetId || '',
+          target_type: data.targetType || 'UNKNOWN',
+          target_id: data.targetId || '',
           details: {
             ...data.details,
             success: data.success,
             errorMessage: data.errorMessage,
             timestamp: new Date().toISOString(),
           },
-          ipAddress: data.ipAddress,
-          userAgent: data.userAgent,
+          ip_address: data.ipAddress,
+          user_agent: data.userAgent,
         },
       });
     } catch (error) {
@@ -317,11 +317,11 @@ export class AuditLogService {
       reason?: string;
     }
   ): Promise<void> {
-    await prisma.contentModerationLog.create({
+    await prisma.content_moderation_logs.create({
       data: {
         adminId: data.adminId,
         contentType: data.contentType,
-        contentId: data.contentId,
+        content_id: data.contentId,
         action: data.action,
         reason: data.reason,
       },
@@ -394,26 +394,26 @@ export class AuditLogService {
   }) {
     const where: any = {};
 
-    if (filters.userId) where.adminId = filters.userId;
+    if (filters.userId) where.admin_id = filters.userId;
     if (filters.action) where.action = filters.action;
-    if (filters.targetType) where.targetType = filters.targetType;
+    if (filters.targetType) where.target_type = filters.targetType;
     if (filters.success !== undefined)
       where.details = { path: ['success'], equals: filters.success };
 
     if (filters.startDate || filters.endDate) {
-      where.createdAt = {};
-      if (filters.startDate) where.createdAt.gte = filters.startDate;
-      if (filters.endDate) where.createdAt.lte = filters.endDate;
+      where.created_at = {};
+      if (filters.startDate) where.created_at.gte = filters.startDate;
+      if (filters.endDate) where.created_at.lte = filters.endDate;
     }
 
     const [logs, total] = await Promise.all([
-      prisma.auditLog.findMany({
+      prisma.audit_logs.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         take: filters.limit || 100,
         skip: filters.offset || 0,
       }),
-      prisma.auditLog.count({ where }),
+      prisma.audit_logs.count({ where }),
     ]);
 
     return { logs, total };
@@ -429,21 +429,21 @@ export class AuditLogService {
   }) {
     const where: any = {};
 
-    if (filters.userId) where.adminId = filters.userId;
+    if (filters.userId) where.admin_id = filters.userId;
     if (filters.startDate || filters.endDate) {
-      where.createdAt = {};
-      if (filters.startDate) where.createdAt.gte = filters.startDate;
-      if (filters.endDate) where.createdAt.lte = filters.endDate;
+      where.created_at = {};
+      if (filters.startDate) where.created_at.gte = filters.startDate;
+      if (filters.endDate) where.created_at.lte = filters.endDate;
     }
 
     const [totalLogs, actionCounts, successRate] = await Promise.all([
-      prisma.auditLog.count({ where }),
-      prisma.auditLog.groupBy({
+      prisma.audit_logs.count({ where }),
+      prisma.audit_logs.groupBy({
         by: ['action'],
         where,
         _count: true,
       }),
-      prisma.auditLog.groupBy({
+      prisma.audit_logs.groupBy({
         by: ['details'],
         where,
         _count: true,
