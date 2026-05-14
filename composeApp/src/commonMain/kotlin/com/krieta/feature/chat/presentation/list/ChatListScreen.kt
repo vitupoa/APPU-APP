@@ -213,7 +213,7 @@ class ChatListScreen : Screen {
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
 
-                ScrollableTabRow(
+                PrimaryScrollableTabRow(
                     selectedTabIndex = selectedTab.ordinal,
                     modifier = Modifier.fillMaxWidth(),
                     edgePadding = 16.dp

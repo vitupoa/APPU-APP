@@ -45,12 +45,20 @@ export class ContestService {
     const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
     
     const totalDailyPrizePool = data.allowDailyPrizes && data.dailyPrizeKr ? (data.dailyPrizeKr * durationDays) : 0;
+    const dailyPrizePlatformFee = totalDailyPrizePool * PLATFORM_FEE_RATE;
+    
     const airdropTotalPool = (data.airdropKr && data.airdropLimit) ? (data.airdropKr * data.airdropLimit) : 0;
+    const airdropPlatformFee = airdropTotalPool * PLATFORM_FEE_RATE;
     
     // Massive Escrow Calculation blocking fraudulent contest creations natively 
-    const totalChargedKr = new Prisma.Decimal(data.prizeTotalKr + platformFeeKr + totalDailyPrizePool + airdropTotalPool);
+    // Creator pays: prize + 15% fee + daily prizes + 15% fee + airdrops + 15% fee
+    const totalChargedKr = new Prisma.Decimal(
+      data.prizeTotalKr + platformFeeKr + 
+      totalDailyPrizePool + dailyPrizePlatformFee + 
+      airdropTotalPool + airdropPlatformFee
+    );
     const prizeKr = new Prisma.Decimal(data.prizeTotalKr);
-    const feeKr = new Prisma.Decimal(platformFeeKr);
+    const feeKr = new Prisma.Decimal(platformFeeKr + dailyPrizePlatformFee + airdropPlatformFee);
 
     return prisma.$transaction(async (tx) => {
       // Verify creator balance
@@ -410,14 +418,20 @@ export class ContestService {
     cursor?: string;
     limit: number;
     userId?: string;
+    userCurrency?: string;
   }) {
-    const { status, cursor, limit, userId } = params;
+    const { status, cursor, limit, userId, userCurrency } = params;
 
     const contests = await prisma.contest.findMany({
       where: status ? { status: status as any } : undefined,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { created_at: 'desc' }
+      orderBy: { created_at: 'desc' },
+      include: {
+        contest_prize_distributions: {
+          orderBy: { rank: 'asc' }
+        }
+      }
     });
 
     const hasMore = contests.length > limit;
@@ -434,38 +448,63 @@ export class ContestService {
       joined.forEach((j: { contest_id: string }) => joinedIds.add(j.contest_id));
     }
 
+    // Get exchange rate if currency provided
+    let krToLocalRate = 1;
+    if (userCurrency) {
+      try {
+        const { ExchangeService } = await import('../../services/exchange/exchange.service.js');
+        const krToUsd = ExchangeService.getUSDFromKr(1);
+        const usdToLocalRate = await ExchangeService.getRate(userCurrency);
+        krToLocalRate = krToUsd * usdToLocalRate;
+      } catch (error) {
+        // Fallback to 1:1 if conversion fails
+        krToLocalRate = 1;
+      }
+    }
+
     return {
-      items: items.map((c: any) => ({
-        id: c.id,
-        creator: c.User,
-        title: c.title,
-        description: c.description,
-        media_type: c.media_type,
-        contestCategory: c.category,
-        prizeTotalKr: Number(c.prize_total_kr),
-        platformFeeKr: Number(c.platform_fee_kr),
-        totalChargedKr: Number(c.prize_total_kr) + Number(c.platform_fee_kr),
-        maxWinners: c.max_winners,
-        judgingCriteria: c.judging_criteria,
-        sponsorName: c.sponsor_name,
-        sponsorUrl: c.sponsor_url,
-        deadline: c.deadline.toISOString(),
-        coverMediaUrl: c.cover_media_url,
-        status: c.status,
-        totalParticipants: c.total_participants,
-        submissionsCount: c.total_submissions,
-        isJoined: joinedIds.has(c.id),
-        created_at: c.created_at.toISOString()
-      })),
+      items: items.map((c: any) => {
+        const prizeTotalKr = Number(c.prize_total_kr);
+        const prizeTotalFiat = userCurrency ? prizeTotalKr * krToLocalRate : null;
+
+        return {
+          id: c.id,
+          creator: c.User,
+          title: c.title,
+          description: c.description,
+          media_type: c.media_type,
+          contestCategory: c.category,
+          prizeTotalKr,
+          prizeTotalFiat,
+          currency: userCurrency?.toUpperCase(),
+          platformFeeKr: Number(c.platform_fee_kr),
+          totalChargedKr: Number(c.prize_total_kr) + Number(c.platform_fee_kr),
+          maxWinners: c.max_winners,
+          judgingCriteria: c.judging_criteria,
+          publicVoteWeight: c.public_vote_weight,
+          sponsorName: c.sponsor_name,
+          sponsorUrl: c.sponsor_url,
+          deadline: c.deadline.toISOString(),
+          coverMediaUrl: c.cover_media_url,
+          status: c.status,
+          totalParticipants: c.total_participants,
+          submissionsCount: c.total_submissions,
+          isJoined: joinedIds.has(c.id),
+          created_at: c.created_at.toISOString()
+        };
+      }),
       nextCursor
     };
   }
 
-  static async getContestById(contestId: string, userId?: string) {
+  static async getContestById(contestId: string, userId?: string, userCurrency?: string) {
     const contest = await prisma.contest.findUniqueOrThrow({
       where: { id: contestId },
       include: {
-        User: true
+        User: true,
+        contest_prize_distributions: {
+          orderBy: { rank: 'asc' }
+        }
       }
     });
 
@@ -474,6 +513,17 @@ export class ContestService {
           where: { contest_id_user_id: { contest_id: contestId, user_id: userId } }
         }))
       : false;
+
+    // Get prize breakdown with currency conversion if currency provided
+    let prizeBreakdown = null;
+    if (userCurrency) {
+      try {
+        prizeBreakdown = await this.getPrizeBreakdown(contestId, userCurrency);
+      } catch (error) {
+        // Fallback to just Kr amounts if conversion fails
+        prizeBreakdown = null;
+      }
+    }
 
     return {
       id: contest.id,
@@ -485,10 +535,16 @@ export class ContestService {
       prizeTotalKr: Number(contest.prize_total_kr),
       platformFeeKr: Number(contest.platform_fee_kr),
       totalChargedKr: Number(contest.prize_total_kr) + Number(contest.platform_fee_kr),
+      prizeBreakdown,
+      prizeDistributions: contest.contest_prize_distributions.map(d => ({
+        rank: d.rank,
+        percentage: Number(d.percentage)
+      })),
       rules: [],
       requiredActions: [],
       maxWinners: contest.max_winners,
       judgingCriteria: contest.judging_criteria,
+      publicVoteWeight: contest.public_vote_weight,
       sponsorName: contest.sponsor_name,
       sponsorUrl: contest.sponsor_url,
       deadline: contest.deadline.toISOString(),
@@ -757,55 +813,313 @@ export class ContestService {
   }
 
   /**
-   * Distributes prizes to winners atomically.
-   * Uses prize distribution percentages from the contest.
+   * Transition contest from ACTIVE to JUDGING status
+   * Called when deadline passes or manually by creator
    */
-  static async distributeContestPrizes(contestId: string, winnerIds: string[]) {
+  static async transitionToJudging(contestId: string, creatorId?: string) {
     const contest = await prisma.contest.findUniqueOrThrow({
       where: { id: contestId }
     });
-    if (contest.status !== 'JUDGING') throw new Error('Contest is not in JUDGING state');
+
+    // Verify creator if provided
+    if (creatorId && contest.creator_id !== creatorId) {
+      throw new Error('Only contest creator can manually transition to judging');
+    }
+
+    if (contest.status !== 'ACTIVE') {
+      throw new Error('Contest must be ACTIVE to transition to JUDGING');
+    }
+
+    // Check if deadline has passed or creator is manually transitioning
+    const now = new Date();
+    if (creatorId && contest.deadline > now) {
+      // Allow creator to manually transition before deadline
+    } else if (contest.deadline > now) {
+      throw new Error('Contest deadline has not passed yet');
+    }
+
+    await prisma.contest.update({
+      where: { id: contestId },
+      data: { status: 'JUDGING' }
+    });
+
+    return { success: true, message: 'Contest transitioned to JUDGING status' };
+  }
+
+  /**
+   * Judge scores a submission
+   * Only judges assigned to the contest can score
+   */
+  static async scoreSubmission(judgeUserId: string, submissionId: string, score: number, feedback?: string) {
+    const submission = await prisma.contestSubmission.findUniqueOrThrow({
+      where: { id: submissionId },
+      include: { Contest: true }
+    });
+
+    // Verify judge is assigned to this contest
+    const judgeAssignment = await prisma.judge_invites.findUnique({
+      where: {
+        contest_id_judge_id: {
+          contest_id: submission.contest_id,
+          judge_id: judgeUserId
+        }
+      }
+    });
+
+    if (!judgeAssignment || judgeAssignment.status !== 'ACCEPTED') {
+      throw new Error('You are not authorized to judge this contest');
+    }
+
+    if (submission.Contest.status !== 'JUDGING') {
+      throw new Error('Contest must be in JUDGING status to score submissions');
+    }
+
+    if (score < 0 || score > 100) {
+      throw new Error('Score must be between 0 and 100');
+    }
+
+    // Get or create judge record
+    const judge = await prisma.contest_judges.upsert({
+      where: {
+        contest_id_user_id: {
+          contest_id: submission.contest_id,
+          user_id: judgeUserId
+        }
+      },
+      create: {
+        contest_id: submission.contest_id,
+        user_id: judgeUserId,
+        status: 'active'
+      },
+      update: {}
+    });
+
+    // Upsert judge score
+    const judgeScore = await prisma.judge_scores.upsert({
+      where: {
+        judge_id_submission_id: {
+          judge_id: judge.id,
+          submission_id: submissionId
+        }
+      },
+      create: {
+        judge_id: judge.id,
+        submission_id: submissionId,
+        score: new Prisma.Decimal(score),
+        feedback
+      },
+      update: {
+        score: new Prisma.Decimal(score),
+        feedback,
+        updated_at: new Date()
+      }
+    });
+
+    // Recalculate average judge score for this submission
+    await this.recalculateSubmissionScores(submissionId);
+
+    return judgeScore;
+  }
+
+  /**
+   * Recalculate judge_score and final_score for a submission
+   */
+  static async recalculateSubmissionScores(submissionId: string) {
+    const submission = await prisma.contestSubmission.findUniqueOrThrow({
+      where: { id: submissionId },
+      include: {
+        Contest: true,
+        judge_scores: true
+      }
+    });
+
+    // Calculate average judge score
+    let avgJudgeScore = new Prisma.Decimal(0);
+    if (submission.judge_scores.length > 0) {
+      const totalScore = submission.judge_scores.reduce(
+        (sum, js) => sum + Number(js.score),
+        0
+      );
+      avgJudgeScore = new Prisma.Decimal(totalScore / submission.judge_scores.length);
+    }
+
+    // Calculate final score based on judging criteria
+    let finalScore = new Prisma.Decimal(0);
+    const contest = submission.Contest;
+
+    switch (contest.judging_criteria) {
+      case 'CREATOR_PICKS':
+        // Final score is just judge score (creator is the judge)
+        finalScore = avgJudgeScore;
+        break;
+
+      case 'COMMUNITY_VOTE':
+        // Final score is just vote count
+        finalScore = new Prisma.Decimal(submission.votes_count);
+        break;
+
+      case 'MOST_ENGAGEMENT':
+        // Final score is vote count (can be extended to include comments, shares, etc.)
+        finalScore = new Prisma.Decimal(submission.votes_count);
+        break;
+
+      case 'COMBINATION':
+        // Weighted combination of judge score and public votes
+        const judgeWeight = 100 - (contest.public_vote_weight || 50);
+        const publicWeight = contest.public_vote_weight || 50;
+        
+        // Normalize votes to 0-100 scale (assuming max 1000 votes)
+        const normalizedVotes = Math.min(submission.votes_count / 10, 100);
+        
+        finalScore = new Prisma.Decimal(
+          (Number(avgJudgeScore) * judgeWeight / 100) +
+          (normalizedVotes * publicWeight / 100)
+        );
+        break;
+    }
+
+    // Update submission with new scores
+    await prisma.contestSubmission.update({
+      where: { id: submissionId },
+      data: {
+        judge_score: avgJudgeScore,
+        final_score: finalScore
+      }
+    });
+
+    return { judge_score: avgJudgeScore, final_score: finalScore };
+  }
+
+  /**
+   * Calculate winners based on judging criteria and final scores
+   * Returns array of winner user IDs in rank order
+   */
+  static async calculateWinners(contestId: string) {
+    const contest = await prisma.contest.findUniqueOrThrow({
+      where: { id: contestId },
+      include: {
+        ContestSubmission: {
+          include: {
+            User: {
+              select: {
+                id: true,
+                username: true,
+                display_name: true
+              }
+            }
+          }
+        },
+        contest_prize_distributions: {
+          orderBy: { rank: 'asc' }
+        }
+      }
+    });
+
+    if (contest.status !== 'JUDGING') {
+      throw new Error('Contest must be in JUDGING status to calculate winners');
+    }
+
+    // Recalculate all submission scores first
+    for (const submission of contest.ContestSubmission) {
+      await this.recalculateSubmissionScores(submission.id);
+    }
+
+    // Fetch updated submissions with scores
+    const submissions = await prisma.contestSubmission.findMany({
+      where: { contest_id: contestId },
+      include: {
+        User: {
+          select: {
+            id: true,
+            username: true,
+            display_name: true
+          }
+        }
+      },
+      orderBy: [
+        { final_score: 'desc' },
+        { submitted_at: 'asc' } // Tiebreaker: earlier submission wins
+      ],
+      take: contest.max_winners
+    });
+
+    // Update ranks
+    for (let i = 0; i < submissions.length; i++) {
+      await prisma.contestSubmission.update({
+        where: { id: submissions[i].id },
+        data: { rank: i + 1 }
+      });
+    }
+
+    return submissions.map((s, index) => ({
+      userId: s.user_id,
+      rank: index + 1,
+      username: s.User.username,
+      displayName: s.User.display_name,
+      finalScore: Number(s.final_score),
+      judgeScore: Number(s.judge_score),
+      votesCount: s.votes_count
+    }));
+  }
+
+  /**
+   * Distributes prizes to winners atomically.
+   * Uses prize distribution percentages from the contest.
+   */
+  static async distributeContestPrizes(contestId: string, winnerIds?: string[]) {
+    const contest = await prisma.contest.findUniqueOrThrow({
+      where: { id: contestId },
+      include: {
+        contest_prize_distributions: {
+          orderBy: { rank: 'asc' }
+        }
+      }
+    });
+
+    if (contest.status !== 'JUDGING') {
+      throw new Error('Contest is not in JUDGING state');
+    }
+
+    // If no winnerIds provided, calculate them automatically
+    let winners: { userId: string; rank: number }[];
+    if (!winnerIds || winnerIds.length === 0) {
+      const calculatedWinners = await this.calculateWinners(contestId);
+      winners = calculatedWinners.map(w => ({ userId: w.userId, rank: w.rank }));
+    } else {
+      // Use provided winner IDs
+      winners = winnerIds.map((userId, index) => ({ userId, rank: index + 1 }));
+    }
 
     const totalPrize = Number(contest.prize_total_kr);
 
+    // Validate prize distribution percentages sum to 100
+    const totalPercentage = contest.contest_prize_distributions.reduce(
+      (sum, dist) => sum + Number(dist.percentage),
+      0
+    );
+
+    if (Math.abs(totalPercentage - 100) > 0.01) {
+      throw new Error('Prize distribution percentages must sum to 100%');
+    }
+
     return prisma.$transaction(async (tx) => {
-      for (const [index, winnerId] of winnerIds.entries()) {
-        const prizeAmount = new Prisma.Decimal(totalPrize / winnerIds.length);
+      for (const winner of winners) {
+        // Find prize distribution for this rank
+        const distribution = contest.contest_prize_distributions.find(
+          d => d.rank === winner.rank
+        );
 
-        // Credit winner wallet
-        await tx.wallets.upsert({
-          where: { user_id: winnerId },
-          create: { user_id: winnerId, kr_balance: prizeAmount, updated_at: new Date() },
-          update: { kr_balance: { increment: prizeAmount } }
-        });
-
-        // Record transaction
-        await tx.transactions.create({
-          data: {
-            user_id: winnerId,
-            type: 'contest_prize',
-            amount_kr: prizeAmount,
-            status: 'completed',
-            provider: 'platform',
-            reference: contestId
-          }
-        });
-
-        // Record winner
-        await tx.contest_winners.create({
-          data: {
-            contest_id: contestId,
-            user_id: winnerId,
-            rank: index + 1,
-            prize_kr: prizeAmount
-          }
-        });
-
-        // Unlock wallet on first prize income
-        await tx.user.update({
-          where: { id: winnerId },
-          data: { is_wallet_unlocked: true }
-        });
+        if (!distribution) {
+          // If no specific distribution, divide equally
+          const prizeAmount = new Prisma.Decimal(totalPrize / winners.length);
+          await this.creditWinner(tx, winner.userId, contestId, winner.rank, prizeAmount);
+        } else {
+          // Use percentage distribution
+          const prizeAmount = new Prisma.Decimal(
+            (totalPrize * Number(distribution.percentage)) / 100
+          );
+          await this.creditWinner(tx, winner.userId, contestId, winner.rank, prizeAmount);
+        }
       }
 
       // Release escrow
@@ -820,5 +1134,95 @@ export class ContestService {
         data: { status: 'COMPLETED' }
       });
     });
+  }
+
+  /**
+   * Helper to credit winner wallet and record transaction
+   */
+  private static async creditWinner(
+    tx: any,
+    winnerId: string,
+    contestId: string,
+    rank: number,
+    prizeAmount: Prisma.Decimal
+  ) {
+    // Credit winner wallet
+    await tx.wallets.upsert({
+      where: { user_id: winnerId },
+      create: { user_id: winnerId, kr_balance: prizeAmount, updated_at: new Date() },
+      update: { kr_balance: { increment: prizeAmount } }
+    });
+
+    // Record transaction
+    await tx.transactions.create({
+      data: {
+        user_id: winnerId,
+        type: 'contest_prize',
+        amount_kr: prizeAmount,
+        status: 'completed',
+        provider: 'platform',
+        reference: contestId
+      }
+    });
+
+    // Record winner
+    await tx.contest_winners.create({
+      data: {
+        contest_id: contestId,
+        user_id: winnerId,
+        rank: rank,
+        prize_kr: prizeAmount
+      }
+    });
+
+    // Unlock wallet on first prize income
+    await tx.user.update({
+      where: { id: winnerId },
+      data: { is_wallet_unlocked: true }
+    });
+  }
+
+  /**
+   * Get prize amounts with currency conversion for display
+   */
+  static async getPrizeBreakdown(contestId: string, userCurrency: string) {
+    const contest = await prisma.contest.findUniqueOrThrow({
+      where: { id: contestId },
+      include: {
+        contest_prize_distributions: {
+          orderBy: { rank: 'asc' }
+        }
+      }
+    });
+
+    const totalPrizeKr = Number(contest.prize_total_kr);
+    
+    // Import exchange service dynamically
+    const { ExchangeService } = await import('../../services/exchange/exchange.service.js');
+    
+    // Get exchange rate for user's currency
+    const krToUsd = ExchangeService.getUSDFromKr(1); // 1 Kr = $100 USD
+    const usdToLocalRate = await ExchangeService.getRate(userCurrency);
+    const krToLocalRate = krToUsd * usdToLocalRate;
+
+    const breakdown = contest.contest_prize_distributions.map(dist => {
+      const prizeKr = (totalPrizeKr * Number(dist.percentage)) / 100;
+      const prizeFiat = prizeKr * krToLocalRate;
+
+      return {
+        rank: dist.rank,
+        percentage: Number(dist.percentage),
+        amountKr: prizeKr,
+        amountFiat: prizeFiat,
+        currency: userCurrency.toUpperCase()
+      };
+    });
+
+    return {
+      totalPrizeKr,
+      totalPrizeFiat: totalPrizeKr * krToLocalRate,
+      currency: userCurrency.toUpperCase(),
+      breakdown
+    };
   }
 }

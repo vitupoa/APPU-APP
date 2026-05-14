@@ -1,379 +1,492 @@
-# 📋 Deployment Checklist
+# Contest Judging System - Deployment Checklist
 
 ## Pre-Deployment
 
-### Backend
-- [x] ✅ Social media service created
-- [x] ✅ Marketplace service created
-- [x] ✅ Sales funnel service created
-- [x] ✅ Gamification service created
-- [x] ✅ Notification service created
-- [x] ✅ API routes created (15+ endpoints)
-- [x] ✅ Database schema designed
-- [x] ✅ package.json updated to Prisma 7.8.0
-- [x] ✅ shadowDatabaseUrl removed from schema
-- [ ] ⚠️ Prisma version updated (run: npm install)
-- [ ] ⚠️ Marketplace models added to schema.prisma
-- [ ] ⚠️ Database pushed to Railway
-- [ ] ⚠️ API keys added to Railway
+### Code Review
+- [ ] All TypeScript files compile without errors
+- [ ] No console.log statements in production code
+- [ ] All imports are correct
+- [ ] No unused variables or functions
+- [ ] Error handling is comprehensive
 
-### Frontend
-- [x] ✅ Data models created
-- [x] ✅ Repository interface created
-- [x] ✅ API service created
-- [x] ✅ Repository implementation created
-- [x] ✅ DI module created
-- [x] ✅ ViewModels created (6 screens)
-- [x] ✅ UI screens created (6 screens)
-- [x] ✅ Navigation wrappers created
-- [x] ✅ Social media components created
-- [x] ✅ Marketplace module registered in AppModule
-- [x] ✅ Marketplace tab added to navigation
-- [ ] ⚠️ Test build
-- [ ] ⚠️ Test navigation
-- [ ] ⚠️ Test API calls
+### Database
+- [ ] Prisma schema is valid
+- [ ] Migration SQL file is ready
+- [ ] Backup current database
+- [ ] Test migration on staging database
 
-### Documentation
-- [x] ✅ Implementation guide created
-- [x] ✅ Railway deployment guide created
-- [x] ✅ Social media integration guide created
-- [x] ✅ Executive summary created
-- [x] ✅ Quick reference created
-- [x] ✅ Ready to deploy guide created
+### Dependencies
+- [ ] All npm packages installed
+- [ ] No security vulnerabilities (`npm audit`)
+- [ ] Package versions are compatible
+
+### Configuration
+- [ ] Environment variables set correctly
+- [ ] Database connection string is correct
+- [ ] Exchange rate API configured
+- [ ] CORS settings updated if needed
 
 ---
 
 ## Deployment Steps
 
-### Step 1: Update Prisma (2 min)
-```powershell
-cd C:\Users\ADMIN\Krieta\backend
-Remove-Item -Recurse -Force node_modules
-Remove-Item -Force package-lock.json
-npm install
-npx prisma --version  # Verify 7.8.0
+### Step 1: Database Migration
+```bash
+# Connect to database
+psql $DATABASE_URL
+
+# Run migration
+\i backend/prisma/migrations/add_judge_scores_table.sql
+
+# Verify table created
+\dt judge_scores
+
+# Check indexes
+\di judge_scores*
+
+# Exit
+\q
 ```
-- [ ] node_modules removed
-- [ ] package-lock.json removed
-- [ ] npm install completed
-- [ ] Prisma version is 7.8.0
 
-### Step 2: Update Schema (5 min)
-- [ ] Opened schema.prisma
-- [ ] Opened marketplace-models-to-add.prisma
-- [ ] Copied all models
-- [ ] Pasted at end of schema.prisma
-- [ ] Added 5 relations to User model
-- [ ] Saved file
+**Verification:**
+- [ ] `judge_scores` table exists
+- [ ] Unique constraint on (judge_id, submission_id)
+- [ ] Index on submission_id
+- [ ] Foreign keys to contest_judges and contest_submission
 
-### Step 3: Push to Railway (2 min)
-```powershell
-npx prisma db push
+---
+
+### Step 2: Regenerate Prisma Client
+```bash
+cd backend
 npx prisma generate
 ```
-- [ ] db push succeeded
-- [ ] Prisma Client generated
-- [ ] No errors in output
 
-### Step 4: Add API Keys (5 min)
-Go to Railway → Variables → Add:
-- [ ] YOUTUBE_API_KEY
-- [ ] TWITTER_BEARER_TOKEN
-- [ ] RAPIDAPI_KEY
-- [ ] FACEBOOK_APP_ID
-- [ ] FACEBOOK_APP_SECRET
+**Verification:**
+- [ ] No errors during generation
+- [ ] `@prisma/client` updated
+- [ ] Types available in IDE
 
-### Step 5: Deploy Code (2 min)
-```powershell
-git add .
-git commit -m "Add marketplace and social media integration"
-git push origin main
+---
+
+### Step 3: Build Application
+```bash
+cd backend
+npm run build
 ```
-- [ ] Code committed
-- [ ] Code pushed
-- [ ] Railway deployment started
+
+**Verification:**
+- [ ] Build completes successfully
+- [ ] No TypeScript errors
+- [ ] Dist folder created
+
+---
+
+### Step 4: Deploy Code
+```bash
+# Push to repository
+git add .
+git commit -m "feat: implement contest judging system"
+git push origin main
+
+# Or deploy directly
+npm run deploy
+```
+
+**Verification:**
+- [ ] Code pushed successfully
+- [ ] CI/CD pipeline passes
+- [ ] Deployment successful
+
+---
+
+### Step 5: Restart Server
+```bash
+# Development
+npm run dev
+
+# Production
+pm2 restart krieta-api
+# or
+npm start
+```
+
+**Verification:**
+- [ ] Server starts without errors
+- [ ] Worker logs show: "Contest deadline worker started"
+- [ ] All routes accessible
 
 ---
 
 ## Post-Deployment Verification
 
-### Backend Tests
-```powershell
-# Test health
-curl https://your-app.up.railway.app/health
+### Health Checks
+
+#### 1. Server Health
+```bash
+curl http://localhost:3000/health
 ```
-- [ ] Health endpoint returns 200
-- [ ] Response contains "ok"
+- [ ] Returns 200 OK
 
-```powershell
-# Test marketplace
-curl https://your-app.up.railway.app/api/v1/marketplace/influencers/search
+#### 2. Database Connection
+```bash
+curl http://localhost:3000/api/v1/contests?limit=1
 ```
-- [ ] Marketplace endpoint accessible
-- [ ] Returns JSON response
+- [ ] Returns contest list
+- [ ] No database errors
 
-```powershell
-# Check logs
-railway logs
+#### 3. Worker Status
+Check logs for:
 ```
-- [ ] No errors in logs
-- [ ] Server started successfully
-
-### Frontend Tests
-- [ ] App builds successfully
-- [ ] No compilation errors
-- [ ] Marketplace tab visible in bottom nav
-- [ ] Can navigate to MarketplaceHomeScreen
-- [ ] Can switch between Brand/Influencer/User roles
-- [ ] Can navigate to InfluencerSearchScreen
-- [ ] Can navigate to CampaignListScreen
-- [ ] Can navigate to GamificationScreen
-
-### Database Tests
-```powershell
-npx prisma studio
+[CRON] Contest Deadline Worker started (runs every 5 minutes)
 ```
-- [ ] Can open Prisma Studio
-- [ ] influencer_profiles table exists
-- [ ] social_media_accounts table exists
-- [ ] brand_campaigns table exists
-- [ ] campaign_applications table exists
-- [ ] notifications table exists
-- [ ] gamification_points table exists
+- [ ] Worker started successfully
 
 ---
 
-## Feature Tests
+### Functional Tests
 
-### Social Media Integration
-- [ ] Can add TikTok account
-- [ ] Can add YouTube account
-- [ ] Can add Instagram account (with OAuth)
-- [ ] Follower count fetched automatically
-- [ ] Engagement rate calculated
-- [ ] Tier updated based on total followers
-- [ ] Can set primary account
-- [ ] Can sync account manually
-- [ ] Can delete account
+#### Test 1: Create Contest with Airdrops
+```bash
+curl -X POST http://localhost:3000/api/v1/contests \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Test Contest",
+    "description": "Testing deployment",
+    "media_type": "PHOTO",
+    "category": "CREATIVE",
+    "prizeTotalKr": 100,
+    "maxWinners": 1,
+    "prizeDistribution": [{"rank": 1, "percentage": 100}],
+    "judgingCriteria": "COMMUNITY_VOTE",
+    "deadline": "2026-12-31T23:59:59Z",
+    "participationType": "INDIVIDUAL_ONLY",
+    "airdropKr": 10,
+    "airdropLimit": 10
+  }'
+```
 
-### Influencer Marketplace
-- [ ] Can search influencers
-- [ ] Can filter by tier
-- [ ] Can filter by category
-- [ ] Can filter by engagement
-- [ ] Can view influencer profile
-- [ ] Social accounts displayed
-- [ ] Total reach shown
-- [ ] Verified badge shown
+**Expected:**
+- [ ] Contest created
+- [ ] Total charged = 100 + 15 + 100 + 15 = 230 Kr
+- [ ] Wallet deducted correctly
 
-### Brand Campaigns
-- [ ] Can create campaign
-- [ ] Can set target tier
-- [ ] Can set budget
-- [ ] Can set deliverables
-- [ ] Can view my campaigns
-- [ ] Can view available campaigns (influencer)
-- [ ] Can apply to campaign
-- [ ] Can review applications
-- [ ] Can accept/reject applications
+#### Test 2: Get Contest with Currency
+```bash
+curl "http://localhost:3000/api/v1/contests/$CONTEST_ID?currency=kes"
+```
 
-### Contest Sponsorships
-- [ ] Can browse contests
-- [ ] Can sponsor contest
-- [ ] Can enable purchase-to-enter
-- [ ] Can add product URL
-- [ ] Legal compliance info shown
-- [ ] Sponsorship tracked
+**Expected:**
+- [ ] Returns contest details
+- [ ] Includes `prizeBreakdown` with fiat amounts
+- [ ] Currency conversion works
 
-### Gamification
-- [ ] Points awarded for actions
-- [ ] Level calculated correctly
-- [ ] Recent activity shown
-- [ ] Contests won counted
-- [ ] Winner-to-influencer transition works (3 wins)
+#### Test 3: Transition to Judging
+```bash
+curl -X POST "http://localhost:3000/api/v1/contests/$CONTEST_ID/transition-to-judging" \
+  -H "Authorization: Bearer $TOKEN"
+```
 
----
+**Expected:**
+- [ ] Status changes to JUDGING
+- [ ] Returns success message
 
-## Performance Tests
+#### Test 4: Score Submission (as judge)
+```bash
+curl -X POST "http://localhost:3000/api/v1/contests/submissions/$SUBMISSION_ID/score" \
+  -H "Authorization: Bearer $JUDGE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"score": 85, "feedback": "Great work!"}'
+```
 
-- [ ] API response time < 500ms
-- [ ] Database queries optimized
-- [ ] No N+1 query problems
-- [ ] Images load quickly
-- [ ] Navigation is smooth
-- [ ] No memory leaks
+**Expected:**
+- [ ] Score recorded
+- [ ] Submission scores updated
 
----
+#### Test 5: Calculate Winners
+```bash
+curl "http://localhost:3000/api/v1/contests/$CONTEST_ID/calculate-winners" \
+  -H "Authorization: Bearer $TOKEN"
+```
 
-## Security Tests
+**Expected:**
+- [ ] Returns ranked winners
+- [ ] Scores calculated correctly
 
-- [ ] API keys encrypted in database
-- [ ] JWT authentication works
-- [ ] Rate limiting active
-- [ ] CORS configured correctly
-- [ ] SQL injection prevented
-- [ ] XSS prevented
+#### Test 6: Prize Breakdown
+```bash
+curl "http://localhost:3000/api/v1/contests/$CONTEST_ID/prize-breakdown?currency=kes"
+```
 
----
-
-## Monitoring Setup
-
-- [ ] Railway logs monitored
-- [ ] Error tracking enabled
-- [ ] Performance monitoring enabled
-- [ ] API usage tracked
-- [ ] Database performance monitored
+**Expected:**
+- [ ] Returns breakdown with fiat amounts
+- [ ] Percentages match configuration
 
 ---
 
-## Documentation Review
+### Performance Tests
 
-- [ ] README updated
-- [ ] API documentation complete
-- [ ] Environment variables documented
-- [ ] Deployment guide reviewed
-- [ ] Troubleshooting guide reviewed
+#### 1. Worker Performance
+- [ ] Create contest with past deadline
+- [ ] Wait 5 minutes
+- [ ] Verify status changed to JUDGING
+- [ ] Check worker logs for execution time
 
----
+#### 2. Score Calculation Performance
+- [ ] Create contest with 10 submissions
+- [ ] Have 3 judges score all submissions
+- [ ] Measure time for `calculate-winners`
+- [ ] Should complete in < 2 seconds
 
-## Launch Readiness
-
-### Critical (Must Have)
-- [ ] Prisma updated to 7.8.0
-- [ ] Database schema deployed
-- [ ] Backend deployed to Railway
-- [ ] Frontend builds successfully
-- [ ] Basic navigation works
-
-### Important (Should Have)
-- [ ] API keys configured
-- [ ] Social media sync works
-- [ ] Campaign creation works
-- [ ] Influencer search works
-- [ ] Gamification works
-
-### Nice to Have (Can Add Later)
-- [ ] Analytics dashboard
-- [ ] Campaign detail screen
-- [ ] My applications screen
-- [ ] Notification UI
-- [ ] Historical metrics
+#### 3. Currency Conversion Performance
+- [ ] Request contest list with currency
+- [ ] Measure response time
+- [ ] Should complete in < 500ms (with cache)
 
 ---
 
-## Go/No-Go Decision
+### Security Tests
 
-### GO if:
-✅ All critical items checked
-✅ All important items checked
-✅ No blocking errors
-✅ Performance acceptable
-✅ Security verified
+#### 1. Judge Authorization
+```bash
+# Try to score as non-judge
+curl -X POST "http://localhost:3000/api/v1/contests/submissions/$SUBMISSION_ID/score" \
+  -H "Authorization: Bearer $NON_JUDGE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"score": 85}'
+```
 
-### NO-GO if:
-❌ Prisma version wrong
-❌ Database migration failed
-❌ Backend won't deploy
-❌ Frontend won't build
-❌ Critical bugs found
+**Expected:**
+- [ ] Returns 403 Forbidden
+- [ ] Error: "You are not authorized to judge this contest"
+
+#### 2. Admin-Only Distribution
+```bash
+# Try to distribute as non-admin
+curl -X POST "http://localhost:3000/api/v1/contests/$CONTEST_ID/distribute-auto" \
+  -H "Authorization: Bearer $USER_TOKEN"
+```
+
+**Expected:**
+- [ ] Returns 403 Forbidden
+- [ ] Only admins can distribute
+
+#### 3. CSRF Protection
+```bash
+# Try POST without CSRF token
+curl -X POST "http://localhost:3000/api/v1/contests/$CONTEST_ID/transition-to-judging" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Expected:**
+- [ ] CSRF validation works
+- [ ] Protected endpoints require CSRF token
 
 ---
 
-## Post-Launch Tasks
+### Edge Case Tests
 
-### Day 1
-- [ ] Monitor error rates
-- [ ] Check API usage
-- [ ] Verify user flows
-- [ ] Gather feedback
-- [ ] Fix critical bugs
+#### 1. Percentage Validation
+```bash
+# Try to create contest with invalid percentages
+curl -X POST http://localhost:3000/api/v1/contests \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prizeDistribution": [
+      {"rank": 1, "percentage": 50},
+      {"rank": 2, "percentage": 30}
+    ]
+  }'
+```
 
-### Week 1
-- [ ] Optimize slow queries
-- [ ] Add missing features
-- [ ] Improve UI/UX
-- [ ] Add analytics
-- [ ] Plan next iteration
+**Expected:**
+- [ ] Returns 400 Bad Request
+- [ ] Error about percentages not summing to 100%
 
-### Month 1
-- [ ] Review metrics
-- [ ] User interviews
-- [ ] Feature prioritization
-- [ ] Performance optimization
-- [ ] Scale infrastructure
+#### 2. Score Range Validation
+```bash
+# Try to score outside 0-100 range
+curl -X POST "http://localhost:3000/api/v1/contests/submissions/$SUBMISSION_ID/score" \
+  -H "Authorization: Bearer $JUDGE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"score": 150}'
+```
+
+**Expected:**
+- [ ] Returns 400 Bad Request
+- [ ] Error about score range
+
+#### 3. Exchange Rate Failure
+- [ ] Mock exchange service failure
+- [ ] Request contest with currency
+- [ ] Should return Kr amounts only (graceful fallback)
+
+---
+
+## Monitoring
+
+### Logs to Monitor
+
+#### Application Logs
+```bash
+tail -f logs/app.log | grep -i contest
+```
+
+Watch for:
+- [ ] Contest creation logs
+- [ ] Worker execution logs
+- [ ] Score calculation logs
+- [ ] Prize distribution logs
+- [ ] Error logs
+
+#### Worker Logs
+```bash
+tail -f logs/app.log | grep -i cron
+```
+
+Watch for:
+- [ ] "Contest deadline worker started"
+- [ ] "Running contest deadline check"
+- [ ] "Contest transitioned to JUDGING"
+- [ ] Any errors
+
+#### Database Logs
+```bash
+tail -f logs/postgres.log | grep -i judge_scores
+```
+
+Watch for:
+- [ ] INSERT operations on judge_scores
+- [ ] UPDATE operations on contest_submission
+- [ ] No constraint violations
+- [ ] No deadlocks
+
+---
+
+### Metrics to Track
+
+#### Performance Metrics
+- [ ] Average response time for contest endpoints
+- [ ] Worker execution time
+- [ ] Score calculation time
+- [ ] Prize distribution time
+
+#### Business Metrics
+- [ ] Number of contests created
+- [ ] Number of contests transitioned to JUDGING
+- [ ] Number of judge scores submitted
+- [ ] Number of prizes distributed
+
+#### Error Metrics
+- [ ] Failed contest creations
+- [ ] Failed score submissions
+- [ ] Failed prize distributions
+- [ ] Worker errors
 
 ---
 
 ## Rollback Plan
 
-If deployment fails:
+### If Issues Occur
 
-1. **Revert code**:
-   ```powershell
-   git revert HEAD
-   git push origin main
-   ```
+#### 1. Immediate Rollback
+```bash
+# Revert code
+git revert HEAD
+git push origin main
 
-2. **Revert database** (if needed):
-   ```powershell
-   # Railway keeps backups
-   # Restore from Railway dashboard
-   ```
+# Restart server
+pm2 restart krieta-api
+```
 
-3. **Check logs**:
-   ```powershell
-   railway logs
-   ```
+#### 2. Database Rollback
+```bash
+# Drop judge_scores table
+psql $DATABASE_URL -c "DROP TABLE IF EXISTS judge_scores CASCADE;"
 
-4. **Fix issues**:
-   - Review error messages
-   - Fix code
-   - Test locally
-   - Redeploy
+# Revert Prisma schema
+git checkout HEAD~1 backend/prisma/schema.prisma
 
----
+# Regenerate client
+npx prisma generate
+```
 
-## Success Metrics
-
-### Technical
-- ✅ 99.9% uptime
-- ✅ < 500ms API response time
-- ✅ < 1% error rate
-- ✅ 100% test coverage (critical paths)
-
-### Business
-- ✅ Influencers can add social accounts
-- ✅ Brands can create campaigns
-- ✅ Users can earn points
-- ✅ ROI tracking works
-- ✅ Tier calculation accurate
-
-### User Experience
-- ✅ Smooth navigation
-- ✅ Fast loading
-- ✅ Intuitive UI
-- ✅ Clear error messages
-- ✅ Helpful documentation
+#### 3. Verify Rollback
+- [ ] Server running on previous version
+- [ ] No errors in logs
+- [ ] Existing contests still work
+- [ ] No data loss
 
 ---
 
-## Final Checklist
+## Success Criteria
 
-Before going live:
-
-- [ ] All tests pass
-- [ ] Documentation complete
-- [ ] Team trained
-- [ ] Support ready
-- [ ] Monitoring active
-- [ ] Backup plan ready
-- [ ] Rollback plan tested
-- [ ] Stakeholders informed
+### All checks must pass:
+- [ ] Database migration successful
+- [ ] Server starts without errors
+- [ ] Worker starts and runs
+- [ ] All functional tests pass
+- [ ] All security tests pass
+- [ ] Performance is acceptable
+- [ ] No errors in logs
+- [ ] Monitoring is active
 
 ---
 
-## 🎉 Ready to Launch!
+## Post-Deployment Tasks
 
-When all critical and important items are checked, you're ready to go live!
+### Documentation
+- [ ] Update API documentation
+- [ ] Update changelog
+- [ ] Notify team of new features
 
-**Good luck!** 🚀
+### Communication
+- [ ] Announce new features to users
+- [ ] Update help documentation
+- [ ] Train support team
+
+### Monitoring
+- [ ] Set up alerts for errors
+- [ ] Monitor performance metrics
+- [ ] Track usage statistics
+
+---
+
+## Sign-Off
+
+### Deployment Completed By:
+- Name: _______________
+- Date: _______________
+- Time: _______________
+
+### Verified By:
+- Name: _______________
+- Date: _______________
+- Time: _______________
+
+### Notes:
+```
+[Add any deployment notes, issues encountered, or special considerations]
+```
+
+---
+
+## Emergency Contacts
+
+- **DevOps Lead**: [Contact]
+- **Backend Lead**: [Contact]
+- **Database Admin**: [Contact]
+- **On-Call Engineer**: [Contact]
+
+---
+
+## Next Steps
+
+After successful deployment:
+1. Monitor for 24 hours
+2. Collect user feedback
+3. Address any issues
+4. Plan next iteration
+5. Document lessons learned

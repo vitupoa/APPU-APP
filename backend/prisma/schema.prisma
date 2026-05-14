@@ -93,6 +93,7 @@ model ContestSubmission {
   User                       User                         @relation(fields: [user_id], references: [id], onDelete: Cascade)
   contest_action_completions contest_action_completions[]
   contest_votes              contest_votes[]
+  judge_scores               judge_scores[]
 
   @@unique([contest_id, user_id])
   @@map("contest_submission")
@@ -1053,16 +1054,33 @@ model contest_engagement_actions {
 }
 
 model contest_judges {
-  id         String   @id @default(uuid())
-  contest_id String
-  user_id    String
-  status     String   @default("pending")
-  added_at   DateTime @default(now())
-  Contest    Contest  @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id                 String                  @id @default(uuid())
+  contest_id         String
+  user_id            String
+  status             String                  @default("pending")
+  added_at           DateTime                @default(now())
+  Contest            Contest                 @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User               User                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  judge_scores       judge_scores[]
 
   @@unique([contest_id, user_id])
   @@map("contest_judges")
+}
+
+model judge_scores {
+  id            String            @id @default(uuid())
+  judge_id      String
+  submission_id String
+  score         Decimal           @db.Decimal(5, 2)
+  feedback      String?
+  created_at    DateTime          @default(now())
+  updated_at    DateTime          @updatedAt
+  judge         contest_judges    @relation(fields: [judge_id], references: [id], onDelete: Cascade)
+  submission    ContestSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+
+  @@unique([judge_id, submission_id])
+  @@index([submission_id])
+  @@map("judge_scores")
 }
 
 model contest_participants {
@@ -3756,3 +3774,4 @@ model platform_announcements {
 
   @@map("platform_announcements")
 }
+

@@ -52,6 +52,7 @@ import subscriptionRoutes from './modules/user/subscription.routes.js';
 import webhookRoutes from './routes/webhook.routes.js';
 import { startChamaDefaultWorker } from './workers/chamaDefaultWorker.js';
 import { startStoryCleanupWorker } from './workers/storyCleanupWorker.js';
+import { startContestDeadlineWorker } from './workers/contestDeadline.worker.js';
 import { startDailyPrizeWorker } from './workers/dailyPrizeWorker.js';
 import { startFlashSaleWorker } from './workers/flashSaleWorker.js';
 import { FCMService } from './services/fcm.service.js';
@@ -230,6 +231,7 @@ const PORT = env.PORT || 3000;
       try {
         startChamaDefaultWorker();
         startStoryCleanupWorker();
+        startContestDeadlineWorker();
         startDailyPrizeWorker();
         startFlashSaleWorker();
         

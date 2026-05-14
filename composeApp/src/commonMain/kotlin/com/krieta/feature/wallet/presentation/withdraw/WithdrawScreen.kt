@@ -184,7 +184,7 @@ class WithdrawScreen : Screen {
                                 readOnly = true,
                                 label = { Text("Select Country") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(countryExpanded) },
-                                modifier = Modifier.fillMaxWidth().menuAnchor()
+                                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
                             )
                             ExposedDropdownMenu(
                                 expanded = countryExpanded,
@@ -224,7 +224,7 @@ class WithdrawScreen : Screen {
                                 readOnly = true,
                                 label = { Text("Select Bank") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
                                 enabled = state.banks.isNotEmpty()
                             )
                             ExposedDropdownMenu(

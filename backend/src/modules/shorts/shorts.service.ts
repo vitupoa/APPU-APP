@@ -8,8 +8,16 @@ import { ContentLockService } from '../contentLock/contentLock.service.js';
 export class ShortsService {
   /**
    * Get shorts feed based on type
-   * - discover: Users NOT in admiring list (For You)
-   * - admiring: Users in admiring list (Following)
+   * 
+   * ADMIRING TAB (Following):
+   * - Shows shorts from users YOU are admiring (admirer_id = userId)
+   * - Shows shorts from mutual lovers (admired_id = userId AND is_lovers = true)
+   * - Shows YOUR OWN shorts
+   * 
+   * DISCOVER TAB (For You):
+   * - Shows shorts from users you are NOT admiring
+   * - Excludes mutual lovers
+   * - Excludes your own shorts
    */
   static async getFeed(type: string, cursor?: string, limit = 20, userId?: string) {
     let whereClause: any = {};
@@ -27,10 +35,10 @@ export class ShortsService {
       });
       const admiringIds = admiringList.map((a: { admirer_id: string; admired_id: string }) => a.admirer_id === userId ? a.admired_id : a.admirer_id);
 
-      if (admiringIds.length === 0) {
-        return { items: [], nextCursor: null };
-      }
+      // Include the user's own shorts in the admiring feed
+      admiringIds.push(userId);
 
+      // Now admiringIds will always have at least the user's own ID
       whereClause.user_id = { in: admiringIds };
     } else if (type === 'discover' && userId) {
       // Get list of users the current user is admiring, or mutual lovers

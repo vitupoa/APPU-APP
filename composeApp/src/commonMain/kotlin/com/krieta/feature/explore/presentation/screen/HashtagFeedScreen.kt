@@ -165,7 +165,7 @@ class HashtagFeedScreen(private val hashtag: String) : Screen {
                     }
                 }
                 
-                TabRow(
+                PrimaryTabRow(
                     selectedTabIndex = selectedTab,
                     containerColor = KrietaColors.BackgroundElevated
                 ) {

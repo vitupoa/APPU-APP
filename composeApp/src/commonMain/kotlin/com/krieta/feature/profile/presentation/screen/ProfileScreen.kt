@@ -358,9 +358,17 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 Spacer(modifier = Modifier.height(24.dp))
                 var selectedTab by remember { mutableStateOf(0) }
                 val tabs = listOf("Videos", "Contests", "Liked")
+                
+                // Add a divider above tabs to separate from profile content
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = KrietaColors.Outline.copy(alpha = 0.2f)
+                )
+                
                 PrimaryTabRow(
                     selectedTabIndex = selectedTab,
-                    containerColor = Color.Transparent,
+                    containerColor = KrietaColors.Background,
                     contentColor = KrietaColors.Primary
                 ) {
                     tabs.forEachIndexed { index, title ->

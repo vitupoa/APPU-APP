@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,7 +35,7 @@ class KrietaAdsManagerScreen : Screen {
                     title = { Text("Krieta Ads Manager", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.ArrowBack, "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                         }
                     }
                 )
@@ -43,7 +46,7 @@ class KrietaAdsManagerScreen : Screen {
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                TabRow(
+                PrimaryTabRow(
                     selectedTabIndex = selectedTab,
                     containerColor = KrietaColors.BackgroundElevated
                 ) {
@@ -178,7 +181,7 @@ private fun DisplayAdsTab(onCreateCampaign: () -> Unit) {
 
         item {
             PlacementCard(
-                icon = Icons.Default.Chat,
+                icon = Icons.AutoMirrored.Filled.Chat,
                 title = "Group & Chama Chats",
                 description = "Targeted ads in niche communities",
                 cpmRange = "KES 60-200"
@@ -292,7 +295,7 @@ private fun BoostContentTab() {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Icon(
-                        Icons.Default.TrendingUp,
+                        Icons.AutoMirrored.Filled.TrendingUp,
                         contentDescription = null,
                         modifier = Modifier.size(48.dp),
                         tint = MaterialTheme.colorScheme.tertiary

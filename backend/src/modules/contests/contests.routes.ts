@@ -59,7 +59,7 @@ const submitEntrySchema = z.object({
 });
 
 const distributeSchema = z.object({
-  winnerIds: z.array(z.string().uuid()).min(1).max(3)
+  winnerIds: z.array(z.string().uuid()).min(1).max(10).optional()
 });
 
 // GET /api/v1/contests
@@ -68,7 +68,14 @@ router.get('/', optionalAuth, async (req: AuthRequest, res: Response) => {
     const status = req.query.status as string | undefined;
     const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
-    const result = await ContestService.listContests({ status, cursor, limit, userId: req.userId });
+    const currency = getQueryParam(req.query.currency);
+    const result = await ContestService.listContests({ 
+      status, 
+      cursor, 
+      limit, 
+      userId: req.userId,
+      userCurrency: currency
+    });
     res.status(200).json(result);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -117,7 +124,8 @@ router.get('/my-contests', authMiddleware, async (req: AuthRequest, res: Respons
 // GET /api/v1/contests/:id
 router.get('/:id', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const contest = await ContestService.getContestById(String(req.params.id), req.userId);
+    const currency = getQueryParam(req.query.currency);
+    const contest = await ContestService.getContestById(String(req.params.id), req.userId, currency);
     res.status(200).json(contest);
   } catch (error: any) {
     res.status(404).json({ error: 'Contest not found' });
@@ -220,15 +228,15 @@ router.get('/:id/leaderboard', async (req: AuthRequest, res: Response) => {
   }
 });
 
-// POST /api/v1/contests/:id/distribute — Admin only
+// POST /api/v1/contests/:id/distribute — Admin only (supports both manual and auto)
 router.post('/:id/distribute', 
   authMiddleware, 
   adminAuth, 
   csrfProtection,
   async (req: AuthRequest, res: Response) => {
   try {
-    const { winnerIds } = distributeSchema.parse(req.body);
-    await ContestService.distributeContestPrizes(String(req.params.id), winnerIds);
+    const parsed = distributeSchema.parse(req.body);
+    await ContestService.distributeContestPrizes(String(req.params.id), parsed.winnerIds);
     res.status(200).json({ success: true, message: 'Prizes distributed successfully' });
   } catch (error: any) {
     if (error.name === 'ZodError') {
@@ -306,6 +314,86 @@ router.get('/judge/assigned', authMiddleware, async (req: AuthRequest, res: Resp
     res.status(200).json(contests);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ─── JUDGING & SCORING ENDPOINTS ───────────────────────────────
+
+// POST /api/v1/contests/:id/transition-to-judging
+router.post('/:id/transition-to-judging', 
+  authMiddleware, 
+  csrfProtection,
+  async (req: AuthRequest, res: Response) => {
+  try {
+    const result = await ContestService.transitionToJudging(String(req.params.id), req.userId);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+const scoreSubmissionSchema = z.object({
+  score: z.number().min(0).max(100),
+  feedback: z.string().max(500).optional()
+});
+
+// POST /api/v1/contests/submissions/:submissionId/score
+router.post('/submissions/:submissionId/score', 
+  authMiddleware, 
+  csrfProtection,
+  async (req: AuthRequest, res: Response) => {
+  try {
+    const { score, feedback } = scoreSubmissionSchema.parse(req.body);
+    const result = await ContestService.scoreSubmission(
+      req.userId!,
+      String(req.params.submissionId),
+      score,
+      feedback
+    );
+    res.status(200).json(result);
+  } catch (error: any) {
+    if (error.name === 'ZodError') {
+      res.status(400).json({ error: 'Validation failed', details: error.errors });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
+  }
+});
+
+// GET /api/v1/contests/:id/calculate-winners
+router.get('/:id/calculate-winners', 
+  authMiddleware, 
+  async (req: AuthRequest, res: Response) => {
+  try {
+    const winners = await ContestService.calculateWinners(String(req.params.id));
+    res.status(200).json(winners);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// GET /api/v1/contests/:id/prize-breakdown
+router.get('/:id/prize-breakdown', async (req: AuthRequest, res: Response) => {
+  try {
+    const currency = getQueryParam(req.query.currency) || 'usd';
+    const breakdown = await ContestService.getPrizeBreakdown(String(req.params.id), currency);
+    res.status(200).json(breakdown);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/v1/contests/:id/distribute-auto — Automatic distribution based on scores
+router.post('/:id/distribute-auto', 
+  authMiddleware, 
+  adminAuth, 
+  csrfProtection,
+  async (req: AuthRequest, res: Response) => {
+  try {
+    await ContestService.distributeContestPrizes(String(req.params.id));
+    res.status(200).json({ success: true, message: 'Prizes distributed automatically based on scores' });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
   }
 });
 

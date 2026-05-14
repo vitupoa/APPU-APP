@@ -61,7 +61,13 @@ class AndroidSecureKeyStorage(private val context: Context) : SecureKeyStorage {
                         KeyProperties.AUTH_BIOMETRIC_STRONG
                     )
                 }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requireBiometric) {
+                builder.setUserAuthenticationParameters(
+                    30,
+                    KeyProperties.AUTH_BIOMETRIC_STRONG
+                )
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && requireBiometric) {
+                @Suppress("DEPRECATION")
                 builder.setUserAuthenticationValidityDurationSeconds(30)
             }
 
@@ -161,7 +167,13 @@ class AndroidSecureKeyStorage(private val context: Context) : SecureKeyStorage {
                     KeyProperties.AUTH_BIOMETRIC_STRONG
                 )
             }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requireBiometric) {
+            builder.setUserAuthenticationParameters(
+                30,
+                KeyProperties.AUTH_BIOMETRIC_STRONG
+            )
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && requireBiometric) {
+            @Suppress("DEPRECATION")
             builder.setUserAuthenticationValidityDurationSeconds(30)
         }
 

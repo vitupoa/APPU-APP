@@ -52,7 +52,7 @@ fun Step4PrizesAndValidation(
             validationErrors = validationErrors
         )
         
-        Divider(color = Color(0xFF3A3A3F), thickness = 1.dp)
+        HorizontalDivider(color = Color(0xFF3A3A3F), thickness = 1.dp)
         
         // Prize Distribution Section (Subtask 8.1)
         PrizeDistributionSection(
@@ -61,7 +61,7 @@ fun Step4PrizesAndValidation(
             validationErrors = validationErrors
         )
         
-        Divider(color = Color(0xFF3A3A3F), thickness = 1.dp)
+        HorizontalDivider(color = Color(0xFF3A3A3F), thickness = 1.dp)
         
         // Selection Method Section (Subtask 8.2)
         SelectionMethodSection(
@@ -70,7 +70,7 @@ fun Step4PrizesAndValidation(
             validationErrors = validationErrors
         )
         
-        Divider(color = Color(0xFF3A3A3F), thickness = 1.dp)
+        HorizontalDivider(color = Color(0xFF3A3A3F), thickness = 1.dp)
         
         // Milestone Airdrop Section (Subtask 8.3)
         MilestoneAirdropSection(
@@ -908,7 +908,7 @@ private fun VotingCostInput(
                         )
                     }
                     
-                    Divider(color = Color(0xFF3A3A3F), thickness = 1.dp)
+                    HorizontalDivider(color = Color(0xFF3A3A3F), thickness = 1.dp)
                     
                     // Show how end users will see it
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

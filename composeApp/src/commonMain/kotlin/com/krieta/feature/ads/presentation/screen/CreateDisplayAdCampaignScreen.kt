@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -42,7 +43,7 @@ fun CreateDisplayAdCampaignScreen(
                 title = { Text("Create Ad Campaign") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                     }
                 }
             )
@@ -578,7 +579,7 @@ private fun LocationPickerDialog(
         title = { Text("Select Location") },
         text = {
             Column {
-                ScrollableTabRow(selectedTabIndex = 0) {
+                PrimaryScrollableTabRow(selectedTabIndex = 0) {
                     listOf("Country", "City", "Region").forEach { scope ->
                         Tab(
                             selected = selectedScope == scope.uppercase(),

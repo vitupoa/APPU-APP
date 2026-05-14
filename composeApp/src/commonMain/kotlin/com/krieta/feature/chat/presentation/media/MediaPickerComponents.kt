@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -151,7 +152,7 @@ fun MediaPreviewDialog(
     
     AlertDialog(
         onDismissRequest = { if (uploadProgress !is UploadProgress.Uploading) onCancel() },
-        title = { Text("Send ${mediaType.capitalize()}") },
+        title = { Text("Send ${mediaType.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}") },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -293,7 +294,7 @@ fun MediaPreviewDialog(
                     onClick = onSend,
                     enabled = uploadProgress !is UploadProgress.Error
                 ) {
-                    Icon(Icons.Default.Send, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Send")
                 }

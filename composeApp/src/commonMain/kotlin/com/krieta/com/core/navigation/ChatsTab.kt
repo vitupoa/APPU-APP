@@ -29,6 +29,9 @@ object ChatsTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(ChatListScreen())
+        Navigator(
+            screen = ChatListScreen(),
+            key = "ChatsTabNavigator"
+        )
     }
 }

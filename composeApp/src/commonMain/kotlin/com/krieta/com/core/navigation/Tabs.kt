@@ -53,7 +53,10 @@ object HomeTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(com.krieta.feature.feed.presentation.screen.HomeScreen()) {
+        Navigator(
+            screen = com.krieta.feature.feed.presentation.screen.HomeScreen(),
+            key = "HomeTabNavigator"
+        ) {
             CurrentScreen()
         }
     }
@@ -69,7 +72,10 @@ object DripsTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(com.krieta.feature.feed.presentation.screen.DripsScreen()) {
+        Navigator(
+            screen = com.krieta.feature.feed.presentation.screen.DripsScreen(),
+            key = "DripsTabNavigator"
+        ) {
             CurrentScreen()
         }
     }
@@ -86,7 +92,10 @@ object ExploreTab : Tab {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        Navigator(ExploreScreen()) {
+        Navigator(
+            screen = ExploreScreen(),
+            key = "ExploreTabNavigator"
+        ) {
             CurrentScreen()
         }
     }
@@ -102,7 +111,10 @@ object MarketplaceTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(com.krieta.feature.marketplace.presentation.screen.MarketplaceHomeScreen()) {
+        Navigator(
+            screen = com.krieta.feature.marketplace.presentation.screen.MarketplaceHomeScreen(),
+            key = "MarketplaceTabNavigator"
+        ) {
             CurrentScreen()
         }
     }
@@ -762,10 +774,14 @@ object ProfileTab : Tab {
 
     @Composable
     override fun Content() {
-        // ✅ Nested Navigator — each tab has its own navigation stack
-        // This is the correct Voyager pattern: ensures LocalNavigator is properly
-        // available within ProfileScreen and all screens it pushes (Wallet, Milestones, etc.)
-        Navigator(ProfileScreen()) {
+        // ✅ ProfileTab ONLY shows the logged-in user's profile (no userId parameter)
+        // Other users' profiles should be pushed onto the current screen's Navigator,
+        // not navigated to via the ProfileTab. This follows the standard pattern
+        // used by Instagram, Twitter, etc. where the Profile tab is always "you".
+        Navigator(
+            screen = ProfileScreen(userId = null), // null = logged-in user
+            key = "ProfileTabNavigator"
+        ) {
             CurrentScreen()
         }
     }

@@ -131,7 +131,7 @@ fun FilterSection(
                 }
             }
             
-            Divider()
+            HorizontalDivider()
             
             Text("Social Media Filters", style = MaterialTheme.typography.titleMedium)
             
@@ -209,7 +209,7 @@ fun InfluencerCard(
             
             if (socialAccounts.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
-                Divider()
+                HorizontalDivider()
                 Spacer(Modifier.height(8.dp))
                 Text("Social Media", style = MaterialTheme.typography.labelSmall)
                 Spacer(Modifier.height(4.dp))

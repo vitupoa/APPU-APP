@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,7 +38,7 @@ class BoostContentScreen : Screen {
                     title = { Text("Boost Content") },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(Icons.Default.ArrowBack, "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                         }
                     }
                 )
@@ -58,7 +60,7 @@ class BoostContentScreen : Screen {
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Icon(
-                                Icons.Default.TrendingUp,
+                                Icons.AutoMirrored.Filled.TrendingUp,
                                 contentDescription = null,
                                 modifier = Modifier.size(48.dp),
                                 tint = MaterialTheme.colorScheme.primary
@@ -70,7 +72,7 @@ class BoostContentScreen : Screen {
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                "Increase reach and engagement on your shorts, posts, and live streams",
+                                "Increase reach and engagement on your shorts and posts",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -196,7 +198,7 @@ class BoostContentScreen : Screen {
                         modifier = Modifier.fillMaxWidth(),
                         enabled = selectedContent != null && boostBudget.toIntOrNull()?.let { it >= 500 } == true
                     ) {
-                        Icon(Icons.Default.TrendingUp, null)
+                        Icon(Icons.AutoMirrored.Filled.TrendingUp, null)
                         Spacer(Modifier.width(8.dp))
                         Text("Boost Content - KES $boostBudget")
                     }

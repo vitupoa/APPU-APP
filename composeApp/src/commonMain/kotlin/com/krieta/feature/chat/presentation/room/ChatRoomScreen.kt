@@ -1,6 +1,8 @@
 package com.krieta.feature.chat.presentation.room
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Reply
+import androidx.compose.material.icons.automirrored.filled.Forward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.CircleShape
@@ -123,7 +125,7 @@ class ChatRoomScreen(private val chatId: String, private val chatTitle: String) 
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    Icons.Default.Reply,
+                                    Icons.AutoMirrored.Filled.Reply,
                                     contentDescription = null,
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -396,7 +398,7 @@ fun ChatBubble(
                         onReply()
                         showMenu = false
                     },
-                    leadingIcon = { Icon(Icons.Default.Reply, contentDescription = null) }
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.Reply, contentDescription = null) }
                 )
                 if (isMine) {
                     DropdownMenuItem(
@@ -414,7 +416,7 @@ fun ChatBubble(
                         onForward()
                         showMenu = false
                     },
-                    leadingIcon = { Icon(Icons.Default.Forward, contentDescription = null) }
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.Forward, contentDescription = null) }
                 )
             }
         }

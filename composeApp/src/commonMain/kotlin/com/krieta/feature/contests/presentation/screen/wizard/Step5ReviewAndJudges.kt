@@ -61,7 +61,7 @@ fun Step5ReviewAndJudges(
                 validationErrors = validationErrors
             )
             
-            Divider(color = Color(0xFF3A3A3F), thickness = 1.dp)
+            HorizontalDivider(color = Color(0xFF3A3A3F), thickness = 1.dp)
         }
         
         // Review Section Header
@@ -799,7 +799,7 @@ private fun ReviewCard(
                 color = Color(0xFFF5A623)
             )
             
-            Divider(color = Color(0xFF3A3A3F), thickness = 1.dp)
+            HorizontalDivider(color = Color(0xFF3A3A3F), thickness = 1.dp)
             
             content()
         }

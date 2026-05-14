@@ -166,7 +166,7 @@ data class ChamaSettingsScreen(val chamaId: String, val chamaName: String) : Scr
                 }
 
                 item {
-                    Divider()
+                    HorizontalDivider()
                     Text(
                         "Danger Zone",
                         fontSize = 18.sp,

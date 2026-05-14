@@ -13,12 +13,25 @@ import com.krieta.com.core.security.AndroidBiometricAuthenticator
 import com.krieta.com.core.security.SecureKeyStorage
 import com.krieta.com.core.security.AndroidSecureKeyStorage
 import com.krieta.com.security.DeviceSecurityChecker
+import com.krieta.db.KrietaDatabase
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import android.content.Context
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
 actual fun platformModule(): Module = module {
+    // SQLDelight Database
+    single<KrietaDatabase> { 
+        KrietaDatabase(
+            driver = AndroidSqliteDriver(
+                schema = KrietaDatabase.Schema,
+                context = androidContext(),
+                name = "krieta.db"
+            )
+        )
+    }
+    
     single<TokenManager> { AndroidTokenManager(androidContext()) }
     single<DeviceSecurity> { AndroidDeviceSecurity(androidContext()) }
     single { LocationProvider(androidContext()) }
