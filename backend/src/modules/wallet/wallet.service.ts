@@ -105,34 +105,64 @@ export class WalletService {
           update: { kr_balance: { increment: recipientReceiveAmount } }
         });
 
-        // Record Transactions accurately outlining Revenue Velocity
+        // Record Transactions accurately outlining Revenue Velocity with full context
         await tx.transactions.createMany({
           data: [
             {
               user_id: senderId,
               counterparty_id: recipientId,
               type: 'tip_sent',
+              transaction_type: 'CONTENT_TIP',
               amount_kr: krDecimal,
               amount_fiat: fiatAmount,
               currency: senderCurrency,
               status: 'completed',
-              provider: 'platform'
+              provider: 'platform',
+              description: `Tip sent to ${recipientId.slice(0, 8)}`,
+              context: {
+                action: 'tip_sent',
+                sender_id: senderId,
+                recipient_id: recipientId,
+                amount_kr: senderKrAmount,
+                timestamp: new Date().toISOString()
+              }
             },
             {
               user_id: recipientId,
               counterparty_id: senderId,
               type: 'tip_received',
+              transaction_type: 'CONTENT_TIP',
               amount_kr: recipientReceiveAmount,
               status: 'completed',
-              provider: 'platform'
+              provider: 'platform',
+              description: `Tip received from ${senderId.slice(0, 8)}`,
+              context: {
+                action: 'tip_received',
+                sender_id: senderId,
+                recipient_id: recipientId,
+                amount_kr: recipientReceiveAmount.toNumber(),
+                timestamp: new Date().toISOString()
+              }
             },
             {
-              user_id: senderId, // Associated essentially with the action
+              user_id: senderId,
               counterparty_id: 'PLATFORM_REVENUE',
               type: 'platform_fee',
+              transaction_type: 'PLATFORM_REWARD',
               amount_kr: platformCutDecimal,
               status: 'completed',
-              provider: 'platform_engine'
+              provider: 'platform_engine',
+              description: `Platform fee (15%) from tip transaction`,
+              context: {
+                action: 'platform_fee',
+                source_transaction: 'tip',
+                sender_id: senderId,
+                recipient_id: recipientId,
+                fee_amount: platformCut,
+                fee_percentage: 15,
+                original_amount: senderKrAmount,
+                timestamp: new Date().toISOString()
+              }
             }
           ]
         });
@@ -304,17 +334,31 @@ export class WalletService {
     // SECURITY: Generate cryptographically secure unique reference
     const reference = `TOPUP_${Date.now()}_${crypto.randomBytes(8).toString('hex').toUpperCase()}`;
 
-    // SECURITY: Create pending transaction with exact amounts (immutable record)
+    // SECURITY: Create pending transaction with exact amounts (immutable record) and full context
     const transaction = await prisma.transactions.create({
       data: {
         user_id: userId,
         type: 'topup',
+        transaction_type: 'TOP_UP',
         amount_kr: new Prisma.Decimal(krAmount),
         amount_fiat: fiatAmount,
         currency,
         provider,
         status: 'pending',
         reference,
+        description: `Wallet top-up via ${provider.toUpperCase()} - ${krAmount} Kr`,
+        context: {
+          action: 'topup_initiated',
+          provider,
+          fiat_amount: fiatAmount,
+          currency,
+          kr_amount: krAmount,
+          buy_rate: buyRate,
+          flat_fee: 30,
+          platform_margin: '4.5%',
+          initiated_at: new Date().toISOString(),
+          ip_address: ipAddress || 'unknown'
+        },
         metadata: { 
           phoneNumber: phoneNumber || null, 
           email: email || null,
@@ -571,11 +615,20 @@ export class WalletService {
           throw new Error('Transaction state changed');
         }
 
-        // Update transaction status
+        // Update transaction status with completion details
         await tx.transactions.update({
           where: { id: transactionId },
           data: {
             status: 'completed',
+            description: `Wallet top-up completed via ${transaction.provider?.toUpperCase()} - ${transaction.amount_kr} Kr`,
+            context: {
+              ...(transaction.context as any),
+              action: 'topup_completed',
+              completed_at: new Date().toISOString(),
+              payment_reference: paymentReference,
+              verified_amount: verifiedAmount,
+              verified_currency: verifiedCurrency
+            },
             metadata: {
               ...(transaction.metadata as any),
               paymentReference,

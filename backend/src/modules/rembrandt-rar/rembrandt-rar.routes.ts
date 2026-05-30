@@ -19,6 +19,7 @@ import {
 } from './rembrandt-rar.validation.js';
 import { prisma } from '../../config/database.js';
 import analyticsRoutes from './analytics.routes.js';
+import complianceRoutes from './compliance.routes.js';
 
 
 // Helper to safely extract string from query parameter
@@ -36,6 +37,11 @@ router.use(requireRarAccess as any);
 // ANALYTICS DASHBOARD (NEW)
 // ═══════════════════════════════════════════════════════════
 router.use('/analytics', analyticsRoutes);
+
+// ═══════════════════════════════════════════════════════════
+// COMPLIANCE DASHBOARD (NEW)
+// ═══════════════════════════════════════════════════════════
+router.use('/compliance', complianceRoutes);
 
 // ═══════════════════════════════════════════════════════════
 // DASHBOARD
