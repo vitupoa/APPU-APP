@@ -50,7 +50,7 @@ export async function integratedComplianceCheck(req: Request, res: Response, nex
     // Step 3: Detect self-tipping patterns (for tip transactions)
     if (type === 'tip_sent' || type === 'CONTENT_TIP') {
       if (counterparty_id) {
-        const selfTippingResult = await selfTippingDetectionService.detectSelfTipping(userId, counterparty_id);
+        const selfTippingResult = await selfTippingDetectionService.detectSelfTipping(userId);
 
         if (selfTippingResult.score > 70) {
           res.status(403).json({

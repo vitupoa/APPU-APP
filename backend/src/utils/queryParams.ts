@@ -1,6 +1,9 @@
 import { ParsedQs } from 'qs';
 
-export function parseQueryString(value: string | ParsedQs | string[] | ParsedQs[] | undefined): string | undefined {
+// Type that matches Express req.query property types exactly
+type QueryValue = string | ParsedQs | (string | ParsedQs)[] | undefined;
+
+export function parseQueryString(value: QueryValue): string | undefined {
   if (!value) return undefined;
   if (typeof value === 'string') return value;
   if (Array.isArray(value) && value.length > 0) {
@@ -10,14 +13,14 @@ export function parseQueryString(value: string | ParsedQs | string[] | ParsedQs[
   return undefined;
 }
 
-export function parseQueryDate(value: string | ParsedQs | string[] | ParsedQs[] | undefined): Date | undefined {
+export function parseQueryDate(value: QueryValue): Date | undefined {
   const str = parseQueryString(value);
   if (!str) return undefined;
   const date = new Date(str);
   return isNaN(date.getTime()) ? undefined : date;
 }
 
-export function parseQueryNumber(value: string | ParsedQs | string[] | ParsedQs[] | undefined): number | undefined {
+export function parseQueryNumber(value: QueryValue): number | undefined {
   const str = parseQueryString(value);
   if (!str) return undefined;
   const num = parseInt(str, 10);
