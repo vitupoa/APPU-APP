@@ -8,7 +8,7 @@
     "dev": "tsx watch src/index.ts",
     "postinstall": "prisma generate",
     "build": "prisma generate && node -e \"import('fs').then(fs => { fs.cpSync('src', 'dist', {recursive: true}); console.log('✅ Source copied to dist'); })\"",
-    "start": "tsx dist/index.ts",
+    "start": "node start.mjs",
     "start:prod": "npm run migrate:rls && npm run start",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
