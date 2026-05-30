@@ -1,7 +1,7 @@
 import { Router, Response, NextFunction } from 'express';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { AdManagementService } from './adManagement.service.js';
-import { getQueryString, getQueryNumber, getQueryDate } from '../../utils/queryParams.js';
+import { parseQueryString, parseQueryNumber, parseQueryDate } from '../../utils/queryParams.js';
 
 const router = Router();
 
@@ -143,11 +143,11 @@ router.get('/campaigns', authMiddleware, adminMiddleware, async (req: AuthReques
   try {
     const { status, brand_id, adType, page, limit } = req.query;
     const result = await AdManagementService.getCampaigns({
-      status: getQueryString(status),
-      brandId: getQueryString(brand_id),
-      adType: getQueryString(adType),
-      page: getQueryNumber(page),
-      limit: getQueryNumber(limit)
+      status: parseQueryString(status),
+      brandId: parseQueryString(brand_id),
+      adType: parseQueryString(adType),
+      page: parseQueryNumber(page),
+      limit: parseQueryNumber(limit)
     });
     res.json(result);
     return;
@@ -225,11 +225,11 @@ router.get('/sponsored-posts', authMiddleware, adminMiddleware, async (req: Auth
   try {
     const { status, brand_id, creator_id, page, limit } = req.query;
     const result = await AdManagementService.getSponsoredPosts({
-      status: getQueryString(status),
-      brandId: getQueryString(brand_id),
-      creatorId: getQueryString(creator_id),
-      page: getQueryNumber(page),
-      limit: getQueryNumber(limit)
+      status: parseQueryString(status),
+      brandId: parseQueryString(brand_id),
+      creatorId: parseQueryString(creator_id),
+      page: parseQueryNumber(page),
+      limit: parseQueryNumber(limit)
     });
     res.json(result);
     return;
@@ -281,8 +281,8 @@ router.get('/analytics', authMiddleware, adminMiddleware, async (req: AuthReques
   try {
     const { start_date, end_date } = req.query;
     
-    const start = getQueryDate(start_date);
-    const end = getQueryDate(end_date);
+    const start = parseQueryDate(start_date);
+    const end = parseQueryDate(end_date);
     
     if (!start || !end) {
       res.status(400).json({ error: 'startDate and endDate are required' });

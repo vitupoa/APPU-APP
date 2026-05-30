@@ -11,7 +11,7 @@ export function isAdmin(req: Request, res: Response, next: NextFunction) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    if (!user.isAdmin) {
+    if (!user.is_admin) {
       return res.status(403).json({ error: 'Forbidden - Admin access required' });
     }
 

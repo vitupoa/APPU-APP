@@ -23,3 +23,8 @@ export function parseQueryNumber(value: string | ParsedQs | string[] | ParsedQs[
   const num = parseInt(str, 10);
   return isNaN(num) ? undefined : num;
 }
+
+// Aliases for backward compatibility
+export const getQueryString = parseQueryString;
+export const getQueryDate = parseQueryDate;
+export const getQueryNumber = parseQueryNumber;

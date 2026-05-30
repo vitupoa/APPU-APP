@@ -9,7 +9,7 @@ import { VelocityCheckResult, RiskAnalysisResult } from '../types/compliance.typ
 export async function integratedComplianceCheck(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = req.user?.id;
-    const { type, amount_kr, context_type, context_ref_id, context_desc, counterparty_id } = req.body;
+    const { type, amount_kr, context_ref_id, context_desc, counterparty_id } = req.body;
 
     if (!userId) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -20,8 +20,7 @@ export async function integratedComplianceCheck(req: Request, res: Response, nex
     if (type && type !== 'topup' && type !== 'withdrawal') {
       const contextValidation = await transactionContextService.validateContext({
         type: type,
-        contextType: context_type,
-        referenceId: context_ref_id,
+        reference_id: context_ref_id,
         description: context_desc
       });
 
@@ -51,7 +50,7 @@ export async function integratedComplianceCheck(req: Request, res: Response, nex
     // Step 3: Detect self-tipping patterns (for tip transactions)
     if (type === 'tip_sent' || type === 'CONTENT_TIP') {
       if (counterparty_id) {
-        const selfTippingResult: RiskAnalysisResult = await selfTippingDetectionService.detectSelfTipping(userId, counterparty_id);
+        const selfTippingResult = await selfTippingDetectionService.detectSelfTipping(userId, counterparty_id);
 
         if (selfTippingResult.score > 70) {
           res.status(403).json({

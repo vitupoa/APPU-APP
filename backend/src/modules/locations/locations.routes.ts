@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../../middleware/auth.js';
 import { prisma } from '../../config/database.js';
-import { getQueryString } from '../../utils/queryParams.js';
+import { parseQueryString } from '../../utils/queryParams.js';
 
 const router = Router();
 
@@ -57,12 +57,12 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<v
 
     const where: any = { is_active: true };
 
-    if (scope) where.scope = getQueryString(scope);
-    if (parent_id) where.parent_id = getQueryString(parent_id);
-    if (country_code) where.country_code = getQueryString(country_code);
+    if (scope) where.scope = parseQueryString(scope);
+    if (parent_id) where.parent_id = parseQueryString(parent_id);
+    if (country_code) where.country_code = parseQueryString(country_code);
     if (search) {
       where.display_name = {
-        contains: getQueryString(search),
+        contains: parseQueryString(search),
         mode: 'insensitive',
       };
     }

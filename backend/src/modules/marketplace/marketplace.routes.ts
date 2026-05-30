@@ -4,7 +4,7 @@ import { BrandMarketplaceService } from './brand-marketplace.service.js';
 import { SalesFunnelService } from './sales-funnel.service.js';
 import socialMediaRoutes from './social-media.routes.js';
 import { z } from 'zod';
-import { getQueryString } from '../../utils/queryParams.js';
+import { parseQueryString } from '../../utils/queryParams.js';
 
 
 // Helper to safely extract string from query parameter
@@ -24,13 +24,13 @@ router.use('/', socialMediaRoutes);
 // GET /api/v1/marketplace/influencers - Search influencers (Brand view)
 router.get('/influencers', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const tier = req.query.tier ? (getQueryString(req.query.tier) || '').split(',') : undefined;
-    const categories = req.query.categories ? (getQueryString(req.query.categories) || '').split(',') : undefined;
-    const minFollowers = req.query.minFollowers ? parseInt(getQueryString(req.query.minFollowers) || '') : undefined;
-    const minEngagementRate = req.query.minEngagementRate ? parseFloat(getQueryString(req.query.minEngagementRate) || '') : undefined;
-    const minRating = req.query.minRating ? parseFloat(getQueryString(req.query.minRating) || '') : undefined;
-    const minAdmirers = req.query.minAdmirers ? parseInt(getQueryString(req.query.minAdmirers) || '') : undefined;
-    const minSubscribers = req.query.minSubscribers ? parseInt(getQueryString(req.query.minSubscribers) || '') : undefined;
+    const tier = req.query.tier ? (parseQueryString(req.query.tier) || '').split(',') : undefined;
+    const categories = req.query.categories ? (parseQueryString(req.query.categories) || '').split(',') : undefined;
+    const minFollowers = req.query.minFollowers ? parseInt(parseQueryString(req.query.minFollowers) || '') : undefined;
+    const minEngagementRate = req.query.minEngagementRate ? parseFloat(parseQueryString(req.query.minEngagementRate) || '') : undefined;
+    const minRating = req.query.minRating ? parseFloat(parseQueryString(req.query.minRating) || '') : undefined;
+    const minAdmirers = req.query.minAdmirers ? parseInt(parseQueryString(req.query.minAdmirers) || '') : undefined;
+    const minSubscribers = req.query.minSubscribers ? parseInt(parseQueryString(req.query.minSubscribers) || '') : undefined;
     const sortBy = (req.query.sortBy as any) || 'engagement';
     const cursor = req.query.cursor as string | undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
@@ -145,9 +145,9 @@ router.post('/campaigns/:id/publish', authMiddleware, async (req: AuthRequest, r
 // GET /api/v1/marketplace/campaigns - Browse campaigns (Influencer view)
 router.get('/campaigns', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const type = req.query.type ? (getQueryString(req.query.type) || '').split(',') : undefined;
-    const categories = req.query.categories ? (getQueryString(req.query.categories) || '').split(',') : undefined;
-    const minCompensation = req.query.minCompensation ? parseFloat(getQueryString(req.query.minCompensation) || '') : undefined;
+    const type = req.query.type ? (parseQueryString(req.query.type) || '').split(',') : undefined;
+    const categories = req.query.categories ? (parseQueryString(req.query.categories) || '').split(',') : undefined;
+    const minCompensation = req.query.minCompensation ? parseFloat(parseQueryString(req.query.minCompensation) || '') : undefined;
     const cursor = req.query.cursor as string | undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
 

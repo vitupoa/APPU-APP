@@ -1,4 +1,4 @@
-import { TransactionContext } from '../../types/transaction.types';
+import { TransactionContext } from './transaction.types.js';
 
 export interface VelocityCheckResult {
   allowed: boolean;

@@ -34,7 +34,7 @@ export async function blockChatTips(req: Request, res: Response, next: NextFunct
 
 export async function validateTransactionContext(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { type, context_type, context_ref_id, context_desc } = req.body;
+    const { type, context_ref_id, context_desc } = req.body;
 
     if (!type) {
       next();
@@ -43,8 +43,7 @@ export async function validateTransactionContext(req: Request, res: Response, ne
 
     const validation = await transactionContextService.validateContext({
       type: type,
-      contextType: context_type,
-      referenceId: context_ref_id,
+      reference_id: context_ref_id,
       description: context_desc
     });
 

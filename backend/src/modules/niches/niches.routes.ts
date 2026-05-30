@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../../middleware/auth.js';
 import { prisma } from '../../config/database.js';
-import { getQueryString } from '../../utils/queryParams.js';
+import { parseQueryString } from '../../utils/queryParams.js';
 
 const router = Router();
 
