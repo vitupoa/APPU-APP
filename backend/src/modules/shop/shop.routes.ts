@@ -4,6 +4,9 @@ import { ShopService } from './shop.service.js';
 import { ReviewService, WishlistService, CartService, GiftService } from './social-shop.service.js';
 import { FlashSaleService, GroupBuyService, DealAlertService } from './deals.service.js';
 import { GarageService, ImporterService, LogisticsService, PremiumService, ProductShareService } from './verticals.service.js';
+import { sanitizePaymentInput } from '../../middleware/sanitization.js';
+import { idempotencyMiddleware } from '../../middleware/idempotency.js';
+import { paymentRateLimiter } from '../../middleware/ipRateLimiter.js';
 import {
   createProductSchema, updateProductSchema, productFilterSchema,
   createReviewSchema, createWishlistSchema, addWishlistItemSchema,
@@ -253,7 +256,12 @@ router.delete('/cart', authMiddleware, async (req: AuthRequest, res: Response) =
 // GIFTS
 // ═══════════════════════════════════════════════════════════
 
-router.post('/gifts', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/gifts', 
+  authMiddleware, 
+  paymentRateLimiter,
+  sanitizePaymentInput,
+  idempotencyMiddleware({ ttlSeconds: 86400, autoGenerate: true }),
+  async (req: AuthRequest, res: Response) => {
   try {
     const data = sendGiftSchema.parse(req.body);
     const gift = await GiftService.sendGift(req.userId!, data);
@@ -596,7 +604,12 @@ router.delete('/discounts/:id', authMiddleware, async (req: AuthRequest, res: Re
 // ORDERS
 // ═══════════════════════════════════════════════════════════
 
-router.post('/orders', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/orders', 
+  authMiddleware, 
+  paymentRateLimiter,
+  sanitizePaymentInput,
+  idempotencyMiddleware({ ttlSeconds: 3600, autoGenerate: true }),
+  async (req: AuthRequest, res: Response) => {
   try {
     const order = await OrderService.createOrder(req.userId!, req.body.notes);
     res.status(201).json(order);

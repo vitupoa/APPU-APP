@@ -46,6 +46,8 @@ data class UserProfileDto(
     val bioLinks: List<BioLinkDto> = emptyList(),
     val stats: ProfileStatsDto = ProfileStatsDto(),
     val relationshipStatus: String = "NONE",
+    val selectedNiches: List<String> = emptyList(),
+    val customNiches: List<String> = emptyList(),
     @kotlinx.serialization.SerialName("created_at")
     val createdAt: String? = null
 )

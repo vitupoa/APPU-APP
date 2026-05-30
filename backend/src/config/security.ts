@@ -100,6 +100,9 @@ export const corsConfig = cors({
     'X-Requested-With',
     'X-CSRF-Token',
     'X-Request-ID',
+    'Idempotency-Key',
+    'X-Device-ID',
+    'X-App-Version',
   ],
   
   // Exposed headers (accessible to frontend)
@@ -108,6 +111,7 @@ export const corsConfig = cors({
     'X-RateLimit-Limit',
     'X-RateLimit-Remaining',
     'X-RateLimit-Reset',
+    'X-Total-Count',
   ],
   
   // Preflight cache duration (24 hours)
@@ -126,11 +130,14 @@ export const corsConfig = cors({
 export function additionalSecurityHeaders(req: any, res: any, next: any) {
   // Remove server information
   res.removeHeader('X-Powered-By');
+  res.removeHeader('Server');
   
   // Prevent caching of sensitive data
   if (req.path.includes('/api/v1/wallet') || 
       req.path.includes('/api/v1/payments') ||
-      req.path.includes('/api/v1/kyc')) {
+      req.path.includes('/api/v1/kyc') ||
+      req.path.includes('/api/v1/auth') ||
+      req.path.includes('/api/v1/chamas')) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
@@ -141,6 +148,13 @@ export function additionalSecurityHeaders(req: any, res: any, next: any) {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  res.setHeader('X-DNS-Prefetch-Control', 'off');
+  res.setHeader('X-Download-Options', 'noopen');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  
+  // Add request ID for tracing
+  const requestId = req.requestId || Math.random().toString(36).substring(7);
+  res.setHeader('X-Request-ID', requestId);
   
   next();
 }

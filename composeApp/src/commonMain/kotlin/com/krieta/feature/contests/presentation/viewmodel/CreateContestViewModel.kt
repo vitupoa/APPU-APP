@@ -6,6 +6,7 @@ import com.krieta.com.core.network.CloudinaryUploader
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.ApiConstants
 import com.krieta.com.core.util.SafeConversion
+import com.krieta.com.core.security.InputValidator
 import com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto
 import com.krieta.feature.contests.data.remote.dto.PrizeDistributionDto
 import com.krieta.feature.contests.data.remote.dto.RequiredActionDto
@@ -742,13 +743,45 @@ class CreateContestViewModel(
     }
     
     // Step 1: Contest Details and Dates Update Functions (Subtask 2.2)
-    fun updateTitle(v: String) { _state.value = _state.value.copy(title = v) }
-    fun updateDescription(v: String) { _state.value = _state.value.copy(description = v) }
-    fun updateRules(v: String) { _state.value = _state.value.copy(rules = v) }
+    fun updateTitle(v: String) { 
+        try {
+            val validated = InputValidator.validateText(v, "title")
+            _state.value = _state.value.copy(title = validated)
+        } catch (e: SecurityException) {
+            _state.value = _state.value.copy(error = e.message)
+        }
+    }
+    fun updateDescription(v: String) { 
+        try {
+            val validated = InputValidator.validateText(v, "description")
+            _state.value = _state.value.copy(description = validated)
+        } catch (e: SecurityException) {
+            _state.value = _state.value.copy(error = e.message)
+        }
+    }
+    fun updateRules(v: String) { 
+        try {
+            val validated = InputValidator.validateText(v, "rules")
+            _state.value = _state.value.copy(rules = validated)
+        } catch (e: SecurityException) {
+            _state.value = _state.value.copy(error = e.message)
+        }
+    }
     fun setCoverImage(file: io.github.vinceglb.filekit.core.PlatformFile?) { _state.value = _state.value.copy(coverImageFile = file) }
     fun updateStartDate(v: Instant?) { _state.value = _state.value.copy(startDate = v) }
     fun updateEndDate(v: Instant?) { _state.value = _state.value.copy(endDate = v) }
-    fun updateExampleContentUrl(v: String) { _state.value = _state.value.copy(exampleContentUrl = v) }
+    fun updateExampleContentUrl(v: String) { 
+        try {
+            if (v.isNotBlank()) {
+                val validated = InputValidator.validateUrl(v)
+                _state.value = _state.value.copy(exampleContentUrl = validated)
+            } else {
+                _state.value = _state.value.copy(exampleContentUrl = v)
+            }
+        } catch (e: SecurityException) {
+            _state.value = _state.value.copy(error = e.message)
+        }
+    }
     
     // Step 2: Audience Demographics Update Functions (Subtask 2.3)
     fun updateDemographicsLock(v: Boolean) { _state.value = _state.value.copy(demographicsLock = v) }
@@ -766,9 +799,44 @@ class CreateContestViewModel(
     
     // Step 3: Tasks Update Functions (Subtask 2.4)
     fun updateTaskType(v: TaskType) { _state.value = _state.value.copy(taskType = v) }
-    fun updateTaskConfiguration(v: String) { _state.value = _state.value.copy(taskConfiguration = v) }
-    fun updateCustomTaskName(v: String) { _state.value = _state.value.copy(customTaskName = v) }
-    fun updateCustomTaskLink(v: String) { _state.value = _state.value.copy(customTaskLink = v) }
+    fun updateTaskConfiguration(v: String) { 
+        try {
+            if (v.isNotBlank()) {
+                val validated = when (_state.value.taskType) {
+                    TaskType.SUBSCRIBE_YOUTUBE, TaskType.FOLLOW_SPOTIFY, 
+                    TaskType.WATCH_VIDEO, TaskType.VISIT_SHOP, TaskType.CUSTOM_TASK -> {
+                        InputValidator.validateUrl(v)
+                    }
+                    else -> InputValidator.validateText(v, "task")
+                }
+                _state.value = _state.value.copy(taskConfiguration = validated)
+            } else {
+                _state.value = _state.value.copy(taskConfiguration = v)
+            }
+        } catch (e: SecurityException) {
+            _state.value = _state.value.copy(error = e.message)
+        }
+    }
+    fun updateCustomTaskName(v: String) { 
+        try {
+            val validated = InputValidator.validateText(v, "task name")
+            _state.value = _state.value.copy(customTaskName = validated)
+        } catch (e: SecurityException) {
+            _state.value = _state.value.copy(error = e.message)
+        }
+    }
+    fun updateCustomTaskLink(v: String) { 
+        try {
+            if (v.isNotBlank()) {
+                val validated = InputValidator.validateUrl(v)
+                _state.value = _state.value.copy(customTaskLink = validated)
+            } else {
+                _state.value = _state.value.copy(customTaskLink = v)
+            }
+        } catch (e: SecurityException) {
+            _state.value = _state.value.copy(error = e.message)
+        }
+    }
     
     fun addTask() {
         val currentState = _state.value

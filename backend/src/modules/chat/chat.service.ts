@@ -2,6 +2,7 @@ import { prisma } from '../../config/database.js';
 import { io } from '../../shared/gateway/socket.js';
 import { WalletService } from '../wallet/wallet.service.js';
 import { v4 as uuidv4 } from 'uuid';
+import { lockedChatTaskService } from '../../services/compliance/lockedChatTask.service.js';
 
 export class ChatService {
   /**
@@ -143,6 +144,7 @@ export class ChatService {
 
   /**
    * Send a message
+   * Wave 3 Task 6.4: Check locked chat access before allowing messages
    */
   static async sendMessage(
     senderId: string,
@@ -161,6 +163,27 @@ export class ChatService {
 
     if (!isParticipant) {
       throw new Error('Not authorized to send message in this chat');
+    }
+
+    // Wave 3 Task 6.4: Check locked chat access for DIRECT chats
+    const chat = await prisma.chat.findUnique({
+      where: { id: chat_id },
+      include: { participants: true }
+    });
+
+    if (chat && chat.type === 'DIRECT' && chat.participants.length === 2) {
+      // Find the other participant (potential creator)
+      const otherParticipant = chat.participants.find(p => p.user_id !== senderId);
+
+      if (otherParticipant) {
+        const accessCheck = await lockedChatTaskService.canUserMessageCreator(senderId, otherParticipant.user_id);
+
+        if (!accessCheck.canMessage) {
+          throw new Error(
+            `Chat is locked. Unlock fee: ${accessCheck.unlockFeeKr} Kr. Please unlock chat with a task to message this creator.`
+          );
+        }
+      }
     }
 
     // Sanitize payload

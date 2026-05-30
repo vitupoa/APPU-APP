@@ -160,7 +160,8 @@ class ChatRoomScreen(private val chatId: String, private val chatTitle: String) 
                             viewModel.sendMessage(messageText)
                             messageText = "" 
                         },
-                        onAttachClick = { showMediaPicker = true }
+                        onAttachClick = { showMediaPicker = true },
+                        enabled = true
                     )
                 }
             }
@@ -555,7 +556,8 @@ fun ChatInputBar(
     text: String,
     onTextChange: (String) -> Unit,
     onSend: () -> Unit,
-    onAttachClick: () -> Unit
+    onAttachClick: () -> Unit,
+    enabled: Boolean = true
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -566,15 +568,16 @@ fun ChatInputBar(
                 .windowInsetsPadding(WindowInsets.navigationBars),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onAttachClick) {
+            IconButton(onClick = onAttachClick, enabled = enabled) {
                 Icon(Icons.Default.AttachFile, contentDescription = "Attach")
             }
             TextField(
                 value = text,
                 onValueChange = onTextChange,
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("Message...") },
+                placeholder = { Text(if (enabled) "Message..." else "Locked") },
                 shape = RoundedCornerShape(24.dp),
+                enabled = enabled,
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
@@ -583,9 +586,18 @@ fun ChatInputBar(
             Spacer(modifier = Modifier.width(8.dp))
             IconButton(
                 onClick = onSend,
-                modifier = Modifier.clip(RoundedCornerShape(50)).background(MaterialTheme.colorScheme.primary)
+                modifier = Modifier.clip(RoundedCornerShape(50)).background(
+                    if (enabled && text.isNotBlank()) MaterialTheme.colorScheme.primary 
+                    else MaterialTheme.colorScheme.surfaceVariant
+                ),
+                enabled = enabled && text.isNotBlank()
             ) {
-                Icon(painterResource(Res.drawable.ic_send), contentDescription = "Send", tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(
+                    painterResource(Res.drawable.ic_send), 
+                    contentDescription = "Send", 
+                    tint = if (enabled && text.isNotBlank()) MaterialTheme.colorScheme.onPrimary 
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

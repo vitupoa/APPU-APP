@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.util.SafeConversion
+import com.krieta.com.core.security.InputValidator
 import com.krieta.feature.chama.data.remote.dto.ChamaDto
 import com.krieta.feature.chama.data.remote.dto.CreateChamaRequest
 import com.krieta.feature.chama.domain.repository.ChamaRepository
@@ -90,10 +91,31 @@ class CreateChamaViewModel(
 
     val totalSteps = 4
 
-    fun updateName(value: String) = _state.update { it.copy(name = value) }
+    fun updateName(value: String) {
+        try {
+            val validated = InputValidator.validateText(value, "chama name")
+            _state.update { it.copy(name = validated, error = null) }
+        } catch (e: SecurityException) {
+            _state.update { it.copy(error = e.message) }
+        }
+    }
     fun updateType(value: String) = _state.update { it.copy(type = value) }
-    fun updateDescription(value: String) = _state.update { it.copy(description = value) }
-    fun updateReason(value: String) = _state.update { it.copy(reason = value) }
+    fun updateDescription(value: String) {
+        try {
+            val validated = InputValidator.validateText(value, "description")
+            _state.update { it.copy(description = validated, error = null) }
+        } catch (e: SecurityException) {
+            _state.update { it.copy(error = e.message) }
+        }
+    }
+    fun updateReason(value: String) {
+        try {
+            val validated = InputValidator.validateText(value, "reason")
+            _state.update { it.copy(reason = validated, error = null) }
+        } catch (e: SecurityException) {
+            _state.update { it.copy(error = e.message) }
+        }
+    }
     fun updateMaxMembers(value: String) = _state.update { it.copy(maxMembers = value) }
     fun updateAutoLockOnFull(value: Boolean) = _state.update { it.copy(autoLockOnFull = value) }
     fun updateContributionAmountKr(value: String) {

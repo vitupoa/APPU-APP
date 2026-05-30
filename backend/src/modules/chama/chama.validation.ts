@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createChamaSchema = z.object({
   name: z.string().min(2).max(100),
-  type: z.enum(['ROTATING', 'INVESTMENT', 'WELFARE', 'HYBRID']),
+  type: z.enum(['MERRY_GO_ROUND', 'WELFARE']),
   description: z.string().optional(),
   reason: z.string().optional(),
   maxMembers: z.number().int().min(2).optional(),

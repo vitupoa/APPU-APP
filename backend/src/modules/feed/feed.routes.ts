@@ -15,7 +15,8 @@ const createPostSchema = z.object({
   imageUrls: z.array(z.string().url()).min(1).max(10),
   caption: z.string().max(2200).default(''),
   isLocked: z.boolean().default(false),
-  requiredTier: z.enum(['TOP_FUN', 'REAL_FAN', 'TRUE_FAN', 'SUPER_FAN']).optional()
+  requiredTier: z.enum(['TOP_FUN', 'REAL_FAN', 'TRUE_FAN', 'SUPER_FAN']).optional(),
+  unlockAmountKr: z.number().positive().optional()
 });
 
 const addCommentSchema = z.object({

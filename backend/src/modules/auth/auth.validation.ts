@@ -11,6 +11,8 @@ export const registerSchema = z.object({
   country: z.string().length(2, 'Country must be a 2-letter ISO code'),
   currency: z.string().length(3, 'Currency must be a 3-letter ISO code'),
   device_id: z.string().min(1, 'Device ID is required'),
+  selectedNiches: z.array(z.string()).default([]),
+  customNiches: z.array(z.string()).default([]),
 });
 
 export const loginSchema = z.object({

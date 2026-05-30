@@ -21,11 +21,11 @@ export class AuditLogService {
     try {
       await prisma.audit_logs.create({
         data: {
-          admin_id: data.userId || 'SYSTEM',
-          action: data.action,
-          target_type: data.targetType || 'UNKNOWN',
-          target_id: data.targetId || '',
-          details: {
+          performed_by: data.userId || 'SYSTEM',
+          action_type: data.action,
+          target_user_id: data.targetId,
+          action_details: {
+            target_type: data.targetType || 'UNKNOWN',
             ...data.details,
             success: data.success,
             errorMessage: data.errorMessage,
@@ -394,11 +394,11 @@ export class AuditLogService {
   }) {
     const where: any = {};
 
-    if (filters.userId) where.admin_id = filters.userId;
-    if (filters.action) where.action = filters.action;
-    if (filters.targetType) where.target_type = filters.targetType;
+    if (filters.userId) where.performed_by = filters.userId;
+    if (filters.action) where.action_type = filters.action;
+    if (filters.targetType) where.action_details = { path: ['target_type'], equals: filters.targetType };
     if (filters.success !== undefined)
-      where.details = { path: ['success'], equals: filters.success };
+      where.action_details = { path: ['success'], equals: filters.success };
 
     if (filters.startDate || filters.endDate) {
       where.created_at = {};
@@ -429,22 +429,17 @@ export class AuditLogService {
   }) {
     const where: any = {};
 
-    if (filters.userId) where.admin_id = filters.userId;
+    if (filters.userId) where.performed_by = filters.userId;
     if (filters.startDate || filters.endDate) {
       where.created_at = {};
       if (filters.startDate) where.created_at.gte = filters.startDate;
       if (filters.endDate) where.created_at.lte = filters.endDate;
     }
 
-    const [totalLogs, actionCounts, successRate] = await Promise.all([
+    const [totalLogs, actionCounts] = await Promise.all([
       prisma.audit_logs.count({ where }),
       prisma.audit_logs.groupBy({
-        by: ['action'],
-        where,
-        _count: true,
-      }),
-      prisma.audit_logs.groupBy({
-        by: ['details'],
+        by: ['action_type'],
         where,
         _count: true,
       }),
@@ -452,8 +447,7 @@ export class AuditLogService {
 
     return {
       totalLogs,
-      actionCounts,
-      successRate,
+      actionCounts
     };
   }
 }

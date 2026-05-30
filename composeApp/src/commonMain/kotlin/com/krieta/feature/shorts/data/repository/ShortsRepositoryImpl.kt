@@ -164,15 +164,22 @@ class ShortsRepositoryImpl(
         try { api.incrementView(shortId) } catch (_: Exception) {}
     }
 
-    override suspend fun createShort(videoUrl: String, caption: String): NetworkResult<Unit> {
+    override suspend fun createShort(
+        videoUrl: String,
+        caption: String,
+        isLocked: Boolean,
+        unlockAmountKr: Double?
+    ): NetworkResult<Short> {
         return safeApiCall { 
-            api.createShort(
+            val dto = api.createShort(
                 com.krieta.feature.shorts.data.remote.dto.CreateShortRequestDto(
                     videoUrl = videoUrl,
-                    caption = caption
+                    caption = caption,
+                    isLocked = isLocked,
+                    unlockAmountKr = unlockAmountKr
                 )
             )
-            Unit 
+            dto.toDomain()
         }
     }
 

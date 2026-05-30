@@ -6,6 +6,9 @@ import { ChamaFinanceController } from './chama-finance.controller.js';
 import { ChamaElectionController } from './chama-election.controller.js';
 import { ChamaCycleController } from './chama-cycle.controller.js';
 import { ChamaRiskController } from './chama-risk.controller.js';
+import { sanitizePaymentInput } from '../../middleware/sanitization.js';
+import { idempotencyMiddleware } from '../../middleware/idempotency.js';
+import { paymentRateLimiter } from '../../middleware/ipRateLimiter.js';
 import {
   createChamaSchema,
   updateChamaSchema,
@@ -34,9 +37,23 @@ chamaRoutes.post('/:id/activate', ChamaController.activate);
 chamaRoutes.delete('/:id/members/:uid', ChamaController.removeMember);
 
 // Finance
-chamaRoutes.post('/:id/contribute', validateRequest(contributeSchema), ChamaFinanceController.contribute);
-chamaRoutes.post('/:id/payout', validateRequest(requestPayoutSchema), ChamaFinanceController.requestPayout);
-chamaRoutes.post('/:id/payout/:pid/approve', validateRequest(approvePayoutSchema), ChamaFinanceController.approvePayout);
+chamaRoutes.post('/:id/contribute', 
+  paymentRateLimiter,
+  sanitizePaymentInput,
+  idempotencyMiddleware({ ttlSeconds: 86400, autoGenerate: true }),
+  validateRequest(contributeSchema), 
+  ChamaFinanceController.contribute
+);
+chamaRoutes.post('/:id/payout', 
+  validateRequest(requestPayoutSchema), 
+  idempotencyMiddleware({ ttlSeconds: 3600, autoGenerate: true }),
+  ChamaFinanceController.requestPayout
+);
+chamaRoutes.post('/:id/payout/:pid/approve', 
+  validateRequest(approvePayoutSchema), 
+  idempotencyMiddleware({ ttlSeconds: 3600, autoGenerate: true }),
+  ChamaFinanceController.approvePayout
+);
 chamaRoutes.get('/:id/balance', ChamaFinanceController.getBalance);
 chamaRoutes.get('/:id/transactions', ChamaFinanceController.getTransactions);
 chamaRoutes.post('/:id/receipt', ChamaFinanceController.uploadReceipt);

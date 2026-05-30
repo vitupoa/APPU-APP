@@ -334,4 +334,30 @@ class ShortsViewModel(
             sponsoredManager.recordEngagement(type)
         }
     }
+
+    /**
+     * Add a newly created short to the top of the feed (optimistic update)
+     * This provides instant feedback without waiting for a full refresh
+     */
+    fun addNewShort(shortId: String) {
+        screenModelScope.launch {
+            when (val result = shortsRepository.getShortById(shortId)) {
+                is NetworkResult.Success -> {
+                    val newShort = result.data
+                    // Add to the top of the feed
+                    _state.value = _state.value.copy(
+                        items = listOf(newShort) + _state.value.items
+                    )
+                    // Log analytics
+                    println("Analytics: Short created - ID: $shortId")
+                }
+                is NetworkResult.Error -> {
+                    // If fetch fails, fall back to full refresh
+                    println("Error fetching new short, falling back to refresh: ${result.message}")
+                    refresh()
+                }
+                else -> {}
+            }
+        }
+    }
 }

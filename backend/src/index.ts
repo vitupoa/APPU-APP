@@ -50,7 +50,11 @@ import kycRoutes from './modules/kyc/kyc.routes.js';
 import contentLockRoutes from './modules/contentLock/contentLock.routes.js';
 import subscriptionRoutes from './modules/user/subscription.routes.js';
 import webhookRoutes from './routes/webhook.routes.js';
+import complianceRoutes from './modules/compliance/compliance.routes.js';
 import { startChamaDefaultWorker } from './workers/chamaDefaultWorker.js';
+import { ofacScreeningService } from './services/compliance/ofacScreening.service.js';
+import { ComplianceCronService } from './services/compliance/compliance.cron.js';
+import { trackDeviceFingerprint } from './middleware/compliance.middleware.js';
 import { startStoryCleanupWorker } from './workers/storyCleanupWorker.js';
 import { startContestDeadlineWorker } from './workers/contestDeadline.worker.js';
 import { startDailyPrizeWorker } from './workers/dailyPrizeWorker.js';
@@ -129,6 +133,7 @@ app.use(globalRateLimiter); // Redis-backed global rate limiting
 app.use(sanitizeInputs); // Input sanitization
 app.use(preventPathTraversal); // Prevent path traversal
 app.use(preventCommandInjection); // Prevent command injection
+app.use(trackDeviceFingerprint); // Track device fingerprints for compliance
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -190,6 +195,7 @@ app.use('/api/v1/niches', nichesRoutes);
 app.use('/api/v1/content-lock', contentLockRoutes);
 app.use('/api/v1/subscriptions', subscriptionRoutes);
 app.use('/api/v1/webhooks', webhookRoutes);
+app.use('/api/v1/compliance', complianceRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
@@ -229,6 +235,14 @@ const PORT = env.PORT || 3000;
       // Start cron workers
       logger.info('Starting background workers...');
       try {
+        // Initialize OFAC screening service
+        logger.info('Initializing OFAC screening service...');
+        await ofacScreeningService.initialize();
+        logger.info('OFAC screening service initialized');
+        
+        // Initialize compliance cron jobs
+        ComplianceCronService.initialize();
+        
         startChamaDefaultWorker();
         startStoryCleanupWorker();
         startContestDeadlineWorker();

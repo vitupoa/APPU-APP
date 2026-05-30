@@ -12,11 +12,13 @@ export class AuditService {
   ) {
     return prisma.audit_logs.create({
       data: {
-        admin_id: adminId,
-        action,
-        target_type: targetType,
-        target_id: targetId,
-        details: (details ?? undefined) as any,
+        performed_by: adminId,
+        action_type: action,
+        target_user_id: targetId,
+        action_details: {
+          target_type: targetType,
+          details: details ?? {}
+        } as any,
         ip_address: ipAddress ?? null,
         user_agent: userAgent ?? null,
       }
@@ -36,10 +38,10 @@ export class AuditService {
     const { page = 1, limit = 50, adminId, action, targetType, targetId, startDate, endDate } = options;
     const where: any = {};
 
-    if (adminId) where.admin_id = adminId;
-    if (action) where.action = { contains: action };
-    if (targetType) where.target_type = targetType;
-    if (targetId) where.target_id = targetId;
+    if (adminId) where.performed_by = adminId;
+    if (action) where.action_type = { contains: action };
+    if (targetType) where.action_details = { path: ['target_type'], equals: targetType };
+    if (targetId) where.target_user_id = targetId;
     if (startDate || endDate) {
       where.created_at = {};
       if (startDate) where.created_at.gte = startDate;

@@ -35,6 +35,12 @@ class CreatePostScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinScreenModel<CreatePostViewModel>()
         val state by viewModel.state.collectAsState()
+        val currencyProvider = org.koin.compose.koinInject<com.krieta.com.core.location.UserCurrencyProvider>()
+        val exchangeRate by currencyProvider.exchangeRate.collectAsState()
+
+        LaunchedEffect(Unit) {
+            currencyProvider.start()
+        }
 
         LaunchedEffect(state.success) {
             if (state.success) navigator.pop()
@@ -91,6 +97,66 @@ class CreatePostScreen : Screen {
                 // Display selected images preview count or error
                 if (state.imageFiles.isNotEmpty()) {
                     Text("${state.imageFiles.size} images selected", fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Lock content section
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Lock this content", fontWeight = FontWeight.Bold)
+                                Text(
+                                    "Viewers must pay or subscribe to unlock",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Switch(
+                                checked = state.isLocked,
+                                onCheckedChange = { viewModel.toggleLock(it) }
+                            )
+                        }
+
+                        if (state.isLocked) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            OutlinedTextField(
+                                value = state.unlockPriceLocal,
+                                onValueChange = { 
+                                    viewModel.updateUnlockPrice(it, exchangeRate?.baseRate)
+                                },
+                                label = { Text("Unlock Price (${currencyProvider.currencyCode})") },
+                                placeholder = { Text("Enter amount") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                                )
+                            )
+
+                            // Show Kr conversion
+                            if (state.unlockPriceKr != null) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    "≈ ${com.krieta.com.core.util.KrCurrencyFormatter.formatKr(state.unlockPriceKr!!)}",
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
                 }
 
                 if (state.isPosting) {

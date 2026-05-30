@@ -3,12 +3,15 @@ import { Prisma } from '@prisma/client';
 import { categoryDetailSchemas } from './shop.types.js';
 import { io } from '../../index.js';
 import { emitProductCreated, emitProductUpdated, emitProductDeleted } from '../../shared/gateway/shop-socket.js';
+import { listingFeeService } from './listing-fee.service.js';
 
 const SELLER_SELECT = {
   id: true, username: true, display_name: true, avatar_url: true, is_verified: true
 };
 
-// ─── PRODUCT CRUD ───────────────────────────────────────
+// ─── PRODUCT CRUD (LISTING-ONLY MODEL - Wave 3 Task 7.2) ───────────────────────────────────────
+// Shop operates as listing-only platform. No payment processing or escrow.
+// Buyers contact sellers directly via WhatsApp or external purchase URLs.
 
 export class ShopService {
 
@@ -18,6 +21,24 @@ export class ShopService {
     // Validate category-specific details
     if (categoryDetails && categoryDetailSchemas[data.category]) {
       categoryDetailSchemas[data.category].parse(categoryDetails);
+    }
+
+    // Get user country for listing fee calculation
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: sellerId }, select: { country: true } });
+    
+    // Calculate listing fee
+    const { fee, isFree } = await listingFeeService.calculateListingFee(
+      sellerId,
+      productData.category || 'OTHER',
+      user.country
+    );
+
+    // Check if user has sufficient balance (if fee required)
+    if (!isFree && fee > 0) {
+      const wallet = await prisma.wallets.findUnique({ where: { user_id: sellerId } });
+      if (!wallet || wallet.kr_balance < fee) {
+        throw new Error(`Insufficient balance. Listing fee: ${fee} KR`);
+      }
     }
 
     const product = await prisma.$transaction(async (tx: any) => {
@@ -55,6 +76,9 @@ export class ShopService {
       if (categoryDetails) {
         await createCategoryDetail(tx, p.id, productData.category, categoryDetails);
       }
+
+      // Charge listing fee
+      await listingFeeService.chargeListingFee(sellerId, p.id, productData.category || 'OTHER', user.country);
 
       return p;
     });

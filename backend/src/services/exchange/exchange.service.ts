@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { env } from '../../config/env.js';
+import { pubClient as redis } from '../../shared/gateway/redis.js';
 
-// In-memory cache fallback if Redis isn't fully set up yet
+// In-memory cache fallback if Redis isn't available
 const rateCache = new Map<string, { rate: number; expiresAt: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL_SECONDS = 3600; // 1 hour (as per requirements)
+const CACHE_TTL_MS = CACHE_TTL_SECONDS * 1000;
 
 // ─── PLATFORM FEE CONSTANTS (KES-denominated) ───────────
 // These are invisible operational fees baked into exchange math.
@@ -15,20 +17,38 @@ export class ExchangeService {
   /**
    * Fetches the raw exchange rate from USD → localCurrency.
    * This is the pure market rate with NO platform adjustments.
+   * 
+   * Caches exchange rates in Redis for 1 hour (3600 seconds).
+   * Falls back to in-memory cache if Redis is unavailable.
+   * Supports multiple fiat currencies (USD, KES, EUR, GBP, etc.)
+   * Handles API failures gracefully with cached fallback.
+   * 
+   * Requirements: 2.1.2
    */
   static async getRate(localCurrency: string): Promise<number> {
     const currency = localCurrency.toLowerCase();
+    const cacheKey = `exchange_rate:usd:${currency}`;
     
-    // Check cache
-    const cached = rateCache.get(currency);
-    if (cached && cached.expiresAt > Date.now()) {
-      return cached.rate;
+    try {
+      // Try Redis cache first
+      const cachedRate = await redis.get(cacheKey);
+      if (cachedRate) {
+        return parseFloat(cachedRate);
+      }
+    } catch (redisError) {
+      console.warn('[ExchangeService] Redis unavailable, checking in-memory cache:', redisError);
+      
+      // Fallback to in-memory cache
+      const cached = rateCache.get(currency);
+      if (cached && cached.expiresAt > Date.now()) {
+        return cached.rate;
+      }
     }
 
     try {
-      // fawazahmed0 API provides rates relative to USD (base)
+      // Fetch from fawazahmed0 API
       const url = `${env.EXCHANGE_RATE_BASE_URL}/usd.json`;
-      const response = await axios.get(url);
+      const response = await axios.get(url, { timeout: 5000 });
       
       const rates = response.data.usd;
       if (!rates || !rates[currency]) {
@@ -37,20 +57,54 @@ export class ExchangeService {
 
       const rawRate = rates[currency];
       
-      // Cache the result
-      rateCache.set(currency, {
-        rate: rawRate,
-        expiresAt: Date.now() + CACHE_TTL
-      });
+      // Cache in Redis with 1 hour TTL
+      try {
+        await redis.setex(cacheKey, CACHE_TTL_SECONDS, rawRate.toString());
+      } catch (redisError) {
+        console.warn('[ExchangeService] Failed to cache in Redis:', redisError);
+        
+        // Fallback to in-memory cache
+        rateCache.set(currency, {
+          rate: rawRate,
+          expiresAt: Date.now() + CACHE_TTL_MS
+        });
+      }
 
       return rawRate;
     } catch (error) {
-      // Return a stale cached rate if API fails, otherwise throw
-      const stale = rateCache.get(currency);
-      if (stale) return stale.rate;
+      console.error('[ExchangeService] Failed to fetch exchange rate:', error);
       
-      throw new Error(`Failed to fetch exchange rate for ${currency}`);
+      // Try Redis cache even if expired (stale data better than no data)
+      try {
+        const staleRedisRate = await redis.get(cacheKey);
+        if (staleRedisRate) {
+          console.warn('[ExchangeService] Using stale Redis cache for', currency);
+          return parseFloat(staleRedisRate);
+        }
+      } catch (redisError) {
+        // Ignore Redis errors, try in-memory cache
+      }
+      
+      // Try in-memory cache even if expired
+      const stale = rateCache.get(currency);
+      if (stale) {
+        console.warn('[ExchangeService] Using stale in-memory cache for', currency);
+        return stale.rate;
+      }
+      
+      throw new Error(`Failed to fetch exchange rate for ${currency} and no cached data available`);
     }
+  }
+
+  /**
+   * Alias for getRate() to match task requirements naming.
+   * Fetches real-time exchange rates with Redis caching (1 hour TTL).
+   * 
+   * @param localCurrency ISO currency code (e.g., USD, KES, EUR, GBP)
+   * @returns Exchange rate from USD to localCurrency
+   */
+  static async getExchangeRate(localCurrency: string): Promise<number> {
+    return this.getRate(localCurrency);
   }
 
   /**

@@ -40,6 +40,10 @@ class UploadWorker(
         val typeStr = inputData.getString("UPLOAD_TYPE") ?: return@withContext Result.failure()
         val filePath = inputData.getString("FILE_PATH") ?: return@withContext Result.failure()
         val caption = inputData.getString("CAPTION") ?: ""
+        val isLocked = inputData.getBoolean("IS_LOCKED", false)
+        val unlockAmountKr = if (inputData.keyValueMap.containsKey("UNLOCK_AMOUNT_KR")) {
+            inputData.getDouble("UNLOCK_AMOUNT_KR", 0.0)
+        } else null
         
         val type = UploadType.valueOf(typeStr)
 
@@ -52,22 +56,48 @@ class UploadWorker(
                     when (val result = cloudinaryUploader.uploadMedia(ApiConstants.CloudinaryFolders.SHORTS_VIDEO, filePath, isVideo = true)) {
                         is NetworkResult.Success -> {
                             updateProgress(type, 70, "Creating short...")
-                            val createResult = shortsRepository.createShort(result.data, caption)
+                            val createResult = shortsRepository.createShort(
+                                videoUrl = result.data,
+                                caption = caption,
+                                isLocked = isLocked,
+                                unlockAmountKr = unlockAmountKr
+                            )
                             if (createResult is NetworkResult.Success) {
                                 updateProgress(type, 100, "Upload complete!")
                                 showCompletionNotification("Short Uploaded Successfully!")
+                                // Notify that upload is complete so the shorts feed can refresh
+                                UploadCompletionNotifier.notifyUploadComplete(
+                                    type = UploadType.SHORT,
+                                    contentId = createResult.data.id,
+                                    success = true
+                                )
                                 return@withContext Result.success()
                             } else {
                                 showCompletionNotification("Failed to create short. Please try again.")
+                                UploadCompletionNotifier.notifyUploadComplete(
+                                    type = UploadType.SHORT,
+                                    contentId = "",
+                                    success = false
+                                )
                                 return@withContext Result.failure()
                             }
                         }
                         is NetworkResult.Error -> {
                             showCompletionNotification("Upload failed: ${result.message}")
+                            UploadCompletionNotifier.notifyUploadComplete(
+                                type = UploadType.SHORT,
+                                contentId = "",
+                                success = false
+                            )
                             return@withContext Result.failure()
                         }
                         else -> {
                             showCompletionNotification("Upload failed. Please try again.")
+                            UploadCompletionNotifier.notifyUploadComplete(
+                                type = UploadType.SHORT,
+                                contentId = "",
+                                success = false
+                            )
                             return@withContext Result.failure()
                         }
                     }
@@ -77,14 +107,50 @@ class UploadWorker(
                     when (val result = cloudinaryUploader.uploadMedia(ApiConstants.CloudinaryFolders.FEED_PHOTO, filePath, isVideo = false)) {
                         is NetworkResult.Success -> {
                             updateProgress(type, 70, "Creating post...")
-                            val createResult = feedRepository.createPost(caption, listOf(result.data))
+                            val createResult = feedRepository.createPost(
+                                caption = caption,
+                                imageUrls = listOf(result.data),
+                                isLocked = isLocked,
+                                unlockAmountKr = unlockAmountKr
+                            )
                             if (createResult is NetworkResult.Success) {
                                 updateProgress(type, 100, "Upload complete!")
                                 showCompletionNotification("Drip Uploaded Successfully!")
+                                // Notify that upload is complete so the feed can refresh
+                                UploadCompletionNotifier.notifyUploadComplete(
+                                    type = UploadType.DRIP,
+                                    contentId = createResult.data.id,
+                                    success = true
+                                )
                                 return@withContext Result.success()
+                            } else {
+                                showCompletionNotification("Failed to create post. Please try again.")
+                                UploadCompletionNotifier.notifyUploadComplete(
+                                    type = UploadType.DRIP,
+                                    contentId = "",
+                                    success = false
+                                )
+                                return@withContext Result.failure()
                             }
                         }
-                        else -> {}
+                        is NetworkResult.Error -> {
+                            showCompletionNotification("Upload failed: ${result.message}")
+                            UploadCompletionNotifier.notifyUploadComplete(
+                                type = UploadType.DRIP,
+                                contentId = "",
+                                success = false
+                            )
+                            return@withContext Result.failure()
+                        }
+                        else -> {
+                            showCompletionNotification("Upload failed. Please try again.")
+                            UploadCompletionNotifier.notifyUploadComplete(
+                                type = UploadType.DRIP,
+                                contentId = "",
+                                success = false
+                            )
+                            return@withContext Result.failure()
+                        }
                     }
                 }
                 UploadType.CONTEST -> {

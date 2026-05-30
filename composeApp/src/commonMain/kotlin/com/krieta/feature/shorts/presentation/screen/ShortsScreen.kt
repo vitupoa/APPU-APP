@@ -90,7 +90,16 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             UploadCompletionNotifier.uploadCompletions
                 .onEach { event ->
                     if (event.success && event.type == UploadType.SHORT) {
-                        viewModel.refresh()
+                        // Optimistic update: add the new short immediately instead of full refresh
+                        if (event.contentId.isNotEmpty()) {
+                            viewModel.addNewShort(event.contentId)
+                        } else {
+                            // Fallback to refresh if no contentId
+                            viewModel.refresh()
+                        }
+                    } else if (!event.success && event.type == UploadType.SHORT) {
+                        // Log failed upload for error recovery
+                        println("Error Recovery: Short upload failed - ID: ${event.contentId}")
                     }
                 }
                 .launchIn(this)

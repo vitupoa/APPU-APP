@@ -1,6 +1,6 @@
 generator client {
-  provider      = "prisma-client-js"
-  fieldMapping  = "camelCase"
+  provider     = "prisma-client-js"
+  fieldMapping = "camelCase"
 }
 
 datasource db {
@@ -8,34 +8,47 @@ datasource db {
 }
 
 model Contest {
-  id                          String                        @id @default(uuid())
-  creator_id                  String
-  title                       String
-  description                 String?
-  media_type                  ContestMediaType
-  category                    String
-  cover_media_url             String?
-  prize_total_kr              Decimal                       @db.Decimal(18, 4)
-  platform_fee_kr             Decimal                       @db.Decimal(18, 4)
-  participation_type          ParticipationType             @default(INDIVIDUAL_ONLY)
-  team_size                   Int?
-  max_teams                   Int?
-  entry_fee_kr                Decimal?                      @db.Decimal(18, 4)
-  public_vote_weight          Int?
-  target_ages                 Int[]
-  target_geos                 String[]
-  airdrop_kr                  Decimal?                      @db.Decimal(18, 4)
-  airdrop_limit               Int?
-  allow_daily_prizes          Boolean                       @default(false)
-  daily_prize_kr              Decimal?                      @db.Decimal(18, 4)
-  max_winners                 Int                           @db.SmallInt
-  judging_criteria            JudgingCriteria
-  sponsor_name                String?
-  sponsor_url                 String?
-  deadline                    DateTime
-  status                      ContestStatus                 @default(ACTIVE)
-  total_participants          Int                           @default(0)
-  total_submissions           Int                           @default(0)
+  id                 String            @id @default(uuid())
+  creator_id         String
+  title              String
+  description        String?
+  media_type         ContestMediaType
+  category           String
+  cover_media_url    String?
+  prize_total_kr     Decimal           @db.Decimal(18, 4)
+  platform_fee_kr    Decimal           @db.Decimal(18, 4)
+  participation_type ParticipationType @default(INDIVIDUAL_ONLY)
+  team_size          Int?
+  max_teams          Int?
+  entry_fee_kr       Decimal?          @db.Decimal(18, 4)
+  public_vote_weight Int?
+  target_ages        Int[]
+  target_geos        String[]
+  airdrop_kr         Decimal?          @db.Decimal(18, 4)
+  airdrop_limit      Int?
+  allow_daily_prizes Boolean           @default(false)
+  daily_prize_kr     Decimal?          @db.Decimal(18, 4)
+  max_winners        Int               @db.SmallInt
+  judging_criteria   JudgingCriteria
+  sponsor_name       String?
+  sponsor_url        String?
+  deadline           DateTime
+  status             ContestStatus     @default(ACTIVE)
+  total_participants Int               @default(0)
+  total_submissions  Int               @default(0)
+
+  // COMPLIANCE: Voting validation
+  voting_enabled          Boolean        @default(true)
+  voting_cost_per_vote_kr Decimal?       @db.Decimal(18, 4)
+  is_voting_paid          Boolean        @default(false)
+  judging_method          JudgingMethod? // JUDGES_ONLY, VOTES_ONLY, JUDGES_AND_VOTES
+  judge_weight_percentage Int? // 0-100
+  vote_weight_percentage  Int? // 0-100
+
+  // COMPLIANCE: Validation flags
+  is_legal_structure Boolean  @default(true)
+  validation_errors  String[] @default([])
+
   created_at                  DateTime                      @default(now())
   User                        User                          @relation(fields: [creator_id], references: [id])
   ContestAction               ContestAction[]
@@ -59,6 +72,7 @@ model Contest {
   team_submissions            team_submissions[]
 
   @@index([status, deadline])
+  @@index([is_legal_structure])
   @@map("contest")
 }
 
@@ -305,7 +319,7 @@ model chat {
   updated_at   DateTime          @updatedAt
   participants chatParticipant[]
   messages     messages[]
-  calls        call[]
+
 
   @@map("chat")
 }
@@ -327,38 +341,39 @@ model chatParticipant {
 }
 
 model Chama {
-  id                      String                @id @default(uuid())
-  name                    String
-  type                    ChamaType
-  description             String?
-  reason                  String?
-  chat_id                 String
-  creator_id              String
-  status                  ChamaStatus           @default(SETUP)
-  isLocked                Boolean               @default(false)
-  maxMembers              Int?
-  autoLockOnFull          Boolean               @default(false)
-  contribution_amount_kr  Decimal               @db.Decimal(18, 4)
-  contributionFrequency   ContributionFrequency
-  membershipFeeKr         Decimal?              @db.Decimal(18, 4)
-  lockPeriodDays          Int?
-  penalty_amount_kr       Decimal?              @db.Decimal(18, 4)
-  gracePeriodDays         Int                   @default(3)
-  current_cycle_number    Int                   @default(1)
-  min_approvals           Int                   @default(2)
-  allowMidTermVoteOut     Boolean               @default(true)
-  avatar_url              String?
-  created_at              DateTime              @default(now())
-  updated_at              DateTime
-  creator                 User                  @relation("chama_creator", fields: [creator_id], references: [id])
-  chama_wallet            ChamaWallet?
-  chama_members           ChamaMember[]
-  chama_cycles            ChamaCycle[]
-  chama_transactions      ChamaTransaction[]
-  chama_payouts           ChamaPayout[]
-  chama_contributions     ChamaContribution[]
-  chama_elections         ChamaElection[]
-  chama_defaulters        ChamaDefaulter[]
+  id                        String                @id @default(uuid())
+  name                      String
+  type                      ChamaType
+  description               String?
+  reason                    String?
+  chat_id                   String
+  creator_id                String
+  status                    ChamaStatus           @default(SETUP)
+  isLocked                  Boolean               @default(false)
+  maxMembers                Int?
+  autoLockOnFull            Boolean               @default(false)
+  contribution_amount_kr    Decimal               @db.Decimal(18, 4)
+  contributionFrequency     ContributionFrequency
+  membershipFeeKr           Decimal?              @db.Decimal(18, 4)
+  lockPeriodDays            Int?
+  penalty_amount_kr         Decimal?              @db.Decimal(18, 4)
+  gracePeriodDays           Int                   @default(3)
+  current_cycle_number      Int                   @default(1)
+  min_approvals             Int                   @default(2)
+  allowMidTermVoteOut       Boolean               @default(true)
+  avatar_url                String?
+  kyc_verified_members_only Boolean               @default(true)
+  created_at                DateTime              @default(now())
+  updated_at                DateTime
+  creator                   User                  @relation("chama_creator", fields: [creator_id], references: [id])
+  chama_wallet              ChamaWallet?
+  chama_members             ChamaMember[]
+  chama_cycles              ChamaCycle[]
+  chama_transactions        ChamaTransaction[]
+  chama_payouts             ChamaPayout[]
+  chama_contributions       ChamaContribution[]
+  chama_elections           ChamaElection[]
+  chama_defaulters          ChamaDefaulter[]
 
   @@index([status])
   @@index([creator_id])
@@ -376,6 +391,7 @@ model ChamaMember {
   leftAt              DateTime?
   total_contributed   Decimal             @default(0) @db.Decimal(18, 4)
   total_received      Decimal             @default(0) @db.Decimal(18, 4)
+  device_fingerprint  String?
   created_at          DateTime            @default(now())
   updated_at          DateTime
   chama               Chama               @relation(fields: [chama_id], references: [id], onDelete: Cascade)
@@ -1054,14 +1070,14 @@ model contest_engagement_actions {
 }
 
 model contest_judges {
-  id                 String                  @id @default(uuid())
-  contest_id         String
-  user_id            String
-  status             String                  @default("pending")
-  added_at           DateTime                @default(now())
-  Contest            Contest                 @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-  User               User                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  judge_scores       judge_scores[]
+  id           String         @id @default(uuid())
+  contest_id   String
+  user_id      String
+  status       String         @default("pending")
+  added_at     DateTime       @default(now())
+  Contest      Contest        @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  User         User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  judge_scores judge_scores[]
 
   @@unique([contest_id, user_id])
   @@map("contest_judges")
@@ -1267,32 +1283,32 @@ model digital_product_details {
 }
 
 model display_ad_analytics {
-  id                      String               @id @default(uuid())
-  campaign_id             String
-  date                    DateTime             @db.Date
-  contest_impressions     Int                  @default(0)
-  contest_clicks          Int                  @default(0)
-  discover_impressions    Int                  @default(0)
-  discover_clicks         Int                  @default(0)
-  admiring_impressions    Int                  @default(0)
-  admiring_clicks         Int                  @default(0)
-  drips_impressions       Int                  @default(0)
-  drips_clicks            Int                  @default(0)
-  stories_impressions     Int                  @default(0)
-  stories_clicks          Int                  @default(0)
-  group_chat_impressions  Int                  @default(0)
-  group_chat_clicks       Int                  @default(0)
-  chama_chat_impressions  Int                  @default(0)
-  chama_chat_clicks       Int                  @default(0)
-  total_impressions       Int                  @default(0)
-  total_clicks            Int                  @default(0)
-  total_conversions       Int                  @default(0)
-  total_spent_kes         Decimal              @default(0) @db.Decimal(18, 4)
-  ctr                     Decimal              @default(0) @db.Decimal(5, 4)
-  avg_cpm                 Decimal              @default(0) @db.Decimal(10, 2)
-  cost_per_click          Decimal              @default(0) @db.Decimal(10, 2)
-  created_at              DateTime             @default(now())
-  display_ad_campaigns    display_ad_campaigns @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+  id                     String               @id @default(uuid())
+  campaign_id            String
+  date                   DateTime             @db.Date
+  contest_impressions    Int                  @default(0)
+  contest_clicks         Int                  @default(0)
+  discover_impressions   Int                  @default(0)
+  discover_clicks        Int                  @default(0)
+  admiring_impressions   Int                  @default(0)
+  admiring_clicks        Int                  @default(0)
+  drips_impressions      Int                  @default(0)
+  drips_clicks           Int                  @default(0)
+  stories_impressions    Int                  @default(0)
+  stories_clicks         Int                  @default(0)
+  group_chat_impressions Int                  @default(0)
+  group_chat_clicks      Int                  @default(0)
+  chama_chat_impressions Int                  @default(0)
+  chama_chat_clicks      Int                  @default(0)
+  total_impressions      Int                  @default(0)
+  total_clicks           Int                  @default(0)
+  total_conversions      Int                  @default(0)
+  total_spent_kes        Decimal              @default(0) @db.Decimal(18, 4)
+  ctr                    Decimal              @default(0) @db.Decimal(5, 4)
+  avg_cpm                Decimal              @default(0) @db.Decimal(10, 2)
+  cost_per_click         Decimal              @default(0) @db.Decimal(10, 2)
+  created_at             DateTime             @default(now())
+  display_ad_campaigns   display_ad_campaigns @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
 
   @@unique([campaign_id, date])
   @@index([date])
@@ -1300,56 +1316,56 @@ model display_ad_analytics {
 }
 
 model display_ad_campaigns {
-  id                      String                  @id @default(uuid())
-  brand_id                String
-  campaign_name           String
-  campaign_objective      String
-  ad_title                String
-  ad_description          String?
-  primary_image_url       String
-  secondary_image_urls    String[]                @default([])
-  video_url               String?
-  cta_text                String
-  cta_url                 String
-  budget_type             BudgetType
-  daily_budget_kes        Decimal?                @db.Decimal(18, 4)
-  lifetime_budget_kes     Decimal?                @db.Decimal(18, 4)
-  total_spent_kes         Decimal                 @default(0) @db.Decimal(18, 4)
-  bidding_strategy        BiddingStrategy
-  target_cpm              Decimal?                @db.Decimal(10, 2)
-  cost_cap                Decimal?                @db.Decimal(10, 2)
-  target_age_min          Int?
-  target_age_max          Int?
-  target_genders          String[]                @default([])
-  target_languages        String[]                @default([])
-  target_interests        String[]                @default([])
-  target_behaviors        String[]                @default([])
-  target_creator_tiers    String[]                @default([])
-  target_content_niches   String[]                @default([])
-  placements              PlacementType[]         @default([])
-  chat_niches             ChatNiche[]             @default([])
-  pixel_id                String?
-  conversion_events       String[]                @default([])
-  start_date              DateTime
-  end_date                DateTime?
-  status                  AdCampaignStatus        @default(PENDING)
-  rejection_reason        String?
-  approved_by             String?
-  approved_at             DateTime?
-  impressions             Int                     @default(0)
-  clicks                  Int                     @default(0)
-  conversions             Int                     @default(0)
-  reach                   Int                     @default(0)
-  frequency               Decimal                 @default(0) @db.Decimal(5, 2)
-  ctr                     Decimal                 @default(0) @db.Decimal(5, 4)
-  conversion_rate         Decimal                 @default(0) @db.Decimal(5, 4)
-  avg_cpm                 Decimal                 @default(0) @db.Decimal(10, 2)
-  escrow_id               String?
-  payment_status          String                  @default("PENDING")
-  created_at              DateTime                @default(now())
-  updated_at              DateTime                @updatedAt
-  ad_campaign_locations   ad_campaign_locations[]
-  display_ad_analytics    display_ad_analytics[]
+  id                    String                  @id @default(uuid())
+  brand_id              String
+  campaign_name         String
+  campaign_objective    String
+  ad_title              String
+  ad_description        String?
+  primary_image_url     String
+  secondary_image_urls  String[]                @default([])
+  video_url             String?
+  cta_text              String
+  cta_url               String
+  budget_type           BudgetType
+  daily_budget_kes      Decimal?                @db.Decimal(18, 4)
+  lifetime_budget_kes   Decimal?                @db.Decimal(18, 4)
+  total_spent_kes       Decimal                 @default(0) @db.Decimal(18, 4)
+  bidding_strategy      BiddingStrategy
+  target_cpm            Decimal?                @db.Decimal(10, 2)
+  cost_cap              Decimal?                @db.Decimal(10, 2)
+  target_age_min        Int?
+  target_age_max        Int?
+  target_genders        String[]                @default([])
+  target_languages      String[]                @default([])
+  target_interests      String[]                @default([])
+  target_behaviors      String[]                @default([])
+  target_creator_tiers  String[]                @default([])
+  target_content_niches String[]                @default([])
+  placements            PlacementType[]         @default([])
+  chat_niches           ChatNiche[]             @default([])
+  pixel_id              String?
+  conversion_events     String[]                @default([])
+  start_date            DateTime
+  end_date              DateTime?
+  status                AdCampaignStatus        @default(PENDING)
+  rejection_reason      String?
+  approved_by           String?
+  approved_at           DateTime?
+  impressions           Int                     @default(0)
+  clicks                Int                     @default(0)
+  conversions           Int                     @default(0)
+  reach                 Int                     @default(0)
+  frequency             Decimal                 @default(0) @db.Decimal(5, 2)
+  ctr                   Decimal                 @default(0) @db.Decimal(5, 4)
+  conversion_rate       Decimal                 @default(0) @db.Decimal(5, 4)
+  avg_cpm               Decimal                 @default(0) @db.Decimal(10, 2)
+  escrow_id             String?
+  payment_status        String                  @default("PENDING")
+  created_at            DateTime                @default(now())
+  updated_at            DateTime                @updatedAt
+  ad_campaign_locations ad_campaign_locations[]
+  display_ad_analytics  display_ad_analytics[]
 
   @@index([brand_id, status])
   @@index([status, start_date])
@@ -2522,7 +2538,7 @@ model team_submissions {
 model transactions {
   id              String   @id @default(uuid())
   user_id         String
-  type            String
+  type            String // Legacy transaction type (string)
   amount_kr       Decimal  @db.Decimal(18, 4)
   amount_fiat     Decimal? @db.Decimal(18, 4)
   currency        String?  @db.VarChar(3)
@@ -2531,10 +2547,35 @@ model transactions {
   reference       String?
   counterparty_id String?
   metadata        Json?
-  created_at      DateTime @default(now())
-  User            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  // COMPLIANCE: Transaction context (mandatory) - Legacy fields (kept for backward compatibility)
+  context_type   String? // CONTENT_TIP, LOCKED_CHAT_TASK, SUBSCRIPTION, etc.
+  context_ref_id String? // Reference to content, task, subscription, etc.
+  context_desc   String? // Human-readable description
+
+  // COMPLIANCE: New structured context fields
+  context          Json? // Consolidated JSONB context object
+  transaction_type TransactionType? // Enum-based transaction type
+  reference_id     String? // Reference to content/service (replaces context_ref_id)
+  description      String? // Human-readable context (replaces context_desc)
+
+  // COMPLIANCE: Risk and validation
+  risk_score  Int?    @default(0)
+  is_flagged  Boolean @default(false)
+  flag_reason String?
+
+  // COMPLIANCE: Device tracking
+  device_id  String?
+  ip_address String?
+  user_agent String?
+
+  created_at DateTime @default(now())
+  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
+  @@index([context_type])
+  @@index([transaction_type])
+  @@index([is_flagged])
   @@map("transactions")
 }
 
@@ -3066,6 +3107,12 @@ enum JudgingCriteria {
   COMBINATION
 }
 
+enum JudgingMethod {
+  JUDGES_ONLY
+  VOTES_ONLY
+  JUDGES_AND_VOTES
+}
+
 enum OrderStatus {
   PENDING
   CONFIRMED
@@ -3233,11 +3280,9 @@ enum VehicleBodyType {
 // Chama Enums
 
 enum ChamaType {
-  ROTATING
-  SAVINGS
-  INVESTMENT
-  HYBRID
-  WELFARE
+  MERRY_GO_ROUND // Rotating savings (was ROTATING)
+  WELFARE // Emergency fund
+  // INVESTMENT removed for compliance (securities regulations)
 }
 
 enum ChamaStatus {
@@ -3342,22 +3387,6 @@ model AdminProfile {
   @@map("admin_profile")
 }
 
-model audit_logs {
-  id          String   @id @default(uuid())
-  admin_id    String
-  action      String
-  target_type String
-  target_id   String
-  details     Json?
-  ip_address  String?
-  user_agent  String?
-  created_at  DateTime @default(now())
-
-  @@index([admin_id, created_at])
-  @@index([target_type, target_id])
-  @@map("audit_logs")
-}
-
 // Hashtag and Mention Models
 model hashtag {
   id              String           @id @default(uuid())
@@ -3402,40 +3431,7 @@ model contentMention {
 // CALLS & VIDEO CHAT
 // ═══════════════════════════════════════════════════════════
 
-model call {
-  id           String             @id @default(uuid())
-  chat_id      String
-  caller_id    String
-  type         CallType
-  status       CallStatus         @default(RINGING)
-  started_at   DateTime?
-  ended_at     DateTime?
-  duration_secs Int?
-  created_at   DateTime           @default(now())
-  chat         chat               @relation(fields: [chat_id], references: [id], onDelete: Cascade)
-  participants call_participants[]
 
-  @@index([chat_id])
-  @@index([caller_id])
-  @@index([status])
-  @@map("call")
-}
-
-model call_participants {
-  id         String    @id @default(uuid())
-  call_id    String
-  user_id    String
-  status     CallParticipantStatus @default(invited)
-  joined_at  DateTime?
-  left_at    DateTime?
-  created_at DateTime  @default(now())
-  call       call      @relation(fields: [call_id], references: [id], onDelete: Cascade)
-
-  @@unique([call_id, user_id])
-  @@index([call_id])
-  @@index([user_id])
-  @@map("call_participants")
-}
 
 // ═══════════════════════════════════════════════════════════
 // KYC & COMPLIANCE
@@ -3463,32 +3459,32 @@ model kyc_documents {
 }
 
 model withdrawal_limits {
-  id                  String   @id @default(uuid())
-  user_id             String   @unique
-  daily_limit_kr      Decimal  @db.Decimal(18, 4)
-  withdrawn_today_kr  Decimal  @default(0) @db.Decimal(18, 4)
-  last_reset_date     DateTime
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+  id                 String   @id @default(uuid())
+  user_id            String   @unique
+  daily_limit_kr     Decimal  @db.Decimal(18, 4)
+  withdrawn_today_kr Decimal  @default(0) @db.Decimal(18, 4)
+  last_reset_date    DateTime
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
 
   @@index([user_id])
   @@map("withdrawal_limits")
 }
 
 model suspicious_activities {
-  id                String   @id @default(uuid())
-  user_id           String
-  activity_type     String
-  description       String
-  severity          String
-  ip_address        String?
-  user_agent        String?
-  metadata          Json?
-  resolved          Boolean  @default(false)
-  resolved_by       String?
-  resolved_at       DateTime?
-  resolution_note   String?
-  created_at        DateTime @default(now())
+  id              String    @id @default(uuid())
+  user_id         String
+  activity_type   String
+  description     String
+  severity        String
+  ip_address      String?
+  user_agent      String?
+  metadata        Json?
+  resolved        Boolean   @default(false)
+  resolved_by     String?
+  resolved_at     DateTime?
+  resolution_note String?
+  created_at      DateTime  @default(now())
 
   @@index([user_id])
   @@index([resolved])
@@ -3500,26 +3496,7 @@ model suspicious_activities {
 // ENUMS FOR NEW MODELS
 // ═══════════════════════════════════════════════════════════
 
-enum CallType {
-  VOICE
-  VIDEO
-}
 
-enum CallStatus {
-  RINGING
-  ACTIVE
-  ENDED
-  DECLINED
-  MISSED
-}
-
-enum CallParticipantStatus {
-  invited
-  joined
-  declined
-  missed
-  left
-}
 
 enum DocumentType {
   NATIONAL_ID
@@ -3534,6 +3511,21 @@ enum KYCStatus {
   REJECTED
 }
 
+enum TransactionType {
+  CONTENT_TIP
+  LOCKED_CHAT_TASK
+  SUBSCRIPTION
+  CONTEST_ENTRY
+  CONTEST_VOTE
+  CONTEST_PRIZE
+  CHAMA_CONTRIBUTION
+  CHAMA_PAYOUT
+  PLATFORM_REWARD
+  WITHDRAWAL
+  TOP_UP
+  SHOP_LISTING_FEE
+}
+
 enum WithdrawalStatus {
   PENDING
   APPROVED
@@ -3543,6 +3535,13 @@ enum WithdrawalStatus {
   FAILED
   CANCELLED
   FLAGGED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3603,16 +3602,16 @@ model financial_transaction_logs {
 }
 
 model suspicious_activity_logs {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   user_id      String
   activityType String
   description  String
   severity     String
   metadata     Json?
-  resolved     Boolean  @default(false)
+  resolved     Boolean   @default(false)
   resolved_by  String?
   resolved_at  DateTime?
-  created_at   DateTime @default(now())
+  created_at   DateTime  @default(now())
 
   @@index([user_id])
   @@index([severity])
@@ -3621,19 +3620,20 @@ model suspicious_activity_logs {
 }
 
 model content_moderation_logs {
-  id           String   @id @default(uuid())
-  adminId      String
-  contentType  String
-  content_id   String
-  action       String
-  reason       String?
-  created_at   DateTime @default(now())
+  id          String   @id @default(uuid())
+  adminId     String
+  contentType String
+  content_id  String
+  action      String
+  reason      String?
+  created_at  DateTime @default(now())
 
   @@index([adminId])
   @@index([contentType, content_id])
   @@map("content_moderation_logs")
 }
 
+// ═══════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════
 // DISPLAY ADS & TARGETING MODELS
 // ═══════════════════════════════════════════════════════════
@@ -3678,14 +3678,14 @@ model creator_boost_settings {
 }
 
 model creator_boost_global_settings {
-  id                 String   @id @default(uuid())
-  minBoostAmountKes  Decimal  @db.Decimal(18, 4)
-  shortCpmKes        Decimal  @db.Decimal(10, 2)
-  postCpmKes         Decimal  @db.Decimal(10, 2)
-  liveCpmKes         Decimal  @db.Decimal(10, 2)
-  updatedBy          String?
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
+  id                String   @id @default(uuid())
+  minBoostAmountKes Decimal  @db.Decimal(18, 4)
+  shortCpmKes       Decimal  @db.Decimal(10, 2)
+  postCpmKes        Decimal  @db.Decimal(10, 2)
+  liveCpmKes        Decimal  @db.Decimal(10, 2)
+  updatedBy         String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
   @@map("creator_boost_global_settings")
 }
@@ -3775,3 +3775,401 @@ model platform_announcements {
   @@map("platform_announcements")
 }
 
+// ═══════════════════════════════════════════════════════════
+// SHOP LISTING FEE SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+model listing_fee_config {
+  id                    String          @id @default(uuid())
+  is_enabled            Boolean         @default(false)
+  scope                 TargetingScope
+  scope_value           String?
+  category              ProductCategory?
+  base_fee_kr           Decimal         @db.Decimal(18, 4)
+  daily_free_quota      Int             @default(0)
+  weekly_free_quota     Int             @default(0)
+  monthly_free_quota    Int             @default(0)
+  priority              Int             @default(0)
+  is_active             Boolean         @default(true)
+  created_by            String?
+  updated_by            String?
+  created_at            DateTime        @default(now())
+  updated_at            DateTime        @updatedAt
+
+  @@unique([scope, scope_value, category])
+  @@index([scope, priority])
+  @@index([is_enabled, is_active])
+  @@map("listing_fee_config")
+}
+
+model user_listing_quota {
+  id                    String   @id @default(uuid())
+  user_id               String
+  daily_used            Int      @default(0)
+  weekly_used           Int      @default(0)
+  monthly_used          Int      @default(0)
+  last_daily_reset      DateTime @default(now())
+  last_weekly_reset     DateTime @default(now())
+  last_monthly_reset    DateTime @default(now())
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  @@unique([user_id])
+  @@index([user_id])
+  @@map("user_listing_quota")
+}
+
+model listing_fee_transaction {
+  id              String          @id @default(uuid())
+  user_id         String
+  product_id      String
+  category        ProductCategory
+  location_scope  TargetingScope
+  location_value  String?
+  fee_kr          Decimal         @db.Decimal(18, 4)
+  was_free        Boolean         @default(false)
+  quota_type      String?
+  transaction_id  String?
+  created_at      DateTime        @default(now())
+
+  @@index([user_id, created_at])
+  @@index([product_id])
+  @@index([was_free])
+  @@map("listing_fee_transaction")
+}
+
+// ═══════════════════════════════════════════════════════════
+// WALLET COMPLIANCE RESTRUCTURING MODELS
+// ═══════════════════════════════════════════════════════════
+
+// User Risk Profiles for compliance monitoring
+model user_risk_profiles {
+  id         String    @id @default(uuid())
+  user_id    String    @unique
+  risk_score Int       @default(0) // 0-100
+  risk_level RiskLevel @default(LOW) // LOW, MEDIUM, HIGH, CRITICAL
+
+  // Risk factors
+  kyc_risk_score         Int @default(0)
+  geographic_risk_score  Int @default(0)
+  transaction_risk_score Int @default(0)
+  behavioral_risk_score  Int @default(0)
+
+  // Flags
+  self_tipping_score     Int @default(0)
+  circular_tipping_score Int @default(0)
+  recipient_diversity    Int @default(100)
+
+  // Actions
+  withdrawal_blocked     Boolean @default(false)
+  transaction_limited    Boolean @default(false)
+  requires_manual_review Boolean @default(false)
+
+  // Metadata
+  last_calculated_at DateTime @default(now())
+  flagged_reasons    String[]
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  @@index([risk_level])
+  @@index([risk_score])
+  @@index([user_id])
+  @@index([last_calculated_at])
+  @@map("user_risk_profiles")
+}
+
+// Risk Factors - Individual risk factor values for detailed tracking
+model risk_factors {
+  id            String   @id @default(uuid())
+  user_id       String
+  factor_type   String // PROFILE, GEOGRAPHIC, TRANSACTION, BEHAVIORAL
+  factor_name   String // kyc_status, account_age, country, volume_24h, etc.
+  factor_value  String // Stored as string, parsed as needed
+  factor_score  Int // Individual factor contribution to risk score
+  calculated_at DateTime @default(now())
+
+  @@index([user_id])
+  @@index([factor_type])
+  @@index([user_id, calculated_at])
+  @@map("risk_factors")
+}
+
+// Device Fingerprints for fraud detection (server-side)
+model device_fingerprints {
+  id               String @id @default(uuid())
+  user_id          String
+  fingerprint_hash String // Hash of device characteristics
+
+  // Device info
+  user_agent  String
+  ip_address  String
+  browser     String?
+  os          String?
+  device_type String?
+
+  // Tracking
+  first_seen_at DateTime @default(now())
+  last_seen_at  DateTime @default(now())
+  request_count Int      @default(1)
+
+  // Flags
+  is_suspicious     Boolean  @default(false)
+  shared_with_users String[] // User IDs using same device
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([user_id, fingerprint_hash])
+  @@index([fingerprint_hash])
+  @@index([ip_address])
+  @@index([is_suspicious])
+  @@map("device_fingerprints")
+}
+
+// Locked Chat Tasks (task-based service model)
+model locked_chat_tasks {
+  id         String @id @default(uuid())
+  user_id    String // User who paid
+  creator_id String // Creator providing service
+
+  // Task details
+  task_description String
+  amount_kr        Decimal @db.Decimal(18, 4)
+
+  // Status
+  status   String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, EXPIRED
+  deadline DateTime
+
+  // Deliverable
+  deliverable_url  String?
+  deliverable_type String? // video, audio, image, file, text
+
+  // Timestamps
+  created_at   DateTime  @default(now())
+  started_at   DateTime?
+  completed_at DateTime?
+  expired_at   DateTime?
+
+  // Chat access
+  chat_unlocked_until DateTime? // When chat locks again
+
+  @@index([user_id])
+  @@index([creator_id])
+  @@index([status])
+  @@index([creator_id, status])
+  @@map("locked_chat_tasks")
+}
+
+// OFAC Sanctions Screening Cache
+model ofac_screening_cache {
+  id              String @id @default(uuid())
+  name            String // Name to check
+  name_normalized String // Normalized for matching
+
+  // Match result
+  is_match      Boolean @default(false)
+  match_score   Int? // 0-100 similarity score
+  matched_entry String? // SDN list entry that matched
+
+  // Cache metadata
+  checked_at   DateTime @default(now())
+  list_version String? // OFAC list version/date
+  expires_at   DateTime // Cache expiry (7 days)
+
+  created_at DateTime @default(now())
+
+  @@unique([name_normalized])
+  @@index([is_match])
+  @@index([expires_at])
+  @@map("ofac_screening_cache")
+}
+
+// Transaction Context (mandatory for all transactions)
+model transaction_contexts {
+  id             String @id @default(uuid())
+  transaction_id String @unique
+
+  // Context type and reference
+  context_type String // CONTENT_TIP, LOCKED_CHAT_TASK, SUBSCRIPTION, etc.
+  reference_id String? // ID of content, task, subscription, etc.
+  description  String
+
+  // Additional context
+  content_type String? // post, short, video, etc.
+  metadata     Json?
+
+  created_at DateTime @default(now())
+
+  @@index([context_type])
+  @@index([reference_id])
+  @@map("transaction_contexts")
+}
+
+// Compliance Dashboard - Flagged Transactions
+model flagged_transactions {
+  id             String @id @default(uuid())
+  transaction_id String
+  user_id        String
+
+  // Flag details
+  flag_reason String
+  flag_type   String // VELOCITY, SELF_TIPPING, CIRCULAR, HIGH_RISK, etc.
+  severity    String // LOW, MEDIUM, HIGH, CRITICAL
+  risk_score  Int // Risk score at time of flagging
+
+  // Review
+  status      String    @default("PENDING") // PENDING, REVIEWED, APPROVED, BLOCKED
+  reviewed_by String?
+  reviewed_at DateTime?
+  review_note String?
+
+  // Actions taken
+  action_taken String? // NONE, BLOCKED, LIMITED, SUSPENDED
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([user_id])
+  @@index([status])
+  @@index([severity])
+  @@index([flag_type])
+  @@index([risk_score])
+  @@index([created_at])
+  @@map("flagged_transactions")
+}
+
+// Locked Chat Settings (per creator)
+model locked_chat_settings {
+  id         String @id @default(uuid())
+  creator_id String @unique
+
+  // Settings
+  is_locked             Boolean @default(false)
+  task_fee_kr           Decimal @db.Decimal(18, 4)
+  typical_delivery_time String? // "24 hours", "3 days", etc.
+
+  // Stats
+  total_tasks_completed Int      @default(0)
+  average_rating        Decimal? @db.Decimal(3, 2)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([creator_id])
+  @@index([is_locked])
+  @@map("locked_chat_settings")
+}
+
+// Chat Task Unlocks (task-based chat access)
+model chat_task_unlocks {
+  id         String  @id @default(uuid())
+  user_id    String
+  creator_id String
+  amount_kr  Decimal @db.Decimal(18, 4)
+
+  // Task details
+  task_description String
+  status           ChatTaskStatus @default(PENDING)
+  deadline         DateTime
+  deliverable_url  String?
+
+  created_at   DateTime  @default(now())
+  completed_at DateTime?
+
+  @@index([creator_id])
+  @@index([user_id])
+  @@index([status])
+  @@index([user_id, creator_id])
+  @@map("chat_task_unlocks")
+}
+
+enum ChatTaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+// ═══════════════════════════════════════════════════════════
+// COMPLIANCE DASHBOARD TABLES
+// ═══════════════════════════════════════════════════════════
+
+// Compliance Reviews - Manual review workflow for flagged transactions
+model compliance_reviews {
+  id             String  @id @default(uuid())
+  transaction_id String
+  user_id        String
+  reviewer_id    String?
+
+  // Review details
+  review_type String // TRANSACTION, USER_PROFILE, WITHDRAWAL, CHAMA, etc.
+  status      String  @default("PENDING") // PENDING, IN_REVIEW, APPROVED, REJECTED, ESCALATED
+  decision    String? // APPROVE, REJECT, REQUEST_INFO, ESCALATE
+  notes       String?
+
+  // Timestamps
+  created_at  DateTime  @default(now())
+  reviewed_at DateTime?
+
+  @@index([transaction_id])
+  @@index([user_id])
+  @@index([reviewer_id])
+  @@index([status])
+  @@index([created_at])
+  @@map("compliance_reviews")
+}
+
+// Suspicious Activity Reports - SAR tracking for regulatory filing
+model suspicious_activity_reports {
+  id            String @id @default(uuid())
+  user_id       String
+  activity_type String // SELF_TIPPING, CIRCULAR_TIPPING, RAPID_WITHDRAWAL, CHAMA_FRAUD, etc.
+  description   String
+  severity      String // LOW, MEDIUM, HIGH, CRITICAL
+  status        String @default("DRAFT") // DRAFT, FILED, ACKNOWLEDGED, CLOSED
+
+  // Filing details
+  filed_at        DateTime?
+  filed_by        String?
+  report_number   String? // Unique SAR number for regulatory tracking
+  regulatory_body String? // e.g., "FinCEN", "FCA", etc.
+
+  // Supporting data
+  related_transactions String[] @default([]) // Array of transaction IDs
+  evidence_urls        String[] @default([]) // URLs to evidence/screenshots
+  metadata             Json? // Additional context data
+
+  // Timestamps
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([user_id])
+  @@index([status])
+  @@index([severity])
+  @@index([activity_type])
+  @@index([created_at])
+  @@index([filed_at])
+  @@map("suspicious_activity_reports")
+}
+
+// Audit Logs - Immutable compliance action tracking
+model audit_logs {
+  id             String  @id @default(uuid())
+  action_type    String // TRANSACTION_FLAGGED, USER_SUSPENDED, WITHDRAWAL_BLOCKED, KYC_APPROVED, etc.
+  performed_by   String // User ID or "SYSTEM" for automated actions
+  target_user_id String? // User affected by the action
+
+  // Action details
+  action_details Json // JSONB with full context of the action
+  ip_address     String?
+  user_agent     String?
+
+  // Immutable timestamp - no updates or deletes allowed
+  created_at DateTime @default(now())
+
+  @@index([action_type])
+  @@index([performed_by])
+  @@index([target_user_id])
+  @@index([created_at])
+  @@map("audit_logs")
+}

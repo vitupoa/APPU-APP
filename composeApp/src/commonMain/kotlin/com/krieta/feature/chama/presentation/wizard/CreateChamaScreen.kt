@@ -1,5 +1,7 @@
 package com.krieta.feature.chama.presentation.wizard
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.foundation.shape.CircleShape
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
@@ -191,6 +193,26 @@ private fun StepBasicInfo(state: CreateChamaState, viewModel: CreateChamaViewMod
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 14.sp
         )
+        
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = ChamaGold.copy(alpha = 0.1f)
+            ),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(Icons.Default.Info, contentDescription = null, tint = ChamaGold, modifier = Modifier.size(20.dp))
+                Text(
+                    "KYC verification required to create or join chamas. Complete your profile verification first.",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
 
         OutlinedTextField(
             value = state.name,

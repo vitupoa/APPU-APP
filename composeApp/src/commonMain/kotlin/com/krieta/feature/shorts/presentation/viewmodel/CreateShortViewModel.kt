@@ -14,6 +14,9 @@ import kotlinx.coroutines.launch
 data class CreateShortState(
     val caption: String = "",
     val videoFile: io.github.vinceglb.filekit.core.PlatformFile? = null,
+    val isLocked: Boolean = false,
+    val unlockPriceLocal: String = "", // Price in creator's local currency
+    val unlockPriceKr: Double? = null, // Converted Kr amount
     val isPosting: Boolean = false,
     val success: Boolean = false,
     val error: String? = null
@@ -35,10 +38,33 @@ class CreateShortViewModel(
         _state.value = _state.value.copy(videoFile = file)
     }
 
+    fun toggleLock(isLocked: Boolean) {
+        _state.value = _state.value.copy(isLocked = isLocked)
+    }
+
+    fun updateUnlockPrice(priceLocal: String, exchangeRate: Double?) {
+        _state.value = _state.value.copy(unlockPriceLocal = priceLocal)
+        
+        // Convert to Kr if valid number and exchange rate available
+        val priceDouble = priceLocal.toDoubleOrNull()
+        if (priceDouble != null && priceDouble > 0 && exchangeRate != null && exchangeRate > 0) {
+            // Convert local currency to Kr: Kr = localAmount / exchangeRate
+            val krAmount = priceDouble / exchangeRate
+            _state.value = _state.value.copy(unlockPriceKr = krAmount)
+        } else {
+            _state.value = _state.value.copy(unlockPriceKr = null)
+        }
+    }
+
     fun post() {
         val currentState = _state.value
         if (currentState.videoFile == null) {
             _state.value = currentState.copy(error = "Please select a video")
+            return
+        }
+
+        if (currentState.isLocked && currentState.unlockPriceKr == null) {
+            _state.value = currentState.copy(error = "Please enter a valid unlock price")
             return
         }
 
@@ -50,7 +76,9 @@ class CreateShortViewModel(
                 com.krieta.com.core.upload.BackgroundUploader.enqueueUpload(
                     type = com.krieta.com.core.upload.UploadType.SHORT,
                     filePath = filePath,
-                    caption = currentState.caption
+                    caption = currentState.caption,
+                    isLocked = currentState.isLocked,
+                    unlockAmountKr = currentState.unlockPriceKr
                 )
                 
                 _state.value = _state.value.copy(isPosting = false, success = true)

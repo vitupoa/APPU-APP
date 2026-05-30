@@ -1,6 +1,8 @@
 import { prisma } from '../../config/database.js';
 import { Prisma, ChamaType, ChamaStatus, ContributionFrequency } from '@prisma/client';
 import { io } from '../../shared/gateway/socket.js';
+import { kycService } from '../kyc/kyc.service.js';
+import { chamaPatternDetectionService } from '../../services/compliance/chamaPatternDetection.service.js';
 
 export class ChamaService {
   /**
@@ -26,6 +28,12 @@ export class ChamaService {
       allowMidTermVoteOut?: boolean;
     }
   ) {
+    // Wave 2 Task 9.2: Validate creator is KYC-approved
+    const isKYCApproved = await kycService.hasCompletedKYC(creatorId);
+    if (!isKYCApproved) {
+      throw new Error('KYC verification required to create a Chama');
+    }
+
     return prisma.$transaction(async (tx) => {
       // 1. Create the GROUP chat
       const chat = await tx.chat.create({
@@ -77,7 +85,7 @@ export class ChamaService {
           chama_id: chama.id,
           user_id: creatorId,
           role: 'ADMIN',
-          rotationNumber: data.type === 'ROTATING' ? 1 : null,
+          rotationNumber: data.type === 'MERRY_GO_ROUND' ? 1 : null,
           updated_at: new Date(),
         },
       });
@@ -171,9 +179,15 @@ export class ChamaService {
 
   /**
    * Join a chama. Charges membership fee if applicable.
-   * For ROTATING chamas, assigns the next rotation number.
+   * For MERRY_GO_ROUND chamas, assigns the next rotation number.
    */
   static async joinChama(userId: string, chamaId: string) {
+    // Wave 2 Task 9.2: Validate user is KYC-approved
+    const isKYCApproved = await kycService.hasCompletedKYC(userId);
+    if (!isKYCApproved) {
+      throw new Error('KYC verification required to join a Chama');
+    }
+
     return prisma.$transaction(async (tx) => {
       const chama = await tx.chama.findUnique({
         where: { id: chamaId },
@@ -239,9 +253,9 @@ export class ChamaService {
         });
       }
 
-      // Get next rotation number for ROTATING chamas
+      // Get next rotation number for MERRY_GO_ROUND chamas
       let rotationNumber: number | null = null;
-      if (chama.type === 'ROTATING') {
+      if (chama.type === 'MERRY_GO_ROUND') {
         const maxRotation = await tx.chamaMember.aggregate({
           where: { chama_id: chamaId, status: 'ACTIVE' },
           _max: { rotationNumber: true },
@@ -330,7 +344,7 @@ export class ChamaService {
   }
 
   /**
-   * Leave a chama. Blocked for ROTATING type if rotation is active.
+   * Leave a chama. Blocked for MERRY_GO_ROUND type if rotation is active.
    */
   static async leaveChama(userId: string, chamaId: string) {
     return prisma.$transaction(async (tx) => {
@@ -354,8 +368,8 @@ export class ChamaService {
         }
       }
 
-      // For ROTATING chamas: block if rotation is active and user hasn't completed their obligation
-      if (chama.type === 'ROTATING' && chama.status === 'ACTIVE') {
+      // For MERRY_GO_ROUND chamas: block if rotation is active and user hasn't completed their obligation
+      if (chama.type === 'MERRY_GO_ROUND' && chama.status === 'ACTIVE') {
         if (Number(member.total_received) > 0 && Number(member.total_contributed) < Number(member.total_received)) {
           // They received more than contributed — can't leave, must be flagged
           await tx.chamaDefaulter.create({
@@ -377,12 +391,12 @@ export class ChamaService {
         data: { status: 'LEFT', leftAt: new Date() },
       });
 
-      // Check if user is in any other active rotating chamas
+      // Check if user is in any other active merry-go-round chamas
       const otherRotating = await tx.chamaMember.count({
         where: {
           user_id: userId,
           status: 'ACTIVE',
-          chama: { type: 'ROTATING', status: 'ACTIVE' },
+          chama: { type: 'MERRY_GO_ROUND', status: 'ACTIVE' },
         },
       });
       if (otherRotating === 0) {
@@ -440,8 +454,8 @@ export class ChamaService {
         data: { status: 'REMOVED', leftAt: new Date() },
       });
 
-      // For rotating chamas, check outstanding obligations
-      if (chama.type === 'ROTATING' && Number(targetMember.total_received) > Number(targetMember.total_contributed)) {
+      // For merry-go-round chamas, check outstanding obligations
+      if (chama.type === 'MERRY_GO_ROUND' && Number(targetMember.total_received) > Number(targetMember.total_contributed)) {
         await tx.chamaDefaulter.create({
           data: {
             user_id: targetUserId,

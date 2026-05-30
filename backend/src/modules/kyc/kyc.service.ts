@@ -135,17 +135,20 @@ export class KYCService {
     // Log audit
     await prisma.audit_logs.create({
       data: {
-        admin_id: adminId,
-        action: approved ? 'KYC_APPROVED' : 'KYC_REJECTED',
-        target_type: 'KYC_DOCUMENT',
-        target_id: documentId,
-        details: {
-          user_id: document.user_id,
-          documentType: document.document_type,
-          verificationNote,
-          rejectionReason,
-          nameMatches,
-          nameMatchScore
+        performed_by: adminId,
+        action_type: approved ? 'KYC_APPROVED' : 'KYC_REJECTED',
+        target_user_id: document.user_id,
+        action_details: {
+          target_type: 'KYC_DOCUMENT',
+          target_id: documentId,
+          details: {
+            user_id: document.user_id,
+            documentType: document.document_type,
+            verificationNote,
+            rejectionReason,
+            nameMatches,
+            nameMatchScore
+          }
         }
       }
     });

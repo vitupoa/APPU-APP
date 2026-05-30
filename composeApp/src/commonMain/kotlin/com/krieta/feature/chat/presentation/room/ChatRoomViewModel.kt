@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.com.core.network.WebSocketService
 import com.krieta.com.core.security.TokenManager
+import com.krieta.com.core.security.InputValidator
 import com.krieta.feature.chat.data.media.ChatMediaUploadService
 import com.krieta.feature.chat.data.media.UploadProgress
 import com.krieta.feature.chat.data.remote.dto.MessageDto
@@ -107,27 +108,31 @@ class ChatRoomViewModel(
     fun sendMessage(payload: String) {
         if (payload.isBlank()) return
         
-        // Stop typing indicator when sending
-        stopTyping()
-        
-        val replyToId = _state.value.replyingTo?.id
-        
-        screenModelScope.launch {
-            when (val result = repository.sendMessage(chatId, payload, replyToId = replyToId)) {
-                is NetworkResult.Success -> {
-                    val currentMessages = _state.value.messages.toMutableList()
-                    if (currentMessages.none { it.id == result.data.id }) {
-                        currentMessages.add(0, result.data)
-                        _state.value = _state.value.copy(messages = currentMessages, replyingTo = null)
+        try {
+            val validatedPayload = InputValidator.validateText(payload, "message")
+            
+            stopTyping()
+            
+            val replyToId = _state.value.replyingTo?.id
+            
+            screenModelScope.launch {
+                when (val result = repository.sendMessage(chatId, validatedPayload, replyToId = replyToId)) {
+                    is NetworkResult.Success -> {
+                        val currentMessages = _state.value.messages.toMutableList()
+                        if (currentMessages.none { it.id == result.data.id }) {
+                            currentMessages.add(0, result.data)
+                            _state.value = _state.value.copy(messages = currentMessages, replyingTo = null)
+                        }
+                        eventBus.emit(ChatEvent.MessageSent(chatId))
                     }
-                    // Emit event to trigger chat list refresh
-                    eventBus.emit(ChatEvent.MessageSent(chatId))
-                }
-                is NetworkResult.Loading -> {}
-                is NetworkResult.Error -> {
-                    _state.value = _state.value.copy(error = "Failed to send message")
+                    is NetworkResult.Loading -> {}
+                    is NetworkResult.Error -> {
+                        _state.value = _state.value.copy(error = "Failed to send message")
+                    }
                 }
             }
+        } catch (e: SecurityException) {
+            _state.value = _state.value.copy(error = e.message ?: "Invalid message content")
         }
     }
 
@@ -141,54 +146,67 @@ class ChatRoomViewModel(
     fun sendMediaMessage(caption: String) {
         val media = _state.value.selectedMedia ?: return
         
-        screenModelScope.launch {
-            mediaUploadService.uploadMedia(
-                chatId = chatId,
-                fileBytes = media.bytes,
-                fileName = media.fileName,
-                mimeType = getMimeType(media.type)
-            ).collect { progress ->
-                _state.value = _state.value.copy(uploadProgress = progress)
-                
-                when (progress) {
-                    is UploadProgress.Success -> {
-                        val replyToId = _state.value.replyingTo?.id
-                        when (val result = repository.sendMessage(
-                            chatId = chatId,
-                            payload = caption.ifBlank { "📎" },
-                            mediaUrl = progress.url,
-                            mediaType = media.type,
-                            replyToId = replyToId
-                        )) {
-                            is NetworkResult.Success -> {
-                                val currentMessages = _state.value.messages.toMutableList()
-                                if (currentMessages.none { it.id == result.data.id }) {
-                                    currentMessages.add(0, result.data)
+        try {
+            val validatedCaption = if (caption.isNotBlank()) {
+                InputValidator.validateText(caption, "caption")
+            } else {
+                "📎"
+            }
+            
+            screenModelScope.launch {
+                mediaUploadService.uploadMedia(
+                    chatId = chatId,
+                    fileBytes = media.bytes,
+                    fileName = media.fileName,
+                    mimeType = getMimeType(media.type)
+                ).collect { progress ->
+                    _state.value = _state.value.copy(uploadProgress = progress)
+                    
+                    when (progress) {
+                        is UploadProgress.Success -> {
+                            val replyToId = _state.value.replyingTo?.id
+                            when (val result = repository.sendMessage(
+                                chatId = chatId,
+                                payload = validatedCaption,
+                                mediaUrl = progress.url,
+                                mediaType = media.type,
+                                replyToId = replyToId
+                            )) {
+                                is NetworkResult.Success -> {
+                                    val currentMessages = _state.value.messages.toMutableList()
+                                    if (currentMessages.none { it.id == result.data.id }) {
+                                        currentMessages.add(0, result.data)
+                                        _state.value = _state.value.copy(
+                                            messages = currentMessages,
+                                            selectedMedia = null,
+                                            uploadProgress = UploadProgress.Idle,
+                                            replyingTo = null
+                                        )
+                                    }
+                                    eventBus.emit(ChatEvent.MessageSent(chatId))
+                                }
+                                is NetworkResult.Error -> {
                                     _state.value = _state.value.copy(
-                                        messages = currentMessages,
-                                        selectedMedia = null,
-                                        uploadProgress = UploadProgress.Idle,
-                                        replyingTo = null
+                                        uploadProgress = UploadProgress.Error("Failed to send message")
                                     )
                                 }
-                                eventBus.emit(ChatEvent.MessageSent(chatId))
+                                is NetworkResult.Loading -> {}
                             }
-                            is NetworkResult.Error -> {
-                                _state.value = _state.value.copy(
-                                    uploadProgress = UploadProgress.Error("Failed to send message")
-                                )
-                            }
-                            is NetworkResult.Loading -> {}
                         }
-                    }
-                    is UploadProgress.Error -> {
-                        // Error state already set
-                    }
-                    else -> {
-                        // Progress updates
+                        is UploadProgress.Error -> {
+                            // Error state already set
+                        }
+                        else -> {
+                            // Progress updates
+                        }
                     }
                 }
             }
+        } catch (e: SecurityException) {
+            _state.value = _state.value.copy(
+                error = e.message ?: "Invalid caption content",
+                uploadProgress = UploadProgress.Idle
+            )
         }
     }
 

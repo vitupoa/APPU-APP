@@ -18,7 +18,8 @@ const createShortSchema = z.object({
   musicTrack: z.string().max(200).optional(),
   linkedProductId: z.string().uuid().optional(),
   isLocked: z.boolean().optional(),
-  requiredTier: z.nativeEnum(SubscriptionTierType).optional()
+  requiredTier: z.nativeEnum(SubscriptionTierType).optional(),
+  unlockAmountKr: z.number().positive().optional()
 });
 
 // GET /api/v1/shorts/feed

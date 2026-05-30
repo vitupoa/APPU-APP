@@ -22,7 +22,9 @@ data class RegisterRequestDto(
     @kotlinx.serialization.SerialName("account_type") val accountType: String,
     val country: String,
     val currency: String,
-    @kotlinx.serialization.SerialName("device_id") val deviceId: String
+    @kotlinx.serialization.SerialName("device_id") val deviceId: String,
+    val selectedNiches: List<String> = emptyList(),
+    val customNiches: List<String> = emptyList()
 )
 
 @Serializable

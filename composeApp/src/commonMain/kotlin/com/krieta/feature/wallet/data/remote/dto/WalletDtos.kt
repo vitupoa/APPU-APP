@@ -7,7 +7,10 @@ data class WalletBalanceDto(
     val krBalance: Double,
     val fiatEquivalent: Double,
     val currency: String,
-    val isWalletUnlocked: Boolean
+    val isWalletUnlocked: Boolean,
+    // Wave 3 Task 5.3: Exchange rate metadata
+    val exchangeRate: Double? = null,
+    val baseUsd: Double? = null
 )
 
 @Serializable
@@ -33,7 +36,14 @@ data class TransactionDto(
     val status: String,
     val reference: String?,
     val counterpartyId: String?,
-    val createdAt: String
+    val createdAt: String,
+    // Wave 3 Task 5.3: Fiat conversion metadata
+    val fiatEquivalent: Double? = null,
+    val exchangeRate: Double? = null,
+    // Wave 1 Task 2.1: Transaction context
+    val contextType: String? = null,
+    val contextRefId: String? = null,
+    val contextDesc: String? = null
 )
 
 @Serializable

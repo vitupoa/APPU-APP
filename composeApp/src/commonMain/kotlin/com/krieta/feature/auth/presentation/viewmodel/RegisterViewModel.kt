@@ -33,11 +33,37 @@ class RegisterViewModel(
     var username = MutableStateFlow("")
     var email = MutableStateFlow("")
     var password = MutableStateFlow("")
+    var selectedNiches = MutableStateFlow<List<String>>(emptyList())
+    var customNiches = MutableStateFlow<List<String>>(emptyList())
+
+    fun addNiche(niche: String) {
+        val current = selectedNiches.value
+        if (!current.contains(niche)) {
+            selectedNiches.value = current + niche
+        }
+    }
+    
+    fun removeNiche(niche: String) {
+        selectedNiches.value = selectedNiches.value.filter { it != niche }
+        customNiches.value = customNiches.value.filter { it != niche }
+    }
+    
+    fun addCustomNiche(niche: String) {
+        val current = customNiches.value
+        if (!current.contains(niche) && niche.isNotBlank()) {
+            customNiches.value = current + niche
+        }
+    }
 
     fun register() {
         if (firstName.value.isBlank() || lastName.value.isBlank() || username.value.isBlank() ||
             email.value.isBlank() || password.value.isBlank()) {
             _registerState.value = RegisterState.Error("Please fill out all fields")
+            return
+        }
+        
+        if (selectedNiches.value.isEmpty() && customNiches.value.isEmpty()) {
+            _registerState.value = RegisterState.Error("Please select at least one niche")
             return
         }
 
@@ -53,7 +79,9 @@ class RegisterViewModel(
                 accountType = accountType.value,
                 country = locationProvider.getCurrentCountry(),
                 currency = locationProvider.getCurrentCurrency(),
-                deviceId = "TEMP_DEVICE_ID" // Ideally bound locally
+                deviceId = "TEMP_DEVICE_ID", // Ideally bound locally
+                selectedNiches = selectedNiches.value,
+                customNiches = customNiches.value
             )
             
             val result = authRepository.register(request)

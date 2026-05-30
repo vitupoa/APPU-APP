@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "calculate-risk-scores": "tsx scripts/calculateInitialRiskScores.ts"
+  }
+}

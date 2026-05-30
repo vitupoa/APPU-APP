@@ -186,4 +186,30 @@ class FeedViewModel(
             sponsoredManager.recordEngagement(type)
         }
     }
+
+    /**
+     * Add a newly created post to the top of the feed (optimistic update)
+     * This provides instant feedback without waiting for a full refresh
+     */
+    fun addNewPost(postId: String) {
+        screenModelScope.launch {
+            when (val result = repository.getPostById(postId)) {
+                is NetworkResult.Success -> {
+                    val newPost = result.data
+                    // Add to the top of the feed
+                    _state.value = _state.value.copy(
+                        items = listOf(newPost) + _state.value.items
+                    )
+                    // Log analytics
+                    println("Analytics: Post created - ID: $postId")
+                }
+                is NetworkResult.Error -> {
+                    // If fetch fails, fall back to full refresh
+                    println("Error fetching new post, falling back to refresh: ${result.message}")
+                    refresh()
+                }
+                else -> {}
+            }
+        }
+    }
 }

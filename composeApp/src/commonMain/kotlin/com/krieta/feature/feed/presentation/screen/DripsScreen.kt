@@ -92,7 +92,16 @@ class DripsScreen : Screen {
             UploadCompletionNotifier.uploadCompletions
                 .onEach { event ->
                     if (event.success && event.type == UploadType.DRIP) {
-                        viewModel.refresh()
+                        // Optimistic update: add the new post immediately instead of full refresh
+                        if (event.contentId.isNotEmpty()) {
+                            viewModel.addNewPost(event.contentId)
+                        } else {
+                            // Fallback to refresh if no contentId
+                            viewModel.refresh()
+                        }
+                    } else if (!event.success && event.type == UploadType.DRIP) {
+                        // Log failed upload for error recovery
+                        println("Error Recovery: Post upload failed - ID: ${event.contentId}")
                     }
                 }
                 .launchIn(this)

@@ -104,11 +104,14 @@ export async function logAuditAction(
   try {
     await prisma.audit_logs.create({
       data: {
-        admin_id: adminId,
-        action,
-        target_type: targetType,
-        target_id: targetId,
-        details: (details ?? undefined) as any,
+        performed_by: adminId,
+        action_type: action,
+        target_user_id: targetId,
+        action_details: {
+          target_type: targetType,
+          target_id: targetId,
+          details: details ?? {}
+        } as any,
         ip_address: req?.ip ?? req?.headers['x-forwarded-for']?.toString() ?? null,
         user_agent: req?.headers['user-agent']?.toString() ?? null,
       }

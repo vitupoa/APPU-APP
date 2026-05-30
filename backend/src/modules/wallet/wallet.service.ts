@@ -10,6 +10,7 @@ import { lockWalletForUpdate, lockWalletsForUpdate, withDeadlockRetry } from '..
 export class WalletService {
   /**
    * Retrieves the wallet balance ensuring a wallet exists.
+   * Wave 3 Task 5.3: Returns fiat equivalent in response
    */
   static async getBalance(userId: string, targetCurrency?: string) {
     let wallet = await prisma.wallets.findUnique({
@@ -41,7 +42,10 @@ export class WalletService {
       kr_balance: wallet.kr_balance,
       fiatEquivalent,
       currency: currencyToUse,
-      is_wallet_unlocked: wallet.User.is_wallet_unlocked
+      is_wallet_unlocked: wallet.User.is_wallet_unlocked,
+      // Wave 3 Task 5.3: Include exchange rate metadata
+      exchange_rate: fiatRate,
+      base_usd: baseUsd
     };
   }
 
@@ -163,7 +167,26 @@ export class WalletService {
       skip: offset
     });
 
-    return transactions;
+    // Wave 3 Task 5.3: Add fiat equivalent to each transaction
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { currency: true }
+    });
+
+    const currency = user?.currency || 'USD';
+    const fiatRate = await ExchangeService.getDisplayRate(currency);
+
+    return transactions.map(tx => {
+      const baseUsd = Number(tx.amount_kr) / 100;
+      const fiatEquivalent = baseUsd * fiatRate;
+
+      return {
+        ...tx,
+        fiat_equivalent: fiatEquivalent,
+        currency,
+        exchange_rate: fiatRate
+      };
+    });
   }
 
   static async searchUsers(query: string) {

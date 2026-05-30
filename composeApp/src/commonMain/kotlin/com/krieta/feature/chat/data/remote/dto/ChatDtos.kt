@@ -78,6 +78,7 @@ data class MessageListResponseDto(
 
 @Serializable
 data class CreateDirectChatRequest(
+    @kotlinx.serialization.SerialName("recipient_id")
     val recipientId: String
 )
 

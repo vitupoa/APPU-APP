@@ -3,6 +3,7 @@ package com.krieta.com.core.network
 
 import com.krieta.com.core.security.TokenManager
 import com.krieta.com.core.security.DeviceSecurity
+import com.krieta.com.core.security.pinning.createCertificatePinner
 import com.krieta.com.core.session.SessionManager
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
@@ -44,7 +45,10 @@ object KtorClientFactory {
     }
 
     fun create(tokenManager: TokenManager, deviceSecurity: DeviceSecurity? = null, sessionManager: SessionManager): HttpClient {
+        val certificatePinner = createCertificatePinner()
+        
         return HttpClient {
+            certificatePinner.configurePinning(this)
             install(ContentNegotiation) {
                 json(json)
             }

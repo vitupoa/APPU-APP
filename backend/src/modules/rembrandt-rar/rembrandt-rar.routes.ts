@@ -18,6 +18,7 @@ import {
   announcementSchema, platformConfigSchema, paginationSchema,
 } from './rembrandt-rar.validation.js';
 import { prisma } from '../../config/database.js';
+import analyticsRoutes from './analytics.routes.js';
 
 
 // Helper to safely extract string from query parameter
@@ -30,6 +31,11 @@ const router = Router();
 // All RAR routes require auth + active admin profile
 router.use(authMiddleware as any);
 router.use(requireRarAccess as any);
+
+// ═══════════════════════════════════════════════════════════
+// ANALYTICS DASHBOARD (NEW)
+// ═══════════════════════════════════════════════════════════
+router.use('/analytics', analyticsRoutes);
 
 // ═══════════════════════════════════════════════════════════
 // DASHBOARD
@@ -605,6 +611,132 @@ router.get('/database/performance', requireSuperAdmin as any, async (_req: RarRe
       prisma.$queryRaw`SELECT locktype, mode, count(*) FROM pg_locks GROUP BY locktype, mode ORDER BY count DESC`
     ]);
     res.json({ cacheHitRatio, indexHitRatio, locks }); return;
+  } catch (e: any) { res.status(500).json({ error: e.message }); return; }
+});
+
+// ═══════════════════════════════════════════════════════════
+// SHOP LISTING FEES
+// ═══════════════════════════════════════════════════════════
+
+router.get('/listing-fees/config', requirePermission('fees.configure') as any, async (_req: RarRequest, res: Response) => {
+  try {
+    const configs = await prisma.listing_fee_config.findMany({
+      orderBy: [{ scope: 'asc' }, { priority: 'desc' }]
+    });
+    res.json(configs); return;
+  } catch (e: any) { res.status(500).json({ error: e.message }); return; }
+});
+
+router.post('/listing-fees/config', requirePermission('fees.configure') as any, async (req: RarRequest, res: Response) => {
+  try {
+    const { scope, scopeValue, category, baseFeeKr, dailyFreeQuota, weeklyFreeQuota, monthlyFreeQuota, isEnabled, priority } = req.body;
+    
+    const config = await prisma.listing_fee_config.upsert({
+      where: {
+        scope_scope_value_category: {
+          scope,
+          scope_value: scopeValue || null,
+          category: category || null
+        }
+      },
+      create: {
+        scope,
+        scope_value: scopeValue,
+        category,
+        base_fee_kr: baseFeeKr,
+        daily_free_quota: dailyFreeQuota || 0,
+        weekly_free_quota: weeklyFreeQuota || 0,
+        monthly_free_quota: monthlyFreeQuota || 0,
+        is_enabled: isEnabled ?? false,
+        priority: priority || 0,
+        created_by: req.user_id
+      },
+      update: {
+        base_fee_kr: baseFeeKr,
+        daily_free_quota: dailyFreeQuota,
+        weekly_free_quota: weeklyFreeQuota,
+        monthly_free_quota: monthlyFreeQuota,
+        is_enabled: isEnabled,
+        priority,
+        updated_by: req.user_id
+      }
+    });
+    
+    await AuditService.log(req.user_id!, 'listing_fee.config', 'listing_fee_config', config.id, req.body, req.ip, req.headers['user-agent'] as string | undefined);
+    res.json(config); return;
+  } catch (e: any) { res.status(400).json({ error: e.message }); return; }
+});
+
+router.post('/listing-fees/toggle', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
+  try {
+    const { isEnabled } = req.body;
+    await prisma.listing_fee_config.updateMany({ data: { is_enabled: isEnabled } });
+    await AuditService.log(req.user_id!, 'listing_fee.toggle', 'system', 'global', { isEnabled }, req.ip, req.headers['user-agent'] as string | undefined);
+    res.json({ success: true, isEnabled }); return;
+  } catch (e: any) { res.status(400).json({ error: e.message }); return; }
+});
+
+router.delete('/listing-fees/config/:id', requirePermission('fees.configure') as any, async (req: RarRequest, res: Response) => {
+  try {
+    await prisma.listing_fee_config.delete({ where: { id: req.params.id as string } });
+    await AuditService.log(req.user_id!, 'listing_fee.delete', 'listing_fee_config', req.params.id as string, {}, req.ip, req.headers['user-agent'] as string | undefined);
+    res.json({ success: true }); return;
+  } catch (e: any) { res.status(400).json({ error: e.message }); return; }
+});
+
+router.get('/listing-fees/analytics', requirePermission('analytics.view') as any, async (req: RarRequest, res: Response) => {
+  try {
+    const startDate = req.query.startDate ? new Date(req.query.startDate as string) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const endDate = req.query.endDate ? new Date(req.query.endDate as string) : new Date();
+    
+    const transactions = await prisma.listing_fee_transaction.findMany({
+      where: { created_at: { gte: startDate, lte: endDate } }
+    });
+    
+    const totalRevenue = transactions.reduce((sum, t) => sum + Number(t.fee_kr), 0);
+    const paidListings = transactions.filter(t => !t.was_free).length;
+    const freeListings = transactions.filter(t => t.was_free).length;
+    
+    const byCategory = await prisma.listing_fee_transaction.groupBy({
+      by: ['category'],
+      where: { created_at: { gte: startDate, lte: endDate } },
+      _sum: { fee_kr: true },
+      _count: true
+    });
+    
+    const byLocation = await prisma.listing_fee_transaction.groupBy({
+      by: ['location_value'],
+      where: { created_at: { gte: startDate, lte: endDate } },
+      _sum: { fee_kr: true },
+      _count: true
+    });
+    
+    res.json({
+      totalRevenue,
+      totalListings: transactions.length,
+      paidListings,
+      freeListings,
+      averageFee: paidListings > 0 ? totalRevenue / paidListings : 0,
+      byCategory: byCategory.map(c => ({ category: c.category, revenue: Number(c._sum.fee_kr || 0), count: c._count })),
+      byLocation: byLocation.map(l => ({ location: l.location_value, revenue: Number(l._sum.fee_kr || 0), count: l._count }))
+    }); return;
+  } catch (e: any) { res.status(500).json({ error: e.message }); return; }
+});
+
+router.get('/listing-fees/transactions', requirePermission('transactions.view') as any, async (req: RarRequest, res: Response) => {
+  try {
+    const { page, limit } = paginationSchema.parse(req.query);
+    
+    const [transactions, total] = await Promise.all([
+      prisma.listing_fee_transaction.findMany({
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: { created_at: 'desc' }
+      }),
+      prisma.listing_fee_transaction.count()
+    ]);
+    
+    res.json({ items: transactions, total, page, limit }); return;
   } catch (e: any) { res.status(500).json({ error: e.message }); return; }
 });
 

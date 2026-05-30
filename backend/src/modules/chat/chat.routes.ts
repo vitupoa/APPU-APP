@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware as requireAuth } from '../../middleware/auth.js';
+import { blockDirectChatTips } from '../../middleware/blockDirectChatTips.js';
 import { ChatController } from './chat.controller.js';
 import { ChatMediaController } from './chat-media.controller.js';
 import { validateRequest } from '../../middleware/validate.js';
@@ -26,7 +27,8 @@ router.post('/:chatId/mark-read', ChatController.markAsRead);
 router.post('/:chatId/typing', ChatController.sendTypingIndicator);
 router.delete('/messages/:messageId', ChatController.deleteMessage);
 router.post('/messages/:messageId/forward', ChatController.forwardMessage);
-router.post('/:chatId/tip', ChatController.sendTip);
+// Block tips in direct chats (compliance requirement 2.2.2)
+router.post('/:chatId/tip', blockDirectChatTips, ChatController.sendTip);
 router.put('/:chatId', validateRequest(updateGroupChatSchema), ChatController.updateGroupChat);
 router.post('/:chatId/manage-member', validateRequest(manageMemberSchema), ChatController.manageMember);
 router.post('/:chatId/transfer-ownership', validateRequest(transferOwnershipSchema), ChatController.transferOwnership);

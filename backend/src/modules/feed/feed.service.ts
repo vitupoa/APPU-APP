@@ -4,6 +4,10 @@ import { ContentLockService } from '../contentLock/contentLock.service.js';
 import { Prisma } from '@prisma/client';
 
 export class FeedService {
+  /**
+   * Get personalized and randomized feed for user
+   * Uses similar algorithm to shorts feed for consistency
+   */
   static async getFeed(params: {
     userId?: string;
     cursor?: string;
@@ -11,23 +15,15 @@ export class FeedService {
   }) {
     const { userId, cursor, limit } = params;
 
-    const posts = await prisma.post.findMany({
-      take: limit + 1,
-      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { created_at: 'desc' as const },
-      include: {
-        User: {
-          select: {
-            id: true,
-            username: true,
-            display_name: true,
-            avatar_url: true,
-            is_verified: true,
-            account_type: true
-          }
-        }
-      }
-    });
+    let posts: any[];
+
+    if (userId) {
+      // Personalized feed with randomization
+      posts = await this.getPersonalizedFeed(userId, cursor, limit);
+    } else {
+      // Guest users get random popular posts
+      posts = await this.getGuestFeed(cursor, limit);
+    }
 
     const hasMore = posts.length > limit;
     const items = hasMore ? posts.slice(0, limit) : posts;
@@ -86,6 +82,240 @@ export class FeedService {
       }),
       nextCursor
     };
+  }
+
+  /**
+   * Get personalized feed with randomization
+   * Mix of: admirers' posts, similar interests, trending, and random
+   */
+  private static async getPersonalizedFeed(userId: string, cursor: string | undefined, limit: number) {
+    const user = await prisma.user.findUnique({ 
+      where: { id: userId },
+      select: { country: true }
+    });
+    const userCountry = user?.country || '';
+
+    // Get user's admirers (people they follow)
+    const admiringList = await prisma.admires.findMany({
+      where: { admirer_id: userId },
+      select: { admired_id: true }
+    });
+    const admiringIds = admiringList.map(a => a.admired_id);
+
+    // Calculate distribution (similar to shorts)
+    const admirersCount = Math.floor(limit * 0.4); // 40% from people you follow
+    const similarCount = Math.floor(limit * 0.3);  // 30% similar interests
+    const trendingCount = Math.floor(limit * 0.2); // 20% trending posts
+    const randomCount = limit - admirersCount - similarCount - trendingCount; // 10% random
+
+    // Get posts from different sources
+    const [admirersPosts, similarPosts, trendingPosts, randomPosts] = await Promise.all([
+      this.getAdmirersPosts(admiringIds, admirersCount, cursor),
+      this.getSimilarInterestPosts(userId, userCountry, similarCount, cursor),
+      this.getTrendingPosts(userCountry, trendingCount, cursor),
+      this.getRandomPosts(userCountry, randomCount, cursor)
+    ]);
+
+    // Combine and shuffle to create personalized feed
+    const allPosts = [
+      ...admirersPosts,
+      ...similarPosts,
+      ...trendingPosts,
+      ...randomPosts
+    ];
+
+    // Remove duplicates by post ID
+    const uniquePosts = Array.from(
+      new Map(allPosts.map(p => [p.id, p])).values()
+    );
+
+    // Shuffle to randomize order (Fisher-Yates shuffle)
+    for (let i = uniquePosts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [uniquePosts[i], uniquePosts[j]] = [uniquePosts[j], uniquePosts[i]];
+    }
+
+    return uniquePosts.slice(0, limit + 1);
+  }
+
+  /**
+   * Get posts from people the user is following
+   */
+  private static async getAdmirersPosts(admiringIds: string[], count: number, cursor?: string) {
+    if (admiringIds.length === 0) return [];
+
+    return prisma.post.findMany({
+      where: { user_id: { in: admiringIds } },
+      take: count,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      orderBy: { created_at: 'desc' },
+      include: {
+        User: {
+          select: {
+            id: true,
+            username: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
+            account_type: true
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Get posts based on similar interests (hashtags user has interacted with)
+   */
+  private static async getSimilarInterestPosts(userId: string, country: string, count: number, cursor?: string) {
+    // Get hashtags from posts the user has liked
+    const likedHashtags = await prisma.$queryRaw<{ hashtag_id: string }[]>`
+      SELECT DISTINCT ch.hashtag_id
+      FROM content_hashtags ch
+      INNER JOIN post_likes pl ON ch.content_id = pl.post_id
+      WHERE pl.user_id = ${userId}
+      AND ch.content_type = 'POST'
+      LIMIT 20
+    `;
+
+    if (likedHashtags.length === 0) {
+      // Fallback to random posts from same country
+      return this.getRandomPosts(country, count, cursor);
+    }
+
+    const hashtagIds = likedHashtags.map(h => h.hashtag_id);
+
+    // Get posts with similar hashtags
+    const posts = await prisma.$queryRaw<any[]>`
+      SELECT DISTINCT p.*
+      FROM post p
+      INNER JOIN content_hashtags ch ON p.id = ch.content_id
+      WHERE ch.hashtag_id = ANY(${hashtagIds})
+      AND ch.content_type = 'POST'
+      AND p.user_id IN (SELECT id FROM "user" WHERE country = ${country})
+      ORDER BY RANDOM()
+      LIMIT ${count}
+    `;
+
+    // Fetch user data for each post
+    const postsWithUsers = await Promise.all(
+      posts.map(async (p) => {
+        const user = await prisma.user.findUnique({
+          where: { id: p.user_id },
+          select: {
+            id: true,
+            username: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
+            account_type: true
+          }
+        });
+        return { ...p, User: user };
+      })
+    );
+
+    return postsWithUsers;
+  }
+
+  /**
+   * Get trending posts (high engagement in last 24 hours)
+   */
+  private static async getTrendingPosts(country: string, count: number, cursor?: string) {
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    return prisma.post.findMany({
+      where: {
+        created_at: { gte: oneDayAgo },
+        User: { country }
+      },
+      take: count,
+      orderBy: [
+        { likes_count: 'desc' },
+        { comments_count: 'desc' }
+      ],
+      include: {
+        User: {
+          select: {
+            id: true,
+            username: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
+            account_type: true
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Get random posts for diversity
+   */
+  private static async getRandomPosts(country: string, count: number, cursor?: string) {
+    const posts = await prisma.$queryRaw<any[]>`
+      SELECT p.*
+      FROM post p
+      INNER JOIN "user" u ON p.user_id = u.id
+      WHERE u.country = ${country}
+      ORDER BY RANDOM()
+      LIMIT ${count}
+    `;
+
+    // Fetch user data for each post
+    const postsWithUsers = await Promise.all(
+      posts.map(async (p) => {
+        const user = await prisma.user.findUnique({
+          where: { id: p.user_id },
+          select: {
+            id: true,
+            username: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
+            account_type: true
+          }
+        });
+        return { ...p, User: user };
+      })
+    );
+
+    return postsWithUsers;
+  }
+
+  /**
+   * Get feed for guest users (not logged in)
+   */
+  private static async getGuestFeed(cursor: string | undefined, limit: number) {
+    // Show popular posts with randomization
+    const posts = await prisma.$queryRaw<any[]>`
+      SELECT p.*
+      FROM post p
+      WHERE p.created_at >= NOW() - INTERVAL '7 days'
+      AND p.likes_count > 5
+      ORDER BY RANDOM()
+      LIMIT ${limit + 1}
+    `;
+
+    // Fetch user data for each post
+    const postsWithUsers = await Promise.all(
+      posts.map(async (p) => {
+        const user = await prisma.user.findUnique({
+          where: { id: p.user_id },
+          select: {
+            id: true,
+            username: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
+            account_type: true
+          }
+        });
+        return { ...p, User: user };
+      })
+    );
+
+    return postsWithUsers;
   }
 
   static async createPost(data: {

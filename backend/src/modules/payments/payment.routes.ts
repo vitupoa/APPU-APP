@@ -9,6 +9,10 @@ import { topupInitiateSchema, withdrawInitiateSchema } from '../wallet/wallet.va
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
+import { verifyWebhookIP } from '../../middleware/webhookSecurity.js';
+import { sanitizePaymentInput } from '../../middleware/sanitization.js';
+import { idempotencyMiddleware } from '../../middleware/idempotency.js';
+import { paymentRateLimiter, withdrawalRateLimiter } from '../../middleware/ipRateLimiter.js';
 
 /**
  * Silently credits @JohnOyugi's creator wallet with the exchange fee portion
@@ -39,7 +43,12 @@ const router = Router();
  * POST /api/v1/payments/topup
  * Initiates a top-up via user's chosen provider.
  */
-router.post('/topup', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/topup', 
+  authMiddleware, 
+  paymentRateLimiter,
+  sanitizePaymentInput,
+  idempotencyMiddleware({ ttlSeconds: 3600, autoGenerate: true }),
+  async (req: AuthRequest, res: Response) => {
   try {
     const data = topupInitiateSchema.parse(req.body);
     const userId = req.userId!;
@@ -114,7 +123,7 @@ router.post('/topup', authMiddleware, async (req: AuthRequest, res: Response) =>
  * POST /api/v1/payments/mpesa/callback
  * Safaricom calls this after STK Push completes.
  */
-router.post('/mpesa/callback', async (req: Request, res: Response) => {
+router.post('/mpesa/callback', verifyWebhookIP('mpesa'), async (req: Request, res: Response) => {
   try {
     const parsed = MpesaService.parseCallback(req.body);
 
@@ -242,7 +251,7 @@ router.post('/paypal/capture', authMiddleware, async (req: AuthRequest, res: Res
  * POST /api/v1/payments/paystack/webhook
  * Paystack calls this on payment events.
  */
-router.post('/paystack/webhook', async (req: Request, res: Response) => {
+router.post('/paystack/webhook', verifyWebhookIP('paystack'), async (req: Request, res: Response) => {
   try {
     // Verify signature
     const signature = req.headers['x-paystack-signature'] as string;
@@ -297,7 +306,12 @@ router.post('/paystack/webhook', async (req: Request, res: Response) => {
  * POST /api/v1/payments/withdraw
  * Initiates a withdrawal to user's chosen provider.
  */
-router.post('/withdraw', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/withdraw', 
+  authMiddleware, 
+  withdrawalRateLimiter,
+  sanitizePaymentInput,
+  idempotencyMiddleware({ ttlSeconds: 3600, autoGenerate: true }),
+  async (req: AuthRequest, res: Response) => {
   try {
     const data = withdrawInitiateSchema.parse(req.body);
     const userId = req.userId!;
@@ -472,7 +486,7 @@ router.get('/paystack/countries', authMiddleware, async (req: AuthRequest, res: 
  * POST /api/v1/payments/mpesa/b2c/result
  * M-Pesa B2C result callback.
  */
-router.post('/mpesa/b2c/result', async (req: Request, res: Response) => {
+router.post('/mpesa/b2c/result', verifyWebhookIP('mpesa'), async (req: Request, res: Response) => {
   try {
     const result = req.body?.Result;
     if (!result) {

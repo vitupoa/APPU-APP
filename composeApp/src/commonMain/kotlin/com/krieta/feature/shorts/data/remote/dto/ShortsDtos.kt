@@ -81,7 +81,8 @@ data class CreateShortRequestDto(
     val collectionId: String? = null,
     val linkedProductId: String? = null,
     val isLocked: Boolean = false,
-    val requiredTier: String? = null
+    val requiredTier: String? = null,
+    val unlockAmountKr: Double? = null
 )
 
 @Serializable

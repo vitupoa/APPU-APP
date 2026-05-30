@@ -14,6 +14,8 @@ expect object BackgroundUploader {
         type: UploadType,
         filePath: String,
         caption: String,
-        additionalData: Map<String, String> = emptyMap()
+        additionalData: Map<String, String> = emptyMap(),
+        isLocked: Boolean = false,
+        unlockAmountKr: Double? = null
     )
 }

@@ -128,6 +128,8 @@ export class AuthService {
         account_type: data.account_type,
         country: data.country,
         currency: data.currency,
+        selectedNiches: data.selectedNiches || [],
+        customNiches: data.customNiches || [],
         updated_at: new Date()
       }
     });

@@ -72,7 +72,9 @@ export class UserService {
       return {
         ...baseProfile,
         currency: user.currency,
-        is_wallet_unlocked: user.is_wallet_unlocked
+        is_wallet_unlocked: user.is_wallet_unlocked,
+        selectedNiches: user.selectedNiches || [],
+        customNiches: user.customNiches || []
       };
     }
 

@@ -92,8 +92,16 @@ class FeedRepositoryImpl(
         }
     }
 
-    override suspend fun createPost(caption: String, imageUrls: List<String>): NetworkResult<Unit> {
-        return safeApiCall { api.createPost(caption, imageUrls); Unit }
+    override suspend fun createPost(
+        caption: String,
+        imageUrls: List<String>,
+        isLocked: Boolean,
+        unlockAmountKr: Double?
+    ): NetworkResult<Post> {
+        return safeApiCall { 
+            val dto = api.createPost(caption, imageUrls, isLocked, unlockAmountKr)
+            dto.toDomain()
+        }
     }
 
     // Recommendation system methods

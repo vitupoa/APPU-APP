@@ -14,7 +14,9 @@ actual object BackgroundUploader {
         type: UploadType,
         filePath: String,
         caption: String,
-        additionalData: Map<String, String>
+        additionalData: Map<String, String>,
+        isLocked: Boolean,
+        unlockAmountKr: Double?
     ) {
         println("iOS Background Upload Queued for: $filePath")
         
@@ -32,7 +34,7 @@ actual object BackgroundUploader {
         
         GlobalScope.launch(Dispatchers.Default) {
             try {
-                val success = IosUploadProcessor.processUpload(type, filePath, caption, additionalData)
+                val success = IosUploadProcessor.processUpload(type, filePath, caption, additionalData, isLocked, unlockAmountKr)
                 if (success) {
                     println("iOS Upload Completed Successfully!")
                 } else {

@@ -78,6 +78,27 @@ fun Step5ReviewAndJudges(
             color = Color(0xFFA0A0A0)
         )
         
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFF1A1A1F)
+            ),
+            border = BorderStroke(1.dp, Color(0xFFF5A623)),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(painterResource(Res.drawable.ic_info), contentDescription = null, tint = Color(0xFFF5A623))
+                Text(
+                    "Contest funds are held by the platform (not in escrow) until winners are selected. Platform validates contest completion before prize distribution.",
+                    fontSize = 12.sp,
+                    color = Color.White
+                )
+            }
+        }
+        
         // Comprehensive Review Cards (Subtask 9.2)
         ReviewCardsSection(
             viewModel = viewModel,

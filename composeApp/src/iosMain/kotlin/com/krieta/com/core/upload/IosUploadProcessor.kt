@@ -20,7 +20,9 @@ object IosUploadProcessor : KoinComponent {
         type: UploadType,
         filePath: String,
         caption: String,
-        additionalData: Map<String, String>
+        additionalData: Map<String, String>,
+        isLocked: Boolean = false,
+        unlockAmountKr: Double? = null
     ): Boolean = withContext(Dispatchers.Default) {
         println("IosUploadProcessor: Starting upload for $type from $filePath")
         try {
@@ -28,25 +30,85 @@ object IosUploadProcessor : KoinComponent {
                 UploadType.SHORT -> {
                     when (val result = cloudinaryUploader.uploadMedia(ApiConstants.CloudinaryFolders.SHORTS_VIDEO, filePath, isVideo = true)) {
                         is NetworkResult.Success -> {
-                            val createResult = shortsRepository.createShort(result.data, caption)
+                            val createResult = shortsRepository.createShort(
+                                videoUrl = result.data,
+                                caption = caption,
+                                isLocked = isLocked,
+                                unlockAmountKr = unlockAmountKr
+                            )
                             if (createResult is NetworkResult.Success) {
                                 println("IosUploadProcessor: Short uploaded successfully!")
+                                // Notify that upload is complete so the shorts feed can refresh
+                                UploadCompletionNotifier.notifyUploadComplete(
+                                    type = UploadType.SHORT,
+                                    contentId = createResult.data.id,
+                                    success = true
+                                )
                                 return@withContext true
+                            } else {
+                                UploadCompletionNotifier.notifyUploadComplete(
+                                    type = UploadType.SHORT,
+                                    contentId = "",
+                                    success = false
+                                )
                             }
                         }
-                        else -> {}
+                        is NetworkResult.Error -> {
+                            UploadCompletionNotifier.notifyUploadComplete(
+                                type = UploadType.SHORT,
+                                contentId = "",
+                                success = false
+                            )
+                        }
+                        else -> {
+                            UploadCompletionNotifier.notifyUploadComplete(
+                                type = UploadType.SHORT,
+                                contentId = "",
+                                success = false
+                            )
+                        }
                     }
                 }
                 UploadType.DRIP -> {
                     when (val result = cloudinaryUploader.uploadMedia(ApiConstants.CloudinaryFolders.FEED_PHOTO, filePath, isVideo = false)) {
                         is NetworkResult.Success -> {
-                            val createResult = feedRepository.createPost(caption, listOf(result.data))
+                            val createResult = feedRepository.createPost(
+                                caption = caption,
+                                imageUrls = listOf(result.data),
+                                isLocked = isLocked,
+                                unlockAmountKr = unlockAmountKr
+                            )
                             if (createResult is NetworkResult.Success) {
                                 println("IosUploadProcessor: Drip uploaded successfully!")
+                                // Notify that upload is complete so the feed can refresh
+                                UploadCompletionNotifier.notifyUploadComplete(
+                                    type = UploadType.DRIP,
+                                    contentId = createResult.data.id,
+                                    success = true
+                                )
                                 return@withContext true
+                            } else {
+                                UploadCompletionNotifier.notifyUploadComplete(
+                                    type = UploadType.DRIP,
+                                    contentId = "",
+                                    success = false
+                                )
                             }
                         }
-                        else -> {}
+                        is NetworkResult.Error -> {
+                            UploadCompletionNotifier.notifyUploadComplete(
+                                type = UploadType.DRIP,
+                                contentId = "",
+                                success = false
+                            )
+                        }
+                        else -> {
+                            UploadCompletionNotifier.notifyUploadComplete(
+                                type = UploadType.DRIP,
+                                contentId = "",
+                                success = false
+                            )
+                        }
                     }
                 }
                 UploadType.CONTEST -> {

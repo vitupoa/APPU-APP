@@ -175,6 +175,8 @@ class ProfileRepositoryImpl(
             bioLinks = bioLinks.map { it.toBioLink() },
             stats = ProfileStats(stats.admirers, stats.admiring, stats.lovers, stats.contestsWon),
             relationshipStatus = parseRelationship(relationshipStatus),
+            selectedNiches = selectedNiches,
+            customNiches = customNiches,
             createdAt = createdAt ?: ""
         )
     }

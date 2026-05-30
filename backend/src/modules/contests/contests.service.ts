@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { emitVoteUpdate, emitContestUpdate } from '../../shared/gateway/events.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { NotificationService } from '../../shared/services/notification.service.js';
+import { contestValidationService } from '../../services/compliance/contestValidation.service.js';
 
 const PLATFORM_FEE_RATE = 0.15; // 15%
 
@@ -36,8 +37,31 @@ export class ContestService {
     targetGeos?: string[];
     airdropKr?: number;
     airdropLimit?: number;
-    judges?: string[]; // Array of judge userIds explicitly defined in step 5 mapping to the combination algorithm
+    judges?: string[];
+    votingEnabled?: boolean;
+    votingCostPerVoteKr?: number;
+    judgingMethod?: string;
+    judgeWeightPercentage?: number;
+    voteWeightPercentage?: number;
   }) {
+    // Wave 2 Task 8.2: Validate contest structure for gambling compliance
+    const validation = await contestValidationService.validateContestCreation({
+      entry_fee_kr: data.entryFeeKr || 0,
+      voting_enabled: data.votingEnabled !== false,
+      voting_cost_per_vote_kr: data.votingCostPerVoteKr || 0,
+      judging_method: data.judgingMethod as any,
+      judge_weight_percentage: data.judgeWeightPercentage,
+      vote_weight_percentage: data.voteWeightPercentage,
+      max_judges: data.judges?.length,
+      prize_total_kr: data.prizeTotalKr,
+      deadline: data.deadline,
+      max_winners: data.maxWinners
+    });
+
+    if (!validation.isValid) {
+      throw new Error(`Contest validation failed: ${validation.errors.join(', ')}`);
+    }
+
     const platformFeeKr = data.prizeTotalKr * PLATFORM_FEE_RATE;
     
     // Calculate total duration in days dynamically locking the daily prize pool Escrow natively
@@ -1065,6 +1089,7 @@ export class ContestService {
   /**
    * Distributes prizes to winners atomically.
    * Uses prize distribution percentages from the contest.
+   * Wave 3 Task 8.3: Uses "platform-held funds" terminology (not escrow)
    */
   static async distributeContestPrizes(contestId: string, winnerIds?: string[]) {
     const contest = await prisma.contest.findUniqueOrThrow({
@@ -1122,7 +1147,7 @@ export class ContestService {
         }
       }
 
-      // Release escrow
+      // Release platform-held funds (Wave 3 Task 8.3: removed "escrow" terminology)
       await tx.escrows.updateMany({
         where: { contest_id: contestId, status: 'held' },
         data: { status: 'released' }

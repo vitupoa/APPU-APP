@@ -3,6 +3,7 @@ package com.krieta.feature.feed.data.remote
 import com.krieta.com.core.network.ApiConstants
 import com.krieta.feature.feed.data.remote.dto.FeedResponseDto
 import com.krieta.feature.feed.data.remote.dto.PostCommentDto
+import com.krieta.feature.feed.data.remote.dto.PostDto
 import com.krieta.feature.feed.data.remote.dto.ToggleLikeResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -38,12 +39,22 @@ class FeedApi(private val httpClient: HttpClient) {
         }.body()
     }
 
-    suspend fun createPost(caption: String, imageUrls: List<String>) {
+    suspend fun createPost(
+        caption: String,
+        imageUrls: List<String>,
+        isLocked: Boolean = false,
+        unlockAmountKr: Double? = null
+    ): PostDto {
         @Serializable
-        data class CreatePostRequest(val caption: String, val imageUrls: List<String>)
-        httpClient.post(ApiConstants.FEED) {
-            setBody(CreatePostRequest(caption, imageUrls))
-        }
+        data class CreatePostRequest(
+            val caption: String,
+            val imageUrls: List<String>,
+            val isLocked: Boolean = false,
+            val unlockAmountKr: Double? = null
+        )
+        return httpClient.post(ApiConstants.FEED) {
+            setBody(CreatePostRequest(caption, imageUrls, isLocked, unlockAmountKr))
+        }.body()
     }
 
     // Recommendation system endpoints

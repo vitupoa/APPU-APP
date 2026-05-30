@@ -146,6 +146,66 @@ class RegisterScreen : Screen {
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email)
                 )
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Niches Section
+                Text("Your Niches (Required)", style = MaterialTheme.typography.titleMedium, modifier = Modifier.align(Alignment.Start))
+                Text(
+                    "Select or add niches that describe your content",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(Alignment.Start)
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                var showNicheDialog by remember { mutableStateOf(false) }
+                val selectedNiches by viewModel.selectedNiches.collectAsState()
+                val customNiches by viewModel.customNiches.collectAsState()
+                
+                OutlinedButton(
+                    onClick = { showNicheDialog = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(painterResource(Res.drawable.ic_add), "Add Niche")
+                    Spacer(Modifier.width(8.dp))
+                    Text("Manage Niches")
+                }
+                
+                if (selectedNiches.isNotEmpty() || customNiches.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    androidx.compose.foundation.layout.FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        (selectedNiches + customNiches).forEach { niche ->
+                            FilterChip(
+                                selected = true,
+                                onClick = { viewModel.removeNiche(niche) },
+                                label = { Text(niche) },
+                                trailingIcon = {
+                                    Icon(
+                                        painterResource(Res.drawable.ic_close),
+                                        contentDescription = "Remove",
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+                
+                if (showNicheDialog) {
+                    NicheSelectionDialog(
+                        selectedNiches = selectedNiches,
+                        customNiches = customNiches,
+                        onDismiss = { showNicheDialog = false },
+                        onNicheSelected = { viewModel.addNiche(it) },
+                        onCustomNicheAdded = { viewModel.addCustomNiche(it) }
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
@@ -213,3 +273,79 @@ class RegisterScreen : Screen {
 }
 
 
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NicheSelectionDialog(
+    selectedNiches: List<String>,
+    customNiches: List<String>,
+    onDismiss: () -> Unit,
+    onNicheSelected: (String) -> Unit,
+    onCustomNicheAdded: (String) -> Unit
+) {
+    var customNicheText by remember { mutableStateOf("") }
+    val predefinedNiches = listOf(
+        "Tech", "Gadgets", "Fashion", "Beauty", "Automotive", "Food & Beverage",
+        "Health & Fitness", "Education", "Entertainment", "Gaming", "Travel",
+        "Real Estate", "Finance", "Sports", "Music", "Art", "Business",
+        "Lifestyle", "Parenting", "Pets", "Home Decor"
+    )
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Select Your Niches") },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("Predefined Niches", style = MaterialTheme.typography.labelMedium)
+                androidx.compose.foundation.layout.FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    predefinedNiches.forEach { niche ->
+                        val isSelected = selectedNiches.contains(niche)
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { if (!isSelected) onNicheSelected(niche) },
+                            label = { Text(niche) }
+                        )
+                    }
+                }
+                
+                Spacer(Modifier.height(8.dp))
+                Text("Add Custom Niche", style = MaterialTheme.typography.labelMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = customNicheText,
+                        onValueChange = { customNicheText = it },
+                        label = { Text("Custom Niche") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    )
+                    IconButton(
+                        onClick = {
+                            if (customNicheText.isNotBlank()) {
+                                onCustomNicheAdded(customNicheText)
+                                customNicheText = ""
+                            }
+                        }
+                    ) {
+                        Icon(painterResource(Res.drawable.ic_add), "Add")
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Done")
+            }
+        }
+    )
+}

@@ -17,7 +17,12 @@ interface FeedRepository {
     suspend fun getPostById(postId: String): NetworkResult<Post>
     suspend fun toggleLike(postId: String): NetworkResult<Boolean>
     suspend fun addComment(postId: String, text: String): NetworkResult<Unit>
-    suspend fun createPost(caption: String, imageUrls: List<String>): NetworkResult<Unit>
+    suspend fun createPost(
+        caption: String,
+        imageUrls: List<String>,
+        isLocked: Boolean = false,
+        unlockAmountKr: Double? = null
+    ): NetworkResult<Post>
     
     // Recommendation system endpoints
     suspend fun getDiscoverFeed(limit: Int, cursor: String?): NetworkResult<DiscoverFeedResult>
