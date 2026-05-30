@@ -21,3 +21,6 @@ export function isAdmin(req: Request, res: Response, next: NextFunction) {
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
+
+// Alias for compatibility
+export const requireAdmin = isAdmin;

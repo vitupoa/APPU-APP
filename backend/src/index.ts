@@ -42,7 +42,7 @@ import locationsRoutes from './modules/locations/locations.routes.js';
 import creatorBoostRoutes from './modules/creatorBoost/creatorBoost.routes.js';
 import nichesRoutes from './modules/niches/niches.routes.js';
 import { rembrandtRarRoutes } from './modules/rembrandt-rar/rembrandt-rar.routes.js';
-import callsRoutes from './modules/calls/calls.routes.js';
+
 import exploreRoutes from './modules/explore/explore.routes.js';
 import recommendationRoutes from './modules/recommendation/recommendation.routes.js';
 import escrowRoutes from './modules/escrow/escrow.routes.js';
@@ -60,7 +60,7 @@ import { startContestDeadlineWorker } from './workers/contestDeadline.worker.js'
 import { startDailyPrizeWorker } from './workers/dailyPrizeWorker.js';
 import { startFlashSaleWorker } from './workers/flashSaleWorker.js';
 import { FCMService } from './services/fcm.service.js';
-import { initializeCallSocket } from './shared/gateway/call-socket.js';
+
 import { initializeDatabaseMonitorSocket } from './shared/gateway/databaseMonitorSocket.js';
 import { initializeShopSocket } from './shared/gateway/shop-socket.js';
 
@@ -74,8 +74,7 @@ app.set('trust proxy', true);
 // Socket.io Redis Clustered Gateway for real-time features (milestones, contests, notifications)
 const io = initializeGateway(httpServer);
 
-// Initialize Call socket handlers
-initializeCallSocket(io);
+
 
 // Initialize Database Monitoring WebSocket (Super Admin only)
 const dbMonitorSocket = initializeDatabaseMonitorSocket(httpServer);
@@ -183,7 +182,7 @@ app.use('/api/v1/notifications', notificationsRoutes);
 app.use('/api/v1/marketplace', marketplaceRoutes);
 app.use('/api/v1/oauth', oauthRoutes);
 app.use('/api/v1/rar', rembrandtRarRoutes);
-app.use('/api/v1/calls', callsRoutes);
+
 app.use('/api/v1/explore', exploreRoutes);
 app.use('/api/v1/recommendation', recommendationRoutes);
 app.use('/api/v1/escrow', escrowRoutes);

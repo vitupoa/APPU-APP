@@ -196,3 +196,6 @@ export function webhookSecurity(provider: 'paystack' | 'mpesa' | 'paypal') {
     }
   };
 }
+
+// Alias for compatibility
+export const verifyWebhookIP = webhookSecurity;

@@ -120,3 +120,6 @@ export async function logAuditAction(
     console.error('Audit log write failed:', error);
   }
 }
+
+// Alias for compatibility
+export const requireRembrandtRar = requireRarAccess;
