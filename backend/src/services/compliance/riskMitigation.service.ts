@@ -37,14 +37,14 @@ export class RiskMitigationService {
     await prisma.compliance_reviews.create({
       data: {
         user_id: userId,
+        transaction_id: '',
         review_type: 'CRITICAL_RISK',
         status: 'PENDING',
-        priority: 'HIGH',
-        details: {
+        notes: JSON.stringify({
           risk_score: riskScore,
           risk_level: 'CRITICAL',
           action_taken: 'Account suspended, withdrawals blocked, flagged for manual review'
-        }
+        })
       }
     });
 
@@ -63,14 +63,14 @@ export class RiskMitigationService {
     await prisma.compliance_reviews.create({
       data: {
         user_id: userId,
+        transaction_id: '',
         review_type: 'HIGH_RISK',
         status: 'PENDING',
-        priority: 'MEDIUM',
-        details: {
+        notes: JSON.stringify({
           risk_score: riskScore,
           risk_level: 'HIGH',
           action_taken: 'Transaction limits reduced, KYC required, flagged for review'
-        }
+        })
       }
     });
 
@@ -105,7 +105,7 @@ export class RiskMitigationService {
 
   async checkAndApplyMitigation(userId: string): Promise<void> {
     const riskData = await riskScoringService.calculateUserRiskScore(userId);
-    await this.applyRiskMitigation(userId, riskData.riskScore, riskData.riskLevel);
+    await this.applyRiskMitigation(userId, riskData.score, riskData.level);
   }
 }
 

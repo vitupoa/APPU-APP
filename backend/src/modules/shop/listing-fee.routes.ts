@@ -8,10 +8,15 @@ const router = Router();
 router.use(authMiddleware);
 
 // Calculate listing fee for a product
-router.get('/calculate', async (req, res) => {
+router.get('/calculate', async (req, res): Promise<void> => {
   try {
     const { category } = req.query;
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
     
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -19,7 +24,8 @@ router.get('/calculate', async (req, res) => {
     });
     
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: 'User not found' });
+      return;
     }
     
     const result = await listingFeeService.calculateListingFee(
@@ -29,15 +35,21 @@ router.get('/calculate', async (req, res) => {
     );
     
     res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    const err = error as Error;
+    res.status(500).json({ error: err.message });
   }
 });
 
 // Get user's listing quota status
-router.get('/quota', async (req, res) => {
+router.get('/quota', async (req, res): Promise<void> => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
     
     let quota = await prisma.user_listing_quota.findUnique({
       where: { user_id: userId }
@@ -62,8 +74,9 @@ router.get('/quota', async (req, res) => {
       weeklyLimit: config?.weekly_free_quota || 0,
       monthlyLimit: config?.monthly_free_quota || 0
     });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    const err = error as Error;
+    res.status(500).json({ error: err.message });
   }
 });
 

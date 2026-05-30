@@ -123,12 +123,14 @@ export class ListingFeeService {
     for (const config of configs) {
       if (config.category && config.category !== category) continue;
       if (config.scope === 'COUNTRY' && config.scope_value === country) {
-        return config.base_fee_kr;
+        const feeValue = config.base_fee_kr;
+        return typeof feeValue === 'number' ? feeValue : Number(feeValue);
       }
     }
 
     const globalConfig = configs.find(c => c.scope === 'GLOBAL');
-    return globalConfig?.base_fee_kr || 0;
+    const globalFee = globalConfig?.base_fee_kr || 0;
+    return typeof globalFee === 'number' ? globalFee : Number(globalFee);
   }
 
   private async incrementQuota(userId: string, quotaType: string) {
@@ -181,9 +183,12 @@ export class ListingFeeService {
       }
     });
 
-    const totalRevenue = transactions.reduce((sum, t) => sum + Number(t.fee_kr), 0);
-    const paidListings = transactions.filter(t => !t.was_free).length;
-    const freeListings = transactions.filter(t => t.was_free).length;
+    const totalRevenue = transactions.reduce((sum: number, t: any) => {
+      const fee = typeof t.fee_kr === 'number' ? t.fee_kr : Number(t.fee_kr);
+      return sum + fee;
+    }, 0);
+    const paidListings = transactions.filter((t: any) => !t.was_free).length;
+    const freeListings = transactions.filter((t: any) => t.was_free).length;
 
     return {
       totalRevenue,

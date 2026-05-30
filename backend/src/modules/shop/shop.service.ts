@@ -36,7 +36,9 @@ export class ShopService {
     // Check if user has sufficient balance (if fee required)
     if (!isFree && fee > 0) {
       const wallet = await prisma.wallets.findUnique({ where: { user_id: sellerId } });
-      if (!wallet || wallet.kr_balance < fee) {
+      const walletBalance = wallet?.kr_balance;
+      const balanceNum = typeof walletBalance === 'number' ? walletBalance : Number(walletBalance || 0);
+      if (!wallet || balanceNum < fee) {
         throw new Error(`Insufficient balance. Listing fee: ${fee} KR`);
       }
     }

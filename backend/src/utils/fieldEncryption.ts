@@ -28,7 +28,7 @@ export function encryptField(plaintext: string, fieldName: string): string {
   
   // Generate unique salt for this field
   const salt = crypto.randomBytes(32);
-  const key = deriveKey(env.FIELD_ENCRYPTION_KEY || env.ENCRYPTION_KEY, salt);
+  const key = deriveKey(env.ENCRYPTION_KEY, salt);
   const iv = crypto.randomBytes(IV_LENGTH);
   
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
@@ -61,7 +61,7 @@ export function decryptField(encryptedData: string, fieldName: string): string {
     const authTag = buffer.subarray(32 + IV_LENGTH, 32 + IV_LENGTH + AUTH_TAG_LENGTH);
     const encrypted = buffer.subarray(32 + IV_LENGTH + AUTH_TAG_LENGTH);
     
-    const key = deriveKey(env.FIELD_ENCRYPTION_KEY || env.ENCRYPTION_KEY, salt);
+    const key = deriveKey(env.ENCRYPTION_KEY, salt);
     
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
     decipher.setAuthTag(authTag);

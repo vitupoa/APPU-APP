@@ -76,16 +76,17 @@ router.get('/reviews/:id', async (req: Request, res: Response) => {
  * POST /api/v1/compliance/reviews
  * Create a new compliance review
  */
-router.post('/reviews', async (req: Request, res: Response) => {
+router.post('/reviews', async (req: Request, res: Response): Promise<void> => {
   try {
     const { transaction_id, user_id, review_type, notes } = req.body;
     const reviewerId = req.user?.id;
 
     if (!transaction_id || !user_id || !review_type) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Missing required fields: transaction_id, user_id, review_type'
       });
+      return;
     }
 
     const review = await complianceReviewService.createReview(
@@ -122,17 +123,18 @@ router.post('/reviews', async (req: Request, res: Response) => {
  * PUT /api/v1/compliance/reviews/:id/assign
  * Assign reviewer to a review
  */
-router.put('/reviews/:id/assign', async (req: Request, res: Response) => {
+router.put('/reviews/:id/assign', async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { reviewer_id } = req.body;
     const adminId = req.user?.id;
 
     if (!reviewer_id) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Missing required field: reviewer_id'
       });
+      return;
     }
 
     const review = await complianceReviewService.assignReviewer(id, reviewer_id);
@@ -166,17 +168,18 @@ router.put('/reviews/:id/assign', async (req: Request, res: Response) => {
  * PUT /api/v1/compliance/reviews/:id/decision
  * Submit review decision
  */
-router.put('/reviews/:id/decision', async (req: Request, res: Response) => {
+router.put('/reviews/:id/decision', async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { decision, notes } = req.body;
     const reviewerId = req.user?.id;
 
     if (!decision || !['APPROVE', 'REJECT', 'REQUEST_INFO', 'ESCALATE'].includes(decision)) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Invalid decision. Must be APPROVE, REJECT, REQUEST_INFO, or ESCALATE'
       });
+      return;
     }
 
     const review = await complianceReviewService.submitDecision(
@@ -302,16 +305,17 @@ router.get('/sars/:id', async (req: Request, res: Response) => {
  * POST /api/v1/compliance/sars
  * Create a new SAR
  */
-router.post('/sars', async (req: Request, res: Response) => {
+router.post('/sars', async (req: Request, res: Response): Promise<void> => {
   try {
     const { user_id, activity_type, description, severity, related_transactions, evidence_urls, metadata } = req.body;
     const adminId = req.user?.id;
 
     if (!user_id || !activity_type || !description || !severity) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Missing required fields: user_id, activity_type, description, severity'
       });
+      return;
     }
 
     const sar = await sarService.createSAR({
@@ -353,17 +357,18 @@ router.post('/sars', async (req: Request, res: Response) => {
  * PUT /api/v1/compliance/sars/:id/status
  * Update SAR status
  */
-router.put('/sars/:id/status', async (req: Request, res: Response) => {
+router.put('/sars/:id/status', async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { status, regulatory_body } = req.body;
     const adminId = req.user?.id;
 
     if (!status || !['DRAFT', 'FILED', 'ACKNOWLEDGED', 'CLOSED'].includes(status)) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Invalid status. Must be DRAFT, FILED, ACKNOWLEDGED, or CLOSED'
       });
+      return;
     }
 
     const sar = await sarService.updateSARStatus(id, status, adminId, regulatory_body);
@@ -419,24 +424,25 @@ router.get('/sars/:id/template', async (req: Request, res: Response) => {
  * GET /api/v1/compliance/sars/export
  * Export SARs to CSV or PDF
  */
-router.get('/sars/export', async (req: Request, res: Response) => {
+router.get('/sars/export', async (req: Request, res: Response): Promise<void> => {
   try {
     const { format, status, severity, activity_type, date_from, date_to } = req.query;
 
     if (!format || !['CSV', 'PDF'].includes(format as string)) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Invalid format. Must be CSV or PDF'
       });
+      return;
     }
 
     const options = {
       format: format as 'CSV' | 'PDF',
-      status: status as string,
-      severity: severity as string,
-      activity_type: activity_type as string,
-      date_from: date_from ? new Date(date_from as string) : undefined,
-      date_to: date_to ? new Date(date_to as string) : undefined
+      status: Array.isArray(status) ? status[0] : status as string,
+      severity: Array.isArray(severity) ? severity[0] : severity as string,
+      activity_type: Array.isArray(activity_type) ? activity_type[0] : activity_type as string,
+      date_from: date_from ? new Date(Array.isArray(date_from) ? date_from[0] : date_from as string) : undefined,
+      date_to: date_to ? new Date(Array.isArray(date_to) ? date_to[0] : date_to as string) : undefined
     };
 
     if (format === 'CSV') {

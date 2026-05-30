@@ -55,7 +55,7 @@ function ipInCIDR(ip: string, cidr: string): boolean {
  */
 function verifyPaystackSignature(req: Request): boolean {
   const signature = req.headers['x-paystack-signature'] as string;
-  if (!signature) return false;
+  if (!signature || !env.PAYSTACK_SECRET_KEY) return false;
   
   const hash = crypto
     .createHmac('sha512', env.PAYSTACK_SECRET_KEY)

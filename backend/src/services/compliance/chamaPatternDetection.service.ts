@@ -15,12 +15,12 @@ export class ChamaPatternDetectionService {
     const chama = await prisma.chama.findUnique({
       where: { id: chamaId },
       include: {
-        ChamaMember: true,
-        ChamaContribution: {
+        chama_members: true,
+        chama_contributions: {
           orderBy: { created_at: 'desc' },
           take: 100
         },
-        ChamaPayout: {
+        chama_payouts: {
           orderBy: { created_at: 'desc' },
           take: 50
         }
@@ -30,8 +30,8 @@ export class ChamaPatternDetectionService {
     if (!chama) throw new Error('Chama not found');
 
     // Check 1: Same device fingerprint across members
-    const deviceFingerprints = chama.ChamaMember
-      .map(m => m.device_fingerprint)
+    const deviceFingerprints = chama.chamaMembers
+      .map((m: any) => m.device_fingerprint)
       .filter(Boolean);
 
     if (deviceFingerprints.length > 0) {
@@ -45,9 +45,9 @@ export class ChamaPatternDetectionService {
     }
 
     // Check 2: Circular contribution patterns
-    const contributions = chama.ChamaContribution;
+    const contributions = chama.chamaContributions;
     if (contributions.length >= 3) {
-      const contributorSequence = contributions.slice(0, 10).map(c => c.member_id);
+      const contributorSequence = contributions.slice(0, 10).map((c: any) => c.member_id);
       const uniqueContributors = new Set(contributorSequence);
 
       if (uniqueContributors.size < contributorSequence.length * 0.5) {
@@ -57,7 +57,7 @@ export class ChamaPatternDetectionService {
     }
 
     // Check 3: Rapid contribution-to-payout cycles
-    const payouts = chama.ChamaPayout;
+    const payouts = chama.chamaPayouts;
     if (payouts.length > 0 && contributions.length > 0) {
       const firstContribution = contributions[contributions.length - 1];
       const firstPayout = payouts[payouts.length - 1];
@@ -112,7 +112,7 @@ export class ChamaPatternDetectionService {
     await prisma.suspicious_activity_logs.create({
       data: {
         user_id: chama.creator_id,
-        activity_type: 'FAKE_CHAMA',
+        activityType: 'FAKE_CHAMA',
         severity: suspicionScore >= 70 ? 'HIGH' : 'MEDIUM',
         description: `Suspicious chama pattern detected: ${reasons.join(', ')}`,
         metadata: {
@@ -130,7 +130,7 @@ export class ChamaPatternDetectionService {
     const chama = await prisma.chama.findUnique({
       where: { id: chamaId },
       include: {
-        ChamaPayout: {
+        chama_payouts: {
           orderBy: { created_at: 'asc' },
           take: 1
         }
@@ -142,7 +142,7 @@ export class ChamaPatternDetectionService {
     const chamaAge = Date.now() - chama.created_at.getTime();
     const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
 
-    if (chamaAge < sevenDaysMs && chama.ChamaPayout.length === 0) {
+    if (chamaAge < sevenDaysMs && chama.chamaPayouts.length === 0) {
       return false; // Block payout
     }
 
