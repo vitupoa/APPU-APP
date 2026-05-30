@@ -30,7 +30,7 @@ export class ChamaPatternDetectionService {
     if (!chama) throw new Error('Chama not found');
 
     // Check 1: Same device fingerprint across members
-    const deviceFingerprints = chama.chamaMembers
+    const deviceFingerprints = chama.chama_members
       .map((m: any) => m.device_fingerprint)
       .filter(Boolean);
 
@@ -45,7 +45,7 @@ export class ChamaPatternDetectionService {
     }
 
     // Check 2: Circular contribution patterns
-    const contributions = chama.chamaContributions;
+    const contributions = chama.chama_contributions;
     if (contributions.length >= 3) {
       const contributorSequence = contributions.slice(0, 10).map((c: any) => c.member_id);
       const uniqueContributors = new Set(contributorSequence);
@@ -57,7 +57,7 @@ export class ChamaPatternDetectionService {
     }
 
     // Check 3: Rapid contribution-to-payout cycles
-    const payouts = chama.chamaPayouts;
+    const payouts = chama.chama_payouts;
     if (payouts.length > 0 && contributions.length > 0) {
       const firstContribution = contributions[contributions.length - 1];
       const firstPayout = payouts[payouts.length - 1];
@@ -142,7 +142,7 @@ export class ChamaPatternDetectionService {
     const chamaAge = Date.now() - chama.created_at.getTime();
     const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
 
-    if (chamaAge < sevenDaysMs && chama.chamaPayouts.length === 0) {
+    if (chamaAge < sevenDaysMs && chama.chama_payouts.length === 0) {
       return false; // Block payout
     }
 

@@ -47,8 +47,8 @@ export class JudgeNotificationService {
       }
 
       logger.info(`Judge invitation notification sent to ${judgeId} for contest ${contestId}`);
-    } catch (error) {
-      logger.error('Failed to send judge invitation notification:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to send judge invitation notification:', error as Error);
     }
   }
 
@@ -80,8 +80,8 @@ export class JudgeNotificationService {
       });
 
       logger.info(`Judge acceptance notification sent for contest ${contestId}`);
-    } catch (error) {
-      logger.error('Failed to send judge acceptance notification:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to send judge acceptance notification:', error as Error);
     }
   }
 
@@ -128,8 +128,8 @@ export class JudgeNotificationService {
       }
 
       logger.info(`Judging ready notifications sent for contest ${contestId} to ${judges.length} judges`);
-    } catch (error) {
-      logger.error('Failed to send judging ready notifications:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to send judging ready notifications:', error as Error);
     }
   }
 
@@ -188,8 +188,8 @@ export class JudgeNotificationService {
       }
 
       logger.info(`Judging deadline notifications sent for contest ${contestId}`);
-    } catch (error) {
-      logger.error('Failed to send judging deadline notifications:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to send judging deadline notifications:', error as Error);
     }
   }
 
@@ -250,8 +250,8 @@ export class JudgeNotificationService {
       });
 
       logger.info(`Judging complete notifications sent for contest ${contestId}`);
-    } catch (error) {
-      logger.error('Failed to send judging complete notifications:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to send judging complete notifications:', error as Error);
     }
   }
 
@@ -296,8 +296,8 @@ export class JudgeNotificationService {
       }
 
       logger.info(`Submission comment notification sent to judge ${judgeId}`);
-    } catch (error) {
-      logger.error('Failed to send submission comment notification:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to send submission comment notification:', error as Error);
     }
   }
 
@@ -322,8 +322,8 @@ export class JudgeNotificationService {
         completionPercentage: totalSubmissions > 0 ? (scoredSubmissions / totalSubmissions) * 100 : 0,
         averageScore: avgScore._avg.score || 0
       };
-    } catch (error) {
-      logger.error('Failed to get judge stats:', error);
+    } catch (error: unknown) {
+      logger.error('Failed to get judge stats:', error as Error);
       return null;
     }
   }

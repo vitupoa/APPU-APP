@@ -4,6 +4,7 @@ import { riskMitigationService } from '../services/compliance/riskMitigation.ser
 import { selfTippingDetectionService } from '../services/compliance/selfTippingDetection.service.js';
 import { velocityCheckerService } from '../services/compliance/velocityChecker.service.js';
 import { transactionContextService } from '../services/compliance/transactionContext.service.js';
+import { VelocityCheckResult, RiskAnalysisResult } from '../types/compliance.types.js';
 
 export async function integratedComplianceCheck(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -18,7 +19,7 @@ export async function integratedComplianceCheck(req: Request, res: Response, nex
     // Step 1: Validate transaction context
     if (type && type !== 'topup' && type !== 'withdrawal') {
       const contextValidation = await transactionContextService.validateContext({
-        transactionType: type,
+        type: type,
         contextType: context_type,
         referenceId: context_ref_id,
         description: context_desc
@@ -35,13 +36,13 @@ export async function integratedComplianceCheck(req: Request, res: Response, nex
 
     // Step 2: Check velocity limits
     if (amount_kr) {
-      const velocityCheck = await velocityCheckerService.checkVelocity(userId, type, amount_kr);
+      const velocityCheck: VelocityCheckResult = await velocityCheckerService.checkVelocity(userId, type, amount_kr);
 
       if (!velocityCheck.allowed) {
         res.status(429).json({
           error: 'Transaction velocity limit exceeded',
           reason: velocityCheck.reason,
-          retryAfter: velocityCheck.waitTimeSeconds
+          retryAfter: velocityCheck.waitTimeSeconds || 0
         });
         return;
       }
@@ -50,13 +51,13 @@ export async function integratedComplianceCheck(req: Request, res: Response, nex
     // Step 3: Detect self-tipping patterns (for tip transactions)
     if (type === 'tip_sent' || type === 'CONTENT_TIP') {
       if (counterparty_id) {
-        const selfTippingScore = await selfTippingDetectionService.detectSelfTipping(userId, counterparty_id);
+        const selfTippingResult: RiskAnalysisResult = await selfTippingDetectionService.detectSelfTipping(userId, counterparty_id);
 
-        if (selfTippingScore > 70) {
+        if (selfTippingResult.score > 70) {
           res.status(403).json({
             error: 'Suspicious tipping pattern detected',
             message: 'Your account has been flagged for review',
-            score: selfTippingScore
+            score: selfTippingResult.score
           });
           return;
         }

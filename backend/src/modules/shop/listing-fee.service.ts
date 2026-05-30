@@ -22,7 +22,7 @@ export class ListingFeeService {
     
     if (!isFree && fee > 0) {
       const wallet = await prisma.wallets.findUnique({ where: { user_id: userId } });
-      if (!wallet || wallet.kr_balance < fee) {
+      if (!wallet || Number(wallet.kr_balance) < fee) {
         throw new Error('Insufficient balance for listing fee');
       }
 

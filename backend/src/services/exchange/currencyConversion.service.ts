@@ -19,12 +19,12 @@ export class CurrencyConversionService {
     return baseUsd * displayRate;
   }
 
-  static async getTopupFee(currency: string): Promise<number> {
-    return await ExchangeService.getTopupFeeKr(currency);
+  static async getTopupFee(fiatAmount: number, currency: string): Promise<number> {
+    return await ExchangeService.getTopupFeeKr(fiatAmount, currency);
   }
 
-  static async getWithdrawalFee(currency: string): Promise<number> {
-    return await ExchangeService.getWithdrawalFeeKr(currency);
+  static async getWithdrawalFee(): Promise<number> {
+    return await ExchangeService.getWithdrawalFeeKr();
   }
 }
 

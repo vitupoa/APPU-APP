@@ -144,6 +144,11 @@ export class FCMService {
     });
   }
 
+  static async sendNotification(deviceToken: string, payload: NotificationPayload): Promise<void> {
+    const instance = FCMService.getInstance();
+    await instance.sendToDevice(deviceToken, payload);
+  }
+
   async sendContentFlagged(deviceToken: string, contentType: string): Promise<void> {
     await this.sendToDevice(deviceToken, {
       title: '⚠️ Content Moderated',

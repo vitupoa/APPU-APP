@@ -1,6 +1,7 @@
 package com.krieta.feature.shop.data.remote
 
-import com.krieta.core.network.ApiResponse
+import com.krieta.com.core.network.NetworkResult
+import com.krieta.com.core.network.safeApiCall
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -23,23 +24,17 @@ data class UserListingQuota(
 
 class ListingFeeApi(private val client: HttpClient) {
     
-    suspend fun calculateListingFee(category: String): ApiResponse<ListingFeeCalculation> {
-        return try {
-            val response = client.get("/shop/listing-fee/calculate") {
+    suspend fun calculateListingFee(category: String): NetworkResult<ListingFeeCalculation> {
+        return safeApiCall {
+            client.get("/shop/listing-fee/calculate") {
                 parameter("category", category)
-            }
-            ApiResponse.Success(response.body())
-        } catch (e: Exception) {
-            ApiResponse.Error(e.message ?: "Failed to calculate listing fee")
+            }.body()
         }
     }
     
-    suspend fun getUserQuota(): ApiResponse<UserListingQuota> {
-        return try {
-            val response = client.get("/shop/listing-fee/quota")
-            ApiResponse.Success(response.body())
-        } catch (e: Exception) {
-            ApiResponse.Error(e.message ?: "Failed to get quota")
+    suspend fun getUserQuota(): NetworkResult<UserListingQuota> {
+        return safeApiCall {
+            client.get("/shop/listing-fee/quota").body()
         }
     }
 }

@@ -42,7 +42,7 @@ export async function validateTransactionContext(req: Request, res: Response, ne
     }
 
     const validation = await transactionContextService.validateContext({
-      transactionType: type,
+      type: type,
       contextType: context_type,
       referenceId: context_ref_id,
       description: context_desc

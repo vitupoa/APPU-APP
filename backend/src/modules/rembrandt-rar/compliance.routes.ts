@@ -4,6 +4,7 @@ import { sarService } from '../../services/compliance/sar.service.js';
 import { AuditLogService } from '../../services/auditLog.service.js';
 import { authenticateToken } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/admin.js';
+import { parseQueryString, parseQueryDate } from '../../utils/queryParams.js';
 
 const router = Router();
 
@@ -438,11 +439,11 @@ router.get('/sars/export', async (req: Request, res: Response): Promise<void> =>
 
     const options = {
       format: format as 'CSV' | 'PDF',
-      status: Array.isArray(status) ? status[0] : status as string,
-      severity: Array.isArray(severity) ? severity[0] : severity as string,
-      activity_type: Array.isArray(activity_type) ? activity_type[0] : activity_type as string,
-      date_from: date_from ? new Date(Array.isArray(date_from) ? date_from[0] : date_from as string) : undefined,
-      date_to: date_to ? new Date(Array.isArray(date_to) ? date_to[0] : date_to as string) : undefined
+      status: parseQueryString(status),
+      severity: parseQueryString(severity),
+      activity_type: parseQueryString(activity_type),
+      date_from: parseQueryDate(date_from),
+      date_to: parseQueryDate(date_to)
     };
 
     if (format === 'CSV') {
