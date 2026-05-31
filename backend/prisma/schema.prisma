@@ -1,6 +1,7 @@
 generator client {
-  provider     = "prisma-client-js"
-  fieldMapping = "camelCase"
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
+  fieldMapping    = "camelCase"
 }
 
 datasource db {
@@ -8,52 +9,46 @@ datasource db {
 }
 
 model Contest {
-  id                 String            @id @default(uuid())
-  creator_id         String
-  title              String
-  description        String?
-  media_type         ContestMediaType
-  category           String
-  cover_media_url    String?
-  prize_total_kr     Decimal           @db.Decimal(18, 4)
-  platform_fee_kr    Decimal           @db.Decimal(18, 4)
-  participation_type ParticipationType @default(INDIVIDUAL_ONLY)
-  team_size          Int?
-  max_teams          Int?
-  entry_fee_kr       Decimal?          @db.Decimal(18, 4)
-  public_vote_weight Int?
-  target_ages        Int[]
-  target_geos        String[]
-  airdrop_kr         Decimal?          @db.Decimal(18, 4)
-  airdrop_limit      Int?
-  allow_daily_prizes Boolean           @default(false)
-  daily_prize_kr     Decimal?          @db.Decimal(18, 4)
-  max_winners        Int               @db.SmallInt
-  judging_criteria   JudgingCriteria
-  sponsor_name       String?
-  sponsor_url        String?
-  deadline           DateTime
-  status             ContestStatus     @default(ACTIVE)
-  total_participants Int               @default(0)
-  total_submissions  Int               @default(0)
-
-  // COMPLIANCE: Voting validation
-  voting_enabled          Boolean        @default(true)
-  voting_cost_per_vote_kr Decimal?       @db.Decimal(18, 4)
-  is_voting_paid          Boolean        @default(false)
-  judging_method          JudgingMethod? // JUDGES_ONLY, VOTES_ONLY, JUDGES_AND_VOTES
-  judge_weight_percentage Int? // 0-100
-  vote_weight_percentage  Int? // 0-100
-
-  // COMPLIANCE: Validation flags
-  is_legal_structure Boolean  @default(true)
-  validation_errors  String[] @default([])
-
+  id                          String                        @id @default(uuid())
+  creator_id                  String
+  title                       String
+  description                 String?
+  media_type                  ContestMediaType
+  category                    String
+  cover_media_url             String?
+  prize_total_kr              Decimal                       @db.Decimal(18, 4)
+  platform_fee_kr             Decimal                       @db.Decimal(18, 4)
+  participation_type          ParticipationType             @default(INDIVIDUAL_ONLY)
+  team_size                   Int?
+  max_teams                   Int?
+  entry_fee_kr                Decimal?                      @db.Decimal(18, 4)
+  public_vote_weight          Int?
+  target_ages                 Int[]
+  target_geos                 String[]
+  airdrop_kr                  Decimal?                      @db.Decimal(18, 4)
+  airdrop_limit               Int?
+  allow_daily_prizes          Boolean                       @default(false)
+  daily_prize_kr              Decimal?                      @db.Decimal(18, 4)
+  max_winners                 Int                           @db.SmallInt
+  judging_criteria            JudgingCriteria
+  sponsor_name                String?
+  sponsor_url                 String?
+  deadline                    DateTime
+  status                      ContestStatus                 @default(ACTIVE)
+  total_participants          Int                           @default(0)
+  total_submissions           Int                           @default(0)
   created_at                  DateTime                      @default(now())
+  is_legal_structure          Boolean                       @default(true)
+  is_voting_paid              Boolean                       @default(false)
+  judge_weight_percentage     Int?
+  judging_method              JudgingMethod?
+  validation_errors           String[]                      @default([])
+  vote_weight_percentage      Int?
+  voting_cost_per_vote_kr     Decimal?                      @db.Decimal(18, 4)
+  voting_enabled              Boolean                       @default(true)
+  brand_campaigns             brand_campaigns[]
   User                        User                          @relation(fields: [creator_id], references: [id])
   ContestAction               ContestAction[]
-  ContestSubmission           ContestSubmission[]
-  brand_campaigns             brand_campaigns[]
   contest_analytics           contest_analytics[]
   contest_engagement_actions  contest_engagement_actions[]
   contest_judges              contest_judges[]
@@ -61,6 +56,7 @@ model Contest {
   contest_prize_distributions contest_prize_distributions[]
   contest_purchase_entries    contest_purchase_entries[]
   contest_sponsorships        contest_sponsorships[]
+  ContestSubmission           ContestSubmission[]
   contest_winners             contest_winners[]
   conversion_campaigns        conversion_campaigns[]
   escrows                     escrows[]
@@ -103,9 +99,9 @@ model ContestSubmission {
   final_score                Decimal?                     @db.Decimal(7, 2)
   rank                       Int?
   submitted_at               DateTime                     @default(now())
+  contest_action_completions contest_action_completions[]
   Contest                    Contest                      @relation(fields: [contest_id], references: [id], onDelete: Cascade)
   User                       User                         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  contest_action_completions contest_action_completions[]
   contest_votes              contest_votes[]
   judge_scores               judge_scores[]
 
@@ -200,40 +196,50 @@ model User {
   is_wallet_unlocked                                               Boolean                          @default(false)
   wallet_pin_hash                                                  String?
   password_hash                                                    String?
-  isRotationLocked                                                 Boolean                          @default(false)
-  isSuspended                                                      Boolean                          @default(false)
-  suspendedAt                                                      DateTime?
   created_at                                                       DateTime                         @default(now())
   updated_at                                                       DateTime
   devicePlatform                                                   String?
   fcmToken                                                         String?
-  selectedNiches                                                   String[]                         @default([])
   customNiches                                                     String[]                         @default([])
+  selectedNiches                                                   String[]                         @default([])
   admirers_count                                                   Int                              @default(0)
   kyc_status                                                       KYCStatus                        @default(NOT_STARTED)
-  Contest                                                          Contest[]
-  ContestSubmission                                                ContestSubmission[]
-  Post                                                             Post[]
-  ShortCollection                                                  ShortCollection[]
-  SubscriptionTier                                                 SubscriptionTier[]
-  Team                                                             Team[]
+  isRotationLocked                                                 Boolean                          @default(false)
+  isSuspended                                                      Boolean                          @default(false)
+  suspendedAt                                                      DateTime?
   ad_campaigns                                                     ad_campaigns[]
+  adminProfile                                                     AdminProfile?
   admires_admires_admired_idToUser                                 admires[]                        @relation("admires_admired_idToUser")
   admires_admires_admirer_idToUser                                 admires[]                        @relation("admires_admirer_idToUser")
   bio_links                                                        bio_links[]
   brand_campaigns                                                  brand_campaigns[]
   cart_items                                                       cart_items[]
+  chamas_created                                                   Chama[]                          @relation("chama_creator")
+  chama_contributions                                              ChamaContribution[]
+  chama_defaulters                                                 ChamaDefaulter[]
+  chama_members                                                    ChamaMember[]
+  chama_nominations_as_nominator                                   ChamaNomination[]                @relation("chama_nomination_nominator")
+  chama_nominations_as_nominee                                     ChamaNomination[]                @relation("chama_nomination_nominee")
+  chama_payouts                                                    ChamaPayout[]
+  chama_payout_approvals                                           ChamaPayoutApproval[]
+  chama_secondments                                                ChamaSecondment[]
+  chama_transactions                                               ChamaTransaction[]
+  chama_votes                                                      ChamaVote[]
+  chat_participants                                                chatParticipant[]
   comment_likes                                                    comment_likes[]
   comment_reports                                                  comment_reports[]
   comments_comments_reply_to_user_idToUser                         comments[]                       @relation("comments_reply_to_user_idToUser")
   comments_comments_user_idToUser                                  comments[]                       @relation("comments_user_idToUser")
+  contentMentions                                                  contentMention[]
   content_unlocks_content_unlocks_creator_idToUser                 content_unlocks[]                @relation("content_unlocks_creator_idToUser")
   content_unlocks_content_unlocks_user_idToUser                    content_unlocks[]                @relation("content_unlocks_user_idToUser")
+  Contest                                                          Contest[]
   contest_engagement_actions                                       contest_engagement_actions[]
   contest_judges                                                   contest_judges[]
   contest_participants                                             contest_participants[]
   contest_purchase_entries                                         contest_purchase_entries[]
   contest_sponsorships                                             contest_sponsorships[]
+  ContestSubmission                                                ContestSubmission[]
   contest_votes                                                    contest_votes[]
   contest_winners                                                  contest_winners[]
   conversion_campaign_recipients                                   conversion_campaign_recipients[]
@@ -257,7 +263,9 @@ model User {
   messages_messages_forwarded_from_idToUser                        messages[]                       @relation("messages_forwarded_from_idToUser")
   messages_messages_sender_idToUser                                messages[]                       @relation("messages_sender_idToUser")
   milestone_completions                                            milestone_completions[]
+  notifications                                                    notifications[]
   orders                                                           orders[]
+  Post                                                             Post[]
   post_comments                                                    post_comments[]
   post_likes                                                       post_likes[]
   product_reviews                                                  product_reviews[]
@@ -266,6 +274,7 @@ model User {
   refresh_tokens                                                   refresh_tokens[]
   sales_funnel_events                                              sales_funnel_events[]
   shipping_jobs                                                    shipping_jobs[]
+  ShortCollection                                                  ShortCollection[]
   short_comments                                                   short_comments[]
   short_likes                                                      short_likes[]
   shorts                                                           shorts[]
@@ -273,36 +282,23 @@ model User {
   sponsored_impressions                                            sponsored_impressions[]
   sponsored_post_requests_sponsored_post_requests_brand_idToUser   sponsored_post_requests[]        @relation("sponsored_post_requests_brand_idToUser")
   sponsored_post_requests_sponsored_post_requests_creator_idToUser sponsored_post_requests[]        @relation("sponsored_post_requests_creator_idToUser")
+  stories                                                          stories[]
+  story_creator                                                    Story[]                          @relation("story_creator")
+  story_viewer_preferences                                         StoryViewerPreference[]          @relation("story_viewer_preferences")
+  SubscriptionTier                                                 SubscriptionTier[]
   subscriptions_subscriptions_creator_idToUser                     subscriptions[]                  @relation("subscriptions_creator_idToUser")
   subscriptions_subscriptions_subscriber_idToUser                  subscriptions[]                  @relation("subscriptions_subscriber_idToUser")
+  Team                                                             Team[]
   team_invitations_team_invitations_invitee_idToUser               team_invitations[]               @relation("team_invitations_invitee_idToUser")
   team_invitations_team_invitations_inviter_idToUser               team_invitations[]               @relation("team_invitations_inviter_idToUser")
   team_members                                                     team_members[]
   team_submission_votes                                            team_submission_votes[]
   transactions                                                     transactions[]
+  user_micro_interests                                             user_micro_interests[]
+  suspensions                                                      user_suspensions[]
+  vehicle_favorites                                                vehicle_favorites[]
   wallets                                                          wallets?
   wishlists                                                        wishlists[]
-  notifications                                                    notifications[]
-  user_micro_interests                                             user_micro_interests[]
-  stories                                                          stories[]
-  story_creator                                                    Story[]                          @relation("story_creator")
-  story_viewer_preferences                                         StoryViewerPreference[]          @relation("story_viewer_preferences")
-  chama_members                                                    ChamaMember[]
-  chama_contributions                                              ChamaContribution[]
-  chama_payouts                                                    ChamaPayout[]
-  chama_payout_approvals                                           ChamaPayoutApproval[]
-  chama_transactions                                               ChamaTransaction[]
-  chama_nominations_as_nominee                                     ChamaNomination[]                @relation("chama_nomination_nominee")
-  chama_nominations_as_nominator                                   ChamaNomination[]                @relation("chama_nomination_nominator")
-  chama_secondments                                                ChamaSecondment[]
-  chama_votes                                                      ChamaVote[]
-  chama_defaulters                                                 ChamaDefaulter[]
-  chamas_created                                                   Chama[]                          @relation("chama_creator")
-  chat_participants                                                chatParticipant[]
-  adminProfile                                                     AdminProfile?
-  contentMentions                                                  contentMention[]
-  vehicle_favorites                                                vehicle_favorites[]
-  suspensions                                                      user_suspensions[]
   withdrawal_requests                                              withdrawal_requests[]
 
   @@index([fcmToken])
@@ -319,7 +315,6 @@ model chat {
   updated_at   DateTime          @updatedAt
   participants chatParticipant[]
   messages     messages[]
-
 
   @@map("chat")
 }
@@ -343,37 +338,37 @@ model chatParticipant {
 model Chama {
   id                        String                @id @default(uuid())
   name                      String
-  type                      ChamaType
-  description               String?
-  reason                    String?
   chat_id                   String
-  creator_id                String
-  status                    ChamaStatus           @default(SETUP)
-  isLocked                  Boolean               @default(false)
-  maxMembers                Int?
-  autoLockOnFull            Boolean               @default(false)
   contribution_amount_kr    Decimal               @db.Decimal(18, 4)
-  contributionFrequency     ContributionFrequency
-  membershipFeeKr           Decimal?              @db.Decimal(18, 4)
-  lockPeriodDays            Int?
-  penalty_amount_kr         Decimal?              @db.Decimal(18, 4)
-  gracePeriodDays           Int                   @default(3)
   current_cycle_number      Int                   @default(1)
   min_approvals             Int                   @default(2)
-  allowMidTermVoteOut       Boolean               @default(true)
-  avatar_url                String?
-  kyc_verified_members_only Boolean               @default(true)
   created_at                DateTime              @default(now())
   updated_at                DateTime
+  penalty_amount_kr         Decimal?              @db.Decimal(18, 4)
+  allowMidTermVoteOut       Boolean               @default(true)
+  autoLockOnFull            Boolean               @default(false)
+  avatar_url                String?
+  contributionFrequency     ContributionFrequency
+  creator_id                String
+  description               String?
+  gracePeriodDays           Int                   @default(3)
+  isLocked                  Boolean               @default(false)
+  lockPeriodDays            Int?
+  maxMembers                Int?
+  membershipFeeKr           Decimal?              @db.Decimal(18, 4)
+  reason                    String?
+  type                      ChamaType
+  status                    ChamaStatus           @default(SETUP)
+  kyc_verified_members_only Boolean               @default(true)
   creator                   User                  @relation("chama_creator", fields: [creator_id], references: [id])
-  chama_wallet              ChamaWallet?
-  chama_members             ChamaMember[]
-  chama_cycles              ChamaCycle[]
-  chama_transactions        ChamaTransaction[]
-  chama_payouts             ChamaPayout[]
   chama_contributions       ChamaContribution[]
-  chama_elections           ChamaElection[]
+  chama_cycles              ChamaCycle[]
   chama_defaulters          ChamaDefaulter[]
+  chama_elections           ChamaElection[]
+  chama_members             ChamaMember[]
+  chama_payouts             ChamaPayout[]
+  chama_transactions        ChamaTransaction[]
+  chama_wallet              ChamaWallet?
 
   @@index([status])
   @@index([creator_id])
@@ -386,17 +381,17 @@ model ChamaMember {
   user_id             String
   role                Chama_Member_Role
   status              Chama_Member_Status @default(ACTIVE)
-  is_defaulter        Boolean             @default(false)
-  rotationNumber      Int?
-  leftAt              DateTime?
   total_contributed   Decimal             @default(0) @db.Decimal(18, 4)
   total_received      Decimal             @default(0) @db.Decimal(18, 4)
-  device_fingerprint  String?
   created_at          DateTime            @default(now())
   updated_at          DateTime
+  is_defaulter        Boolean             @default(false)
+  leftAt              DateTime?
+  rotationNumber      Int?
+  device_fingerprint  String?
+  chama_contributions ChamaContribution[]
   chama               Chama               @relation(fields: [chama_id], references: [id], onDelete: Cascade)
   user                User                @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  chama_contributions ChamaContribution[]
   chama_payouts       ChamaPayout[]
 
   @@unique([chama_id, user_id])
@@ -466,9 +461,9 @@ model ChamaPayout {
   disbursed_at DateTime?
   created_at   DateTime              @default(now())
   chama        Chama                 @relation(fields: [chama_id], references: [id], onDelete: Cascade)
-  recipient    User                  @relation(fields: [recipient_id], references: [id], onDelete: Cascade)
+  cycle        ChamaCycle?           @relation(fields: [cycle_id], references: [id])
   member       ChamaMember           @relation(fields: [member_id], references: [id], onDelete: Cascade)
-  cycle        ChamaCycle?           @relation(fields: [cycle_id], references: [id], onDelete: SetNull)
+  recipient    User                  @relation(fields: [recipient_id], references: [id], onDelete: Cascade)
   approvals    ChamaPayoutApproval[]
 
   @@index([chama_id])
@@ -484,8 +479,8 @@ model ChamaPayoutApproval {
   decision    Chama_Payout_Decision
   reason      String?
   created_at  DateTime              @default(now())
-  payout      ChamaPayout           @relation(fields: [payout_id], references: [id], onDelete: Cascade)
   approver    User                  @relation(fields: [approver_id], references: [id], onDelete: Cascade)
+  payout      ChamaPayout           @relation(fields: [payout_id], references: [id], onDelete: Cascade)
 
   @@index([payout_id])
   @@index([approver_id])
@@ -535,8 +530,8 @@ model ChamaNomination {
   seconds_count Int               @default(0)
   created_at    DateTime          @default(now())
   election      ChamaElection     @relation(fields: [election_id], references: [id], onDelete: Cascade)
-  nominee       User              @relation("chama_nomination_nominee", fields: [nominee_id], references: [id], onDelete: Cascade)
   nominator     User              @relation("chama_nomination_nominator", fields: [nominator_id], references: [id], onDelete: Cascade)
+  nominee       User              @relation("chama_nomination_nominee", fields: [nominee_id], references: [id], onDelete: Cascade)
   secondments   ChamaSecondment[]
   votes         ChamaVote[]
 
@@ -708,7 +703,6 @@ model ad_impressions {
   placement        PlacementType
   content_id       String?
   content_type     String?
-  content_niche    String?
   chat_id          String?
   chat_niche       ChatNiche?
   was_clicked      Boolean       @default(false)
@@ -718,6 +712,7 @@ model ad_impressions {
   user_country     String?
   user_city        String?
   created_at       DateTime      @default(now())
+  content_niche    String?
 
   @@index([campaign_id, user_id])
   @@index([placement, created_at])
@@ -1341,7 +1336,6 @@ model display_ad_campaigns {
   target_interests      String[]                @default([])
   target_behaviors      String[]                @default([])
   target_creator_tiers  String[]                @default([])
-  target_content_niches String[]                @default([])
   placements            PlacementType[]         @default([])
   chat_niches           ChatNiche[]             @default([])
   pixel_id              String?
@@ -1364,6 +1358,7 @@ model display_ad_campaigns {
   payment_status        String                  @default("PENDING")
   created_at            DateTime                @default(now())
   updated_at            DateTime                @updatedAt
+  target_content_niches String[]                @default([])
   ad_campaign_locations ad_campaign_locations[]
   display_ad_analytics  display_ad_analytics[]
 
@@ -1720,8 +1715,8 @@ model influencer_profiles {
   updated_at            DateTime
   campaign_applications campaign_applications[]
   campaign_deliverables campaign_deliverables[]
-  User                  User                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   influencer_portfolio  influencer_portfolio[]
+  User                  User                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   influencer_reviews    influencer_reviews[]
   social_media_accounts social_media_accounts[]
 
@@ -1831,17 +1826,17 @@ model messages {
   recipient_id                          String?
   chat_id                               String?
   text                                  String?
-  payload                               String?
   media_url                             String?
   media_type                            String?
-  thumbnail_url                         String?
-  reply_to_id                           String?
   forwarded_from_id                     String?
-  replies_count                         Int      @default(0)
   is_read                               Boolean  @default(false)
-  is_system_event                       Boolean  @default(false)
-  status                                String?
   created_at                            DateTime @default(now())
+  is_system_event                       Boolean  @default(false)
+  payload                               String?
+  status                                String?
+  replies_count                         Int      @default(0)
+  reply_to_id                           String?
+  thumbnail_url                         String?
   chat                                  chat?    @relation(fields: [chat_id], references: [id], onDelete: Cascade)
   User_messages_forwarded_from_idToUser User?    @relation("messages_forwarded_from_idToUser", fields: [forwarded_from_id], references: [id])
   User_messages_sender_idToUser         User     @relation("messages_sender_idToUser", fields: [sender_id], references: [id], onDelete: Cascade)
@@ -2096,8 +2091,8 @@ model products {
   fashion_details         fashion_details?
   flash_sale_products     flash_sale_products[]
   food_details            food_details?
-  grocery_details         grocery_details?
   furniture_details       furniture_details?
+  grocery_details         grocery_details?
   group_buys              group_buys[]
   order_items             order_items[]
   premium_listings        premium_listings[]
@@ -2113,8 +2108,8 @@ model products {
   shorts                  shorts[]
   spare_part_details      spare_part_details?
   vehicle_details         vehicle_details?
-  wishlist_items          wishlist_items[]
   vehicle_favorites       vehicle_favorites[]
+  wishlist_items          wishlist_items[]
 
   @@index([category, status])
   @@index([seller_id, status])
@@ -2251,9 +2246,6 @@ model shorts {
   user_id           String
   video_url         String
   thumbnail_url     String?
-  media_type        String                @default("VIDEO")
-  aspect_ratio      Float?
-  media_urls        String[]              @default([])
   caption           String?
   music_title       String?
   music_artist      String?
@@ -2267,6 +2259,9 @@ model shorts {
   comments_count    Int                   @default(0)
   created_at        DateTime              @default(now())
   unlock_amount_kr  Decimal?              @db.Decimal(18, 4)
+  aspect_ratio      Float?
+  media_type        String                @default("VIDEO")
+  media_urls        String[]              @default([])
   short_comments    short_comments[]
   short_likes       short_likes[]
   ShortCollection   ShortCollection?      @relation(fields: [collection_id], references: [id])
@@ -2275,6 +2270,7 @@ model shorts {
   User              User                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
+  @@index([is_locked, user_id], map: "idx_shorts_locked", where: raw("(is_locked = true)"))
   @@map("shorts")
 }
 
@@ -2536,41 +2532,32 @@ model team_submissions {
 }
 
 model transactions {
-  id              String   @id @default(uuid())
-  user_id         String
-  type            String // Legacy transaction type (string)
-  amount_kr       Decimal  @db.Decimal(18, 4)
-  amount_fiat     Decimal? @db.Decimal(18, 4)
-  currency        String?  @db.VarChar(3)
-  provider        String?
-  status          String   @default("pending")
-  reference       String?
-  counterparty_id String?
-  metadata        Json?
-
-  // COMPLIANCE: Transaction context (mandatory) - Legacy fields (kept for backward compatibility)
-  context_type   String? // CONTENT_TIP, LOCKED_CHAT_TASK, SUBSCRIPTION, etc.
-  context_ref_id String? // Reference to content, task, subscription, etc.
-  context_desc   String? // Human-readable description
-
-  // COMPLIANCE: New structured context fields
-  context          Json? // Consolidated JSONB context object
-  transaction_type TransactionType? // Enum-based transaction type
-  reference_id     String? // Reference to content/service (replaces context_ref_id)
-  description      String? // Human-readable context (replaces context_desc)
-
-  // COMPLIANCE: Risk and validation
-  risk_score  Int?    @default(0)
-  is_flagged  Boolean @default(false)
-  flag_reason String?
-
-  // COMPLIANCE: Device tracking
-  device_id  String?
-  ip_address String?
-  user_agent String?
-
-  created_at DateTime @default(now())
-  User       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id               String           @id @default(uuid())
+  user_id          String
+  type             String
+  amount_kr        Decimal          @db.Decimal(18, 4)
+  amount_fiat      Decimal?         @db.Decimal(18, 4)
+  currency         String?          @db.VarChar(3)
+  provider         String?
+  status           String           @default("pending")
+  reference        String?
+  counterparty_id  String?
+  metadata         Json?
+  created_at       DateTime         @default(now())
+  context          Json?
+  context_desc     String?
+  context_ref_id   String?
+  context_type     String?
+  description      String?
+  device_id        String?
+  flag_reason      String?
+  ip_address       String?
+  is_flagged       Boolean          @default(false)
+  reference_id     String?
+  risk_score       Int?             @default(0)
+  transaction_type TransactionType?
+  user_agent       String?
+  User             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, created_at])
   @@index([context_type])
@@ -2624,28 +2611,28 @@ model withdrawal_requests {
   id                String           @id @default(uuid())
   user_id           String
   amount_kr         Decimal          @db.Decimal(18, 4)
-  amount_fiat       Decimal?         @db.Decimal(18, 4)
-  status            WithdrawalStatus @default(PENDING)
   method            String?
   destination       String?
-  provider          String?
-  account_name      String?
-  account_details   Json?
-  currency          String?
-  requires_kyc      Boolean          @default(false)
-  kyc_document_ids  String[]         @default([])
-  suspicious_flags  Json?
-  risk_score        Int              @default(0)
-  metadata          Json?
-  reviewed_by       String?
-  review_note       String?
-  flag_reason       String?
-  name_match_status String?
-  reviewed_at       DateTime?
-  flagged_at        DateTime?
   created_at        DateTime         @default(now())
   updated_at        DateTime
   processed_at      DateTime?
+  status            WithdrawalStatus @default(PENDING)
+  account_details   Json?
+  account_name      String?
+  amount_fiat       Decimal?         @db.Decimal(18, 4)
+  currency          String?
+  flag_reason       String?
+  flagged_at        DateTime?
+  kyc_document_ids  String[]         @default([])
+  metadata          Json?
+  name_match_status String?
+  provider          String?
+  requires_kyc      Boolean          @default(false)
+  review_note       String?
+  reviewed_at       DateTime?
+  reviewed_by       String?
+  risk_score        Int              @default(0)
+  suspicious_flags  Json?
   user              User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id, status])
@@ -2703,7 +2690,7 @@ model notifications {
   user_id    String
   type       String
   title      String
-  message    String    @db.Text
+  message    String
   data       Json?
   is_read    Boolean   @default(false)
   read_at    DateTime?
@@ -2719,12 +2706,12 @@ model user_micro_interests {
   id              String   @id @default(uuid())
   user_id         String
   interest        String
-  category        String
-  affinity        Decimal  @default(1.0) @db.Decimal(5, 2)
-  keywords        String[] @default([])
   weight          Decimal  @default(1.0) @db.Decimal(5, 2)
-  last_engaged_at DateTime @default(now())
   last_updated    DateTime @default(now())
+  affinity        Decimal  @default(1.0) @db.Decimal(5, 2)
+  category        String
+  keywords        String[] @default([])
+  last_engaged_at DateTime @default(now())
   User            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, interest])
@@ -2817,9 +2804,9 @@ model platform_config {
   id         String   @id @default(uuid())
   key        String   @unique
   value      Json
-  updated_by String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  updated_by String?
 
   @@map("platform_config")
 }
@@ -2893,6 +2880,652 @@ model user_interaction_signals {
   @@index([user_id, content_id])
   @@index([content_id, content_type])
   @@map("user_interaction_signals")
+}
+
+model AdminProfile {
+  id            String    @id @default(uuid())
+  user_id       String    @unique
+  role          AdminRole @default(ADMIN)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  is_active     Boolean   @default(true)
+  last_login_at DateTime?
+  granted_by    String?
+  permissions   Json?
+  user          User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("admin_profile")
+}
+
+model hashtag {
+  id              String           @id @default(uuid())
+  tag             String           @unique
+  usageCount      Int              @default(1)
+  created_at      DateTime         @default(now())
+  contentHashtags contentHashtag[]
+
+  @@index([usageCount])
+  @@map("hashtag")
+}
+
+model contentHashtag {
+  id          String   @id @default(uuid())
+  hashtagId   String
+  content_id  String
+  contentType String
+  created_at  DateTime @default(now())
+  hashtag     hashtag  @relation(fields: [hashtagId], references: [id], onDelete: Cascade)
+
+  @@unique([hashtagId, content_id, contentType], name: "hashtagId_contentId_contentType")
+  @@index([content_id, contentType])
+  @@index([hashtagId])
+  @@map("content_hashtag")
+}
+
+model contentMention {
+  id              String   @id @default(uuid())
+  mentionedUserId String
+  content_id      String
+  contentType     String
+  created_at      DateTime @default(now())
+  user            User     @relation(fields: [mentionedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([mentionedUserId, content_id, contentType], name: "mentionedUserId_contentId_contentType")
+  @@index([content_id, contentType])
+  @@index([mentionedUserId])
+  @@map("content_mention")
+}
+
+model kyc_documents {
+  id                String       @id @default(uuid())
+  user_id           String
+  document_type     DocumentType
+  front_image_url   String
+  back_image_url    String?
+  selfie_url        String
+  status            KYCStatus    @default(PENDING)
+  verified_by       String?
+  verification_note String?
+  rejection_reason  String?
+  name_matches      Boolean      @default(false)
+  name_match_score  Decimal?     @db.Decimal(5, 2)
+  verified_at       DateTime?
+  created_at        DateTime     @default(now())
+
+  @@index([user_id])
+  @@index([status])
+  @@map("kyc_documents")
+}
+
+model withdrawal_limits {
+  id                 String   @id @default(uuid())
+  user_id            String   @unique
+  daily_limit_kr     Decimal  @db.Decimal(18, 4)
+  withdrawn_today_kr Decimal  @default(0) @db.Decimal(18, 4)
+  last_reset_date    DateTime
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  @@index([user_id])
+  @@map("withdrawal_limits")
+}
+
+model suspicious_activities {
+  id              String    @id @default(uuid())
+  user_id         String
+  activity_type   String
+  description     String
+  severity        String
+  ip_address      String?
+  user_agent      String?
+  metadata        Json?
+  resolved        Boolean   @default(false)
+  resolved_by     String?
+  resolved_at     DateTime?
+  created_at      DateTime  @default(now())
+  resolution_note String?
+
+  @@index([user_id])
+  @@index([resolved])
+  @@index([severity])
+  @@map("suspicious_activities")
+}
+
+model user_session_secrets {
+  id         String   @id @default(uuid())
+  user_id    String
+  secret     Bytes
+  expires_at DateTime
+  device_id  String?
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+
+  @@index([user_id, is_active])
+  @@index([expires_at])
+  @@map("user_session_secrets")
+}
+
+model transaction_nonces {
+  id              String   @id @default(uuid())
+  nonce           String   @unique
+  user_id         String
+  transactionType String?
+  expires_at      DateTime
+  created_at      DateTime @default(now())
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@map("transaction_nonces")
+}
+
+model financial_transaction_logs {
+  id              String   @id @default(uuid())
+  transaction_id  String
+  user_id         String
+  transactionType String
+  amount_kr       Decimal  @db.Decimal(18, 4)
+  amount_fiat     Decimal? @db.Decimal(18, 4)
+  currency        String?  @db.VarChar(3)
+  provider        String?
+  counterpartyId  String?
+  signature       String
+  nonce           String
+  timestamp       BigInt
+  ipAddress       String?
+  userAgent       String?
+  device_id       String?
+  status          String
+  errorMessage    String?
+  created_at      DateTime @default(now())
+
+  @@index([user_id, created_at])
+  @@index([transaction_id])
+  @@index([transactionType])
+  @@map("financial_transaction_logs")
+}
+
+model suspicious_activity_logs {
+  id           String    @id @default(uuid())
+  user_id      String
+  activityType String
+  description  String
+  severity     String
+  metadata     Json?
+  resolved     Boolean   @default(false)
+  resolved_by  String?
+  resolved_at  DateTime?
+  created_at   DateTime  @default(now())
+
+  @@index([user_id])
+  @@index([severity])
+  @@index([resolved])
+  @@map("suspicious_activity_logs")
+}
+
+model content_moderation_logs {
+  id          String   @id @default(uuid())
+  adminId     String
+  contentType String
+  content_id  String
+  action      String
+  reason      String?
+  created_at  DateTime @default(now())
+
+  @@index([adminId])
+  @@index([contentType, content_id])
+  @@map("content_moderation_logs")
+}
+
+model content_niche_tags {
+  id          String   @id @default(uuid())
+  content_id  String
+  contentType String
+  niche       String
+  created_at  DateTime @default(now())
+  confidence  Decimal  @default(1.0) @db.Decimal(3, 2)
+
+  @@unique([content_id, contentType, niche], name: "content_id_contentType_niche")
+  @@index([niche])
+  @@index([content_id, contentType])
+  @@map("content_niche_tags")
+}
+
+model creator_boost_settings {
+  id                    String   @id @default(uuid())
+  creator_id            String   @unique
+  is_enabled            Boolean  @default(false)
+  daily_budget_kes      Decimal  @db.Decimal(18, 4)
+  spent_today_kes       Decimal  @default(0) @db.Decimal(18, 4)
+  target_cpm            Decimal  @db.Decimal(10, 2)
+  target_age_min        Int?
+  target_age_max        Int?
+  target_genders        String[]
+  target_locations      String[]
+  target_interests      String[]
+  boosted_content_count Int      @default(0)
+  total_impressions     Int      @default(0)
+  total_clicks          Int      @default(0)
+  total_spent_kes       Decimal  @default(0) @db.Decimal(18, 4)
+  last_reset_date       DateTime
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  @@index([creator_id])
+  @@index([is_enabled])
+  @@map("creator_boost_settings")
+}
+
+model creator_boost_global_settings {
+  id                String   @id @default(uuid())
+  minBoostAmountKes Decimal  @db.Decimal(18, 4)
+  shortCpmKes       Decimal  @db.Decimal(10, 2)
+  postCpmKes        Decimal  @db.Decimal(10, 2)
+  liveCpmKes        Decimal  @db.Decimal(10, 2)
+  updatedBy         String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  @@map("creator_boost_global_settings")
+}
+
+model prohibited_names {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  type       String?
+  reason     String?
+  created_at DateTime @default(now())
+  created_by String?
+  added_by   String?
+
+  @@index([type])
+  @@map("prohibited_names")
+}
+
+model reserved_usernames {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  reserved_for String?
+  reason       String?
+  created_at   DateTime @default(now())
+  created_by   String?
+  reserved_by  String?
+
+  @@index([reserved_for])
+  @@map("reserved_usernames")
+}
+
+model platform_wallet {
+  id         String   @id @default(uuid())
+  label      String?  @unique
+  kr_balance Decimal  @default(0) @db.Decimal(18, 4)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("platform_wallet")
+}
+
+model user_suspensions {
+  id          String    @id @default(uuid())
+  user_id     String
+  reason      String
+  type        String
+  suspendedBy String?
+  liftedBy    String?
+  liftedAt    DateTime?
+  expires_at  DateTime?
+  created_at  DateTime  @default(now())
+  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@map("user_suspensions")
+}
+
+model feature_flags {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  is_enabled  Boolean  @default(false)
+  config      Json?
+  scope       String?
+  scope_value String?
+  priority    Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@unique([key, scope, scope_value], name: "featureKey_scope_scopeValue")
+  @@index([scope, priority])
+  @@map("feature_flags")
+}
+
+model platform_announcements {
+  id         String    @id @default(uuid())
+  title      String
+  message    String
+  type       String
+  is_active  Boolean   @default(true)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  created_by String?
+  expires_at DateTime?
+
+  @@map("platform_announcements")
+}
+
+model listing_fee_config {
+  id                 String           @id @default(uuid())
+  is_enabled         Boolean          @default(false)
+  scope              TargetingScope
+  scope_value        String?
+  category           ProductCategory?
+  base_fee_kr        Decimal          @db.Decimal(18, 4)
+  daily_free_quota   Int              @default(0)
+  weekly_free_quota  Int              @default(0)
+  monthly_free_quota Int              @default(0)
+  priority           Int              @default(0)
+  is_active          Boolean          @default(true)
+  created_by         String?
+  updated_by         String?
+  created_at         DateTime         @default(now())
+  updated_at         DateTime         @updatedAt
+
+  @@unique([scope, scope_value, category])
+  @@index([scope, priority])
+  @@index([is_enabled, is_active])
+  @@map("listing_fee_config")
+}
+
+model user_listing_quota {
+  id                 String   @id @default(uuid())
+  user_id            String   @unique
+  daily_used         Int      @default(0)
+  weekly_used        Int      @default(0)
+  monthly_used       Int      @default(0)
+  last_daily_reset   DateTime @default(now())
+  last_weekly_reset  DateTime @default(now())
+  last_monthly_reset DateTime @default(now())
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  @@index([user_id])
+  @@map("user_listing_quota")
+}
+
+model listing_fee_transaction {
+  id             String          @id @default(uuid())
+  user_id        String
+  product_id     String
+  category       ProductCategory
+  location_scope TargetingScope
+  location_value String?
+  fee_kr         Decimal         @db.Decimal(18, 4)
+  was_free       Boolean         @default(false)
+  quota_type     String?
+  transaction_id String?
+  created_at     DateTime        @default(now())
+
+  @@index([user_id, created_at])
+  @@index([product_id])
+  @@index([was_free])
+  @@map("listing_fee_transaction")
+}
+
+model user_risk_profiles {
+  id                     String    @id @default(uuid())
+  user_id                String    @unique
+  risk_score             Int       @default(0)
+  kyc_risk_score         Int       @default(0)
+  geographic_risk_score  Int       @default(0)
+  transaction_risk_score Int       @default(0)
+  behavioral_risk_score  Int       @default(0)
+  self_tipping_score     Int       @default(0)
+  circular_tipping_score Int       @default(0)
+  recipient_diversity    Int       @default(100)
+  withdrawal_blocked     Boolean   @default(false)
+  transaction_limited    Boolean   @default(false)
+  requires_manual_review Boolean   @default(false)
+  last_calculated_at     DateTime  @default(now())
+  flagged_reasons        String[]
+  created_at             DateTime  @default(now())
+  updated_at             DateTime  @updatedAt
+  risk_level             RiskLevel @default(LOW)
+
+  @@index([risk_level])
+  @@index([risk_score])
+  @@index([user_id])
+  @@index([last_calculated_at])
+  @@map("user_risk_profiles")
+}
+
+model risk_factors {
+  id            String   @id @default(uuid())
+  user_id       String
+  factor_type   String
+  factor_name   String
+  factor_value  String
+  factor_score  Int
+  calculated_at DateTime @default(now())
+
+  @@index([user_id])
+  @@index([factor_type])
+  @@index([user_id, calculated_at])
+  @@map("risk_factors")
+}
+
+model device_fingerprints {
+  id                String   @id @default(uuid())
+  user_id           String
+  fingerprint_hash  String
+  user_agent        String
+  ip_address        String
+  browser           String?
+  os                String?
+  device_type       String?
+  first_seen_at     DateTime @default(now())
+  last_seen_at      DateTime @default(now())
+  request_count     Int      @default(1)
+  is_suspicious     Boolean  @default(false)
+  shared_with_users String[]
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  @@unique([user_id, fingerprint_hash])
+  @@index([fingerprint_hash])
+  @@index([ip_address])
+  @@index([is_suspicious])
+  @@map("device_fingerprints")
+}
+
+model locked_chat_tasks {
+  id                  String    @id @default(uuid())
+  user_id             String
+  creator_id          String
+  task_description    String
+  amount_kr           Decimal   @db.Decimal(18, 4)
+  status              String    @default("PENDING")
+  deadline            DateTime
+  deliverable_url     String?
+  deliverable_type    String?
+  created_at          DateTime  @default(now())
+  started_at          DateTime?
+  completed_at        DateTime?
+  expired_at          DateTime?
+  chat_unlocked_until DateTime?
+
+  @@index([user_id])
+  @@index([creator_id])
+  @@index([status])
+  @@index([creator_id, status])
+  @@map("locked_chat_tasks")
+}
+
+model ofac_screening_cache {
+  id              String   @id @default(uuid())
+  name            String
+  name_normalized String   @unique
+  is_match        Boolean  @default(false)
+  match_score     Int?
+  matched_entry   String?
+  checked_at      DateTime @default(now())
+  list_version    String?
+  expires_at      DateTime
+  created_at      DateTime @default(now())
+
+  @@index([is_match])
+  @@index([expires_at])
+  @@map("ofac_screening_cache")
+}
+
+model transaction_contexts {
+  id             String   @id @default(uuid())
+  transaction_id String   @unique
+  context_type   String
+  reference_id   String?
+  description    String
+  content_type   String?
+  metadata       Json?
+  created_at     DateTime @default(now())
+
+  @@index([context_type])
+  @@index([reference_id])
+  @@map("transaction_contexts")
+}
+
+model flagged_transactions {
+  id             String    @id @default(uuid())
+  transaction_id String
+  user_id        String
+  flag_reason    String
+  flag_type      String
+  severity       String
+  risk_score     Int
+  status         String    @default("PENDING")
+  reviewed_by    String?
+  reviewed_at    DateTime?
+  review_note    String?
+  action_taken   String?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  @@index([user_id])
+  @@index([status])
+  @@index([severity])
+  @@index([flag_type])
+  @@index([risk_score])
+  @@index([created_at])
+  @@map("flagged_transactions")
+}
+
+model locked_chat_settings {
+  id                    String   @id @default(uuid())
+  creator_id            String   @unique
+  is_locked             Boolean  @default(false)
+  task_fee_kr           Decimal  @db.Decimal(18, 4)
+  typical_delivery_time String?
+  total_tasks_completed Int      @default(0)
+  average_rating        Decimal? @db.Decimal(3, 2)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  @@index([creator_id])
+  @@index([is_locked])
+  @@map("locked_chat_settings")
+}
+
+model chat_task_unlocks {
+  id               String         @id @default(uuid())
+  user_id          String
+  creator_id       String
+  amount_kr        Decimal        @db.Decimal(18, 4)
+  task_description String
+  status           ChatTaskStatus @default(PENDING)
+  deadline         DateTime
+  deliverable_url  String?
+  created_at       DateTime       @default(now())
+  completed_at     DateTime?
+
+  @@index([creator_id])
+  @@index([user_id])
+  @@index([status])
+  @@index([user_id, creator_id])
+  @@map("chat_task_unlocks")
+}
+
+model compliance_reviews {
+  id             String    @id @default(uuid())
+  transaction_id String
+  user_id        String
+  reviewer_id    String?
+  review_type    String
+  status         String    @default("PENDING")
+  decision       String?
+  notes          String?
+  created_at     DateTime  @default(now())
+  reviewed_at    DateTime?
+
+  @@index([transaction_id])
+  @@index([user_id])
+  @@index([reviewer_id])
+  @@index([status])
+  @@index([created_at])
+  @@index([created_at], map: "idx_compliance_reviews_created_at")
+  @@index([reviewer_id], map: "idx_compliance_reviews_reviewer_id")
+  @@index([status], map: "idx_compliance_reviews_status")
+  @@index([user_id], map: "idx_compliance_reviews_user_id")
+  @@map("compliance_reviews")
+}
+
+model suspicious_activity_reports {
+  id                   String    @id @default(uuid())
+  user_id              String
+  activity_type        String
+  description          String
+  severity             String
+  status               String    @default("DRAFT")
+  filed_at             DateTime?
+  filed_by             String?
+  report_number        String?
+  regulatory_body      String?
+  related_transactions String[]  @default([])
+  evidence_urls        String[]  @default([])
+  metadata             Json?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+
+  @@index([user_id])
+  @@index([status])
+  @@index([severity])
+  @@index([activity_type])
+  @@index([created_at])
+  @@index([filed_at])
+  @@index([activity_type], map: "idx_sar_activity_type")
+  @@index([created_at], map: "idx_sar_created_at")
+  @@index([filed_at], map: "idx_sar_filed_at")
+  @@index([severity], map: "idx_sar_severity")
+  @@index([status], map: "idx_sar_status")
+  @@map("suspicious_activity_reports")
+}
+
+model audit_logs {
+  id             String   @id @default(uuid())
+  ip_address     String?
+  user_agent     String?
+  created_at     DateTime @default(now())
+  action_details Json
+  action_type    String
+  performed_by   String
+  target_user_id String?
+
+  @@index([action_type])
+  @@index([performed_by])
+  @@index([target_user_id])
+  @@index([created_at])
+  @@index([created_at], map: "idx_audit_logs_created_at")
+  @@index([performed_by], map: "idx_audit_logs_performed_by")
+  @@index([target_user_id], map: "idx_audit_logs_target_user_id")
+  @@map("audit_logs")
 }
 
 enum AccountType {
@@ -3277,12 +3910,9 @@ enum VehicleBodyType {
   MOTORCYCLE
 }
 
-// Chama Enums
-
 enum ChamaType {
-  MERRY_GO_ROUND // Rotating savings (was ROTATING)
-  WELFARE // Emergency fund
-  // INVESTMENT removed for compliance (securities regulations)
+  MERRY_GO_ROUND
+  WELFARE
 }
 
 enum ChamaStatus {
@@ -3340,28 +3970,28 @@ enum Chama_Payout_Status {
 }
 
 enum Chama_Payout_Decision {
-  APPROVE
-  REJECT
   APPROVED
   REJECTED
+  APPROVE
+  REJECT
 }
 
 enum Chama_Transaction_Type {
   CONTRIBUTION
   PAYOUT
+  EXTERNAL
   PENALTY
   MEMBERSHIP_FEE
   REFUND
-  EXTERNAL
 }
 
 enum Chama_Election_Phase {
   NOMINATION
-  SECONDMENT
   SECONDING
   VOTING
   RERUN
   COMPLETED
+  SECONDMENT
 }
 
 enum AdminRole {
@@ -3370,133 +4000,6 @@ enum AdminRole {
   MODERATOR
   FINANCIAL_ADMIN
 }
-
-model AdminProfile {
-  id            String    @id @default(uuid())
-  user_id       String    @unique
-  role          AdminRole @default(ADMIN)
-  permissions   Json?
-  is_active     Boolean   @default(true)
-  granted_by    String?
-  last_login_at DateTime?
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
-  user          User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id])
-  @@map("admin_profile")
-}
-
-// Hashtag and Mention Models
-model hashtag {
-  id              String           @id @default(uuid())
-  tag             String           @unique
-  usageCount      Int              @default(1)
-  created_at      DateTime         @default(now())
-  contentHashtags contentHashtag[]
-
-  @@index([usageCount])
-  @@map("hashtag")
-}
-
-model contentHashtag {
-  id          String   @id @default(uuid())
-  hashtagId   String
-  content_id  String
-  contentType String
-  created_at  DateTime @default(now())
-  hashtag     hashtag  @relation(fields: [hashtagId], references: [id], onDelete: Cascade)
-
-  @@unique([hashtagId, content_id, contentType], name: "hashtagId_contentId_contentType")
-  @@index([content_id, contentType])
-  @@index([hashtagId])
-  @@map("content_hashtag")
-}
-
-model contentMention {
-  id              String   @id @default(uuid())
-  mentionedUserId String
-  content_id      String
-  contentType     String
-  created_at      DateTime @default(now())
-  user            User     @relation(fields: [mentionedUserId], references: [id], onDelete: Cascade)
-
-  @@unique([mentionedUserId, content_id, contentType], name: "mentionedUserId_contentId_contentType")
-  @@index([content_id, contentType])
-  @@index([mentionedUserId])
-  @@map("content_mention")
-}
-
-// ═══════════════════════════════════════════════════════════
-// CALLS & VIDEO CHAT
-// ═══════════════════════════════════════════════════════════
-
-
-
-// ═══════════════════════════════════════════════════════════
-// KYC & COMPLIANCE
-// ═══════════════════════════════════════════════════════════
-
-model kyc_documents {
-  id                String       @id @default(uuid())
-  user_id           String
-  document_type     DocumentType
-  front_image_url   String
-  back_image_url    String?
-  selfie_url        String
-  status            KYCStatus    @default(PENDING)
-  verified_by       String?
-  verification_note String?
-  rejection_reason  String?
-  name_matches      Boolean      @default(false)
-  name_match_score  Decimal?     @db.Decimal(5, 2)
-  verified_at       DateTime?
-  created_at        DateTime     @default(now())
-
-  @@index([user_id])
-  @@index([status])
-  @@map("kyc_documents")
-}
-
-model withdrawal_limits {
-  id                 String   @id @default(uuid())
-  user_id            String   @unique
-  daily_limit_kr     Decimal  @db.Decimal(18, 4)
-  withdrawn_today_kr Decimal  @default(0) @db.Decimal(18, 4)
-  last_reset_date    DateTime
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
-
-  @@index([user_id])
-  @@map("withdrawal_limits")
-}
-
-model suspicious_activities {
-  id              String    @id @default(uuid())
-  user_id         String
-  activity_type   String
-  description     String
-  severity        String
-  ip_address      String?
-  user_agent      String?
-  metadata        Json?
-  resolved        Boolean   @default(false)
-  resolved_by     String?
-  resolved_at     DateTime?
-  resolution_note String?
-  created_at      DateTime  @default(now())
-
-  @@index([user_id])
-  @@index([resolved])
-  @@index([severity])
-  @@map("suspicious_activities")
-}
-
-// ═══════════════════════════════════════════════════════════
-// ENUMS FOR NEW MODELS
-// ═══════════════════════════════════════════════════════════
-
-
 
 enum DocumentType {
   NATIONAL_ID
@@ -3544,632 +4047,9 @@ enum RiskLevel {
   CRITICAL
 }
 
-// ═══════════════════════════════════════════════════════════
-// FINANCIAL SECURITY & TRANSACTION MODELS
-// ═══════════════════════════════════════════════════════════
-
-model user_session_secrets {
-  id         String   @id @default(uuid())
-  user_id    String
-  secret     Bytes
-  expires_at DateTime
-  device_id  String?
-  is_active  Boolean  @default(true)
-  created_at DateTime @default(now())
-
-  @@index([user_id, is_active])
-  @@index([expires_at])
-  @@map("user_session_secrets")
-}
-
-model transaction_nonces {
-  id              String   @id @default(uuid())
-  nonce           String   @unique
-  user_id         String
-  transactionType String?
-  expires_at      DateTime
-  created_at      DateTime @default(now())
-
-  @@index([user_id])
-  @@index([expires_at])
-  @@map("transaction_nonces")
-}
-
-model financial_transaction_logs {
-  id              String   @id @default(uuid())
-  transaction_id  String
-  user_id         String
-  transactionType String
-  amount_kr       Decimal  @db.Decimal(18, 4)
-  amount_fiat     Decimal? @db.Decimal(18, 4)
-  currency        String?  @db.VarChar(3)
-  provider        String?
-  counterpartyId  String?
-  signature       String
-  nonce           String
-  timestamp       BigInt
-  ipAddress       String?
-  userAgent       String?
-  device_id       String?
-  status          String
-  errorMessage    String?
-  created_at      DateTime @default(now())
-
-  @@index([user_id, created_at])
-  @@index([transaction_id])
-  @@index([transactionType])
-  @@map("financial_transaction_logs")
-}
-
-model suspicious_activity_logs {
-  id           String    @id @default(uuid())
-  user_id      String
-  activityType String
-  description  String
-  severity     String
-  metadata     Json?
-  resolved     Boolean   @default(false)
-  resolved_by  String?
-  resolved_at  DateTime?
-  created_at   DateTime  @default(now())
-
-  @@index([user_id])
-  @@index([severity])
-  @@index([resolved])
-  @@map("suspicious_activity_logs")
-}
-
-model content_moderation_logs {
-  id          String   @id @default(uuid())
-  adminId     String
-  contentType String
-  content_id  String
-  action      String
-  reason      String?
-  created_at  DateTime @default(now())
-
-  @@index([adminId])
-  @@index([contentType, content_id])
-  @@map("content_moderation_logs")
-}
-
-// ═══════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════
-// DISPLAY ADS & TARGETING MODELS
-// ═══════════════════════════════════════════════════════════
-
-model content_niche_tags {
-  id          String   @id @default(uuid())
-  content_id  String
-  contentType String
-  niche       String
-  confidence  Decimal  @default(1.0) @db.Decimal(3, 2)
-  created_at  DateTime @default(now())
-
-  @@unique([content_id, contentType, niche], name: "content_id_contentType_niche")
-  @@index([niche])
-  @@index([content_id, contentType])
-  @@map("content_niche_tags")
-}
-
-model creator_boost_settings {
-  id                    String   @id @default(uuid())
-  creator_id            String   @unique
-  is_enabled            Boolean  @default(false)
-  daily_budget_kes      Decimal  @db.Decimal(18, 4)
-  spent_today_kes       Decimal  @default(0) @db.Decimal(18, 4)
-  target_cpm            Decimal  @db.Decimal(10, 2)
-  target_age_min        Int?
-  target_age_max        Int?
-  target_genders        String[]
-  target_locations      String[]
-  target_interests      String[]
-  boosted_content_count Int      @default(0)
-  total_impressions     Int      @default(0)
-  total_clicks          Int      @default(0)
-  total_spent_kes       Decimal  @default(0) @db.Decimal(18, 4)
-  last_reset_date       DateTime
-  created_at            DateTime @default(now())
-  updated_at            DateTime @updatedAt
-
-  @@index([creator_id])
-  @@index([is_enabled])
-  @@map("creator_boost_settings")
-}
-
-model creator_boost_global_settings {
-  id                String   @id @default(uuid())
-  minBoostAmountKes Decimal  @db.Decimal(18, 4)
-  shortCpmKes       Decimal  @db.Decimal(10, 2)
-  postCpmKes        Decimal  @db.Decimal(10, 2)
-  liveCpmKes        Decimal  @db.Decimal(10, 2)
-  updatedBy         String?
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
-
-  @@map("creator_boost_global_settings")
-}
-
-model prohibited_names {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  type       String?
-  reason     String?
-  created_at DateTime @default(now())
-  created_by String?
-  added_by   String?
-
-  @@index([type])
-  @@map("prohibited_names")
-}
-
-model reserved_usernames {
-  id           String   @id @default(uuid())
-  username     String   @unique
-  reserved_for String?
-  reason       String?
-  created_at   DateTime @default(now())
-  created_by   String?
-  reserved_by  String?
-
-  @@index([reserved_for])
-  @@map("reserved_usernames")
-}
-
-model platform_wallet {
-  id         String   @id @default(uuid())
-  label      String?  @unique
-  kr_balance Decimal  @default(0) @db.Decimal(18, 4)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@map("platform_wallet")
-}
-
-model user_suspensions {
-  id          String    @id @default(uuid())
-  user_id     String
-  reason      String
-  type        String
-  suspendedBy String?
-  liftedBy    String?
-  liftedAt    DateTime?
-  expires_at  DateTime?
-  created_at  DateTime  @default(now())
-  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id])
-  @@index([expires_at])
-  @@map("user_suspensions")
-}
-
-model feature_flags {
-  id          String   @id @default(uuid())
-  key         String   @unique
-  name        String
-  description String?
-  is_enabled  Boolean  @default(false)
-  config      Json?
-  scope       String?
-  scope_value String?
-  priority    Int      @default(0)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  @@unique([key, scope, scope_value], name: "featureKey_scope_scopeValue")
-  @@index([scope, priority])
-  @@map("feature_flags")
-}
-
-model platform_announcements {
-  id         String    @id @default(uuid())
-  title      String
-  message    String
-  type       String
-  is_active  Boolean   @default(true)
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  created_by String?
-  expires_at DateTime?
-
-  @@map("platform_announcements")
-}
-
-// ═══════════════════════════════════════════════════════════
-// SHOP LISTING FEE SYSTEM
-// ═══════════════════════════════════════════════════════════
-
-model listing_fee_config {
-  id                    String          @id @default(uuid())
-  is_enabled            Boolean         @default(false)
-  scope                 TargetingScope
-  scope_value           String?
-  category              ProductCategory?
-  base_fee_kr           Decimal         @db.Decimal(18, 4)
-  daily_free_quota      Int             @default(0)
-  weekly_free_quota     Int             @default(0)
-  monthly_free_quota    Int             @default(0)
-  priority              Int             @default(0)
-  is_active             Boolean         @default(true)
-  created_by            String?
-  updated_by            String?
-  created_at            DateTime        @default(now())
-  updated_at            DateTime        @updatedAt
-
-  @@unique([scope, scope_value, category])
-  @@index([scope, priority])
-  @@index([is_enabled, is_active])
-  @@map("listing_fee_config")
-}
-
-model user_listing_quota {
-  id                    String   @id @default(uuid())
-  user_id               String
-  daily_used            Int      @default(0)
-  weekly_used           Int      @default(0)
-  monthly_used          Int      @default(0)
-  last_daily_reset      DateTime @default(now())
-  last_weekly_reset     DateTime @default(now())
-  last_monthly_reset    DateTime @default(now())
-  created_at            DateTime @default(now())
-  updated_at            DateTime @updatedAt
-
-  @@unique([user_id])
-  @@index([user_id])
-  @@map("user_listing_quota")
-}
-
-model listing_fee_transaction {
-  id              String          @id @default(uuid())
-  user_id         String
-  product_id      String
-  category        ProductCategory
-  location_scope  TargetingScope
-  location_value  String?
-  fee_kr          Decimal         @db.Decimal(18, 4)
-  was_free        Boolean         @default(false)
-  quota_type      String?
-  transaction_id  String?
-  created_at      DateTime        @default(now())
-
-  @@index([user_id, created_at])
-  @@index([product_id])
-  @@index([was_free])
-  @@map("listing_fee_transaction")
-}
-
-// ═══════════════════════════════════════════════════════════
-// WALLET COMPLIANCE RESTRUCTURING MODELS
-// ═══════════════════════════════════════════════════════════
-
-// User Risk Profiles for compliance monitoring
-model user_risk_profiles {
-  id         String    @id @default(uuid())
-  user_id    String    @unique
-  risk_score Int       @default(0) // 0-100
-  risk_level RiskLevel @default(LOW) // LOW, MEDIUM, HIGH, CRITICAL
-
-  // Risk factors
-  kyc_risk_score         Int @default(0)
-  geographic_risk_score  Int @default(0)
-  transaction_risk_score Int @default(0)
-  behavioral_risk_score  Int @default(0)
-
-  // Flags
-  self_tipping_score     Int @default(0)
-  circular_tipping_score Int @default(0)
-  recipient_diversity    Int @default(100)
-
-  // Actions
-  withdrawal_blocked     Boolean @default(false)
-  transaction_limited    Boolean @default(false)
-  requires_manual_review Boolean @default(false)
-
-  // Metadata
-  last_calculated_at DateTime @default(now())
-  flagged_reasons    String[]
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
-
-  @@index([risk_level])
-  @@index([risk_score])
-  @@index([user_id])
-  @@index([last_calculated_at])
-  @@map("user_risk_profiles")
-}
-
-// Risk Factors - Individual risk factor values for detailed tracking
-model risk_factors {
-  id            String   @id @default(uuid())
-  user_id       String
-  factor_type   String // PROFILE, GEOGRAPHIC, TRANSACTION, BEHAVIORAL
-  factor_name   String // kyc_status, account_age, country, volume_24h, etc.
-  factor_value  String // Stored as string, parsed as needed
-  factor_score  Int // Individual factor contribution to risk score
-  calculated_at DateTime @default(now())
-
-  @@index([user_id])
-  @@index([factor_type])
-  @@index([user_id, calculated_at])
-  @@map("risk_factors")
-}
-
-// Device Fingerprints for fraud detection (server-side)
-model device_fingerprints {
-  id               String @id @default(uuid())
-  user_id          String
-  fingerprint_hash String // Hash of device characteristics
-
-  // Device info
-  user_agent  String
-  ip_address  String
-  browser     String?
-  os          String?
-  device_type String?
-
-  // Tracking
-  first_seen_at DateTime @default(now())
-  last_seen_at  DateTime @default(now())
-  request_count Int      @default(1)
-
-  // Flags
-  is_suspicious     Boolean  @default(false)
-  shared_with_users String[] // User IDs using same device
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@unique([user_id, fingerprint_hash])
-  @@index([fingerprint_hash])
-  @@index([ip_address])
-  @@index([is_suspicious])
-  @@map("device_fingerprints")
-}
-
-// Locked Chat Tasks (task-based service model)
-model locked_chat_tasks {
-  id         String @id @default(uuid())
-  user_id    String // User who paid
-  creator_id String // Creator providing service
-
-  // Task details
-  task_description String
-  amount_kr        Decimal @db.Decimal(18, 4)
-
-  // Status
-  status   String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, EXPIRED
-  deadline DateTime
-
-  // Deliverable
-  deliverable_url  String?
-  deliverable_type String? // video, audio, image, file, text
-
-  // Timestamps
-  created_at   DateTime  @default(now())
-  started_at   DateTime?
-  completed_at DateTime?
-  expired_at   DateTime?
-
-  // Chat access
-  chat_unlocked_until DateTime? // When chat locks again
-
-  @@index([user_id])
-  @@index([creator_id])
-  @@index([status])
-  @@index([creator_id, status])
-  @@map("locked_chat_tasks")
-}
-
-// OFAC Sanctions Screening Cache
-model ofac_screening_cache {
-  id              String @id @default(uuid())
-  name            String // Name to check
-  name_normalized String // Normalized for matching
-
-  // Match result
-  is_match      Boolean @default(false)
-  match_score   Int? // 0-100 similarity score
-  matched_entry String? // SDN list entry that matched
-
-  // Cache metadata
-  checked_at   DateTime @default(now())
-  list_version String? // OFAC list version/date
-  expires_at   DateTime // Cache expiry (7 days)
-
-  created_at DateTime @default(now())
-
-  @@unique([name_normalized])
-  @@index([is_match])
-  @@index([expires_at])
-  @@map("ofac_screening_cache")
-}
-
-// Transaction Context (mandatory for all transactions)
-model transaction_contexts {
-  id             String @id @default(uuid())
-  transaction_id String @unique
-
-  // Context type and reference
-  context_type String // CONTENT_TIP, LOCKED_CHAT_TASK, SUBSCRIPTION, etc.
-  reference_id String? // ID of content, task, subscription, etc.
-  description  String
-
-  // Additional context
-  content_type String? // post, short, video, etc.
-  metadata     Json?
-
-  created_at DateTime @default(now())
-
-  @@index([context_type])
-  @@index([reference_id])
-  @@map("transaction_contexts")
-}
-
-// Compliance Dashboard - Flagged Transactions
-model flagged_transactions {
-  id             String @id @default(uuid())
-  transaction_id String
-  user_id        String
-
-  // Flag details
-  flag_reason String
-  flag_type   String // VELOCITY, SELF_TIPPING, CIRCULAR, HIGH_RISK, etc.
-  severity    String // LOW, MEDIUM, HIGH, CRITICAL
-  risk_score  Int // Risk score at time of flagging
-
-  // Review
-  status      String    @default("PENDING") // PENDING, REVIEWED, APPROVED, BLOCKED
-  reviewed_by String?
-  reviewed_at DateTime?
-  review_note String?
-
-  // Actions taken
-  action_taken String? // NONE, BLOCKED, LIMITED, SUSPENDED
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([user_id])
-  @@index([status])
-  @@index([severity])
-  @@index([flag_type])
-  @@index([risk_score])
-  @@index([created_at])
-  @@map("flagged_transactions")
-}
-
-// Locked Chat Settings (per creator)
-model locked_chat_settings {
-  id         String @id @default(uuid())
-  creator_id String @unique
-
-  // Settings
-  is_locked             Boolean @default(false)
-  task_fee_kr           Decimal @db.Decimal(18, 4)
-  typical_delivery_time String? // "24 hours", "3 days", etc.
-
-  // Stats
-  total_tasks_completed Int      @default(0)
-  average_rating        Decimal? @db.Decimal(3, 2)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([creator_id])
-  @@index([is_locked])
-  @@map("locked_chat_settings")
-}
-
-// Chat Task Unlocks (task-based chat access)
-model chat_task_unlocks {
-  id         String  @id @default(uuid())
-  user_id    String
-  creator_id String
-  amount_kr  Decimal @db.Decimal(18, 4)
-
-  // Task details
-  task_description String
-  status           ChatTaskStatus @default(PENDING)
-  deadline         DateTime
-  deliverable_url  String?
-
-  created_at   DateTime  @default(now())
-  completed_at DateTime?
-
-  @@index([creator_id])
-  @@index([user_id])
-  @@index([status])
-  @@index([user_id, creator_id])
-  @@map("chat_task_unlocks")
-}
-
 enum ChatTaskStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
   EXPIRED
-}
-
-// ═══════════════════════════════════════════════════════════
-// COMPLIANCE DASHBOARD TABLES
-// ═══════════════════════════════════════════════════════════
-
-// Compliance Reviews - Manual review workflow for flagged transactions
-model compliance_reviews {
-  id             String  @id @default(uuid())
-  transaction_id String
-  user_id        String
-  reviewer_id    String?
-
-  // Review details
-  review_type String // TRANSACTION, USER_PROFILE, WITHDRAWAL, CHAMA, etc.
-  status      String  @default("PENDING") // PENDING, IN_REVIEW, APPROVED, REJECTED, ESCALATED
-  decision    String? // APPROVE, REJECT, REQUEST_INFO, ESCALATE
-  notes       String?
-
-  // Timestamps
-  created_at  DateTime  @default(now())
-  reviewed_at DateTime?
-
-  @@index([transaction_id])
-  @@index([user_id])
-  @@index([reviewer_id])
-  @@index([status])
-  @@index([created_at])
-  @@map("compliance_reviews")
-}
-
-// Suspicious Activity Reports - SAR tracking for regulatory filing
-model suspicious_activity_reports {
-  id            String @id @default(uuid())
-  user_id       String
-  activity_type String // SELF_TIPPING, CIRCULAR_TIPPING, RAPID_WITHDRAWAL, CHAMA_FRAUD, etc.
-  description   String
-  severity      String // LOW, MEDIUM, HIGH, CRITICAL
-  status        String @default("DRAFT") // DRAFT, FILED, ACKNOWLEDGED, CLOSED
-
-  // Filing details
-  filed_at        DateTime?
-  filed_by        String?
-  report_number   String? // Unique SAR number for regulatory tracking
-  regulatory_body String? // e.g., "FinCEN", "FCA", etc.
-
-  // Supporting data
-  related_transactions String[] @default([]) // Array of transaction IDs
-  evidence_urls        String[] @default([]) // URLs to evidence/screenshots
-  metadata             Json? // Additional context data
-
-  // Timestamps
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([user_id])
-  @@index([status])
-  @@index([severity])
-  @@index([activity_type])
-  @@index([created_at])
-  @@index([filed_at])
-  @@map("suspicious_activity_reports")
-}
-
-// Audit Logs - Immutable compliance action tracking
-model audit_logs {
-  id             String  @id @default(uuid())
-  action_type    String // TRANSACTION_FLAGGED, USER_SUSPENDED, WITHDRAWAL_BLOCKED, KYC_APPROVED, etc.
-  performed_by   String // User ID or "SYSTEM" for automated actions
-  target_user_id String? // User affected by the action
-
-  // Action details
-  action_details Json // JSONB with full context of the action
-  ip_address     String?
-  user_agent     String?
-
-  // Immutable timestamp - no updates or deletes allowed
-  created_at DateTime @default(now())
-
-  @@index([action_type])
-  @@index([performed_by])
-  @@index([target_user_id])
-  @@index([created_at])
-  @@map("audit_logs")
 }

@@ -31,7 +31,7 @@ const healthServer = healthApp.listen(PORT, () => {
   console.log('📥 Loading main application...');
   
   // Now try to load the main app
-  import('./dist/index.ts')
+  import('./dist/index.js')
     .then(() => {
       console.log('✅ Main application loaded successfully');
       // Close health server as main app will take over

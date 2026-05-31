@@ -46,7 +46,17 @@ suspend inline fun <T> safeApiCall(crossinline block: suspend () -> T): NetworkR
         NetworkResult.Error(e.response.status.value, "Unexpected redirect. Please try again.")
     } catch (e: kotlinx.io.IOException) {
         println("❌ IOException: ${e.message}")
-        NetworkResult.Error(message = "No internet connection. Please check your network.")
+        println("❌ Full exception: ${e}")
+        val errorMessage = when {
+            e.message?.contains("Unable to resolve host", ignoreCase = true) == true -> 
+                "Cannot reach server. Please check your internet connection."
+            e.message?.contains("timeout", ignoreCase = true) == true -> 
+                "Connection timeout. Please check your internet connection."
+            e.message?.contains("Connection refused", ignoreCase = true) == true -> 
+                "Server is not responding. Please try again later."
+            else -> "Network error: ${e.message ?: "Unknown error"}"
+        }
+        NetworkResult.Error(message = errorMessage)
     } catch (e: kotlinx.serialization.SerializationException) {
         println("❌ SerializationException: ${e.message}")
         println("❌ This usually means the API response doesn't match the expected DTO")

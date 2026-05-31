@@ -4,10 +4,26 @@ import com.krieta.com.core.security.AppConfig
 
 object ApiConstants {
     // Railway backend base URL securely passed via local.properties
-    val BASE_URL = if (AppConfig.RAILWAY_URL.contains("10.0.2.2") || AppConfig.RAILWAY_URL.contains("localhost")) {
-        "http://${AppConfig.RAILWAY_URL}"
-    } else {
-        "https://${AppConfig.RAILWAY_URL}"
+    val BASE_URL = run {
+        val railwayUrl = AppConfig.RAILWAY_URL
+        println("🔧 Configuring BASE_URL with RAILWAY_URL: $railwayUrl")
+        
+        when {
+            railwayUrl.startsWith("http://") || railwayUrl.startsWith("https://") -> {
+                println("✅ Using URL as-is: $railwayUrl")
+                railwayUrl
+            }
+            railwayUrl.contains("10.0.2.2") || railwayUrl.contains("localhost") || railwayUrl.contains("127.0.0.1") -> {
+                val url = "http://$railwayUrl"
+                println("✅ Local development URL: $url")
+                url
+            }
+            else -> {
+                val url = "https://$railwayUrl"
+                println("✅ Production URL: $url")
+                url
+            }
+        }
     }
     const val API_VERSION = "/api/v1"
 

@@ -6,7 +6,7 @@ builder = "railpack"
 NODE_ENV = "production"
 
 [deploy]
-startCommand = "npm run start"
+startCommand = "npm start"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"

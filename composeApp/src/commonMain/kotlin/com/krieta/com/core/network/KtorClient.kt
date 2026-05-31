@@ -47,6 +47,8 @@ object KtorClientFactory {
     fun create(tokenManager: TokenManager, deviceSecurity: DeviceSecurity? = null, sessionManager: SessionManager): HttpClient {
         val certificatePinner = createCertificatePinner()
         
+        println("🔧 Creating HttpClient with BASE_URL: ${ApiConstants.BASE_URL}")
+        
         return HttpClient {
             certificatePinner.configurePinning(this)
             install(ContentNegotiation) {
@@ -122,9 +124,9 @@ object KtorClientFactory {
             }
 
             install(HttpTimeout) {
-                connectTimeoutMillis = 15_000
-                requestTimeoutMillis = 30_000
-                socketTimeoutMillis = 30_000
+                connectTimeoutMillis = 30_000  // Increased from 15s to 30s
+                requestTimeoutMillis = 60_000  // Increased from 30s to 60s
+                socketTimeoutMillis = 60_000   // Increased from 30s to 60s
             }
 
             install(Logging) {

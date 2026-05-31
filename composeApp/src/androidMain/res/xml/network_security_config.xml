@@ -7,9 +7,16 @@
     </base-config>
 
     <!-- Railway backend domain pinning -->
-    <!-- Railway backend domain routing -> Pinning temporarily disabled for local compilation -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">appu-app-production.up.railway.app</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+    
+    <!-- Local development -->
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">krieta-api.up.railway.app</domain>
-        <domain includeSubdomains="true">10.0.2.2</domain> <!-- For local Android emulator testing -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
     </domain-config>
 </network-security-config>
