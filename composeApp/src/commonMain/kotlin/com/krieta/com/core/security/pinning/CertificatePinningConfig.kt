@@ -8,7 +8,7 @@ object CertificatePinningConfig {
         "sha256/1UF7u2rF/gMt/exg0vytwI7Y1lh6itDPCKovyHH8Dk0="  // Railway SSL certificate
     )
     
-    val PINNING_ENABLED = true  // Enabled with correct Railway certificate pin
+    val PINNING_ENABLED = false  // Disabled: re-enable with correct pin after certificate stabilizes
     
     const val ALLOW_USER_CERTIFICATES = false
 }
