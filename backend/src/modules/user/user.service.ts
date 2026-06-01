@@ -218,20 +218,12 @@ export class UserService {
    */
   static async getAdmiring(userId: string, cursor?: string, limit = 20) {
     const records = await prisma.admires.findMany({
-      where: {
-        OR: [
-          { admirer_id: userId },
-          { admired_id: userId, is_lovers: true }
-        ]
-      },
+      where: { admirer_id: userId },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { created_at: 'desc' },
       include: {
         User_admires_admired_idToUser: {
-          select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true }
-        },
-        User_admires_admirer_idToUser: {
           select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true }
         }
       }
@@ -240,10 +232,7 @@ export class UserService {
     const hasMore = records.length > limit;
     const items = hasMore ? records.slice(0, limit) : records;
     return {
-      items: items.map((r: any) => {
-        const otherUser = r.admirer_id === userId ? r.User_admires_admired_idToUser : r.User_admires_admirer_idToUser;
-        return { ...otherUser, isLovers: r.is_lovers };
-      }),
+      items: items.map((r: any) => ({ ...r.User_admires_admired_idToUser, isLovers: r.is_lovers })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
   }

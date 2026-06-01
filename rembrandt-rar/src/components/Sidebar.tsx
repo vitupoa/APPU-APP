@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useAdminStore } from '@/store/adminStore';
 import {
   LayoutDashboard, Users, Film, Wallet, Flag, Settings,
-  ScrollText, Shield, Megaphone, FileWarning, LogOut, ChevronLeft, Store, ShieldAlert, ShieldBan, TrendingDown, Database, FileCheck, CreditCard, DollarSign, MapPin
+  ScrollText, Shield, Megaphone, FileWarning, LogOut, ChevronLeft, Store, ShieldAlert, ShieldBan, TrendingDown, Database, FileCheck, CreditCard, DollarSign, MapPin, ShieldCheck
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn, getInitials } from '@/lib/utils';
@@ -19,6 +19,7 @@ const navItems = [
   { href: '/financials', label: 'Financials', icon: Wallet, perm: 'withdrawals.view' },
   { href: '/kyc', label: 'KYC Verification', icon: FileCheck, financialOnly: true },
   { href: '/withdrawals', label: 'Withdrawals', icon: CreditCard, financialOnly: true },
+  { href: '/compliance', label: 'Compliance', icon: ShieldCheck, superOnly: true },
   { href: '/bulk-deduction', label: 'Bulk Deduction', icon: TrendingDown, superOnly: true },
   { href: '/feature-flags', label: 'Feature Flags', icon: Flag, superOnly: true },
   { href: '/auto-admire', label: 'Auto-Admire', icon: Users, superOnly: true },

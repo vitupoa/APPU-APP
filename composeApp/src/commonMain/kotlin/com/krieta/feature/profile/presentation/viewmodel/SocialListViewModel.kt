@@ -40,7 +40,7 @@ class SocialListViewModel(
             when (result) {
                 is NetworkResult.Success -> {
                     _state.value = _state.value.copy(
-                        items = _state.value.items + result.data.items,
+                        items = (_state.value.items + result.data.items).distinctBy { it.id },
                         nextCursor = result.data.nextCursor,
                         isLoadingMore = false
                     )
@@ -56,7 +56,7 @@ class SocialListViewModel(
             when (val result = fetchList(null)) {
                 is NetworkResult.Success -> {
                     _state.value = SocialListState(
-                        items = result.data.items,
+                        items = result.data.items.distinctBy { it.id },
                         nextCursor = result.data.nextCursor,
                         isLoading = false
                     )
