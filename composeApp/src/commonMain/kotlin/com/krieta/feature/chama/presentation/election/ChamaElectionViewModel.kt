@@ -45,7 +45,6 @@ class ChamaElectionViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -62,7 +61,6 @@ class ChamaElectionViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isActionLoading = false, error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -79,7 +77,6 @@ class ChamaElectionViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isActionLoading = false, error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -96,7 +93,6 @@ class ChamaElectionViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isActionLoading = false, error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

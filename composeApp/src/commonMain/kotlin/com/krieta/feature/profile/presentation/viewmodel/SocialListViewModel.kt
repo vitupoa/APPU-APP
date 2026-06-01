@@ -65,7 +65,6 @@ class SocialListViewModel(
                 is NetworkResult.Error -> {
                     _state.value = SocialListState(isLoading = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

@@ -41,7 +41,6 @@ class BioLinksViewModel(
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isLoading = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -76,7 +75,6 @@ class BioLinksViewModel(
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isSaving = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

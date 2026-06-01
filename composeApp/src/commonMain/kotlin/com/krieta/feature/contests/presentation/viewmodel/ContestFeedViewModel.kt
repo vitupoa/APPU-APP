@@ -82,7 +82,6 @@ class ContestFeedViewModel(
                 is NetworkResult.Error -> {
                     _state.value = ContestFeedState.Error(result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

@@ -28,12 +28,11 @@ class JudgeInvitationsViewModel(
     fun loadInvitations() {
         screenModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
-            
+
             when (val result = repository.getJudgeInvitations()) {
                 is NetworkResult.Success -> {
-                    // Filter to show only pending invitations
-                    val pendingInvites = result.data.filter { 
-                        it.status == JudgeInviteStatus.PENDING 
+                    val pendingInvites = result.data.filter {
+                        it.status == JudgeInviteStatus.PENDING
                     }
                     _state.value = _state.value.copy(
                         invitations = pendingInvites,
@@ -48,12 +47,6 @@ class JudgeInvitationsViewModel(
                         error = result.message
                     )
                 }
-                else -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = "An unexpected error occurred"
-                    )
-                }
             }
         }
     }
@@ -61,10 +54,9 @@ class JudgeInvitationsViewModel(
     fun acceptInvite(inviteId: String) {
         screenModelScope.launch {
             _state.value = _state.value.copy(processingInviteId = inviteId)
-            
+
             when (repository.acceptJudgeInvite(inviteId)) {
                 is NetworkResult.Success -> {
-                    // Remove the accepted invite from the list
                     _state.value = _state.value.copy(
                         invitations = _state.value.invitations.filter { it.id != inviteId },
                         processingInviteId = null
@@ -77,12 +69,6 @@ class JudgeInvitationsViewModel(
                         error = "Failed to accept invitation"
                     )
                 }
-                else -> {
-                    _state.value = _state.value.copy(
-                        processingInviteId = null,
-                        error = "An unexpected error occurred"
-                    )
-                }
             }
         }
     }
@@ -90,10 +76,9 @@ class JudgeInvitationsViewModel(
     fun declineInvite(inviteId: String) {
         screenModelScope.launch {
             _state.value = _state.value.copy(processingInviteId = inviteId)
-            
+
             when (repository.declineJudgeInvite(inviteId)) {
                 is NetworkResult.Success -> {
-                    // Remove the declined invite from the list
                     _state.value = _state.value.copy(
                         invitations = _state.value.invitations.filter { it.id != inviteId },
                         processingInviteId = null
@@ -104,12 +89,6 @@ class JudgeInvitationsViewModel(
                     _state.value = _state.value.copy(
                         processingInviteId = null,
                         error = "Failed to decline invitation"
-                    )
-                }
-                else -> {
-                    _state.value = _state.value.copy(
-                        processingInviteId = null,
-                        error = "An unexpected error occurred"
                     )
                 }
             }

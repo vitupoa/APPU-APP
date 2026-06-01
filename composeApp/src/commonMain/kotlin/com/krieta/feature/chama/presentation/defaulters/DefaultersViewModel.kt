@@ -46,7 +46,6 @@ class DefaultersViewModel(
                         error = result.message
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -69,7 +68,6 @@ class DefaultersViewModel(
                         error = result.message
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -89,7 +87,6 @@ class DefaultersViewModel(
                         error = "Failed to resolve default"
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

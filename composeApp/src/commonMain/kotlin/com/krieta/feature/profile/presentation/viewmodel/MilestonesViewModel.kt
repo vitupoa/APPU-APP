@@ -70,7 +70,6 @@ class MilestonesViewModel(
                 is NetworkResult.Error -> {
                     _state.value = MilestonesState(isLoading = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

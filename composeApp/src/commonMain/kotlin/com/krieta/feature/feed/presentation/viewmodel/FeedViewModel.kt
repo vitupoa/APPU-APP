@@ -68,7 +68,6 @@ class FeedViewModel(
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isRefreshing = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -91,7 +90,6 @@ class FeedViewModel(
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isLoadingMore = false)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -131,7 +129,6 @@ class FeedViewModel(
                 is NetworkResult.Error -> {
                     _state.value = FeedState(isLoading = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

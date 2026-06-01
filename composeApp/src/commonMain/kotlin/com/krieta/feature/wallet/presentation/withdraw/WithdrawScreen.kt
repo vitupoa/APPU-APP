@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.krieta.com.core.theme.KrietaColors
@@ -27,7 +27,7 @@ class WithdrawScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = getScreenModel<WithdrawViewModel>()
+        val viewModel = koinScreenModel<WithdrawViewModel>()
         val state by viewModel.state.collectAsState()
         
         LaunchedEffect(state.successMessage) {
@@ -184,7 +184,7 @@ class WithdrawScreen : Screen {
                                 readOnly = true,
                                 label = { Text("Select Country") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(countryExpanded) },
-                                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                             )
                             ExposedDropdownMenu(
                                 expanded = countryExpanded,
@@ -224,7 +224,7 @@ class WithdrawScreen : Screen {
                                 readOnly = true,
                                 label = { Text("Select Bank") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                                 enabled = state.banks.isNotEmpty()
                             )
                             ExposedDropdownMenu(

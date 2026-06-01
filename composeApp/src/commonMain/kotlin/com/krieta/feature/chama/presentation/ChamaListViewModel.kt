@@ -43,7 +43,6 @@ class ChamaListViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -59,7 +58,6 @@ class ChamaListViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -77,7 +75,6 @@ class ChamaListViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(joiningId = null, error = it.error) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -93,7 +90,6 @@ class ChamaListViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoading = false, error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

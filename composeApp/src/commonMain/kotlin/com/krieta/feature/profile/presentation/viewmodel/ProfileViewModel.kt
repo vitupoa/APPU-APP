@@ -100,7 +100,6 @@ class ProfileViewModel(
                 is NetworkResult.Error -> {
                             _state.value = _state.value.copy(isRelationshipLoading = false, error = result.message)
                         }
-                        is NetworkResult.Loading -> {}
                     }
                 }
                 RelationshipStatus.ADMIRING, RelationshipStatus.LOVERS -> {
@@ -119,7 +118,6 @@ class ProfileViewModel(
                 is NetworkResult.Error -> {
                             _state.value = _state.value.copy(isRelationshipLoading = false)
                         }
-                        is NetworkResult.Loading -> {}
                     }
                 }
             }
@@ -130,10 +128,9 @@ class ProfileViewModel(
         val profile = _state.value.profile ?: return
         screenModelScope.launch {
             when (repository.subscribe(profile.id, tier)) {
-                is NetworkResult.Success -> loadProfile() // Refresh to show updated state
+                is NetworkResult.Success -> loadProfile()
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {}
-                is NetworkResult.Loading -> {}
             }
         }
     }

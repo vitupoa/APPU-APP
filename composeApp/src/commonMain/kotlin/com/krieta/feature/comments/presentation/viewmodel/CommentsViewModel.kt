@@ -77,7 +77,6 @@ class CommentsViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = result.message, isLoading = false) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -110,7 +109,6 @@ class CommentsViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(isLoadingMore = false) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -131,7 +129,6 @@ class CommentsViewModel(
                 }
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {}
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -165,7 +162,6 @@ class CommentsViewModel(
                     removeOptimisticComment(tempComment.id)
                     _state.update { it.copy(error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -185,7 +181,6 @@ class CommentsViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -204,7 +199,6 @@ class CommentsViewModel(
                     loadComments(refresh = true)
                     _state.update { it.copy(error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -232,7 +226,6 @@ class CommentsViewModel(
                 is NetworkResult.Error -> {
                     updateCommentInList(comment)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -253,7 +246,6 @@ class CommentsViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = result.message) }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -268,7 +260,6 @@ class CommentsViewModel(
                 is NetworkResult.Error -> {
                     _state.update { it.copy(error = "Failed to report comment") }
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -321,7 +312,6 @@ class CommentsViewModel(
                 }
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {}
-                is NetworkResult.Loading -> {}
             }
         }
     }

@@ -69,7 +69,6 @@ class PayoutViewModel(
                         error = "Failed to submit payout request"
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -98,7 +97,6 @@ class PayoutViewModel(
                         error = "Failed to process payout"
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

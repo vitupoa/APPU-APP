@@ -75,7 +75,6 @@ class DiscoverFeedViewModel(
                 is NetworkResult.Error -> {
                     _state.value = DiscoverFeedState(isLoading = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -98,7 +97,6 @@ class DiscoverFeedViewModel(
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isLoadingMore = false)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

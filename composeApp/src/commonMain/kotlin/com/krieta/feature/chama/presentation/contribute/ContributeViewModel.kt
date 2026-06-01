@@ -75,7 +75,6 @@ class ContributeViewModel(
                         error = result.message
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -100,7 +99,6 @@ class ContributeViewModel(
                         error = "Failed to make contribution"
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

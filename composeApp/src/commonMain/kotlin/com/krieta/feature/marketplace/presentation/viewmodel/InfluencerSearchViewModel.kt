@@ -40,7 +40,6 @@ class InfluencerSearchViewModel(
                 is NetworkResult.Error -> {
                     _uiState.value = InfluencerSearchState.Error(result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

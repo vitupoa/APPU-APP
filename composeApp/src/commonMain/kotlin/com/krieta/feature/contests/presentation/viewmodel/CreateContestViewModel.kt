@@ -937,12 +937,6 @@ class CreateContestViewModel(
                     isSearchingJudges = false
                 )
             }
-            else -> {
-                _state.value = _state.value.copy(
-                    judgeSearchResults = emptyList(),
-                    isSearchingJudges = false
-                )
-            }
         }
     }
     
@@ -1147,13 +1141,6 @@ class CreateContestViewModel(
                                         error = "Contest created but some judge invites failed"
                                     )
                                 }
-                                else -> {
-                                    _state.value = _state.value.copy(
-                                        isPublishing = false,
-                                        success = true,
-                                        error = null
-                                    )
-                                }
                             }
                         } else {
                             _state.value = _state.value.copy(
@@ -1173,13 +1160,6 @@ class CreateContestViewModel(
                             error = result.message
                         )
                         // Note: The UI remains on step 5 to allow the user to correct errors
-                    }
-                    else -> {
-                        _state.value = _state.value.copy(
-                            isPublishing = false,
-                            success = false,
-                            error = "An unexpected error occurred. Please try again."
-                        )
                     }
                 }
             } catch (e: Exception) {

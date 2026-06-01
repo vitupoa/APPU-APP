@@ -59,7 +59,6 @@ class ContestSubmissionFeedViewModel(
                         error = result.message
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -89,7 +88,6 @@ class ContestSubmissionFeedViewModel(
                 is NetworkResult.Error -> {
                     _state.value = _state.value.copy(isLoadingMore = false)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

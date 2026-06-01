@@ -47,7 +47,6 @@ class StoriesViewModel(
                         error = result.message
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

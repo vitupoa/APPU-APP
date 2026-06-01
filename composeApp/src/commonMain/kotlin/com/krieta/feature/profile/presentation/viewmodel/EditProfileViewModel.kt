@@ -121,7 +121,6 @@ class EditProfileViewModel(
                 is NetworkResult.Error -> {
                     _state.value = s.copy(isSaving = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -149,7 +148,6 @@ class EditProfileViewModel(
                 is NetworkResult.Error -> {
                     _state.value = EditProfileState(isLoading = false, error = result.message)
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }

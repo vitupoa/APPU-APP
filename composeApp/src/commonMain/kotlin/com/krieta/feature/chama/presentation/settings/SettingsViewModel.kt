@@ -49,7 +49,6 @@ class SettingsViewModel(
                         error = result.message
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -91,7 +90,6 @@ class SettingsViewModel(
                         error = "Failed to update chama settings"
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -115,7 +113,6 @@ class SettingsViewModel(
                         error = "Failed to remove member"
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
@@ -138,7 +135,6 @@ class SettingsViewModel(
                         error = "Failed to leave chama"
                     )
                 }
-                is NetworkResult.Loading -> {}
             }
         }
     }
