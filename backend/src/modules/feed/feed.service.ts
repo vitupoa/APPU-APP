@@ -65,7 +65,14 @@ export class FeedService {
           const access = accessMap.get(p.id) || { hasAccess: true };
           return {
             id: p.id,
-            creator: p.User,
+            creator: {
+              id: p.User.id,
+              username: p.User.username,
+              displayName: p.User.display_name,
+              avatarUrl: p.User.avatar_url,
+              isVerified: p.User.is_verified,
+              accountType: p.User.account_type
+            },
             imageUrls: access.hasAccess ? p.image_urls : [],
             caption: p.caption,
             isLocked: p.is_locked,

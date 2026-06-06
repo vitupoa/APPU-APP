@@ -113,7 +113,9 @@ export class StoriesService {
       return acc;
     }, {} as Record<string, any>);
 
-    return Object.values(grouped);
+      return {
+        feed: Object.values(grouped)
+      };
   }
 
   /**
