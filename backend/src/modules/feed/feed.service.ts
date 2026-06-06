@@ -15,73 +15,82 @@ export class FeedService {
   }) {
     const { userId, cursor, limit } = params;
 
-    let posts: any[];
+    try {
+      let posts: any[];
 
-    if (userId) {
-      // Personalized feed with randomization
-      posts = await this.getPersonalizedFeed(userId, cursor, limit);
-    } else {
-      // Guest users get random popular posts
-      posts = await this.getGuestFeed(cursor, limit);
+      if (userId) {
+        // Personalized feed with randomization
+        posts = await this.getPersonalizedFeed(userId, cursor, limit);
+      } else {
+        // Guest users get random popular posts
+        posts = await this.getGuestFeed(cursor, limit);
+      }
+
+      const hasMore = posts.length > limit;
+      const items = hasMore ? posts.slice(0, limit) : posts;
+      const nextCursor = hasMore ? items[items.length - 1].id : null;
+
+      // Check liked status if user is authenticated
+      const likedIds = new Set<string>();
+      if (userId) {
+        const liked = await prisma.post_likes.findMany({
+          where: { user_id: userId, post_id: { in: items.map((p) => p.id) } },
+          select: { post_id: true }
+        });
+        liked.forEach((l: any) => likedIds.add(l.post_id));
+      }
+
+      // Check access for locked content
+      const accessChecks = await Promise.all(
+        items.map(async (p: any) => {
+          if (!p.is_locked) return { id: p.id, hasAccess: true };
+          if (!userId) return { id: p.id, hasAccess: false };
+          
+          const access = await ContentLockService.checkAccess(
+            userId,
+            p.id,
+            'POST',
+            p.user_id,
+            p.is_locked,
+            p.required_tier,
+            p.unlock_amount_kr ? Number(p.unlock_amount_kr) : undefined
+          );
+          return { id: p.id, ...access };
+        })
+      );
+      const accessMap = new Map(accessChecks.map(a => [a.id, a]));
+
+      return {
+        items: items.map((p: any) => {
+          const access = accessMap.get(p.id) || { hasAccess: true };
+          return {
+            id: p.id,
+            creator: p.User,
+            imageUrls: access.hasAccess ? p.image_urls : [],
+            caption: p.caption,
+            isLocked: p.is_locked,
+            requiredTier: p.required_tier,
+            unlockAmountKr: p.unlock_amount_kr ? Number(p.unlock_amount_kr) : undefined,
+            hasAccess: access.hasAccess,
+            requiresSubscription: (access as any).requiresSubscription,
+            requiresUnlock: (access as any).requiresUnlock,
+            likesCount: p.likes_count,
+            commentsCount: p.comments_count,
+            isLiked: likedIds.has(p.id),
+            commentsEnabled: (p as any).commentsEnabled ?? true,
+            created_at: p.created_at.toISOString()
+          };
+        }),
+        nextCursor
+      };
+    } catch (error) {
+      console.error('Error in getFeed:', error);
+      // Always return valid structure even on error
+      return {
+        items: [],
+        nextCursor: null
+      };
     }
-
-    const hasMore = posts.length > limit;
-    const items = hasMore ? posts.slice(0, limit) : posts;
-    const nextCursor = hasMore ? items[items.length - 1].id : null;
-
-    // Check liked status if user is authenticated
-    const likedIds = new Set<string>();
-    if (userId) {
-      const liked = await prisma.post_likes.findMany({
-        where: { user_id: userId, post_id: { in: items.map((p) => p.id) } },
-        select: { post_id: true }
-      });
-      liked.forEach((l: any) => likedIds.add(l.post_id));
-    }
-
-    // Check access for locked content
-    const accessChecks = await Promise.all(
-      items.map(async (p: any) => {
-        if (!p.is_locked) return { id: p.id, hasAccess: true };
-        if (!userId) return { id: p.id, hasAccess: false };
-        
-        const access = await ContentLockService.checkAccess(
-          userId,
-          p.id,
-          'POST',
-          p.user_id,
-          p.is_locked,
-          p.required_tier,
-          p.unlock_amount_kr ? Number(p.unlock_amount_kr) : undefined
-        );
-        return { id: p.id, ...access };
-      })
-    );
-    const accessMap = new Map(accessChecks.map(a => [a.id, a]));
-
-    return {
-      items: items.map((p: any) => {
-        const access = accessMap.get(p.id) || { hasAccess: true };
-        return {
-          id: p.id,
-          creator: p.User,
-          imageUrls: access.hasAccess ? p.image_urls : [],
-          caption: p.caption,
-          isLocked: p.is_locked,
-          requiredTier: p.required_tier,
-          unlockAmountKr: p.unlock_amount_kr ? Number(p.unlock_amount_kr) : undefined,
-          hasAccess: access.hasAccess,
-          requiresSubscription: (access as any).requiresSubscription,
-          requiresUnlock: (access as any).requiresUnlock,
-          likesCount: p.likes_count,
-          commentsCount: p.comments_count,
-          isLiked: likedIds.has(p.id),
-          commentsEnabled: (p as any).commentsEnabled ?? true,
-          created_at: p.created_at.toISOString()
-        };
-      }),
-      nextCursor
-    };
   }
 
   /**

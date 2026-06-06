@@ -39,13 +39,12 @@ export class WalletService {
     const fiatEquivalent = baseUsd * fiatRate;
 
     return {
-      kr_balance: wallet.kr_balance,
+      krBalance: wallet.kr_balance.toNumber(),
       fiatEquivalent,
       currency: currencyToUse,
-      is_wallet_unlocked: wallet.User.is_wallet_unlocked,
-      // Wave 3 Task 5.3: Include exchange rate metadata
-      exchange_rate: fiatRate,
-      base_usd: baseUsd
+      isWalletUnlocked: wallet.User.is_wallet_unlocked,
+      exchangeRate: fiatRate,
+      baseUsd: baseUsd
     };
   }
 
