@@ -34,14 +34,12 @@ export class AuthService {
     
     const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL);
 
-    await prisma.refresh_tokens.create({
-      data: {
+    await prisma.refresh_tokens.create({ data: {
         user_id: userId,
         device_id: deviceId,
         token_hash: tokenHash,
         expires_at: expiresAt
-      }
-    });
+      }} as any));
 
     return rawToken;
   }
@@ -117,9 +115,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(data.password, 12);
     const displayName = `${data.first_name} ${data.last_name}`;
 
-    const user = await prisma.user.create({
-      data: {
-        email: data.email,
+    const user = await prisma.user.create({ data: { id: crypto.randomUUID(), email: data.email,
         password_hash: passwordHash,
         first_name: data.first_name,
         last_name: data.last_name,
@@ -130,9 +126,7 @@ export class AuthService {
         currency: data.currency,
         selectedNiches: data.selectedNiches || [],
         customNiches: data.customNiches || [],
-        updated_at: new Date()
-      }
-    });
+        updated_at: new Date()}} as any));
 
     await this.processAutoAdmire(user.id);
 
@@ -266,8 +260,7 @@ export class AuthService {
       }
 
       const displayName = `${data.first_name} ${data.last_name}`;
-      user = await prisma.user.create({
-        data: {
+      user = await prisma.user.create({ data: {
           email: providerEmail, // The real verified email from Google/Apple
           google_id: data.provider === 'google' ? providerId : null,
           apple_id: data.provider === 'apple' ? providerId : null,
@@ -280,8 +273,7 @@ export class AuthService {
           currency: data.currency,
           updated_at: new Date()
           // passwordHash is optional
-        }
-      });
+        }} as any));
       await this.processAutoAdmire(user.id);
     }
 
@@ -322,7 +314,7 @@ export class AuthService {
     // Find the token
     const tokenRecord = await prisma.refresh_tokens.findFirst({
       where: { token_hash: tokenHash, device_id: data.deviceId },
-      include: { User: true }
+      include: { user: true }
     });
 
     if (!tokenRecord) {

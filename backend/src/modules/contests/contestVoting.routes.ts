@@ -5,6 +5,7 @@ import { validateRequest } from '../../middleware/validate.js';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { votingRateLimiter } from '../../middleware/rateLimiter.js';
 import { csrfProtection } from '../../middleware/csrfProtection.js';
+import crypto from 'crypto';
 
 const router = Router();
 

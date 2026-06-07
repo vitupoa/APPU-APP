@@ -209,7 +209,8 @@ router.post('/applications/:id/review', authMiddleware, async (req: AuthRequest,
     const result = await BrandMarketplaceService.reviewApplication({
       applicationId: String(req.params.id),
       brand_id: req.user_id!,
-      ...data
+      decision: data.decision,
+      response_note: data.responseNote
     });
 
     res.json(result);

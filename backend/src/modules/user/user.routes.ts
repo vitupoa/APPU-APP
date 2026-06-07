@@ -72,7 +72,7 @@ router.put('/me', authMiddleware, preventSensitiveFieldModification, sanitizePro
 // PUT /api/v1/users/me/bio-links
 router.put('/me/bio-links', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const links = bioLinksSchema.parse(req.body);
+    const links = bioLinksSchema.parse(req.body) as { label: string; url: string; icon?: string; }[];
     const result = await UserService.updateBioLinks(req.userId!, links);
     res.status(200).json(result);
   } catch (error: any) {
@@ -208,7 +208,7 @@ router.get('/me/subscription-tiers', authMiddleware, async (req: AuthRequest, re
 // PUT /api/v1/users/me/subscription-tiers
 router.put('/me/subscription-tiers', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const tiers = updateTiersSchema.parse(req.body);
+    const tiers = updateTiersSchema.parse(req.body) as { tier: string; krAmount: number; benefits: string; isEnabled: boolean; }[];
     const result = await SubscriptionService.updateTiers(req.userId!, tiers);
     res.status(200).json(result);
   } catch (error: any) {

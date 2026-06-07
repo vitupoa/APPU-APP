@@ -2039,6 +2039,7 @@ model platform_announcements {
   id         String    @id
   title      String
   message    String
+  targetScope String?   @default("all")
   type       String
   is_active  Boolean   @default(true)
   created_at DateTime  @default(now())

@@ -1,4 +1,5 @@
 import { prisma } from '../../config/database.js';
+import crypto from 'crypto';
 
 export interface ComplianceReviewData {
   transaction_id: string;
@@ -18,16 +19,14 @@ class ComplianceReviewService {
    */
   async createReview(data: ComplianceReviewData, reviewerId?: string): Promise<any> {
     try {
-      const review = await prisma.compliance_reviews.create({
-        data: {
+      const review = await prisma.compliance_reviews.create({ data: {
           transaction_id: data.transaction_id,
           user_id: data.user_id,
           reviewer_id: reviewerId,
           review_type: data.review_type,
           status: 'PENDING',
           notes: data.notes
-        }
-      });
+        }} as any));
 
       return review;
     } catch (error: any) {

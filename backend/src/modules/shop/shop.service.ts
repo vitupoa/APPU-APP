@@ -4,6 +4,7 @@ import { categoryDetailSchemas } from './shop.types.js';
 import { io } from '../../index.js';
 import { emitProductCreated, emitProductUpdated, emitProductDeleted } from '../../shared/gateway/shop-socket.js';
 import { listingFeeService } from './listing-fee.service.js';
+import crypto from 'crypto';
 
 const SELLER_SELECT = {
   id: true, username: true, display_name: true, avatar_url: true, is_verified: true
@@ -71,7 +72,7 @@ export class ShopService {
           stock: productData.stock ?? 1,
           status: 'active',
         },
-        include: { User: { select: SELLER_SELECT } }
+        include: { user: { select: SELLER_SELECT } }
       });
 
       // Create category-specific detail record
@@ -317,8 +318,7 @@ export class ShopService {
     const products = await prisma.products.findMany({
       where: { seller_id: sellerId, status: { not: 'removed' } },
       orderBy: { created_at: 'desc' },
-      include: {
-        User: { select: SELLER_SELECT },
+      include: { user: { select: SELLER_SELECT },
         vehicle_details: true,
         spare_part_details: true,
       }
@@ -335,7 +335,7 @@ export class ShopService {
       where: { status: 'active' },
       orderBy: [{ view_count: 'desc' }, { sales_count: 'desc' }],
       take: limit,
-      include: { User: { select: SELLER_SELECT } }
+      include: { user: { select: SELLER_SELECT } }
     });
     return products.map(formatProduct);
   }
@@ -357,7 +357,7 @@ export class ShopService {
 
     return prisma.vehicle_favorites.create({
       data: { user_id: userId, product_id: productId },
-      include: { products: { include: { User: { select: SELLER_SELECT }, vehicle_details: true } } }
+      include: { products: { include: { user: { select: SELLER_SELECT }, vehicle_details: true } } }
     });
   }
 
@@ -368,7 +368,7 @@ export class ShopService {
   static async getVehicleFavorites(userId: string) {
     const favorites = await prisma.vehicle_favorites.findMany({
       where: { user_id: userId },
-      include: { products: { include: { User: { select: SELLER_SELECT }, vehicle_details: true } } },
+      include: { products: { include: { user: { select: SELLER_SELECT }, vehicle_details: true } } },
       orderBy: { created_at: 'desc' }
     });
     return favorites.map((f: any) => ({
@@ -459,7 +459,7 @@ export class ShopService {
     });
 
     return orderItems.map((item: any) => ({
-      user: item.orders.User,
+      user: item.orders.user,
       purchasedAt: item.orders.created_at.toISOString(),
     }));
   }
@@ -482,8 +482,7 @@ export class ShopService {
       },
       include: {
         products: {
-          include: {
-            User: { select: SELLER_SELECT },
+          include: { user: { select: SELLER_SELECT },
             vehicle_details: true,
             fashion_details: true,
           }
@@ -517,7 +516,7 @@ export class ShopService {
     const parts = await prisma.spare_part_details.findMany({
       where,
       include: {
-        products: { include: { User: { select: SELLER_SELECT } } }
+        products: { include: { user: { select: SELLER_SELECT } } }
       }
     });
 
@@ -584,7 +583,7 @@ async function upsertCategoryDetail(tx: any, product_id: string, category: strin
 function formatProduct(p: any) {
   const result: any = {
     id: p.id,
-    seller: p.User,
+    seller: p.user,
     title: p.title,
     description: p.description,
     imageUrls: p.image_urls,

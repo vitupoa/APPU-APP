@@ -5,6 +5,7 @@ import { YouTubeService } from '../services/oauth/youtube.service.js';
 import { TwitterService } from '../services/oauth/twitter.service.js';
 import { FacebookService } from '../services/oauth/facebook.service.js';
 import { TwitchService } from '../services/oauth/twitch.service.js';
+import crypto from 'crypto';
 
 /**
  * Social Media Sync Worker
@@ -211,8 +212,7 @@ export class SocialMediaSyncWorker {
         }
 
         // Log sync
-        await prisma.social_media_sync_logs.create({
-          data: {
+        await prisma.social_media_sync_logs.create({ data: {
             account_id: account.id,
             sync_type: 'follower_count',
             status: 'success',
@@ -220,14 +220,12 @@ export class SocialMediaSyncWorker {
             followers_after: followersAfter,
             follower_change: followersAfter - followersBefore,
             duration_ms: 0
-          }
-        });
+          }} as any));
 
         console.log(`[SocialMediaSyncWorker] Synced ${account.platform} account ${account.id}: ${followersBefore} -> ${followersAfter}`);
       } catch (error: any) {
         console.error(`[SocialMediaSyncWorker] Failed to sync ${account.id}:`, error.message);
-        await prisma.social_media_sync_logs.create({
-          data: {
+        await prisma.social_media_sync_logs.create({ data: {
             account_id: account.id,
             sync_type: 'follower_count',
             status: 'failed',
@@ -236,8 +234,7 @@ export class SocialMediaSyncWorker {
             follower_change: 0,
             error_message: error.message,
             duration_ms: 0
-          }
-        });
+          }} as any));
       }
     }
   }

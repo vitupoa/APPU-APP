@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import axios from 'axios';
 import { Logger } from '../../utils/logger.js';
+import crypto from 'crypto';
 
 const logger = new Logger('OFACScreening');
 

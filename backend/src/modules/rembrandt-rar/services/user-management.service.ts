@@ -2,6 +2,7 @@ import { prisma } from '../../../config/database.js';
 import { AuditService } from './audit.service.js';
 import { ADMIN_ACTIONS } from '../rembrandt-rar.types.js';
 import { EmailService } from '../../../shared/services/email.service.js';
+import crypto from 'crypto';
 
 export class UserManagementService {
   static async listUsers(options: {
@@ -78,7 +79,7 @@ export class UserManagementService {
     if (adminId === targetUserId) throw new Error('Cannot suspend yourself');
 
     // Prevent suspending another super admin
-    const targetProfile = await prisma.adminProfile.findUnique({ where: { user_id: targetUserId } });
+    const targetProfile = await prisma.admin_profile.findUnique({ where: { user_id: targetUserId } });
     if (targetProfile?.role === 'SUPER_ADMIN') {
       throw new Error('Cannot suspend a Super Admin');
     }
@@ -137,7 +138,7 @@ export class UserManagementService {
   static async deleteUser(adminId: string, targetUserId: string, ip?: string, ua?: string) {
     if (adminId === targetUserId) throw new Error('Cannot delete yourself');
 
-    const targetProfile = await prisma.adminProfile.findUnique({ where: { user_id: targetUserId } });
+    const targetProfile = await prisma.admin_profile.findUnique({ where: { user_id: targetUserId } });
     if (targetProfile?.role === 'SUPER_ADMIN') {
       throw new Error('Cannot delete a Super Admin');
     }
@@ -153,14 +154,14 @@ export class UserManagementService {
     ip?: string, ua?: string
   ) {
     // Only super admins can assign roles
-    const adminProfile = await prisma.adminProfile.findUnique({ where: { user_id: adminId } });
+    const adminProfile = await prisma.admin_profile.findUnique({ where: { user_id: adminId } });
     if (adminProfile?.role !== 'SUPER_ADMIN') {
       throw new Error('Only Super Admins can assign roles');
     }
 
     // Self-protection: can't remove own SUPER_ADMIN if last one
     if (adminId === targetUserId && data.role !== 'SUPER_ADMIN') {
-      const superAdminCount = await prisma.adminProfile.count({
+      const superAdminCount = await prisma.admin_profile.count({
         where: { role: 'SUPER_ADMIN', is_active: true }
       });
       if (superAdminCount <= 1) {
@@ -168,15 +169,15 @@ export class UserManagementService {
       }
     }
 
-    const existing = await prisma.adminProfile.findUnique({ where: { user_id: targetUserId } });
+    const existing = await prisma.admin_profile.findUnique({ where: { user_id: targetUserId } });
 
     if (existing) {
-      await prisma.adminProfile.update({
+      await prisma.admin_profile.update({
         where: { id: existing.id },
         data: { role: data.role as any, is_active: true }
       });
     } else {
-      await prisma.adminProfile.create({
+      await prisma.admin_profile.create({
         data: {
           user_id: targetUserId,
           role: data.role as any,
@@ -192,7 +193,7 @@ export class UserManagementService {
 
   static async revokeRole(adminId: string, targetUserId: string, ip?: string, ua?: string) {
     if (adminId === targetUserId) {
-      const superAdminCount = await prisma.adminProfile.count({
+      const superAdminCount = await prisma.admin_profile.count({
         where: { role: 'SUPER_ADMIN', is_active: true }
       });
       if (superAdminCount <= 1) {
@@ -200,16 +201,16 @@ export class UserManagementService {
       }
     }
 
-    const targetProfile = await prisma.adminProfile.findUnique({ where: { user_id: targetUserId } });
+    const targetProfile = await prisma.admin_profile.findUnique({ where: { user_id: targetUserId } });
     if (!targetProfile) throw new Error('User has no admin role');
 
     // Non-super-admins can't revoke super admin
-    const adminSelf = await prisma.adminProfile.findUnique({ where: { user_id: adminId } });
+    const adminSelf = await prisma.admin_profile.findUnique({ where: { user_id: adminId } });
     if (targetProfile.role === 'SUPER_ADMIN' && adminSelf?.role !== 'SUPER_ADMIN') {
       throw new Error('Cannot revoke Super Admin role');
     }
 
-    await prisma.adminProfile.update({
+    await prisma.admin_profile.update({
       where: { id: targetProfile.id },
       data: { is_active: false }
     });
@@ -334,9 +335,7 @@ export class UserManagementService {
   // ─── NAME MANAGEMENT ───────────────────────────────────
 
   static async addProhibitedName(adminId: string, data: { name: string; reason?: string }) {
-    const entry = await prisma.prohibited_names.create({
-      data: { name: data.name.toLowerCase(), reason: data.reason, added_by: adminId }
-    });
+    const entry = await prisma.prohibited_names.create({ data: { id: crypto.randomUUID(), name: data.name.toLowerCase(), reason: data.reason, added_by: adminId}} as any));
     await AuditService.log(adminId, ADMIN_ACTIONS.NAME_PROHIBIT, 'prohibited_name', entry.id, data);
     return entry;
   }
@@ -355,9 +354,7 @@ export class UserManagementService {
   }
 
   static async reserveUsername(adminId: string, data: { username: string; reservedFor?: string; reason?: string }) {
-    const entry = await prisma.reserved_usernames.create({
-      data: { username: data.username.toLowerCase(), reserved_for: data.reservedFor, reason: data.reason, reserved_by: adminId }
-    });
+    const entry = await prisma.reserved_usernames.create({ data: { id: crypto.randomUUID(), username: data.username.toLowerCase(), reserved_for: data.reservedFor, reason: data.reason, reserved_by: adminId}} as any));
     await AuditService.log(adminId, ADMIN_ACTIONS.USERNAME_RESERVE, 'reserved_username', entry.id, data);
     return entry;
   }

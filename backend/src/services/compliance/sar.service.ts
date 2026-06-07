@@ -2,6 +2,7 @@ import { prisma } from '../../config/database.js';
 import { Parser } from 'json2csv';
 import PDFDocument from 'pdfkit';
 import { Readable } from 'stream';
+import crypto from 'crypto';
 
 /**
  * SAR (Suspicious Activity Report) Service
@@ -80,8 +81,7 @@ class SARService {
       }
 
       // Create SAR with DRAFT status
-      const sar = await prisma.suspicious_activity_reports.create({
-        data: {
+      const sar = await prisma.suspicious_activity_reports.create({ data: {
           user_id: data.user_id,
           activity_type: data.activity_type,
           description: data.description,
@@ -89,8 +89,7 @@ class SARService {
           status: 'DRAFT',
           related_transactions: data.related_transactions || [],
           evidence_urls: data.evidence_urls || [],
-          metadata: data.metadata || {}
-        }
+          metadata: data.metadata || {}} as any)
       });
 
       return sar;

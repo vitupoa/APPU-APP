@@ -15,22 +15,20 @@ export class WalletService {
   static async getBalance(userId: string, targetCurrency?: string) {
     let wallet = await prisma.wallets.findUnique({
       where: { user_id: userId },
-      include: { User: { select: { is_wallet_unlocked: true, currency: true } } }
+      include: { user: { select: { is_wallet_unlocked: true, currency: true } } }
     });
 
     if (!wallet) {
-      wallet = await prisma.wallets.create({
-        data: { 
+      wallet = await prisma.wallets.create({ data: { 
           User: {
-            connect: { id: userId }
-          },
+            connect: { id: userId }} as any),
           updated_at: new Date()
         },
-        include: { User: { select: { is_wallet_unlocked: true, currency: true } } }
+        include: { user: { select: { is_wallet_unlocked: true, currency: true } } }
       });
     }
 
-    const currencyToUse = targetCurrency || wallet.User.currency;
+    const currencyToUse = targetCurrency || wallet.user.currency;
 
     // Convert Kr balance to user fiat equivalent using display-adjusted rate
     // 1 Kr = $0.01 USD. Apply the display rate (with silent platform adjustment)
@@ -42,7 +40,7 @@ export class WalletService {
       krBalance: wallet.kr_balance.toNumber(),
       fiatEquivalent,
       currency: currencyToUse,
-      isWalletUnlocked: wallet.User.is_wallet_unlocked,
+      isWalletUnlocked: wallet.user.is_wallet_unlocked,
       exchangeRate: fiatRate,
       baseUsd: baseUsd
     };

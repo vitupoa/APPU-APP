@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { ShopNotificationService } from './notifications.service.js';
+import crypto from 'crypto';
 
 export class ReviewService {
 
@@ -17,7 +18,7 @@ export class ReviewService {
         video_url: data.videoUrl,
         image_urls: data.imageUrls || [],
       },
-      include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } }
+      include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } }
     });
 
     // Update product average rating
@@ -44,7 +45,7 @@ export class ReviewService {
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { created_at: 'desc' },
-      include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } }
+      include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } }
     });
 
     const hasMore = reviews.length > limit;
@@ -247,8 +248,7 @@ export class GiftService {
       select: { display_name: true, username: true }
     });
 
-    const gift = await prisma.gifts.create({
-      data: {
+    const gift = await prisma.gifts.create({ data: {
         sender_id: senderId,
         recipient_id: data.recipient_id,
         product_id: data.product_id,
@@ -256,8 +256,7 @@ export class GiftService {
         amount_kr: product.price_kr,
         status: 'pending',
         escrow_status: 'held',
-      }
-    });
+      }} as any));
 
     await ShopNotificationService.notifyGiftReceived(
       data.recipient_id,
@@ -290,7 +289,7 @@ export class GiftService {
 function formatReview(r: any) {
   return {
     id: r.id,
-    user: r.User,
+    user: r.user,
     rating: r.rating,
     title: r.title,
     text: r.text,

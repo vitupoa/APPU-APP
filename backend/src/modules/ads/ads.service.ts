@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 /**
  * DEPRECATED: Ads service for rewarded video ads (AdMob)

@@ -20,7 +20,7 @@ export class ContentLockService {
     unlockAmountKr?: number
   ): Promise<{
     hasAccess: boolean;
-    reason?: 'creator' | 'subscribed' | 'unlocked' | 'not_locked';
+    reason?: 'user' | 'subscribed' | 'unlocked' | 'not_locked';
     requiresSubscription?: boolean;
     requiresUnlock?: boolean;
     unlockAmountKr?: number;
@@ -30,7 +30,7 @@ export class ContentLockService {
     }
 
     if (userId === creator_id) {
-      return { hasAccess: true, reason: 'creator' };
+      return { hasAccess: true, reason: 'user' };
     }
 
     if (requiredTier) {

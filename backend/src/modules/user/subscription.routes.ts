@@ -64,7 +64,7 @@ router.post('/subscribe', subscriptionRateLimiter, async (req: AuthRequest, res,
   const { creator_id, tierType } = req.body;
   try {
     if (!creator_id || !tierType) return res.status(400).json({ error: 'creator_id and tierType are required' });
-    const tier = await prisma.subscriptionTier.findUnique({ where: { creator_id_tier: { creator_id, tier: tierType } }, select: { kr_amount: true } });
+    const tier = await prisma.subscription_tier.findUnique({ where: { creator_id_tier: { creator_id, tier: tierType } }, select: { kr_amount: true } });
     if (!tier) return res.status(404).json({ error: 'Subscription tier not found' });
     const amountKr = Number(tier.kr_amount);
     const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(subscriberId, 'subscription', { creator_id, tierType, amount_kr: amountKr });

@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { io } from '../../shared/gateway/socket.js';
+import crypto from 'crypto';
 
 export class CommentsService {
   async getComments(
@@ -419,7 +420,7 @@ export class CommentsService {
     }
 
     await prisma.$transaction([
-      prisma.comment_likes.create({ data: { comment_id, user_id } }),
+      prisma.comment_likes.create({ data: { id: crypto.randomUUID(), comment_id, user_id}} as any)),
       prisma.comments.update({
         where: { id: commentId },
         data: { likes_count: { increment: 1 } },
@@ -574,7 +575,7 @@ export class CommentsService {
         });
         return owner ? { id: owner.user_id } : null;
       case 'contest_submission':
-        owner = await prisma.contestSubmission.findUnique({
+        owner = await prisma.contest_submission.findUnique({
           where: { id: content_id },
           select: { user_id: true },
         });

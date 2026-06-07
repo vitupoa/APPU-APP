@@ -246,14 +246,12 @@ router.post('/:platform/callback', authMiddleware, async (req: AuthRequest, res:
     });
 
     if (!influencerProfile) {
-      influencerProfile = await prisma.influencer_profiles.create({
-        data: {
+      influencerProfile = await prisma.influencer_profiles.create({ data: {
           user_id: userId,
           tier: 'NANO',
           categories: [],
           updated_at: new Date()
-        }
-      });
+        }} as any));
     }
 
     // Create or update social media account

@@ -1,4 +1,5 @@
 import { prisma } from '../../config/database.js';
+import crypto from 'crypto';
 
 export class DisplayAdCampaignService {
   async createCampaign(brandId: string, data: any) {
@@ -363,9 +364,7 @@ export class DisplayAdCampaignService {
     });
 
     if (!global) {
-      global = await prisma.ad_platform_settings.create({
-        data: {
-          scope: 'GLOBAL',
+      global = await prisma.ad_platform_settings.create({ data: { id: crypto.randomUUID(), scope: 'GLOBAL',
           scope_value: null,
           min_daily_budget_kes: 1000,
           min_lifetime_budget_kes: 5000,
@@ -384,8 +383,7 @@ export class DisplayAdCampaignService {
           chama_chat_min_cpm: 70,
           chama_chat_max_cpm: 200,
           targeting_multiplier: 1.0,
-          priority: 0,
-        },
+          priority: 0,},
       });
     }
 

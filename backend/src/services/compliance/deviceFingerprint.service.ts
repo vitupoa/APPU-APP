@@ -75,8 +75,7 @@ export class DeviceFingerprintService {
       });
     } else {
       // Create new fingerprint record
-      await prisma.device_fingerprints.create({
-        data: {
+      await prisma.device_fingerprints.create({ data: {
           user_id: userId,
           fingerprint_hash: fingerprint.fingerprint_hash,
           user_agent: fingerprint.user_agent,
@@ -87,8 +86,7 @@ export class DeviceFingerprintService {
           first_seen_at: new Date(),
           last_seen_at: new Date(),
           request_count: 1
-        }
-      });
+        }} as any));
 
       // Check if this device is used by other users (fraud detection)
       await this.checkSharedDevice(fingerprint.fingerprint_hash, userId);

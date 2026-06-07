@@ -187,7 +187,7 @@ export async function validateChamaMembership(
   }
 
   try {
-    const membership = await prisma.chamaMember.findUnique({
+    const membership = await prisma.chama_member.findUnique({
       where: {
         chama_id_user_id: {
           chama_id: chamaId,
@@ -205,7 +205,7 @@ export async function validateChamaMembership(
     }
 
     // Store membership info for later use
-    req.body.chamaMembership = membership;
+    req.body.chama_membership = membership;
 
     next();
   } catch (error) {

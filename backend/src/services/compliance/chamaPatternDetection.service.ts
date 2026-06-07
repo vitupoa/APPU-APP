@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { Logger } from '../../utils/logger.js';
+import crypto from 'crypto';
 
 const logger = new Logger('ChamaPatternDetection');
 

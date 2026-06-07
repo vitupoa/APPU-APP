@@ -1,4 +1,5 @@
 import { prisma } from '../config/database.js';
+import crypto from 'crypto';
 
 // Nonce expiry time (5 minutes)
 const NONCE_EXPIRY_MS = 5 * 60 * 1000;
@@ -28,13 +29,11 @@ export class NonceService {
   async markNonceUsed(nonce: string, userId: string): Promise<void> {
     const expiresAt = new Date(Date.now() + NONCE_EXPIRY_MS);
 
-    await prisma.transaction_nonces.create({
-      data: {
+    await prisma.transaction_nonces.create({ data: {
         nonce,
         user_id: userId,
         expires_at: expiresAt
-      }
-    });
+      }} as any));
   }
 
   /**

@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 /**
  * Brand Marketplace Service
@@ -105,17 +106,14 @@ export class BrandMarketplaceService {
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy,
-      include: {
-        User: {
+      include: { user: {
           select: {
             id: true,
             username: true,
             display_name: true,
             avatar_url: true,
             is_verified: true,
-            _count: {
-              select: {
-                admires_admires_admired_idToUser: true,
+            _count: { select: { admires_admires_admired_idTouser: true,
                 subscriptions_subscriptions_creator_idToUser: true
               }
             }
@@ -129,8 +127,8 @@ export class BrandMarketplaceService {
     });
 
     const filteredInfluencers = influencers.filter((inf: any) => {
-      if (minAdmirers && inf.User._count.admirers_admires_admired_idToUser < minAdmirers) return false;
-      if (minSubscribers && inf.User._count.subscriptions_subscriptions_creator_idToUser < minSubscribers) return false;
+      if (minAdmirers && inf.user._count.admirers_admires_admired_idToUser < minAdmirers) return false;
+      if (minSubscribers && inf.user._count.subscriptions_subscriptions_creator_idToUser < minSubscribers) return false;
       return true;
     });
 
@@ -141,9 +139,9 @@ export class BrandMarketplaceService {
       items: items.map((inf: any) => ({
         id: inf.id,
         user: {
-          ...inf.User,
-          admirersCount: inf.User._count.admirers_admires_admired_idToUser,
-          subscribersCount: inf.User._count.subscriptions_subscriptions_creator_idToUser
+          ...inf.user,
+          admirersCount: inf.user._count.admirers_admires_admired_idToUser,
+          subscribersCount: inf.user._count.subscriptions_subscriptions_creator_idToUser
         },
         tier: inf.tier,
         bio: inf.bio,
@@ -167,8 +165,8 @@ export class BrandMarketplaceService {
           avg_views: inf.avg_views,
           avgRating: Number(inf.avg_rating),
           totalCampaigns: inf.total_campaigns,
-          admirersCount: inf.User._count.admirers_admires_admired_idToUser,
-          subscribersCount: inf.User._count.subscriptions_subscriptions_creator_idToUser
+          admirersCount: inf.user._count.admirers_admires_admired_idToUser,
+          subscribersCount: inf.user._count.subscriptions_subscriptions_creator_idToUser
         },
         rates: {
           perPost: inf.rate_per_post ? Number(inf.rate_per_post) : null,
@@ -189,8 +187,7 @@ export class BrandMarketplaceService {
   static async getInfluencerProfile(influencerId: string) {
     const profile = await prisma.influencer_profiles.findUniqueOrThrow({
       where: { id: influencerId },
-      include: {
-        User: {
+      include: { user: {
           select: {
             id: true,
             username: true,
@@ -296,8 +293,7 @@ export class BrandMarketplaceService {
           campaign_start_date: data.campaign_start_date,
           campaign_end_date: data.campaign_end_date
         },
-        include: {
-          User: {
+        include: { user: {
             select: {
               id: true,
               username: true,
@@ -400,8 +396,7 @@ export class BrandMarketplaceService {
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { created_at: 'desc' },
-      include: {
-        User: {
+      include: { user: {
           select: {
             id: true,
             username: true,
@@ -427,7 +422,7 @@ export class BrandMarketplaceService {
     return {
       items: items.map((c: any) => ({
         id: c.id,
-        brand: c.User,
+        brand: c.user,
         title: c.title,
         description: c.description,
         type: c.type,
@@ -442,11 +437,11 @@ export class BrandMarketplaceService {
           start_date: c.campaign_start_date.toISOString(),
           end_date: c.campaign_end_date.toISOString()
         },
-        contest: c.Contest ? {
-          id: c.Contest.id,
-          title: c.Contest.title,
-          prizeTotalKr: Number(c.Contest.prize_total_kr),
-          deadline: c.Contest.deadline.toISOString()
+        contest: c.contest ? {
+          id: c.contest.id,
+          title: c.contest.title,
+          prizeTotalKr: Number(c.contest.prize_total_kr),
+          deadline: c.contest.deadline.toISOString()
         } : null,
         spotsAvailable: c.max_influencers - c.accepted_influencers,
         created_at: c.created_at.toISOString()
@@ -502,8 +497,7 @@ export class BrandMarketplaceService {
       },
       include: {
         influencer_profiles: {
-          include: {
-            User: {
+          include: { user: {
               select: {
                 id: true,
                 username: true,
@@ -696,8 +690,7 @@ export class BrandMarketplaceService {
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { total_participants: 'desc' },
-      include: {
-        User: {
+      include: { user: {
           select: {
             id: true,
             username: true,
@@ -717,7 +710,7 @@ export class BrandMarketplaceService {
     return {
       items: items.map((c: any) => ({
         id: c.id,
-        creator: c.User,
+        creator: c.user,
         title: c.title,
         description: c.description,
         category: c.category,

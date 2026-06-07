@@ -20,6 +20,7 @@ import {
 import { prisma } from '../../config/database.js';
 import analyticsRoutes from './analytics.routes.js';
 import complianceRoutes from './compliance.routes.js';
+import crypto from 'crypto';
 
 
 // Helper to safely extract string from query parameter
@@ -101,7 +102,7 @@ router.get('/users/:id', requirePermission('users.view') as any, async (req: Rar
 router.post('/users/:id/suspend', requirePermission('users.suspend') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = suspendUserSchema.parse(req.body);
-    res.json(await UserManagementService.suspendUser(req.user_id!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await UserManagementService.suspendUser(req.user_id!, req.params.id as string, { reason: data.reason, type: data.type, expiresAt: data.expires_at }, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -123,7 +124,7 @@ router.delete('/users/:id', requireSuperAdmin as any, async (req: RarRequest, re
 router.post('/users/:id/role', requireSuperAdmin as any, async (req: RarRequest, res: Response) => {
   try {
     const data = assignRoleSchema.parse(req.body);
-    res.json(await UserManagementService.assignRole(req.user_id!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await UserManagementService.assignRole(req.user_id!, req.params.id as string, { role: data.role!, permissions: data.permissions }, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -234,14 +235,14 @@ router.get('/wallet/platform', requirePermission('platform_wallet.view') as any,
 router.post('/wallet/platform', requirePermission('platform_wallet.manage') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = platformWalletActionSchema.parse(req.body);
-    res.json(await FinancialService.platformWalletAction(req.user_id!, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FinancialService.platformWalletAction(req.user_id!, { amount_kr: data.amount_kr!, action: data.action!, reason: data.reason! }, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
 router.post('/wallet/topup-user', requirePermission('wallet.topup') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = walletTopupSchema.parse(req.body);
-    res.json(await FinancialService.topupUserWallet(req.user_id!, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FinancialService.topupUserWallet(req.user_id!, { userId: data.userId!, amountKr: data.amountKr!, reason: data.reason! }, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -281,7 +282,7 @@ router.get('/withdrawals/:id', requirePermission('withdrawals.view') as any, asy
 router.post('/withdrawals/:id/review', requirePermission('withdrawals.approve', 'withdrawals.reject') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = withdrawalReviewSchema.parse(req.body);
-    res.json(await FinancialService.reviewWithdrawal(req.user_id!, req.params.id as string, data, req.ip, req.headers['user-agent'] as string | undefined)); return;
+    res.json(await FinancialService.reviewWithdrawal(req.user_id!, req.params.id as string, { action: data.action!, note: data.note }, req.ip, req.headers['user-agent'] as string | undefined)); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -381,7 +382,7 @@ router.get('/names/prohibited', requirePermission('names.manage') as any, async 
 router.post('/names/prohibited', requirePermission('names.manage') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = prohibitedNameSchema.parse(req.body);
-    res.json(await UserManagementService.addProhibitedName(req.user_id!, data)); return;
+    res.json(await UserManagementService.addProhibitedName(req.user_id!, { name: data.name!, reason: data.reason })); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -400,7 +401,7 @@ router.get('/names/reserved', requirePermission('names.manage') as any, async (r
 router.post('/names/reserved', requirePermission('names.manage') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = reservedUsernameSchema.parse(req.body);
-    res.json(await UserManagementService.reserveUsername(req.user_id!, data)); return;
+    res.json(await UserManagementService.reserveUsername(req.user_id!, { username: data.username!, reservedFor: data.reservedFor, reason: data.reason })); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
 });
 
@@ -452,13 +453,16 @@ router.get('/announcements', requirePermission('announcements.send') as any, asy
 router.post('/announcements', requirePermission('announcements.send') as any, async (req: RarRequest, res: Response) => {
   try {
     const data = announcementSchema.parse(req.body);
-    const announcement = await prisma.platform_announcements.create({
-      data: {
-        ...data,
+    const announcement = await prisma.platform_announcements.create({ data: {
+        id: crypto.randomUUID(),
+        title: data.title!,
+        message: data.message!,
+        type: data.type!,
+        targetScope: data.targetScope!,
         created_by: req.user_id!,
         expires_at: data.expires_at ? new Date(data.expires_at) : null,
-      }
-    });
+        updated_at: new Date()
+      }} as any));
     await AuditService.log(req.user_id!, 'announcement.create', 'announcement', announcement.id, data, req.ip, req.headers['user-agent'] as string | undefined);
     res.status(201).json(announcement); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }
@@ -547,7 +551,7 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
         },
       });
 
-      const adminProfile = await tx.adminProfile.create({
+      const adminProfile = await tx.admin_profile.create({
         data: {
           user_id: user.id,
           role,
@@ -585,7 +589,7 @@ router.post('/team/add', requireSuperAdmin as any, async (req: RarRequest, res: 
         email: newAdmin.email,
         username: newAdmin.username,
         display_name: newAdmin.display_name,
-        role: newAdmin.adminProfile.role,
+        role: newAdmin.admin_profile.role,
       },
     }); return;
   } catch (e: any) {

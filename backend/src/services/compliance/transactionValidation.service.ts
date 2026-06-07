@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { riskScoringService } from './riskScoring.service.js';
 import { Logger } from '../../utils/logger.js';
+import crypto from 'crypto';
 
 const logger = new Logger('TransactionValidation');
 
@@ -236,8 +237,7 @@ export class TransactionValidationService {
     severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
     riskScore: number = 0
   ): Promise<void> {
-    await prisma.flagged_transactions.create({
-      data: {
+    await prisma.flagged_transactions.create({ data: {
         transaction_id: transactionId,
         user_id: userId,
         flag_type: flagType,
@@ -245,18 +245,15 @@ export class TransactionValidationService {
         severity: severity,
         risk_score: riskScore,
         status: 'PENDING'
-      }
-    });
+      }} as any));
 
     // Also log as suspicious activity
-    await prisma.suspicious_activity_logs.create({
-      data: {
+    await prisma.suspicious_activity_logs.create({ data: {
         user_id: userId,
         activityType: flagType,
         description: reason,
         severity: severity,
-        metadata: { transaction_id: transactionId }
-      }
+        metadata: { transaction_id: transactionId }} as any)
     });
 
     logger.warn(`Transaction flagged: ${transactionId} - ${reason}`);

@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { Chama_Member_Role, Chama_Election_Phase } from '@prisma/client';
 import { randomUUID } from 'crypto';
+import crypto from 'crypto';
 
 
 export class ChamaElectionService {
@@ -9,7 +10,7 @@ export class ChamaElectionService {
    * Only ADMIN can start elections. isMidTerm = true if replacing current holder.
    */
   static async startElection(adminId: string, chamaId: string, position: Chama_Member_Role, isMidTerm: boolean = false) {
-    const admin = await prisma.chamaMember.findUnique({
+    const admin = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id: adminId } },
     });
     if (!admin || admin.role !== 'ADMIN') throw new Error('Only Admin can start elections');
@@ -19,7 +20,7 @@ export class ChamaElectionService {
     }
 
     // Check no active election for this position
-    const activeElection = await prisma.chamaElection.findFirst({
+    const activeElection = await prisma.chama_election.findFirst({
       where: {
         chama_id: chamaId,
         position,
@@ -31,7 +32,7 @@ export class ChamaElectionService {
     const chama = await prisma.chama.findUnique({ where: { id: chamaId } });
     if (!chama) throw new Error('Chama not found');
 
-    const election = await prisma.chamaElection.create({
+    const election = await prisma.chama_election.create({
       data: { 
         id: randomUUID(),
         chama_id: chamaId, 
@@ -60,17 +61,17 @@ export class ChamaElectionService {
    * Nominate a member for a position.
    */
   static async nominate(nominatorId: string, chamaId: string, electionId: string, nomineeId: string) {
-    const election = await prisma.chamaElection.findUnique({ where: { id: electionId } });
+    const election = await prisma.chama_election.findUnique({ where: { id: electionId } });
     if (!election || election.chama_id !== chamaId) throw new Error('Election not found');
     if (election.phase !== 'NOMINATION') throw new Error('Election is not in NOMINATION phase');
 
     // Verify both are members
-    const nominator = await prisma.chamaMember.findUnique({
+    const nominator = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id: nominatorId } },
     });
     if (!nominator || nominator.status !== 'ACTIVE') throw new Error('You must be an active member to nominate');
 
-    const nominee = await prisma.chamaMember.findUnique({
+    const nominee = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id: nomineeId } },
     });
     if (!nominee || nominee.status !== 'ACTIVE') throw new Error('Nominee must be an active member');
@@ -106,13 +107,13 @@ export class ChamaElectionService {
    * Second a nomination.
    */
   static async secondNomination(seconderId: string, chamaId: string, electionId: string, nominationId: string) {
-    const election = await prisma.chamaElection.findUnique({ where: { id: electionId } });
+    const election = await prisma.chama_election.findUnique({ where: { id: electionId } });
     if (!election || election.chama_id !== chamaId) throw new Error('Election not found');
     if (election.phase !== 'NOMINATION' && election.phase !== 'SECONDING') {
       throw new Error('Election is not accepting seconds');
     }
 
-    const seconder = await prisma.chamaMember.findUnique({
+    const seconder = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id: seconderId } },
     });
     if (!seconder || seconder.status !== 'ACTIVE') throw new Error('You must be an active member');
@@ -138,7 +139,7 @@ export class ChamaElectionService {
 
     // Move to seconding phase if still in nomination
     if (election.phase === 'NOMINATION') {
-      await prisma.chamaElection.update({
+      await prisma.chama_election.update({
         where: { id: electionId },
         data: { phase: 'SECONDING', updated_at: new Date() },
       });
@@ -152,12 +153,12 @@ export class ChamaElectionService {
    * Only nominations with the most seconds proceed.
    */
   static async advanceToVoting(adminId: string, chamaId: string, electionId: string) {
-    const admin = await prisma.chamaMember.findUnique({
+    const admin = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id: adminId } },
     });
     if (!admin || admin.role !== 'ADMIN') throw new Error('Only Admin can advance elections');
 
-    const election = await prisma.chamaElection.findUnique({
+    const election = await prisma.chama_election.findUnique({
       where: { id: electionId },
       include: { nominations: { orderBy: { seconds_count: 'desc' } } },
     });
@@ -175,7 +176,7 @@ export class ChamaElectionService {
       return ChamaElectionService.electWinner(chamaId, electionId, qualified[0].nominee_id);
     }
 
-    await prisma.chamaElection.update({
+    await prisma.chama_election.update({
       where: { id: electionId },
       data: { phase: 'VOTING', updated_at: new Date() },
     });
@@ -199,16 +200,16 @@ export class ChamaElectionService {
    * Cast a vote for a nominee.
    */
   static async castVote(voterId: string, chamaId: string, electionId: string, nominationId: string) {
-    const election = await prisma.chamaElection.findUnique({ where: { id: electionId } });
+    const election = await prisma.chama_election.findUnique({ where: { id: electionId } });
     if (!election || election.chama_id !== chamaId) throw new Error('Election not found');
     if (election.phase !== 'VOTING') throw new Error('Election is not in VOTING phase');
 
-    const voter = await prisma.chamaMember.findUnique({
+    const voter = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id: voterId } },
     });
     if (!voter || voter.status !== 'ACTIVE') throw new Error('You must be an active member to vote');
 
-    await prisma.chamaVote.create({
+    await prisma.chama_vote.create({
       data: { 
         id: randomUUID(),
         election_id: electionId, 
@@ -224,12 +225,12 @@ export class ChamaElectionService {
    * Tally votes and determine winner. Handles ties by triggering re-run.
    */
   static async tallyVotes(adminId: string, chamaId: string, electionId: string) {
-    const admin = await prisma.chamaMember.findUnique({
+    const admin = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id: adminId } },
     });
     if (!admin || admin.role !== 'ADMIN') throw new Error('Only Admin can tally votes');
 
-    const election = await prisma.chamaElection.findUnique({
+    const election = await prisma.chama_election.findUnique({
       where: { id: electionId },
       include: {
         nominations: {
@@ -253,13 +254,13 @@ export class ChamaElectionService {
 
     if (tiedCandidates.length > 1) {
       // Tie — trigger re-run
-      await prisma.chamaElection.update({
+      await prisma.chama_election.update({
         where: { id: electionId },
         data: { phase: 'RERUN', updated_at: new Date() },
       });
 
       // Clear previous votes for re-run
-      await prisma.chamaVote.deleteMany({ where: { election_id: electionId } });
+      await prisma.chama_vote.deleteMany({ where: { election_id: electionId } });
 
       const tiedNames = tiedCandidates.map((c: any) => c.nominee.display_name).join(', ');
       await prisma.messages.create({
@@ -274,7 +275,7 @@ export class ChamaElectionService {
       });
 
       // Re-open voting
-      await prisma.chamaElection.update({
+      await prisma.chama_election.update({
         where: { id: electionId },
         data: { phase: 'VOTING', updated_at: new Date() },
       });
@@ -290,28 +291,28 @@ export class ChamaElectionService {
    * Internal: Elect a winner, update roles.
    */
   private static async electWinner(chamaId: string, electionId: string, winnerId: string) {
-    const election = await prisma.chamaElection.findUnique({ where: { id: electionId } });
+    const election = await prisma.chama_election.findUnique({ where: { id: electionId } });
     if (!election) throw new Error('Election not found');
 
     // Remove previous holder of this position
-    const previousHolder = await prisma.chamaMember.findFirst({
+    const previousHolder = await prisma.chama_member.findFirst({
       where: { chama_id: chamaId, role: election.position, status: 'ACTIVE' },
     });
     if (previousHolder) {
-      await prisma.chamaMember.update({
+      await prisma.chama_member.update({
         where: { id: previousHolder.id },
         data: { role: 'MEMBER', updated_at: new Date() },
       });
     }
 
     // Assign role to winner
-    await prisma.chamaMember.updateMany({
+    await prisma.chama_member.updateMany({
       where: { chama_id: chamaId, user_id: winnerId, status: 'ACTIVE' },
       data: { role: election.position, updated_at: new Date() },
     });
 
     // Complete election
-    await prisma.chamaElection.update({
+    await prisma.chama_election.update({
       where: { id: electionId },
       data: { phase: 'COMPLETED', completed_at: new Date(), updated_at: new Date() },
     });
@@ -337,7 +338,7 @@ export class ChamaElectionService {
    * Get election status with all nominations, seconds, and votes.
    */
   static async getElectionStatus(chamaId: string, electionId: string) {
-    return prisma.chamaElection.findUnique({
+    return prisma.chama_election.findUnique({
       where: { id: electionId },
       include: {
         nominations: {
@@ -356,7 +357,7 @@ export class ChamaElectionService {
    * Get active elections for a Chama
    */
   static async getActiveElections(chamaId: string) {
-    return prisma.chamaElection.findMany({
+    return prisma.chama_election.findMany({
       where: {
         chama_id: chamaId,
         phase: { notIn: ['COMPLETED'] }

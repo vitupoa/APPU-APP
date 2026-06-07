@@ -2,6 +2,7 @@ import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { ShopAnalyticsService } from './analytics.service.js';
 import { ShopNotificationService } from './notifications.service.js';
+import crypto from 'crypto';
 
 const PLATFORM_FEE_RATE = 0.025; // 2.5%
 
@@ -133,7 +134,7 @@ export class OrderService {
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { orders: { created_at: 'desc' } },
       include: {
-        orders: { include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
+        orders: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
         products: { select: { id: true, title: true, image_urls: true } },
       }
     });
@@ -152,12 +153,12 @@ export class OrderService {
     const order = await prisma.orders.update({
       where: { id: orderId },
       data: { status: status as any },
-      include: { User: { select: { id: true } } }
+      include: { user: { select: { id: true } } }
     });
 
     // Notify buyer of status change
     await ShopNotificationService.notifyOrderStatusUpdate(
-      order.User.id, orderId, status
+      order.user.id, orderId, status
     ).catch(() => {});
 
     return formatOrder(order);
@@ -235,8 +236,7 @@ export class DiscountService {
     const product = await prisma.products.findUniqueOrThrow({ where: { id: productId } });
     if (product.seller_id !== sellerId) throw new Error('Not your product');
 
-    return prisma.product_discounts.create({
-      data: {
+    return prisma.product_discounts.create({ data: {
         product_id: productId,
         discount_type: data.discountType,
         discount_value: new Prisma.Decimal(data.discountValue),
@@ -244,8 +244,7 @@ export class DiscountService {
         start_date: new Date(data.startDate),
         end_date: new Date(data.endDate),
         is_active: true,
-      }
-    });
+      }} as any));
   }
 
   static async getProductDiscounts(productId: string) {
@@ -269,7 +268,7 @@ function formatOrder(o: any) {
   return {
     id: o.id,
     buyer_id: o.buyer_id,
-    buyer: o.User,
+    buyer: o.user,
     totalKr: Number(o.total_kr),
     platformFeeKr: Number(o.platform_fee_kr),
     status: o.status,
@@ -296,7 +295,7 @@ function formatOrderItem(i: any) {
       id: i.orders.id,
       status: i.orders.status,
       created_at: i.orders.created_at?.toISOString(),
-      buyer: i.orders.User,
+      buyer: i.orders.user,
     } : undefined,
   };
 }

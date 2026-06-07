@@ -12,6 +12,7 @@ export class WalletController {
       const result = await WalletService.getBalance(req.user_id!, targetCurrency);
       res.status(200).json(result);
     } catch (error: any) {
+      console.error('Error in getBalance:', error);
       res.status(500).json({ error: error.message });
     }
   }

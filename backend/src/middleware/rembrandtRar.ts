@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { AuthRequest } from './auth.js';
 import { prisma } from '../config/database.js';
 import { hasPermission, isSuperAdmin } from '../modules/rembrandt-rar/rembrandt-rar.types.js';
+import crypto from 'crypto';
 
 export interface RarRequest extends AuthRequest {
   adminRole?: string;
@@ -20,7 +21,7 @@ export async function requireRarAccess(req: RarRequest, res: Response, next: Nex
       return;
     }
 
-    const profile = await prisma.adminProfile.findUnique({
+    const profile = await prisma.admin_profile.findUnique({
       where: { user_id: req.userId },
       select: {
         id: true,
@@ -41,7 +42,7 @@ export async function requireRarAccess(req: RarRequest, res: Response, next: Nex
     req.adminProfileId = profile.id;
 
     // Update last login timestamp (fire and forget)
-    prisma.adminProfile.update({
+    prisma.admin_profile.update({
       where: { id: profile.id },
       data: { last_login_at: new Date() }
     }).catch(() => {});
@@ -104,18 +105,19 @@ export async function logAuditAction(
   try {
     await prisma.audit_logs.create({
       data: {
+        id: crypto.randomUUID(),
         performed_by: adminId,
         action_type: action,
         target_user_id: targetId,
         action_details: {
           target_type: targetType,
           target_id: targetId,
-          details: details ?? {}
-        } as any,
+          details: details ?? {},
+        },
         ip_address: req?.ip ?? req?.headers['x-forwarded-for']?.toString() ?? null,
         user_agent: req?.headers['user-agent']?.toString() ?? null,
       }
-    });
+    } as any);
   } catch (error) {
     console.error('Audit log write failed:', error);
   }

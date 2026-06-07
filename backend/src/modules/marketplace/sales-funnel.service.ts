@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 /**
  * Sales Funnel & Conversion Service
@@ -106,8 +107,7 @@ export class SalesFunnelService {
     proofUrl?: string;
     metadata?: any;
   }) {
-    const action = await prisma.contest_engagement_actions.create({
-      data: {
+    const action = await prisma.contest_engagement_actions.create({ data: {
         contest_id: data.contest_id,
         user_id: data.userId,
         action_type: data.actionType,
@@ -116,8 +116,7 @@ export class SalesFunnelService {
         metadata: data.metadata,
         is_completed: true,
         completed_at: new Date()
-      }
-    });
+      }} as any));
 
     // Track funnel event
     await this.trackFunnelEvent({
@@ -592,16 +591,14 @@ export class SalesFunnelService {
 
       if (!existingProfile) {
         // Create basic influencer profile
-        await prisma.influencer_profiles.create({
-          data: {
+        await prisma.influencer_profiles.create({ data: {
             user_id: userId,
             tier: 'NANO',
             categories: [],
             is_available: true,
             is_verified: false,
             updated_at: new Date()
-          }
-        });
+          }} as any));
 
         // Award points for becoming influencer
         await this.awardPoints({

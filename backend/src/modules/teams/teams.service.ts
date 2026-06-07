@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 const PLATFORM_FEE_RATE = 0.15;
 
@@ -70,7 +71,7 @@ export class TeamsService {
   static async respondToInvitation(invitationId: string, userId: string, accept: boolean) {
     const invitation = await prisma.team_invitations.findUnique({
       where: { id: invitationId },
-      include: { Team: { include: { team_members: true } } },
+      include: { team: { include: { team_members: true } } },
     });
 
     if (!invitation) throw new Error('Invitation not found');
@@ -79,7 +80,7 @@ export class TeamsService {
     if (new Date() > invitation.expires_at) throw new Error('Invitation expired');
 
     if (accept) {
-      if (invitation.Team.team_members.length >= invitation.Team.max_members) {
+      if (invitation.team.team_members.length >= invitation.team.max_members) {
         throw new Error('Team is full');
       }
 
@@ -224,12 +225,10 @@ export class TeamsService {
   static async getMyTeams(userId: string) {
     const memberships = await prisma.team_members.findMany({
       where: { user_id: userId },
-      include: {
-        Team: {
+      include: { team: {
           include: {
             team_members: {
-              include: {
-                User: {
+              include: { user: {
                   select: {
                     id: true,
                     username: true,
@@ -244,7 +243,7 @@ export class TeamsService {
       },
     });
 
-    return memberships.map((m) => m.Team);
+    return memberships.map((m) => m.team);
   }
 
   static async getTeamStats(teamId: string) {

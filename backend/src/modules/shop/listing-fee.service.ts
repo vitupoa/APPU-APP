@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma';
 import { ProductCategory, TargetingScope } from '@prisma/client';
+import crypto from 'crypto';
 
 export class ListingFeeService {
   async calculateListingFee(userId: string, category: ProductCategory, country: string) {
@@ -70,9 +71,7 @@ export class ListingFeeService {
     let quota = await prisma.user_listing_quota.findUnique({ where: { user_id: userId } });
     
     if (!quota) {
-      quota = await prisma.user_listing_quota.create({
-        data: { user_id: userId }
-      });
+      quota = await prisma.user_listing_quota.create({ data: { user_id: userId }} as any));
     }
 
     const now = new Date();
@@ -146,8 +145,7 @@ export class ListingFeeService {
   }
 
   private async recordListingFee(userId: string, productId: string, category: ProductCategory, country: string, fee: number, isFree: boolean, quotaType: string | null) {
-    await prisma.listing_fee_transaction.create({
-      data: {
+    await prisma.listing_fee_transaction.create({ data: {
         user_id: userId,
         product_id: productId,
         category,
@@ -156,8 +154,7 @@ export class ListingFeeService {
         fee_kr: fee,
         was_free: isFree,
         quota_type: quotaType
-      }
-    });
+      }} as any));
   }
 
   private shouldResetDaily(lastReset: Date): boolean {

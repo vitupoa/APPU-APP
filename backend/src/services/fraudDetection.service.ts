@@ -1,4 +1,5 @@
 import { prisma } from '../config/database.js';
+import crypto from 'crypto';
 
 type Decimal = {
   toNumber(): number;

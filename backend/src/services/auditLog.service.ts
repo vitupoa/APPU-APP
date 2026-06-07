@@ -1,5 +1,6 @@
 import { prisma } from '../config/database.js';
 import { Request } from 'express';
+import crypto from 'crypto';
 
 interface AuditLogData {
   action: string;

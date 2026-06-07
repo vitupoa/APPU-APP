@@ -1,4 +1,5 @@
 import { prisma } from '../../../config/database.js';
+import crypto from 'crypto';
 
 interface TestAudienceConfig {
   totalSize: number;
@@ -30,14 +31,12 @@ export class ContentDistributionService {
     if (!creator) throw new Error('Creator not found');
 
     // Create distribution record
-    const distribution = await prisma.content_distribution.create({
-      data: {
+    const distribution = await prisma.content_distribution.create({ data: {
         content_id: contentId,
         content_type: contentType,
         distribution_tier: 'TEST',
         target_audience_size: TEST_AUDIENCE_CONFIG.totalSize
-      }
-    });
+      }} as any));
 
     // Select test audience
     const testAudience = await this.selectTestAudience(creatorId, metadata);

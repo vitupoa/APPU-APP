@@ -1,5 +1,6 @@
 import { prisma } from '../../../config/database.js';
 import { redis } from '../../../config/redis.js';
+import crypto from 'crypto';
 
 const FEED_CACHE_TTL = 300; // 5 minutes
 const TRENDING_CACHE_TTL = 900; // 15 minutes
@@ -303,8 +304,7 @@ export class FeedGenerationService {
     totalDuration?: number;
   }) {
     // Track interaction signal
-    await prisma.user_interaction_signals.create({
-      data: {
+    await prisma.user_interaction_signals.create({ data: {
         user_id: userId,
         content_id,
         content_type: contentType,
@@ -312,8 +312,7 @@ export class FeedGenerationService {
         watch_duration: interaction.watchDuration || 0,
         total_duration: interaction.totalDuration || 0,
         weight: this.getSignalWeight(interaction.signalType)
-      }
-    });
+      }} as any));
 
     // Update delivery record
     const updates: any = {};
@@ -404,15 +403,13 @@ export class FeedGenerationService {
           }
         });
       } else {
-        await prisma.user_micro_interests.create({
-          data: {
+        await prisma.user_micro_interests.create({ data: {
             user_id: userId,
             interest: tag,
             category: tag,
             affinity: Math.min(0.1 * weight, 1.0),
             last_engaged_at: new Date()
-          }
-        });
+          }} as any));
       }
     }
   }

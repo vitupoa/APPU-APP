@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../../middleware/auth.js';
 import { prisma } from '../../config/database.js';
 import { parseQueryString } from '../../utils/queryParams.js';
+import crypto from 'crypto';
 
 const router = Router();
 
@@ -27,9 +28,7 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<
       population,
     } = req.body;
 
-    const location = await prisma.location_master.create({
-      data: {
-        scope,
+    const location = await prisma.location_master.create({ data: { id: crypto.randomUUID(), scope,
         scope_value: scopeValue,
         display_name,
         parent_id,
@@ -41,8 +40,7 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<
         latitude: latitude ? parseFloat(latitude) : null,
         longitude: longitude ? parseFloat(longitude) : null,
         population: population ? parseInt(population) : null,
-        is_active: true,
-      },
+        is_active: true,},
     });
 
     res.status(201).json(location);

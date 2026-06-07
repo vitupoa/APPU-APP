@@ -4,6 +4,7 @@ import { emitLikeUpdate } from '../../shared/gateway/events.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { contentDistributionService } from '../recommendation/services/contentDistribution.service.js';
 import { ContentLockService } from '../contentLock/contentLock.service.js';
+import crypto from 'crypto';
 
 export class ShortsService {
   /**
@@ -64,8 +65,7 @@ export class ShortsService {
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { created_at: 'desc' },
-      include: {
-        User: {
+      include: { user: {
           select: {
             id: true,
             username: true,
@@ -126,7 +126,7 @@ export class ShortsService {
         const access = accessMap.get(s.id) || { hasAccess: true, requiresSubscription: false, requiresUnlock: false };
         return {
           id: s.id,
-          creator: s.User,
+          creator: s.user,
           videoUrl: access.hasAccess ? s.video_url : null,
           thumbnailUrl: s.thumbnail_url,
           media_type: s.media_type,
@@ -199,8 +199,7 @@ export class ShortsService {
         required_tier: data.requiredTier,
         unlock_amount_kr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
       } as any,
-      include: {
-        User: {
+      include: { user: {
           select: {
             id: true,
             username: true,
@@ -223,12 +222,12 @@ export class ShortsService {
       short.id,
       'SHORT',
       data.creator_id,
-      { hashtags, location: short.User.country }
+      { hashtags, location: short.user.country }
     ).catch(err => console.error('Failed to initialize distribution:', err));
 
     return {
       id: short.id,
-      creator: short.User,
+      creator: short.user,
       videoUrl: short.video_url,
       thumbnailUrl: short.thumbnail_url,
       media_type: short.media_type,

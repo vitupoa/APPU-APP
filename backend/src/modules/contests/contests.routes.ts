@@ -93,9 +93,31 @@ router.post('/',
     const data = createContestSchema.parse(req.body);
     const contest = await ContestService.createContest({
       creator_id: req.userId!,
-      ...data,
+      title: data.title,
+      description: data.description,
       mediaType: data.media_type,
-      deadline: new Date(data.deadline)
+      category: data.category,
+      prizeTotalKr: data.prizeTotalKr,
+      requiredActions: data.requiredActions as { type: string; targetUrl?: string; label: string; }[],
+      maxWinners: data.maxWinners,
+      prizeDistribution: data.prizeDistribution as { rank: number; percentage: number; }[],
+      judgingCriteria: data.judgingCriteria,
+      sponsorName: data.sponsorName,
+      sponsorUrl: data.sponsorUrl,
+      deadline: new Date(data.deadline),
+      coverMediaUrl: data.coverMediaUrl,
+      entryFeeKr: data.entryFeeKr,
+      publicVoteWeight: data.publicVoteWeight,
+      allowDailyPrizes: data.allowDailyPrizes,
+      dailyprizeTotalKr: data.dailyprizeTotalKr,
+      targetAges: data.targetAges,
+      targetGeos: data.targetGeos,
+      airdropKr: data.airdropKr,
+      airdropLimit: data.airdropLimit,
+      judges: data.judges,
+      participationType: data.participationType,
+      teamSize: data.teamSize,
+      maxTeams: data.maxTeams
     });
     // Return only contestId and message as expected by frontend
     res.status(201).json({ 
@@ -115,7 +137,7 @@ router.post('/',
 router.get('/my-contests', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const result = await ContestService.listContests({ userId: req.userId, limit: 50 });
-    const mine = result.items.filter((c: any) => c.creator?.id === req.userId);
+    const mine = result.items.filter((c: any) => c.user?.id === req.userId);
     res.status(200).json(mine);
   } catch (error: any) {
     res.status(500).json({ error: error.message });

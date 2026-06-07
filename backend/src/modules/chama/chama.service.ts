@@ -3,6 +3,7 @@ import { Prisma, ChamaType, ChamaStatus, ContributionFrequency } from '@prisma/c
 import { io } from '../../shared/gateway/socket.js';
 import { kycService } from '../kyc/kyc.service.js';
 import { chamaPatternDetectionService } from '../../services/compliance/chamaPatternDetection.service.js';
+import crypto from 'crypto';
 
 export class ChamaService {
   /**
@@ -80,7 +81,7 @@ export class ChamaService {
       });
 
       // 4. Add creator as ADMIN member
-      await tx.chamaMember.create({
+      await tx.chama_member.create({
         data: {
           chama_id: chama.id,
           user_id: creatorId,
@@ -209,7 +210,7 @@ export class ChamaService {
       }
 
       // Check if already a member
-      const existing = await tx.chamaMember.findUnique({
+      const existing = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id: chamaId, user_id: userId } },
       });
       if (existing && existing.status === 'ACTIVE') {
@@ -242,7 +243,7 @@ export class ChamaService {
         });
 
         // Record transaction
-        await tx.chamaTransaction.create({
+        await tx.chama_transaction.create({
           data: {
             chama_id: chamaId,
             user_id: userId,
@@ -256,7 +257,7 @@ export class ChamaService {
       // Get next rotation number for MERRY_GO_ROUND chamas
       let rotationNumber: number | null = null;
       if (chama.type === 'MERRY_GO_ROUND') {
-        const maxRotation = await tx.chamaMember.aggregate({
+        const maxRotation = await tx.chama_member.aggregate({
           where: { chama_id: chamaId, status: 'ACTIVE' },
           _max: { rotationNumber: true },
         });
@@ -272,7 +273,7 @@ export class ChamaService {
       // Create or reactivate member
       let member;
       if (existing) {
-        member = await tx.chamaMember.update({
+        member = await tx.chama_member.update({
           where: { id: existing.id },
           data: {
             status: 'ACTIVE',
@@ -282,7 +283,7 @@ export class ChamaService {
           },
         });
       } else {
-        member = await tx.chamaMember.create({
+        member = await tx.chama_member.create({
           data: {
             chama_id: chamaId,
             user_id: userId,
@@ -351,7 +352,7 @@ export class ChamaService {
       const chama = await tx.chama.findUnique({ where: { id: chamaId } });
       if (!chama) throw new Error('Chama not found');
 
-      const member = await tx.chamaMember.findUnique({
+      const member = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id: chamaId, user_id: userId } },
       });
       if (!member || member.status !== 'ACTIVE') {
@@ -360,7 +361,7 @@ export class ChamaService {
 
       // Block admin from leaving when chama is active with members
       if (member.role === 'ADMIN') {
-        const activeCount = await tx.chamaMember.count({
+        const activeCount = await tx.chama_member.count({
           where: { chama_id: chamaId, status: 'ACTIVE' },
         });
         if (activeCount > 1) {
@@ -386,13 +387,13 @@ export class ChamaService {
       }
 
       // Mark member as LEFT
-      await tx.chamaMember.update({
+      await tx.chama_member.update({
         where: { id: member.id },
         data: { status: 'LEFT', leftAt: new Date() },
       });
 
       // Check if user is in any other active merry-go-round chamas
-      const otherRotating = await tx.chamaMember.count({
+      const otherRotating = await tx.chama_member.count({
         where: {
           user_id: userId,
           status: 'ACTIVE',
@@ -431,14 +432,14 @@ export class ChamaService {
   static async removeMember(adminId: string, chamaId: string, targetUserId: string, reason: string) {
     return prisma.$transaction(async (tx) => {
       // Verify admin
-      const adminMember = await tx.chamaMember.findUnique({
+      const adminMember = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id: chamaId, user_id: adminId } },
       });
       if (!adminMember || adminMember.role !== 'ADMIN') {
         throw new Error('Only the Admin can remove members');
       }
 
-      const targetMember = await tx.chamaMember.findUnique({
+      const targetMember = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id: chamaId, user_id: targetUserId } },
       });
       if (!targetMember || targetMember.status !== 'ACTIVE') {
@@ -449,7 +450,7 @@ export class ChamaService {
       if (!chama) throw new Error('Chama not found');
 
       // Mark as REMOVED
-      await tx.chamaMember.update({
+      await tx.chama_member.update({
         where: { id: targetMember.id },
         data: { status: 'REMOVED', leftAt: new Date() },
       });
@@ -505,7 +506,7 @@ export class ChamaService {
       status?: ChamaStatus;
     }
   ) {
-    const adminMember = await prisma.chamaMember.findUnique({
+    const adminMember = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id: adminId } },
     });
     if (!adminMember || adminMember.role !== 'ADMIN') {
@@ -526,7 +527,7 @@ export class ChamaService {
     if (data.status !== undefined) {
       // Block dissolving when members are active
       if (data.status === 'DISSOLVED') {
-        const activeCount = await prisma.chamaMember.count({
+        const activeCount = await prisma.chama_member.count({
           where: { chama_id: chamaId, status: 'ACTIVE' },
         });
         if (activeCount > 1) {
@@ -550,7 +551,7 @@ export class ChamaService {
    * Activate a chama (move from SETUP to ACTIVE).
    */
   static async activateChama(adminId: string, chamaId: string) {
-    const adminMember = await prisma.chamaMember.findUnique({
+    const adminMember = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id: adminId } },
     });
     if (!adminMember || adminMember.role !== 'ADMIN') {
@@ -622,7 +623,7 @@ export class ChamaService {
       });
 
       // Record transaction
-      await tx.chamaTransaction.create({
+      await tx.chama_transaction.create({
         data: {
           chama_id: record.chama_id,
           user_id: userId,

@@ -52,7 +52,7 @@ export class HashtagService {
         update: { usageCount: { increment: 1 } }
       });
 
-      await prisma.contentHashtag.upsert({
+      await prisma.content_hashtag.upsert({
         where: {
           hashtagId_contentId_contentType: {
             hashtagId: hashtag.id,
@@ -84,7 +84,7 @@ export class HashtagService {
     });
 
     for (const user of users) {
-      await prisma.contentMention.upsert({
+      await prisma.content_mention.upsert({
         where: {
           mentionedUserId_contentId_contentType: {
             mentionedUserId: user.id,
@@ -136,7 +136,7 @@ export class HashtagService {
       whereClause.contentType = contentType;
     }
 
-    const items = await prisma.contentHashtag.findMany({
+    const items = await prisma.content_hashtag.findMany({
       where: whereClause,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),

@@ -96,8 +96,7 @@ router.post('/topup',
     }
 
     // Record pending transaction
-    await prisma.transactions.create({
-      data: {
+    await prisma.transactions.create({ data: {
         user_id: userId,
         type: 'topup',
         amount_fiat: data.fiatAmount,
@@ -106,8 +105,7 @@ router.post('/topup',
         status: 'pending',
         provider: data.provider,
         reference
-      }
-    });
+      }} as any));
 
     res.status(200).json({ reference, ...result });
   } catch (error: any) {
@@ -370,7 +368,7 @@ router.post('/withdraw',
           currency: data.currency,
           reference,
           reason: 'Krieta Withdrawal',
-          recipientName: data.accountName || 'User',
+          recipientName: data.accountName || 'user',
           country: data.country // Pass country code (NG, GH, ZA, KE)
         });
         break;
@@ -378,8 +376,7 @@ router.post('/withdraw',
     }
 
     // Create withdrawal request
-    await prisma.withdrawal_requests.create({
-      data: {
+    await prisma.withdrawal_requests.create({ data: {
         user_id: userId,
         amount_kr: new Prisma.Decimal(data.krAmount),
         amount_fiat: fiatAmount,
@@ -389,8 +386,7 @@ router.post('/withdraw',
         account_details: data,
         status: 'PENDING',
         updated_at: new Date()
-      }
-    });
+      }} as any));
 
     // Deduct from wallet
     await prisma.wallets.update({

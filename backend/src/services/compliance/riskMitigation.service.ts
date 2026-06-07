@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { riskScoringService } from './riskScoring.service.js';
 import { Logger } from '../../utils/logger.js';
+import crypto from 'crypto';
 
 const logger = new Logger('RiskMitigation');
 

@@ -1,6 +1,7 @@
 import { prisma } from '../config/database.js';
 import { FCMService } from './fcm.service.js';
 import { Logger } from '../utils/logger.js';
+import crypto from 'crypto';
 
 const logger = new Logger('JudgeNotificationService');
 
@@ -94,7 +95,7 @@ export class JudgeNotificationService {
         prisma.contest.findUnique({ where: { id: contestId }, select: { title: true } }),
         prisma.contest_judges.findMany({
           where: { contest_id: contestId, status: 'accepted' },
-          include: { User: { select: { id: true, fcmToken: true, username: true } } }
+          include: { user: { select: { id: true, fcmToken: true, username: true } } }
         })
       ]);
 
@@ -104,7 +105,7 @@ export class JudgeNotificationService {
       for (const judge of judges) {
         await prisma.notifications.create({
           data: {
-            user_id: judge.User.id,
+            user_id: judge.user.id,
             type: 'JUDGING_READY',
             title: 'Ready to Judge',
             message: `Submissions are ready for judging in "${contest.title}"`,
@@ -115,8 +116,8 @@ export class JudgeNotificationService {
           }
         });
 
-        if (judge.User.fcmToken) {
-          await FCMService.sendNotification(judge.User.fcmToken, {
+        if (judge.user.fcmToken) {
+          await FCMService.sendNotification(judge.user.fcmToken, {
             title: 'Ready to Judge',
             body: `Submissions are ready for judging in "${contest.title}"`,
             data: {
@@ -142,7 +143,7 @@ export class JudgeNotificationService {
         prisma.contest.findUnique({ where: { id: contestId }, select: { title: true } }),
         prisma.contest_judges.findMany({
           where: { contest_id: contestId, status: 'accepted' },
-          include: { User: { select: { id: true, fcmToken: true } } }
+          include: { user: { select: { id: true, fcmToken: true } } }
         })
       ]);
 
@@ -154,14 +155,14 @@ export class JudgeNotificationService {
           where: { judge_id: judge.id }
         });
 
-        const submissions = await prisma.contestSubmission.count({
+        const submissions = await prisma.contest_submission.count({
           where: { contest_id: contestId }
         });
 
         if (scores < submissions) {
           await prisma.notifications.create({
             data: {
-              user_id: judge.User.id,
+              user_id: judge.user.id,
               type: 'JUDGING_DEADLINE',
               title: 'Judging Deadline Approaching',
               message: `Only ${hoursRemaining} hours left to complete judging for "${contest.title}"`,
@@ -173,8 +174,8 @@ export class JudgeNotificationService {
             }
           });
 
-          if (judge.User.fcmToken) {
-            await FCMService.sendNotification(judge.User.fcmToken, {
+          if (judge.user.fcmToken) {
+            await FCMService.sendNotification(judge.user.fcmToken, {
               title: 'Judging Deadline Approaching',
               body: `Only ${hoursRemaining} hours left to complete judging for "${contest.title}"`,
               data: {
@@ -202,7 +203,7 @@ export class JudgeNotificationService {
         prisma.contest.findUnique({ where: { id: contestId }, select: { title: true, creator_id: true } }),
         prisma.contest_judges.findMany({
           where: { contest_id: contestId, status: 'accepted' },
-          include: { User: { select: { id: true, fcmToken: true } } }
+          include: { user: { select: { id: true, fcmToken: true } } }
         })
       ]);
 
@@ -212,7 +213,7 @@ export class JudgeNotificationService {
       for (const judge of judges) {
         await prisma.notifications.create({
           data: {
-            user_id: judge.User.id,
+            user_id: judge.user.id,
             type: 'JUDGING_COMPLETE',
             title: 'Judging Complete',
             message: `All judges have completed scoring for "${contest.title}"`,
@@ -223,8 +224,8 @@ export class JudgeNotificationService {
           }
         });
 
-        if (judge.User.fcmToken) {
-          await FCMService.sendNotification(judge.User.fcmToken, {
+        if (judge.user.fcmToken) {
+          await FCMService.sendNotification(judge.user.fcmToken, {
             title: 'Judging Complete',
             body: `All judges have completed scoring for "${contest.title}"`,
             data: {
@@ -307,7 +308,7 @@ export class JudgeNotificationService {
   static async getJudgeStats(judgeId: string, contestId: string) {
     try {
       const [totalSubmissions, scoredSubmissions, avgScore] = await Promise.all([
-        prisma.contestSubmission.count({ where: { contest_id: contestId } }),
+        prisma.contest_submission.count({ where: { contest_id: contestId } }),
         prisma.judge_scores.count({ where: { judge: { contest_id: contestId, user_id: judgeId } } }),
         prisma.judge_scores.aggregate({
           where: { judge: { contest_id: contestId, user_id: judgeId } },

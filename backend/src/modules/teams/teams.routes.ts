@@ -20,7 +20,9 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const data = createTeamSchema.parse(req.body);
     const team = await TeamsService.createTeam({
       leaderId: req.userId!,
-      ...data,
+      name: data.name,
+      avatar_url: data.avatar_url,
+      maxMembers: data.maxMembers
     });
     res.status(201).json(team);
   } catch (error: any) {

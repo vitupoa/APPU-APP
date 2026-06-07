@@ -17,8 +17,8 @@ export class StoriesController {
   static async getFeed(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId!;
-      const groupedStories = await StoriesService.getFeed(userId);
-      res.json({ success: true, feed: groupedStories });
+      const result = await StoriesService.getFeed(userId);
+      res.json({ success: true, ...result });
     } catch (error) {
       next(error);
     }

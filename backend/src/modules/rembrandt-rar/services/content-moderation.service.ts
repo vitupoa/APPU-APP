@@ -1,6 +1,7 @@
 import { prisma } from '../../../config/database.js';
 import { AuditService } from './audit.service.js';
 import { ADMIN_ACTIONS } from '../rembrandt-rar.types.js';
+import crypto from 'crypto';
 
 type ContentType = 'short' | 'post' | 'contest' | 'comment' | 'product' | 'story';
 
@@ -27,7 +28,7 @@ export class ContentModerationService {
     const [items, total] = await Promise.all([
       prisma.shorts.findMany({
         where,
-        include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
         orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
@@ -44,7 +45,7 @@ export class ContentModerationService {
     const [items, total] = await Promise.all([
       prisma.post.findMany({
         where,
-        include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
         orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
@@ -62,7 +63,7 @@ export class ContentModerationService {
     const [items, total] = await Promise.all([
       prisma.contest.findMany({
         where,
-        include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
+        include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } },
         orderBy: { created_at: 'desc' },
         take: limit, skip: (page - 1) * limit,
       }),
@@ -98,9 +99,7 @@ export class ContentModerationService {
     }
     // For 'hide', we'd add a hidden flag — using delete as primary action for now
 
-    await prisma.content_moderation_logs.create({
-      data: { adminId: adminId, contentType: 'short', content_id: shortId, action, reason }
-    });
+    await prisma.content_moderation_logs.create({ data: { adminId: adminId, contentType: 'short', content_id: shortId, action, reason }} as any));
     await AuditService.log(adminId, `content.${action}`, 'short', shortId, { reason }, ip, ua);
     return { success: true, message: `Short ${action}d` };
   }
@@ -113,9 +112,7 @@ export class ContentModerationService {
       await prisma.post.delete({ where: { id: postId } });
     }
 
-    await prisma.content_moderation_logs.create({
-      data: { adminId: adminId, contentType: 'post', content_id: postId, action, reason }
-    });
+    await prisma.content_moderation_logs.create({ data: { adminId: adminId, contentType: 'post', content_id: postId, action, reason }} as any));
     await AuditService.log(adminId, `content.${action}`, 'post', postId, { reason }, ip, ua);
     return { success: true, message: `Post ${action}d` };
   }
@@ -132,9 +129,7 @@ export class ContentModerationService {
       await prisma.contest.update({ where: { id: contestId }, data: { status: 'ACTIVE' } });
     }
 
-    await prisma.content_moderation_logs.create({
-      data: { adminId: adminId, contentType: 'contest', content_id: contestId, action, reason }
-    });
+    await prisma.content_moderation_logs.create({ data: { adminId: adminId, contentType: 'contest', content_id: contestId, action, reason }} as any));
     await AuditService.log(adminId, `content.${action}`, 'contest', contestId, { reason }, ip, ua);
     return { success: true, message: `Contest ${action}d` };
   }
@@ -147,9 +142,7 @@ export class ContentModerationService {
       await prisma.story.delete({ where: { id: storyId } });
     }
 
-    await prisma.content_moderation_logs.create({
-      data: { adminId: adminId, contentType: 'story', content_id: storyId, action, reason }
-    });
+    await prisma.content_moderation_logs.create({ data: { adminId: adminId, contentType: 'story', content_id: storyId, action, reason }} as any));
     await AuditService.log(adminId, `content.${action}`, 'story', storyId, { reason }, ip, ua);
     return { success: true, message: `Story ${action}d` };
   }

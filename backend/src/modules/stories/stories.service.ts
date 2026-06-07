@@ -3,6 +3,7 @@ import { StoryPrivacy } from '@prisma/client';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { WalletService } from '../wallet/wallet.service.js';
 import { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 export class StoriesService {
   /**
@@ -95,7 +96,7 @@ export class StoriesService {
       const creatorId = story.creator_id;
       if (!acc[creatorId]) {
         acc[creatorId] = {
-          creator: story.creator,
+          creator: story.user,
           stories: [],
         };
       }
@@ -139,7 +140,7 @@ export class StoriesService {
    * Mark a story as viewed
    */
   static async viewStory(userId: string, storyId: string) {
-    return prisma.storyView.upsert({
+    return prisma.story_view.upsert({
       where: {
         storyId_viewerId: { storyId, viewerId: userId },
       },
@@ -169,7 +170,7 @@ export class StoriesService {
     const tipResult = await WalletService.sendTip(viewerId, story.creator_id, amount_kr, currency);
 
     // Update story view with tip info
-    await prisma.storyView.upsert({
+    await prisma.story_view.upsert({
       where: {
         storyId_viewerId: { storyId, viewerId },
       },
@@ -188,7 +189,7 @@ export class StoriesService {
     return {
       success: true,
       tipResult,
-      creatorName: story.creator.display_name,
+      creatorName: story.user.display_name,
     };
   }
 
@@ -207,12 +208,12 @@ export class StoriesService {
    * Update preferred viewers for SPECIFIC_USERS privacy
    */
   static async setViewerPreferences(userId: string, preferredViewerIds: string[]) {
-    await prisma.storyViewerPreference.deleteMany({
+    await prisma.story_viewerPreference.deleteMany({
       where: { ownerId: userId },
     });
 
     if (preferredViewerIds.length > 0) {
-      await prisma.storyViewerPreference.createMany({
+      await prisma.story_viewerPreference.createMany({
         data: preferredViewerIds.map((id: any) => ({
           ownerId: userId,
           preferredViewerId: id,

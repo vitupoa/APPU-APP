@@ -3,6 +3,7 @@ import { io } from '../../shared/gateway/socket.js';
 import { WalletService } from '../wallet/wallet.service.js';
 import { v4 as uuidv4 } from 'uuid';
 import { lockedChatTaskService } from '../../services/compliance/lockedChatTask.service.js';
+import crypto from 'crypto';
 
 export class ChatService {
   /**
@@ -120,7 +121,7 @@ export class ChatService {
     // Filter for unread chats
     const unreadChats = [];
     for (const chat of chats) {
-      const participant = await prisma.chatParticipant.findUnique({
+      const participant = await prisma.chat_participant.findUnique({
         where: { chatId_userId: { chat_id: chat.id, user_id: userId } },
       });
 
@@ -157,7 +158,7 @@ export class ChatService {
     forwardedFromId?: string
   ) {
     // Ensure sender is participant
-    const isParticipant = await prisma.chatParticipant.findUnique({
+    const isParticipant = await prisma.chat_participant.findUnique({
       where: { chatId_userId: { chat_id, user_id: senderId } },
     });
 
@@ -239,7 +240,7 @@ export class ChatService {
     });
 
     // Find all participants to broadcast message via WebSocket
-    const participants = await prisma.chatParticipant.findMany({
+    const participants = await prisma.chat_participant.findMany({
       where: { chat_id },
       select: { user_id: true },
     });
@@ -308,7 +309,7 @@ export class ChatService {
     }
 
     // Verify user is participant in target chat
-    const isParticipant = await prisma.chatParticipant.findUnique({
+    const isParticipant = await prisma.chat_participant.findUnique({
       where: { chatId_userId: { chat_id: targetChatId, user_id: userId } },
     });
 
@@ -345,7 +346,7 @@ export class ChatService {
     });
 
     // Broadcast to target chat participants
-    const participants = await prisma.chatParticipant.findMany({
+    const participants = await prisma.chat_participant.findMany({
       where: { chat_id: targetChatId },
       select: { user_id: true },
     });
@@ -363,7 +364,7 @@ export class ChatService {
    */
   static async getMessages(userId: string, chat_id: string, page: number = 1, limit: number = 50) {
     // Ensure user is participant
-    const isParticipant = await prisma.chatParticipant.findUnique({
+    const isParticipant = await prisma.chat_participant.findUnique({
       where: { chatId_userId: { chat_id, user_id: userId } },
     });
 
@@ -396,7 +397,7 @@ export class ChatService {
     currency: string
   ) {
     // Verify sender is participant
-    const isParticipant = await prisma.chatParticipant.findUnique({
+    const isParticipant = await prisma.chat_participant.findUnique({
       where: { chatId_userId: { chat_id, user_id: senderId } },
     });
     if (!isParticipant) {
@@ -404,7 +405,7 @@ export class ChatService {
     }
 
     // Verify recipient is participant
-    const recipientParticipant = await prisma.chatParticipant.findUnique({
+    const recipientParticipant = await prisma.chat_participant.findUnique({
       where: { chatId_userId: { chat_id, user_id: recipient_id } },
     });
     if (!recipientParticipant) {
@@ -439,7 +440,7 @@ export class ChatService {
     });
 
     // Broadcast to chat participants
-    const participants = await prisma.chatParticipant.findMany({
+    const participants = await prisma.chat_participant.findMany({
       where: { chat_id },
       select: { user_id: true },
     });
@@ -532,7 +533,7 @@ export class ChatService {
     }
 
     if (action === 'kick') {
-      await prisma.chatParticipant.delete({
+      await prisma.chat_participant.delete({
         where: { chatId_userId: { chat_id, user_id: targetUserId } },
       });
 
@@ -548,7 +549,7 @@ export class ChatService {
     }
 
     const newRole = action === 'promote' ? 'admin' : 'member';
-    await prisma.chatParticipant.update({
+    await prisma.chat_participant.update({
       where: { chatId_userId: { chat_id, user_id: targetUserId } },
       data: { role: newRole },
     });
@@ -594,13 +595,13 @@ export class ChatService {
     }
 
     // Demote current owner to member
-    await prisma.chatParticipant.update({
+    await prisma.chat_participant.update({
       where: { chatId_userId: { chat_id, user_id: userId } },
       data: { role: 'member' },
     });
 
     // Promote new owner to admin
-    await prisma.chatParticipant.update({
+    await prisma.chat_participant.update({
       where: { chatId_userId: { chat_id, user_id: newOwnerId } },
       data: { role: 'admin' },
     });
@@ -641,7 +642,7 @@ export class ChatService {
       throw new Error('Transfer ownership before leaving the group');
     }
 
-    await prisma.chatParticipant.delete({
+    await prisma.chat_participant.delete({
       where: { chatId_userId: { chat_id, user_id: userId } },
     });
 
@@ -662,7 +663,7 @@ export class ChatService {
    * Mark messages as read
    */
   static async markAsRead(userId: string, chat_id: string) {
-    const participant = await prisma.chatParticipant.findUnique({
+    const participant = await prisma.chat_participant.findUnique({
       where: { chatId_userId: { chat_id, user_id: userId } },
     });
 
@@ -670,7 +671,7 @@ export class ChatService {
       throw new Error('Not a participant in this chat');
     }
 
-    await prisma.chatParticipant.update({
+    await prisma.chat_participant.update({
       where: { chatId_userId: { chat_id, user_id: userId } },
       data: { lastRead: new Date() },
     });
@@ -683,7 +684,7 @@ export class ChatService {
    */
   static async sendTypingIndicator(userId: string, chat_id: string, isTyping: boolean) {
     // Verify user is participant
-    const participant = await prisma.chatParticipant.findUnique({
+    const participant = await prisma.chat_participant.findUnique({
       where: { chatId_userId: { chat_id, user_id: userId } },
     });
 
@@ -698,7 +699,7 @@ export class ChatService {
     });
 
     // Get all participants except the sender
-    const participants = await prisma.chatParticipant.findMany({
+    const participants = await prisma.chat_participant.findMany({
       where: { chat_id, user_id: { not: userId } },
       select: { user_id: true },
     });

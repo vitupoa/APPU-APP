@@ -1,4 +1,5 @@
 import { prisma } from '../../../config/database.js';
+import crypto from 'crypto';
 
 export class AuditService {
   static async log(
@@ -10,15 +11,13 @@ export class AuditService {
     ipAddress?: string | null,
     userAgent?: string | null
   ) {
-    return prisma.audit_logs.create({
-      data: {
+    return prisma.audit_logs.create({ data: {
         performed_by: adminId,
         action_type: action,
         target_user_id: targetId,
         action_details: {
           target_type: targetType,
-          details: details ?? {}
-        } as any,
+          details: details ?? {}} as any) as any,
         ip_address: ipAddress ?? null,
         user_agent: userAgent ?? null,
       }

@@ -12,7 +12,22 @@ export class ChamaController {
   static async create(req: AuthRequest, res: Response) {
     try {
       const parsed = createChamaSchema.parse(req.body);
-      const chama = await ChamaService.createChama(req.userId!, parsed);
+      const chama = await ChamaService.createChama(req.userId!, {
+        name: parsed.name,
+        type: parsed.type,
+        description: parsed.description,
+        reason: parsed.reason,
+        maxMembers: parsed.maxMembers,
+        autoLockOnFull: parsed.autoLockOnFull,
+        contributionAmountKr: parsed.contributionAmountKr,
+        contributionFrequency: parsed.contributionFrequency,
+        membershipFeeKr: parsed.membershipFeeKr,
+        lockPeriodDays: parsed.lockPeriodDays,
+        penaltyAmountKr: parsed.penaltyAmountKr,
+        gracePeriodDays: parsed.gracePeriodDays,
+        minApprovals: parsed.minApprovals,
+        allowMidTermVoteOut: parsed.allowMidTermVoteOut
+      });
       res.status(201).json({ success: true, chama });
     } catch (e: any) {
       res.status(400).json({ success: false, chama: null, error: e.message });

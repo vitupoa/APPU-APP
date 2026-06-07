@@ -2,6 +2,7 @@ import { prisma } from '../../config/database.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { ContentLockService } from '../contentLock/contentLock.service.js';
 import { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 export class FeedService {
   /**
@@ -66,12 +67,12 @@ export class FeedService {
           return {
             id: p.id,
             creator: {
-              id: p.User.id,
-              username: p.User.username,
-              displayName: p.User.display_name,
-              avatarUrl: p.User.avatar_url,
-              isVerified: p.User.is_verified,
-              accountType: p.User.account_type
+              id: p.user.id,
+              username: p.user.username,
+              displayName: p.user.display_name,
+              avatarUrl: p.user.avatar_url,
+              isVerified: p.user.is_verified,
+              accountType: p.user.account_type
             },
             imageUrls: access.hasAccess ? p.image_urls : [],
             caption: p.caption,
@@ -165,8 +166,7 @@ export class FeedService {
       take: count,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { created_at: 'desc' },
-      include: {
-        User: {
+      include: { user: {
           select: {
             id: true,
             username: true,
@@ -250,8 +250,7 @@ export class FeedService {
         { likes_count: 'desc' },
         { comments_count: 'desc' }
       ],
-      include: {
-        User: {
+      include: { user: {
           select: {
             id: true,
             username: true,
@@ -351,8 +350,7 @@ export class FeedService {
         required_tier: data.requiredTier as any,
         unlock_amount_kr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
       } as any,
-      include: {
-        User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
+      include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } }
       }
     });
 
@@ -363,7 +361,7 @@ export class FeedService {
 
     return {
       ...post,
-      creator: (post as any).User,
+      creator: (post as any).user,
       created_at: post.created_at.toISOString()
     };
   }
@@ -381,7 +379,7 @@ export class FeedService {
       return { liked: false };
     } else {
       await prisma.$transaction([
-        prisma.post_likes.create({ data: { user_id: userId, post_id } }),
+        prisma.post_likes.create({ data: { user_id: userId, post_id }} as any)),
         prisma.post.update({ where: { id: post_id }, data: { likes_count: { increment: 1 } } })
       ]);
       return { liked: true };
@@ -392,8 +390,7 @@ export class FeedService {
     const [comment] = await prisma.$transaction([
       prisma.post_comments.create({
         data: { user_id: userId, post_id, text },
-        include: {
-          User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
+        include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } }
         }
       }),
       prisma.post.update({ where: { id: post_id }, data: { comments_count: { increment: 1 } } })

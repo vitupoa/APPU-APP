@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { authenticate, AuthRequest } from '../../middleware/auth.js';
 import { prisma } from '../../config/database.js';
 import { parseQueryString } from '../../utils/queryParams.js';
+import crypto from 'crypto';
 
 const router = Router();
 
@@ -33,13 +34,9 @@ router.post('/custom', authenticate, async (req: AuthRequest, res: Response): Pr
     return;
   }
   
-  const niche = await prisma.creator_niche.create({
-    data: {
-      name: name.toLowerCase(),
+  const niche = await prisma.creator_niche.create({ data: { id: crypto.randomUUID(), name: name.toLowerCase(),
       isCustom: true,
-      createdBy: req.userId!
-    }
-  });
+      createdBy: req.userId!}} as any));
   
   res.json(niche);
 });

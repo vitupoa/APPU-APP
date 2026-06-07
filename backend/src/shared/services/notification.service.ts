@@ -28,8 +28,7 @@ export class NotificationService {
         }),
         prisma.contest.findUnique({ 
           where: { id: contest_id },
-          include: { 
-            User: { 
+          include: { user: { 
               select: { 
                 id: true, 
                 display_name: true, 
@@ -52,8 +51,8 @@ export class NotificationService {
           ${judgeId},
           'JUDGE_INVITE',
           'Judge Invitation',
-          ${`${contest.User.display_name} invited you to judge "${contest.title}"`},
-          ${JSON.stringify({ contest_id, inviteId, creator_id: contest.User.id })}::jsonb,
+          ${`${contest.user.display_name} invited you to judge "${contest.title}"`},
+          ${JSON.stringify({ contest_id, inviteId, creator_id: contest.user.id })}::jsonb,
           false,
           NOW()
         )
@@ -88,7 +87,7 @@ export class NotificationService {
       const [contest, judge] = await Promise.all([
         prisma.contest.findUnique({
           where: { id: contestId },
-          include: { User: { select: { id: true, display_name: true, fcmToken: true } } }
+          include: { user: { select: { id: true, display_name: true, fcmToken: true } } }
         }),
         prisma.user.findUnique({
           where: { id: judgeId },
@@ -114,8 +113,8 @@ export class NotificationService {
       `;
 
       // Send push notification
-      if (contest.User.fcmToken) {
-        await this.sendPushNotification(contest.User.fcmToken, {
+      if (contest.user.fcmToken) {
+        await this.sendPushNotification(contest.user.fcmToken, {
           title: 'Judge Accepted',
           body: `${judge.display_name} will judge your contest`,
           data: { type: 'JUDGE_ACCEPTED', contest_id: contestId, judgeId }
@@ -134,7 +133,7 @@ export class NotificationService {
       const [contest, judge] = await Promise.all([
         prisma.contest.findUnique({
           where: { id: contestId },
-          include: { User: { select: { id: true, display_name: true, fcmToken: true } } }
+          include: { user: { select: { id: true, display_name: true, fcmToken: true } } }
         }),
         prisma.user.findUnique({
           where: { id: judgeId },
@@ -160,8 +159,8 @@ export class NotificationService {
       `;
 
       // Send push notification
-      if (contest.User.fcmToken) {
-        await this.sendPushNotification(contest.User.fcmToken, {
+      if (contest.user.fcmToken) {
+        await this.sendPushNotification(contest.user.fcmToken, {
           title: 'Judge Declined',
           body: `${judge.display_name} declined to judge your contest`,
           data: { type: 'JUDGE_DECLINED', contest_id: contestId, judgeId }

@@ -1,4 +1,5 @@
 import { prisma } from '../config/database.js';
+import crypto from 'crypto';
 
 /**
  * Escrow Approval System
@@ -159,7 +160,7 @@ export class EscrowApprovalManager {
       include: { adminProfile: true }
     });
 
-    if (!approver?.is_admin || approver.adminProfile?.role !== 'SUPER_ADMIN') {
+    if (!approver?.is_admin || approver.admin_profile?.role !== 'SUPER_ADMIN') {
       throw new Error('Only super admins can approve payouts');
     }
 

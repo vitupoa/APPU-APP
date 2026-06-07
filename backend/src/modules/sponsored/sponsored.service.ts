@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { CreateSponsoredContentRequest, SponsoredContentStatus, PricingModel, SponsoredContentType } from './sponsored.types.js';
+import crypto from 'crypto';
 
 /**
  * Sponsored Content Service - Native Ad Marketplace
@@ -110,13 +111,11 @@ export class SponsoredContentService {
         where: { id: campaignId },
         data: { impressions: { increment: 1 } }
       }),
-      prisma.sponsored_impressions.create({
-        data: {
+      prisma.sponsored_impressions.create({ data: {
           campaign_id: campaignId,
           user_id,
           type: 'impression'
-        }
-      })
+        }} as any))
     ]);
   }
 
@@ -137,14 +136,12 @@ export class SponsoredContentService {
           spent: { increment: cost }
         }
       }),
-      prisma.sponsored_impressions.create({
-        data: {
+      prisma.sponsored_impressions.create({ data: {
           campaign_id: campaignId,
           user_id,
           type: 'view',
           cost
-        }
-      })
+        }} as any))
     ]);
   }
 
@@ -165,14 +162,12 @@ export class SponsoredContentService {
           spent: { increment: cost }
         }
       }),
-      prisma.sponsored_impressions.create({
-        data: {
+      prisma.sponsored_impressions.create({ data: {
           campaign_id: campaignId,
           user_id,
           type: engagementType,
           cost
-        }
-      })
+        }} as any))
     ]);
   }
 
@@ -260,7 +255,7 @@ export class SponsoredContentService {
   static async getPendingCampaigns() {
     return await prisma.sponsored_content.findMany({
       where: { status: SponsoredContentStatus.PENDING_REVIEW },
-      include: { User: { select: { username: true, display_name: true } } },
+      include: { user: { select: { username: true, display_name: true } } },
       orderBy: { created_at: 'desc' }
     });
   }
@@ -270,7 +265,7 @@ export class SponsoredContentService {
    */
   static async getAllCampaigns() {
     return await prisma.sponsored_content.findMany({
-      include: { User: { select: { username: true, display_name: true } } },
+      include: { user: { select: { username: true, display_name: true } } },
       orderBy: { created_at: 'desc' }
     });
   }

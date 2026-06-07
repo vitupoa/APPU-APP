@@ -5,6 +5,7 @@ import { transactionSigner, TransactionPayload } from '../../utils/transactionSi
 import { nonceService } from '../../services/nonce.service.js';
 import { WithdrawalSecurityMetadata } from './withdrawal.types.js';
 import { WithdrawalSecurityValidator } from '../../utils/withdrawalSecurity.js';
+import crypto from 'crypto';
 
 const DAILY_WITHDRAWAL_LIMIT = 500000; // Kr. 500,000 per day
 const HOURLY_WITHDRAWAL_LIMIT = 30000; // Kr. 30,000 per hour
@@ -633,8 +634,7 @@ export class WithdrawalService {
     });
 
     // Log audit
-    await prisma.audit_logs.create({
-      data: {
+    await prisma.audit_logs.create({ data: {
         performed_by: adminId,
         action_type: approved ? 'WITHDRAWAL_APPROVED' : 'WITHDRAWAL_REJECTED',
         target_user_id: request.user_id,
@@ -646,8 +646,7 @@ export class WithdrawalService {
             amount: request.amount_kr,
             reviewNote,
             flagReason
-          }
-        }
+          }} as any)
       }
     });
 

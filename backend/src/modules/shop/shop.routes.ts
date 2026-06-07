@@ -146,7 +146,7 @@ router.get('/products/:id/reviews', async (req: AuthRequest, res: Response) => {
 router.post('/reviews', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createReviewSchema.parse(req.body);
-    const review = await ReviewService.createReview(req.userId!, data);
+    const review = await ReviewService.createReview(req.userId!, { product_id: data.product_id!, rating: data.rating!, title: data.title, text: data.text, videoUrl: data.videoUrl, imageUrls: data.imageUrls });
     res.status(201).json(review);
   } catch (e: any) {
     res.status(e.name === 'ZodError' ? 400 : 400).json({ error: e.message });
@@ -183,7 +183,7 @@ router.get('/wishlists/public/:userId', async (req: AuthRequest, res: Response) 
 router.post('/wishlists', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createWishlistSchema.parse(req.body);
-    const wishlist = await WishlistService.createWishlist(req.userId!, data);
+    const wishlist = await WishlistService.createWishlist(req.userId!, { name: data.name!, isPublic: data.isPublic, isRegistry: data.isRegistry, eventType: data.eventType, eventDate: data.eventDate });
     res.status(201).json(wishlist);
   } catch (e: any) {
     res.status(e.name === 'ZodError' ? 400 : 400).json({ error: e.message });
@@ -194,7 +194,7 @@ router.post('/wishlists/:id/items', authMiddleware, async (req: AuthRequest, res
   try {
     const wishlistId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const data = addWishlistItemSchema.parse(req.body);
-    const item = await WishlistService.addItem(wishlistId, req.userId!, data);
+    const item = await WishlistService.addItem(wishlistId, req.userId!, { product_id: data.product_id!, quantity: data.quantity, priority: data.priority, notes: data.notes });
     res.status(201).json(item);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -230,7 +230,7 @@ router.get('/cart', authMiddleware, async (req: AuthRequest, res: Response) => {
 router.post('/cart', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = addToCartSchema.parse(req.body);
-    const item = await CartService.addToCart(req.userId!, data);
+    const item = await CartService.addToCart(req.userId!, { product_id: data.product_id!, quantity: data.quantity, bargainPrice: data.bargainPrice });
     res.status(201).json(item);
   } catch (e: any) {
     res.status(e.name === 'ZodError' ? 400 : 400).json({ error: e.message });
@@ -264,7 +264,7 @@ router.post('/gifts',
   async (req: AuthRequest, res: Response) => {
   try {
     const data = sendGiftSchema.parse(req.body);
-    const gift = await GiftService.sendGift(req.userId!, data);
+    const gift = await GiftService.sendGift(req.userId!, { recipient_id: data.recipient_id!, product_id: data.product_id!, message: data.message });
     res.status(201).json(gift);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -305,9 +305,12 @@ router.post('/flash-sales', authMiddleware, async (req: AuthRequest, res: Respon
   try {
     const data = createFlashSaleSchema.parse(req.body);
     const sale = await FlashSaleService.createFlashSale({
-      ...data,
-      startTime: data.start_time,
-      endTime: data.end_time,
+      title: data.title!,
+      description: data.description,
+      type: data.type!,
+      startTime: data.start_time!,
+      endTime: data.end_time!,
+      products: data.products as { product_id: string; salePrice: number; stockLimit?: number; perUserLimit?: number; }[]
     });
     res.status(201).json(sale);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
@@ -330,8 +333,12 @@ router.post('/group-buys', authMiddleware, async (req: AuthRequest, res: Respons
   try {
     const data = createGroupBuySchema.parse(req.body);
     const gb = await GroupBuyService.createGroupBuy(req.userId!, {
-      ...data,
-      expiresAt: data.expires_at,
+      product_id: data.product_id!,
+      title: data.title!,
+      description: data.description,
+      targetParticipants: data.targetParticipants!,
+      discountPercent: data.discountPercent!,
+      expiresAt: data.expires_at!
     });
     res.status(201).json(gb);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
@@ -534,7 +541,7 @@ router.post('/shipping-jobs', authMiddleware, async (req: AuthRequest, res: Resp
 router.post('/premium-listings', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createPremiumListingSchema.parse(req.body);
-    const result = await PremiumService.createListing(req.userId!, data);
+    const result = await PremiumService.createListing(req.userId!, { product_id: data.product_id!, type: data.type!, days: data.days! });
     res.status(201).json(result);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -546,7 +553,7 @@ router.post('/premium-listings', authMiddleware, async (req: AuthRequest, res: R
 router.post('/shares', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = createProductShareSchema.parse(req.body);
-    const share = await ProductShareService.shareProduct(req.userId!, data);
+    const share = await ProductShareService.shareProduct(req.userId!, { product_id: data.product_id!, contentId: data.content_id, contentType: data.contentType, caption: data.caption });
     res.status(201).json(share);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });
@@ -576,9 +583,11 @@ router.post('/products/:id/discounts', authMiddleware, async (req: AuthRequest, 
     const data = createDiscountSchema.parse(req.body);
     const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const discount = await DiscountService.createDiscount(req.userId!, productId, {
-      ...data,
-      startDate: data.start_date,
-      endDate: data.end_date,
+      discountType: data.discountType!,
+      discountValue: data.discountValue!,
+      minQuantity: data.minQuantity,
+      startDate: data.start_date!,
+      endDate: data.end_date!
     });
     res.status(201).json(discount);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
@@ -721,7 +730,7 @@ router.get('/vehicles/favorites', authMiddleware, async (req: AuthRequest, res: 
 router.post('/calculator/import-cost', async (req: AuthRequest, res: Response) => {
   try {
     const data = priceCalculatorSchema.parse(req.body);
-    const result = await ShopService.calculateImportCost(data);
+    const result = await ShopService.calculateImportCost({ vehiclePriceUsd: data.vehiclePriceUsd!, destinationCountry: data.destinationCountry!, port: data.port, engineCc: data.engineCc, yearOfManufacture: data.yearOfManufacture });
     res.json(result);
   } catch (e: any) { res.status(400).json({ error: e.message }); }
 });

@@ -371,8 +371,7 @@ export class AnalyticsDashboardService {
       prisma.shorts.findMany({
         take: limit,
         orderBy: { views: 'desc' },
-        include: {
-          User: {
+        include: { user: {
             select: { username: true, avatar_url: true }
           }
         }
@@ -380,8 +379,7 @@ export class AnalyticsDashboardService {
       prisma.post.findMany({
         take: limit,
         orderBy: { likes_count: 'desc' },
-        include: {
-          User: {
+        include: { user: {
             select: { username: true, avatar_url: true }
           }
         }
@@ -389,8 +387,7 @@ export class AnalyticsDashboardService {
       prisma.products.findMany({
         take: limit,
         orderBy: { sales_count: 'desc' },
-        include: {
-          User: {
+        include: { user: {
             select: { username: true, avatar_url: true }
           }
         }

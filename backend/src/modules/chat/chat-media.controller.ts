@@ -16,7 +16,7 @@ export class ChatMediaController {
       const { media_type, resourceType } = req.body;
 
       // Verify user is participant in chat
-      const participant = await prisma.chatParticipant.findUnique({
+      const participant = await prisma.chat_participant.findUnique({
         where: { chatId_userId: { chat_id: chatId, user_id: userId } },
       });
 

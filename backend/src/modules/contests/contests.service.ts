@@ -4,6 +4,7 @@ import { emitVoteUpdate, emitContestUpdate } from '../../shared/gateway/events.j
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { NotificationService } from '../../shared/services/notification.service.js';
 import { contestValidationService } from '../../services/compliance/contestValidation.service.js';
+import crypto from 'crypto';
 
 const PLATFORM_FEE_RATE = 0.15; // 15%
 
@@ -33,6 +34,7 @@ export class ContestService {
     publicVoteWeight?: number;
     allowDailyPrizes?: boolean;
     dailyPrizeKr?: number;
+    dailyprizeTotalKr?: number;
     targetAges?: number[];
     targetGeos?: string[];
     airdropKr?: number;
@@ -43,6 +45,11 @@ export class ContestService {
     judgingMethod?: string;
     judgeWeightPercentage?: number;
     voteWeightPercentage?: number;
+    
+    // Team Participation Fields
+    participationType?: 'INDIVIDUAL_ONLY' | 'TEAM_ONLY' | 'BOTH';
+    teamSize?: number;
+    maxTeams?: number;
   }) {
     // Wave 2 Task 8.2: Validate contest structure for gambling compliance
     const validation = await contestValidationService.validateContestCreation({
@@ -224,8 +231,7 @@ export class ContestService {
             status: 'PENDING',
             updated_at: new Date()
           },
-          include: {
-            Contest: {
+          include: { contest: {
               select: {
                 id: true,
                 title: true,
@@ -251,13 +257,13 @@ export class ContestService {
           invitedAt: invite.invited_at.toISOString(),
           respondedAt: invite.responded_at?.toISOString() || null,
           contest: {
-            id: invite.Contest.id,
-            title: invite.Contest.title,
-            description: invite.Contest.description,
-            coverMediaUrl: invite.Contest.cover_media_url,
-            creatorUsername: invite.Contest.User.username,
-            creatorDisplayName: invite.Contest.User.display_name,
-            deadline: invite.Contest.deadline.toISOString()
+            id: invite.contest.id,
+            title: invite.contest.title,
+            description: invite.contest.description,
+            coverMediaUrl: invite.contest.cover_media_url,
+            creatorUsername: invite.contest.user.username,
+            creatorDisplayName: invite.contest.user.display_name,
+            deadline: invite.contest.deadline.toISOString()
           }
         });
 
@@ -283,8 +289,7 @@ export class ContestService {
         judge_id: judgeUserId,
         status: 'PENDING'
       },
-      include: {
-        Contest: {
+      include: { contest: {
           select: {
             id: true,
             title: true,
@@ -311,13 +316,13 @@ export class ContestService {
       invitedAt: invite.invited_at.toISOString(),
       respondedAt: invite.responded_at?.toISOString() || null,
       contest: {
-        id: invite.Contest.id,
-        title: invite.Contest.title,
-        description: invite.Contest.description,
-        coverMediaUrl: invite.Contest.cover_media_url,
-        creatorUsername: invite.Contest.User.username,
-        creatorDisplayName: invite.Contest.User.display_name,
-        deadline: invite.Contest.deadline.toISOString()
+        id: invite.contest.id,
+        title: invite.contest.title,
+        description: invite.contest.description,
+        coverMediaUrl: invite.contest.cover_media_url,
+        creatorUsername: invite.contest.user.username,
+        creatorDisplayName: invite.contest.user.display_name,
+        deadline: invite.contest.deadline.toISOString()
       }
     }));
   }
@@ -397,10 +402,8 @@ export class ContestService {
         judge_id: judgeId,
         status: 'ACCEPTED'
       },
-      include: {
-        Contest: {
-          include: {
-            User: {
+      include: { contest: {
+          include: { user: {
               select: {
                 id: true,
                 username: true,
@@ -415,25 +418,25 @@ export class ContestService {
     });
 
     return invites.map((invite: any) => ({
-      id: invite.Contest.id,
-      creator: invite.Contest.User,
-      title: invite.Contest.title,
-      description: invite.Contest.description,
-      media_type: invite.Contest.media_type,
-      contestCategory: invite.Contest.category,
-      prizeTotalKr: Number(invite.Contest.prize_total_kr),
-      platformFeeKr: Number(invite.Contest.platform_fee_kr),
-      totalChargedKr: Number(invite.Contest.prize_total_kr) + Number(invite.Contest.platform_fee_kr),
-      maxWinners: invite.Contest.max_winners,
-      judgingCriteria: invite.Contest.judging_criteria,
-      sponsorName: invite.Contest.sponsor_name,
-      sponsorUrl: invite.Contest.sponsor_url,
-      deadline: invite.Contest.deadline.toISOString(),
-      coverMediaUrl: invite.Contest.cover_media_url,
-      status: invite.Contest.status,
-      totalParticipants: invite.Contest.total_participants,
-      submissionsCount: invite.Contest.total_submissions,
-      created_at: invite.Contest.created_at.toISOString()
+      id: invite.contest.id,
+      creator: invite.contest.user,
+      title: invite.contest.title,
+      description: invite.contest.description,
+      media_type: invite.contest.media_type,
+      contestCategory: invite.contest.category,
+      prizeTotalKr: Number(invite.contest.prize_total_kr),
+      platformFeeKr: Number(invite.contest.platform_fee_kr),
+      totalChargedKr: Number(invite.contest.prize_total_kr) + Number(invite.contest.platform_fee_kr),
+      maxWinners: invite.contest.max_winners,
+      judgingCriteria: invite.contest.judging_criteria,
+      sponsorName: invite.contest.sponsor_name,
+      sponsorUrl: invite.contest.sponsor_url,
+      deadline: invite.contest.deadline.toISOString(),
+      coverMediaUrl: invite.contest.cover_media_url,
+      status: invite.contest.status,
+      totalParticipants: invite.contest.total_participants,
+      submissionsCount: invite.contest.total_submissions,
+      created_at: invite.contest.created_at.toISOString()
     }));
   }
 
@@ -493,7 +496,7 @@ export class ContestService {
 
         return {
           id: c.id,
-          creator: c.User,
+          creator: c.user,
           title: c.title,
           description: c.description,
           media_type: c.media_type,
@@ -524,8 +527,7 @@ export class ContestService {
   static async getContestById(contestId: string, userId?: string, userCurrency?: string) {
     const contest = await prisma.contest.findUniqueOrThrow({
       where: { id: contestId },
-      include: {
-        User: true,
+      include: { user: true,
         contest_prize_distributions: {
           orderBy: { rank: 'asc' }
         }
@@ -551,7 +553,7 @@ export class ContestService {
 
     return {
       id: contest.id,
-      creator: contest.User,
+      creator: contest.user,
       title: contest.title,
       description: contest.description,
       media_type: contest.media_type,
@@ -594,7 +596,7 @@ export class ContestService {
     if (existing) throw new Error('Already joined this contest');
 
     const [participant] = await prisma.$transaction([
-      prisma.contest_participants.create({ data: { user_id: userId, contest_id: contestId } }),
+      prisma.contest_participants.create({ data: { user_id: userId, contest_id: contestId }} as any)),
       prisma.contest.update({ where: { id: contestId }, data: { total_participants: { increment: 1 } } })
     ]);
 
@@ -609,7 +611,7 @@ export class ContestService {
       where: { id: contestId }
     });
 
-    const hasSubmitted = !!(await prisma.contestSubmission.findUnique({
+    const hasSubmitted = !!(await prisma.contest_submission.findUnique({
       where: { contest_id_user_id: { contest_id: contestId, user_id: userId } }
     }));
 
@@ -643,7 +645,7 @@ export class ContestService {
     if (!participant) throw new Error('You must join this contest before submitting');
 
     const [submission] = await prisma.$transaction([
-      prisma.contestSubmission.create({
+      prisma.contest_submission.create({
         data: {
           user_id: data.user_id,
           contest_id: data.contestId,
@@ -651,8 +653,7 @@ export class ContestService {
           media_type: data.mediaType,
           proof_urls: data.proofUrls || []
         },
-        include: {
-          User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
+        include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } }
         }
       }),
       prisma.contest.update({ where: { id: data.contestId }, data: { total_submissions: { increment: 1 } } })
@@ -669,13 +670,12 @@ export class ContestService {
   }
 
   static async getSubmissions(contestId: string, cursor?: string, limit = 20) {
-    const submissions = await prisma.contestSubmission.findMany({
+    const submissions = await prisma.contest_submission.findMany({
       where: { contest_id: contestId },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { submitted_at: 'desc' },
-      include: {
-        User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
+      include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } }
       }
     });
 
@@ -684,7 +684,7 @@ export class ContestService {
     return {
       items: items.map((s: any) => ({
         id: s.id,
-        user: s.User,
+        user: s.user,
         contest_id: s.contest_id,
         media_url: s.media_url,
         media_type: s.media_type,
@@ -700,18 +700,17 @@ export class ContestService {
   }
 
   static async getLeaderboard(contestId: string) {
-    const submissions = await prisma.contestSubmission.findMany({
+    const submissions = await prisma.contest_submission.findMany({
       where: { contest_id: contestId },
       orderBy: [{ votes_count: 'desc' }, { submitted_at: 'asc' }],
       take: 50,
-      include: {
-        User: { select: { id: true, username: true, display_name: true, avatar_url: true } }
+      include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } }
       }
     });
 
     return submissions.map((s: any) => ({
       id: s.id,
-      user: s.User,
+      user: s.user,
       contest_id: s.contest_id,
       media_url: s.media_url,
       media_type: s.media_type,
@@ -728,15 +727,14 @@ export class ContestService {
    * Get all contest submissions feed from active contests
    */
   static async getSubmissionsFeed(cursor?: string, limit = 20, userId?: string) {
-    const submissions = await prisma.contestSubmission.findMany({
+    const submissions = await prisma.contest_submission.findMany({
       where: {
         Contest: { status: 'ACTIVE' }
       },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { submitted_at: 'desc' },
-      include: {
-        User: { select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true } },
+      include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true } },
         Contest: {
           select: {
             id: true,
@@ -754,13 +752,13 @@ export class ContestService {
     return {
       items: items.map((s: any) => ({
         id: s.id,
-        user: s.User,
+        user: s.user,
         contest_id: s.contest_id,
         contest: {
-          id: s.Contest.id,
-          title: s.Contest.title,
-          prizeTotalKr: Number(s.Contest.prize_total_kr),
-          status: s.Contest.status
+          id: s.contest.id,
+          title: s.contest.title,
+          prizeTotalKr: Number(s.contest.prize_total_kr),
+          status: s.contest.status
         },
         media_url: s.media_url,
         media_type: s.media_type,
@@ -780,12 +778,12 @@ export class ContestService {
    * Vote on a contest submission
    */
   static async voteOnSubmission(userId: string, submissionId: string, voteType: 'UPVOTE' | 'DOWNVOTE') {
-    const submission = await prisma.contestSubmission.findUniqueOrThrow({
+    const submission = await prisma.contest_submission.findUniqueOrThrow({
       where: { id: submissionId },
-      include: { Contest: true }
+      include: { contest: true }
     });
 
-    if (submission.Contest.status !== 'ACTIVE') {
+    if (submission.contest.status !== 'ACTIVE') {
       throw new Error('Contest is not active');
     }
 
@@ -875,9 +873,9 @@ export class ContestService {
    * Only judges assigned to the contest can score
    */
   static async scoreSubmission(judgeUserId: string, submissionId: string, score: number, feedback?: string) {
-    const submission = await prisma.contestSubmission.findUniqueOrThrow({
+    const submission = await prisma.contest_submission.findUniqueOrThrow({
       where: { id: submissionId },
-      include: { Contest: true }
+      include: { contest: true }
     });
 
     // Verify judge is assigned to this contest
@@ -894,7 +892,7 @@ export class ContestService {
       throw new Error('You are not authorized to judge this contest');
     }
 
-    if (submission.Contest.status !== 'JUDGING') {
+    if (submission.contest.status !== 'JUDGING') {
       throw new Error('Contest must be in JUDGING status to score submissions');
     }
 
@@ -949,10 +947,9 @@ export class ContestService {
    * Recalculate judge_score and final_score for a submission
    */
   static async recalculateSubmissionScores(submissionId: string) {
-    const submission = await prisma.contestSubmission.findUniqueOrThrow({
+    const submission = await prisma.contest_submission.findUniqueOrThrow({
       where: { id: submissionId },
-      include: {
-        Contest: true,
+      include: { contest: true,
         judge_scores: true
       }
     });
@@ -969,7 +966,7 @@ export class ContestService {
 
     // Calculate final score based on judging criteria
     let finalScore = new Prisma.Decimal(0);
-    const contest = submission.Contest;
+    const contest = submission.contest;
 
     switch (contest.judging_criteria) {
       case 'CREATOR_PICKS':
@@ -1003,7 +1000,7 @@ export class ContestService {
     }
 
     // Update submission with new scores
-    await prisma.contestSubmission.update({
+    await prisma.contest_submission.update({
       where: { id: submissionId },
       data: {
         judge_score: avgJudgeScore,
@@ -1023,8 +1020,7 @@ export class ContestService {
       where: { id: contestId },
       include: {
         ContestSubmission: {
-          include: {
-            User: {
+          include: { user: {
               select: {
                 id: true,
                 username: true,
@@ -1044,15 +1040,14 @@ export class ContestService {
     }
 
     // Recalculate all submission scores first
-    for (const submission of contest.ContestSubmission) {
+    for (const submission of contest.contest_submission) {
       await this.recalculateSubmissionScores(submission.id);
     }
 
     // Fetch updated submissions with scores
-    const submissions = await prisma.contestSubmission.findMany({
+    const submissions = await prisma.contest_submission.findMany({
       where: { contest_id: contestId },
-      include: {
-        User: {
+      include: { user: {
           select: {
             id: true,
             username: true,
@@ -1069,7 +1064,7 @@ export class ContestService {
 
     // Update ranks
     for (let i = 0; i < submissions.length; i++) {
-      await prisma.contestSubmission.update({
+      await prisma.contest_submission.update({
         where: { id: submissions[i].id },
         data: { rank: i + 1 }
       });
@@ -1078,8 +1073,8 @@ export class ContestService {
     return submissions.map((s, index) => ({
       userId: s.user_id,
       rank: index + 1,
-      username: s.User.username,
-      displayName: s.User.display_name,
+      username: s.user.username,
+      displayName: s.user.display_name,
       finalScore: Number(s.final_score),
       judgeScore: Number(s.judge_score),
       votesCount: s.votes_count

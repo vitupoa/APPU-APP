@@ -135,7 +135,7 @@ export class AnalyticsService {
   }
 
   static async getAdminList() {
-    return prisma.adminProfile.findMany({
+    return prisma.admin_profile.findMany({
       include: {
         user: {
           select: { id: true, username: true, display_name: true, avatar_url: true, email: true }

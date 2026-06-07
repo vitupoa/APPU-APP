@@ -1,4 +1,5 @@
 import { prisma } from '../../config/database.js';
+import crypto from 'crypto';
 
 export class NicheAdTargetingService {
   async tagContentWithNiche(

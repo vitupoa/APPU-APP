@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 
 async function main() {
@@ -16,7 +17,7 @@ async function main() {
 
     if (existing) {
       console.log(`User ${email} or ${username} already exists. Upgrading to Super Admin...`);
-      await prisma.adminProfile.upsert({
+      await prisma.admin_profile.upsert({
         where: { user_id: existing.id },
         update: { role: 'SUPER_ADMIN' },
         create: {
@@ -31,9 +32,7 @@ async function main() {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await prisma.user.create({
-      data: {
-        email,
+    const user = await prisma.user.create({ data: { id: crypto.randomUUID(), email,
         username,
         first_name: 'Super',
         last_name: 'Admin',
@@ -46,9 +45,7 @@ async function main() {
         updated_at: new Date(),
         adminProfile: {
           create: {
-            role: 'SUPER_ADMIN',
-          }
-        }
+            role: 'SUPER_ADMIN',}} as any)
       }
     });
 

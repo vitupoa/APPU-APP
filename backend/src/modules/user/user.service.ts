@@ -1,4 +1,5 @@
 import { prisma } from '../../config/database.js';
+import crypto from 'crypto';
 
 export class UserService {
   /**
@@ -9,9 +10,7 @@ export class UserService {
       where: { id: userId },
       include: {
         bio_links: { orderBy: { sort_order: 'asc' } },
-        _count: {
-          select: {
-            admires_admires_admired_idToUser: true,
+        _count: { select: { admires_admires_admired_idTouser: true,
             admires_admires_admirer_idToUser: true,
             contest_winners: true
           }
@@ -199,7 +198,7 @@ export class UserService {
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { created_at: 'desc' },
       include: {
-        User_admires_admirer_idToUser: {
+        user_admires_admirer_idTouser: {
           select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true }
         }
       }
@@ -208,7 +207,7 @@ export class UserService {
     const hasMore = records.length > limit;
     const items = hasMore ? records.slice(0, limit) : records;
     return {
-      items: items.map((r: any) => ({ ...r.User_admires_admirer_idToUser, isLovers: r.is_lovers })),
+      items: items.map((r: any) => ({ ...r.user_admires_admirer_idTouser, isLovers: r.is_lovers })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
   }
@@ -223,7 +222,7 @@ export class UserService {
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { created_at: 'desc' },
       include: {
-        User_admires_admired_idToUser: {
+        user_admires_admired_idTouser: {
           select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true }
         }
       }
@@ -232,7 +231,7 @@ export class UserService {
     const hasMore = records.length > limit;
     const items = hasMore ? records.slice(0, limit) : records;
     return {
-      items: items.map((r: any) => ({ ...r.User_admires_admired_idToUser, isLovers: r.is_lovers })),
+      items: items.map((r: any) => ({ ...r.user_admires_admired_idTouser, isLovers: r.is_lovers })),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
   }
@@ -247,7 +246,7 @@ export class UserService {
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { created_at: 'desc' },
       include: {
-        User_admires_admired_idToUser: {
+        user_admires_admired_idTouser: {
           select: { id: true, username: true, display_name: true, avatar_url: true, is_verified: true }
         }
       }
@@ -256,7 +255,7 @@ export class UserService {
     const hasMore = records.length > limit;
     const items = hasMore ? records.slice(0, limit) : records;
     return {
-      items: items.map((r: any) => r.User_admires_admired_idToUser),
+      items: items.map((r: any) => r.user_admires_admired_idTouser),
       nextCursor: hasMore ? items[items.length - 1].id : null
     };
   }
@@ -280,7 +279,7 @@ export class UserService {
         avatar_url: true,
         bio: true,
         is_verified: true,
-        _count: { select: { admires_admires_admired_idToUser: true } }
+        _count: { select: { admires_admires_admired_idTouser: true } }
       }
     });
 
@@ -331,7 +330,7 @@ export class UserService {
     return prisma.milestones.findMany({
       include: {
         milestone_completions: {
-          include: { User: { select: { id: true, username: true, display_name: true } } }
+          include: { user: { select: { id: true, username: true, display_name: true } } }
         }
       }
     });
@@ -342,7 +341,7 @@ export class UserService {
       include: {
         milestone_completions: {
           where: { user_id: userId },
-          include: { User: { select: { id: true, username: true, display_name: true } } }
+          include: { user: { select: { id: true, username: true, display_name: true } } }
         }
       }
     });
@@ -355,7 +354,7 @@ export class UserService {
       requirement_value: m.requirement_value,
       reward_kr: Number(m.reward_kr),
       isCompleted: m.milestone_completions.length > 0,
-      completedBy: m.milestone_completions[0]?.User ?? null
+      completedBy: m.milestone_completions[0]?.user ?? null
     }));
   }
 }

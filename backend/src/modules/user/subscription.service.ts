@@ -8,7 +8,7 @@ export class SubscriptionService {
    * Get creator's subscription tier config.
    */
   static async getCreatorTiers(creatorId: string) {
-    return prisma.subscriptionTier.findMany({
+    return prisma.subscription_tier.findMany({
       where: { creator_id: creatorId },
       orderBy: { tier: 'asc' }
     });
@@ -18,7 +18,7 @@ export class SubscriptionService {
    * Get available tiers for a user (public — for subscriber view).
    */
   static async getAvailableTiers(creatorId: string) {
-    return prisma.subscriptionTier.findMany({
+    return prisma.subscription_tier.findMany({
       where: { creator_id: creatorId, is_enabled: true },
       orderBy: { tier: 'asc' }
     });

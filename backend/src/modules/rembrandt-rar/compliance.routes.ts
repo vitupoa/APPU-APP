@@ -57,7 +57,7 @@ router.get('/reviews', async (req: Request, res: Response) => {
  */
 router.get('/reviews/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const review = await complianceReviewService.getReviewById(id);
 
     res.json({
@@ -126,7 +126,7 @@ router.post('/reviews', async (req: Request, res: Response): Promise<void> => {
  */
 router.put('/reviews/:id/assign', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { reviewer_id } = req.body;
     const adminId = req.user?.id;
 
@@ -171,7 +171,7 @@ router.put('/reviews/:id/assign', async (req: Request, res: Response): Promise<v
  */
 router.put('/reviews/:id/decision', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { decision, notes } = req.body;
     const reviewerId = req.user?.id;
 
@@ -286,7 +286,7 @@ router.get('/sars', async (req: Request, res: Response) => {
  */
 router.get('/sars/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const sar = await sarService.getSARById(id);
 
     res.json({
@@ -360,7 +360,7 @@ router.post('/sars', async (req: Request, res: Response): Promise<void> => {
  */
 router.put('/sars/:id/status', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { status, regulatory_body } = req.body;
     const adminId = req.user?.id;
 
@@ -405,7 +405,7 @@ router.put('/sars/:id/status', async (req: Request, res: Response): Promise<void
  */
 router.get('/sars/:id/template', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const template = await sarService.generateSAR(id);
 
     res.json({

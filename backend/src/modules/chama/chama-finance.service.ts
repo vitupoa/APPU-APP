@@ -2,6 +2,7 @@ import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { io } from '../../shared/gateway/socket.js';
 import { randomUUID } from 'crypto';
+import crypto from 'crypto';
 
 export class ChamaFinanceService {
   /**
@@ -17,7 +18,7 @@ export class ChamaFinanceService {
       if (!chama) throw new Error('Chama not found');
       if (chama.status !== 'ACTIVE') throw new Error('Chama is not active');
 
-      const member = await tx.chamaMember.findUnique({
+      const member = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id, user_id: userId } },
       });
       if (!member || member.status !== 'ACTIVE') {
@@ -50,7 +51,7 @@ export class ChamaFinanceService {
       });
 
       // Record contribution
-      const contribution = await tx.chamaContribution.create({
+      const contribution = await tx.chama_contribution.create({
         data: {
           id: randomUUID(),
           chama_id,
@@ -62,24 +63,24 @@ export class ChamaFinanceService {
       });
 
       // Update member totals
-      await tx.chamaMember.update({
+      await tx.chama_member.update({
         where: { id: member.id },
         data: { total_contributed: { increment: amountDecimal } },
       });
 
       // Update cycle collected amount if a cycle is active
-      const activeCycle = await tx.chamaCycle.findFirst({
+      const activeCycle = await tx.chama_cycle.findFirst({
         where: { chama_id, status: { in: ['OPEN', 'COLLECTING'] } },
       });
       if (activeCycle) {
-        await tx.chamaCycle.update({
+        await tx.chama_cycle.update({
           where: { id: activeCycle.id },
           data: { collected_amount_kr: { increment: amountDecimal } },
         });
       }
 
       // Record transaction
-      await tx.chamaTransaction.create({
+      await tx.chama_transaction.create({
         data: {
           id: randomUUID(),
           chama_id,
@@ -135,7 +136,7 @@ export class ChamaFinanceService {
   ) {
     return prisma.$transaction(async (tx) => {
       // Verify requester is TREASURER
-      const requester = await tx.chamaMember.findUnique({
+      const requester = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id, user_id: requesterId } },
       });
       if (!requester || requester.role !== 'TREASURER') {
@@ -154,14 +155,14 @@ export class ChamaFinanceService {
       }
 
       // Find recipient member
-      const recipientMember = await tx.chamaMember.findUnique({
+      const recipientMember = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id, user_id: recipientUserId } },
       });
       if (!recipientMember || recipientMember.status !== 'ACTIVE') {
         throw new Error('Recipient is not an active member');
       }
 
-      const payout = await tx.chamaPayout.create({
+      const payout = await tx.chama_payout.create({
         data: {
           id: randomUUID(),
           chama_id,
@@ -206,14 +207,14 @@ export class ChamaFinanceService {
   ) {
     return prisma.$transaction(async (tx) => {
       // Verify approver is an official (ADMIN, CHAIRPERSON, TREASURER, SECRETARY)
-      const approver = await tx.chamaMember.findUnique({
+      const approver = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id, user_id: approverId } },
       });
       if (!approver || approver.role === 'MEMBER') {
         throw new Error('Only officials can approve/reject payouts');
       }
 
-      const payout = await tx.chamaPayout.findUnique({
+      const payout = await tx.chama_payout.findUnique({
         where: { id: payout_id },
         include: { approvals: true },
       });
@@ -235,7 +236,7 @@ export class ChamaFinanceService {
       if (!chama) throw new Error('Chama not found');
 
       if (decision === 'REJECT') {
-        await tx.chamaPayout.update({
+        await tx.chama_payout.update({
           where: { id: payout_id },
           data: { status: 'REJECTED' },
         });
@@ -302,19 +303,19 @@ export class ChamaFinanceService {
     });
 
     // Update member totals
-    await tx.chamaMember.update({
+    await tx.chama_member.update({
       where: { id: payout.member_id },
       data: { total_received: { increment: amountDecimal } },
     });
 
     // Mark payout as disbursed
-    await tx.chamaPayout.update({
+    await tx.chama_payout.update({
       where: { id: payout.id },
       data: { status: 'DISBURSED', disbursed_at: new Date() },
     });
 
     // Record transaction
-    await tx.chamaTransaction.create({
+    await tx.chama_transaction.create({
       data: {
         id: randomUUID(),
         chama_id: chama.id,
@@ -378,7 +379,7 @@ export class ChamaFinanceService {
   static async getTransactions(chamaId: string, page: number = 1, limit: number = 50) {
     const skip = (page - 1) * limit;
     const [transactions, total] = await Promise.all([
-      prisma.chamaTransaction.findMany({
+      prisma.chama_transaction.findMany({
         where: { chama_id: chamaId },
         include: {
           user: { select: { id: true, username: true, display_name: true, avatar_url: true } },
@@ -387,7 +388,7 @@ export class ChamaFinanceService {
         skip,
         take: limit,
       }),
-      prisma.chamaTransaction.count({ where: { chama_id: chamaId } }),
+      prisma.chama_transaction.count({ where: { chama_id: chamaId } }),
     ]);
     return { transactions, total, page, limit };
   }
@@ -403,7 +404,7 @@ export class ChamaFinanceService {
     amountKr?: number
   ) {
     // Verify membership
-    const member = await prisma.chamaMember.findUnique({
+    const member = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id, user_id: userId } },
     });
     if (!member || member.status !== 'ACTIVE') {
@@ -413,7 +414,7 @@ export class ChamaFinanceService {
     const chama = await prisma.chama.findUnique({ where: { id: chama_id } });
     if (!chama) throw new Error('Chama not found');
 
-    const transaction = await prisma.chamaTransaction.create({
+    const transaction = await prisma.chama_transaction.create({
       data: {
         id: randomUUID(),
         chama_id,

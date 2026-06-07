@@ -64,7 +64,7 @@ export function initializeDatabaseMonitorSocket(httpServer: HTTPServer) {
         include: { adminProfile: true },
       });
 
-      if (!user?.adminProfile || user.adminProfile.role !== 'SUPER_ADMIN') {
+      if (!user?.admin_profile || user.admin_profile.role !== 'SUPER_ADMIN') {
         return next(new Error('Super admin access required'));
       }
 

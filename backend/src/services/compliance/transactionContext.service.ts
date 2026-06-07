@@ -126,7 +126,7 @@ export class TransactionContextService {
 
         case TransactionType.SUBSCRIPTION:
           // Check if subscription tier exists
-          const subscription = await prisma.subscriptionTier.findUnique({
+          const subscription = await prisma.subscription_tier.findUnique({
             where: { id: referenceId },
             select: { id: true },
           });
@@ -239,7 +239,7 @@ export class TransactionContextService {
           });
 
           const content = post || short;
-          const creatorName = additionalInfo?.counterpartyName || content?.User?.display_name || 'creator';
+          const creatorName = additionalInfo?.counterpartyName || content?.user?.display_name || 'user';
           contentType = post ? 'post' : short ? 'short' : contentType;
           description = `Tip to ${creatorName} on ${contentType || 'content'}`;
           break;
@@ -249,18 +249,18 @@ export class TransactionContextService {
             where: { id: referenceId },
             select: { task_description: true, creator_id: true },
           });
-          const taskCreatorName = additionalInfo?.counterpartyName || 'creator';
+          const taskCreatorName = additionalInfo?.counterpartyName || 'user';
           const taskDesc = chatTask?.task_description || 'task';
           description = `Unlock chat with ${taskCreatorName} for: ${taskDesc}`;
           contentType = 'chat_task';
           break;
 
         case TransactionType.SUBSCRIPTION:
-          const subscription = await prisma.subscriptionTier.findUnique({
+          const subscription = await prisma.subscription_tier.findUnique({
             where: { id: referenceId },
             select: { tier: true, User: { select: { display_name: true } } },
           });
-          const subCreatorName = additionalInfo?.counterpartyName || subscription?.User?.display_name || 'creator';
+          const subCreatorName = additionalInfo?.counterpartyName || subscription?.user?.display_name || 'user';
           const tier = subscription?.tier || 'subscription';
           description = `${tier} subscription to ${subCreatorName}`;
           contentType = 'subscription';

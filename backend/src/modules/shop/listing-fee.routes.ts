@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authMiddleware } from '../../middleware/auth';
 import { listingFeeService } from './listing-fee.service';
 import { prisma } from '../../lib/prisma';
+import crypto from 'crypto';
 
 const router = Router();
 
@@ -56,9 +57,7 @@ router.get('/quota', async (req, res): Promise<void> => {
     });
     
     if (!quota) {
-      quota = await prisma.user_listing_quota.create({
-        data: { user_id: userId }
-      });
+      quota = await prisma.user_listing_quota.create({ data: { user_id: userId }} as any));
     }
     
     const config = await prisma.listing_fee_config.findFirst({

@@ -1,5 +1,6 @@
 import { sarService } from './sar.service';
 import { prisma } from '../../config/database';
+import crypto from 'crypto';
 
 /**
  * SAR Service Tests
@@ -12,9 +13,7 @@ describe('SAR Service', () => {
 
   beforeAll(async () => {
     // Create a test user
-    const testUser = await prisma.user.create({
-      data: {
-        email: 'sar-test@example.com',
+    const testUser = await prisma.user.create({ data: { id: crypto.randomUUID(), email: 'sar-test@example.com',
         username: 'sar_test_user',
         first_name: 'SAR',
         last_name: 'Test',
@@ -22,9 +21,7 @@ describe('SAR Service', () => {
         country: 'US',
         currency: 'USD',
         password_hash: 'test_hash',
-        updated_at: new Date()
-      }
-    });
+        updated_at: new Date()}} as any));
     testUserId = testUser.id;
   });
 

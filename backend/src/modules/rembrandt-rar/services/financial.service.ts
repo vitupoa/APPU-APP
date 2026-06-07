@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { AuditService } from './audit.service.js';
 import { ADMIN_ACTIONS } from '../rembrandt-rar.types.js';
 import { ExchangeService } from '../../../services/exchange/exchange.service.js';
+import crypto from 'crypto';
 
 export class FinancialService {
   // ─── PLATFORM WALLET ────────────────────────────────────
@@ -268,8 +269,7 @@ export class FinancialService {
     const [items, total] = await Promise.all([
       prisma.escrows.findMany({
         where,
-        include: {
-          User: { select: { id: true, username: true, display_name: true } },
+        include: { user: { select: { id: true, username: true, display_name: true } },
           Contest: { select: { id: true, title: true } },
         },
         orderBy: { created_at: 'desc' },

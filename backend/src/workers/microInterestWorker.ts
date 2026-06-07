@@ -1,4 +1,5 @@
 import { prisma } from '../config/database.js';
+import crypto from 'crypto';
 
 export function startMicroInterestWorker() {
   console.log('Starting Micro Interest Worker (runs every hour)');
@@ -75,15 +76,13 @@ async function updateMicroInterests() {
               }
             });
           } else {
-            await prisma.user_micro_interests.create({
-              data: {
+            await prisma.user_micro_interests.create({ data: {
                 user_id: interaction.user_id,
                 interest: tag,
                 category: 'hashtag', // Add required category field
                 weight: Math.min(0.1 * weight, 1.0),
                 last_updated: new Date()
-              }
-            });
+              }} as any));
           }
         }
       } catch (error) {

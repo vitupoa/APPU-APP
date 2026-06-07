@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import axios from 'axios';
 import { encrypt, decrypt } from '../../utils/encryption.js';
+import crypto from 'crypto';
 
 interface SocialMetrics {
   follower_count: number;

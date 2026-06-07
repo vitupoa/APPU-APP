@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 const USER_SELECT = { id: true, username: true, display_name: true, avatar_url: true, is_verified: true };
 
@@ -19,17 +20,16 @@ export class GarageService {
         service_area: data.serviceArea,
         offers_on_site: data.offersOnSite || false,
       },
-      include: { User: { select: USER_SELECT } }
+      include: { user: { select: USER_SELECT } }
     });
   }
 
   static async getProfile(garageId: string) {
     return prisma.garage_profiles.findUniqueOrThrow({
       where: { id: garageId },
-      include: {
-        User: { select: USER_SELECT },
+      include: { user: { select: USER_SELECT },
         garage_reviews: {
-          include: { User: { select: USER_SELECT } },
+          include: { user: { select: USER_SELECT } },
           orderBy: { created_at: 'desc' },
           take: 10
         }
@@ -47,7 +47,7 @@ export class GarageService {
       where, take: limit + 1,
       ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
       orderBy: { avg_rating: 'desc' },
-      include: { User: { select: USER_SELECT } }
+      include: { user: { select: USER_SELECT } }
     });
 
     const hasMore = garages.length > limit;
@@ -67,7 +67,7 @@ export class GarageService {
         location: data.location,
         status: 'PENDING',
       },
-      include: { garage_profiles: { include: { User: { select: USER_SELECT } } } }
+      include: { garage_profiles: { include: { user: { select: USER_SELECT } } } }
     });
   }
 
@@ -83,7 +83,7 @@ export class GarageService {
   static async getUserBookings(userId: string) {
     return prisma.garage_bookings.findMany({
       where: { user_id: userId },
-      include: { garage_profiles: { include: { User: { select: USER_SELECT } } } },
+      include: { garage_profiles: { include: { user: { select: USER_SELECT } } } },
       orderBy: { scheduled_date: 'desc' }
     });
   }
@@ -91,7 +91,7 @@ export class GarageService {
   static async getGarageBookings(garageId: string) {
     return prisma.garage_bookings.findMany({
       where: { garage_id: garageId },
-      include: { User: { select: USER_SELECT } },
+      include: { user: { select: USER_SELECT } },
       orderBy: { scheduled_date: 'desc' }
     });
   }
@@ -99,7 +99,7 @@ export class GarageService {
   static async createReview(userId: string, data: { garage_id: string; rating: number; text?: string }) {
     const review = await prisma.garage_reviews.create({
       data: { garage_id: data.garage_id, user_id: userId, rating: data.rating, text: data.text },
-      include: { User: { select: USER_SELECT } }
+      include: { user: { select: USER_SELECT } }
     });
 
     const agg = await prisma.garage_reviews.aggregate({
@@ -127,7 +127,7 @@ export class ImporterService {
         specialization: data.specialization,
         years_experience: data.yearsExperience,
       },
-      include: { User: { select: USER_SELECT } }
+      include: { user: { select: USER_SELECT } }
     });
   }
 
@@ -140,7 +140,7 @@ export class ImporterService {
       where, take: limit + 1,
       ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
       orderBy: { total_imports: 'desc' },
-      include: { User: { select: USER_SELECT } }
+      include: { user: { select: USER_SELECT } }
     });
 
     const hasMore = importers.length > limit;
@@ -149,8 +149,7 @@ export class ImporterService {
   }
 
   static async createImportRequest(userId: string, data: any) {
-    return prisma.import_requests.create({
-      data: {
+    return prisma.import_requests.create({ data: {
         user_id: userId,
         make: data.make,
         model: data.model,
@@ -160,30 +159,27 @@ export class ImporterService {
         budget: data.budget ? new Prisma.Decimal(data.budget) : undefined,
         requirements: data.requirements,
         status: 'PENDING',
-      }
-    });
+      }} as any));
   }
 
   static async getImportRequests(userId: string) {
     return prisma.import_requests.findMany({
       where: { user_id: userId },
-      include: { import_quotes: { include: { importer_profiles: { include: { User: { select: USER_SELECT } } } } } },
+      include: { import_quotes: { include: { importer_profiles: { include: { user: { select: USER_SELECT } } } } } },
       orderBy: { created_at: 'desc' }
     });
   }
 
   static async submitQuote(importerId: string, data: { requestId: string; quoteAmountKr: number; estimatedDays?: number; notes?: string }) {
     const profile = await prisma.importer_profiles.findUniqueOrThrow({ where: { user_id: importerId } });
-    return prisma.import_quotes.create({
-      data: {
+    return prisma.import_quotes.create({ data: {
         request_id: data.requestId,
         importer_id: profile.id,
         quote_amount_kr: new Prisma.Decimal(data.quoteAmountKr),
         estimated_days: data.estimatedDays,
         notes: data.notes,
         status: 'pending',
-      }
-    });
+      }} as any));
   }
 
   static async acceptQuote(requestId: string, quoteId: string, userId: string) {
@@ -209,7 +205,7 @@ export class LogisticsService {
         coverage_areas: data.coverageAreas,
         vehicle_types: data.vehicleTypes || [],
       },
-      include: { User: { select: USER_SELECT } }
+      include: { user: { select: USER_SELECT } }
     });
   }
 
@@ -222,7 +218,7 @@ export class LogisticsService {
     const companies = await prisma.logistics_companies.findMany({
       where, take: limit + 1,
       ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
-      include: { User: { select: USER_SELECT } }
+      include: { user: { select: USER_SELECT } }
     });
 
     const hasMore = companies.length > limit;
@@ -231,16 +227,14 @@ export class LogisticsService {
   }
 
   static async createShippingJob(requesterId: string, data: any) {
-    return prisma.shipping_jobs.create({
-      data: {
+    return prisma.shipping_jobs.create({ data: {
         requester_id: requesterId,
         pickup_location: data.pickupLocation,
         delivery_location: data.deliveryLocation,
         job_type: data.jobType,
         vehicle_desc: data.vehicleDesc,
         status: 'open',
-      }
-    });
+      }} as any));
   }
 
   static async getShippingJobs(params: { status?: string; cursor?: string; limit?: number }) {
@@ -251,7 +245,7 @@ export class LogisticsService {
     return prisma.shipping_jobs.findMany({
       where, take: limit,
       orderBy: { created_at: 'desc' },
-      include: { User: { select: USER_SELECT }, logistics_companies: true }
+      include: { user: { select: USER_SELECT }, logistics_companies: true }
     });
   }
 }
@@ -304,31 +298,27 @@ export class ProductShareService {
   static async shareProduct(userId: string, data: {
     product_id: string; contentId?: string; contentType?: string; caption?: string;
   }) {
-    return prisma.product_shares.create({
-      data: {
+    return prisma.product_shares.create({ data: {
         product_id: data.product_id,
         user_id: userId,
         content_id: data.contentId,
         content_type: data.contentType,
         caption: data.caption,
-      }
-    });
+      }} as any));
   }
 
   static async tagProduct(data: {
     product_id: string; contentId: string; contentType: string;
     positionX?: number; positionY?: number; timestamp?: number;
   }) {
-    return prisma.product_tags.create({
-      data: {
+    return prisma.product_tags.create({ data: {
         product_id: data.product_id,
         content_id: data.contentId,
         content_type: data.contentType,
         position_x: data.positionX ? new Prisma.Decimal(data.positionX) : undefined,
         position_y: data.positionY ? new Prisma.Decimal(data.positionY) : undefined,
         timestamp: data.timestamp,
-      }
-    });
+      }} as any));
   }
 
   static async getProductTags(contentId: string, contentType: string) {

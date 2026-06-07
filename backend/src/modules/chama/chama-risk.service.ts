@@ -2,6 +2,7 @@ import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { io } from '../../shared/gateway/socket.js';
 import { randomUUID } from 'crypto';
+import crypto from 'crypto';
 
 export class ChamaRiskService {
   /**
@@ -9,7 +10,7 @@ export class ChamaRiskService {
    * This would typically be called by a CRON job.
    */
   static async checkDefaults() {
-    const activeCycles = await prisma.chamaCycle.findMany({
+    const activeCycles = await prisma.chama_cycle.findMany({
       where: {
         status: { in: ['COLLECTING', 'OPEN'] },
         end_date: { lt: new Date() } // Past due
@@ -26,7 +27,7 @@ export class ChamaRiskService {
 
       for (const member of chama.chama_members) {
         // Did they contribute this cycle?
-        const contribution = await prisma.chamaContribution.findFirst({
+        const contribution = await prisma.chama_contribution.findFirst({
           where: {
             chama_id: chama.id,
             user_id: member.user_id,
@@ -39,19 +40,17 @@ export class ChamaRiskService {
           const owed = Number(chama.contribution_amount_kr) - (contribution ? Number(contribution.amount_kr) : 0);
           const penalty = chama.penalty_amount_kr ? Number(chama.penalty_amount_kr) : 0;
 
-          const defaulter = await prisma.chamaDefaulter.create({
-            data: {
+          const defaulter = await prisma.chamaDefaulter.create({ data: {
               id: randomUUID(),
               user_id: member.user_id,
               chama_id: chama.id,
               chama_name: chama.name,
               amount_owed_kr: new Prisma.Decimal(owed),
               fine_amount_kr: new Prisma.Decimal(penalty),
-            }
-          });
+            }} as any));
 
           // Mark member
-          await prisma.chamaMember.update({
+          await prisma.chama_member.update({
             where: { id: member.id },
             data: { is_defaulter: true }
           });
@@ -73,7 +72,7 @@ export class ChamaRiskService {
       }
 
       // Mark cycle as disbursing
-      await prisma.chamaCycle.update({
+      await prisma.chama_cycle.update({
         where: { id: cycle.id },
         data: { status: 'DISBURSING' }
       });
@@ -87,12 +86,12 @@ export class ChamaRiskService {
    */
   static async flagDefaulter(adminId: string, chama_id: string, targetUserId: string, amountOwed: number) {
     return prisma.$transaction(async (tx) => {
-      const admin = await tx.chamaMember.findUnique({
+      const admin = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id, user_id: adminId } },
       });
       if (!admin || admin.role !== 'ADMIN') throw new Error('Only Admin can flag defaulters');
 
-      const target = await tx.chamaMember.findUnique({
+      const target = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id, user_id: targetUserId } },
       });
       if (!target || target.status !== 'ACTIVE') throw new Error('Target is not an active member');
@@ -111,7 +110,7 @@ export class ChamaRiskService {
         }
       });
 
-      await tx.chamaMember.update({
+      await tx.chama_member.update({
         where: { id: target.id },
         data: { is_defaulter: true }
       });
@@ -140,7 +139,7 @@ export class ChamaRiskService {
     const chama = await prisma.chama.findUnique({ where: { id: chamaId } });
     if (!chama) throw new Error('Chama not found');
 
-    const member = await prisma.chamaMember.findUnique({
+    const member = await prisma.chama_member.findUnique({
       where: { chama_id_user_id: { chama_id: chamaId, user_id } },
     });
     if (!member || member.status !== 'ACTIVE') throw new Error('Member not found');
@@ -217,7 +216,7 @@ export class ChamaRiskService {
    */
   static async applyPenalty(adminId: string, chama_id: string, targetUserId: string) {
     return prisma.$transaction(async (tx) => {
-      const admin = await tx.chamaMember.findUnique({
+      const admin = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id, user_id: adminId } },
       });
       if (!admin || admin.role !== 'ADMIN') throw new Error('Only Admin can apply penalties');
@@ -225,7 +224,7 @@ export class ChamaRiskService {
       const chama = await tx.chama.findUnique({ where: { id: chama_id } });
       if (!chama || !chama.penalty_amount_kr) throw new Error('No penalty configured for this Chama');
 
-      const target = await tx.chamaMember.findUnique({
+      const target = await tx.chama_member.findUnique({
         where: { chama_id_user_id: { chama_id, user_id: targetUserId } },
       });
       if (!target || target.status !== 'ACTIVE') throw new Error('Target is not an active member');
@@ -261,7 +260,7 @@ export class ChamaRiskService {
       });
 
       // Record transaction
-      await tx.chamaTransaction.create({
+      await tx.chama_transaction.create({
         data: {
           id: randomUUID(),
           chama_id,

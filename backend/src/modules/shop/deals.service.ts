@@ -1,6 +1,7 @@
 import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { ShopNotificationService } from './notifications.service.js';
+import crypto from 'crypto';
 
 export class FlashSaleService {
 
@@ -122,13 +123,11 @@ export class GroupBuyService {
       },
       include: {
         products: { select: { id: true, title: true, image_urls: true, price_kr: true } },
-        group_buy_participants: { include: { User: { select: { id: true, username: true, display_name: true, avatar_url: true } } } }
+        group_buy_participants: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } }
       }
     });
 
-    await prisma.group_buy_participants.create({
-      data: { group_buy_id: groupBuy.id, user_id: organizerId }
-    });
+    await prisma.group_buy_participants.create({ data: { group_buy_id: groupBuy.id, user_id: organizerId }} as any));
 
     return formatGroupBuy(groupBuy);
   }
@@ -138,7 +137,7 @@ export class GroupBuyService {
     if (groupBuy.status !== 'OPEN') throw new Error('Group buy is not open');
     if (new Date() > groupBuy.expires_at) throw new Error('Group buy has expired');
 
-    await prisma.group_buy_participants.create({ data: { group_buy_id: groupBuyId, user_id: userId } });
+    await prisma.group_buy_participants.create({ data: { group_buy_id: groupBuyId, user_id: userId }} as any));
 
     const newCount = groupBuy.current_count + 1;
     const status = newCount >= groupBuy.target_participants ? 'THRESHOLD_MET' : 'OPEN';
@@ -159,7 +158,7 @@ export class GroupBuyService {
       orderBy: { created_at: 'desc' },
       include: {
         products: { select: { id: true, title: true, image_urls: true, price_kr: true } },
-        group_buy_participants: { include: { User: { select: { id: true, username: true, avatar_url: true } } }, take: 5 }
+        group_buy_participants: { include: { user: { select: { id: true, username: true, avatar_url: true } } }, take: 5 }
       }
     });
 
@@ -213,7 +212,7 @@ function formatGroupBuy(gb: any) {
     expires_at: gb.expires_at?.toISOString(),
     timeRemaining: Math.max(0, new Date(gb.expires_at).getTime() - Date.now()),
     product: gb.products ? { ...gb.products, price_kr: Number(gb.products.price_kr) } : null,
-    participants: gb.group_buy_participants?.map((p: any) => p.User) || [],
+    participants: gb.group_buy_participants?.map((p: any) => p.user) || [],
     created_at: gb.created_at?.toISOString(),
   };
 }

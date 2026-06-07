@@ -113,7 +113,7 @@ router.get(
         include: { adminProfile: true }
       });
 
-      if (user?.adminProfile?.role !== 'SUPER_ADMIN') {
+      if (user?.admin_profile?.role !== 'SUPER_ADMIN') {
         res.status(403).json({ error: 'Only super admins can view approval requests' });
         return;
       }
@@ -184,7 +184,7 @@ router.post(
         include: { adminProfile: true }
       });
 
-      if (user?.adminProfile?.role !== 'SUPER_ADMIN') {
+      if (user?.admin_profile?.role !== 'SUPER_ADMIN') {
         res.status(403).json({ error: 'Only super admins can approve payouts' });
         return;
       }
@@ -223,7 +223,7 @@ router.post(
         include: { adminProfile: true }
       });
 
-      if (user?.adminProfile?.role !== 'SUPER_ADMIN') {
+      if (user?.admin_profile?.role !== 'SUPER_ADMIN') {
         res.status(403).json({ error: 'Only super admins can cleanup approvals' });
         return;
       }

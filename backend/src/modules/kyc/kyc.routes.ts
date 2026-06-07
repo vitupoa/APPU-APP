@@ -210,7 +210,7 @@ router.get('/admin/kyc/pending', authenticateToken, async (req: AuthRequest, res
       return;
     }
 
-    const adminProfile = await prisma.adminProfile.findUnique({
+    const adminProfile = await prisma.admin_profile.findUnique({
       where: { user_id: req.user_id },
       select: { role: true }
     });
@@ -238,7 +238,7 @@ router.post('/admin/kyc/verify/:documentId', authenticateToken, async (req: Auth
       return;
     }
 
-    const adminProfile = await prisma.adminProfile.findUnique({
+    const adminProfile = await prisma.admin_profile.findUnique({
       where: { user_id: req.user_id },
       select: { role: true }
     });
@@ -279,7 +279,7 @@ router.get('/admin/withdrawal/pending', authenticateToken, async (req: AuthReque
       return;
     }
 
-    const adminProfile = await prisma.adminProfile.findUnique({
+    const adminProfile = await prisma.admin_profile.findUnique({
       where: { user_id: req.user_id },
       select: { role: true }
     });
@@ -308,7 +308,7 @@ router.post('/admin/withdrawal/review/:requestId', authenticateToken, async (req
       return;
     }
 
-    const adminProfile = await prisma.adminProfile.findUnique({
+    const adminProfile = await prisma.admin_profile.findUnique({
       where: { user_id: req.user_id },
       select: { role: true }
     });
@@ -347,7 +347,7 @@ router.get('/admin/suspicious', authenticateToken, async (req: AuthRequest, res)
       return;
     }
 
-    const adminProfile = await prisma.adminProfile.findUnique({
+    const adminProfile = await prisma.admin_profile.findUnique({
       where: { user_id: req.user_id },
       select: { role: true }
     });
@@ -376,7 +376,7 @@ router.post('/admin/suspicious/resolve/:activityId', authenticateToken, async (r
       return;
     }
 
-    const adminProfile = await prisma.adminProfile.findUnique({
+    const adminProfile = await prisma.admin_profile.findUnique({
       where: { user_id: req.user_id },
       select: { role: true }
     });

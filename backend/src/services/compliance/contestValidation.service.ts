@@ -225,7 +225,7 @@ export class ContestValidationService {
     const judgeWeight = (contest.judge_weight_percentage || 0) / 100;
     const voteWeight = (contest.vote_weight_percentage || 100) / 100;
 
-    for (const submission of contest.ContestSubmission) {
+    for (const submission of contest.contest_submission) {
       let finalScore = 0;
 
       switch (judgingMethod) {
@@ -259,7 +259,7 @@ export class ContestValidationService {
 
           // Normalize scores to 0-100 scale
           const normalizedJudgeScore = judgeScore; // Already 0-100
-          const maxVotes = Math.max(...contest.ContestSubmission.map(s => s.votes_count));
+          const maxVotes = Math.max(...contest.contest_submission.map(s => s.votes_count));
           const normalizedVoteScore = maxVotes > 0 ? (voteScore / maxVotes) * 100 : 0;
 
           finalScore = (normalizedJudgeScore * judgeWeight) + (normalizedVoteScore * voteWeight);
@@ -267,20 +267,20 @@ export class ContestValidationService {
       }
 
       // Update submission with final score
-      await prisma.contestSubmission.update({
+      await prisma.contest_submission.update({
         where: { id: submission.id },
         data: { final_score: finalScore }
       });
     }
 
     // Rank submissions
-    const submissions = await prisma.contestSubmission.findMany({
+    const submissions = await prisma.contest_submission.findMany({
       where: { contest_id: contestId },
       orderBy: { final_score: 'desc' }
     });
 
     for (let i = 0; i < submissions.length; i++) {
-      await prisma.contestSubmission.update({
+      await prisma.contest_submission.update({
         where: { id: submissions[i].id },
         data: { rank: i + 1 }
       });

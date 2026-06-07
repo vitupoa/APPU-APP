@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import { prisma } from '../config/database.js'; // Assumes exported prisma instance 
 import { pubClient, RedisChannels } from '../shared/gateway/redis.js';
+import crypto from 'crypto';
 
 export function startDailyPrizeWorker() {
     console.log('[Worker] Daily Prize Cron Job Scheduled: Runs daily at 00:00 Server Time (Midnight)');
@@ -26,7 +27,7 @@ export function startDailyPrizeWorker() {
                 if (!contest.daily_prize_kr || contest.daily_prize_kr.toNumber() <= 0) continue;
 
                 // Find all unique submissions submitted strictly within the last 24 hours
-                const eligibleSubmissions = await prisma.contestSubmission.findMany({
+                const eligibleSubmissions = await prisma.contest_submission.findMany({
                     where: {
                         contest_id: contest.id,
                         submitted_at: { gte: yesterday }

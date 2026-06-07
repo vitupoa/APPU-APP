@@ -1,5 +1,6 @@
 import { prisma } from '../config/database.js';
 import { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 /**
  * Database Lock Utilities for Financial Operations
