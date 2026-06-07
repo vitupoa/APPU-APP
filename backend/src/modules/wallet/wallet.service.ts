@@ -13,27 +13,30 @@ export class WalletService {
    * Wave 3 Task 5.3: Returns fiat equivalent in response
    */
   static async getBalance(userId: string, targetCurrency?: string) {
-    let wallet = await prisma.wallets.findUnique({
+    // Optimized query - only fetch what we need
+    const result = await prisma.wallets.findUnique({
       where: { user_id: userId },
-      include: { user: { select: { is_wallet_unlocked: true, currency: true } } }
+      select: {
+        kr_balance: true,
+        user: { select: { is_wallet_unlocked: true, currency: true } }
+      }
     });
 
+    let wallet = result;
     if (!wallet) {
       wallet = await prisma.wallets.create({
         data: { 
-          User: {
-            connect: { id: userId }
-          },
+          User: { connect: { id: userId } },
           updated_at: new Date()
         },
-        include: { user: { select: { is_wallet_unlocked: true, currency: true } } }
+        select: {
+          kr_balance: true,
+          user: { select: { is_wallet_unlocked: true, currency: true } }
+        }
       } as any);
     }
 
     const currencyToUse = targetCurrency || wallet.user.currency;
-
-    // Convert Kr balance to user fiat equivalent using display-adjusted rate
-    // 1 Kr = $0.01 USD. Apply the display rate (with silent platform adjustment)
     const fiatRate = await ExchangeService.getDisplayRate(currencyToUse);
     const baseUsd = Number(wallet.kr_balance) / 100;
     const fiatEquivalent = baseUsd * fiatRate;
@@ -44,7 +47,7 @@ export class WalletService {
       currency: currencyToUse,
       isWalletUnlocked: wallet.user.is_wallet_unlocked,
       exchangeRate: fiatRate,
-      baseUsd: baseUsd
+      baseUsd
     };
   }
 
@@ -189,18 +192,36 @@ export class WalletService {
   }
 
   static async getTransactions(userId: string, limit: number = 20, offset: number = 0) {
-    const transactions = await prisma.transactions.findMany({
-      where: { user_id: userId },
-      orderBy: { created_at: 'desc' },
-      take: limit,
-      skip: offset
-    });
-
-    // Wave 3 Task 5.3: Add fiat equivalent to each transaction
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { currency: true }
-    });
+    // Optimized: Fetch transactions and user currency in parallel
+    const [transactions, user] = await Promise.all([
+      prisma.transactions.findMany({
+        where: { user_id: userId },
+        orderBy: { created_at: 'desc' },
+        take: limit,
+        skip: offset,
+        select: {
+          id: true,
+          user_id: true,
+          type: true,
+          amount_kr: true,
+          amount_fiat: true,
+          currency: true,
+          provider: true,
+          status: true,
+          reference: true,
+          counterparty_id: true,
+          metadata: true,
+          created_at: true,
+          context: true,
+          description: true,
+          transaction_type: true
+        }
+      }),
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { currency: true }
+      })
+    ]);
 
     const currency = user?.currency || 'USD';
     const fiatRate = await ExchangeService.getDisplayRate(currency);
