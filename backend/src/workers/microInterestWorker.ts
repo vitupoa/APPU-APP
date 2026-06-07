@@ -76,13 +76,15 @@ async function updateMicroInterests() {
               }
             });
           } else {
-            await prisma.user_micro_interests.create({ data: {
+            await prisma.user_micro_interests.create({
+              data: {
                 user_id: interaction.user_id,
                 interest: tag,
-                category: 'hashtag', // Add required category field
+                category: 'hashtag',
                 weight: Math.min(0.1 * weight, 1.0),
                 last_updated: new Date()
-              }} as any));
+              }
+            } as any);
           }
         }
       } catch (error) {
