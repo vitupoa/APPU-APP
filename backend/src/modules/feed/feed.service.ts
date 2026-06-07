@@ -86,7 +86,7 @@ export class FeedService {
             commentsCount: p.comments_count,
             isLiked: likedIds.has(p.id),
             commentsEnabled: (p as any).commentsEnabled ?? true,
-            created_at: p.created_at.toISOString()
+            createdAt: p.created_at.toISOString()
           };
         }),
         nextCursor
@@ -362,7 +362,7 @@ export class FeedService {
     return {
       ...post,
       creator: (post as any).user,
-      created_at: post.created_at.toISOString()
+      createdAt: post.created_at.toISOString()
     };
   }
 
@@ -400,7 +400,7 @@ export class FeedService {
 
     return {
       ...comment,
-      created_at: comment.created_at.toISOString()
+      createdAt: comment.created_at.toISOString()
     };
   }
 

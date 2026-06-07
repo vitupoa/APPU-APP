@@ -156,7 +156,7 @@ export class ShortsService {
             priceKr: Number(s.products.price_kr),
             imageUrl: s.products.image_urls[0] || null
           } : null,
-          created_at: s.created_at.toISOString()
+          createdAt: s.created_at.toISOString()
         };
       }),
       nextCursor: hasMore ? items[items.length - 1].id : null
@@ -254,7 +254,7 @@ export class ShortsService {
       isLocked: short.is_locked,
       requiredTier: short.required_tier,
       unlockAmountKr: short.unlock_amount_kr ? Number(short.unlock_amount_kr) : undefined,
-      created_at: short.created_at.toISOString()
+      createdAt: short.created_at.toISOString()
     };
   }
 
