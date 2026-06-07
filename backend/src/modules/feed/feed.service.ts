@@ -106,11 +106,14 @@ export class FeedService {
    * Mix of: admirers' posts, similar interests, trending, and random
    */
   private static async getPersonalizedFeed(userId: string, cursor: string | undefined, limit: number) {
+    console.log('[FeedService] Getting personalized feed for user:', userId);
+    
     const user = await prisma.user.findUnique({ 
       where: { id: userId },
       select: { country: true }
     });
     const userCountry = user?.country || '';
+    console.log('[FeedService] User country:', userCountry);
 
     // Get user's admirers (people they follow)
     const admiringList = await prisma.admires.findMany({
@@ -142,6 +145,15 @@ export class FeedService {
       ...randomPosts,
       ...userPosts
     ];
+
+    console.log('[FeedService] Feed sources:', {
+      admirers: admirersPosts.length,
+      similar: similarPosts.length,
+      trending: trendingPosts.length,
+      random: randomPosts.length,
+      userOwn: userPosts.length,
+      total: allPosts.length
+    });
 
     // Remove duplicates by post ID
     const uniquePosts = Array.from(
@@ -396,6 +408,8 @@ export class FeedService {
     requiredTier?: string;
     unlockAmountKr?: number;
   }) {
+    console.log('[FeedService] Creating post with data:', data);
+    
     const post = await prisma.post.create({
       data: {
         user_id: data.user_id,
@@ -408,6 +422,8 @@ export class FeedService {
       include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } }
       }
     });
+
+    console.log('[FeedService] Post created successfully:', post.id);
 
     // Process hashtags and mentions from caption (fire-and-forget)
     if (post.caption) {
