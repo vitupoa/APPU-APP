@@ -251,7 +251,7 @@ router.post('/:platform/callback', authMiddleware, async (req: AuthRequest, res:
           tier: 'NANO',
           categories: [],
           updated_at: new Date()
-        }} as any));
+        }} as any);
     }
 
     // Create or update social media account

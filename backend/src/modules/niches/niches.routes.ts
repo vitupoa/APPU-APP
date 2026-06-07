@@ -36,7 +36,7 @@ router.post('/custom', authenticate, async (req: AuthRequest, res: Response): Pr
   
   const niche = await prisma.creator_niche.create({ data: { id: crypto.randomUUID(), name: name.toLowerCase(),
       isCustom: true,
-      createdBy: req.userId!}} as any));
+      createdBy: req.userId!}} as any);
   
   res.json(niche);
 });

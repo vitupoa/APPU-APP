@@ -462,7 +462,7 @@ router.post('/announcements', requirePermission('announcements.send') as any, as
         created_by: req.user_id!,
         expires_at: data.expires_at ? new Date(data.expires_at) : null,
         updated_at: new Date()
-      }} as any));
+      }} as any);
     await AuditService.log(req.user_id!, 'announcement.create', 'announcement', announcement.id, data, req.ip, req.headers['user-agent'] as string | undefined);
     res.status(201).json(announcement); return;
   } catch (e: any) { res.status(400).json({ error: e.message }); return; }

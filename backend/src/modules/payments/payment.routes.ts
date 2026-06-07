@@ -105,7 +105,7 @@ router.post('/topup',
         status: 'pending',
         provider: data.provider,
         reference
-      }} as any));
+      }} as any);
 
     res.status(200).json({ reference, ...result });
   } catch (error: any) {
