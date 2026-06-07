@@ -20,12 +20,12 @@ export class ChatService {
       where: {
         type: 'DIRECT',
         AND: [
-          { participants: { some: { user_id: userId } } },
-          { participants: { some: { user_id: recipient_id } } },
+          { chat_participant: { some: { user_id: userId } } },
+          { chat_participant: { some: { user_id: recipient_id } } },
         ],
       },
       include: {
-        participants: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
+        chat_participant: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
         messages: { orderBy: { created_at: 'desc' }, take: 1 },
       },
     });
@@ -39,7 +39,7 @@ export class ChatService {
       data: {
         id: uuidv4(),
         type: 'DIRECT',
-        participants: {
+        chat_participant: {
           createMany: {
             data: participantIds.map(id => ({ 
               id: uuidv4(),
@@ -50,7 +50,7 @@ export class ChatService {
         },
       },
       include: {
-        participants: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
+        chat_participant: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
         messages: { orderBy: { created_at: 'desc' }, take: 1 },
       },
     });
@@ -76,7 +76,7 @@ export class ChatService {
         type: 'GROUP',
         name,
         description,
-        participants: {
+        chat_participant: {
           createMany: {
             data: allParticipantIds.map((id: any) => ({
               id: uuidv4(),
@@ -87,7 +87,7 @@ export class ChatService {
         },
       },
       include: {
-        participants: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
+        chat_participant: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
       },
     });
 
@@ -106,9 +106,9 @@ export class ChatService {
     const skip = (page - 1) * limit;
 
     const chats = await prisma.chat.findMany({
-      where: { participants: { some: { user_id: userId } } },
+      where: { chat_participant: { some: { user_id: userId } } },
       include: {
-        participants: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
+        chat_participant: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
         messages: { orderBy: { created_at: 'desc' }, take: 1 },
       },
       orderBy: { updated_at: 'desc' },
@@ -169,12 +169,12 @@ export class ChatService {
     // Wave 3 Task 6.4: Check locked chat access for DIRECT chats
     const chat = await prisma.chat.findUnique({
       where: { id: chat_id },
-      include: { participants: true }
+      include: { chat_participant: true }
     });
 
-    if (chat && chat.type === 'DIRECT' && chat.participants.length === 2) {
+    if (chat && chat.type === 'DIRECT' && chat.chat_participant.length === 2) {
       // Find the other participant (potential creator)
-      const otherParticipant = chat.participants.find(p => p.user_id !== senderId);
+      const otherParticipant = chat.chat_participant.find(p => p.user_id !== senderId);
 
       if (otherParticipant) {
         const accessCheck = await lockedChatTaskService.canUserMessageCreator(senderId, otherParticipant.user_id);
@@ -234,7 +234,7 @@ export class ChatService {
       where: { id: chat_id },
       data: { updated_at: new Date() },
       include: {
-        participants: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
+        chat_participant: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
         messages: { orderBy: { created_at: 'desc' }, take: 1 },
       },
     });
@@ -262,7 +262,7 @@ export class ChatService {
   static async deleteMessage(userId: string, messageId: string) {
     const message = await prisma.messages.findUnique({
       where: { id: messageId },
-      include: { chat: { include: { participants: true } } },
+      include: { chat: { include: { chat_participant: true } } },
     });
 
     if (!message) {
@@ -277,7 +277,7 @@ export class ChatService {
 
     // Broadcast deletion to all participants
     if (message.chat) {
-      message.chat.participants.forEach((p: any) => {
+      message.chat.chat_participant.forEach((p: any) => {
         io.to(`user:${p.user_id}`).emit('chat:message_deleted', {
           chat_id: message.chat_id,
           messageId,
@@ -340,7 +340,7 @@ export class ChatService {
       where: { id: targetChatId },
       data: { updated_at: new Date() },
       include: {
-        participants: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
+        chat_participant: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
         messages: { orderBy: { created_at: 'desc' }, take: 1 },
       },
     });
@@ -469,7 +469,7 @@ export class ChatService {
     // Verify chat exists and is a group
     const chat = await prisma.chat.findUnique({
       where: { id: chat_id },
-      include: { participants: true },
+      include: { chat_participant: true },
     });
 
     if (!chat) {
@@ -481,7 +481,7 @@ export class ChatService {
     }
 
     // Verify user is admin
-    const participant = chat.participants.find(p => p.user_id === userId);
+    const participant = chat.chat_participant.find(p => p.user_id === userId);
     if (!participant || participant.role !== 'admin') {
       throw new Error('Only admins can update group details');
     }
@@ -491,12 +491,12 @@ export class ChatService {
       where: { id: chat_id },
       data: updates,
       include: {
-        participants: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
+        chat_participant: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
       },
     });
 
     // Broadcast update to all participants
-    chat.participants.forEach((p: any) => {
+    chat.chat_participant.forEach((p: any) => {
       io.to(`user:${p.user_id}`).emit('chat:updated', updatedChat);
     });
 
@@ -515,19 +515,19 @@ export class ChatService {
   ) {
     const chat = await prisma.chat.findUnique({
       where: { id: chat_id },
-      include: { participants: true },
+      include: { chat_participant: true },
     });
 
     if (!chat || chat.type !== 'GROUP') {
       throw new Error('Group not found');
     }
 
-    const requester = chat.participants.find(p => p.user_id === userId);
+    const requester = chat.chat_participant.find(p => p.user_id === userId);
     if (!requester || requester.role !== 'admin') {
       throw new Error('Only admins can manage members');
     }
 
-    const target = chat.participants.find(p => p.user_id === targetUserId);
+    const target = chat.chat_participant.find(p => p.user_id === targetUserId);
     if (!target) {
       throw new Error('User is not a member of this group');
     }
@@ -538,7 +538,7 @@ export class ChatService {
       });
 
       // Broadcast member removed
-      chat.participants.forEach((p: any) => {
+      chat.chat_participant.forEach((p: any) => {
         io.to(`user:${p.user_id}`).emit('chat:member_removed', {
           chat_id,
           user_id: targetUserId,
@@ -555,7 +555,7 @@ export class ChatService {
     });
 
     // Broadcast role change
-    chat.participants.forEach((p: any) => {
+    chat.chat_participant.forEach((p: any) => {
       io.to(`user:${p.user_id}`).emit('chat:member_role_changed', {
         chat_id,
         user_id: targetUserId,
@@ -577,19 +577,19 @@ export class ChatService {
   ) {
     const chat = await prisma.chat.findUnique({
       where: { id: chat_id },
-      include: { participants: true },
+      include: { chat_participant: true },
     });
 
     if (!chat || chat.type !== 'GROUP') {
       throw new Error('Group not found');
     }
 
-    const currentOwner = chat.participants.find(p => p.user_id === userId);
+    const currentOwner = chat.chat_participant.find(p => p.user_id === userId);
     if (!currentOwner || currentOwner.role !== 'admin') {
       throw new Error('Only the owner can transfer ownership');
     }
 
-    const newOwner = chat.participants.find(p => p.user_id === newOwnerId);
+    const newOwner = chat.chat_participant.find(p => p.user_id === newOwnerId);
     if (!newOwner) {
       throw new Error('New owner is not a member of this group');
     }
@@ -607,7 +607,7 @@ export class ChatService {
     });
 
     // Broadcast ownership transfer
-    chat.participants.forEach((p: any) => {
+    chat.chat_participant.forEach((p: any) => {
       io.to(`user:${p.user_id}`).emit('chat:ownership_transferred', {
         chat_id,
         oldOwnerId: userId,
@@ -624,20 +624,20 @@ export class ChatService {
   static async leaveGroup(userId: string, chat_id: string) {
     const chat = await prisma.chat.findUnique({
       where: { id: chat_id },
-      include: { participants: true },
+      include: { chat_participant: true },
     });
 
     if (!chat || chat.type !== 'GROUP') {
       throw new Error('Group not found');
     }
 
-    const participant = chat.participants.find(p => p.user_id === userId);
+    const participant = chat.chat_participant.find(p => p.user_id === userId);
     if (!participant) {
       throw new Error('You are not a member of this group');
     }
 
     // If user is the only admin, prevent leaving
-    const admins = chat.participants.filter((p: any) => p.role === 'admin');
+    const admins = chat.chat_participant.filter((p: any) => p.role === 'admin');
     if (admins.length === 1 && participant.role === 'admin') {
       throw new Error('Transfer ownership before leaving the group');
     }
@@ -647,7 +647,7 @@ export class ChatService {
     });
 
     // Broadcast member left
-    chat.participants.forEach((p: any) => {
+    chat.chat_participant.forEach((p: any) => {
       if (p.user_id !== userId) {
         io.to(`user:${p.user_id}`).emit('chat:member_left', {
           chat_id,
