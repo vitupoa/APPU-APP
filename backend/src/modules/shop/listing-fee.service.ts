@@ -147,7 +147,8 @@ export class ListingFeeService {
   }
 
   private async recordListingFee(userId: string, productId: string, category: ProductCategory, country: string, fee: number, isFree: boolean, quotaType: string | null) {
-    await prisma.listing_fee_transaction.create({ data: {
+    await prisma.listing_fee_transaction.create({
+      data: {
         user_id: userId,
         product_id: productId,
         category,
@@ -156,7 +157,8 @@ export class ListingFeeService {
         fee_kr: fee,
         was_free: isFree,
         quota_type: quotaType
-      }} as any));
+      }
+    } as any);
   }
 
   private shouldResetDaily(lastReset: Date): boolean {
