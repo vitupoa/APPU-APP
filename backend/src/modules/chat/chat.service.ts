@@ -7,6 +7,19 @@ import crypto from 'crypto';
 
 export class ChatService {
   /**
+   * Transform chat object from database format to API format
+   */
+  private static transformChat(chat: any) {
+    return {
+      ...chat,
+      createdAt: chat.created_at,
+      updatedAt: chat.updated_at,
+      created_at: undefined,
+      updated_at: undefined,
+    };
+  }
+
+  /**
    * Create or fetch existing Direct Chat
    */
   static async createDirectChat(userId: string, recipient_id: string) {
@@ -30,7 +43,7 @@ export class ChatService {
       },
     });
 
-    if (existingChat) return existingChat;
+    if (existingChat) return this.transformChat(existingChat);
 
     // Create new direct chat (including self-chat)
     const participantIds = userId === recipient_id ? [userId] : [userId, recipient_id];
@@ -61,7 +74,7 @@ export class ChatService {
       io.to(`user:${recipient_id}`).emit('chat:new_chat', newChat);
     }
 
-    return newChat;
+    return this.transformChat(newChat);
   }
 
   /**
@@ -96,7 +109,7 @@ export class ChatService {
       io.to(`user:${pid}`).emit('chat:new_chat', chat);
     });
 
-    return chat;
+    return this.transformChat(chat);
   }
 
   /**
@@ -116,7 +129,9 @@ export class ChatService {
       take: limit,
     });
 
-    if (!unreadOnly) return chats;
+    if (!unreadOnly) {
+      return chats.map(chat => this.transformChat(chat));
+    }
 
     // Filter for unread chats
     const unreadChats = [];
@@ -136,7 +151,7 @@ export class ChatService {
       });
 
       if (unreadCount > 0) {
-        unreadChats.push(chat);
+        unreadChats.push(this.transformChat(chat));
       }
     }
 
@@ -500,7 +515,7 @@ export class ChatService {
       io.to(`user:${p.user_id}`).emit('chat:updated', updatedChat);
     });
 
-    return updatedChat;
+    return this.transformChat(updatedChat);
   }
 
   /**

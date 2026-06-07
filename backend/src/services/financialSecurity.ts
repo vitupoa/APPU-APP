@@ -2,10 +2,8 @@
 // This file includes all security features: session secrets, signature verification,
 // nonce tracking, rate limiting, and transaction processing
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../config/database.js';
 import crypto from 'crypto';
-
-const prisma = new PrismaClient();
 
 // ============================================================================
 // 1. SESSION SECRET MANAGEMENT

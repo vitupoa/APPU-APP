@@ -48,8 +48,8 @@ data class ChatDto(
     val avatarUrl: String? = null,
     val participants: List<ChatParticipantDto> = emptyList(),
     val messages: List<MessageDto> = emptyList(),
-    val createdAt: String? = null,
-    val updatedAt: String? = null
+    val createdAt: String,
+    val updatedAt: String
 )
 
 @Serializable
