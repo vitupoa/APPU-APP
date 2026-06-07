@@ -201,12 +201,14 @@ export class LockedChatTaskService {
 
     if (!settings) {
       // Create default settings
-      settings = await prisma.locked_chat_settings.create({ data: {
+      settings = await prisma.locked_chat_settings.create({
+        data: {
           creator_id: creatorId,
           is_locked: false,
           task_fee_kr: 100, // Default 100 Kr
           typical_delivery_time: '24 hours'
-        }} as any));
+        }
+      } as any);
     }
 
     return settings;

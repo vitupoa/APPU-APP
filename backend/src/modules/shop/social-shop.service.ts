@@ -248,7 +248,8 @@ export class GiftService {
       select: { display_name: true, username: true }
     });
 
-    const gift = await prisma.gifts.create({ data: {
+    const gift = await prisma.gifts.create({
+      data: {
         sender_id: senderId,
         recipient_id: data.recipient_id,
         product_id: data.product_id,
@@ -256,7 +257,8 @@ export class GiftService {
         amount_kr: product.price_kr,
         status: 'pending',
         escrow_status: 'held',
-      }} as any));
+      }
+    } as any);
 
     await ShopNotificationService.notifyGiftReceived(
       data.recipient_id,

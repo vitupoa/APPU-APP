@@ -335,7 +335,9 @@ export class UserManagementService {
   // ─── NAME MANAGEMENT ───────────────────────────────────
 
   static async addProhibitedName(adminId: string, data: { name: string; reason?: string }) {
-    const entry = await prisma.prohibited_names.create({ data: { id: crypto.randomUUID(), name: data.name.toLowerCase(), reason: data.reason, added_by: adminId}} as any));
+    const entry = await prisma.prohibited_names.create({
+      data: { id: crypto.randomUUID(), name: data.name.toLowerCase(), reason: data.reason, added_by: adminId}
+    } as any);
     await AuditService.log(adminId, ADMIN_ACTIONS.NAME_PROHIBIT, 'prohibited_name', entry.id, data);
     return entry;
   }
@@ -354,7 +356,9 @@ export class UserManagementService {
   }
 
   static async reserveUsername(adminId: string, data: { username: string; reservedFor?: string; reason?: string }) {
-    const entry = await prisma.reserved_usernames.create({ data: { id: crypto.randomUUID(), username: data.username.toLowerCase(), reserved_for: data.reservedFor, reason: data.reason, reserved_by: adminId}} as any));
+    const entry = await prisma.reserved_usernames.create({
+      data: { id: crypto.randomUUID(), username: data.username.toLowerCase(), reserved_for: data.reservedFor, reason: data.reason, reserved_by: adminId}
+    } as any);
     await AuditService.log(adminId, ADMIN_ACTIONS.USERNAME_RESERVE, 'reserved_username', entry.id, data);
     return entry;
   }

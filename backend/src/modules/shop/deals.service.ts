@@ -127,7 +127,9 @@ export class GroupBuyService {
       }
     });
 
-    await prisma.group_buy_participants.create({ data: { group_buy_id: groupBuy.id, user_id: organizerId }} as any));
+    await prisma.group_buy_participants.create({
+      data: { group_buy_id: groupBuy.id, user_id: organizerId }
+    } as any);
 
     return formatGroupBuy(groupBuy);
   }
@@ -137,7 +139,9 @@ export class GroupBuyService {
     if (groupBuy.status !== 'OPEN') throw new Error('Group buy is not open');
     if (new Date() > groupBuy.expires_at) throw new Error('Group buy has expired');
 
-    await prisma.group_buy_participants.create({ data: { group_buy_id: groupBuyId, user_id: userId }} as any));
+    await prisma.group_buy_participants.create({
+      data: { group_buy_id: groupBuyId, user_id: userId }
+    } as any);
 
     const newCount = groupBuy.current_count + 1;
     const status = newCount >= groupBuy.target_participants ? 'THRESHOLD_MET' : 'OPEN';

@@ -379,7 +379,9 @@ export class FeedService {
       return { liked: false };
     } else {
       await prisma.$transaction([
-        prisma.post_likes.create({ data: { user_id: userId, post_id }} as any)),
+        prisma.post_likes.create({
+          data: { user_id: userId, post_id }
+        } as any),
         prisma.post.update({ where: { id: post_id }, data: { likes_count: { increment: 1 } } })
       ]);
       return { liked: true };

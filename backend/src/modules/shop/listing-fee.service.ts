@@ -71,7 +71,9 @@ export class ListingFeeService {
     let quota = await prisma.user_listing_quota.findUnique({ where: { user_id: userId } });
     
     if (!quota) {
-      quota = await prisma.user_listing_quota.create({ data: { user_id: userId }} as any));
+      quota = await prisma.user_listing_quota.create({
+        data: { user_id: userId }
+      } as any);
     }
 
     const now = new Date();

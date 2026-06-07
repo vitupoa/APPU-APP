@@ -420,7 +420,9 @@ export class CommentsService {
     }
 
     await prisma.$transaction([
-      prisma.comment_likes.create({ data: { id: crypto.randomUUID(), comment_id, user_id}} as any)),
+      prisma.comment_likes.create({
+        data: { id: crypto.randomUUID(), comment_id, user_id}
+      } as any),
       prisma.comments.update({
         where: { id: commentId },
         data: { likes_count: { increment: 1 } },

@@ -236,7 +236,8 @@ export class DiscountService {
     const product = await prisma.products.findUniqueOrThrow({ where: { id: productId } });
     if (product.seller_id !== sellerId) throw new Error('Not your product');
 
-    return prisma.product_discounts.create({ data: {
+    return prisma.product_discounts.create({
+      data: {
         product_id: productId,
         discount_type: data.discountType,
         discount_value: new Prisma.Decimal(data.discountValue),
@@ -244,7 +245,8 @@ export class DiscountService {
         start_date: new Date(data.startDate),
         end_date: new Date(data.endDate),
         is_active: true,
-      }} as any));
+      }
+    } as any);
   }
 
   static async getProductDiscounts(productId: string) {

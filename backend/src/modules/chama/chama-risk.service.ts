@@ -40,14 +40,16 @@ export class ChamaRiskService {
           const owed = Number(chama.contribution_amount_kr) - (contribution ? Number(contribution.amount_kr) : 0);
           const penalty = chama.penalty_amount_kr ? Number(chama.penalty_amount_kr) : 0;
 
-          const defaulter = await prisma.chamaDefaulter.create({ data: {
+          const defaulter = await prisma.chamaDefaulter.create({
+            data: {
               id: randomUUID(),
               user_id: member.user_id,
               chama_id: chama.id,
               chama_name: chama.name,
               amount_owed_kr: new Prisma.Decimal(owed),
               fine_amount_kr: new Prisma.Decimal(penalty),
-            }} as any));
+            }
+          } as any);
 
           // Mark member
           await prisma.chama_member.update({

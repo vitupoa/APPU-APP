@@ -596,7 +596,9 @@ export class ContestService {
     if (existing) throw new Error('Already joined this contest');
 
     const [participant] = await prisma.$transaction([
-      prisma.contest_participants.create({ data: { user_id: userId, contest_id: contestId }} as any)),
+      prisma.contest_participants.create({
+        data: { user_id: userId, contest_id: contestId }
+      } as any),
       prisma.contest.update({ where: { id: contestId }, data: { total_participants: { increment: 1 } } })
     ]);
 

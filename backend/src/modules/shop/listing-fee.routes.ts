@@ -57,7 +57,9 @@ router.get('/quota', async (req, res): Promise<void> => {
     });
     
     if (!quota) {
-      quota = await prisma.user_listing_quota.create({ data: { user_id: userId }} as any));
+      quota = await prisma.user_listing_quota.create({
+        data: { user_id: userId }
+      } as any);
     }
     
     const config = await prisma.listing_fee_config.findFirst({
