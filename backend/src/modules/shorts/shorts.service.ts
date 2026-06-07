@@ -104,17 +104,22 @@ export class ShortsService {
     // Check access for locked content
     const accessChecks = await Promise.all(
       items.map(async (s: any) => {
-        if (!s.isLocked) return { id: s.id, hasAccess: true };
-        if (!userId) return { id: s.id, hasAccess: false };
+        // CRITICAL: Use snake_case field names from Prisma
+        const isLocked = s.is_locked;
+        const requiredTier = s.required_tier;
+        const unlockAmountKr = s.unlock_amount_kr;
+        
+        if (!isLocked) return { id: s.id, hasAccess: true };
+        if (!userId) return { id: s.id, hasAccess: false, requiresSubscription: !!requiredTier, requiresUnlock: !!unlockAmountKr };
         
         const access = await ContentLockService.checkAccess(
           userId,
           s.id,
           'SHORT',
           s.user_id,
-          s.isLocked,
-          s.requiredTier,
-          s.unlockAmountKr ? Number(s.unlockAmountKr) : undefined
+          isLocked,
+          requiredTier,
+          unlockAmountKr ? Number(unlockAmountKr) : undefined
         );
         return { id: s.id, ...access };
       })
@@ -124,6 +129,8 @@ export class ShortsService {
     return {
       items: items.map((s: any) => {
         const access = accessMap.get(s.id) || { hasAccess: true, requiresSubscription: false, requiresUnlock: false };
+        const isLocked = s.is_locked;
+        
         return {
           id: s.id,
           creator: {
@@ -133,8 +140,9 @@ export class ShortsService {
             avatarUrl: s.user.avatar_url,
             isVerified: s.user.is_verified
           },
+          // CRITICAL: Only send video/media URLs if user has access
           videoUrl: access.hasAccess ? s.video_url : null,
-          thumbnailUrl: s.thumbnail_url,
+          thumbnailUrl: access.hasAccess ? s.thumbnail_url : null,
           media_type: s.media_type,
           aspectRatio: s.aspect_ratio,
           mediaUrls: access.hasAccess ? s.media_urls : [],
@@ -143,12 +151,12 @@ export class ShortsService {
           likesCount: s.likes_count,
           commentsCount: s.comments_count,
           isLiked: likedIds.has(s.id),
-          isLocked: s.is_locked,
+          isLocked: isLocked,
           requiredTier: s.required_tier,
           unlockAmountKr: s.unlock_amount_kr ? Number(s.unlock_amount_kr) : undefined,
           hasAccess: access.hasAccess,
-          requiresSubscription: (access as any).requiresSubscription,
-          requiresUnlock: (access as any).requiresUnlock,
+          requiresSubscription: (access as any).requiresSubscription || false,
+          requiresUnlock: (access as any).requiresUnlock || false,
           commentsEnabled: s.commentsEnabled ?? true,
           linkedProduct: s.products ? {
             id: s.products.id,

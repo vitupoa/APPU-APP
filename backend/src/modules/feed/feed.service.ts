@@ -44,17 +44,21 @@ export class FeedService {
       // Check access for locked content
       const accessChecks = await Promise.all(
         items.map(async (p: any) => {
-          if (!p.is_locked) return { id: p.id, hasAccess: true };
-          if (!userId) return { id: p.id, hasAccess: false };
+          const isLocked = p.is_locked;
+          const requiredTier = p.required_tier;
+          const unlockAmountKr = p.unlock_amount_kr;
+          
+          if (!isLocked) return { id: p.id, hasAccess: true };
+          if (!userId) return { id: p.id, hasAccess: false, requiresSubscription: !!requiredTier, requiresUnlock: !!unlockAmountKr };
           
           const access = await ContentLockService.checkAccess(
             userId,
             p.id,
             'POST',
             p.user_id,
-            p.is_locked,
-            p.required_tier,
-            p.unlock_amount_kr ? Number(p.unlock_amount_kr) : undefined
+            isLocked,
+            requiredTier,
+            unlockAmountKr ? Number(unlockAmountKr) : undefined
           );
           return { id: p.id, ...access };
         })
@@ -63,7 +67,7 @@ export class FeedService {
 
       return {
         items: items.map((p: any) => {
-          const access = accessMap.get(p.id) || { hasAccess: true };
+          const access = accessMap.get(p.id) || { hasAccess: true, requiresSubscription: false, requiresUnlock: false };
           return {
             id: p.id,
             creator: {
@@ -80,8 +84,8 @@ export class FeedService {
             requiredTier: p.required_tier,
             unlockAmountKr: p.unlock_amount_kr ? Number(p.unlock_amount_kr) : undefined,
             hasAccess: access.hasAccess,
-            requiresSubscription: (access as any).requiresSubscription,
-            requiresUnlock: (access as any).requiresUnlock,
+            requiresSubscription: (access as any).requiresSubscription || false,
+            requiresUnlock: (access as any).requiresUnlock || false,
             likesCount: p.likes_count,
             commentsCount: p.comments_count,
             isLiked: likedIds.has(p.id),
