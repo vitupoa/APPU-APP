@@ -81,7 +81,8 @@ class SARService {
       }
 
       // Create SAR with DRAFT status
-      const sar = await prisma.suspicious_activity_reports.create({ data: {
+      const sar = await prisma.suspicious_activity_reports.create({
+        data: {
           user_id: data.user_id,
           activity_type: data.activity_type,
           description: data.description,
@@ -89,8 +90,9 @@ class SARService {
           status: 'DRAFT',
           related_transactions: data.related_transactions || [],
           evidence_urls: data.evidence_urls || [],
-          metadata: data.metadata || {}} as any)
-      });
+          metadata: data.metadata || {}
+        }
+      } as any);
 
       return sar;
     } catch (error: any) {

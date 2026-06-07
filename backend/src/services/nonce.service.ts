@@ -29,11 +29,13 @@ export class NonceService {
   async markNonceUsed(nonce: string, userId: string): Promise<void> {
     const expiresAt = new Date(Date.now() + NONCE_EXPIRY_MS);
 
-    await prisma.transaction_nonces.create({ data: {
+    await prisma.transaction_nonces.create({
+      data: {
         nonce,
         user_id: userId,
         expires_at: expiresAt
-      }} as any));
+      }
+    } as any);
   }
 
   /**

@@ -19,13 +19,15 @@ export class WalletService {
     });
 
     if (!wallet) {
-      wallet = await prisma.wallets.create({ data: { 
+      wallet = await prisma.wallets.create({
+        data: { 
           User: {
-            connect: { id: userId }} as any),
+            connect: { id: userId }
+          },
           updated_at: new Date()
         },
         include: { user: { select: { is_wallet_unlocked: true, currency: true } } }
-      });
+      } as any);
     }
 
     const currencyToUse = targetCurrency || wallet.user.currency;
