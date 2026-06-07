@@ -149,7 +149,8 @@ export class ImporterService {
   }
 
   static async createImportRequest(userId: string, data: any) {
-    return prisma.import_requests.create({ data: {
+    return prisma.import_requests.create({
+      data: {
         user_id: userId,
         make: data.make,
         model: data.model,
@@ -159,7 +160,8 @@ export class ImporterService {
         budget: data.budget ? new Prisma.Decimal(data.budget) : undefined,
         requirements: data.requirements,
         status: 'PENDING',
-      }} as any));
+      }
+    } as any);
   }
 
   static async getImportRequests(userId: string) {
@@ -172,14 +174,16 @@ export class ImporterService {
 
   static async submitQuote(importerId: string, data: { requestId: string; quoteAmountKr: number; estimatedDays?: number; notes?: string }) {
     const profile = await prisma.importer_profiles.findUniqueOrThrow({ where: { user_id: importerId } });
-    return prisma.import_quotes.create({ data: {
+    return prisma.import_quotes.create({
+      data: {
         request_id: data.requestId,
         importer_id: profile.id,
         quote_amount_kr: new Prisma.Decimal(data.quoteAmountKr),
         estimated_days: data.estimatedDays,
         notes: data.notes,
         status: 'pending',
-      }} as any));
+      }
+    } as any);
   }
 
   static async acceptQuote(requestId: string, quoteId: string, userId: string) {
@@ -227,14 +231,16 @@ export class LogisticsService {
   }
 
   static async createShippingJob(requesterId: string, data: any) {
-    return prisma.shipping_jobs.create({ data: {
+    return prisma.shipping_jobs.create({
+      data: {
         requester_id: requesterId,
         pickup_location: data.pickupLocation,
         delivery_location: data.deliveryLocation,
         job_type: data.jobType,
         vehicle_desc: data.vehicleDesc,
         status: 'open',
-      }} as any));
+      }
+    } as any);
   }
 
   static async getShippingJobs(params: { status?: string; cursor?: string; limit?: number }) {
@@ -298,27 +304,31 @@ export class ProductShareService {
   static async shareProduct(userId: string, data: {
     product_id: string; contentId?: string; contentType?: string; caption?: string;
   }) {
-    return prisma.product_shares.create({ data: {
+    return prisma.product_shares.create({
+      data: {
         product_id: data.product_id,
         user_id: userId,
         content_id: data.contentId,
         content_type: data.contentType,
         caption: data.caption,
-      }} as any));
+      }
+    } as any);
   }
 
   static async tagProduct(data: {
     product_id: string; contentId: string; contentType: string;
     positionX?: number; positionY?: number; timestamp?: number;
   }) {
-    return prisma.product_tags.create({ data: {
+    return prisma.product_tags.create({
+      data: {
         product_id: data.product_id,
         content_id: data.contentId,
         content_type: data.contentType,
         position_x: data.positionX ? new Prisma.Decimal(data.positionX) : undefined,
         position_y: data.positionY ? new Prisma.Decimal(data.positionY) : undefined,
         timestamp: data.timestamp,
-      }} as any));
+      }
+    } as any);
   }
 
   static async getProductTags(contentId: string, contentType: string) {

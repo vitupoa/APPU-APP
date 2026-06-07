@@ -634,7 +634,8 @@ export class WithdrawalService {
     });
 
     // Log audit
-    await prisma.audit_logs.create({ data: {
+    await prisma.audit_logs.create({
+      data: {
         performed_by: adminId,
         action_type: approved ? 'WITHDRAWAL_APPROVED' : 'WITHDRAWAL_REJECTED',
         target_user_id: request.user_id,
@@ -646,7 +647,8 @@ export class WithdrawalService {
             amount: request.amount_kr,
             reviewNote,
             flagReason
-          }} as any)
+          }
+        } as any
       }
     });
 
