@@ -41,7 +41,7 @@ export class ChatController {
   static async sendMessage(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const senderId = req.userId!;
-      const chatId = String(req.params.chat_id);
+      const chatId = String(req.params.chatId);
       const { payload, media_url, media_type, replyToId, forwarded_from_id } = req.body;
 
       const message = await ChatService.sendMessage(
@@ -63,7 +63,7 @@ export class ChatController {
   static async getMessages(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId!;
-      const chatId = String(req.params.chat_id);
+      const chatId = String(req.params.chatId);
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 50;
 
@@ -77,7 +77,7 @@ export class ChatController {
   static async sendTip(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const senderId = req.userId!;
-      const chatId = String(req.params.chat_id);
+      const chatId = String(req.params.chatId);
       const { recipient_id, amount_kr, currency } = req.body;
 
       const result = await ChatService.sendTipInChat(
@@ -97,7 +97,7 @@ export class ChatController {
   static async updateGroupChat(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId!;
-      const chatId = String(req.params.chat_id);
+      const chatId = String(req.params.chatId);
       const { name, description, avatar_url } = req.body;
 
       const chat = await ChatService.updateGroupChat(userId, chatId, {
@@ -115,7 +115,7 @@ export class ChatController {
   static async manageMember(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId!;
-      const chatId = String(req.params.chat_id);
+      const chatId = String(req.params.chatId);
       const { user_id: targetUserId, action } = req.body;
 
       const result = await ChatService.manageMember(userId, chatId, targetUserId, action);
@@ -128,7 +128,7 @@ export class ChatController {
   static async transferOwnership(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId!;
-      const chatId = String(req.params.chat_id);
+      const chatId = String(req.params.chatId);
       const { newOwnerId } = req.body;
 
       const result = await ChatService.transferOwnership(userId, chatId, newOwnerId);
@@ -141,7 +141,7 @@ export class ChatController {
   static async leaveGroup(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId!;
-      const chatId = String(req.params.chat_id);
+      const chatId = String(req.params.chatId);
 
       const result = await ChatService.leaveGroup(userId, chatId);
       res.json(result);
@@ -178,7 +178,7 @@ export class ChatController {
   static async markAsRead(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId!;
-      const chatId = String(req.params.chat_id);
+      const chatId = String(req.params.chatId);
 
       const result = await ChatService.markAsRead(userId, chatId);
       res.json(result);
@@ -190,7 +190,7 @@ export class ChatController {
   static async sendTypingIndicator(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId!;
-      const chatId = String(req.params.chat_id);
+      const chatId = String(req.params.chatId);
       const { isTyping } = req.body;
 
       const result = await ChatService.sendTypingIndicator(userId, chatId, isTyping);

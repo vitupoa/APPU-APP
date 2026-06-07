@@ -9,7 +9,7 @@ export class WalletController {
   static async getBalance(req: AuthRequest, res: Response) {
     try {
       const targetCurrency = req.query.currency as string;
-      const result = await WalletService.getBalance(req.user_id!, targetCurrency);
+      const result = await WalletService.getBalance(req.userId!, targetCurrency);
       res.status(200).json(result);
     } catch (error: any) {
       console.error('Error in getBalance:', error);
@@ -63,7 +63,7 @@ export class WalletController {
   static async sendTip(req: AuthRequest, res: Response): Promise<void> {
     try {
       const data = tipSchema.parse(req.body);
-      if (req.user_id === data.recipient_id) {
+      if (req.userId === data.recipient_id) {
         res.status(400).json({ error: 'You cannot tip yourself', code: 'SELF_TIP_NOT_ALLOWED' });
         return;
       }
@@ -79,12 +79,12 @@ export class WalletController {
       );
 
       if (!signatureValid) {
-        console.warn(`⚠️ Invalid tip signature from user ${req.user_id}`);
+        console.warn(`⚠️ Invalid tip signature from user ${req.userId}`);
         res.status(403).json({ error: 'Invalid transaction signature', code: 'SIGNATURE_INVALID' });
         return;
       }
 
-      const result = await WalletService.sendTip(req.user_id!, data.recipient_id, data.krAmount, data.currency);
+      const result = await WalletService.sendTip(req.userId!, data.recipient_id, data.krAmount, data.currency);
       res.status(200).json(result);
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -100,7 +100,7 @@ export class WalletController {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
       const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
       
-      const result = await WalletService.getTransactions(req.user_id!, limit, offset);
+      const result = await WalletService.getTransactions(req.userId!, limit, offset);
       res.status(200).json(result);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -152,7 +152,7 @@ export class WalletController {
                         'unknown';
       
       const result = await WalletService.initiateTopup(
-        req.user_id!,
+        req.userId!,
         data.fiatAmount,
         data.currency,
         data.provider,

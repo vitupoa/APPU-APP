@@ -92,4 +92,14 @@ router.post('/:id/comment', authMiddleware, async (req: AuthRequest, res: Respon
   }
 });
 
+// GET /api/v1/feed/:id - Get single post by ID
+router.get('/:id', optionalAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const post = await FeedService.getPostById(String(req.params.id), req.userId);
+    res.status(200).json(post);
+  } catch (error: any) {
+    res.status(404).json({ error: error.message || 'Post not found' });
+  }
+});
+
 export default router;

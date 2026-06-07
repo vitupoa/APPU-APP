@@ -28,7 +28,7 @@ export class StoriesController {
     try {
       const userId = req.userId!;
       const stories = await StoriesService.getMyStories(userId);
-      res.json({ success: true, stories });
+      res.json({ success: true, feed: stories });
     } catch (error) {
       next(error);
     }

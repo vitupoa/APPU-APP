@@ -401,4 +401,68 @@ export class FeedService {
       created_at: comment.created_at.toISOString()
     };
   }
-}
+
+  static async getPostById(postId: string, userId?: string) {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
+            account_type: true
+          }
+        }
+      }
+    });
+
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
+    // Check if user has liked this post
+    let isLiked = false;
+    if (userId) {
+      const like = await prisma.post_likes.findUnique({
+        where: { post_id_user_id: { post_id: postId, user_id: userId } }
+      });
+      isLiked = !!like;
+    }
+
+    // Check access for locked content
+    const access = await ContentLockService.checkAccess(
+      userId || '',
+      post.id,
+      'POST',
+      post.user_id,
+      post.is_locked,
+      post.required_tier,
+      post.unlock_amount_kr ? Number(post.unlock_amount_kr) : undefined
+    );
+
+    return {
+      id: post.id,
+      creator: {
+        id: post.user.id,
+        username: post.user.username,
+        displayName: post.user.display_name,
+        avatarUrl: post.user.avatar_url,
+        isVerified: post.user.is_verified,
+        accountType: post.user.account_type
+      },
+      imageUrls: access.hasAccess ? post.image_urls : [],
+      caption: post.caption,
+      isLocked: post.is_locked,
+      requiredTier: post.required_tier,
+      unlockAmountKr: post.unlock_amount_kr ? Number(post.unlock_amount_kr) : undefined,
+      hasAccess: access.hasAccess,
+      likesCount: post.likes_count,
+      commentsCount: post.comments_count,
+      isLiked,
+      commentsEnabled: true,
+      createdAt: post.created_at.toISOString()
+    };
+  }
