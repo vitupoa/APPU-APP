@@ -22,6 +22,24 @@ const createShortSchema = z.object({
   unlockAmountKr: z.number().positive().optional()
 });
 
+// GET /api/v1/shorts - Get shorts feed (default endpoint)
+router.get('/', optionalAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const type = (req.query.type || req.query.tab) as string || 'discover';
+    const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+    
+    if (!['discover', 'admiring'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid feed type. Must be "discover" or "admiring"' });
+    }
+
+    const result = await ShortsService.getFeed(type, cursor, limit, req.userId);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // GET /api/v1/shorts/feed
 router.get('/feed', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {

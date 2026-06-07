@@ -8,7 +8,7 @@ const commentsService = new CommentsService();
 
 const getCommentsSchema = z.object({
   contentType: z.enum(['post', 'short', 'contest_submission']),
-  content_id: z.string().uuid(),
+  contentId: z.string().uuid(),
   sortBy: z.enum(['latest', 'top', 'oldest']).optional().default('latest'),
   cursor: z.string().uuid().optional(),
   limit: z.coerce.number().min(1).max(50).optional().default(20),
@@ -41,11 +41,11 @@ const updateSettingsSchema = z.object({
 // GET /api/v1/comments - Get comments for content
 router.get('/', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { contentType, content_id, sortBy, cursor, limit } = getCommentsSchema.parse(req.query);
+    const { contentType, contentId, sortBy, cursor, limit } = getCommentsSchema.parse(req.query);
 
     const result = await commentsService.getComments(
       contentType,
-      content_id,
+      contentId,
       sortBy,
       cursor || null,
       limit,
@@ -88,13 +88,13 @@ router.get('/:commentId/replies', optionalAuth, async (req: AuthRequest, res: Re
 // POST /api/v1/comments - Create a comment
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { contentType, content_id } = getCommentsSchema.pick({ contentType: true, content_id: true }).parse(req.query);
+    const { contentType, contentId } = getCommentsSchema.pick({ contentType: true, contentId: true }).parse(req.query);
     const { text, parent_id, replyToUserId } = createCommentSchema.parse(req.body);
 
     const result = await commentsService.createComment(
       req.userId!,
       contentType,
-      content_id,
+      contentId,
       text,
       parent_id || null,
       replyToUserId || null
@@ -214,13 +214,13 @@ router.post('/:commentId/report', authMiddleware, async (req: AuthRequest, res: 
 // PUT /api/v1/comments/settings - Update comment settings
 router.put('/settings', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { contentType, content_id } = getCommentsSchema.pick({ contentType: true, content_id: true }).parse(req.query);
+    const { contentType, contentId } = getCommentsSchema.pick({ contentType: true, contentId: true }).parse(req.query);
     const { commentsEnabled, repliesEnabled } = updateSettingsSchema.parse(req.body);
 
     const result = await commentsService.updateCommentSettings(
       req.userId!,
       contentType,
-      content_id,
+      contentId,
       commentsEnabled,
       repliesEnabled
     );
