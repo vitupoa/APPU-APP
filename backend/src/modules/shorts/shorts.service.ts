@@ -191,6 +191,7 @@ export class ShortsService {
 
     const short = await prisma.shorts.create({
       data: {
+        id: crypto.randomUUID(),
         user_id: data.creator_id,
         video_url: data.videoUrl,
         thumbnail_url: data.thumbnailUrl,
