@@ -96,7 +96,7 @@ export class StoriesService {
       const creatorId = story.creator_id;
       if (!acc[creatorId]) {
         acc[creatorId] = {
-          creator: story.user,
+          creator: story.creator,
           stories: [],
         };
       }
@@ -189,7 +189,7 @@ export class StoriesService {
     return {
       success: true,
       tipResult,
-      creatorName: story.user.display_name,
+      creatorName: story.creator.display_name,
     };
   }
 

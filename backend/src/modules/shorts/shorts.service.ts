@@ -126,7 +126,13 @@ export class ShortsService {
         const access = accessMap.get(s.id) || { hasAccess: true, requiresSubscription: false, requiresUnlock: false };
         return {
           id: s.id,
-          creator: s.user,
+          creator: {
+            id: s.user.id,
+            username: s.user.username,
+            displayName: s.user.display_name,
+            avatarUrl: s.user.avatar_url,
+            isVerified: s.user.is_verified
+          },
           videoUrl: access.hasAccess ? s.video_url : null,
           thumbnailUrl: s.thumbnail_url,
           media_type: s.media_type,
@@ -205,6 +211,7 @@ export class ShortsService {
             username: true,
             display_name: true,
             avatar_url: true,
+            is_verified: true,
             country: true
           }
         }
@@ -227,7 +234,13 @@ export class ShortsService {
 
     return {
       id: short.id,
-      creator: short.user,
+      creator: {
+        id: short.user.id,
+        username: short.user.username,
+        displayName: short.user.display_name,
+        avatarUrl: short.user.avatar_url,
+        isVerified: short.user.is_verified
+      },
       videoUrl: short.video_url,
       thumbnailUrl: short.thumbnail_url,
       media_type: short.media_type,
