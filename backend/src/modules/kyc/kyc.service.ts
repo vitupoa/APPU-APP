@@ -24,14 +24,16 @@ export class KYCService {
     }
 
     // Create KYC document
-    const kycDocument = await prisma.kyc_documents.create({ data: {
+    const kycDocument = await prisma.kyc_documents.create({
+      data: {
         user_id: userId,
         document_type: documentType,
         front_image_url: frontImageUrl,
         back_image_url: backImageUrl,
         selfie_url: selfieUrl,
         status: 'PENDING'
-      }} as any));
+      }
+    } as any);
 
     // Update user KYC status
     await prisma.user.update({
@@ -187,12 +189,14 @@ export class KYCService {
 
     if (existing) return existing;
 
-    return await prisma.withdrawal_limits.create({ data: {
+    return await prisma.withdrawal_limits.create({
+      data: {
         user_id: userId,
         daily_limit_kr: DAILY_WITHDRAWAL_LIMIT,
         withdrawn_today_kr: 0,
         last_reset_date: new Date()
-      }} as any));
+      }
+    } as any);
   }
 
   // Reset daily withdrawal limits (run daily via cron)

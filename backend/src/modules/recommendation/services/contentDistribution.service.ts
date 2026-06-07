@@ -31,12 +31,14 @@ export class ContentDistributionService {
     if (!creator) throw new Error('Creator not found');
 
     // Create distribution record
-    const distribution = await prisma.content_distribution.create({ data: {
+    const distribution = await prisma.content_distribution.create({
+      data: {
         content_id: contentId,
         content_type: contentType,
         distribution_tier: 'TEST',
         target_audience_size: TEST_AUDIENCE_CONFIG.totalSize
-      }} as any));
+      }
+    } as any);
 
     // Select test audience
     const testAudience = await this.selectTestAudience(creatorId, metadata);
@@ -143,6 +145,7 @@ export class ContentDistributionService {
 
   private async scheduleContentDelivery(contentId: string, contentType: string, userIds: string[]) {
     const deliveries = userIds.map((userId: any) => ({
+      id: crypto.randomUUID(),
       user_id: userId,
       content_id: contentId,
       content_type: contentType,
@@ -157,7 +160,7 @@ export class ContentDistributionService {
 
   async evaluatePerformance(contentId: string, contentType: string) {
     const distribution = await prisma.content_distribution.findUnique({
-      where: { contentId_contentType: { content_id: contentId, content_type: contentType } }
+      where: { content_id_content_type: { content_id: contentId, content_type: contentType } }
     });
 
     if (!distribution) throw new Error('Distribution not found');
@@ -272,7 +275,7 @@ export class ContentDistributionService {
     };
 
     await prisma.content_distribution.update({
-      where: { contentId_contentType: { content_id: contentId, content_type: contentType } },
+      where: { content_id_content_type: { content_id: contentId, content_type: contentType } },
       data: {
         distribution_tier: nextTier as any,
         target_audience_size: tierSizes[nextTier]

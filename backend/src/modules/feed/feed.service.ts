@@ -468,3 +468,4 @@ export class FeedService {
       createdAt: post.created_at.toISOString()
     };
   }
+}

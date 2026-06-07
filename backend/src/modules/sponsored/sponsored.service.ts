@@ -111,11 +111,13 @@ export class SponsoredContentService {
         where: { id: campaignId },
         data: { impressions: { increment: 1 } }
       }),
-      prisma.sponsored_impressions.create({ data: {
+      prisma.sponsored_impressions.create({
+        data: {
           campaign_id: campaignId,
           user_id,
           type: 'impression'
-        }} as any))
+        }
+      } as any)
     ]);
   }
 
@@ -136,12 +138,14 @@ export class SponsoredContentService {
           spent: { increment: cost }
         }
       }),
-      prisma.sponsored_impressions.create({ data: {
+      prisma.sponsored_impressions.create({
+        data: {
           campaign_id: campaignId,
           user_id,
           type: 'view',
           cost
-        }} as any))
+        }
+      } as any)
     ]);
   }
 
@@ -162,12 +166,14 @@ export class SponsoredContentService {
           spent: { increment: cost }
         }
       }),
-      prisma.sponsored_impressions.create({ data: {
+      prisma.sponsored_impressions.create({
+        data: {
           campaign_id: campaignId,
           user_id,
           type: engagementType,
           cost
-        }} as any))
+        }
+      } as any)
     ]);
   }
 
