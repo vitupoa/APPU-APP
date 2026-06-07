@@ -126,11 +126,12 @@ export class FeedService {
     const randomCount = limit - admirersCount - similarCount - trendingCount; // 10% random
 
     // Get posts from different sources
-    const [admirersPosts, similarPosts, trendingPosts, randomPosts] = await Promise.all([
+    const [admirersPosts, similarPosts, trendingPosts, randomPosts, userPosts] = await Promise.all([
       this.getAdmirersPosts(admiringIds, admirersCount, cursor),
       this.getSimilarInterestPosts(userId, userCountry, similarCount, cursor),
       this.getTrendingPosts(userCountry, trendingCount, cursor),
-      this.getRandomPosts(userCountry, randomCount, cursor)
+      this.getRandomPosts(userCountry, randomCount, cursor),
+      this.getUserOwnPosts(userId, Math.ceil(limit * 0.2))
     ]);
 
     // Combine and shuffle to create personalized feed
@@ -138,13 +139,20 @@ export class FeedService {
       ...admirersPosts,
       ...similarPosts,
       ...trendingPosts,
-      ...randomPosts
+      ...randomPosts,
+      ...userPosts
     ];
 
     // Remove duplicates by post ID
     const uniquePosts = Array.from(
       new Map(allPosts.map(p => [p.id, p])).values()
     );
+
+    // If we still have very few posts, get more random ones globally
+    if (uniquePosts.length < limit / 2) {
+      const additionalPosts = await this.getGlobalRandomPosts(limit, uniquePosts.map(p => p.id));
+      uniquePosts.push(...additionalPosts);
+    }
 
     // Shuffle to randomize order (Fisher-Yates shuffle)
     for (let i = uniquePosts.length - 1; i > 0; i--) {
@@ -185,12 +193,12 @@ export class FeedService {
    */
   private static async getSimilarInterestPosts(userId: string, country: string, count: number, cursor?: string) {
     // Get hashtags from posts the user has liked
-    const likedHashtags = await prisma.$queryRaw<{ hashtag_id: string }[]>`
-      SELECT DISTINCT ch.hashtag_id
-      FROM content_hashtags ch
+    const likedHashtags = await prisma.$queryRaw<{ "hashtagId": string }[]>`
+      SELECT DISTINCT ch."hashtagId"
+      FROM content_hashtag ch
       INNER JOIN post_likes pl ON ch.content_id = pl.post_id
       WHERE pl.user_id = ${userId}
-      AND ch.content_type = 'POST'
+      AND ch."contentType" = 'POST'
       LIMIT 20
     `;
 
@@ -199,15 +207,15 @@ export class FeedService {
       return this.getRandomPosts(country, count, cursor);
     }
 
-    const hashtagIds = likedHashtags.map(h => h.hashtag_id);
+    const hashtagIds = likedHashtags.map(h => h.hashtagId);
 
     // Get posts with similar hashtags
     const posts = await prisma.$queryRaw<any[]>`
       SELECT DISTINCT p.*
       FROM post p
-      INNER JOIN content_hashtags ch ON p.id = ch.content_id
-      WHERE ch.hashtag_id = ANY(${hashtagIds})
-      AND ch.content_type = 'POST'
+      INNER JOIN content_hashtag ch ON p.id = ch.content_id
+      WHERE ch."hashtagId" = ANY(${hashtagIds})
+      AND ch."contentType" = 'POST'
       AND p.user_id IN (SELECT id FROM "user" WHERE country = ${country})
       ORDER BY RANDOM()
       LIMIT ${count}
@@ -265,6 +273,29 @@ export class FeedService {
   }
 
   /**
+   * Get user's own posts
+   */
+  private static async getUserOwnPosts(userId: string, count: number) {
+    return prisma.post.findMany({
+      where: { user_id: userId },
+      take: count,
+      orderBy: { created_at: 'desc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
+            account_type: true
+          }
+        }
+      }
+    });
+  }
+
+  /**
    * Get random posts for diversity
    */
   private static async getRandomPosts(country: string, count: number, cursor?: string) {
@@ -296,6 +327,30 @@ export class FeedService {
     );
 
     return postsWithUsers;
+  }
+
+  /**
+   * Get global random posts (no country filter)
+   */
+  private static async getGlobalRandomPosts(count: number, excludeIds: string[] = []) {
+    const posts = await prisma.post.findMany({
+      where: excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {},
+      take: count,
+      orderBy: { created_at: 'desc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            display_name: true,
+            avatar_url: true,
+            is_verified: true,
+            account_type: true
+          }
+        }
+      }
+    });
+    return posts;
   }
 
   /**

@@ -17,9 +17,9 @@ async function analyzeTrendingTopics() {
     // Get hashtags with high engagement in last 24 hours
     const trendingHashtags = await prisma.$queryRaw<{ tag: string; engagement_count: number }[]>`
       SELECT h.tag, COUNT(DISTINCT uis.user_id) as engagement_count
-      FROM hashtags h
-      INNER JOIN content_hashtags ch ON h.id = ch.hashtag_id
-      INNER JOIN user_interaction_signals uis ON ch.content_id = uis.content_id AND ch.content_type = uis.content_type
+      FROM hashtag h
+      INNER JOIN content_hashtag ch ON h.id = ch."hashtagId"
+      INNER JOIN user_interaction_signals uis ON ch.content_id = uis.content_id AND ch."contentType" = uis.content_type
       WHERE uis.created_at > NOW() - INTERVAL '24 hours'
         AND uis.signal_type IN ('VIEW', 'LIKE', 'SHARE', 'COMMENT')
       GROUP BY h.tag
@@ -76,9 +76,9 @@ async function analyzeTrendingTopics() {
       WHERE is_active = true
         AND topic NOT IN (
           SELECT DISTINCT h.tag
-          FROM hashtags h
-          INNER JOIN content_hashtags ch ON h.id = ch.hashtag_id
-          INNER JOIN user_interaction_signals uis ON ch.content_id = uis.content_id AND ch.content_type = uis.content_type
+          FROM hashtag h
+          INNER JOIN content_hashtag ch ON h.id = ch."hashtagId"
+          INNER JOIN user_interaction_signals uis ON ch.content_id = uis.content_id AND ch."contentType" = uis.content_type
           WHERE uis.created_at > NOW() - INTERVAL '48 hours'
           GROUP BY h.tag
           HAVING COUNT(DISTINCT uis.user_id) > 50
