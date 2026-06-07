@@ -227,7 +227,7 @@ export class FeedService {
             account_type: true
           }
         });
-        return { ...p, User: user };
+        return { ...p, user: user };
       })
     );
 
@@ -243,7 +243,7 @@ export class FeedService {
     return prisma.post.findMany({
       where: {
         created_at: { gte: oneDayAgo },
-        User: { country }
+        user: { country }
       },
       take: count,
       orderBy: [
@@ -291,7 +291,7 @@ export class FeedService {
             account_type: true
           }
         });
-        return { ...p, User: user };
+        return { ...p, user: user };
       })
     );
 
@@ -326,7 +326,7 @@ export class FeedService {
             account_type: true
           }
         });
-        return { ...p, User: user };
+        return { ...p, user: user };
       })
     );
 
