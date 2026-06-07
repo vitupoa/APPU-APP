@@ -162,7 +162,7 @@ export class ChatMediaController {
       // Verify user is admin of the group
       const chat = await prisma.chat.findUnique({
         where: { id: chatId },
-        include: { participants: true },
+        include: { chat_participant: true },
       });
 
       if (!chat || chat.type !== 'GROUP') {
@@ -170,7 +170,7 @@ export class ChatMediaController {
         return;
       }
 
-      const participant = chat.participants.find((p: any) => p.user_id === userId);
+      const participant = chat.chat_participant.find((p: any) => p.user_id === userId);
       if (!participant || participant.role !== 'admin') {
         res.status(403).json({ 
           success: false, 

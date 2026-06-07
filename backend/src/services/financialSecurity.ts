@@ -29,13 +29,15 @@ export async function generateSessionSecret(userId: string, device_id: string) {
   });
   
   // Store new secret
-  await prisma.user_session_secrets.create({ data: {
+  await prisma.user_session_secrets.create({ 
+    data: {
       user_id: userId,
       secret,
       expires_at: expiresAt,
       device_id,
       is_active: true
-    }} as any));
+    } 
+  } as any);
   
   console.log(`✅ Generated session secret for user ${userId}`);
   
@@ -201,12 +203,14 @@ async function storeNonce(
   // Nonces expire after 10 minutes
   const expiresAt = new Date(timestamp + 10 * 60 * 1000);
   
-  await prisma.transaction_nonces.create({ data: {
+  await prisma.transaction_nonces.create({ 
+    data: {
       nonce,
       user_id: userId,
       transactionType,
       expires_at: expiresAt
-    }} as any));
+    } 
+  } as any);
   
   console.log(`✅ Stored nonce ${nonce} for ${transactionType}`);
 }
@@ -265,7 +269,8 @@ async function logFinancialTransaction(data: {
   status: string;
   errorMessage?: string;
 }) {
-  await prisma.financial_transaction_logs.create({ data: {
+  await prisma.financial_transaction_logs.create({ 
+    data: {
       transaction_id: data.transactionId,
       user_id: data.userId,
       transactionType: data.transactionType,
@@ -282,7 +287,8 @@ async function logFinancialTransaction(data: {
       device_id: data.deviceId,
       status: data.status,
       errorMessage: data.errorMessage
-    }} as any));
+    } 
+  } as any);
   
   console.log(`📝 Logged transaction ${data.transactionId} - ${data.status}`);
 }

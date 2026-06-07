@@ -26,6 +26,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.koin.koinScreenModel
+import org.koin.core.parameter.parametersOf
 import com.krieta.com.core.theme.KrietaColors
 import com.krieta.feature.profile.domain.model.AccountType
 import com.krieta.feature.profile.presentation.viewmodel.ProfileViewModel
@@ -35,7 +36,7 @@ class MarketplaceHomeScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val profileViewModel = koinScreenModel<ProfileViewModel>()
+        val profileViewModel = koinScreenModel<ProfileViewModel> { parametersOf(null) }
         val profileState by profileViewModel.state.collectAsState()
         
         Scaffold(
