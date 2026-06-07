@@ -92,7 +92,7 @@ export class CommentsService {
       canEdit: this.canEdit(comment, user_id),
       canPin: this.canPin(user_id, contentOwner?.id) && !comment.parent_id,
       canReply: settings.repliesEnabled,
-      created_at: comment.created_at.toISOString(),
+      createdAt: comment.created_at.toISOString(),
       editedAt: comment.edited_at?.toISOString() || null,
     }));
 
@@ -177,7 +177,7 @@ export class CommentsService {
       canEdit: this.canEdit(reply, user_id),
       canPin: false,
       canReply: true,
-      created_at: reply.created_at.toISOString(),
+      createdAt: reply.created_at.toISOString(),
       editedAt: reply.edited_at?.toISOString() || null,
     }));
 
@@ -285,7 +285,7 @@ export class CommentsService {
         canEdit: true,
         canPin: false,
         canReply: true,
-        created_at: comment.created_at.toISOString(),
+        createdAt: comment.created_at.toISOString(),
         editedAt: null,
       },
     };
@@ -358,7 +358,7 @@ export class CommentsService {
         canEdit: this.canEdit(updated, user_id),
         canPin: false,
         canReply: true,
-        created_at: updated.created_at.toISOString(),
+        createdAt: updated.created_at.toISOString(),
         editedAt: updated.edited_at?.toISOString() || null,
       },
     };
@@ -705,7 +705,7 @@ export class CommentsService {
       canEdit: this.canEdit(comment, user_id),
       canPin: this.canPin(user_id, contentOwner?.id) && !comment.parent_id,
       canReply: true,
-      created_at: comment.created_at.toISOString(),
+      createdAt: comment.created_at.toISOString(),
       editedAt: comment.edited_at?.toISOString() || null,
     };
   }
