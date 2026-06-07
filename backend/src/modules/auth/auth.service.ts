@@ -161,7 +161,7 @@ export class AuthService {
         account_type: user.account_type,
         is_verified: user.is_verified,
         is_wallet_unlocked: user.is_wallet_unlocked,
-        created_at: user.created_at
+        createdAt: user.created_at.toISOString()
       },
       accessToken,
       refreshToken
@@ -223,7 +223,7 @@ export class AuthService {
         account_type: user.account_type,
         is_verified: user.is_verified,
         is_wallet_unlocked: user.is_wallet_unlocked,
-        created_at: user.created_at
+        createdAt: user.created_at.toISOString()
       },
       accessToken,
       refreshToken

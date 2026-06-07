@@ -63,7 +63,7 @@ export class UserService {
         contestsWon: user._count.contest_winners
       },
       relationshipStatus,
-      created_at: user.created_at.toISOString()
+      createdAt: user.created_at.toISOString()
     };
 
     // Only include sensitive data for own profile
