@@ -87,5 +87,6 @@ data class CreateShortRequestDto(
 
 @Serializable
 data class ToggleLikeResponseDto(
-    val liked: Boolean
+    val liked: Boolean,
+    val likesCount: Int? = null
 )

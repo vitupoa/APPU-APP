@@ -60,7 +60,7 @@ class OfflineActionQueue(
         actionType: ActionType,
         entityType: EntityType,
         entityId: String,
-        payload: Map<String, Any>
+        payload: Map<String, String> = emptyMap()
     ) = withContext(Dispatchers.IO) {
         // CRITICAL: Block financial transactions if offline
         if (!offlineModeGuard.canQueueOffline(actionType)) {

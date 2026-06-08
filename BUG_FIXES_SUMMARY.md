@@ -61,21 +61,33 @@
 **Root Cause:**
 - Backend `ShortsService.toggleLike()` was returning both `liked` and `likesCount`
 - Frontend DTO `ToggleLikeResponseDto` only expected `liked: Boolean`
+- The DTO was too restrictive and didn't accept the additional `likesCount` field
 
 **Fix Applied:**
 
-#### Backend (`backend/src/modules/shorts/shorts.service.ts`):
-```typescript
-// Changed from:
-return { liked: false, likesCount: newCount };
-return { liked: true, likesCount: newCount };
-
-// To:
-return { liked: false };
-return { liked: true };
+#### Frontend (`composeApp/src/.../shorts/data/remote/dto/ShortsDtos.kt`):
+```kotlin
+@Serializable
+data class ToggleLikeResponseDto(
+    val liked: Boolean,
+    val likesCount: Int? = null  // ADDED: Optional field for server-provided count
+)
 ```
 
-The frontend already handles updating the likes count locally in `ShortsViewModel.toggleLike()`.
+#### Frontend (`composeApp/src/.../shorts/domain/model/ShortsModels.kt`):
+```kotlin
+data class ToggleLikeResponse(
+    val liked: Boolean,
+    val likesCount: Int? = null
+)
+```
+
+#### Frontend Repository & ViewModel:
+- Updated `ShortsRepository.toggleLike()` to return `NetworkResult<ToggleLikeResponse>`
+- Updated `ShortsRepositoryImpl` to map the full response
+- Updated `ShortsViewModel.toggleLike()` to use server-provided `likesCount` when available, with fallback to local calculation
+
+The backend already returns the correct response format with both fields.
 
 ## Testing Checklist
 
@@ -118,9 +130,14 @@ All profile-related endpoints now return camelCase field names for consistency w
 ### Files Modified:
 1. `composeApp/src/.../explore/domain/model/TrendingModels.kt` - Added missing fields
 2. `composeApp/src/.../explore/presentation/viewmodel/ExploreViewModel.kt` - Clear error on load
+3. `composeApp/src/.../shorts/data/remote/dto/ShortsDtos.kt` - Added likesCount to ToggleLikeResponseDto
+4. `composeApp/src/.../shorts/domain/model/ShortsModels.kt` - Added ToggleLikeResponse model
+5. `composeApp/src/.../shorts/domain/repository/ShortsRepository.kt` - Changed return type
+6. `composeApp/src/.../shorts/data/repository/ShortsRepositoryImpl.kt` - Updated implementation
+7. `composeApp/src/.../shorts/presentation/viewmodel/ShortsViewModel.kt` - Use server likesCount
 
 ### Note:
-Frontend DTOs already had proper `@SerialName` annotations, so no DTO changes were needed.
+Frontend DTOs already had proper `@SerialName` annotations, so no DTO changes were needed for profile/explore.
 
 ## Deployment Notes
 

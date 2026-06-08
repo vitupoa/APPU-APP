@@ -52,3 +52,8 @@ data class ShortCollection(
     val coverUrl: String?,
     val order: Int
 )
+
+data class ToggleLikeResponse(
+    val liked: Boolean,
+    val likesCount: Int? = null
+)

@@ -4,6 +4,8 @@ import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
 import cafe.adriel.voyager.core.screen.Screen
+import coil3.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import androidx.compose.foundation.background
@@ -96,28 +98,60 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 ) {
                     // Header Area with Cover Image
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(180.dp),
+                        modifier = Modifier.fillMaxWidth().height(240.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        // Cover Banner Placeholder (Dark background)
+                        // Cover Banner - Display user banner or fallback
+                        if (profile.coverPhotoUrl != null) {
+                            AsyncImage(
+                                model = profile.coverPhotoUrl,
+                                contentDescription = "Cover photo",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .background(
+                                        androidx.compose.ui.graphics.Brush.verticalGradient(
+                                            colors = listOf(
+                                                KrietaColors.Primary.copy(alpha = 0.3f),
+                                                KrietaColors.BackgroundElevated
+                                            )
+                                        )
+                                    )
+                            )
+                        }
+                        
+                        // Top App Bar / Actions over Cover with gradient overlay for better visibility
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(130.dp)
-                                .background(KrietaColors.BackgroundElevated)
+                                .height(100.dp)
+                                .background(
+                                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.Black.copy(alpha = 0.5f),
+                                            Color.Transparent
+                                        )
+                                    )
+                                )
                         )
                         
-                        // Top App Bar / Actions over Cover
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 48.dp, end = 16.dp, start = 16.dp, bottom = 16.dp),
+                                .padding(top = 48.dp, end = 16.dp, start = 16.dp),
                             horizontalArrangement = Arrangement.End
                         ) {
                             if (isOwnProfile) {
                                 Box {
                                     IconButton(onClick = { menuExpanded = true }) {
-                                        Icon(painterResource(Res.drawable.ic_more_vert), contentDescription = "Menu", tint = KrietaColors.OnBackground)
+                                        Icon(painterResource(Res.drawable.ic_more_vert), contentDescription = "Menu", tint = Color.White)
                                     }
                                     DropdownMenu(
                                         expanded = menuExpanded,
@@ -155,26 +189,54 @@ class ProfileScreen(val userId: String? = null) : Screen {
                             }
                         }
 
-                        // Avatar overlapping Cover
+                        // Avatar overlapping Cover with shadow
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .offset(y = 10.dp)
+                                .offset(y = 50.dp)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(90.dp)
-                                    .clip(CircleShape)
-                                    .background(KrietaColors.SurfaceVariant)
-                                    .border(3.dp, KrietaColors.Primary, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(profile.username.firstOrNull()?.uppercase() ?: "?", fontSize = 36.sp, color = KrietaColors.Primary)
+                            if (profile.avatarUrl != null) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clip(CircleShape)
+                                        .background(KrietaColors.Background)
+                                        .padding(4.dp)
+                                ) {
+                                    AsyncImage(
+                                        model = profile.avatarUrl,
+                                        contentDescription = "${profile.displayName}'s avatar",
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clip(CircleShape)
+                                            .border(3.dp, KrietaColors.Primary, CircleShape),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clip(CircleShape)
+                                        .background(KrietaColors.Background)
+                                        .padding(4.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clip(CircleShape)
+                                            .background(KrietaColors.SurfaceVariant)
+                                            .border(3.dp, KrietaColors.Primary, CircleShape),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(profile.username.firstOrNull()?.uppercase() ?: "?", fontSize = 40.sp, color = KrietaColors.Primary, fontWeight = FontWeight.Bold)
+                                    }
+                                }
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(60.dp))
 
                     // User Info
                     Row(verticalAlignment = Alignment.CenterVertically) {

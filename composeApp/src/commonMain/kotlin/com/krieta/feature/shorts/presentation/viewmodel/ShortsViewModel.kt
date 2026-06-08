@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.krieta.com.core.network.NetworkResult
 import com.krieta.feature.shorts.domain.model.Short
+import com.krieta.feature.shorts.domain.model.ToggleLikeResponse
 import com.krieta.feature.shorts.domain.repository.ShortsRepository
 import com.krieta.feature.feed.domain.repository.FeedRepository
 import com.krieta.feature.sponsored.presentation.SponsoredContentManager
@@ -156,12 +157,15 @@ class ShortsViewModel(
         screenModelScope.launch {
             when (val result = shortsRepository.toggleLike(shortId)) {
                 is NetworkResult.Success -> {
-                    val isLiked = result.data
+                    val response = result.data
+                    val isLiked = response.liked
                     val updatedItems = _state.value.items.map { short ->
                         if (short.id == shortId) {
+                            // Use likesCount from server if available, otherwise calculate locally
+                            val newCount = response.likesCount ?: if (isLiked) short.likesCount + 1 else short.likesCount - 1
                             short.copy(
                                 isLiked = isLiked,
-                                likesCount = if (isLiked) short.likesCount + 1 else short.likesCount - 1
+                                likesCount = newCount
                             )
                         } else short
                     }

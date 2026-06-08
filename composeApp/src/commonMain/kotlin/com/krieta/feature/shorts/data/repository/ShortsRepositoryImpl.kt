@@ -11,6 +11,7 @@ import com.krieta.feature.shorts.domain.model.LinkedProduct
 import com.krieta.feature.shorts.domain.model.Short
 import com.krieta.feature.shorts.domain.model.ShortComment
 import com.krieta.feature.shorts.domain.model.ShortCreator
+import com.krieta.feature.shorts.domain.model.ToggleLikeResponse
 import com.krieta.feature.shorts.domain.repository.ShortsFeedResult
 import com.krieta.feature.shorts.domain.repository.ShortsRepository
 
@@ -73,7 +74,7 @@ class ShortsRepositoryImpl(
         }
     }
 
-    override suspend fun toggleLike(shortId: String): NetworkResult<Boolean> {
+    override suspend fun toggleLike(shortId: String): NetworkResult<ToggleLikeResponse> {
         // Update cache optimistically
         val cachedShort = localDataSource.getCachedShortById(shortId)
         if (cachedShort != null) {
@@ -84,7 +85,7 @@ class ShortsRepositoryImpl(
         
         return when (val result = safeApiCall {
             val dto = api.toggleLike(shortId)
-            dto.liked
+            ToggleLikeResponse(dto.liked, dto.likesCount)
         }) {
             is NetworkResult.Success -> result
             is NetworkResult.Error -> {
@@ -95,7 +96,12 @@ class ShortsRepositoryImpl(
                     entityId = shortId,
                     payload = emptyMap()
                 )
-                NetworkResult.Success(cachedShort?.isLiked?.not() ?: true)
+                NetworkResult.Success(ToggleLikeResponse(
+                    liked = cachedShort?.isLiked?.not() ?: true,
+                    likesCount = if (cachedShort != null) {
+                        if (cachedShort.isLiked) cachedShort.likesCount - 1 else cachedShort.likesCount + 1
+                    } else null
+                ))
             }
             is NetworkResult.Loading -> result
         }
