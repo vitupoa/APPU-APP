@@ -30,7 +30,10 @@ data class TrendingCreator(
     val avatarUrl: String?,
     val followerCount: Int,
     val isVerified: Boolean,
-    val bio: String?
+    val bio: String?,
+    val selectedNiches: List<String> = emptyList(),
+    val customNiches: List<String> = emptyList(),
+    val accountType: String = "PERSONAL"
 )
 
 enum class ContentCategory(val displayName: String, val emoji: String) {

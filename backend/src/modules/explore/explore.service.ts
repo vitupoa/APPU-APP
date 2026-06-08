@@ -120,18 +120,24 @@ export class ExploreService {
         avatar_url: true,
         admirers_count: true,
         is_verified: true,
-        bio: true
+        bio: true,
+        selectedNiches: true,
+        customNiches: true,
+        account_type: true
       }
     });
 
     return creators.map((c: any) => ({
       id: c.id,
       username: c.username,
-      display_name: c.display_name,
-      avatar_url: c.avatar_url,
-      follower_count: c.admirers_count,
-      is_verified: c.is_verified || false,
-      bio: c.bio
+      displayName: c.display_name,
+      avatarUrl: c.avatar_url,
+      followerCount: c.admirers_count,
+      isVerified: c.is_verified || false,
+      bio: c.bio,
+      selectedNiches: c.selectedNiches || [],
+      customNiches: c.customNiches || [],
+      accountType: c.account_type
     }));
   }
 

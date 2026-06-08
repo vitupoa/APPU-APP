@@ -258,12 +258,20 @@ export class WalletService {
         username: true,
         display_name: true,
         avatar_url: true,
-        is_verified: true
+        is_verified: true,
+        bio: true,
+        admirers_count: true
       }
     });
 
     return users.map((u: any) => ({
-      ...u,
+      id: u.id,
+      username: u.username,
+      displayName: u.display_name,
+      avatarUrl: u.avatar_url,
+      isVerified: u.is_verified || false,
+      bio: u.bio,
+      followersCount: u.admirers_count,
       isLovers: false // Adjust if necessary
     }));
   }

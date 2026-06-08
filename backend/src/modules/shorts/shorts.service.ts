@@ -303,7 +303,7 @@ export class ShortsService {
         const newCount = short.likes_count - 1;
         emitLikeUpdate(shortId, 'SHORT', newCount);
         
-        return { liked: false, likesCount: newCount };
+        return { liked: false };
       } else {
         // Like
         await tx.short_likes.create({
@@ -320,7 +320,7 @@ export class ShortsService {
         const newCount = short.likes_count + 1;
         emitLikeUpdate(shortId, 'SHORT', newCount);
         
-        return { liked: true, likesCount: newCount };
+        return { liked: true };
       }
     });
   }

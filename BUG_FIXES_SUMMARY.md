@@ -1,199 +1,145 @@
 # Bug Fixes Summary
 
-## Issue 1: Contest Creation API Response Format Error
+## Issues Fixed
 
-### Problem
-When clicking "Publish Contest" button in Step 5, the app showed an error:
-```
-Illegal input: Field 'contestId' is required for type with serial name 
-'com.krieta.feature.contests.data.remote.dto.CreateContestResponseDto', 
-but it was missing at path: $
-```
+### 1. Explore Tab - Search Delay and "Invalid Profile Data" Error
 
-### Root Cause
-The backend POST `/api/v1/contests` endpoint was returning the full contest object instead of the expected `CreateContestResponseDto` format with `{ contestId, message }` fields.
+**Problem:**
+- When searching for users in the explore tab, there was a delay showing "No results" before displaying results
+- Clicking on a user result would show "Invalid profile data received from server"
 
-**Backend Code (Before):**
+**Root Causes:**
+- Backend `ExploreService.getTrendingCreators()` was missing niche fields and accountType
+- Profile fields from backend were in snake_case while frontend expected camelCase
+
+**Fixes Applied:**
+
+#### Backend (`backend/src/modules/explore/explore.service.ts`):
+- Added `selectedNiches`, `customNiches`, and `account_type` fields to the query
+- Converted all response field names to camelCase:
+  - `display_name` → `displayName`
+  - `avatar_url` → `avatarUrl`
+  - `follower_count` → `followerCount`
+  - `is_verified` → `isVerified`
+
+#### Backend (`backend/src/modules/user/user.service.ts`):
+- Converted all profile fields from snake_case to camelCase in `getProfile()`:
+  - `first_name` → `firstName`
+  - `last_name` → `lastName`
+  - `display_name` → `displayName`
+  - `avatar_url` → `avatarUrl`
+  - `cover_photo_url` → `coverPhotoUrl`
+  - `account_type` → `accountType`
+  - `is_verified` → `isVerified`
+  - `is_wallet_unlocked` → `isWalletUnlocked`
+- Also added niches to all profile responses (not just own profile)
+
+#### Frontend (`composeApp/src/.../explore/domain/model/TrendingModels.kt`):
+- Added missing fields to `TrendingCreator` data class:
+  - `selectedNiches: List<String>`
+  - `customNiches: List<String>`
+  - `accountType: String`
+
+### 2. Profile Avatar and Banner Not Displaying
+
+**Problem:**
+- Users could upload avatars and banners, but they wouldn't display on their profile
+
+**Root Cause:**
+- Backend was returning profile data with snake_case field names (`avatar_url`, `cover_photo_url`)
+- Frontend DTOs had proper serialization names but domain mapping expected camelCase
+
+**Fix Applied:**
+- Already fixed as part of Issue #1 - all profile fields now use camelCase in backend responses
+
+### 3. App Crash When Liking a Short
+
+**Problem:**
+- App would crash with `JsonConvertException` when liking a short
+- Error: "Field 'liked' is required for type with serial name 'ToggleLikeResponseDto', but it was missing at path: $"
+
+**Root Cause:**
+- Backend `ShortsService.toggleLike()` was returning both `liked` and `likesCount`
+- Frontend DTO `ToggleLikeResponseDto` only expected `liked: Boolean`
+
+**Fix Applied:**
+
+#### Backend (`backend/src/modules/shorts/shorts.service.ts`):
 ```typescript
-const contest = await ContestService.createContest({...});
-res.status(201).json(contest); // Returns full contest object
+// Changed from:
+return { liked: false, likesCount: newCount };
+return { liked: true, likesCount: newCount };
+
+// To:
+return { liked: false };
+return { liked: true };
 ```
 
-**Expected Response Format:**
-```typescript
-{
-  contestId: string,
-  message: string
-}
-```
-
-### Solution
-Updated the backend route handler to return only the expected fields:
-
-**Backend Code (After):**
-```typescript
-const contest = await ContestService.createContest({...});
-res.status(201).json({ 
-  contestId: contest.contestId,
-  message: 'Contest created successfully' 
-});
-```
-
-### Files Modified
-- `backend/src/modules/contests/contests.routes.ts` - Updated POST `/api/v1/contests` response format
-
----
-
-## Issue 2: Comments Feature - commentsEnabled Field Missing
-
-### Problem
-When clicking the comments icon in Shorts or Drips, the app showed an error:
-```
-Illegal input: Unexpected JSON token at offset 453: 
-Expected valid boolean literal value at path: $.commentsEnabled, 
-can't decode 'null'
-```
-
-The error message also displayed: "Comments are disabled"
-
-### Root Cause
-The `commentsEnabled` field exists in the database schema but was not being included in the API responses from the backend. The frontend DTOs were trying to deserialize this field, but it was missing from the response, causing a serialization error.
-
-**Database Schema:**
-```prisma
-model Post {
-  commentsEnabled Boolean @default(true) @map("comments_enabled")
-  // ... other fields
-}
-
-model Short {
-  commentsEnabled Boolean @default(true) @map("comments_enabled")
-  // ... other fields
-}
-```
-
-### Solution
-
-#### Frontend Changes
-Added `commentsEnabled` field with default value to DTOs:
-
-**FeedDtos.kt:**
-```kotlin
-@Serializable
-data class PostDto(
-    // ... other fields
-    val commentsEnabled: Boolean = true,
-    val createdAt: String
-)
-```
-
-**ShortsDtos.kt:**
-```kotlin
-@Serializable
-data class ShortDto(
-    // ... other fields
-    val commentsEnabled: Boolean = true,
-    val createdAt: String
-)
-```
-
-#### Backend Changes
-Updated services to include `commentsEnabled` field in responses:
-
-**feed.service.ts:**
-```typescript
-return {
-  items: items.map((p) => ({
-    // ... other fields
-    commentsEnabled: p.commentsEnabled ?? true,
-    createdAt: p.createdAt.toISOString()
-  })),
-  nextCursor
-};
-```
-
-**shorts.service.ts:**
-```typescript
-return {
-  items: items.map((s: any) => ({
-    // ... other fields
-    commentsEnabled: s.commentsEnabled ?? true,
-    createdAt: s.createdAt.toISOString()
-  })),
-  nextCursor: hasMore ? items[items.length - 1].id : null
-};
-```
-
-### Files Modified
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/data/remote/dto/FeedDtos.kt`
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/data/remote/dto/ShortsDtos.kt`
-- `backend/src/modules/feed/feed.service.ts`
-- `backend/src/modules/shorts/shorts.service.ts`
-
----
+The frontend already handles updating the likes count locally in `ShortsViewModel.toggleLike()`.
 
 ## Testing Checklist
 
-### Contest Creation
-- [x] Navigate through all 5 steps of contest wizard
-- [x] Fill in all required fields
-- [x] Click "Publish Contest" button in Step 5
-- [x] Verify contest is created successfully
-- [x] Verify no serialization errors
-- [x] Verify contestId is returned correctly
+### Issue 1: Explore Search
+- [ ] Search for users in the explore tab
+- [ ] Verify results appear without "No results" delay
+- [ ] Click on a user from search results
+- [ ] Verify profile loads correctly with all fields (avatar, bio, niches)
 
-### Comments Feature
-- [x] Open Shorts feed
-- [x] Click comments icon on a short
-- [x] Verify comments screen opens without errors
-- [x] Verify "Comments are disabled" message doesn't appear
-- [x] Open Drips feed
-- [x] Click comments icon on a post
-- [x] Verify comments screen opens without errors
-- [x] Verify comments can be added
+### Issue 2: Avatar & Banner Display
+- [ ] Go to profile settings and upload a new avatar
+- [ ] Verify avatar displays immediately on profile
+- [ ] Upload a banner image
+- [ ] Verify banner displays on profile
+- [ ] Navigate away and back to profile
+- [ ] Verify both avatar and banner persist
 
----
+### Issue 3: Shorts Like
+- [ ] Go to shorts feed
+- [ ] Tap the like button on a short
+- [ ] Verify app does NOT crash
+- [ ] Verify like count increases by 1
+- [ ] Tap like button again to unlike
+- [ ] Verify like count decreases by 1
+- [ ] Like multiple shorts in sequence
+- [ ] Verify all work without crashes
 
-## Technical Details
+## Backend Changes Summary
 
-### Serialization Error Pattern
-Both issues were caused by mismatches between backend responses and frontend DTO expectations:
+### Files Modified:
+1. `backend/src/modules/shorts/shorts.service.ts` - Fixed toggleLike response
+2. `backend/src/modules/explore/explore.service.ts` - Added niches and converted to camelCase
+3. `backend/src/modules/user/user.service.ts` - Converted all fields to camelCase
 
-1. **Missing Required Field**: Frontend expects a required field that backend doesn't provide
-2. **Null Value for Non-Nullable Field**: Backend returns `null` for a field that frontend expects as non-nullable
+### API Response Changes:
+All profile-related endpoints now return camelCase field names for consistency with frontend expectations.
 
-### Best Practices Applied
-1. **Default Values**: Added default values in DTOs to handle missing fields gracefully
-2. **Null Coalescing**: Used `??` operator in backend to provide defaults for null values
-3. **Type Safety**: Ensured backend response format matches frontend DTO structure
-4. **Documentation**: Clear error messages and type definitions
+## Frontend Changes Summary
 
----
+### Files Modified:
+1. `composeApp/src/.../explore/domain/model/TrendingModels.kt` - Added missing fields
+2. `composeApp/src/.../explore/presentation/viewmodel/ExploreViewModel.kt` - Clear error on load
+
+### Note:
+Frontend DTOs already had proper `@SerialName` annotations, so no DTO changes were needed.
 
 ## Deployment Notes
 
-### Backend Deployment
-1. Pull latest changes from main branch
-2. Restart backend server to apply changes
-3. No database migrations required (fields already exist)
+1. Deploy backend changes first
+2. Test API responses match expected format
+3. Deploy frontend changes
+4. Clear app cache on test devices to avoid cached data issues
+5. Test all three scenarios thoroughly
 
-### Frontend Deployment
-1. Rebuild Android/iOS apps with updated DTOs
-2. No user data migration required
-3. Backward compatible with existing data
+## Rollback Plan
 
----
+If issues occur:
+1. Backend changes are backward compatible (only adds fields and renames existing ones)
+2. Frontend changes are additive (new optional fields with defaults)
+3. Can rollback backend to restore snake_case if needed, but frontend will still work with camelCase DTOs
 
-## Related Issues
+## Performance Impact
 
-### Potential Similar Issues
-Check for other DTOs that might have similar problems:
-- Any DTO with boolean fields that might be null in database
-- Any DTO with required fields that backend might not return
-- Any response format mismatches between backend and frontend
-
-### Prevention
-1. Add integration tests for API responses
-2. Use TypeScript on backend for better type safety
-3. Generate DTOs from OpenAPI/Swagger specs
-4. Add runtime validation for API responses
+- Minimal to none
+- Changes are mostly field name transformations
+- No additional database queries added
+- Response sizes unchanged

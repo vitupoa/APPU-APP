@@ -44,7 +44,8 @@ class ExploreViewModel(
                     trendingHashtags = hashtags,
                     trendingShorts = shorts,
                     trendingContests = contests,
-                    trendingCreators = creators
+                    trendingCreators = creators,
+                    error = null
                 )
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
