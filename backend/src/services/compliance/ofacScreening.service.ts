@@ -6,7 +6,7 @@ import crypto from 'crypto';
 const logger = new Logger('OFACScreening');
 
 export class OFACScreeningService {
-  private sdnListUrl = process.env.OFAC_LIST_URL || 'https://www.treasury.gov/ofac/downloads/sdnlist.txt';
+  private sdnListUrl = process.env.OFAC_LIST_URL || 'https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/SDN.CSV';
   private sdnList: string[] = [];
   private lastUpdated: Date | null = null;
 
@@ -21,18 +21,22 @@ export class OFACScreeningService {
         timeout: 30000
       });
 
-      // Parse the SDN list (simplified - actual format is more complex)
+      // Parse CSV: first field of each row is the name
       const lines = response.data.split('\n');
       this.sdnList = lines
         .filter((line: string) => line.trim().length > 0)
-        .map((line: string) => this.normalizeName(line));
+        .map((line: string) => {
+          // CSV first column is the SDN name
+          const firstCol = line.split(',')[0].replace(/"/g, '').trim();
+          return this.normalizeName(firstCol);
+        })
+        .filter((name: string) => name.length > 2);
 
       this.lastUpdated = new Date();
-      
       logger.info(`OFAC SDN list updated: ${this.sdnList.length} entries`);
     } catch (error) {
       logger.error('Failed to update OFAC SDN list:', error as any);
-      throw error;
+      // Do not rethrow — server continues with empty/cached list
     }
   }
 
@@ -234,13 +238,8 @@ export class OFACScreeningService {
    * Initialize service (load SDN list on startup)
    */
   async initialize(): Promise<void> {
-    try {
-      await this.updateSDNList();
-      logger.info('OFAC screening service initialized');
-    } catch (error) {
-      logger.error('Failed to initialize OFAC screening service:', error as any);
-      // Don't throw - service can still work with cached data
-    }
+    await this.updateSDNList();
+    logger.info('OFAC screening service initialized');
   }
 }
 
