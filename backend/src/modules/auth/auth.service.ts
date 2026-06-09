@@ -36,6 +36,7 @@ export class AuthService {
 
     await prisma.refresh_tokens.create({
       data: {
+        id: uuidv4(),
         user_id: userId,
         device_id: deviceId,
         token_hash: tokenHash,

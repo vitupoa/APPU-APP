@@ -2314,7 +2314,7 @@ model real_estate_details {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model refresh_tokens {
-  id         String   @id
+  id         String   @id @default(uuid())
   user_id    String
   token_hash String
   device_id  String
