@@ -6,6 +6,15 @@ import { z } from 'zod';
 const router = Router();
 const commentsService = new CommentsService();
 
+// Test endpoint to verify comments API is working
+router.get('/test', (req: AuthRequest, res: Response) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'Comments API is accessible',
+    timestamp: new Date().toISOString()
+  });
+});
+
 const getCommentsSchema = z.object({
   contentType: z.enum(['post', 'short', 'contest_submission']),
   contentId: z.string().uuid(),
@@ -88,6 +97,12 @@ router.get('/:commentId/replies', optionalAuth, async (req: AuthRequest, res: Re
 // POST /api/v1/comments - Create a comment
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    console.log('Create comment request:', {
+      query: req.query,
+      body: req.body,
+      userId: req.userId
+    });
+    
     const { contentType, contentId } = getCommentsSchema.pick({ contentType: true, contentId: true }).parse(req.query);
     const { text, parent_id, replyToUserId } = createCommentSchema.parse(req.body);
 
@@ -102,6 +117,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 
     res.status(201).json(result);
   } catch (error: any) {
+    console.error('Create comment error:', error);
     if (error.name === 'ZodError') {
       res.status(400).json({ error: 'Validation failed', details: error.errors });
     } else {

@@ -198,97 +198,110 @@ export class CommentsService {
     parent_id: string | null,
     replyToUserId: string | null
   ) {
-    if (text.length > 500) {
-      throw new Error('Comment text must be 500 characters or less');
-    }
-
-    const settings = await this.getCommentSettings(contentType, contentId);
-    if (!settings.commentsEnabled) {
-      throw new Error('Comments are disabled for this content');
-    }
-
-    if (parent_id && !settings.repliesEnabled) {
-      throw new Error('Replies are disabled for this content');
-    }
-
-    const [comment] = await prisma.$transaction(async (tx) => {
-      const newComment = await tx.comments.create({
-        data: {
-          user_id: userId,
-          content_type: contentType,
-          content_id: contentId,
-          text,
-          parent_id,
-          reply_to_user_id: replyToUserId,
-        },
-        include: {
-          User_comments_user_idToUser: {
-            select: {
-              id: true,
-              username: true,
-              display_name: true,
-              avatar_url: true,
-              is_verified: true,
-            },
-          },
-          User_comments_reply_to_user_idToUser: {
-            select: {
-              id: true,
-              username: true,
-              display_name: true,
-              avatar_url: true,
-              is_verified: true,
-            },
-          },
-        },
-      });
-
-      if (parent_id) {
-        await tx.comments.update({
-          where: { id: parent_id },
-          data: { replies_count: { increment: 1 } },
-        });
+    try {
+      console.log('Creating comment:', { userId, contentType, contentId, textLength: text.length, parent_id, replyToUserId });
+      
+      if (text.length > 500) {
+        throw new Error('Comment text must be 500 characters or less');
       }
 
-      await this.incrementContentCommentCountTx(tx, contentType, contentId);
+      const settings = await this.getCommentSettings(contentType, contentId);
+      console.log('Comment settings:', settings);
+      
+      if (!settings.commentsEnabled) {
+        throw new Error('Comments are disabled for this content');
+      }
 
-      return [newComment];
-    });
+      if (parent_id && !settings.repliesEnabled) {
+        throw new Error('Replies are disabled for this content');
+      }
 
-    const contentOwner = await this.getContentOwner(contentType, contentId);
+      const [comment] = await prisma.$transaction(async (tx) => {
+        const commentId = crypto.randomUUID();
+        const newComment = await tx.comments.create({
+          data: {
+            id: commentId,
+            user_id: userId,
+            content_type: contentType,
+            content_id: contentId,
+            text,
+            parent_id,
+            reply_to_user_id: replyToUserId,
+          },
+          include: {
+            User_comments_user_idToUser: {
+              select: {
+                id: true,
+                username: true,
+                display_name: true,
+                avatar_url: true,
+                is_verified: true,
+              },
+            },
+            User_comments_reply_to_user_idToUser: {
+              select: {
+                id: true,
+                username: true,
+                display_name: true,
+                avatar_url: true,
+                is_verified: true,
+              },
+            },
+          },
+        });
 
-    io.to(`content:${contentId}`).emit('comment_update', {
-      content_id: contentId,
-      contentType,
-      newCount: await this.getCommentCount(contentType, contentId),
-    });
+        if (parent_id) {
+          await tx.comments.update({
+            where: { id: parent_id },
+            data: { replies_count: { increment: 1 } },
+          });
+        }
 
-    return {
-      success: true,
-      comment: {
-        id: comment.id,
-        content_id: comment.content_id,
-        contentType: comment.content_type,
-        author: {
-          ...comment.User_comments_user_idToUser,
-          isContentOwner: comment.User_comments_user_idToUser.id === contentOwner?.id,
+        await this.incrementContentCommentCountTx(tx, contentType, contentId);
+
+        return [newComment];
+      });
+
+      const contentOwner = await this.getContentOwner(contentType, contentId);
+
+      io.to(`content:${contentId}`).emit('comment_update', {
+        content_id: contentId,
+        contentType,
+        newCount: await this.getCommentCount(contentType, contentId),
+      });
+
+      console.log('Comment created successfully:', comment.id);
+
+      return {
+        success: true,
+        comment: {
+          id: comment.id,
+          content_id: comment.content_id,
+          contentType: comment.content_type,
+          author: {
+            ...comment.User_comments_user_idToUser,
+            isContentOwner: comment.User_comments_user_idToUser.id === contentOwner?.id,
+          },
+          text: comment.text,
+          parent_id: comment.parent_id,
+          replyToUser: comment.User_comments_reply_to_user_idToUser,
+          likesCount: comment.likes_count,
+          repliesCount: comment.replies_count,
+          isLiked: false,
+          isPinned: comment.is_pinned,
+          isEdited: comment.is_edited,
+          canDelete: true,
+          canEdit: true,
+          canPin: false,
+          canReply: true,
+          createdAt: comment.created_at.toISOString(),
+          editedAt: null,
         },
-        text: comment.text,
-        parent_id: comment.parent_id,
-        replyToUser: comment.User_comments_reply_to_user_idToUser,
-        likesCount: comment.likes_count,
-        repliesCount: comment.replies_count,
-        isLiked: false,
-        isPinned: comment.is_pinned,
-        isEdited: comment.is_edited,
-        canDelete: true,
-        canEdit: true,
-        canPin: false,
-        canReply: true,
-        createdAt: comment.created_at.toISOString(),
-        editedAt: null,
-      },
-    };
+      };
+    } catch (error) {
+      console.error('Error creating comment:', error);
+      throw error;
+    }
   }
 
   async updateComment(commentId: string, user_id: string, text: string) {
@@ -563,27 +576,42 @@ export class CommentsService {
 
   private async getContentOwner(contentType: string, contentId: string) {
     let owner = null;
-    switch (contentType) {
-      case 'post':
-        owner = await prisma.post.findUnique({
-          where: { id: contentId },
-          select: { user_id: true },
-        });
-        return owner ? { id: owner.user_id } : null;
-      case 'short':
-        owner = await prisma.shorts.findUnique({
-          where: { id: contentId },
-          select: { user_id: true },
-        });
-        return owner ? { id: owner.user_id } : null;
-      case 'contest_submission':
-        owner = await prisma.contest_submission.findUnique({
-          where: { id: contentId },
-          select: { user_id: true },
-        });
-        return owner ? { id: owner.user_id } : null;
-      default:
-        return null;
+    try {
+      switch (contentType) {
+        case 'post':
+          owner = await prisma.post.findUnique({
+            where: { id: contentId },
+            select: { user_id: true },
+          });
+          if (!owner) {
+            console.warn(`Post not found: ${contentId}`);
+          }
+          return owner ? { id: owner.user_id } : null;
+        case 'short':
+          owner = await prisma.shorts.findUnique({
+            where: { id: contentId },
+            select: { user_id: true },
+          });
+          if (!owner) {
+            console.warn(`Short not found: ${contentId}`);
+          }
+          return owner ? { id: owner.user_id } : null;
+        case 'contest_submission':
+          owner = await prisma.contest_submission.findUnique({
+            where: { id: contentId },
+            select: { user_id: true },
+          });
+          if (!owner) {
+            console.warn(`Contest submission not found: ${contentId}`);
+          }
+          return owner ? { id: owner.user_id } : null;
+        default:
+          console.warn(`Unknown content type: ${contentType}`);
+          return null;
+      }
+    } catch (error) {
+      console.error(`Error getting content owner for ${contentType}:${contentId}`, error);
+      return null;
     }
   }
 
