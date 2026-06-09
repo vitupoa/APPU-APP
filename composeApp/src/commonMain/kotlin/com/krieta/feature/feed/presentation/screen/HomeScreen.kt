@@ -32,11 +32,13 @@ class HomeScreen : Screen {
                 }
             }
 
-            // Tab bar positioned absolutely at top (55px)
+            // Tab bar floats over the video, respects status bar at top
             HomeTabBar(
                 selectedTab = selectedTab,
                 onTabSelected = { selectedTab = it },
-                modifier = Modifier.align(Alignment.TopCenter).padding(top = 55.dp)
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .windowInsetsPadding(WindowInsets.statusBars)
             )
         }
     }

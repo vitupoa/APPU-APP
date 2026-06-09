@@ -80,11 +80,19 @@ class DripsScreen : Screen {
         var showTippingFor by remember { mutableStateOf<Post?>(null) }
         var currentUserId by remember { mutableStateOf<String?>(null) }
         var showImageViewer by remember { mutableStateOf(false) }
+        var pendingCommentPost by remember { mutableStateOf<Post?>(null) }
         var selectedImages by remember { mutableStateOf<List<String>>(emptyList()) }
         var selectedImageIndex by remember { mutableStateOf(0) }
         
         LaunchedEffect(Unit) {
             currentUserId = tokenManager.getUserId()
+            // If a comment was tapped before userId loaded, navigate now
+            pendingCommentPost?.let { post ->
+                currentUserId?.let { userId ->
+                    navigator.push(CommentsScreen(ContentType.POST, post.id, userId))
+                    pendingCommentPost = null
+                }
+            }
             currencyProvider.start()
             kotlinx.coroutines.delay(500)
             walletViewModel.fetchWalletData(currencyProvider.countryCode)
@@ -189,9 +197,9 @@ class DripsScreen : Screen {
                                         viewModel.recordSponsoredEngagement(index, "like")
                                     },
                                     onComment = { 
-                                        currentUserId?.let { userId ->
-                                            navigator.push(CommentsScreen(ContentType.POST, post.id, userId))
-                                        }
+                                        val uid = currentUserId
+                                        if (uid != null) navigator.push(CommentsScreen(ContentType.POST, post.id, uid))
+                                        else pendingCommentPost = post
                                         viewModel.recordSponsoredEngagement(index, "comment")
                                     },
                                     onTip = { showTippingFor = post },
@@ -212,9 +220,9 @@ class DripsScreen : Screen {
                                     post = post,
                                     onLike = { viewModel.toggleLike(post.id) },
                                     onComment = { 
-                                        currentUserId?.let { userId ->
-                                            navigator.push(CommentsScreen(ContentType.POST, post.id, userId))
-                                        }
+                                        val uid = currentUserId
+                                        if (uid != null) navigator.push(CommentsScreen(ContentType.POST, post.id, uid))
+                                        else pendingCommentPost = post
                                     },
                                     onTip = { showTippingFor = post },
                                     onImageClick = { images, imgIndex ->

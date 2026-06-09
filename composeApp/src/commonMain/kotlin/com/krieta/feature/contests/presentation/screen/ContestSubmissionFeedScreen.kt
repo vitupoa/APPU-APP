@@ -71,7 +71,7 @@ class ContestSubmissionFeedScreen : Screen {
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black).windowInsetsPadding(WindowInsets(0))) {
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             when {
                 state.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -249,7 +249,10 @@ class ContestSubmissionFeedScreen : Screen {
                 prizeKr = 5000.0,
                 currencyProvider = currencyProvider,
                 onJoin = onContestClick,
-                modifier = Modifier.align(Alignment.TopStart).padding(top = 16.dp, start = 16.dp)
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(top = 56.dp, start = 16.dp) // 56dp clears the HomeTabBar
             )
 
             // Bottom info
@@ -257,13 +260,13 @@ class ContestSubmissionFeedScreen : Screen {
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.navigationBars)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
                         )
                     )
-                    .padding(16.dp)
-                    .padding(bottom = 32.dp)
+                    .padding(start = 16.dp, end = 80.dp, bottom = 16.dp, top = 40.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AsyncImage(
@@ -293,6 +296,7 @@ class ContestSubmissionFeedScreen : Screen {
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
                     .padding(end = 12.dp, bottom = 80.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(24.dp)

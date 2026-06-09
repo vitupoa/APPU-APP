@@ -40,7 +40,7 @@ export class CommentsService {
       orderBy: [{ is_pinned: 'desc' }, orderBy],
       take: limit,
       include: {
-        User_comments_user_idToUser: {
+        user_comments_user_idTouser: {
           select: {
             id: true,
             username: true,
@@ -49,7 +49,7 @@ export class CommentsService {
             is_verified: true,
           },
         },
-        User_comments_reply_to_user_idToUser: {
+        user_comments_reply_to_user_idTouser: {
           select: {
             id: true,
             username: true,
@@ -77,12 +77,12 @@ export class CommentsService {
       content_id: comment.content_id,
       contentType: comment.content_type,
       author: {
-        ...comment.User_comments_user_idToUser,
-        isContentOwner: comment.User_comments_user_idToUser.id === contentOwner?.id,
+        ...comment.user_comments_user_idTouser,
+        isContentOwner: comment.user_comments_user_idTouser.id === contentOwner?.id,
       },
       text: comment.text,
       parent_id: comment.parent_id,
-      replyToUser: comment.User_comments_reply_to_user_idToUser,
+      replyToUser: comment.user_comments_reply_to_user_idTouser,
       likesCount: comment.likes_count,
       repliesCount: comment.replies_count,
       isLiked: likedCommentIds.has(comment.id),
@@ -125,7 +125,7 @@ export class CommentsService {
       orderBy: { created_at: 'asc' },
       take: limit,
       include: {
-        User_comments_user_idToUser: {
+        user_comments_user_idTouser: {
           select: {
             id: true,
             username: true,
@@ -134,7 +134,7 @@ export class CommentsService {
             is_verified: true,
           },
         },
-        User_comments_reply_to_user_idToUser: {
+        user_comments_reply_to_user_idTouser: {
           select: {
             id: true,
             username: true,
@@ -162,12 +162,12 @@ export class CommentsService {
       content_id: reply.content_id,
       contentType: reply.content_type,
       author: {
-        ...reply.User_comments_user_idToUser,
-        isContentOwner: reply.User_comments_user_idToUser.id === contentOwner?.id,
+        ...reply.user_comments_user_idTouser,
+        isContentOwner: reply.user_comments_user_idTouser.id === contentOwner?.id,
       },
       text: reply.text,
       parent_id: reply.parent_id,
-      replyToUser: reply.User_comments_reply_to_user_idToUser,
+      replyToUser: reply.user_comments_reply_to_user_idTouser,
       likesCount: reply.likes_count,
       repliesCount: reply.replies_count,
       isLiked: likedReplyIds.has(reply.id),
@@ -229,7 +229,7 @@ export class CommentsService {
             reply_to_user_id: replyToUserId,
           },
           include: {
-            User_comments_user_idToUser: {
+            user_comments_user_idTouser: {
               select: {
                 id: true,
                 username: true,
@@ -238,7 +238,7 @@ export class CommentsService {
                 is_verified: true,
               },
             },
-            User_comments_reply_to_user_idToUser: {
+            user_comments_reply_to_user_idTouser: {
               select: {
                 id: true,
                 username: true,
@@ -279,12 +279,12 @@ export class CommentsService {
           content_id: comment.content_id,
           contentType: comment.content_type,
           author: {
-            ...comment.User_comments_user_idToUser,
-            isContentOwner: comment.User_comments_user_idToUser.id === contentOwner?.id,
+            ...comment.user_comments_user_idTouser,
+            isContentOwner: comment.user_comments_user_idTouser.id === contentOwner?.id,
           },
           text: comment.text,
           parent_id: comment.parent_id,
-          replyToUser: comment.User_comments_reply_to_user_idToUser,
+          replyToUser: comment.user_comments_reply_to_user_idTouser,
           likesCount: comment.likes_count,
           repliesCount: comment.replies_count,
           isLiked: false,
@@ -326,7 +326,7 @@ export class CommentsService {
         edited_at: new Date(),
       },
       include: {
-        User_comments_user_idToUser: {
+        user_comments_user_idTouser: {
           select: {
             id: true,
             username: true,
@@ -335,7 +335,7 @@ export class CommentsService {
             is_verified: true,
           },
         },
-        User_comments_reply_to_user_idToUser: {
+        user_comments_reply_to_user_idTouser: {
           select: {
             id: true,
             username: true,
@@ -356,12 +356,12 @@ export class CommentsService {
         content_id: updated.content_id,
         contentType: updated.content_type,
         author: {
-          ...updated.User_comments_user_idToUser,
-          isContentOwner: updated.User_comments_user_idToUser.id === contentOwner?.id,
+          ...updated.user_comments_user_idTouser,
+          isContentOwner: updated.user_comments_user_idTouser.id === contentOwner?.id,
         },
         text: updated.text,
         parent_id: updated.parent_id,
-        replyToUser: updated.User_comments_reply_to_user_idToUser,
+        replyToUser: updated.user_comments_reply_to_user_idTouser,
         likesCount: updated.likes_count,
         repliesCount: updated.replies_count,
         isLiked: false,
@@ -682,7 +682,7 @@ export class CommentsService {
     const comment = await prisma.comments.findUnique({
       where: { id: commentId },
       include: {
-        User_comments_user_idToUser: {
+        user_comments_user_idTouser: {
           select: {
             id: true,
             username: true,
@@ -691,7 +691,7 @@ export class CommentsService {
             is_verified: true,
           },
         },
-        User_comments_reply_to_user_idToUser: {
+        user_comments_reply_to_user_idTouser: {
           select: {
             id: true,
             username: true,
@@ -718,12 +718,12 @@ export class CommentsService {
       content_id: comment.content_id,
       contentType: comment.content_type,
       author: {
-        ...comment.User_comments_user_idToUser,
-        isContentOwner: comment.User_comments_user_idToUser.id === contentOwner?.id,
+        ...comment.user_comments_user_idTouser,
+        isContentOwner: comment.user_comments_user_idTouser.id === contentOwner?.id,
       },
       text: comment.text,
       parent_id: comment.parent_id,
-      replyToUser: comment.User_comments_reply_to_user_idToUser,
+      replyToUser: comment.user_comments_reply_to_user_idTouser,
       likesCount: comment.likes_count,
       repliesCount: comment.replies_count,
       isLiked,

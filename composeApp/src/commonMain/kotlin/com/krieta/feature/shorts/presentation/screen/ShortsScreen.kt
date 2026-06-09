@@ -81,11 +81,18 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         val currentBalance = (walletState as? WalletState.Success)?.balance?.krBalance ?: 0.0
         
         var currentUserId by remember { mutableStateOf<String?>(null) }
+        var pendingCommentShort by remember { mutableStateOf<Short?>(null) }
         var showTippingFor by remember { mutableStateOf<Short?>(null) }
         
         // Get current user ID
         LaunchedEffect(Unit) {
             currentUserId = tokenManager.getUserId()
+            pendingCommentShort?.let { short ->
+                currentUserId?.let { userId ->
+                    navigator.push(CommentsScreen(ContentType.SHORT, short.id, userId))
+                    pendingCommentShort = null
+                }
+            }
             
             UploadCompletionNotifier.uploadCompletions
                 .onEach { event ->
@@ -146,7 +153,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black).windowInsetsPadding(WindowInsets(0))) {
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             PullToRefreshBox(
                 isRefreshing = state.isRefreshing,
                 onRefresh = { viewModel.refresh() },
@@ -183,10 +190,10 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                                 viewModel.recordSponsoredEngagement(page, "like")
                             }
                         },
-                        onComment = { 
-                            currentUserId?.let { userId ->
-                                navigator.push(CommentsScreen(ContentType.SHORT, short.id, userId))
-                            }
+                        onComment = {
+                            val uid = currentUserId
+                            if (uid != null) navigator.push(CommentsScreen(ContentType.SHORT, short.id, uid))
+                            else pendingCommentShort = short
                             if (isSponsored) {
                                 viewModel.recordSponsoredEngagement(page, "comment")
                             }
@@ -357,6 +364,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     progress = { (currentPosition.toFloat() / duration.toFloat()).coerceIn(0f, 1f) },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
+                        .windowInsetsPadding(WindowInsets.navigationBars)
                         .fillMaxWidth()
                         .height(2.dp),
                     color = Color.White,
@@ -403,8 +411,8 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .padding(bottom = 32.dp)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(start = 16.dp, end = 80.dp, bottom = 16.dp)
             ) {
                 // Sponsored badge
                 if (isSponsored) {
@@ -442,7 +450,8 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-                    .padding(end = 12.dp),
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(end = 12.dp, bottom = 80.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {

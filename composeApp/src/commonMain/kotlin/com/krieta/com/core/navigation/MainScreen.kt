@@ -111,7 +111,14 @@ class MainScreen : Screen {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding)
+                            // HomeTab gets full screen (videos go edge-to-edge behind nav bar)
+                            // All other tabs respect the bottom nav padding normally
+                            .then(
+                                if (currentTab == HomeTab)
+                                    Modifier
+                                else
+                                    Modifier.padding(innerPadding)
+                            )
                     ) {
                         key(if (currentTab == HomeTab) homeRefreshKey else 0) {
                             CurrentTab()

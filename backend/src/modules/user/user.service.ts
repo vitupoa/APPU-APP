@@ -11,7 +11,7 @@ export class UserService {
       include: {
         bio_links: { orderBy: { sort_order: 'asc' } },
         _count: { select: { admires_admires_admired_idTouser: true,
-            admires_admires_admirer_idToUser: true,
+            admires_admires_admirer_idTouser: true,
             contest_winners: true
           }
         }
@@ -65,8 +65,8 @@ export class UserService {
       selectedNiches: user.selectedNiches || [],
       customNiches: user.customNiches || [],
       stats: {
-        admirers: user._count.admires_admires_admired_idToUser,
-        admiring: user._count.admires_admires_admirer_idToUser,
+        admirers: user._count.admires_admires_admired_idTouser,
+        admiring: user._count.admires_admires_admirer_idTouser,
         lovers: loversCount,
         contestsWon: user._count.contest_winners
       },
