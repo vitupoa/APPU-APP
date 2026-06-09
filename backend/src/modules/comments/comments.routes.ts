@@ -65,7 +65,7 @@ router.get('/', optionalAuth, async (req: AuthRequest, res: Response) => {
 // GET /api/v1/comments/:commentId/replies - Get replies for a comment
 router.get('/:commentId/replies', optionalAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.comment_id);
+    const commentId = String(req.params.commentId);
     const { cursor, limit } = getRepliesSchema.parse(req.query);
 
     const result = await commentsService.getReplies(
@@ -113,7 +113,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 // PUT /api/v1/comments/:commentId - Update a comment
 router.put('/:commentId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.comment_id);
+    const commentId = String(req.params.commentId);
     const { text } = updateCommentSchema.parse(req.body);
 
     const result = await commentsService.updateComment(commentId, req.userId!, text);
@@ -131,7 +131,7 @@ router.put('/:commentId', authMiddleware, async (req: AuthRequest, res: Response
 // DELETE /api/v1/comments/:commentId - Delete a comment
 router.delete('/:commentId', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.comment_id);
+    const commentId = String(req.params.commentId);
 
     const result = await commentsService.deleteComment(commentId, req.userId!);
 
@@ -144,7 +144,7 @@ router.delete('/:commentId', authMiddleware, async (req: AuthRequest, res: Respo
 // POST /api/v1/comments/:commentId/like - Like a comment
 router.post('/:commentId/like', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.comment_id);
+    const commentId = String(req.params.commentId);
 
     const result = await commentsService.likeComment(commentId, req.userId!);
 
@@ -157,7 +157,7 @@ router.post('/:commentId/like', authMiddleware, async (req: AuthRequest, res: Re
 // DELETE /api/v1/comments/:commentId/like - Unlike a comment
 router.delete('/:commentId/like', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.comment_id);
+    const commentId = String(req.params.commentId);
 
     const result = await commentsService.unlikeComment(commentId, req.userId!);
 
@@ -170,7 +170,7 @@ router.delete('/:commentId/like', authMiddleware, async (req: AuthRequest, res: 
 // POST /api/v1/comments/:commentId/pin - Pin a comment
 router.post('/:commentId/pin', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.comment_id);
+    const commentId = String(req.params.commentId);
 
     const result = await commentsService.pinComment(commentId, req.userId!);
 
@@ -183,7 +183,7 @@ router.post('/:commentId/pin', authMiddleware, async (req: AuthRequest, res: Res
 // DELETE /api/v1/comments/:commentId/pin - Unpin a comment
 router.delete('/:commentId/pin', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.comment_id);
+    const commentId = String(req.params.commentId);
 
     const result = await commentsService.unpinComment(commentId, req.userId!);
 
@@ -196,7 +196,7 @@ router.delete('/:commentId/pin', authMiddleware, async (req: AuthRequest, res: R
 // POST /api/v1/comments/:commentId/report - Report a comment
 router.post('/:commentId/report', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const commentId = String(req.params.comment_id);
+    const commentId = String(req.params.commentId);
     const { reason } = reportCommentSchema.parse(req.body);
 
     const result = await commentsService.reportComment(commentId, req.userId!, reason);

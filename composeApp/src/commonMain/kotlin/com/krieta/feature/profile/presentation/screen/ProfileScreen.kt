@@ -11,6 +11,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -60,6 +62,8 @@ class ProfileScreen(val userId: String? = null) : Screen {
         val isLoading = profileState.isLoading
         val error = profileState.error
         
+
+        
         if (isLoading && profile == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = KrietaColors.Primary)
@@ -96,42 +100,49 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Status bar spacer
+                    Spacer(modifier = Modifier.height(48.dp))
+                    
                     // Header Area with Cover Image
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(240.dp),
+                        modifier = Modifier.fillMaxWidth().height(340.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         // Cover Banner - Display user banner or fallback
-                        if (profile.coverPhotoUrl != null) {
-                            AsyncImage(
-                                model = profile.coverPhotoUrl,
-                                contentDescription = "Cover photo",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .background(
-                                        androidx.compose.ui.graphics.Brush.verticalGradient(
-                                            colors = listOf(
-                                                KrietaColors.Primary.copy(alpha = 0.3f),
-                                                KrietaColors.BackgroundElevated
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(280.dp)
+                                .clip(RoundedCornerShape(0.dp))
+                        ) {
+                            if (profile.coverPhotoUrl != null) {
+                                AsyncImage(
+                                    model = profile.coverPhotoUrl,
+                                    contentDescription = "Cover photo",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                                colors = listOf(
+                                                    KrietaColors.Primary.copy(alpha = 0.3f),
+                                                    KrietaColors.BackgroundElevated
+                                                )
                                             )
                                         )
-                                    )
-                            )
+                                )
+                            }
                         }
                         
                         // Top App Bar / Actions over Cover with gradient overlay for better visibility
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(100.dp)
+                                .height(80.dp)
                                 .background(
                                     androidx.compose.ui.graphics.Brush.verticalGradient(
                                         colors = listOf(
@@ -145,12 +156,16 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 48.dp, end = 16.dp, start = 16.dp),
-                            horizontalArrangement = Arrangement.End
+                                .padding(top = 8.dp, end = 16.dp, start = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
+                            Spacer(Modifier.width(48.dp))
                             if (isOwnProfile) {
                                 Box {
-                                    IconButton(onClick = { menuExpanded = true }) {
+                                    IconButton(
+                                        onClick = { menuExpanded = true },
+                                        modifier = Modifier.background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                                    ) {
                                         Icon(painterResource(Res.drawable.ic_more_vert), contentDescription = "Menu", tint = Color.White)
                                     }
                                     DropdownMenu(
@@ -189,11 +204,11 @@ class ProfileScreen(val userId: String? = null) : Screen {
                             }
                         }
 
-                        // Avatar overlapping Cover with shadow
+                        // Avatar overlapping Cover with elegant shadow
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .offset(y = 50.dp)
+                                .offset(y = 40.dp)
                         ) {
                             if (profile.avatarUrl != null) {
                                 Box(
@@ -236,7 +251,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(50.dp))
 
                     // User Info
                     Row(verticalAlignment = Alignment.CenterVertically) {

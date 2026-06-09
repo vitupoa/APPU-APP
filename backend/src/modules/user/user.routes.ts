@@ -25,6 +25,7 @@ const updateProfileSchema = z.object({
   cover_photo_url: z.string().url().optional()
 });
 
+
 const bioLinksSchema = z.array(z.object({
   label: z.string().min(1).max(30),
   url: z.string().url(),

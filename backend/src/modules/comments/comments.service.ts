@@ -5,17 +5,17 @@ import crypto from 'crypto';
 export class CommentsService {
   async getComments(
     contentType: string,
-    content_id: string,
+    contentId: string,
     sortBy: string = 'latest',
     cursor: string | null,
     limit: number = 20,
     user_id: string | null
   ) {
-    const settings = await this.getCommentSettings(contentType, content_id);
+    const settings = await this.getCommentSettings(contentType, contentId);
 
     const where: any = {
       content_type: contentType,
-      content_id,
+      content_id: contentId,
       parent_id: null,
     };
 
@@ -61,7 +61,7 @@ export class CommentsService {
       },
     });
 
-    const contentOwner = await this.getContentOwner(contentType, content_id);
+    const contentOwner = await this.getContentOwner(contentType, contentId);
 
     const commentIds = comments.map((c: any) => c.id);
     const userLikes = user_id
@@ -193,7 +193,7 @@ export class CommentsService {
   async createComment(
     userId: string,
     contentType: string,
-    content_id: string,
+    contentId: string,
     text: string,
     parent_id: string | null,
     replyToUserId: string | null
@@ -202,7 +202,7 @@ export class CommentsService {
       throw new Error('Comment text must be 500 characters or less');
     }
 
-    const settings = await this.getCommentSettings(contentType, content_id);
+    const settings = await this.getCommentSettings(contentType, contentId);
     if (!settings.commentsEnabled) {
       throw new Error('Comments are disabled for this content');
     }
@@ -216,7 +216,7 @@ export class CommentsService {
         data: {
           user_id: userId,
           content_type: contentType,
-          content_id,
+          content_id: contentId,
           text,
           parent_id,
           reply_to_user_id: replyToUserId,
@@ -250,17 +250,17 @@ export class CommentsService {
         });
       }
 
-      await this.incrementContentCommentCountTx(tx, contentType, content_id);
+      await this.incrementContentCommentCountTx(tx, contentType, contentId);
 
       return [newComment];
     });
 
-    const contentOwner = await this.getContentOwner(contentType, content_id);
+    const contentOwner = await this.getContentOwner(contentType, contentId);
 
-    io.to(`content:${content_id}`).emit('comment_update', {
-      content_id,
+    io.to(`content:${contentId}`).emit('comment_update', {
+      content_id: contentId,
       contentType,
-      newCount: await this.getCommentCount(contentType, content_id),
+      newCount: await this.getCommentCount(contentType, contentId),
     });
 
     return {
@@ -517,21 +517,21 @@ export class CommentsService {
   async updateCommentSettings(
     userId: string,
     contentType: string,
-    content_id: string,
+    contentId: string,
     commentsEnabled: boolean,
     repliesEnabled: boolean
   ) {
-    const contentOwner = await this.getContentOwner(contentType, content_id);
+    const contentOwner = await this.getContentOwner(contentType, contentId);
     if (contentOwner?.id !== userId) {
       throw new Error('Only content owner can update settings');
     }
 
     await prisma.comment_settings.upsert({
       where: {
-        content_id_content_type: { content_id, content_type: contentType },
+        content_id_content_type: { content_id: contentId, content_type: contentType },
       },
       create: {
-        content_id,
+        content_id: contentId,
         content_type: contentType,
         comments_enabled: commentsEnabled,
         replies_enabled: repliesEnabled,
@@ -545,14 +545,14 @@ export class CommentsService {
     return { success: true };
   }
 
-  private async getCommentSettings(contentType: string, content_id: string) {
+  private async getCommentSettings(contentType: string, contentId: string) {
     const settings = await prisma.comment_settings.findUnique({
       where: {
-        content_id_content_type: { content_id, content_type: contentType },
+        content_id_content_type: { content_id: contentId, content_type: contentType },
       },
     });
 
-    const totalComments = await this.getCommentCount(contentType, content_id);
+    const totalComments = await this.getCommentCount(contentType, contentId);
 
     return {
       commentsEnabled: settings?.comments_enabled ?? true,
@@ -561,24 +561,24 @@ export class CommentsService {
     };
   }
 
-  private async getContentOwner(contentType: string, content_id: string) {
+  private async getContentOwner(contentType: string, contentId: string) {
     let owner = null;
     switch (contentType) {
       case 'post':
         owner = await prisma.post.findUnique({
-          where: { id: content_id },
+          where: { id: contentId },
           select: { user_id: true },
         });
         return owner ? { id: owner.user_id } : null;
       case 'short':
         owner = await prisma.shorts.findUnique({
-          where: { id: content_id },
+          where: { id: contentId },
           select: { user_id: true },
         });
         return owner ? { id: owner.user_id } : null;
       case 'contest_submission':
         owner = await prisma.contest_submission.findUnique({
-          where: { id: content_id },
+          where: { id: contentId },
           select: { user_id: true },
         });
         return owner ? { id: owner.user_id } : null;
@@ -587,9 +587,9 @@ export class CommentsService {
     }
   }
 
-  private async getCommentCount(contentType: string, content_id: string) {
+  private async getCommentCount(contentType: string, contentId: string) {
     return await prisma.comments.count({
-      where: { content_type: contentType, content_id },
+      where: { content_type: contentType, content_id: contentId },
     });
   }
 
@@ -612,16 +612,16 @@ export class CommentsService {
     return user_id === contentOwnerId;
   }
 
-  private incrementContentCommentCountTx(tx: any, contentType: string, content_id: string) {
+  private incrementContentCommentCountTx(tx: any, contentType: string, contentId: string) {
     switch (contentType) {
       case 'post':
         return tx.post.update({
-          where: { id: content_id },
+          where: { id: contentId },
           data: { comments_count: { increment: 1 } },
         });
       case 'short':
         return tx.shorts.update({
-          where: { id: content_id },
+          where: { id: contentId },
           data: { comments_count: { increment: 1 } },
         });
       case 'contest_submission':
@@ -631,16 +631,16 @@ export class CommentsService {
     }
   }
 
-  private decrementContentCommentCountTx(tx: any, contentType: string, content_id: string) {
+  private decrementContentCommentCountTx(tx: any, contentType: string, contentId: string) {
     switch (contentType) {
       case 'post':
         return tx.post.update({
-          where: { id: content_id },
+          where: { id: contentId },
           data: { comments_count: { decrement: 1 } },
         });
       case 'short':
         return tx.shorts.update({
-          where: { id: content_id },
+          where: { id: contentId },
           data: { comments_count: { decrement: 1 } },
         });
       case 'contest_submission':
