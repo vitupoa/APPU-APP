@@ -73,7 +73,7 @@ export class ChamaService {
       });
 
       // 3. Create ChamaWallet
-      await tx.chamaWallet.create({
+      await tx.chama_wallet.create({
         data: { 
           chama_id: chama.id,
           updated_at: new Date()
@@ -114,8 +114,8 @@ export class ChamaService {
     return db.chama.findUnique({
       where: { id: chamaId },
       include: {
-        chamaWallet: true,
-        members: {
+        chama_wallet: true,
+        chama_member: {
           where: { status: 'ACTIVE' },
           include: {
             user: {
@@ -126,8 +126,8 @@ export class ChamaService {
         },
         _count: {
           select: {
-            members: { where: { status: 'ACTIVE' } },
-            contributions: true,
+            chama_member: { where: { status: 'ACTIVE' } },
+            chama_contribution: true,
           },
         },
       },
@@ -140,12 +140,12 @@ export class ChamaService {
   static async getMyChamas(userId: string) {
     return prisma.chama.findMany({
       where: {
-        chama_members: { some: { user_id: userId, status: 'ACTIVE' } },
+        chama_member: { some: { user_id: userId, status: 'ACTIVE' } },
       },
       include: {
         chama_wallet: true,
         _count: {
-          select: { chama_members: { where: { status: 'ACTIVE' } } },
+          select: { chama_member: { where: { status: 'ACTIVE' } } },
         },
       },
       orderBy: { updated_at: 'desc' },
@@ -162,13 +162,13 @@ export class ChamaService {
       where: {
         status: { in: ['SETUP', 'ACTIVE'] },
         isLocked: false,
-        chama_members: { none: { user_id: userId, status: 'ACTIVE' } },
+        chama_member: { none: { user_id: userId, status: 'ACTIVE' } },
       },
       include: {
         _count: {
-          select: { chama_members: { where: { status: 'ACTIVE' } } },
+          select: { chama_member: { where: { status: 'ACTIVE' } } },
         },
-        creator: {
+        user: {
           select: { id: true, username: true, display_name: true, avatar_url: true },
         },
       },
@@ -193,7 +193,7 @@ export class ChamaService {
       const chama = await tx.chama.findUnique({
         where: { id: chamaId },
         include: {
-          _count: { select: { chama_members: { where: { status: 'ACTIVE' } } } },
+          _count: { select: { chama_member: { where: { status: 'ACTIVE' } } } },
           chama_wallet: true,
         },
       });
@@ -205,7 +205,7 @@ export class ChamaService {
       }
 
       // Check max members
-      if (chama.maxMembers && chama._count.chama_members >= chama.maxMembers) {
+      if (chama.maxMembers && chama._count.chama_member >= chama.maxMembers) {
         throw new Error('Chama has reached maximum members');
       }
 
@@ -237,7 +237,7 @@ export class ChamaService {
         });
 
         // Credit chama wallet
-        await tx.chamaWallet.update({
+        await tx.chama_wallet.update({
           where: { chama_id: chamaId },
           data: { kr_balance: { increment: chama.membershipFeeKr } },
         });
@@ -295,8 +295,8 @@ export class ChamaService {
       }
 
       // Add to chat participants
-      await tx.chatParticipant.upsert({
-        where: { chatId_userId: { chat_id: chama.chat_id, user_id: userId } },
+      await tx.chat_participant.upsert({
+        where: { chat_id_user_id: { chat_id: chama.chat_id, user_id: userId } },
         create: { chat_id: chama.chat_id, user_id: userId, role: 'member' },
         update: {},
       });
@@ -331,7 +331,7 @@ export class ChamaService {
 
       // Auto-lock if full
       if (chama.autoLockOnFull && chama.maxMembers) {
-        const newCount = chama._count.chama_members + 1;
+        const newCount = chama._count.chama_member + 1;
         if (newCount >= chama.maxMembers) {
           await tx.chama.update({
             where: { id: chamaId },
@@ -542,7 +542,7 @@ export class ChamaService {
       data: updateData,
       include: {
         chama_wallet: true,
-        _count: { select: { chama_members: { where: { status: 'ACTIVE' } } } },
+        _count: { select: { chama_member: { where: { status: 'ACTIVE' } } } },
       },
     });
   }
@@ -611,7 +611,7 @@ export class ChamaService {
       });
 
       // Credit chama wallet
-      await tx.chamaWallet.update({
+      await tx.chama_wallet.update({
         where: { chama_id: record.chama_id },
         data: { kr_balance: { increment: new Prisma.Decimal(totalOwed) } },
       });

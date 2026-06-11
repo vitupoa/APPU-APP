@@ -71,8 +71,8 @@ export class StoriesService {
           // Specific users logic:
           {
             privacy: StoryPrivacy.SPECIFIC_USERS,
-            creator: {
-              story_viewer_preferences: {
+            user: {
+              story_viewer_preference: {
                 some: { preferredViewerId: userId },
               },
             },
@@ -80,10 +80,10 @@ export class StoriesService {
         ],
       },
       include: {
-        creator: {
+        user: {
           select: { id: true, username: true, display_name: true, avatar_url: true },
         },
-        views: {
+        story_view: {
           where: { viewerId: userId },
           select: { id: true },
         },
@@ -96,7 +96,7 @@ export class StoriesService {
       const creatorId = story.creator_id;
       if (!acc[creatorId]) {
         acc[creatorId] = {
-          creator: story.creator,
+          creator: story.user,
           stories: [],
         };
       }
@@ -108,7 +108,7 @@ export class StoriesService {
         text: story.text,
         created_at: story.created_at,
         expires_at: story.expires_at,
-        isViewed: story.views.length > 0,
+        isViewed: story.story_view.length > 0,
       });
 
       return acc;
@@ -130,7 +130,7 @@ export class StoriesService {
         expires_at: { gt: now },
       },
       include: {
-        _count: { select: { views: true } },
+        _count: { select: { story_view: true } },
       },
       orderBy: { created_at: 'desc' },
     });
@@ -160,7 +160,7 @@ export class StoriesService {
   ) {
     const story = await prisma.story.findUnique({
       where: { id: storyId },
-      include: { creator: { select: { id: true, display_name: true } } },
+      include: { user: { select: { id: true, display_name: true } } },
     });
 
     if (!story) throw new Error('Story not found');
@@ -189,7 +189,7 @@ export class StoriesService {
     return {
       success: true,
       tipResult,
-      creatorName: story.creator.display_name,
+      creatorName: story.user.display_name,
     };
   }
 
@@ -208,12 +208,12 @@ export class StoriesService {
    * Update preferred viewers for SPECIFIC_USERS privacy
    */
   static async setViewerPreferences(userId: string, preferredViewerIds: string[]) {
-    await prisma.story_viewerPreference.deleteMany({
+    await prisma.story_viewer_preference.deleteMany({
       where: { ownerId: userId },
     });
 
     if (preferredViewerIds.length > 0) {
-      await prisma.story_viewerPreference.createMany({
+      await prisma.story_viewer_preference.createMany({
         data: preferredViewerIds.map((id: any) => ({
           ownerId: userId,
           preferredViewerId: id,

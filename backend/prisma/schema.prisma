@@ -3208,6 +3208,19 @@ model user_suspensions {
   @@index([user_id])
 }
 
+model user_bookmarks {
+  id           String   @id
+  user_id      String
+  content_id   String
+  content_type String
+  created_at   DateTime @default(now())
+
+  @@unique([user_id, content_id, content_type])
+  @@index([user_id])
+  @@index([content_id, content_type])
+  @@index([created_at])
+}
+
 model vehicle_details {
   id                String            @id
   product_id        String            @unique
