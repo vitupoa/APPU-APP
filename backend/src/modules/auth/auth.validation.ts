@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  first_name: z.string().min(1, 'First name is required'),
-  last_name: z.string().min(1, 'Last name is required'),
+  first_name: z.string().trim().min(1, 'First name is required'),
+  last_name: z.string().trim().min(1, 'Last name is required'),
   username: z.string().min(3, 'Username must be at least 3 characters').regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
   phone: z.string().optional(),
   account_type: z.enum(['CREATOR', 'BUSINESS']).default('CREATOR'),
@@ -36,8 +36,8 @@ export const oauthSchema = z.object({
   account_type: z.enum(['CREATOR', 'BUSINESS']).optional(),
   // For OAuth, we'll suggest usernames if missing, but they can provide one
   username: z.string().min(3).regex(/^[a-z0-9_]+$/).optional(),
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
+  first_name: z.string().trim().optional(),
+  last_name: z.string().trim().optional(),
 });
 
 export const refreshTokenSchema = z.object({

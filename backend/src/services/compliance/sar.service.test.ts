@@ -21,6 +21,7 @@ describe('SAR Service', () => {
         country: 'US',
         currency: 'USD',
         password_hash: 'test_hash',
+        is_verified: false,
         updated_at: new Date()}} as any));
     testUserId = testUser.id;
   });

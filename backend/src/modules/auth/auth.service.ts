@@ -115,8 +115,12 @@ export class AuthService {
       throw new Error('Username already taken');
     }
 
+    if (!data.first_name || !data.last_name) {
+      throw new Error('First name and last name are required');
+    }
+
     const passwordHash = await bcrypt.hash(data.password, 12);
-    const displayName = `${data.first_name} ${data.last_name}`;
+    const displayName = `${data.first_name.trim()} ${data.last_name.trim()}`;
 
     const user = await prisma.user.create({
       data: {
@@ -130,6 +134,7 @@ export class AuthService {
         account_type: data.account_type,
         country: data.country,
         currency: data.currency,
+        is_verified: false,
         selectedNiches: data.selectedNiches || [],
         customNiches: data.customNiches || [],
         updated_at: new Date()
@@ -267,7 +272,7 @@ export class AuthService {
         }));
       }
 
-      const displayName = `${data.first_name} ${data.last_name}`;
+      const displayName = `${data.first_name.trim()} ${data.last_name.trim()}`;
       user = await prisma.user.create({
         data: {
           email: providerEmail, // The real verified email from Google/Apple
@@ -280,6 +285,7 @@ export class AuthService {
           account_type: data.account_type || 'CREATOR',
           country: data.country,
           currency: data.currency,
+          is_verified: false,
           updated_at: new Date()
           // passwordHash is optional
         }
