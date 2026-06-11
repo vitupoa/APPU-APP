@@ -208,8 +208,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 CircularProgressIndicator(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .padding(bottom = 16.dp)
+                        .padding(bottom = 130.dp)
                         .size(24.dp),
                     color = Color.White,
                     strokeWidth = 2.dp
@@ -297,8 +296,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     isActive = isActive,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .padding(start = 16.dp, end = 80.dp, bottom = 110.dp)
+                        .padding(start = 16.dp, end = 80.dp, bottom = 180.dp)
                 )
             }
 
@@ -312,8 +310,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                             colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f))
                         )
                     )
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(start = 16.dp, end = 80.dp, top = 60.dp, bottom = 24.dp)
+                    .padding(start = 16.dp, end = 80.dp, top = 60.dp, bottom = 135.dp)
             ) {
                 if (isSponsored) {
                     SponsoredBadge(modifier = Modifier.padding(bottom = 8.dp))
@@ -343,10 +340,9 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(end = 12.dp, bottom = 80.dp),
+                    .padding(end = 12.dp, bottom = 150.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 // Profile + Plus (Admire)
                 if (!isOwnContent) {
@@ -597,11 +593,11 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     progress = { (currentPosition.toFloat() / duration.toFloat()).coerceIn(0f, 1f) },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(bottom = 78.dp)
                         .fillMaxWidth()
-                        .height(2.dp),
+                        .height(3.dp),
                     color = Color.White,
-                    trackColor = Color.White.copy(alpha = 0.3f)
+                    trackColor = Color.White.copy(alpha = 0.25f)
                 )
             }
         }

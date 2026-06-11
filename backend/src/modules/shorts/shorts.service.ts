@@ -11,83 +11,82 @@ export class ShortsService {
   /**
    * Get shorts feed based on type
    * 
-   * DISCOVER TAB (For You):
-   * - Shows shorts from users you are NOT admiring
-   * - Excludes mutual lovers
-   * - Excludes your own shorts
-   * 
    * LOVERS TAB:
-   * - Shows shorts ONLY from mutual connections (both users admire each other)
+   * - Shows shorts from mutual connections (both users admire each other)
    * 
    * ADMIRING TAB (Following):
    * - Shows YOUR OWN shorts
-   * - Shows shorts from users YOU are admiring (non-mutual only)
+   * - Shows shorts from users YOU are admiring (excludes mutual lovers already shown in Lovers tab)
+   * 
+   * DISCOVER TAB (For You):
+   * - Shows shorts from everyone else (not in Lovers or Admiring tabs)
    */
   static async getFeed(type: string, cursor?: string, limit = 20, userId?: string) {
     let whereClause: any = {};
 
-    if (type === 'lovers' && userId) {
-      // Get mutual connections only (is_lovers = true)
-      const loversList = await prisma.admires.findMany({
-        where: {
-          OR: [
-            { admirer_id: userId, is_lovers: true },
-            { admired_id: userId, is_lovers: true }
-          ]
-        },
-        select: { admired_id: true, admirer_id: true }
-      });
-      const loversIds = loversList.map((a: { admirer_id: string; admired_id: string }) => 
-        a.admirer_id === userId ? a.admired_id : a.admirer_id
-      );
+    if (userId) {
+      if (type === 'lovers') {
+        // Get mutual lovers
+        const loversList = await prisma.admires.findMany({
+          where: {
+            OR: [
+              { admirer_id: userId, is_lovers: true },
+              { admired_id: userId, is_lovers: true }
+            ]
+          },
+          select: { admired_id: true, admirer_id: true }
+        });
+        const loversIds = loversList.map((a: { admirer_id: string; admired_id: string }) => 
+          a.admirer_id === userId ? a.admired_id : a.admirer_id
+        );
 
-      // Show only shorts from mutual lovers
-      whereClause.user_id = { in: loversIds };
-    } else if (type === 'admiring' && userId) {
-      // Get users you're admiring (including non-mutual)
-      const admiringList = await prisma.admires.findMany({
-        where: { admirer_id: userId }
-      });
-      
-      // Get mutual lovers to exclude from admiring feed
-      const loversList = await prisma.admires.findMany({
-        where: {
-          OR: [
-            { admirer_id: userId, is_lovers: true },
-            { admired_id: userId, is_lovers: true }
-          ]
-        },
-        select: { admired_id: true, admirer_id: true }
-      });
-      const loversIds = loversList.map((a: { admirer_id: string; admired_id: string }) => 
-        a.admirer_id === userId ? a.admired_id : a.admirer_id
-      );
-      
-      // Non-mutual admirers only
-      const nonMutualIds = admiringList
-        .map((a: { admired_id: string }) => a.admired_id)
-        .filter((id: string) => !loversIds.includes(id));
+        if (loversIds.length > 0) {
+          whereClause.user_id = { in: loversIds };
+        } else {
+          // No lovers, return empty by querying impossible condition
+          whereClause.id = 'impossible-id-no-lovers';
+        }
+      } else if (type === 'admiring') {
+        // Get all people you're admiring
+        const admiringList = await prisma.admires.findMany({
+          where: { admirer_id: userId },
+          select: { admired_id: true }
+        });
+        
+        // Get mutual lovers
+        const loversList = await prisma.admires.findMany({
+          where: {
+            OR: [
+              { admirer_id: userId, is_lovers: true },
+              { admired_id: userId, is_lovers: true }
+            ]
+          },
+          select: { admired_id: true, admirer_id: true }
+        });
+        const loversIds = loversList.map((a: { admirer_id: string; admired_id: string }) => 
+          a.admirer_id === userId ? a.admired_id : a.admirer_id
+        );
+        
+        // Non-mutual admirers (exclude lovers already shown in Lovers tab)
+        const nonMutualIds = admiringList
+          .map((a: { admired_id: string }) => a.admired_id)
+          .filter((id: string) => !loversIds.includes(id));
 
-      // Include own shorts + non-mutual admirers
-      whereClause.user_id = { in: [userId, ...nonMutualIds] };
-    } else if (type === 'discover' && userId) {
-      // Get all admiring connections (mutual and non-mutual)
-      const admiringList = await prisma.admires.findMany({
-        where: {
-          OR: [
-            { admirer_id: userId },
-            { admired_id: userId, is_lovers: true }
-          ]
-        },
-        select: { admired_id: true, admirer_id: true }
-      });
-      const admiringIds = admiringList.map((a: { admirer_id: string; admired_id: string }) => 
-        a.admirer_id === userId ? a.admired_id : a.admirer_id
-      );
+        // Own shorts + non-mutual admirers
+        whereClause.user_id = { in: [userId, ...nonMutualIds] };
+      } else if (type === 'discover') {
+        // Get all people you're admiring
+        const admiringList = await prisma.admires.findMany({
+          where: { admirer_id: userId },
+          select: { admired_id: true }
+        });
+        const admiringIds = admiringList.map((a: { admired_id: string }) => a.admired_id);
 
-      // Exclude all admiring users and self
-      whereClause.user_id = { notIn: [...admiringIds, userId] };
+        // Exclude own shorts and anyone you're admiring
+        whereClause.user_id = { notIn: [userId, ...admiringIds] };
+      }
     }
+    // If no userId, show all shorts (guest mode)
 
     const shorts = await prisma.shorts.findMany({
       where: whereClause,
