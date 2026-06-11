@@ -104,6 +104,7 @@ class EditProfileViewModel(
         val p = s.profile ?: return
         screenModelScope.launch {
             _state.value = s.copy(isSaving = true, error = null)
+            
             val result = repository.updateProfile(
                 firstName = if (s.firstName != p.firstName) s.firstName else null,
                 lastName = if (s.lastName != p.lastName) s.lastName else null,

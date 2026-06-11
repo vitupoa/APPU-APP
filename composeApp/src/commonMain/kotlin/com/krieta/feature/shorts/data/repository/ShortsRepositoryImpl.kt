@@ -215,7 +215,36 @@ class ShortsRepositoryImpl(
             commentsCount = commentsCount,
             views = views,
             isLiked = isLiked,
+            isBookmarked = isBookmarked,
             createdAt = createdAt
         )
+    }
+
+    override suspend fun toggleBookmark(shortId: String): NetworkResult<ToggleLikeResponse> {
+        val cachedShort = localDataSource.getCachedShortById(shortId)
+        if (cachedShort != null) {
+            val newState = !cachedShort.isBookmarked
+            localDataSource.updateShortBookmark(shortId, newState)
+        }
+        
+        return when (val result = safeApiCall {
+            val dto = api.toggleBookmark(shortId)
+            ToggleLikeResponse(dto.liked, dto.likesCount)
+        }) {
+            is NetworkResult.Success -> result
+            is NetworkResult.Error -> {
+                offlineQueue.queueAction(
+                    actionType = if (cachedShort?.isBookmarked == true) ActionType.UNLIKE else ActionType.LIKE,
+                    entityType = EntityType.SHORT,
+                    entityId = shortId,
+                    payload = mapOf("type" to "bookmark")
+                )
+                NetworkResult.Success(ToggleLikeResponse(
+                    liked = cachedShort?.isBookmarked?.not() ?: true,
+                    likesCount = null
+                ))
+            }
+            is NetworkResult.Loading -> result
+        }
     }
 }

@@ -1,15 +1,12 @@
 package com.krieta.feature.contests.presentation.screen
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.shape.CircleShape
-
 
 import org.jetbrains.compose.resources.painterResource
 import krieta.composeapp.generated.resources.Res
 import krieta.composeapp.generated.resources.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
@@ -38,15 +35,16 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.krieta.feature.ads.presentation.components.ContestSponsorBanner
 import com.krieta.com.core.location.UserCurrencyProvider
-import com.krieta.com.core.ui.components.TippingModal
 import com.krieta.com.core.ui.components.VideoPlayer
 import com.krieta.feature.comments.domain.model.ContentType
 import com.krieta.feature.comments.presentation.screen.CommentsScreen
 import com.krieta.feature.contests.domain.model.ContestSubmission
 import com.krieta.feature.contests.presentation.viewmodel.ContestSubmissionFeedViewModel
+import com.krieta.feature.profile.presentation.screen.ProfileScreen
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import kotlin.math.abs
+import kotlinx.coroutines.launch
 
 class ContestSubmissionFeedScreen : Screen {
     @Composable
@@ -56,10 +54,10 @@ class ContestSubmissionFeedScreen : Screen {
         val state by viewModel.state.collectAsState()
         val currencyProvider = koinInject<UserCurrencyProvider>()
         val tokenManager = koinInject<com.krieta.com.core.security.TokenManager>()
+        val scope = rememberCoroutineScope()
         
         var currentUserId by remember { mutableStateOf<String?>(null) }
         
-        // Get current user ID
         LaunchedEffect(Unit) {
             currentUserId = tokenManager.getUserId()
         }
@@ -72,7 +70,9 @@ class ContestSubmissionFeedScreen : Screen {
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)) {
             when {
                 state.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -101,12 +101,13 @@ class ContestSubmissionFeedScreen : Screen {
                         modifier = Modifier.fillMaxSize()
                     ) { page ->
                         val submission = state.submissions[page]
-                        val showSponsorBanner = page > 0 && page % 7 == 0 // Show sponsor every 7 submissions
+                        val showSponsorBanner = page > 0 && page % 7 == 0
                         
                         Box(modifier = Modifier.fillMaxSize()) {
                             SubmissionItem(
                                 submission = submission,
                                 isActive = page == pagerState.currentPage,
+                                onProfileClick = { navigator.push(ProfileScreen(submission.user.id)) },
                                 onUpvote = { viewModel.upvoteSubmission(submission.id) },
                                 onDownvote = { viewModel.downvoteSubmission(submission.id) },
                                 onComment = { 
@@ -114,12 +115,20 @@ class ContestSubmissionFeedScreen : Screen {
                                         navigator.push(CommentsScreen(ContentType.CONTEST_SUBMISSION, submission.id, userId))
                                     }
                                 },
-                                onShare = { /* Handle share */ },
+                                onBookmark = {
+                                    scope.launch {
+                                        println("Bookmark contest submission: ${submission.id}")
+                                    }
+                                },
+                                onShare = {
+                                    scope.launch {
+                                        println("Share contest submission: ${submission.id}")
+                                    }
+                                },
                                 onContestClick = { navigator.push(ContestDetailScreen(submission.contestId)) },
                                 currencyProvider = currencyProvider
                             )
                             
-                            // Sponsor banner overlay
                             if (showSponsorBanner) {
                                 Box(
                                     modifier = Modifier
@@ -143,9 +152,11 @@ class ContestSubmissionFeedScreen : Screen {
     private fun SubmissionItem(
         submission: ContestSubmission,
         isActive: Boolean,
+        onProfileClick: () -> Unit,
         onUpvote: () -> Unit,
         onDownvote: () -> Unit,
         onComment: () -> Unit,
+        onBookmark: () -> Unit,
         onShare: () -> Unit,
         onContestClick: () -> Unit,
         currencyProvider: UserCurrencyProvider
@@ -196,7 +207,6 @@ class ContestSubmissionFeedScreen : Screen {
                     seekToPosition = seekToPosition
                 )
                 
-                // Video progress bar — sits just above nav bar
                 com.krieta.com.core.ui.components.VideoProgressBar(
                     currentPosition = currentPosition,
                     duration = duration,
@@ -207,7 +217,6 @@ class ContestSubmissionFeedScreen : Screen {
                         .padding(bottom = 2.dp, start = 16.dp, end = 72.dp)
                 )
             } else {
-                // Photo — blurred background + sharp centred image
                 Box(modifier = Modifier.fillMaxSize()) {
                     AsyncImage(
                         model = submission.mediaUrl,
@@ -262,7 +271,7 @@ class ContestSubmissionFeedScreen : Screen {
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(top = 56.dp, start = 16.dp) // 56dp clears the HomeTabBar
+                    .padding(top = 60.dp, start = 16.dp)
             )
 
             // Bottom info
@@ -276,7 +285,7 @@ class ContestSubmissionFeedScreen : Screen {
                             colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
                         )
                     )
-                    .padding(start = 16.dp, end = 80.dp, bottom = 16.dp, top = 40.dp)
+                    .padding(start = 16.dp, end = 80.dp, bottom = 24.dp, top = 40.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AsyncImage(
@@ -302,31 +311,122 @@ class ContestSubmissionFeedScreen : Screen {
                 }
             }
 
-            // Right action buttons (NO TIP BUTTON for contests)
+            // ── RIGHT ACTION PANEL (Contests: Profile view, Upvote, Comment, Bookmark, Share) ──
             Column(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
+                    .align(Alignment.BottomEnd)
                     .windowInsetsPadding(WindowInsets.navigationBars)
                     .padding(end = 12.dp, bottom = 80.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Profile (view only, no admire for contests)
+                ProfileViewButton(
+                    avatarUrl = submission.user.avatarUrl,
+                    onClick = onProfileClick
+                )
+
+                // Upvote
                 ActionButton(
-                    icon = painterResource(Res.drawable.ic_thumb_up),
-                    count = submission.votes,
+                    icon = {
+                        Icon(
+                            painterResource(Res.drawable.ic_thumb_up),
+                            contentDescription = "Upvote",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    label = formatCount(submission.votes),
                     onClick = onUpvote
                 )
+
+                // Comment
                 ActionButton(
-                    icon = painterResource(Res.drawable.ic_comment),
-                    count = 0,
+                    icon = {
+                        Icon(
+                            painterResource(Res.drawable.ic_comment),
+                            contentDescription = "Comment",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    label = "Comment",
                     onClick = onComment
                 )
+
+                // Bookmark
                 ActionButton(
-                    icon = painterResource(Res.drawable.ic_share),
-                    count = 0,
+                    icon = {
+                        Icon(
+                            painterResource(Res.drawable.ic_bookmark_border),
+                            contentDescription = "Save",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    label = "Save",
+                    onClick = onBookmark
+                )
+
+                // Share
+                ActionButton(
+                    icon = {
+                        Icon(
+                            painterResource(Res.drawable.ic_share),
+                            contentDescription = "Share",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    label = "Share",
                     onClick = onShare
                 )
             }
+        }
+    }
+
+    @Composable
+    private fun ProfileViewButton(
+        avatarUrl: String?,
+        onClick: () -> Unit
+    ) {
+        AsyncImage(
+            model = avatarUrl,
+            contentDescription = "View Profile",
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .clickable(onClick = onClick)
+                .border(2.dp, Color.White, CircleShape),
+            contentScale = ContentScale.Crop
+        )
+    }
+
+    @Composable
+    private fun ActionButton(
+        icon: @Composable () -> Unit,
+        label: String,
+        onClick: () -> Unit
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clickable(
+                indication = null,
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                onClick = onClick
+            )
+        ) {
+            icon()
+            Spacer(Modifier.height(4.dp))
+            Text(label, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+        }
+    }
+
+    private fun formatCount(count: Int): String {
+        return when {
+            count >= 1_000_000 -> "${count / 1_000_000}M"
+            count >= 1_000 -> "${count / 1_000}K"
+            else -> count.toString()
         }
     }
 
@@ -383,43 +483,6 @@ class ContestSubmissionFeedScreen : Screen {
                         Text("Join", color = Color.Red, fontWeight = FontWeight.Bold)
                     }
                 }
-            }
-        }
-    }
-
-    @Composable
-    private fun ActionButton(
-        icon: androidx.compose.ui.graphics.painter.Painter,
-        count: Int?,
-        onClick: () -> Unit,
-        label: String? = null
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.width(56.dp)
-        ) {
-            IconButton(onClick = onClick) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-            if (count != null) {
-                Text(
-                    "$count",
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            } else if (label != null) {
-                Text(
-                    label,
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
             }
         }
     }

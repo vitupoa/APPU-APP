@@ -11,6 +11,7 @@ interface ShortsRepository {
     suspend fun getFeed(tab: String, cursor: String?): NetworkResult<ShortsFeedResult>
     suspend fun getShortById(shortId: String): NetworkResult<Short>
     suspend fun toggleLike(shortId: String): NetworkResult<ToggleLikeResponse>
+    suspend fun toggleBookmark(shortId: String): NetworkResult<ToggleLikeResponse>
     suspend fun getComments(shortId: String, cursor: String?): NetworkResult<List<ShortComment>>
     suspend fun addComment(shortId: String, text: String): NetworkResult<ShortComment>
     suspend fun incrementView(shortId: String)

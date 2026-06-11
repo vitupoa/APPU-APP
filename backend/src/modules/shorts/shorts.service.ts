@@ -4,6 +4,7 @@ import { emitLikeUpdate } from '../../shared/gateway/events.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { contentDistributionService } from '../recommendation/services/contentDistribution.service.js';
 import { ContentLockService } from '../contentLock/contentLock.service.js';
+import { BookmarkService } from '../bookmarks/bookmarks.service.js';
 import crypto from 'crypto';
 
 export class ShortsService {
@@ -154,10 +155,17 @@ export class ShortsService {
     );
     const accessMap = new Map(accessChecks.map(a => [a.id, a]));
 
+    // Check bookmark status
+    const bookmarkChecks = userId ? await Promise.all(
+      items.map(s => BookmarkService.isBookmarked(userId, s.id, 'SHORT'))
+    ) : [];
+    const bookmarkMap = new Map(items.map((s, i) => [s.id, bookmarkChecks[i] || false]));
+
     return {
       items: items.map((s: any) => {
         const access = accessMap.get(s.id) || { hasAccess: true, requiresSubscription: false, requiresUnlock: false };
         const isLocked = s.is_locked;
+        const isBookmarked = bookmarkMap.get(s.id) || false;
         
         return {
           id: s.id,
@@ -179,6 +187,7 @@ export class ShortsService {
           likesCount: s.likes_count,
           commentsCount: s.comments_count,
           isLiked: likedIds.has(s.id),
+          isBookmarked: isBookmarked,
           isLocked: isLocked,
           requiredTier: s.required_tier,
           unlockAmountKr: s.unlock_amount_kr ? Number(s.unlock_amount_kr) : undefined,

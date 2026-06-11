@@ -18,6 +18,7 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.border
 import androidx.compose.ui.draw.blur
 
 import androidx.compose.material3.*
@@ -51,6 +52,8 @@ import com.krieta.feature.wallet.presentation.viewmodel.WalletViewModel
 import com.krieta.feature.wallet.presentation.viewmodel.WalletState
 import com.krieta.feature.wallet.domain.repository.WalletRepository
 import com.krieta.feature.sponsored.presentation.SponsoredBadge
+import com.krieta.feature.profile.domain.repository.ProfileRepository
+import com.krieta.feature.profile.presentation.screen.ProfileScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType
@@ -68,8 +71,10 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         val viewModel = koinScreenModel<ShortsViewModel>()
         val walletViewModel = koinScreenModel<WalletViewModel>()
         val walletRepository = koinInject<WalletRepository>()
+        val profileRepository = koinInject<ProfileRepository>()
         val currencyProvider = koinInject<UserCurrencyProvider>()
         val tokenManager = koinInject<com.krieta.com.core.security.TokenManager>()
+        val shareManager = koinInject<com.krieta.com.core.util.ShareManager>()
         val scope = rememberCoroutineScope()
 
         val state by viewModel.state.collectAsState()
@@ -119,7 +124,6 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             }
         }
 
-        // True full screen — fills from status bar top to physical bottom edge
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -153,6 +157,13 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                             isTipModalOpen = showTippingFor != null,
                             isSponsored = isSponsored,
                             isOwnContent = currentUserId == short.creator.id,
+                            onProfileClick = { navigator.push(ProfileScreen(short.creator.id)) },
+                            onAdmire = {
+                                scope.launch {
+                                    profileRepository.admire(short.creator.id)
+                                    // TODO: Update UI state to reflect admire status
+                                }
+                            },
                             onLike = {
                                 viewModel.toggleLike(short.id)
                                 if (isSponsored) viewModel.recordSponsoredEngagement(page, "like")
@@ -164,6 +175,18 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                                 if (isSponsored) viewModel.recordSponsoredEngagement(page, "comment")
                             },
                             onTip = { showTippingFor = short },
+                            onBookmark = {
+                                viewModel.toggleBookmark(short.id)
+                            },
+                            onShare = {
+                                scope.launch {
+                                    viewModel.trackShare(short.id)
+                                    shareManager.share(
+                                        text = "Check out this short by @${short.creator.username}: ${short.caption}",
+                                        url = "https://krieta.com/shorts/${short.id}"
+                                    )
+                                }
+                            },
                             onWatchTimeUpdate = { watchTime ->
                                 if (isSponsored && watchTime >= 3) viewModel.recordSponsoredView(page, watchTime)
                             },
@@ -185,7 +208,6 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 CircularProgressIndicator(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        // sits above nav bar
                         .windowInsetsPadding(WindowInsets.navigationBars)
                         .padding(bottom = 16.dp)
                         .size(24.dp),
@@ -223,14 +245,17 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         isTipModalOpen: Boolean,
         isSponsored: Boolean = false,
         isOwnContent: Boolean = false,
+        onProfileClick: () -> Unit,
+        onAdmire: () -> Unit,
         onLike: () -> Unit,
         onComment: () -> Unit,
         onTip: () -> Unit,
+        onBookmark: () -> Unit,
+        onShare: () -> Unit,
         onWatchTimeUpdate: (Int) -> Unit = {},
         onViewTracked: (Long, Long) -> Unit = { _, _ -> }
     ) {
-        // Each pager page is already full-screen sized by the VerticalPager
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Box(modifier = Modifier.fillMaxSize()) {
 
             // ── MEDIA LAYER ──────────────────────────────────────────────────
             if (short.mediaType == "PHOTO" || short.mediaType == "IMAGE") {
@@ -239,7 +264,6 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     aspectRatio = short.aspectRatio
                 )
             } else {
-                // VIDEO — with blurred background for non-9:16 aspect ratios
                 ImmersiveVideoLayer(
                     short = short,
                     isActive = isActive,
@@ -247,11 +271,6 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     onWatchTimeUpdate = onWatchTimeUpdate,
                     onViewTracked = onViewTracked
                 )
-            }
-
-            // ── TAP TO PLAY/PAUSE (video only) ───────────────────────────────
-            if (short.mediaType != "PHOTO" && short.mediaType != "IMAGE") {
-                TapToToggleOverlay()
             }
 
             // ── LOCKED OVERLAY ───────────────────────────────────────────────
@@ -284,103 +303,209 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             }
 
             // ── BOTTOM GRADIENT + TEXT ───────────────────────────────────────
-            // Gradient scrim so text is always readable over any content
-            Box(
+            Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.navigationBars) // clears nav bar
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.75f)),
-                            startY = 0f,
-                            endY = Float.POSITIVE_INFINITY
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f))
                         )
                     )
-                    .padding(start = 16.dp, end = 80.dp, top = 48.dp, bottom = 16.dp)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(start = 16.dp, end = 80.dp, top = 60.dp, bottom = 24.dp)
             ) {
-                Column {
-                    if (isSponsored) {
-                        SponsoredBadge(modifier = Modifier.padding(bottom = 8.dp))
-                    }
-                    Text(
-                        "@${short.creator.username}",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    com.krieta.com.core.ui.components.HashtagMentionText(
-                        text = short.caption,
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        maxLines = 3,
-                        onHashtagClick = {},
-                        onMentionClick = {}
-                    )
-                    short.musicTrack?.let {
-                        Spacer(Modifier.height(6.dp))
-                        Text("🎵 $it", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-                    }
+                if (isSponsored) {
+                    SponsoredBadge(modifier = Modifier.padding(bottom = 8.dp))
+                }
+                Text(
+                    "@${short.creator.username}",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
+                Spacer(Modifier.height(4.dp))
+                com.krieta.com.core.ui.components.HashtagMentionText(
+                    text = short.caption,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    maxLines = 3,
+                    onHashtagClick = {},
+                    onMentionClick = {}
+                )
+                short.musicTrack?.let {
+                    Spacer(Modifier.height(6.dp))
+                    Text("🎵 $it", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
                 }
             }
 
-            // ── RIGHT ACTION BUTTONS ─────────────────────────────────────────
+            // ── RIGHT ACTION PANEL ───────────────────────────────────────────
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .windowInsetsPadding(WindowInsets.navigationBars) // clears nav bar
-                    .padding(end = 12.dp, bottom = 24.dp),
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(end = 12.dp, bottom = 80.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Like
-                ActionColumn(
+                // Profile + Plus (Admire)
+                if (!isOwnContent) {
+                    ProfileActionButton(
+                        avatarUrl = short.creator.avatarUrl,
+                        onProfileClick = onProfileClick,
+                        onAdmireClick = onAdmire
+                    )
+                }
+
+                // Heart (Like)
+                ActionButton(
                     icon = {
                         Icon(
                             painter = if (short.isLiked) painterResource(Res.drawable.ic_favorite)
                                       else painterResource(Res.drawable.ic_favorite_border),
                             contentDescription = "Like",
                             tint = if (short.isLiked) Color.Red else Color.White,
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(32.dp)
                         )
                     },
-                    label = "${short.likesCount}",
+                    label = formatCount(short.likesCount),
                     onClick = onLike
                 )
+
                 // Comment
-                ActionColumn(
+                ActionButton(
                     icon = {
                         Icon(
                             painterResource(Res.drawable.ic_comment),
                             contentDescription = "Comment",
                             tint = Color.White,
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(32.dp)
                         )
                     },
-                    label = "${short.commentsCount}",
+                    label = formatCount(short.commentsCount),
                     onClick = onComment
                 )
-                // Tip
+
+                // Tip (only if not locked and not own content)
                 if (!short.isLocked && !isOwnContent) {
-                    ActionColumn(
+                    ActionButton(
                         icon = {
                             Icon(
                                 painterResource(Res.drawable.ic_send),
                                 contentDescription = "Tip",
                                 tint = Color.White,
-                                modifier = Modifier.size(30.dp)
+                                modifier = Modifier.size(32.dp)
                             )
                         },
                         label = "Tip",
                         onClick = onTip
                     )
                 }
+
+                // Bookmark
+                ActionButton(
+                    icon = {
+                        Icon(
+                            painter = if (short.isBookmarked) painterResource(Res.drawable.ic_bookmark)
+                                      else painterResource(Res.drawable.ic_bookmark_border),
+                            contentDescription = "Save",
+                            tint = if (short.isBookmarked) Color(0xFFFFD700) else Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    label = "Save",
+                    onClick = onBookmark
+                )
+
+                // Share
+                ActionButton(
+                    icon = {
+                        Icon(
+                            painterResource(Res.drawable.ic_share),
+                            contentDescription = "Share",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    label = "Share",
+                    onClick = onShare
+                )
             }
         }
     }
 
-    // ── IMMERSIVE VIDEO: blurred background + centred video ──────────────────
+    @Composable
+    private fun ProfileActionButton(
+        avatarUrl: String?,
+        onProfileClick: () -> Unit,
+        onAdmireClick: () -> Unit
+    ) {
+        Box(
+            modifier = Modifier
+                .size(56.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            // Profile picture
+            AsyncImage(
+                model = avatarUrl,
+                contentDescription = "Creator",
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .clickable(onClick = onProfileClick)
+                    .border(2.dp, Color.White, CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            // Plus button overlay at bottom
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .align(Alignment.BottomCenter)
+                    .offset(y = 4.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF3B5C))
+                    .clickable(onClick = onAdmireClick),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "+",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun ActionButton(
+        icon: @Composable () -> Unit,
+        label: String,
+        onClick: () -> Unit
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clickable(
+                indication = null,
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                onClick = onClick
+            )
+        ) {
+            icon()
+            Spacer(Modifier.height(4.dp))
+            Text(label, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+        }
+    }
+
+    private fun formatCount(count: Int): String {
+        return when {
+            count >= 1_000_000 -> "${count / 1_000_000}M"
+            count >= 1_000 -> "${count / 1_000}K"
+            else -> count.toString()
+        }
+    }
+
     @Composable
     private fun ImmersiveVideoLayer(
         short: Short,
@@ -415,24 +540,19 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             if (showPlayPauseIcon) { delay(1500); showPlayPauseIcon = false }
         }
 
-        // Determine whether this is a non-9:16 video (landscape / square)
-        // aspectRatio > 1 means wider than tall → landscape (16:9 style)
         val isLandscape = (short.aspectRatio ?: 0f) > 1.1f
 
         Box(modifier = Modifier.fillMaxSize()) {
             if (isLandscape) {
-                // Blurred background thumbnail fill
                 AsyncImage(
                     model = short.thumbnailUrl ?: short.videoUrl,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize().blur(24.dp),
                     contentScale = ContentScale.Crop
                 )
-                // Dark overlay on blur
                 Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)))
             }
 
-            // Main video — fillMaxSize for 9:16, natural 16:9 centred for landscape
             VideoPlayer(
                 url = short.videoUrl,
                 isPlaying = isPlaying,
@@ -445,7 +565,6 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 seekToPosition = seekToPosition
             )
 
-            // Tap overlay (play/pause icon)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -473,7 +592,6 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 }
             }
 
-            // Progress bar just above nav bar
             if (duration > 0) {
                 LinearProgressIndicator(
                     progress = { (currentPosition.toFloat() / duration.toFloat()).coerceIn(0f, 1f) },
@@ -489,13 +607,11 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         }
     }
 
-    // ── IMMERSIVE PHOTO: blurred background + sharp centred image ────────────
     @Composable
     private fun ImmersivePhotoLayer(url: String, aspectRatio: Float?) {
-        val isLandscapeOrSquare = (aspectRatio ?: 0f) >= 0.95f // not portrait
+        val isLandscapeOrSquare = (aspectRatio ?: 0f) >= 0.95f
 
         Box(modifier = Modifier.fillMaxSize()) {
-            // Blurred background for any photo that doesn't fill 9:16
             if (isLandscapeOrSquare) {
                 AsyncImage(
                     model = url,
@@ -506,7 +622,6 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.35f)))
             }
 
-            // Sharp photo — fill for portrait, centred with natural ratio for others
             AsyncImage(
                 model = url,
                 contentDescription = null,
@@ -516,31 +631,6 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     Modifier.fillMaxSize(),
                 contentScale = if (isLandscapeOrSquare) ContentScale.Fit else ContentScale.Crop
             )
-        }
-    }
-
-    @Composable
-    private fun TapToToggleOverlay() {
-        // Intentionally empty — tap handled inside ImmersiveVideoLayer
-    }
-
-    @Composable
-    private fun ActionColumn(
-        icon: @Composable () -> Unit,
-        label: String,
-        onClick: () -> Unit
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.clickable(
-                indication = null,
-                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                onClick = onClick
-            )
-        ) {
-            icon()
-            Spacer(Modifier.height(4.dp))
-            Text(label, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 

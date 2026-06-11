@@ -21,29 +21,15 @@ class ProfileRepositoryImpl(
     override val profileUpdates: SharedFlow<UserProfile> = _profileUpdates.asSharedFlow()
 
     override suspend fun getMyProfile(): NetworkResult<UserProfile> {
-        // Try to load from cache first
         val cachedProfile = localDataSource.getCachedMyProfile()
         
-        // Make network call
         return when (val result = safeApiCall { api.getMyProfile() }) {
             is NetworkResult.Success -> {
-                try {
-                    val profile = result.data.toDomain()
-                    // Cache the fresh data
-                    localDataSource.cacheProfile(profile)
-                    NetworkResult.Success(profile)
-                } catch (e: Exception) {
-                    println("❌ ProfileRepositoryImpl: Failed to map profile data - ${e.message}")
-                    // Return cached data if mapping fails
-                    if (cachedProfile != null) {
-                        NetworkResult.Success(cachedProfile)
-                    } else {
-                        NetworkResult.Error(message = "Invalid profile data received from server")
-                    }
-                }
+                val profile = result.data.toDomain()
+                localDataSource.cacheProfile(profile)
+                NetworkResult.Success(profile)
             }
             is NetworkResult.Error -> {
-                // Return cached data if network fails
                 if (cachedProfile != null) {
                     println("✅ ProfileRepositoryImpl: Using cached profile (offline mode)")
                     NetworkResult.Success(cachedProfile)
@@ -56,29 +42,15 @@ class ProfileRepositoryImpl(
     }
 
     override suspend fun getProfile(userId: String): NetworkResult<UserProfile> {
-        // Try to load from cache first
         val cachedProfile = localDataSource.getCachedProfile(userId)
         
-        // Make network call
         return when (val result = safeApiCall { api.getProfile(userId) }) {
             is NetworkResult.Success -> {
-                try {
-                    val profile = result.data.toDomain()
-                    // Cache the fresh data
-                    localDataSource.cacheProfile(profile)
-                    NetworkResult.Success(profile)
-                } catch (e: Exception) {
-                    println("❌ ProfileRepositoryImpl: Failed to map profile data - ${e.message}")
-                    // Return cached data if mapping fails
-                    if (cachedProfile != null) {
-                        NetworkResult.Success(cachedProfile)
-                    } else {
-                        NetworkResult.Error(message = "Invalid profile data received from server")
-                    }
-                }
+                val profile = result.data.toDomain()
+                localDataSource.cacheProfile(profile)
+                NetworkResult.Success(profile)
             }
             is NetworkResult.Error -> {
-                // Return cached data if network fails
                 if (cachedProfile != null) {
                     println("✅ ProfileRepositoryImpl: Using cached profile (offline mode)")
                     NetworkResult.Success(cachedProfile)
@@ -153,17 +125,12 @@ class ProfileRepositoryImpl(
     // ─── MAPPERS ──────────────────────────────────
 
     private fun UserProfileDto.toDomain(): UserProfile {
-        // Validate required fields - throw exception if missing so it can be caught and handled properly
-        requireNotNull(id) { "Profile ID is required" }
-        requireNotNull(username) { "Username is required" }
-        requireNotNull(displayName) { "Display name is required" }
-        
         return UserProfile(
-            id = id,
-            username = username,
+            id = id ?: "",
+            username = username ?: "user",
             firstName = firstName ?: "",
             lastName = lastName ?: "",
-            displayName = displayName,
+            displayName = displayName ?: username ?: "User",
             avatarUrl = avatarUrl,
             coverPhotoUrl = coverPhotoUrl,
             bio = bio,

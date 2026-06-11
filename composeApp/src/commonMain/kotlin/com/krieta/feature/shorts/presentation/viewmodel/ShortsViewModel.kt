@@ -163,7 +163,6 @@ class ShortsViewModel(
                     val isLiked = response.liked
                     val updatedItems = _state.value.items.map { short ->
                         if (short.id == shortId) {
-                            // Use likesCount from server if available, otherwise calculate locally
                             val newCount = response.likesCount ?: if (isLiked) short.likesCount + 1 else short.likesCount - 1
                             short.copy(
                                 isLiked = isLiked,
@@ -173,10 +172,24 @@ class ShortsViewModel(
                     }
                     _state.value = _state.value.copy(items = updatedItems)
                     
-                    // Track interaction for recommendation system
                     if (_state.value.activeTab == ShortsTab.DISCOVER || _state.value.activeTab == ShortsTab.ADMIRING) {
                         trackInteraction(shortId, if (isLiked) "LIKE" else "UNLIKE")
                     }
+                }
+                else -> {}
+            }
+        }
+    }
+
+    fun toggleBookmark(shortId: String) {
+        screenModelScope.launch {
+            when (val result = shortsRepository.toggleBookmark(shortId)) {
+                is NetworkResult.Success -> {
+                    val isBookmarked = result.data.liked
+                    val updatedItems = _state.value.items.map { short ->
+                        if (short.id == shortId) short.copy(isBookmarked = isBookmarked) else short
+                    }
+                    _state.value = _state.value.copy(items = updatedItems)
                 }
                 else -> {}
             }

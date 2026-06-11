@@ -14,10 +14,14 @@ import {
   isTimestampValid,
   storeNonce
 } from '../services/financialSecurity';
+import bookmarkRoutes from '../modules/bookmarks/bookmarks.routes.js';
 import crypto from 'crypto';
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+// Register bookmark routes
+router.use('/bookmarks', bookmarkRoutes);
 
 // ============================================================================
 // AUTHENTICATION ENDPOINTS

@@ -42,6 +42,11 @@ export class UserService {
       }
     }
 
+    // Check if viewer has unwatched stories from this user
+    const hasUnwatchedStories = viewerId && viewerId !== userId
+      ? await this.checkUnwatchedStories(viewerId, userId)
+      : false;
+
     // SECURITY: Only return sensitive data for own profile
     const baseProfile = {
       id: user.id,
@@ -71,6 +76,7 @@ export class UserService {
         contestsWon: user._count.contest_winners
       },
       relationshipStatus,
+      hasUnwatchedStories,
       createdAt: user.created_at.toISOString()
     };
 
@@ -84,6 +90,30 @@ export class UserService {
     }
 
     return baseProfile;
+  }
+
+  /**
+   * Check if viewer has unwatched stories from creator
+   */
+  private static async checkUnwatchedStories(viewerId: string, creatorId: string): Promise<boolean> {
+    const stories = await prisma.story.findMany({
+      where: {
+        creator_id: creatorId,
+        expires_at: { gt: new Date() }
+      },
+      select: { id: true }
+    });
+
+    if (stories.length === 0) return false;
+
+    const viewedStories = await prisma.story_view.count({
+      where: {
+        viewerId: viewerId,
+        storyId: { in: stories.map(s => s.id) }
+      }
+    });
+
+    return viewedStories < stories.length;
   }
 
   /**

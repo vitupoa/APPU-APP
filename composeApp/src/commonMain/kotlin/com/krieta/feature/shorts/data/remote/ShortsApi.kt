@@ -65,4 +65,10 @@ class ShortsApi(private val httpClient: HttpClient) {
     suspend fun getCollections(userId: String): List<ShortCollectionDto> {
         return httpClient.get("${ApiConstants.SHORTS_COLLECTIONS}/$userId").body()
     }
+
+    suspend fun toggleBookmark(shortId: String): ToggleLikeResponseDto {
+        return httpClient.post("${ApiConstants.BASE_URL}/bookmarks/toggle") {
+            setBody(mapOf("contentType" to "SHORT", "contentId" to shortId))
+        }.body()
+    }
 }

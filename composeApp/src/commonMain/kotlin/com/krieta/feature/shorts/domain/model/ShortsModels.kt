@@ -35,6 +35,7 @@ data class Short(
     val commentsCount: Int,
     val views: Int,
     val isLiked: Boolean,
+    val isBookmarked: Boolean = false,
     val createdAt: String
 )
 

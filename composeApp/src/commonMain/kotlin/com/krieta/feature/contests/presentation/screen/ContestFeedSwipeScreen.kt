@@ -28,6 +28,18 @@ import com.krieta.feature.contests.domain.model.Contest
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedState
 import com.krieta.feature.contests.presentation.viewmodel.ContestFeedViewModel
 import com.krieta.feature.contests.domain.model.ContestStatus
+import com.krieta.feature.profile.presentation.screen.ProfileScreen
+import com.krieta.feature.profile.domain.repository.ProfileRepository
+import org.koin.compose.koinInject
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
+import androidx.compose.foundation.border
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 
 class ContestFeedSwipeScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +47,16 @@ class ContestFeedSwipeScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinScreenModel<ContestFeedViewModel>()
+        val profileRepository = koinInject<ProfileRepository>()
+        val tokenManager = koinInject<com.krieta.com.core.security.TokenManager>()
         val state by viewModel.state.collectAsState()
+        val scope = rememberCoroutineScope()
+        
+        var currentUserId by remember { mutableStateOf<String?>(null) }
+        
+        LaunchedEffect(Unit) {
+            currentUserId = tokenManager.getUserId()
+        }
 
         when (val currentState = state) {
             is ContestFeedState.Loading -> {
@@ -68,6 +89,13 @@ class ContestFeedSwipeScreen : Screen {
                     SwipeableContestCard(
                         contest = contest,
                         isActive = isActivated,
+                        isOwnContent = currentUserId == contest.creator.id,
+                        onProfileClick = { navigator.push(ProfileScreen(contest.creator.id)) },
+                        onAdmire = {
+                            scope.launch {
+                                profileRepository.admire(contest.creator.id)
+                            }
+                        },
                         onVote = { isUpvote ->
                             if (isUpvote) {
                                 println("Triggering Tinder YES Vote Gamification for ${contest.title}")
@@ -78,7 +106,8 @@ class ContestFeedSwipeScreen : Screen {
                         },
                         onOpenDetail = {
                             navigator.push(ContestDetailScreen(contest.id))
-                        }
+                        },
+                        profileRepository = profileRepository
                     )
                 }
             }
@@ -94,8 +123,12 @@ class ContestFeedSwipeScreen : Screen {
     private fun SwipeableContestCard(
         contest: Contest,
         isActive: Boolean,
+        isOwnContent: Boolean,
+        onProfileClick: () -> Unit,
+        onAdmire: () -> Unit,
         onVote: (Boolean) -> Unit,
-        onOpenDetail: () -> Unit
+        onOpenDetail: () -> Unit,
+        profileRepository: ProfileRepository
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
@@ -160,6 +193,17 @@ class ContestFeedSwipeScreen : Screen {
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                     // Profile Picture + Plus Button (Admire)
+                     if (!isOwnContent) {
+                         ProfileActionButtonWithStories(
+                             creatorId = contest.creator.id,
+                             avatarUrl = contest.creator.avatarUrl,
+                             onProfileClick = onProfileClick,
+                             onAdmireClick = onAdmire,
+                             profileRepository = profileRepository
+                         )
+                     }
+                     
                      Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.bounceClick{}) {
                          // Upvote Icon representation ONLY showing Upvotes organically!
                          Surface(shape = RoundedCornerShape(20.dp), color = Color.White.copy(alpha = 0.2f), modifier = Modifier.size(56.dp)) {}
@@ -174,6 +218,122 @@ class ContestFeedSwipeScreen : Screen {
                      }
                 }
              }
+        }
+    }
+    
+    @Composable
+    private fun ProfileActionButton(
+        avatarUrl: String?,
+        onProfileClick: () -> Unit,
+        onAdmireClick: () -> Unit
+    ) {
+        Box(
+            modifier = Modifier
+                .size(56.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = avatarUrl,
+                contentDescription = "Creator",
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .clickable(onClick = onProfileClick)
+                    .border(2.dp, Color.White, CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .align(Alignment.BottomCenter)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF3B5C))
+                    .clickable(onClick = onAdmireClick),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "+",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+    
+    @Composable
+    private fun ProfileActionButtonWithStories(
+        creatorId: String,
+        avatarUrl: String?,
+        onProfileClick: () -> Unit,
+        onAdmireClick: () -> Unit,
+        profileRepository: ProfileRepository
+    ) {
+        var hasUnwatchedStories by remember { mutableStateOf(false) }
+        
+        LaunchedEffect(creatorId) {
+            try {
+                val result = profileRepository.getProfile(creatorId)
+                if (result is com.krieta.com.core.network.NetworkResult.Success) {
+                    hasUnwatchedStories = result.data.hasUnwatchedStories
+                }
+            } catch (e: Exception) {
+                // Silent fail
+            }
+        }
+        
+        val borderBrush = when {
+            hasUnwatchedStories -> Brush.sweepGradient(
+                colors = listOf(
+                    Color(0xFFFFCC00),
+                    Color(0xFFFF6B00),
+                    Color(0xFFFFCC00)
+                )
+            )
+            else -> SolidColor(Color.LightGray)
+        }
+        
+        Box(
+            modifier = Modifier
+                .size(56.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            // Story ring
+            Box(
+                modifier = Modifier
+                    .size(52.dp)
+                    .border(2.dp, borderBrush, CircleShape)
+                    .padding(2.dp)
+            ) {
+                // Profile picture
+                AsyncImage(
+                    model = avatarUrl,
+                    contentDescription = "Creator",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .clickable(onClick = onProfileClick),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .align(Alignment.BottomCenter)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF3B5C))
+                    .clickable(onClick = onAdmireClick),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "+",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }

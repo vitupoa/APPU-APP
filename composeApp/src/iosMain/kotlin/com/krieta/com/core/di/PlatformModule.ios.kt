@@ -26,3 +26,7 @@ actual fun platformModule(): Module = module {
     single { DeviceSecurityChecker() }
     single { MediaCacheManager() }
 }
+
+actual fun getShareManager(): com.krieta.com.core.util.ShareManager {
+    return com.krieta.com.core.util.IosShareManager()
+}

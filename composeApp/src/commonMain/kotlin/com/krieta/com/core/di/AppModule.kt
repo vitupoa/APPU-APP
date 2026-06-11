@@ -31,6 +31,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 expect fun platformModule(): Module
+expect fun getShareManager(): com.krieta.com.core.util.ShareManager
 
 val coreModule = module {
     single<HttpClient> { KtorClientFactory.create(get<TokenManager>(), get<DeviceSecurity>(), get<SessionManager>()) }
@@ -39,6 +40,7 @@ val coreModule = module {
     single<com.krieta.com.core.upload.UploadApi> { com.krieta.com.core.upload.UploadApiImpl(get()) }
     single { SessionManager() }
     single { UserCurrencyProvider(get(), get()) }
+    single<com.krieta.com.core.util.ShareManager> { getShareManager() }
     
     // Offline support
     single { CoroutineScope(SupervisorJob()) }

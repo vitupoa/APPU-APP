@@ -30,7 +30,7 @@ class ShortLocalDataSource(private val database: KrietaDatabase) {
                 sharesCount = 0L,
                 viewsCount = short.views.toLong(),
                 isLiked = if (short.isLiked) 1L else 0L,
-                isBookmarked = 0L,
+                isBookmarked = if (short.isBookmarked) 1L else 0L,
                 createdAt = short.createdAt,
                 cachedAt = System.currentTimeMillis()
             )
@@ -83,6 +83,7 @@ class ShortLocalDataSource(private val database: KrietaDatabase) {
         commentsCount = entity.commentsCount.toInt(),
         views = entity.viewsCount.toInt(),
         isLiked = entity.isLiked != 0L,
+        isBookmarked = entity.isBookmarked != 0L,
         createdAt = entity.createdAt
     )
 }

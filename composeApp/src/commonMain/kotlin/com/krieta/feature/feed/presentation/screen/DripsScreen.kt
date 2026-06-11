@@ -60,6 +60,11 @@ import com.krieta.com.core.upload.UploadCompletionNotifier
 import com.krieta.com.core.upload.UploadType
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import com.krieta.feature.profile.presentation.screen.ProfileScreen
+import com.krieta.feature.profile.domain.repository.ProfileRepository
+import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 
 class DripsScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -69,6 +74,7 @@ class DripsScreen : Screen {
         val viewModel = koinScreenModel<FeedViewModel>()
         val walletViewModel = koinScreenModel<WalletViewModel>()
         val walletRepository = koinInject<WalletRepository>()
+        val profileRepository = koinInject<ProfileRepository>()
         val currencyProvider = koinInject<UserCurrencyProvider>()
         val tokenManager = koinInject<com.krieta.com.core.security.TokenManager>()
         val scope = rememberCoroutineScope()
@@ -203,12 +209,19 @@ class DripsScreen : Screen {
                                         viewModel.recordSponsoredEngagement(index, "comment")
                                     },
                                     onTip = { showTippingFor = post },
+                                    onProfileClick = { navigator.push(ProfileScreen(post.creator.id)) },
+                                    onAdmire = {
+                                        scope.launch {
+                                            profileRepository.admire(post.creator.id)
+                                        }
+                                    },
                                     onImageClick = { images, imgIndex ->
                                         selectedImages = images
                                         selectedImageIndex = imgIndex
                                         showImageViewer = true
                                     },
-                                    currentUserId = currentUserId
+                                    currentUserId = currentUserId,
+                                    profileRepository = profileRepository
                                 )
                                 
                                 // Track sponsored impression
@@ -225,12 +238,19 @@ class DripsScreen : Screen {
                                         else pendingCommentPost = post
                                     },
                                     onTip = { showTippingFor = post },
+                                    onProfileClick = { navigator.push(ProfileScreen(post.creator.id)) },
+                                    onAdmire = {
+                                        scope.launch {
+                                            profileRepository.admire(post.creator.id)
+                                        }
+                                    },
                                     onImageClick = { images, imgIndex ->
                                         selectedImages = images
                                         selectedImageIndex = imgIndex
                                         showImageViewer = true
                                     },
-                                    currentUserId = currentUserId
+                                    currentUserId = currentUserId,
+                                    profileRepository = profileRepository
                                 )
                             }
                             HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
@@ -250,7 +270,17 @@ class DripsScreen : Screen {
     }
 
     @Composable
-    private fun PostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit, onImageClick: (List<String>, Int) -> Unit, currentUserId: String? = null) {
+    private fun PostCard(
+        post: Post, 
+        onLike: () -> Unit, 
+        onComment: () -> Unit, 
+        onTip: () -> Unit,
+        onProfileClick: () -> Unit,
+        onAdmire: () -> Unit,
+        onImageClick: (List<String>, Int) -> Unit, 
+        currentUserId: String? = null,
+        profileRepository: ProfileRepository
+    ) {
         val isOwnContent = currentUserId == post.creator.id
         
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -259,12 +289,27 @@ class DripsScreen : Screen {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    model = post.creator.avatarUrl,
-                    contentDescription = post.creator.displayName,
-                    modifier = Modifier.size(40.dp).clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+                // Profile Picture with Plus Button
+                if (!isOwnContent) {
+                    ProfileActionButtonWithStories(
+                        creatorId = post.creator.id,
+                        avatarUrl = post.creator.avatarUrl,
+                        onProfileClick = onProfileClick,
+                        onAdmireClick = onAdmire,
+                        profileRepository = profileRepository
+                    )
+                } else {
+                    // Just show profile picture without plus button for own content
+                    AsyncImage(
+                        model = post.creator.avatarUrl,
+                        contentDescription = post.creator.displayName,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .clickable(onClick = onProfileClick),
+                        contentScale = ContentScale.Crop
+                    )
+                }
                 Spacer(Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(post.creator.displayName, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
@@ -398,7 +443,17 @@ class DripsScreen : Screen {
     }
 
     @Composable
-    private fun SponsoredPostCard(post: Post, onLike: () -> Unit, onComment: () -> Unit, onTip: () -> Unit, onImageClick: (List<String>, Int) -> Unit, currentUserId: String? = null) {
+    private fun SponsoredPostCard(
+        post: Post, 
+        onLike: () -> Unit, 
+        onComment: () -> Unit, 
+        onTip: () -> Unit,
+        onProfileClick: () -> Unit,
+        onAdmire: () -> Unit,
+        onImageClick: (List<String>, Int) -> Unit, 
+        currentUserId: String? = null,
+        profileRepository: ProfileRepository
+    ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
@@ -413,7 +468,7 @@ class DripsScreen : Screen {
                 )
             }
             
-            PostCard(post, onLike, onComment, onTip, onImageClick, currentUserId)
+            PostCard(post, onLike, onComment, onTip, onProfileClick, onAdmire, onImageClick, currentUserId, profileRepository)
         }
     }
 
@@ -716,6 +771,122 @@ class DripsScreen : Screen {
                     ),
                 contentScale = ContentScale.Fit
             )
+        }
+    }
+    
+    @Composable
+    private fun ProfileActionButton(
+        avatarUrl: String?,
+        onProfileClick: () -> Unit,
+        onAdmireClick: () -> Unit
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = avatarUrl,
+                contentDescription = "Creator",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .clickable(onClick = onProfileClick)
+                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .align(Alignment.BottomCenter)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF3B5C))
+                    .clickable(onClick = onAdmireClick),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "+",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+    
+    @Composable
+    private fun ProfileActionButtonWithStories(
+        creatorId: String,
+        avatarUrl: String?,
+        onProfileClick: () -> Unit,
+        onAdmireClick: () -> Unit,
+        profileRepository: ProfileRepository
+    ) {
+        var hasUnwatchedStories by remember { mutableStateOf(false) }
+        
+        LaunchedEffect(creatorId) {
+            try {
+                val result = profileRepository.getProfile(creatorId)
+                if (result is com.krieta.com.core.network.NetworkResult.Success) {
+                    hasUnwatchedStories = result.data.hasUnwatchedStories
+                }
+            } catch (e: Exception) {
+                // Silent fail
+            }
+        }
+        
+        val borderBrush = when {
+            hasUnwatchedStories -> Brush.sweepGradient(
+                colors = listOf(
+                    Color(0xFFFFCC00),
+                    Color(0xFFFF6B00),
+                    Color(0xFFFFCC00)
+                )
+            )
+            else -> SolidColor(Color.LightGray)
+        }
+        
+        Box(
+            modifier = Modifier
+                .size(44.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            // Story ring
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .border(2.dp, borderBrush, CircleShape)
+                    .padding(2.dp)
+            ) {
+                // Profile picture
+                AsyncImage(
+                    model = avatarUrl,
+                    contentDescription = "Creator",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .clickable(onClick = onProfileClick),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .align(Alignment.BottomCenter)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF3B5C))
+                    .clickable(onClick = onAdmireClick),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "+",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }

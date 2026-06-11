@@ -41,3 +41,7 @@ actual fun platformModule(): Module = module {
     single { DeviceSecurityChecker(androidContext()) }
     single { MediaCacheManager(androidContext()) }
 }
+
+actual fun getShareManager(): com.krieta.com.core.util.ShareManager {
+    return com.krieta.com.core.util.AndroidShareManager(org.koin.core.context.GlobalContext.get().get())
+}
