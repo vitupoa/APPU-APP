@@ -3,6 +3,17 @@ import { io } from '../../shared/gateway/socket.js';
 import crypto from 'crypto';
 
 export class CommentsService {
+  private mapReplyToUser(user: any) {
+    if (!user) return null;
+    return {
+      id: user.id,
+      username: user.username,
+      displayName: user.display_name,
+      avatarUrl: user.avatar_url,
+      isVerified: user.is_verified
+    };
+  }
+
   async getComments(
     contentType: string,
     contentId: string,
@@ -86,7 +97,7 @@ export class CommentsService {
       },
       text: comment.text,
       parent_id: comment.parent_id,
-      replyToUser: comment.user_comments_reply_to_user_idTouser,
+      replyToUser: this.mapReplyToUser(comment.user_comments_reply_to_user_idTouser),
       likesCount: comment.likes_count,
       repliesCount: comment.replies_count,
       isLiked: likedCommentIds.has(comment.id),
@@ -175,7 +186,7 @@ export class CommentsService {
       },
       text: reply.text,
       parent_id: reply.parent_id,
-      replyToUser: reply.user_comments_reply_to_user_idTouser,
+      replyToUser: this.mapReplyToUser(reply.user_comments_reply_to_user_idTouser),
       likesCount: reply.likes_count,
       repliesCount: reply.replies_count,
       isLiked: likedReplyIds.has(reply.id),
@@ -296,7 +307,7 @@ export class CommentsService {
           },
           text: comment.text,
           parent_id: comment.parent_id,
-          replyToUser: comment.user_comments_reply_to_user_idTouser,
+          replyToUser: this.mapReplyToUser(comment.user_comments_reply_to_user_idTouser),
           likesCount: comment.likes_count,
           repliesCount: comment.replies_count,
           isLiked: false,
@@ -377,7 +388,7 @@ export class CommentsService {
         },
         text: updated.text,
         parent_id: updated.parent_id,
-        replyToUser: updated.user_comments_reply_to_user_idTouser,
+        replyToUser: this.mapReplyToUser(updated.user_comments_reply_to_user_idTouser),
         likesCount: updated.likes_count,
         repliesCount: updated.replies_count,
         isLiked: false,
@@ -743,7 +754,7 @@ export class CommentsService {
       },
       text: comment.text,
       parent_id: comment.parent_id,
-      replyToUser: comment.user_comments_reply_to_user_idTouser,
+      replyToUser: this.mapReplyToUser(comment.user_comments_reply_to_user_idTouser),
       likesCount: comment.likes_count,
       repliesCount: comment.replies_count,
       isLiked,

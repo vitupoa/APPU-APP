@@ -1,0 +1,17 @@
+// Helper to map replyToUser to camelCase
+const mapReplyToUser = (user: any) => {
+  if (!user) return null;
+  return {
+    id: user.id,
+    username: user.username,
+    displayName: user.display_name,
+    avatarUrl: user.avatar_url,
+    isVerified: user.is_verified
+  };
+};
+
+// Replace all instances of:
+// replyToUser: comment.user_comments_reply_to_user_idTouser,
+// 
+// With:
+// replyToUser: mapReplyToUser(comment.user_comments_reply_to_user_idTouser),
