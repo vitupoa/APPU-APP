@@ -262,7 +262,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     url = short.mediaUrls.firstOrNull() ?: short.thumbnailUrl ?: short.videoUrl,
                     aspectRatio = short.aspectRatio
                 )
-            } else {
+            } else if (short.videoUrl != null) {
                 ImmersiveVideoLayer(
                     short = short,
                     isActive = isActive,
