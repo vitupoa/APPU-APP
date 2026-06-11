@@ -19,6 +19,7 @@ import kotlinx.coroutines.isActive
 enum class ShortsTab(val label: String, val apiValue: String) {
     HOME("Home", "home"),
     DISCOVER("Discover", "discover"),
+    LOVERS("Lovers", "lovers"),
     ADMIRING("Admiring", "admiring")
 }
 
@@ -104,6 +105,7 @@ class ShortsViewModel(
     fun setFeedType(feedType: ShortsFeedType) {
         val tab = when (feedType) {
             ShortsFeedType.DISCOVER -> ShortsTab.DISCOVER
+            ShortsFeedType.LOVERS -> ShortsTab.LOVERS
             ShortsFeedType.ADMIRING -> ShortsTab.ADMIRING
         }
         selectTab(tab)

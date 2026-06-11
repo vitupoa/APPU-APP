@@ -10,39 +10,67 @@ export class ShortsService {
   /**
    * Get shorts feed based on type
    * 
-   * ADMIRING TAB (Following):
-   * - Shows shorts from users YOU are admiring (admirer_id = userId)
-   * - Shows shorts from mutual lovers (admired_id = userId AND is_lovers = true)
-   * - Shows YOUR OWN shorts
-   * 
    * DISCOVER TAB (For You):
    * - Shows shorts from users you are NOT admiring
    * - Excludes mutual lovers
    * - Excludes your own shorts
+   * 
+   * LOVERS TAB:
+   * - Shows shorts ONLY from mutual connections (both users admire each other)
+   * 
+   * ADMIRING TAB (Following):
+   * - Shows YOUR OWN shorts
+   * - Shows shorts from users YOU are admiring (non-mutual only)
    */
   static async getFeed(type: string, cursor?: string, limit = 20, userId?: string) {
     let whereClause: any = {};
 
-    if (type === 'admiring' && userId) {
-      // Get list of users the current user is admiring, or mutual lovers
-      const admiringList = await prisma.admires.findMany({
+    if (type === 'lovers' && userId) {
+      // Get mutual connections only (is_lovers = true)
+      const loversList = await prisma.admires.findMany({
         where: {
           OR: [
-            { admirer_id: userId },
+            { admirer_id: userId, is_lovers: true },
             { admired_id: userId, is_lovers: true }
           ]
         },
         select: { admired_id: true, admirer_id: true }
       });
-      const admiringIds = admiringList.map((a: { admirer_id: string; admired_id: string }) => a.admirer_id === userId ? a.admired_id : a.admirer_id);
+      const loversIds = loversList.map((a: { admirer_id: string; admired_id: string }) => 
+        a.admirer_id === userId ? a.admired_id : a.admirer_id
+      );
 
-      // Include the user's own shorts in the admiring feed
-      admiringIds.push(userId);
+      // Show only shorts from mutual lovers
+      whereClause.user_id = { in: loversIds };
+    } else if (type === 'admiring' && userId) {
+      // Get users you're admiring (including non-mutual)
+      const admiringList = await prisma.admires.findMany({
+        where: { admirer_id: userId }
+      });
+      
+      // Get mutual lovers to exclude from admiring feed
+      const loversList = await prisma.admires.findMany({
+        where: {
+          OR: [
+            { admirer_id: userId, is_lovers: true },
+            { admired_id: userId, is_lovers: true }
+          ]
+        },
+        select: { admired_id: true, admirer_id: true }
+      });
+      const loversIds = loversList.map((a: { admirer_id: string; admired_id: string }) => 
+        a.admirer_id === userId ? a.admired_id : a.admirer_id
+      );
+      
+      // Non-mutual admirers only
+      const nonMutualIds = admiringList
+        .map((a: { admired_id: string }) => a.admired_id)
+        .filter((id: string) => !loversIds.includes(id));
 
-      // Now admiringIds will always have at least the user's own ID
-      whereClause.user_id = { in: admiringIds };
+      // Include own shorts + non-mutual admirers
+      whereClause.user_id = { in: [userId, ...nonMutualIds] };
     } else if (type === 'discover' && userId) {
-      // Get list of users the current user is admiring, or mutual lovers
+      // Get all admiring connections (mutual and non-mutual)
       const admiringList = await prisma.admires.findMany({
         where: {
           OR: [
@@ -52,12 +80,12 @@ export class ShortsService {
         },
         select: { admired_id: true, admirer_id: true }
       });
-      const admiringIds = admiringList.map((a: { admirer_id: string; admired_id: string }) => a.admirer_id === userId ? a.admired_id : a.admirer_id);
+      const admiringIds = admiringList.map((a: { admirer_id: string; admired_id: string }) => 
+        a.admirer_id === userId ? a.admired_id : a.admirer_id
+      );
 
-      // Exclude admiring users and self
-      whereClause.user_id = {
-        notIn: [...admiringIds, userId]
-      };
+      // Exclude all admiring users and self
+      whereClause.user_id = { notIn: [...admiringIds, userId] };
     }
 
     const shorts = await prisma.shorts.findMany({

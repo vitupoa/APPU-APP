@@ -22,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -195,24 +196,33 @@ class ContestSubmissionFeedScreen : Screen {
                     seekToPosition = seekToPosition
                 )
                 
-                // Video progress bar
+                // Video progress bar — sits just above nav bar
                 com.krieta.com.core.ui.components.VideoProgressBar(
                     currentPosition = currentPosition,
                     duration = duration,
-                    onSeek = { position ->
-                        seekToPosition = position
-                    },
+                    onSeek = { position -> seekToPosition = position },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(bottom = 100.dp, start = 16.dp, end = 72.dp)
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(bottom = 2.dp, start = 16.dp, end = 72.dp)
                 )
             } else {
-                AsyncImage(
-                    model = submission.mediaUrl,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+                // Photo — blurred background + sharp centred image
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AsyncImage(
+                        model = submission.mediaUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize().blur(24.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.35f)))
+                    AsyncImage(
+                        model = submission.mediaUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
+                    )
+                }
             }
 
             // Swipe indicators

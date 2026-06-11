@@ -28,7 +28,8 @@ class HomeScreen : Screen {
                 when (selectedTab) {
                     0 -> com.krieta.feature.contests.presentation.screen.ContestSubmissionFeedScreen().Content()
                     1 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.DISCOVER).Content()
-                    2 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.ADMIRING).Content()
+                    2 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.LOVERS).Content()
+                    3 -> com.krieta.feature.shorts.presentation.screen.ShortsScreen(feedType = com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.ADMIRING).Content()
                 }
             }
 
@@ -56,7 +57,7 @@ class HomeScreen : Screen {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            listOf("Contests", "Discover", "Admiring").forEachIndexed { index, label ->
+            listOf("Contests", "Discover", "Lovers", "Admiring").forEachIndexed { index, label ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(horizontal = 16.dp)
@@ -78,7 +79,7 @@ class HomeScreen : Screen {
                         )
                     }
                 }
-                if (index < 2) {
+                if (index < 3) {
                     Box(
                         modifier = Modifier
                             .width(1.dp)

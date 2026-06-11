@@ -29,8 +29,8 @@ router.get('/', optionalAuth, async (req: AuthRequest, res: Response) => {
     const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
     
-    if (!['discover', 'admiring'].includes(type)) {
-      return res.status(400).json({ error: 'Invalid feed type. Must be "discover" or "admiring"' });
+    if (!['discover', 'lovers', 'admiring'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid feed type. Must be "discover", "lovers", or "admiring"' });
     }
 
     const result = await ShortsService.getFeed(type, cursor, limit, req.userId);
@@ -47,8 +47,8 @@ router.get('/feed', optionalAuth, async (req: AuthRequest, res: Response) => {
     const cursor = typeof req.query.cursor === 'string' ? req.query.cursor : undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
     
-    if (!['discover', 'admiring'].includes(type)) {
-      return res.status(400).json({ error: 'Invalid feed type. Must be "discover" or "admiring"' });
+    if (!['discover', 'lovers', 'admiring'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid feed type. Must be "discover", "lovers", or "admiring"' });
     }
 
     const result = await ShortsService.getFeed(type, cursor, limit, req.userId);
