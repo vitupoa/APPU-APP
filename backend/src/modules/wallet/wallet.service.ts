@@ -26,6 +26,7 @@ export class WalletService {
     if (!wallet) {
       wallet = await prisma.wallets.create({
         data: { 
+          id: crypto.randomUUID(),
           User: { connect: { id: userId } },
           updated_at: new Date()
         },
@@ -98,6 +99,7 @@ export class WalletService {
         const recipientWallet = await tx.wallets.upsert({
           where: { user_id: recipientId },
           create: { 
+            id: crypto.randomUUID(),
             User: {
               connect: { id: recipientId }
             },
@@ -671,6 +673,7 @@ export class WalletService {
         await tx.wallets.upsert({
           where: { user_id: userId },
           create: {
+            id: crypto.randomUUID(),
             User: {
               connect: { id: userId }
             },
