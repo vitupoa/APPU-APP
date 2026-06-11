@@ -24,6 +24,8 @@ export class ShortsService {
   static async getFeed(type: string, cursor?: string, limit = 20, userId?: string) {
     let whereClause: any = {};
 
+    console.log(`[SHORTS FEED] Type: ${type}, UserId: ${userId}`);
+
     if (userId) {
       if (type === 'lovers') {
         // Get mutual lovers
@@ -39,6 +41,8 @@ export class ShortsService {
         const loversIds = loversList.map((a: { admirer_id: string; admired_id: string }) => 
           a.admirer_id === userId ? a.admired_id : a.admirer_id
         );
+
+        console.log(`[LOVERS TAB] Found ${loversIds.length} lovers:`, loversIds);
 
         if (loversIds.length > 0) {
           whereClause.user_id = { in: loversIds };
@@ -68,12 +72,17 @@ export class ShortsService {
         );
         
         // Non-mutual admirers (exclude lovers already shown in Lovers tab)
-        const nonMutualIds = admiringList
-          .map((a: { admired_id: string }) => a.admired_id)
-          .filter((id: string) => !loversIds.includes(id));
+        const admiringIds = admiringList.map((a: { admired_id: string }) => a.admired_id);
+        const nonMutualIds = admiringIds.filter((id: string) => !loversIds.includes(id));
 
-        // Own shorts + non-mutual admirers
-        whereClause.user_id = { in: [userId, ...nonMutualIds] };
+        console.log(`[ADMIRING TAB] Admiring ${admiringIds.length} users, ${loversIds.length} are lovers, ${nonMutualIds.length} non-mutual`);
+        console.log(`[ADMIRING TAB] Including userId: ${userId} + nonMutual:`, nonMutualIds);
+
+        // Own shorts + non-mutual admirers (always include userId)
+        const includeIds = [userId, ...nonMutualIds];
+        whereClause.user_id = { in: includeIds };
+        
+        console.log(`[ADMIRING TAB] Final query - user_id IN:`, includeIds);
       } else if (type === 'discover') {
         // Get all people you're admiring
         const admiringList = await prisma.admires.findMany({
@@ -82,11 +91,15 @@ export class ShortsService {
         });
         const admiringIds = admiringList.map((a: { admired_id: string }) => a.admired_id);
 
+        console.log(`[DISCOVER TAB] Excluding userId + ${admiringIds.length} admired users`);
+
         // Exclude own shorts and anyone you're admiring
         whereClause.user_id = { notIn: [userId, ...admiringIds] };
       }
     }
     // If no userId, show all shorts (guest mode)
+
+    console.log(`[SHORTS FEED] Where clause:`, JSON.stringify(whereClause, null, 2));
 
     const shorts = await prisma.shorts.findMany({
       where: whereClause,
@@ -112,6 +125,8 @@ export class ShortsService {
         }
       }
     });
+
+    console.log(`[SHORTS FEED] Query returned ${shorts.length} shorts`);
 
     const hasMore = shorts.length > limit;
     const items = hasMore ? shorts.slice(0, limit) : shorts;
