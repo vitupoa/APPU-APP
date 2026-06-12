@@ -118,7 +118,7 @@ class MainScreen : Screen {
                                     Modifier.padding(innerPadding)
                             )
                     ) {
-                        key(if (currentTab == HomeTab) homeRefreshKey else 0) {
+                        key(currentTab.key, if (currentTab == HomeTab) homeRefreshKey else 0) {
                             CurrentTab()
                         }
                     }

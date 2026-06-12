@@ -65,11 +65,15 @@ class CommentsViewModel(
             )) {
                 is NetworkResult.Success -> {
                     val (comments, nextCursor) = result.data
+                    val builtTree = buildCommentTree(comments)
+                    // Auto-expand all comments that have replies
+                    val autoExpandIds = comments.filter { it.repliesCount > 0 }.map { it.id }.toSet()
                     _state.update {
                         it.copy(
-                            comments = buildCommentTree(comments),
+                            comments = builtTree,
                             nextCursor = nextCursor,
-                            isLoading = false
+                            isLoading = false,
+                            expandedComments = it.expandedComments + autoExpandIds
                         )
                     }
                 }
@@ -317,8 +321,26 @@ class CommentsViewModel(
     }
 
     private fun buildCommentTree(comments: List<Comment>): List<Comment> {
-        val topLevel = comments.filter { it.parentId == null }
-        return topLevel.sortedByDescending { it.isPinned }
+        val commentMap = comments.associateBy { it.id }
+        val topLevel = mutableListOf<Comment>()
+        val childrenMap = mutableMapOf<String, MutableList<Comment>>()
+        
+        // Group children by parent ID
+        comments.forEach { comment ->
+            if (comment.parentId == null) {
+                topLevel.add(comment)
+            } else {
+                childrenMap.getOrPut(comment.parentId) { mutableListOf() }.add(comment)
+            }
+        }
+        
+        // Recursively build tree
+        fun attachChildren(comment: Comment): Comment {
+            val children = childrenMap[comment.id]?.map { attachChildren(it) } ?: emptyList()
+            return comment.copy(replies = children)
+        }
+        
+        return topLevel.map { attachChildren(it) }.sortedByDescending { it.isPinned }
     }
 
     private fun createTempComment(text: String, parentId: String?, replyToUserId: String?): Comment {
