@@ -158,9 +158,22 @@ export class UserService {
     if (admirerId === admiredId) throw new Error('Cannot admire yourself');
 
     return prisma.$transaction(async (tx) => {
-      // Create the admire record
+      // Check if already admiring
+      const existing = await tx.admires.findUnique({
+        where: { admirer_id_admired_id: { admirer_id: admirerId, admired_id: admiredId } }
+      });
+      
+      if (existing) {
+        return { admired: true, isLovers: existing.is_lovers };
+      }
+
+      // Create the admire record with generated ID
       const admire = await tx.admires.create({
-        data: { admirer_id: admirerId, admired_id: admiredId }
+        data: { 
+          id: crypto.randomUUID(),
+          admirer_id: admirerId, 
+          admired_id: admiredId 
+        }
       });
 
       // Check if the other person already admires back → mutual = lovers
@@ -210,17 +223,28 @@ export class UserService {
       const admire = await tx.admires.findUnique({
         where: { admirer_id_admired_id: { admirer_id: admirerId, admired_id: admiredId } }
       });
-      if (!admire || !admire.is_lovers) throw new Error('Not lovers with this user');
+      if (!admire) throw new Error('Not admiring this user');
+      if (!admire.is_lovers) throw new Error('Not lovers with this user');
 
-      // Unloving means completely breaking the admire link from this side
-      await tx.admires.updateMany({
-        where: { admirer_id: admiredId, admired_id: admirerId },
+      // Unloving means setting is_lovers to false on both sides
+      await tx.admires.update({
+        where: { id: admire.id },
         data: { is_lovers: false }
       });
+      
+      // Update the reverse relationship if it exists
+      const reverse = await tx.admires.findUnique({
+        where: { admirer_id_admired_id: { admirer_id: admiredId, admired_id: admirerId } }
+      });
+      
+      if (reverse) {
+        await tx.admires.update({
+          where: { id: reverse.id },
+          data: { is_lovers: false }
+        });
+      }
 
-      await tx.admires.delete({ where: { id: admire.id } });
-
-      return { isLovers: false };
+      return { isLovers: false, admiring: true };
     });
   }
 

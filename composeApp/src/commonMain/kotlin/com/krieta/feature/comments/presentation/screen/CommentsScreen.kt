@@ -76,7 +76,9 @@ data class CommentsScreen(
         }
 
         Scaffold(
-            modifier = Modifier.imePadding(),
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding(),
             topBar = {
                 TopAppBar(
                     title = {
@@ -126,22 +128,27 @@ data class CommentsScreen(
                 )
             },
             bottomBar = {
-                CommentInputBar(
-                    text = state.commentText,
-                    onTextChange = viewModel::setCommentText,
-                    onSend = {
-                        if (state.editingComment != null) {
-                            viewModel.updateComment()
-                        } else {
-                            viewModel.postComment()
-                        }
-                    },
-                    replyingTo = state.replyingTo,
-                    editingComment = state.editingComment,
-                    onCancelReply = { viewModel.setReplyingTo(null) },
-                    onCancelEdit = { viewModel.setEditingComment(null) },
-                    enabled = state.settings?.commentsEnabled == true
-                )
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shadowElevation = 8.dp
+                ) {
+                    CommentInputBar(
+                        text = state.commentText,
+                        onTextChange = viewModel::setCommentText,
+                        onSend = {
+                            if (state.editingComment != null) {
+                                viewModel.updateComment()
+                            } else {
+                                viewModel.postComment()
+                            }
+                        },
+                        replyingTo = state.replyingTo,
+                        editingComment = state.editingComment,
+                        onCancelReply = { viewModel.setReplyingTo(null) },
+                        onCancelEdit = { viewModel.setEditingComment(null) },
+                        enabled = state.settings?.commentsEnabled == true
+                    )
+                }
             },
             containerColor = Color.Black
         ) { padding ->
@@ -528,10 +535,13 @@ private fun CommentInputBar(
     onCancelEdit: () -> Unit,
     enabled: Boolean
 ) {
+    val scope = rememberCoroutineScope()
+    
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFF1A1A1A))
+            .imePadding()
     ) {
         // Reply/Edit indicator
         replyingTo?.let { comment ->

@@ -570,6 +570,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     ) { isPlaying = !isPlaying; showPlayPauseIcon = true },
                 contentAlignment = Alignment.Center
             ) {
+                // Only show play/pause icon, don't block touches on UI elements
                 AnimatedVisibility(visible = showPlayPauseIcon, enter = fadeIn(), exit = fadeOut()) {
                     Box(
                         modifier = Modifier

@@ -33,7 +33,15 @@ class ProfileViewModel(
     private val _state = MutableStateFlow(ProfileState())
     val state: StateFlow<ProfileState> = _state.asStateFlow()
 
+    private val _navigationEvents = MutableSharedFlow<NavigationEvent>(extraBufferCapacity = 1)
+    val navigationEvents: SharedFlow<NavigationEvent> = _navigationEvents.asSharedFlow()
+
     val isOwnProfile: Boolean get() = userId == null
+
+    sealed class NavigationEvent {
+        data class OpenChat(val chatId: String) : NavigationEvent()
+        data class ShowError(val message: String) : NavigationEvent()
+    }
 
     companion object {
         // Cache profile data to prevent "Unknown User" on tab switch
@@ -85,6 +93,7 @@ class ProfileViewModel(
             _state.value = _state.value.copy(isRelationshipLoading = true)
             when (profile.relationshipStatus) {
                 RelationshipStatus.NONE, RelationshipStatus.ADMIRED_BY -> {
+                    // Admire the user
                     when (val result = repository.admire(profile.id)) {
                         is NetworkResult.Success -> {
                             val isLovers = result.data
@@ -97,15 +106,22 @@ class ProfileViewModel(
                             )
                         }
                         is NetworkResult.Loading -> {}
-                is NetworkResult.Error -> {
-                            _state.value = _state.value.copy(isRelationshipLoading = false, error = result.message)
+                        is NetworkResult.Error -> {
+                            _state.value = _state.value.copy(
+                                isRelationshipLoading = false, 
+                                error = result.message
+                            )
                         }
                     }
                 }
                 RelationshipStatus.ADMIRING, RelationshipStatus.LOVERS -> {
-                    when (repository.unadmire(profile.id)) {
+                    // Unadmire the user
+                    when (val result = repository.unadmire(profile.id)) {
                         is NetworkResult.Success -> {
-                            val newStatus = if (profile.relationshipStatus == RelationshipStatus.LOVERS) RelationshipStatus.ADMIRED_BY else RelationshipStatus.NONE
+                            val newStatus = if (profile.relationshipStatus == RelationshipStatus.LOVERS) 
+                                RelationshipStatus.ADMIRED_BY 
+                            else 
+                                RelationshipStatus.NONE
                             _state.value = _state.value.copy(
                                 isRelationshipLoading = false,
                                 profile = profile.copy(
@@ -115,8 +131,11 @@ class ProfileViewModel(
                             )
                         }
                         is NetworkResult.Loading -> {}
-                is NetworkResult.Error -> {
-                            _state.value = _state.value.copy(isRelationshipLoading = false)
+                        is NetworkResult.Error -> {
+                            _state.value = _state.value.copy(
+                                isRelationshipLoading = false,
+                                error = result.message
+                            )
                         }
                     }
                 }
@@ -131,6 +150,26 @@ class ProfileViewModel(
                 is NetworkResult.Success -> loadProfile()
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {}
+            }
+        }
+    }
+
+    fun initiateChat(chatRepository: com.krieta.feature.chat.domain.repository.ChatRepository) {
+        val profile = _state.value.profile ?: return
+        screenModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true)
+            when (val result = chatRepository.createDirectChat(profile.id)) {
+                is NetworkResult.Success -> {
+                    _state.value = _state.value.copy(isLoading = false)
+                    _navigationEvents.tryEmit(NavigationEvent.OpenChat(result.data.id))
+                }
+                is NetworkResult.Error -> {
+                    _state.value = _state.value.copy(isLoading = false)
+                    _navigationEvents.tryEmit(NavigationEvent.ShowError(
+                        result.message ?: "Failed to create chat"
+                    ))
+                }
+                is NetworkResult.Loading -> {}
             }
         }
     }

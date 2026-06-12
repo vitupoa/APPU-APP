@@ -49,18 +49,35 @@ class ProfileScreen(val userId: String? = null) : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val profileViewModel = koinScreenModel<ProfileViewModel> { parametersOf(userId) }
         val bioLinksViewModel = koinScreenModel<BioLinksViewModel>()
+        val chatRepository = koinInject<com.krieta.feature.chat.domain.repository.ChatRepository>()
+        val scope = rememberCoroutineScope()
         
         val profileState by profileViewModel.state.collectAsState()
         val bioLinksState by bioLinksViewModel.state.collectAsState()
 
         var menuExpanded by remember { mutableStateOf(false) }
         var showBioLinkSheet by remember { mutableStateOf(false) }
+        var errorMessage by remember { mutableStateOf<String?>(null) }
         
         val isOwnProfile = profileViewModel.isOwnProfile
         
         val profile = profileState.profile
         val isLoading = profileState.isLoading
         val error = profileState.error
+
+        // Handle navigation events
+        LaunchedEffect(Unit) {
+            profileViewModel.navigationEvents.collect { event ->
+                when (event) {
+                    is com.krieta.feature.profile.presentation.viewmodel.ProfileViewModel.NavigationEvent.OpenChat -> {
+                        navigator.push(com.krieta.feature.chat.presentation.room.ChatRoomScreen(event.chatId))
+                    }
+                    is com.krieta.feature.profile.presentation.viewmodel.ProfileViewModel.NavigationEvent.ShowError -> {
+                        errorMessage = event.message
+                    }
+                }
+            }
+        }
         
 
         
@@ -89,6 +106,19 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 }
             }
         } else if (profile != null) {
+            val snackbarHostState = remember { SnackbarHostState() }
+            
+            // Show error snackbar
+            LaunchedEffect(errorMessage) {
+                errorMessage?.let { msg ->
+                    snackbarHostState.showSnackbar(
+                        message = msg,
+                        duration = SnackbarDuration.Short
+                    )
+                    errorMessage = null
+                }
+            }
+            
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -390,7 +420,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                                 }
                             }
                             Button(
-                                onClick = {}, 
+                                onClick = { profileViewModel.initiateChat(chatRepository) }, 
                                 modifier = Modifier.weight(1f).height(44.dp),
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = KrietaColors.SurfaceVariant, contentColor = KrietaColors.OnSurface)
@@ -485,6 +515,14 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 }
                 Spacer(modifier = Modifier.height(100.dp))
                 }
+                
+                // Snackbar host
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp)
+                )
             }
         }
 
