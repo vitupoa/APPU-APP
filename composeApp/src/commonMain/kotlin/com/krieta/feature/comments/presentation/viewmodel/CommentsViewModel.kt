@@ -322,6 +322,7 @@ class CommentsViewModel(
     }
 
     private fun createTempComment(text: String, parentId: String?, replyToUserId: String?): Comment {
+        val replyingToComment = _state.value.replyingTo
         return Comment(
             id = "temp_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}",
             contentId = contentId,
@@ -336,7 +337,7 @@ class CommentsViewModel(
             ),
             text = text,
             parentId = parentId,
-            replyToUser = null,
+            replyToUser = replyingToComment?.author,
             likesCount = 0,
             repliesCount = 0,
             isLiked = false,
@@ -356,7 +357,13 @@ class CommentsViewModel(
             if (comment.parentId == null) {
                 it.copy(comments = listOf(comment) + it.comments)
             } else {
-                it.copy(comments = addReplyToComment(it.comments, comment.parentId, comment))
+                // Ensure parent comment is expanded when adding a reply
+                val expandedSet = it.expandedComments.toMutableSet()
+                expandedSet.add(comment.parentId)
+                it.copy(
+                    comments = addReplyToComment(it.comments, comment.parentId, comment),
+                    expandedComments = expandedSet
+                )
             }
         }
     }

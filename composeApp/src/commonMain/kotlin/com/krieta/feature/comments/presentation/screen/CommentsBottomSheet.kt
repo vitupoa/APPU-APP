@@ -38,6 +38,7 @@ fun CommentsBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val listState = rememberLazyListState()
     var showSortMenu by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf<Comment?>(null) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -142,7 +143,12 @@ fun CommentsBottomSheet(
                                     comment = comment,
                                     onReply = { viewModel.setReplyingTo(it) },
                                     onLike = { viewModel.toggleLike(it) },
-                                    onProfileClick = onProfileClick
+                                    onDelete = { viewModel.deleteComment(it.id) },
+                                    onReport = { showReportDialog = it },
+                                    onToggleExpand = { viewModel.toggleCommentExpanded(it.id) },
+                                    onProfileClick = onProfileClick,
+                                    expandedComments = state.expandedComments,
+                                    depth = 0
                                 )
                             }
 
@@ -179,6 +185,16 @@ fun CommentsBottomSheet(
                 enabled = state.settings?.commentsEnabled == true
             )
         }
+
+        showReportDialog?.let { comment ->
+            ReportCommentDialog(
+                onDismiss = { showReportDialog = null },
+                onReport = { reason ->
+                    viewModel.reportComment(comment.id, reason)
+                    showReportDialog = null
+                }
+            )
+        }
     }
 }
 
@@ -187,87 +203,201 @@ private fun CommentItem(
     comment: Comment,
     onReply: (Comment) -> Unit,
     onLike: (Comment) -> Unit,
-    onProfileClick: (String) -> Unit
+    onDelete: (Comment) -> Unit,
+    onReport: (Comment) -> Unit,
+    onToggleExpand: (Comment) -> Unit,
+    onProfileClick: (String) -> Unit,
+    expandedComments: Set<String>,
+    depth: Int
 ) {
-    Row(
+    var showMenu by remember { mutableStateOf(false) }
+    val isExpanded = comment.id in expandedComments
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(start = (depth * 24).dp)
     ) {
-        AsyncImage(
-            model = comment.author.avatarUrl,
-            contentDescription = null,
+        Row(
             modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .clickable { onProfileClick(comment.author.id) }
-                .background(Color.Gray)
-        )
-
-        Column(modifier = Modifier.weight(1f)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = comment.author.displayName,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    DateTimeUtil.timeAgo(comment.createdAt),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-            }
-
-            Text(
-                text = comment.text,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.9f),
-                modifier = Modifier.padding(vertical = 4.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            AsyncImage(
+                model = comment.author.avatarUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .clickable { onProfileClick(comment.author.id) }
+                    .background(Color.Gray)
             )
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.clickable { onLike(comment) }
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Icon(
-                        if (comment.isLiked) painterResource(Res.drawable.ic_favorite) 
-                        else painterResource(Res.drawable.ic_favorite_border),
-                        contentDescription = "Like",
-                        modifier = Modifier.size(16.dp),
-                        tint = if (comment.isLiked) Color.Red else Color.Gray
+                    Text(
+                        text = comment.author.displayName,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
                     )
-                    if (comment.likesCount > 0) {
-                        Text(
-                            "${comment.likesCount}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
-                        )
+                    Text(
+                        DateTimeUtil.timeAgo(comment.createdAt),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                    Spacer(Modifier.weight(1f))
+                    
+                    Box {
+                        IconButton(
+                            onClick = { showMenu = true },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                painterResource(Res.drawable.ic_more_vert),
+                                contentDescription = "More",
+                                modifier = Modifier.size(16.dp),
+                                tint = Color.Gray
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            if (comment.canDelete) {
+                                DropdownMenuItem(
+                                    text = { Text("Delete") },
+                                    onClick = {
+                                        onDelete(comment)
+                                        showMenu = false
+                                    },
+                                    leadingIcon = { Icon(painterResource(Res.drawable.ic_delete), null) }
+                                )
+                            }
+                            DropdownMenuItem(
+                                text = { Text("Report") },
+                                onClick = {
+                                    onReport(comment)
+                                    showMenu = false
+                                },
+                                leadingIcon = { Icon(painterResource(Res.drawable.ic_flag), null) }
+                            )
+                        }
                     }
                 }
 
-                if (comment.canReply) {
-                    TextButton(
-                        onClick = { onReply(comment) },
-                        contentPadding = PaddingValues(0.dp)
+                comment.replyToUser?.let { replyTo ->
+                    Text(
+                        "Replying to @${replyTo.username}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF1DA1F2),
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    )
+                }
+
+                Text(
+                    text = comment.text,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+
+                if (comment.isEdited) {
+                    Text(
+                        "(edited)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.clickable { onLike(comment) }
                     ) {
+                        Icon(
+                            if (comment.isLiked) painterResource(Res.drawable.ic_favorite) 
+                            else painterResource(Res.drawable.ic_favorite_border),
+                            contentDescription = "Like",
+                            modifier = Modifier.size(16.dp),
+                            tint = if (comment.isLiked) Color.Red else Color.Gray
+                        )
+                        if (comment.likesCount > 0) {
+                            Text(
+                                "${comment.likesCount}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+
+                    if (comment.canReply) {
+                        TextButton(
+                            onClick = { onReply(comment) },
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            Text(
+                                "Reply",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+
+                if (comment.repliesCount > 0 && comment.replies.isNotEmpty()) {
+                    TextButton(
+                        onClick = { onToggleExpand(comment) },
+                        contentPadding = PaddingValues(0.dp),
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Icon(
+                            if (isExpanded) painterResource(Res.drawable.ic_expand_less) 
+                            else painterResource(Res.drawable.ic_expand_more),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
                         Text(
-                            "Reply",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
+                            if (isExpanded) "Hide replies" 
+                            else "View ${comment.repliesCount} ${if (comment.repliesCount == 1) "reply" else "replies"}",
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
             }
+        }
+
+        if (isExpanded && comment.replies.isNotEmpty()) {
+            Column {
+                comment.replies.forEach { reply ->
+                    CommentItem(
+                        comment = reply,
+                        onReply = onReply,
+                        onLike = onLike,
+                        onDelete = onDelete,
+                        onReport = onReport,
+                        onToggleExpand = onToggleExpand,
+                        onProfileClick = onProfileClick,
+                        expandedComments = expandedComments,
+                        depth = depth + 1
+                    )
+                }
+            }
+        }
+
+        if (depth == 0) {
+            HorizontalDivider(color = Color(0xFF2A2A2A), thickness = 0.5.dp)
         }
     }
 }
@@ -380,4 +510,59 @@ private fun EmptyCommentsMessage(
             )
         }
     }
+}
+
+@Composable
+private fun ReportCommentDialog(
+    onDismiss: () -> Unit,
+    onReport: (String) -> Unit
+) {
+    var selectedReason by remember { mutableStateOf("") }
+    val reasons = listOf(
+        "Spam",
+        "Harassment",
+        "Hate speech",
+        "Violence",
+        "Misinformation",
+        "Other"
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Report Comment") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Why are you reporting this comment?")
+                reasons.forEach { reason ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { selectedReason = reason }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = selectedReason == reason,
+                            onClick = { selectedReason = reason }
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(reason)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onReport(selectedReason) },
+                enabled = selectedReason.isNotEmpty()
+            ) {
+                Text("Report")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

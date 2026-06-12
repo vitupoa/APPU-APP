@@ -27,14 +27,14 @@ export class WalletService {
       wallet = await prisma.wallets.create({
         data: { 
           id: crypto.randomUUID(),
-          User: { connect: { id: userId } },
+          user: { connect: { id: userId } },
           updated_at: new Date()
         },
         select: {
           kr_balance: true,
           user: { select: { is_wallet_unlocked: true, currency: true } }
         }
-      } as any);
+      });
     }
 
     const currencyToUse = targetCurrency || wallet.user.currency;
@@ -100,7 +100,7 @@ export class WalletService {
           where: { user_id: recipientId },
           create: { 
             id: crypto.randomUUID(),
-            User: {
+            user: {
               connect: { id: recipientId }
             },
             kr_balance: recipientReceiveAmount,
@@ -674,7 +674,7 @@ export class WalletService {
           where: { user_id: userId },
           create: {
             id: crypto.randomUUID(),
-            User: {
+            user: {
               connect: { id: userId }
             },
             kr_balance: transaction.amount_kr,
