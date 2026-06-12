@@ -43,6 +43,10 @@ import com.krieta.com.core.util.KrCurrencyFormatter
 import com.krieta.com.core.util.currentTimeMillis
 import com.krieta.feature.comments.domain.model.ContentType
 import com.krieta.feature.comments.presentation.screen.CommentsScreen
+import com.krieta.feature.comments.presentation.screen.CommentsBottomSheet
+import com.krieta.feature.comments.presentation.viewmodel.CommentsViewModel
+import org.koin.core.parameter.parametersOf
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.krieta.feature.shorts.domain.model.LinkedProduct
 import com.krieta.feature.shorts.domain.model.Short
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsViewModel
@@ -82,17 +86,11 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         val currentBalance = (walletState as? WalletState.Success)?.balance?.krBalance ?: 0.0
 
         var currentUserId by remember { mutableStateOf<String?>(null) }
-        var pendingCommentShort by remember { mutableStateOf<Short?>(null) }
+        var showCommentsFor by remember { mutableStateOf<Short?>(null) }
         var showTippingFor by remember { mutableStateOf<Short?>(null) }
 
         LaunchedEffect(Unit) {
             currentUserId = tokenManager.getUserId()
-            pendingCommentShort?.let { short ->
-                currentUserId?.let { userId ->
-                    navigator.push(CommentsScreen(ContentType.SHORT, short.id, userId))
-                    pendingCommentShort = null
-                }
-            }
 
             UploadCompletionNotifier.uploadCompletions
                 .onEach { event ->
@@ -169,10 +167,10 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                                 if (isSponsored) viewModel.recordSponsoredEngagement(page, "like")
                             },
                             onComment = {
-                                val uid = currentUserId
-                                if (uid != null) navigator.push(CommentsScreen(ContentType.SHORT, short.id, uid))
-                                else pendingCommentShort = short
-                                if (isSponsored) viewModel.recordSponsoredEngagement(page, "comment")
+                                if (currentUserId != null) {
+                                    showCommentsFor = short
+                                    if (isSponsored) viewModel.recordSponsoredEngagement(page, "comment")
+                                }
                             },
                             onTip = { showTippingFor = short },
                             onBookmark = {
@@ -213,6 +211,22 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     color = Color.White,
                     strokeWidth = 2.dp
                 )
+            }
+
+            showCommentsFor?.let { short ->
+                currentUserId?.let { userId ->
+                    val commentsViewModel = koinScreenModel<CommentsViewModel> {
+                        parametersOf(ContentType.SHORT, short.id, userId)
+                    }
+                    CommentsBottomSheet(
+                        viewModel = commentsViewModel,
+                        onDismiss = { showCommentsFor = null },
+                        onProfileClick = { profileId ->
+                            showCommentsFor = null
+                            navigator.push(ProfileScreen(profileId))
+                        }
+                    )
+                }
             }
 
             showTippingFor?.let { short ->

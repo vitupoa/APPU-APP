@@ -44,6 +44,7 @@ class CommentsViewModel(
 
     init {
         loadComments()
+        loadSettings()
     }
 
     fun loadComments(refresh: Boolean = false) {
@@ -71,7 +72,6 @@ class CommentsViewModel(
                             isLoading = false
                         )
                     }
-                    loadSettings()
                 }
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {

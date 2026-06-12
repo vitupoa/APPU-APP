@@ -39,6 +39,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import com.krieta.feature.auth.presentation.screen.LoginScreen
 import androidx.compose.foundation.BorderStroke
 import org.koin.core.parameter.parametersOf
+import org.koin.compose.koinInject
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class ProfileScreen(val userId: String? = null) : Screen {
     override val key = "ProfileScreen:${userId ?: "me"}"
@@ -67,10 +70,10 @@ class ProfileScreen(val userId: String? = null) : Screen {
 
         // Handle navigation events
         LaunchedEffect(Unit) {
-            profileViewModel.navigationEvents.collect { event ->
+            profileViewModel.navigationEvents.collectLatest { event ->
                 when (event) {
                     is com.krieta.feature.profile.presentation.viewmodel.ProfileViewModel.NavigationEvent.OpenChat -> {
-                        navigator.push(com.krieta.feature.chat.presentation.room.ChatRoomScreen(event.chatId))
+                        navigator.push(com.krieta.feature.chat.presentation.room.ChatRoomScreen(event.chatId, ""))
                     }
                     is com.krieta.feature.profile.presentation.viewmodel.ProfileViewModel.NavigationEvent.ShowError -> {
                         errorMessage = event.message

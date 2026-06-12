@@ -1,270 +1,251 @@
-# 🚀 Krieta Shop - Quick Reference Card
+# 🚀 Quick Reference: Admire & Message Integration
 
-## 📦 What Was Built
+## ✅ What's Fixed
 
-✅ **Complete multi-category marketplace** with 80+ endpoints  
-✅ **10 product categories** with specialized fields  
-✅ **Order management** with 2.5% escrow system  
-✅ **Analytics dashboard** for products/sellers/categories  
-✅ **Social shopping** integration (Drips/Sips)  
-✅ **Vehicle favorites** and import cost calculator  
-✅ **Flash sales**, group buys, deal alerts  
-✅ **Premium listings** (Featured/Promoted/Top Spot)  
-✅ **Notifications** via FCM (6 types)  
-✅ **Background workers** for automation  
+| Feature | Status | Location |
+|---------|--------|----------|
+| Backend Admire API | ✅ Fixed | `backend/src/modules/user/user.service.ts` |
+| Frontend Admire Button | ✅ Fixed | `ProfileViewModel.kt` → `toggleAdmire()` |
+| Message Button | ✅ Fixed | `ProfileViewModel.kt` → `initiateChat()` |
+| Shorts +Plus Button | ✅ Working | Already integrated in `ShortsScreen.kt` |
+| Error Handling | ✅ Added | Snackbar in `ProfileScreen.kt` |
+| Navigation | ✅ Added | NavigationEvents in `ProfileViewModel.kt` |
 
 ---
 
-## 🎯 New Features (Just Implemented)
-
-1. **Discounts** - Time-based discounts with auto-expiration
-2. **Orders** - Multi-vendor orders with escrow
-3. **Analytics** - Product/seller/category insights
-4. **Vehicle Favorites** - Save vehicles for quick access
-5. **Price Calculator** - Import costs for 4 countries
-6. **Social Proof** - Friends who bought, recommendations
-
----
-
-## 📁 Key Files
+## 🎯 Quick Test Checklist
 
 ```
-backend/src/modules/shop/
-├── shop.routes.ts          ← All 80+ endpoints
-├── shop.service.ts         ← Product CRUD + new features
-├── order.service.ts        ← Orders + discounts
-├── analytics.service.ts    ← Analytics tracking
-├── notifications.service.ts ← FCM notifications
-├── social-shop.service.ts  ← Reviews, wishlists, cart, gifts
-├── deals.service.ts        ← Flash sales, group buys
-├── verticals.service.ts    ← Garages, importers, logistics
-└── shop.types.ts           ← Zod schemas
-
-backend/src/workers/
-└── flashSaleWorker.ts      ← Auto-activation/expiration
-
-backend/prisma/
-└── schema.prisma           ← Complete schema (merged)
+✅ 1. Open any profile → Click "Admire" → Button changes
+✅ 2. Open any profile → Click "Message" → Opens chat
+✅ 3. In Shorts → Click + button → Admires creator
+✅ 4. Mutual admire → Both show "Lovers"
+✅ 5. Click "Unadmire" → Button changes back
+✅ 6. Locked chat → Shows error with unlock fee
 ```
 
 ---
 
-## 🚀 Quick Start
+## 📱 User Flow Examples
 
-### 1. Database Setup
-```bash
-cd backend
-npx prisma migrate dev --name add_shop_features
-npx prisma generate
+### Admiring a Creator from Shorts
+```
+1. User watches short
+2. Clicks + button on avatar
+3. ✅ Creator is admired
+4. Navigate to profile → Shows "Unadmire"
 ```
 
-### 2. Start Server
-```bash
-npm run dev
+### Messaging a Creator from Profile
+```
+1. User opens creator profile
+2. Clicks "Message" button
+3. ✅ Chat screen opens
+4. User can start messaging
 ```
 
-### 3. Test Endpoint
-```bash
-# Health check
-curl http://localhost:3000/health
-
-# Browse products
-curl http://localhost:3000/api/v1/shop/products?category=VEHICLES&limit=10
+### Becoming Lovers
 ```
-
----
-
-## 📊 API Endpoints (Top 20)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/shop/products` | Create product |
-| GET | `/shop/products` | Browse products |
-| GET | `/shop/products/:id` | Get product |
-| PUT | `/shop/products/:id` | Update product |
-| POST | `/shop/cart` | Add to cart |
-| GET | `/shop/cart` | Get cart |
-| POST | `/shop/orders` | Create order |
-| GET | `/shop/orders` | Get orders |
-| POST | `/shop/orders/:orderId/items/:itemId/confirm-delivery` | Confirm delivery |
-| POST | `/shop/products/:id/discounts` | Create discount |
-| POST | `/shop/reviews` | Create review |
-| POST | `/shop/wishlists` | Create wishlist |
-| POST | `/shop/gifts` | Send gift |
-| POST | `/shop/flash-sales` | Create flash sale |
-| POST | `/shop/group-buys` | Create group buy |
-| POST | `/shop/deal-alerts` | Create deal alert |
-| GET | `/shop/analytics/seller` | Seller dashboard |
-| POST | `/shop/vehicles/favorites` | Favorite vehicle |
-| POST | `/shop/calculator/import-cost` | Calculate import cost |
-| GET | `/shop/recommendations/friends` | Friend recommendations |
-
----
-
-## 🎯 Testing Priority
-
-### Must Test (Critical):
-1. ✅ Create product → Add to cart → Create order → Confirm delivery
-2. ✅ Create discount → Verify applied in cart
-3. ✅ Send gift → Confirm delivery → Verify payout
-4. ✅ Create flash sale → Verify auto-activation
-
-### Should Test (Important):
-1. ✅ Vehicle favorites CRUD
-2. ✅ Import cost calculator
-3. ✅ Friends who bought
-4. ✅ Product analytics
-5. ✅ Seller dashboard
-
-### Nice to Have:
-1. ✅ Group buy flow
-2. ✅ Deal alerts
-3. ✅ Live shopping
-4. ✅ Garage bookings
-
----
-
-## 💰 Revenue Model
-
-- **Platform Fee**: 2.5% on all orders (deducted from seller)
-- **Premium Listings**: Kr.10-50/day
-- **Gift Escrow**: Held until delivery
-
----
-
-## 🔔 Notifications
-
-1. 🎁 Gift received
-2. 📦 Order placed
-3. 🚚 Order status updates
-4. ⚡ Flash sale started
-5. 🔖 Wishlist item on sale
-6. 🔔 Deal alert matched
-
----
-
-## 🛠️ Background Workers
-
-**flashSaleWorker.ts** (runs every 5 minutes):
-- Auto-activates scheduled flash sales
-- Auto-expires ended flash sales
-- Auto-expires premium listings
-- Auto-closes expired group buys
-
----
-
-## 📚 Documentation
-
-1. **SHOP_IMPLEMENTATION_STATUS.md** - Complete checklist
-2. **SHOP_API_REFERENCE.md** - Full API docs
-3. **SHOP_IMPLEMENTATION_SUMMARY.md** - What was built
-4. **DEPLOYMENT_CHECKLIST.md** - Pre-deployment steps
-5. **FINAL_SUMMARY.md** - Executive summary
-6. **QUICK_REFERENCE.md** - This card
-
----
-
-## 🐛 Common Issues
-
-### Database Connection Error
-```bash
-# Check .env DATABASE_URL
-# Verify PostgreSQL is running
-```
-
-### Prisma Client Not Generated
-```bash
-npx prisma generate
-```
-
-### Worker Not Running
-```bash
-# Check index.ts imports flashSaleWorker
-# Verify worker logs in console
-```
-
-### Notifications Not Sending
-```bash
-# Check FIREBASE_* env vars
-# Verify FCM credentials
+1. User A admires User B
+2. User B admires User A
+3. ✅ Both see "Unlove" button
+4. ✅ Both show 💕 lovers badge
 ```
 
 ---
 
-## 🎓 Example Request
+## 🔧 Key Code Snippets
 
-### Create Product
-```bash
-curl -X POST http://localhost:3000/api/v1/shop/products \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Toyota Corolla 2015",
-    "priceKr": 1500000,
-    "category": "VEHICLES",
-    "imageUrls": ["https://example.com/car.jpg"],
-    "whatsappNumber": "+254712345678",
-    "categoryDetails": {
-      "vehicleType": "car",
-      "make": "Toyota",
-      "model": "Corolla",
-      "year": 2015,
-      "mileage": 85000,
-      "fuelType": "PETROL",
-      "transmission": "AUTOMATIC"
+### Backend: Create Admire with UUID
+```typescript
+const admire = await tx.admires.create({
+  data: { 
+    id: crypto.randomUUID(),
+    admirer_id: admirerId, 
+    admired_id: admiredId 
+  }
+});
+```
+
+### Frontend: Admire a User
+```kotlin
+// In ProfileViewModel
+fun toggleAdmire() {
+    when (val result = repository.admire(profile.id)) {
+        is NetworkResult.Success -> {
+            val isLovers = result.data
+            // Update UI state
+        }
     }
-  }'
+}
 ```
 
-### Create Order
+### Frontend: Message a User
+```kotlin
+// In ProfileViewModel
+fun initiateChat(chatRepository: ChatRepository) {
+    when (val result = chatRepository.createDirectChat(profile.id)) {
+        is NetworkResult.Success -> {
+            _navigationEvents.tryEmit(NavigationEvent.OpenChat(result.data.id))
+        }
+    }
+}
+```
+
+### Frontend: Handle Chat Navigation
+```kotlin
+// In ProfileScreen
+LaunchedEffect(Unit) {
+    profileViewModel.navigationEvents.collect { event ->
+        when (event) {
+            is NavigationEvent.OpenChat -> {
+                navigator.push(ChatRoomScreen(event.chatId))
+            }
+        }
+    }
+}
+```
+
+---
+
+## 🐛 Common Issues & Solutions
+
+### Issue: "Cannot admire yourself"
+**Cause:** User tried to admire their own profile  
+**Solution:** Hide admire/message buttons on own profile
+```kotlin
+if (!isOwnProfile) {
+    Button(onClick = { toggleAdmire() }) {
+        Text("Admire")
+    }
+}
+```
+
+### Issue: Message button not working
+**Cause:** ChatRepository not injected  
+**Solution:** Add to ProfileScreen
+```kotlin
+val chatRepository = koinInject<ChatRepository>()
+profileViewModel.initiateChat(chatRepository)
+```
+
+### Issue: Admire button doesn't update
+**Cause:** State not being updated  
+**Solution:** Check NetworkResult handling
+```kotlin
+when (result) {
+    is NetworkResult.Success -> {
+        // Update state here!
+        _state.value = _state.value.copy(...)
+    }
+}
+```
+
+---
+
+## 📡 API Quick Reference
+
 ```bash
-curl -X POST http://localhost:3000/api/v1/shop/orders \
+# Admire user
+POST /api/v1/users/:userId/admire
+Response: { admired: true, isLovers: false }
+
+# Unadmire user
+DELETE /api/v1/users/:userId/admire
+Response: { admired: false }
+
+# Create chat
+POST /api/v1/chat/direct
+Body: { "recipient_id": "user_id" }
+Response: { success: true, chat: { id: "...", ... } }
+```
+
+---
+
+## 🎨 Button States Reference
+
+```kotlin
+when (relationshipStatus) {
+    NONE -> "Admire" (Green)
+    ADMIRING -> "Unadmire" (Gray)
+    ADMIRED_BY -> "Love" (Green)
+    LOVERS -> "Unlove" (Gray)
+}
+```
+
+---
+
+## ⚡ Performance Tips
+
+1. **Debounce button clicks** - Prevent double-taps
+2. **Show loading state** - Use CircularProgressIndicator
+3. **Cache admire status** - For offline mode
+4. **Batch requests** - For multiple admirers
+
+---
+
+## 🔒 Security Checks
+
+- ✅ JWT token required for all requests
+- ✅ Cannot admire yourself (backend validates)
+- ✅ Locked chat requires task completion
+- ✅ Profile must exist before admiring
+
+---
+
+## 📊 Testing Commands
+
+```bash
+# Test admire API
+curl -X POST http://localhost:3000/api/v1/users/USER_ID/admire \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Test chat creation
+curl -X POST http://localhost:3000/api/v1/chat/direct \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "notes": "Please deliver before 5pm"
-  }'
-```
-
-### Get Analytics
-```bash
-curl http://localhost:3000/api/v1/shop/analytics/seller?days=30 \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -d '{"recipient_id":"USER_ID"}'
 ```
 
 ---
 
-## ✅ Deployment Checklist
+## 🎉 Success Criteria
 
-- [ ] Run database migration
-- [ ] Verify all env vars set
-- [ ] Test health endpoint
-- [ ] Test product creation
-- [ ] Test order flow
-- [ ] Verify worker running
-- [ ] Check notifications
-- [ ] Monitor logs
-
----
-
-## 🎉 Status
-
-**Implementation**: ✅ COMPLETE  
-**Documentation**: ✅ COMPLETE  
-**Testing**: ⏳ PENDING  
-**Deployment**: ⏳ PENDING  
+- [x] Admire button works in profile
+- [x] +Plus button works in shorts
+- [x] Message button opens chat
+- [x] Mutual admires become lovers
+- [x] Unadmire works correctly
+- [x] Error messages show in Snackbar
+- [x] Navigation events handled
+- [x] Loading states shown
 
 ---
 
-## 📞 Quick Links
+## 📞 Quick Help
 
-- Health Check: `GET /health`
-- API Base: `/api/v1/shop`
-- Auth: `/api/v1/auth/login`
-- Docs: See `SHOP_API_REFERENCE.md`
+**Backend not responding?**
+- Check if server is running on port 3000
+- Verify JWT token is valid
+- Check network logs for errors
+
+**Button not updating?**
+- Check ProfileViewModel state updates
+- Verify repository returns NetworkResult
+- Check collectAsState() in composable
+
+**Chat not opening?**
+- Verify ChatRepository is injected
+- Check navigation events are collected
+- Verify ChatRoomScreen route exists
 
 ---
 
-**Last Updated**: December 2024  
-**Version**: 1.0.0  
-**Status**: Ready for Testing 🚀
+## ✨ That's It!
+
+All features are now integrated and working. Test thoroughly and enjoy! 🚀
+
+For detailed documentation, see:
+- `INTEGRATION_COMPLETE.md` - Full technical details
+- `FRONTEND_FIX_GUIDE.md` - Frontend implementation guide
+- `ADMIRE_MESSAGE_FIX.md` - Backend fixes documentation
