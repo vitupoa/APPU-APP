@@ -566,8 +566,8 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             VideoPlayer(
                 url = short.videoUrl,
                 isPlaying = isPlaying,
-                modifier = if (isLandscape)
-                    Modifier.fillMaxWidth().aspectRatio(short.aspectRatio!!).align(Alignment.Center)
+                modifier = if (isLandscape && short.aspectRatio != null)
+                    Modifier.fillMaxWidth().aspectRatio(short.aspectRatio).align(Alignment.Center)
                 else
                     Modifier.fillMaxSize(),
                 onPlaybackStateChanged = { playing -> isPlaying = playing },
