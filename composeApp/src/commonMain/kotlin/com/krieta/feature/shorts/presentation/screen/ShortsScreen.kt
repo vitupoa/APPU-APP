@@ -88,6 +88,11 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         var currentUserId by remember { mutableStateOf<String?>(null) }
         var showCommentsFor by remember { mutableStateOf<Short?>(null) }
         var showTippingFor by remember { mutableStateOf<Short?>(null) }
+        var isCommentsOpen by remember { mutableStateOf(false) }
+
+        LaunchedEffect(showCommentsFor) {
+            isCommentsOpen = showCommentsFor != null
+        }
 
         LaunchedEffect(Unit) {
             currentUserId = tokenManager.getUserId()
@@ -153,6 +158,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                             short = short,
                             isActive = page == pagerState.currentPage,
                             isTipModalOpen = showTippingFor != null,
+                            isCommentsOpen = isCommentsOpen,
                             isSponsored = isSponsored,
                             isOwnContent = currentUserId == short.creator.id,
                             onProfileClick = { navigator.push(ProfileScreen(short.creator.id)) },
@@ -256,6 +262,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         short: Short,
         isActive: Boolean,
         isTipModalOpen: Boolean,
+        isCommentsOpen: Boolean,
         isSponsored: Boolean = false,
         isOwnContent: Boolean = false,
         onProfileClick: () -> Unit,
@@ -281,6 +288,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     short = short,
                     isActive = isActive,
                     isTipModalOpen = isTipModalOpen,
+                    isCommentsOpen = isCommentsOpen,
                     onWatchTimeUpdate = onWatchTimeUpdate,
                     onViewTracked = onViewTracked
                 )
@@ -521,6 +529,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         short: Short,
         isActive: Boolean,
         isTipModalOpen: Boolean,
+        isCommentsOpen: Boolean,
         onWatchTimeUpdate: (Int) -> Unit,
         onViewTracked: (Long, Long) -> Unit
     ) {
@@ -544,7 +553,9 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
             }
         }
 
-        LaunchedEffect(isActive, isTipModalOpen) { isPlaying = isActive && !isTipModalOpen }
+        LaunchedEffect(isActive, isTipModalOpen, isCommentsOpen) {
+            isPlaying = isActive && !isTipModalOpen && !isCommentsOpen
+        }
 
         LaunchedEffect(showPlayPauseIcon) {
             if (showPlayPauseIcon) { delay(1500); showPlayPauseIcon = false }

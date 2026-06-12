@@ -212,11 +212,13 @@ private fun CommentItem(
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val isExpanded = comment.id in expandedComments
+    val maxDepth = 3 // Limit visual nesting to 3 levels
+    val effectiveDepth = depth.coerceAtMost(maxDepth)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = (depth * 24).dp)
+            .padding(start = (effectiveDepth * 24).dp)
     ) {
         Row(
             modifier = Modifier
