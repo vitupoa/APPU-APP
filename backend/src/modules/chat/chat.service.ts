@@ -123,8 +123,32 @@ export class ChatService {
     const chats = await prisma.chat.findMany({
       where: { chat_participant: { some: { user_id: userId } } },
       include: {
-        chat_participant: { include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } } } },
-        messages: { orderBy: { created_at: 'desc' }, take: 1 },
+        chat_participant: { 
+          include: { 
+            user: { 
+              select: { 
+                id: true, 
+                username: true, 
+                display_name: true, 
+                avatar_url: true 
+              } 
+            } 
+          } 
+        },
+        messages: { 
+          orderBy: { created_at: 'desc' }, 
+          take: 1,
+          include: {
+            User_messages_sender_idTouser: {
+              select: {
+                id: true,
+                username: true,
+                display_name: true,
+                avatar_url: true
+              }
+            }
+          }
+        },
       },
       orderBy: { updated_at: 'desc' },
       skip,
