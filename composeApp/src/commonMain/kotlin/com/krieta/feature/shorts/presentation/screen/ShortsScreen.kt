@@ -89,6 +89,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         var showCommentsFor by remember { mutableStateOf<Short?>(null) }
         var showTippingFor by remember { mutableStateOf<Short?>(null) }
         var isCommentsOpen by remember { mutableStateOf(false) }
+        var admiredCreatorIds by remember { mutableStateOf<Set<String>>(emptySet()) }
 
         LaunchedEffect(showCommentsFor) {
             isCommentsOpen = showCommentsFor != null
@@ -161,11 +162,24 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                             isCommentsOpen = isCommentsOpen,
                             isSponsored = isSponsored,
                             isOwnContent = currentUserId == short.creator.id,
+                            isAdmired = admiredCreatorIds.contains(short.creator.id),
                             onProfileClick = { navigator.push(ProfileScreen(short.creator.id)) },
                             onAdmire = {
                                 scope.launch {
-                                    profileRepository.admire(short.creator.id)
-                                    // TODO: Update UI state to reflect admire status
+                                    when (val result = profileRepository.admire(short.creator.id)) {
+                                        is NetworkResult.Success -> {
+                                            admiredCreatorIds = admiredCreatorIds + short.creator.id
+                                            val isNowLovers = result.data
+                                            if (isNowLovers) {
+                                                // They became lovers - content moves to Lovers tab
+                                                // Optionally show a snackbar or refresh
+                                            }
+                                        }
+                                        is NetworkResult.Error -> {
+                                            // Handle error - could show a toast
+                                        }
+                                        else -> {}
+                                    }
                                 }
                             },
                             onLike = {
@@ -265,6 +279,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
         isCommentsOpen: Boolean,
         isSponsored: Boolean = false,
         isOwnContent: Boolean = false,
+        isAdmired: Boolean = false,
         onProfileClick: () -> Unit,
         onAdmire: () -> Unit,
         onLike: () -> Unit,
@@ -367,11 +382,23 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 // Profile + Plus (Admire)
-                if (!isOwnContent) {
+                if (!isOwnContent && !isAdmired) {
                     ProfileActionButton(
                         avatarUrl = short.creator.avatarUrl,
                         onProfileClick = onProfileClick,
                         onAdmireClick = onAdmire
+                    )
+                } else if (!isOwnContent && isAdmired) {
+                    // Show profile only without plus button
+                    AsyncImage(
+                        model = short.creator.avatarUrl,
+                        contentDescription = "Creator",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .clickable(onClick = onProfileClick)
+                            .border(2.dp, Color.White, CircleShape),
+                        contentScale = ContentScale.Crop
                     )
                 }
 

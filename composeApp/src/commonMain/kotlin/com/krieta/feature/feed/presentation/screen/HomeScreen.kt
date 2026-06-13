@@ -20,12 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 
-private val tabs = listOf("Contests", "Discover", "Lovers", "Admiring")
+private val tabs = listOf("Contests", "Admiring", "Lovers", "Discover")
 
 class HomeScreen : Screen {
     @Composable
     override fun Content() {
-        var selectedTab by remember { mutableStateOf(1) } // Default: Discover
+        var selectedTab by remember { mutableStateOf(1) } // Default: Admiring
 
         // fillMaxSize with no inset padding so content bleeds behind
         // the status bar (battery/time row) and nav bar
@@ -36,11 +36,11 @@ class HomeScreen : Screen {
                     0 -> com.krieta.feature.contests.presentation.screen
                         .ContestSubmissionFeedScreen().Content()
                     1 -> com.krieta.feature.shorts.presentation.screen
-                        .ShortsScreen(com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.DISCOVER).Content()
+                        .ShortsScreen(com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.ADMIRING).Content()
                     2 -> com.krieta.feature.shorts.presentation.screen
                         .ShortsScreen(com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.LOVERS).Content()
                     3 -> com.krieta.feature.shorts.presentation.screen
-                        .ShortsScreen(com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.ADMIRING).Content()
+                        .ShortsScreen(com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType.DISCOVER).Content()
                 }
             }
 

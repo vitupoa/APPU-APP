@@ -11,18 +11,17 @@ export class ShortsService {
   /**
    * Get shorts feed based on type
    * 
-   * LOVERS TAB:
-   * - Shows shorts from mutual admirers ONLY (both users admire each other, is_lovers: true)
-   * 
    * ADMIRING TAB:
    * - Shows YOUR own shorts + shorts from people YOU admire who DON'T admire you back (one-way, is_lovers: false)
    * - Does NOT include lovers (they're in Lovers tab)
    * 
+   * LOVERS TAB:
+   * - Shows shorts from mutual admirers ONLY (both users admire each other, is_lovers: true)
+   * 
    * DISCOVER TAB:
-   * - Shows shorts from everyone else
-   * - Excludes your own shorts
-   * - Excludes anyone YOU admire (whether mutual or one-way)
-   * - INCLUDES people who admire YOU but you don't admire back (strangers/followers)
+   * - Shows shorts from everyone else you don't admire
+   * - Excludes: your own shorts + anyone YOU admire (whether mutual or one-way)
+   * - INCLUDES: Complete strangers + people who admire YOU but you don't admire back
    */
   static async getFeed(type: string, cursor?: string, limit = 20, userId?: string) {
     let whereClause: any = {};

@@ -104,9 +104,9 @@ class ShortsViewModel(
 
     fun setFeedType(feedType: ShortsFeedType) {
         val tab = when (feedType) {
-            ShortsFeedType.DISCOVER -> ShortsTab.DISCOVER
-            ShortsFeedType.LOVERS -> ShortsTab.LOVERS
             ShortsFeedType.ADMIRING -> ShortsTab.ADMIRING
+            ShortsFeedType.LOVERS -> ShortsTab.LOVERS
+            ShortsFeedType.DISCOVER -> ShortsTab.DISCOVER
         }
         selectTab(tab)
     }

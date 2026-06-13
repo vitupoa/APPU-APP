@@ -176,7 +176,7 @@ export class ChatService {
   ) {
     // Ensure sender is participant
     const isParticipant = await prisma.chat_participant.findUnique({
-      where: { chatId_userId: { chat_id, user_id: senderId } },
+      where: { chat_id_user_id: { chat_id, user_id: senderId } },
     });
 
     if (!isParticipant) {
@@ -382,7 +382,7 @@ export class ChatService {
   static async getMessages(userId: string, chat_id: string, page: number = 1, limit: number = 50) {
     // Ensure user is participant
     const isParticipant = await prisma.chat_participant.findUnique({
-      where: { chatId_userId: { chat_id, user_id: userId } },
+      where: { chat_id_user_id: { chat_id, user_id: userId } },
     });
 
     if (!isParticipant) {
@@ -423,7 +423,7 @@ export class ChatService {
 
     // Verify recipient is participant
     const recipientParticipant = await prisma.chat_participant.findUnique({
-      where: { chatId_userId: { chat_id, user_id: recipient_id } },
+      where: { chat_id_user_id: { chat_id, user_id: recipient_id } },
     });
     if (!recipientParticipant) {
       throw new Error('Recipient is not in this chat');
@@ -551,7 +551,7 @@ export class ChatService {
 
     if (action === 'kick') {
       await prisma.chat_participant.delete({
-        where: { chatId_userId: { chat_id, user_id: targetUserId } },
+        where: { chat_id_user_id: { chat_id, user_id: targetUserId } },
       });
 
       // Broadcast member removed
@@ -567,7 +567,7 @@ export class ChatService {
 
     const newRole = action === 'promote' ? 'admin' : 'member';
     await prisma.chat_participant.update({
-      where: { chatId_userId: { chat_id, user_id: targetUserId } },
+      where: { chat_id_user_id: { chat_id, user_id: targetUserId } },
       data: { role: newRole },
     });
 
@@ -613,13 +613,13 @@ export class ChatService {
 
     // Demote current owner to member
     await prisma.chat_participant.update({
-      where: { chatId_userId: { chat_id, user_id: userId } },
+      where: { chat_id_user_id: { chat_id, user_id: userId } },
       data: { role: 'member' },
     });
 
     // Promote new owner to admin
     await prisma.chat_participant.update({
-      where: { chatId_userId: { chat_id, user_id: newOwnerId } },
+      where: { chat_id_user_id: { chat_id, user_id: newOwnerId } },
       data: { role: 'admin' },
     });
 
@@ -660,7 +660,7 @@ export class ChatService {
     }
 
     await prisma.chat_participant.delete({
-      where: { chatId_userId: { chat_id, user_id: userId } },
+      where: { chat_id_user_id: { chat_id, user_id: userId } },
     });
 
     // Broadcast member left
@@ -681,7 +681,7 @@ export class ChatService {
    */
   static async markAsRead(userId: string, chat_id: string) {
     const participant = await prisma.chat_participant.findUnique({
-      where: { chatId_userId: { chat_id, user_id: userId } },
+      where: { chat_id_user_id: { chat_id, user_id: userId } },
     });
 
     if (!participant) {
@@ -689,7 +689,7 @@ export class ChatService {
     }
 
     await prisma.chat_participant.update({
-      where: { chatId_userId: { chat_id, user_id: userId } },
+      where: { chat_id_user_id: { chat_id, user_id: userId } },
       data: { lastRead: new Date() },
     });
 
@@ -702,7 +702,7 @@ export class ChatService {
   static async sendTypingIndicator(userId: string, chat_id: string, isTyping: boolean) {
     // Verify user is participant
     const participant = await prisma.chat_participant.findUnique({
-      where: { chatId_userId: { chat_id, user_id: userId } },
+      where: { chat_id_user_id: { chat_id, user_id: userId } },
     });
 
     if (!participant) {
