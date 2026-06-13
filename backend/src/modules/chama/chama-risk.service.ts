@@ -16,7 +16,7 @@ export class ChamaRiskService {
         end_date: { lt: new Date() } // Past due
       },
       include: {
-        chama: { include: { chama_members: { where: { status: 'ACTIVE' } } } }
+        chama: { include: { chama_member: { where: { status: 'ACTIVE' } } } }
       }
     });
 
@@ -25,7 +25,7 @@ export class ChamaRiskService {
     for (const cycle of activeCycles) {
       const chama = cycle.chama;
 
-      for (const member of chama.chama_members) {
+      for (const member of chama.chama_member) {
         // Did they contribute this cycle?
         const contribution = await prisma.chama_contribution.findFirst({
           where: {
