@@ -241,7 +241,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .offset(y = 40.dp)
+                                .offset(y = 60.dp)
                         ) {
                             if (profile.avatarUrl != null) {
                                 Box(

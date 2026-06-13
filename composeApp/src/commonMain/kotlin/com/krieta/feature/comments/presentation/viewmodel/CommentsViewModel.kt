@@ -160,11 +160,13 @@ class CommentsViewModel(
             )) {
                 is NetworkResult.Success -> {
                     replaceOptimisticComment(tempComment.id, result.data)
+                    // Refresh to get accurate reply counts and structure from backend
+                    loadComments(refresh = true)
                 }
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
                     removeOptimisticComment(tempComment.id)
-                    _state.update { it.copy(error = result.message) }
+                    _state.update { it.copy(error = result.message ?: "Failed to post comment") }
                 }
             }
         }

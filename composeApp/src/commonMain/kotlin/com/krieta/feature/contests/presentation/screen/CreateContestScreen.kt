@@ -85,14 +85,11 @@ class CreateContestScreen : Screen {
                     },
                     navigationIcon = {
                         IconButton(
-                            onClick = { 
-                                if (state.currentStep > 1) viewModel.previousStep() 
-                                else navigator.pop()
-                            }
+                            onClick = { navigator.pop() }
                         ) {
                             Icon(
                                 painterResource(Res.drawable.ic_arrow_back), 
-                                contentDescription = if (state.currentStep > 1) "Go to previous step" else "Close wizard",
+                                contentDescription = "Close wizard",
                                 tint = Color.White
                             )
                         }
@@ -153,6 +150,7 @@ class CreateContestScreen : Screen {
                         viewModel.clearError()
                         viewModel.nextStep() 
                     },
+                    onBack = { viewModel.previousStep() },
                     onPublish = { viewModel.publishContest() }
                 )
             }
@@ -253,6 +251,7 @@ fun BottomActionBar(
     isValid: Boolean,
     isSubmitting: Boolean,
     onContinue: () -> Unit,
+    onBack: () -> Unit,
     onPublish: () -> Unit
 ) {
     Surface(
@@ -260,17 +259,38 @@ fun BottomActionBar(
         color = Color(0xFF1A1A1F),
         shadowElevation = 8.dp
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            if (currentStep > 1) {
+                OutlinedButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFFF5A623)
+                    ),
+                    border = BorderStroke(1.dp, Color(0xFFF5A623)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "Back",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            
             if (currentStep < 5) {
                 Button(
                     onClick = onContinue,
                     enabled = isValid && !isSubmitting,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .weight(1f)
                         .height(48.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFF5A623),
@@ -291,7 +311,7 @@ fun BottomActionBar(
                     onClick = onPublish,
                     enabled = isValid && !isSubmitting,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .weight(1f)
                         .height(48.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFF5A623),

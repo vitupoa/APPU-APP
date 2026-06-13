@@ -253,7 +253,7 @@ private fun CommentItem(
 ) {
     val isExpanded = comment.id in expandedComments
     var showMenu by remember { mutableStateOf(false) }
-    val maxDepth = 3 // Limit visual nesting to 3 levels
+    val maxDepth = 2 // Limit visual nesting to 2 levels
     val effectiveDepth = depth.coerceAtMost(maxDepth)
     val backgroundColor = if (comment.isPinned) {
         Color(0xFF1A1A1A)
@@ -267,7 +267,7 @@ private fun CommentItem(
         modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(start = (effectiveDepth * 32).dp)
+            .padding(start = (effectiveDepth * 20).dp) // Reduced from 32dp to 20dp
     ) {
         Row(
             modifier = Modifier

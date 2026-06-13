@@ -219,7 +219,9 @@ private fun TaskConfigurationInput(
                         unfocusedBorderColor = Color(0xFF3A3A3F),
                         errorBorderColor = Color(0xFFFF3B30),
                         focusedContainerColor = Color(0xFF1A1A1F),
-                        unfocusedContainerColor = Color(0xFF1A1A1F)
+                        unfocusedContainerColor = Color(0xFF1A1A1F),
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White
                     ),
                     shape = RoundedCornerShape(12.dp)
                 )
@@ -296,7 +298,9 @@ private fun TaskConfigurationInput(
                     unfocusedBorderColor = Color(0xFF3A3A3F),
                     errorBorderColor = Color(0xFFFF3B30),
                     focusedContainerColor = Color(0xFF1A1A1F),
-                    unfocusedContainerColor = Color(0xFF1A1A1F)
+                    unfocusedContainerColor = Color(0xFF1A1A1F),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
                 ),
                 shape = RoundedCornerShape(12.dp)
             )

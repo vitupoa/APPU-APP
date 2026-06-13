@@ -167,13 +167,10 @@ private fun JudgeSearchField(
     viewModel: CreateContestViewModel,
     state: CreateContestState
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedTextField(
-            value = searchQuery,
+            value = state.judgeSearchQuery,
             onValueChange = { 
-                searchQuery = it
                 viewModel.updateJudgeSearchQuery(it)
             },
             label = { Text("Search for users") },
@@ -211,7 +208,7 @@ private fun JudgeSearchField(
         )
         
         // Real-time search results
-        if (searchQuery.isNotBlank() && state.judges.size < 15) {
+        if (state.judgeSearchQuery.isNotBlank() && state.judges.size < 15) {
             if (state.judgeSearchResults.isNotEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -233,7 +230,7 @@ private fun JudgeSearchField(
                         }
                     }
                 }
-            } else if (!state.isSearchingJudges && searchQuery.length >= 2) {
+            } else if (!state.isSearchingJudges && state.judgeSearchQuery.length >= 2) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(

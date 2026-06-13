@@ -376,10 +376,12 @@ class ExploreScreen : Screen {
                         SearchResultRow(result = result, onClick = {
                             when (result.type) {
                                 SearchResultType.USER -> navigator.push(ProfileScreen(result.id))
-                                SearchResultType.GROUP -> navigator.push(com.krieta.feature.chat.presentation.room.ChatRoomScreen(result.id, result.title))
-                                SearchResultType.PRODUCT -> navigator.push(ShopScreen())
-                                SearchResultType.CONTEST -> navigator.push(com.krieta.feature.contests.presentation.screen.ContestFeedScreen())
+                                SearchResultType.GROUP, SearchResultType.CHAMA -> navigator.push(com.krieta.feature.chat.presentation.room.ChatRoomScreen(result.id, result.title))
+                                SearchResultType.PRODUCT -> navigator.push(com.krieta.feature.shop.presentation.screen.ProductDetailScreen(result.id))
+                                SearchResultType.CONTEST -> navigator.push(com.krieta.feature.contests.presentation.screen.ContestDetailScreen(result.id))
                                 SearchResultType.SHORT -> navigator.push(com.krieta.feature.shorts.presentation.screen.ShortsScreen())
+                                SearchResultType.HASHTAG -> navigator.push(HashtagFeedScreen(result.id))
+                                SearchResultType.DRIP -> navigator.push(com.krieta.feature.feed.presentation.screen.HomeScreen())
                             }
                         })
                     }
@@ -701,6 +703,9 @@ private val SearchResultType.emoji: String get() = when(this) {
     SearchResultType.PRODUCT -> "🛍️"
     SearchResultType.CONTEST -> "🏆"
     SearchResultType.SHORT -> "🎬"
+    SearchResultType.HASHTAG -> "#️⃣"
+    SearchResultType.CHAMA -> "🏦"
+    SearchResultType.DRIP -> "📸"
 }
 
 private val SearchResultType.color: androidx.compose.ui.graphics.Color get() = when(this) {
@@ -709,6 +714,9 @@ private val SearchResultType.color: androidx.compose.ui.graphics.Color get() = w
     SearchResultType.PRODUCT -> KrietaColors.Accent
     SearchResultType.CONTEST -> KrietaColors.Warning
     SearchResultType.SHORT -> KrietaColors.Info
+    SearchResultType.HASHTAG -> androidx.compose.ui.graphics.Color(0xFF2196F3)
+    SearchResultType.CHAMA -> androidx.compose.ui.graphics.Color(0xFFF5A623)
+    SearchResultType.DRIP -> androidx.compose.ui.graphics.Color(0xFFE91E63)
 }
 
 @Composable
@@ -725,14 +733,26 @@ private fun SearchResultRow(result: SearchResult, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(result.type.color.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(result.type.emoji, fontSize = 20.sp)
+            // Show image if available, otherwise show emoji icon
+            if (result.imageUrl != null) {
+                coil3.compose.AsyncImage(
+                    model = result.imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(if (result.type == SearchResultType.USER) CircleShape else RoundedCornerShape(8.dp)),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(result.type.color.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(result.type.emoji, fontSize = 20.sp)
+                }
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(

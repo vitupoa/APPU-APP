@@ -212,13 +212,13 @@ private fun CommentItem(
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val isExpanded = comment.id in expandedComments
-    val maxDepth = 3 // Limit visual nesting to 3 levels
+    val maxDepth = 2 // Limit visual nesting to 2 levels for bottom sheet
     val effectiveDepth = depth.coerceAtMost(maxDepth)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = (effectiveDepth * 24).dp)
+            .padding(start = (effectiveDepth * 16).dp) // Reduced from 24dp to 16dp
     ) {
         Row(
             modifier = Modifier
@@ -357,7 +357,7 @@ private fun CommentItem(
                     }
                 }
 
-                if (comment.repliesCount > 0 && comment.replies.isNotEmpty()) {
+                if (comment.repliesCount > 0) {
                     TextButton(
                         onClick = { onToggleExpand(comment) },
                         contentPadding = PaddingValues(0.dp),
@@ -380,7 +380,7 @@ private fun CommentItem(
             }
         }
 
-        if (isExpanded && comment.replies.isNotEmpty()) {
+        if (isExpanded) {
             Column {
                 comment.replies.forEach { reply ->
                     CommentItem(

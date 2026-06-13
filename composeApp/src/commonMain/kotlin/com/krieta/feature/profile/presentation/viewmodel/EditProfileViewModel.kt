@@ -111,8 +111,8 @@ class EditProfileViewModel(
                 displayName = if (s.displayName != p.displayName) s.displayName else null,
                 username = if (s.username != p.username) s.username else null,
                 bio = if (s.bio != (p.bio ?: "")) s.bio else null,
-                avatarUrl = if (s.avatarUrl != (p.avatarUrl ?: "")) s.avatarUrl else null,
-                coverPhotoUrl = if (s.coverPhotoUrl != (p.coverPhotoUrl ?: "")) s.coverPhotoUrl else null
+                avatarUrl = s.avatarUrl.ifEmpty { null },
+                coverPhotoUrl = s.coverPhotoUrl.ifEmpty { null }
             )
             when (result) {
                 is NetworkResult.Success -> {
