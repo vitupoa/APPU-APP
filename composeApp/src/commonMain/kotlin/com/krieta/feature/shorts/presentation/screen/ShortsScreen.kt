@@ -58,6 +58,7 @@ import com.krieta.feature.wallet.domain.repository.WalletRepository
 import com.krieta.feature.sponsored.presentation.SponsoredBadge
 import com.krieta.feature.profile.domain.repository.ProfileRepository
 import com.krieta.feature.profile.presentation.screen.ProfileScreen
+import com.krieta.com.core.network.NetworkResult
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import com.krieta.feature.shorts.presentation.viewmodel.ShortsFeedType
