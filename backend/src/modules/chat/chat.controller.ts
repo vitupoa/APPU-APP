@@ -199,5 +199,25 @@ export class ChatController {
       next(error);
     }
   }
+
+  static async searchUsers(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const query = String(req.query.query || '');
+      const users = await ChatService.searchUsers(query);
+      res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async searchGroups(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const query = String(req.query.query || '');
+      const groups = await ChatService.searchGroups(query);
+      res.json(groups);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 

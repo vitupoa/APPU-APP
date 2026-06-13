@@ -731,4 +731,77 @@ export class ChatService {
 
     return { success: true };
   }
+
+  /**
+   * Search for users to start a chat with
+   */
+  static async searchUsers(query: string) {
+    if (!query || query.length < 2) {
+      return [];
+    }
+
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { username: { contains: query, mode: 'insensitive' } },
+          { display_name: { contains: query, mode: 'insensitive' } },
+          { first_name: { contains: query, mode: 'insensitive' } },
+          { last_name: { contains: query, mode: 'insensitive' } }
+        ]
+      },
+      take: 20,
+      select: {
+        id: true,
+        username: true,
+        display_name: true,
+        avatar_url: true,
+        is_verified: true
+      }
+    });
+
+    return users.map((u: any) => ({
+      id: u.id,
+      username: u.username,
+      display_name: u.display_name,
+      avatar_url: u.avatar_url,
+      is_verified: u.is_verified || false,
+      is_lovers: false
+    }));
+  }
+
+  /**
+   * Search for groups by name
+   */
+  static async searchGroups(query: string) {
+    if (!query || query.length < 2) {
+      return [];
+    }
+
+    const groups = await prisma.chat.findMany({
+      where: {
+        type: 'GROUP',
+        name: {
+          contains: query,
+          mode: 'insensitive'
+        }
+      },
+      take: 20,
+      include: {
+        chat_participant: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                display_name: true,
+                avatar_url: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    return groups.map(this.transformChat);
+  }
 }

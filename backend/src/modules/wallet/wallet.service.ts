@@ -243,15 +243,20 @@ export class WalletService {
 
   static async searchUsers(query: string) {
     if (!query || query.length < 2) {
+      console.log('⚠️ Search query too short or empty:', query);
       return [];
     }
+    
+    console.log('🔍 Searching for users with query:', query);
     
     // Search by username or display name
     const users = await prisma.user.findMany({
       where: {
         OR: [
           { username: { contains: query, mode: 'insensitive' } },
-          { display_name: { contains: query, mode: 'insensitive' } }
+          { display_name: { contains: query, mode: 'insensitive' } },
+          { first_name: { contains: query, mode: 'insensitive' } },
+          { last_name: { contains: query, mode: 'insensitive' } }
         ]
       },
       take: 20,
@@ -265,6 +270,11 @@ export class WalletService {
         admirers_count: true
       }
     });
+
+    console.log(`✅ Found ${users.length} users matching "${query}"`);
+    if (users.length > 0) {
+      console.log('Sample results:', users.slice(0, 3).map(u => ({ username: u.username, display_name: u.display_name })));
+    }
 
     return users.map((u: any) => ({
       id: u.id,

@@ -85,7 +85,7 @@ class ContestsRepositoryImpl(
     override suspend fun createContest(request: com.krieta.feature.contests.data.remote.dto.CreateContestRequestDto): NetworkResult<String> {
         return safeApiCall { 
             val response = api.createContest(request)
-            response.contestId
+            response.contestId ?: throw Exception(response.error ?: response.message ?: "Contest creation failed")
         }
     }
 

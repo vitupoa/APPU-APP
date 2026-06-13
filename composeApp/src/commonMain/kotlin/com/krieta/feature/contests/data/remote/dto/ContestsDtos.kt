@@ -109,8 +109,9 @@ data class CreateContestRequestDto(
 
 @Serializable
 data class CreateContestResponseDto(
-    val contestId: String,
-    val message: String = "Contest created successfully"
+    val contestId: String? = null,
+    val message: String? = null,
+    val error: String? = null
 )
 
 @Serializable

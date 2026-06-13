@@ -800,22 +800,8 @@ class CreateContestViewModel(
     // Step 3: Tasks Update Functions (Subtask 2.4)
     fun updateTaskType(v: TaskType) { _state.value = _state.value.copy(taskType = v) }
     fun updateTaskConfiguration(v: String) { 
-        try {
-            if (v.isNotBlank()) {
-                val validated = when (_state.value.taskType) {
-                    TaskType.SUBSCRIBE_YOUTUBE, TaskType.FOLLOW_SPOTIFY, 
-                    TaskType.WATCH_VIDEO, TaskType.VISIT_SHOP, TaskType.CUSTOM_TASK -> {
-                        InputValidator.validateUrl(v)
-                    }
-                    else -> InputValidator.validateText(v, "task")
-                }
-                _state.value = _state.value.copy(taskConfiguration = validated)
-            } else {
-                _state.value = _state.value.copy(taskConfiguration = v)
-            }
-        } catch (e: SecurityException) {
-            _state.value = _state.value.copy(error = e.message)
-        }
+        // Allow typing without validation - validation happens on add
+        _state.value = _state.value.copy(taskConfiguration = v)
     }
     fun updateCustomTaskName(v: String) { 
         try {
@@ -826,16 +812,8 @@ class CreateContestViewModel(
         }
     }
     fun updateCustomTaskLink(v: String) { 
-        try {
-            if (v.isNotBlank()) {
-                val validated = InputValidator.validateUrl(v)
-                _state.value = _state.value.copy(customTaskLink = validated)
-            } else {
-                _state.value = _state.value.copy(customTaskLink = v)
-            }
-        } catch (e: SecurityException) {
-            _state.value = _state.value.copy(error = e.message)
-        }
+        // Allow typing without validation - validation happens on add
+        _state.value = _state.value.copy(customTaskLink = v)
     }
     
     fun addTask() {
@@ -1157,7 +1135,7 @@ class CreateContestViewModel(
                         _state.value = _state.value.copy(
                             isPublishing = false,
                             success = false,
-                            error = result.message
+                            error = result.message ?: "Something went wrong. Please try again."
                         )
                         // Note: The UI remains on step 5 to allow the user to correct errors
                     }

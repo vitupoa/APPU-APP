@@ -34,4 +34,8 @@ router.post('/:chatId/manage-member', validateRequest(manageMemberSchema), ChatC
 router.post('/:chatId/transfer-ownership', validateRequest(transferOwnershipSchema), ChatController.transferOwnership);
 router.post('/:chatId/leave', ChatController.leaveGroup);
 
+// Search endpoints
+router.get('/search/users', ChatController.searchUsers);
+router.get('/search/groups', ChatController.searchGroups);
+
 export default router;
