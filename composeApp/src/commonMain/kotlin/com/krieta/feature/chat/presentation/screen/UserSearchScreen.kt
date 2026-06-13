@@ -23,6 +23,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.krieta.feature.chat.domain.repository.ChatRepository
 import com.krieta.com.core.network.NetworkResult
+import com.krieta.feature.chat.presentation.room.ChatRoomScreen
 import kotlinx.coroutines.launch
 
 data class UserSearchScreen(val title: String = "New Chat") : Screen {
@@ -35,6 +36,7 @@ data class UserSearchScreen(val title: String = "New Chat") : Screen {
         val state by viewModel.state.collectAsState()
         val scope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
+        var isCreatingChat by remember { mutableStateOf(false) }
 
         Scaffold(
             topBar = {
@@ -104,19 +106,36 @@ data class UserSearchScreen(val title: String = "New Chat") : Screen {
                         items(state.users, key = { it.id }) { user ->
                             UserSearchItem(
                                 user = user,
+                                isLoading = isCreatingChat,
                                 onClick = {
-                                    scope.launch {
-                                        when (val result = chatRepository.createDirectChat(user.id)) {
-                                            is NetworkResult.Success -> {
-                                                navigator.replace(com.krieta.feature.chat.presentation.room.ChatRoomScreen(
-                                                    result.data.id,
-                                                    user.displayName
-                                                ))
+                                    if (!isCreatingChat) {
+                                        isCreatingChat = true
+                                        scope.launch {
+                                            try {
+                                                when (val result = chatRepository.createDirectChat(user.id)) {
+                                                    is NetworkResult.Success -> {
+                                                        isCreatingChat = false
+                                                        navigator.replace(ChatRoomScreen(
+                                                            result.data.id,
+                                                            user.displayName
+                                                        ))
+                                                    }
+                                                    is NetworkResult.Error -> {
+                                                        isCreatingChat = false
+                                                        snackbarHostState.showSnackbar(
+                                                            result.message ?: "Failed to create chat"
+                                                        )
+                                                    }
+                                                    else -> {
+                                                        isCreatingChat = false
+                                                    }
+                                                }
+                                            } catch (e: Exception) {
+                                                isCreatingChat = false
+                                                snackbarHostState.showSnackbar(
+                                                    e.message ?: "An error occurred"
+                                                )
                                             }
-                                            is NetworkResult.Error -> {
-                                                snackbarHostState.showSnackbar(result.message ?: "Failed to create chat")
-                                            }
-                                            else -> {}
                                         }
                                     }
                                 }
@@ -132,12 +151,13 @@ data class UserSearchScreen(val title: String = "New Chat") : Screen {
 @Composable
 fun UserSearchItem(
     user: UserSearchResult,
+    isLoading: Boolean = false,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(enabled = !isLoading, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -166,6 +186,13 @@ fun UserSearchItem(
                 text = "@${user.username}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                strokeWidth = 2.dp
             )
         }
     }
