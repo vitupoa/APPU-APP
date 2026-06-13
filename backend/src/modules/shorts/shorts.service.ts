@@ -12,14 +12,17 @@ export class ShortsService {
    * Get shorts feed based on type
    * 
    * LOVERS TAB:
-   * - Shows shorts from mutual connections (both users admire each other)
+   * - Shows shorts from mutual admirers ONLY (both users admire each other, is_lovers: true)
    * 
-   * ADMIRING TAB (Following):
-   * - Shows YOUR OWN shorts
-   * - Shows shorts from users YOU are admiring (excludes mutual lovers already shown in Lovers tab)
+   * ADMIRING TAB:
+   * - Shows YOUR own shorts + shorts from people YOU admire who DON'T admire you back (one-way, is_lovers: false)
+   * - Does NOT include lovers (they're in Lovers tab)
    * 
-   * DISCOVER TAB (For You):
-   * - Shows shorts from everyone else (not in Lovers or Admiring tabs)
+   * DISCOVER TAB:
+   * - Shows shorts from everyone else
+   * - Excludes your own shorts
+   * - Excludes anyone YOU admire (whether mutual or one-way)
+   * - INCLUDES people who admire YOU but you don't admire back (strangers/followers)
    */
   static async getFeed(type: string, cursor?: string, limit = 20, userId?: string) {
     let whereClause: any = {};
@@ -47,14 +50,20 @@ export class ShortsService {
           select: { admired_id: true, is_lovers: true }
         });
         
-        // Filter out lovers (they appear in Lovers tab)
+        // Filter out lovers (they appear in Lovers tab) - only one-way admirers you follow
         const nonMutualIds = admiringList
           .filter((a: { admired_id: string; is_lovers: boolean }) => !a.is_lovers)
           .map((a: { admired_id: string }) => a.admired_id);
 
-        // Own shorts + non-mutual admirers (always include userId)
+        // Include own shorts + people you admire (non-mutual)
         const includeIds = [userId, ...nonMutualIds];
-        whereClause.user_id = { in: includeIds };
+        
+        if (includeIds.length > 1 || includeIds[0] === userId) {
+          whereClause.user_id = { in: includeIds };
+        } else {
+          // Only yourself, still show your shorts
+          whereClause.user_id = userId;
+        }
       } else if (type === 'discover') {
         // Get all people YOU are admiring
         // Discover should exclude: your own shorts + people you admire

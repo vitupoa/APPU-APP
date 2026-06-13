@@ -21,6 +21,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,6 +69,11 @@ class ChatListScreen : Screen {
         val storiesState by storiesViewModel.state.collectAsState()
         val chamaState by chamaViewModel.state.collectAsState()
         val scope = rememberCoroutineScope()
+        
+        // Refresh chats when screen becomes visible
+        LaunchedEffect(Unit) {
+            viewModel.refreshChats()
+        }
         
         val tokenManager = org.koin.compose.koinInject<com.krieta.com.core.security.TokenManager>()
         val currentUserId = runBlocking { tokenManager.getUserId() }
