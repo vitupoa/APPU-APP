@@ -52,6 +52,7 @@ export class ChatService {
       data: {
         id: uuidv4(),
         type: 'DIRECT',
+        updated_at: new Date(),
         chat_participant: {
           createMany: {
             data: participantIds.map(id => ({ 
@@ -89,6 +90,7 @@ export class ChatService {
         type: 'GROUP',
         name,
         description,
+        updated_at: new Date(),
         chat_participant: {
           createMany: {
             data: allParticipantIds.map((id: any) => ({

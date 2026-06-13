@@ -136,7 +136,12 @@ class CreateContestScreen : Screen {
                 if (errorMsg != null) {
                     ErrorMessageCard(
                         errorMessage = errorMsg,
-                        onDismiss = { viewModel.clearError() }
+                        onDismiss = { viewModel.clearError() },
+                        isInsufficientBalance = state.insufficientBalance,
+                        onTopup = {
+                            // Navigate to TopupScreen
+                            navigator.push(com.krieta.feature.wallet.presentation.screen.TopupScreen())
+                        }
                     )
                 }
 
@@ -368,7 +373,9 @@ fun BottomActionBar(
 @Composable
 fun ErrorMessageCard(
     errorMessage: String,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isInsufficientBalance: Boolean = false,
+    onTopup: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -380,39 +387,63 @@ fun ErrorMessageCard(
         border = BorderStroke(2.dp, Color(0xFFFF3B30)),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
             ) {
-                Text(
-                    text = "Error",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFFF3B30)
-                )
-                Text(
-                    text = errorMessage,
-                    fontSize = 14.sp,
-                    color = Color.White
-                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Error",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFFF3B30)
+                    )
+                    Text(
+                        text = errorMessage,
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
+                }
+                
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_close),
+                        contentDescription = "Dismiss error",
+                        tint = Color(0xFFFF3B30)
+                    )
+                }
             }
             
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier.size(24.dp)
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_close),
-                    contentDescription = "Dismiss error",
-                    tint = Color(0xFFFF3B30)
-                )
+            // Show Top Up button if insufficient balance
+            if (isInsufficientBalance) {
+                Button(
+                    onClick = onTopup,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFF5A623),
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "Top Up Wallet",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

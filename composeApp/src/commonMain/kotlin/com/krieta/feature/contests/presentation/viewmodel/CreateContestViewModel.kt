@@ -129,6 +129,11 @@ data class CreateContestState(
     val category: String = "CHALLENGE",
     val mediaType: String = "PHOTO_AND_VIDEO",
     
+    // Wallet Balance
+    val walletBalance: Double = 0.0,
+    val isLoadingBalance: Boolean = false,
+    val insufficientBalance: Boolean = false,
+    
     // UI State
     val isPosting: Boolean = false,
     val isPublishing: Boolean = false, // Task 12.2: Loading state for contest publishing
@@ -250,11 +255,23 @@ class CreateContestViewModel(
     private val repository: ContestsRepository,
     private val cloudinaryUploader: CloudinaryUploader,
     private val currencyProvider: com.krieta.com.core.location.UserCurrencyProvider,
-    private val profileRepository: com.krieta.feature.profile.domain.repository.ProfileRepository
+    private val profileRepository: com.krieta.feature.profile.domain.repository.ProfileRepository,
+    private val walletRepository: com.krieta.feature.wallet.domain.repository.WalletRepository
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(CreateContestState())
     val state: StateFlow<CreateContestState> = _state.asStateFlow()
+    
+    init {
+        // Load wallet balance on initialization
+        screenModelScope.launch {
+            walletRepository.balance.collect { balance ->
+                _state.value = _state.value.copy(
+                    walletBalance = balance?.krBalance ?: 0.0
+                )
+            }
+        }
+    }
 
     // Wizard Navigation Functions (Subtask 3.1)
     // Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9
@@ -950,7 +967,7 @@ class CreateContestViewModel(
      * Task 12.2: Error handling (Requirement 13.7)
      */
     fun clearError() {
-        _state.value = _state.value.copy(error = null)
+        _state.value = _state.value.copy(error = null, insufficientBalance = false)
     }
     
     // Legacy update functions (kept for backward compatibility)
@@ -1021,9 +1038,21 @@ class CreateContestViewModel(
             return
         }
         
+        // Check wallet balance before publishing
+        val totalPrize = currentState.totalPrizePool
+        val totalCostKr = convertToKr(totalPrize, applyMargin = false)
+        
+        if (currentState.walletBalance < totalCostKr) {
+            _state.value = currentState.copy(
+                insufficientBalance = true,
+                error = "Insufficient Kr balance. You need ${formatKr(totalCostKr)} but only have ${formatKr(currentState.walletBalance)}. Please top up your wallet."
+            )
+            return
+        }
+        
         screenModelScope.launch {
             // Task 12.2: Add loading state management during submission (Requirement 13.8, 13.9)
-            _state.value = currentState.copy(isPublishing = true, error = null)
+            _state.value = currentState.copy(isPublishing = true, error = null, insufficientBalance = false)
             
             try {
                 // Task 12.1: Construct comprehensive payload from all wizard steps (Requirement 13.1)
