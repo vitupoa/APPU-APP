@@ -51,6 +51,11 @@ class StoriesViewModel(
         }
     }
 
+    fun refresh() {
+        loadFeed()
+        loadMyStories()
+    }
+
     fun markStoryAsViewed(storyId: String) {
         screenModelScope.launch {
             // Optimistically update UI state

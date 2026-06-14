@@ -73,6 +73,7 @@ class ChatListScreen : Screen {
         // Refresh chats when screen becomes visible
         LaunchedEffect(Unit) {
             viewModel.refreshChats()
+            storiesViewModel.refresh()
         }
         
         val tokenManager = org.koin.compose.koinInject<com.krieta.com.core.security.TokenManager>()
