@@ -11,11 +11,44 @@ export class ChatService {
    */
   private static transformChat(chat: any) {
     return {
-      ...chat,
-      createdAt: chat.created_at,
-      updatedAt: chat.updated_at,
-      created_at: undefined,
-      updated_at: undefined,
+      id: chat.id,
+      type: chat.type,
+      name: chat.name,
+      description: chat.description,
+      avatarUrl: chat.avatar_url,
+      participants: chat.chat_participant?.map((p: any) => ({
+        id: p.id,
+        chatId: p.chat_id,
+        userId: p.user_id,
+        role: p.role,
+        joinedAt: p.created_at.toISOString(),
+        lastRead: p.lastRead.toISOString(),
+        user: p.user ? {
+          id: p.user.id,
+          username: p.user.username,
+          displayName: p.user.display_name,
+          avatarUrl: p.user.avatar_url
+        } : null
+      })) || [],
+      messages: chat.messages?.map((m: any) => ({
+        id: m.id,
+        chatId: m.chat_id,
+        senderId: m.sender_id,
+        payload: m.payload,
+        mediaUrl: m.media_url,
+        mediaType: m.media_type,
+        isSystemEvent: m.is_system_event,
+        status: m.status,
+        createdAt: m.created_at.toISOString(),
+        sender: m.User_messages_sender_idTouser ? {
+          id: m.User_messages_sender_idTouser.id,
+          username: m.User_messages_sender_idTouser.username,
+          displayName: m.User_messages_sender_idTouser.display_name,
+          avatarUrl: m.User_messages_sender_idTouser.avatar_url
+        } : null
+      })) || [],
+      createdAt: chat.created_at.toISOString(),
+      updatedAt: chat.updated_at.toISOString()
     };
   }
 
