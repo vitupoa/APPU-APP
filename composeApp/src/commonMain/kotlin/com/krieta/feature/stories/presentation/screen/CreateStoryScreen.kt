@@ -107,7 +107,7 @@ class CreateStoryScreen : Screen {
                                         "EXPIRES_IN_HOURS" to "24"
                                     )
                                 )
-                                navigator.pop() // Return immediately
+                                navigator.pop()
                             }
                         },
                         containerColor = MaterialTheme.colorScheme.primary,

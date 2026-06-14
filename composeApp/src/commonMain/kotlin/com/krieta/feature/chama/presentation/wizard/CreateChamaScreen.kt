@@ -480,14 +480,45 @@ private fun StepRules(state: CreateChamaState, viewModel: CreateChamaViewModel) 
         )
 
         OutlinedTextField(
-            value = state.penaltyAmountKr,
-            onValueChange = { viewModel.updatePenaltyAmountKr(it) },
-            label = { Text("Late Penalty (Kr, optional)") },
+            value = state.penaltyAmountFiat,
+            onValueChange = { viewModel.updatePenaltyAmountFiat(it) },
+            label = { Text("Late Penalty (${state.userCurrency}, optional)") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            shape = RoundedCornerShape(14.dp)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            shape = RoundedCornerShape(14.dp),
+            leadingIcon = { 
+                Text(
+                    state.userCurrency, 
+                    fontWeight = FontWeight.Bold, 
+                    modifier = Modifier.padding(start = 12.dp)
+                ) 
+            }
         )
+
+        // Penalty Amount - Kr (Read-only display)
+        if (state.penaltyAmountKr.isNotEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = ChamaGold.copy(alpha = 0.1f)
+                ),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "≈ ${state.penaltyAmountKr} Kr",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = ChamaGold
+                    )
+                }
+            }
+        }
 
         OutlinedTextField(
             value = state.gracePeriodDays,
@@ -593,7 +624,11 @@ private fun StepConfirmation(state: CreateChamaState) {
                     ConfirmRow("Membership Fee", "${state.membershipFeeKr} Kr")
                 }
                 if (state.maxMembers.isNotBlank()) ConfirmRow("Max Members", state.maxMembers)
-                if (state.penaltyAmountKr.isNotBlank()) ConfirmRow("Late Penalty", "${state.penaltyAmountKr} Kr")
+                if (state.penaltyAmountFiat.isNotBlank()) {
+                    ConfirmRow("Late Penalty", "${state.penaltyAmountFiat} ${state.userCurrency} (≈ ${state.penaltyAmountKr} Kr)")
+                } else if (state.penaltyAmountKr.isNotBlank()) {
+                    ConfirmRow("Late Penalty", "${state.penaltyAmountKr} Kr")
+                }
                 ConfirmRow("Grace Period", "${state.gracePeriodDays} days")
                 ConfirmRow("Min. Approvals", state.minApprovals)
                 ConfirmRow("Mid-Term Vote-Out", if (state.allowMidTermVoteOut) "Allowed" else "Disabled")

@@ -78,6 +78,12 @@ class ChatListScreen : Screen {
             chamaViewModel.loadMyChamas()
         }
         
+        // Additional delayed refresh for stories uploaded in background
+        LaunchedEffect(Unit) {
+            delay(2000)
+            storiesViewModel.refresh()
+        }
+        
         val tokenManager = org.koin.compose.koinInject<com.krieta.com.core.security.TokenManager>()
         val currentUserId = runBlocking { tokenManager.getUserId() }
         

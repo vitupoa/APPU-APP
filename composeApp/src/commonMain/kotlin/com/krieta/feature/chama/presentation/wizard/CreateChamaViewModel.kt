@@ -28,6 +28,7 @@ data class CreateChamaState(
     val membershipFeeKr: String = "",
     val membershipFeeFiat: String = "",
     val penaltyAmountKr: String = "",
+    val penaltyAmountFiat: String = "",
     val gracePeriodDays: String = "3",
     val minApprovals: String = "2",
     val allowMidTermVoteOut: Boolean = true,
@@ -165,6 +166,17 @@ class CreateChamaViewModel(
             state.copy(membershipFeeFiat = value, membershipFeeKr = newKr)
         }
     }
+    fun updatePenaltyAmountFiat(value: String) {
+        val fiat = value.toDoubleOrNull()
+        _state.update { state ->
+            val newKr = if (fiat != null && state.exchangeRate != null) {
+                formatString("%.2f", fiat * state.exchangeRate)
+            } else {
+                if (value.isEmpty()) "" else state.penaltyAmountKr
+            }
+            state.copy(penaltyAmountFiat = value, penaltyAmountKr = newKr)
+        }
+    }
     fun updatePenaltyAmountKr(value: String) = _state.update { it.copy(penaltyAmountKr = value) }
     fun updateGracePeriodDays(value: String) = _state.update { it.copy(gracePeriodDays = value) }
     fun updateMinApprovals(value: String) = _state.update { it.copy(minApprovals = value) }
@@ -214,7 +226,7 @@ class CreateChamaViewModel(
                 reason = s.reason.takeIf { it.isNotBlank() },
                 maxMembers = s.maxMembers.toIntOrNull(),
                 autoLockOnFull = s.autoLockOnFull,
-                contributionAmountKr = s.contributionAmountKr.toDouble(),
+                contributionAmountKr = s.contributionAmountKr.toDoubleOrNull() ?: s.contributionAmountFiat.toDoubleOrNull()?.let { it * (s.exchangeRate ?: 1.0) } ?: 0.0,
                 contributionFrequency = s.contributionFrequency,
                 membershipFeeKr = if (s.membershipFeeKr.isNotEmpty()) {
                     SafeConversion.toDoubleOrDefault(s.membershipFeeKr, "membershipFee", 0.0)
