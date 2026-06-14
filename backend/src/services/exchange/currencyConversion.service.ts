@@ -1,4 +1,5 @@
 import { ExchangeService } from './exchange.service.js';
+import { env } from '../../config/env.js';
 
 export class CurrencyConversionService {
   static async convertKrToFiat(krAmount: number, currency: string, type: 'buy' | 'sell' = 'sell'): Promise<number> {
@@ -10,7 +11,8 @@ export class CurrencyConversionService {
   static async convertFiatToKr(fiatAmount: number, currency: string, type: 'buy' | 'sell' = 'buy'): Promise<number> {
     const rate = await ExchangeService.getTransactionRate(currency, type);
     const baseUsd = fiatAmount / rate;
-    return Math.floor(baseUsd * 100);
+    // Convert USD to Kr using the configured rate: 1 USD = 100 Kr (since KR_TO_USD_RATE = 0.01)
+    return Math.floor(baseUsd / env.KR_TO_USD_RATE);
   }
 
   static async getDisplayConversion(krAmount: number, currency: string): Promise<number> {

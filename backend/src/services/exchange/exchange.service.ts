@@ -109,14 +109,16 @@ export class ExchangeService {
 
   /**
    * Fiat -> KR Conversion engine properly isolating the Tokenomic Pegs
-   * Kr 1 = $100.00 USD (Base Peg is Absolute)
+   * Kr 1 = $0.01 USD (Base Peg is Absolute)
+   * KR_TO_USD_RATE = 0.01
+   * KR_PRECISION = 1000000 (1 million base units = 1 Kr)
    */
   static getKrFromUSD(usdAmount: number): number {
-      return usdAmount / 100;
+      return usdAmount / 0.01; // 1 USD = 100 Kr
   }
 
   static getUSDFromKr(krAmount: number): number {
-      return krAmount * 100;
+      return krAmount * 0.01; // 1 Kr = 0.01 USD
   }
 
   /**
@@ -130,8 +132,8 @@ export class ExchangeService {
    */
   static async getTransactionRate(localCurrency: string, type: 'buy' | 'sell'): Promise<number> {
     const usdToFiatRate = await this.getRate(localCurrency);
-    // 1 Kr = 100 USD
-    const krToFiatRate = usdToFiatRate * 100;
+    // 1 Kr = 0.01 USD
+    const krToFiatRate = usdToFiatRate * 0.01;
     
     if (type === 'buy') {
       const TOPUP_MARGIN = 0.045; // 4.5% Spread explicitly isolated preventing arbitrage 

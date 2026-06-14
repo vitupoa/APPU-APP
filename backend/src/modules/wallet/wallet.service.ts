@@ -39,7 +39,7 @@ export class WalletService {
 
     const currencyToUse = targetCurrency || wallet.user.currency;
     const fiatRate = await ExchangeService.getDisplayRate(currencyToUse);
-    const baseUsd = Number(wallet.kr_balance) / 100;
+    const baseUsd = Number(wallet.kr_balance) * 0.01; // 1 Kr = 0.01 USD
     const fiatEquivalent = baseUsd * fiatRate;
 
     return {
@@ -65,7 +65,7 @@ export class WalletService {
       throw new Error("Tip amount must be a whole Kr integer strictly above 0.");
     }
 
-    // 1 Kr = $0.01. Calculate specific fiat tracking values!
+    // 1 Kr = 0.01 USD. Calculate specific fiat tracking values!
     const baseUsd = ExchangeService.getUSDFromKr(senderKrAmount);
     const localRate = await ExchangeService.getTransactionRate(senderCurrency, 'sell');
     const fiatAmount = baseUsd * localRate;
@@ -229,7 +229,7 @@ export class WalletService {
     const fiatRate = await ExchangeService.getDisplayRate(currency);
 
     return transactions.map(tx => {
-      const baseUsd = Number(tx.amount_kr) / 100;
+      const baseUsd = Number(tx.amount_kr) * 0.01; // 1 Kr = 0.01 USD
       const fiatEquivalent = baseUsd * fiatRate;
 
       return {
@@ -362,7 +362,7 @@ export class WalletService {
     // Convert to USD base
     const baseUsd = fiatAfterMargin / buyRate;
     
-    // Convert to Kr (1 Kr = $0.01 USD)
+    // Convert to Kr (1 Kr = 0.01 USD, so 1 USD = 100 Kr)
     const krAmount = Math.floor(baseUsd * 100);
 
     if (krAmount < 1) {

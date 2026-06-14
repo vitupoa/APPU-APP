@@ -72,6 +72,10 @@ const envSchema = z.object({
   EXCHANGE_RATE_BASE_URL: z.string().default(
     'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies'
   ),
+
+  // Kr Coin Configuration
+  KR_TO_USD_RATE: z.string().default('0.01').transform(Number),
+  KR_PRECISION: z.string().default('1000000').transform(Number),
 });
 
 export type Env = z.infer<typeof envSchema>;
