@@ -28,7 +28,7 @@ class ChatApi(private val httpClient: HttpClient) {
 
     suspend fun createGroupChat(
         name: String,
-        description: String? = null,
+        description: String,
         participantIds: List<String>
     ): ChatResponseDto {
         return httpClient.post("${ApiConstants.CHAT}/group") {

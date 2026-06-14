@@ -33,7 +33,8 @@ class CreateGroupScreen : Screen {
 
         LaunchedEffect(state.successChatId) {
             state.successChatId?.let { chatId ->
-                navigator.replace(com.krieta.feature.chat.presentation.room.ChatRoomScreen(
+                navigator.pop()
+                navigator.push(com.krieta.feature.chat.presentation.room.ChatRoomScreen(
                     chatId,
                     state.groupName
                 ))
@@ -58,7 +59,7 @@ class CreateGroupScreen : Screen {
                     actions = {
                         IconButton(
                             onClick = { viewModel.createGroup() },
-                            enabled = state.groupName.isNotBlank() && state.selectedUserIds.size >= 2 && !state.isCreating
+                            enabled = state.groupName.isNotBlank() && state.groupDescription.isNotBlank() && state.selectedUserIds.size >= 2 && !state.isCreating
                         ) {
                             if (state.isCreating) {
                                 CircularProgressIndicator(
@@ -99,7 +100,7 @@ class CreateGroupScreen : Screen {
                     OutlinedTextField(
                         value = state.groupDescription,
                         onValueChange = { viewModel.onGroupDescriptionChange(it) },
-                        label = { Text("Description (Optional)") },
+                        label = { Text("Description") },
                         placeholder = { Text("What's this group about?") },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 2,

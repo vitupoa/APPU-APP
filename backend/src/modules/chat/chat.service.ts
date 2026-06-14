@@ -114,7 +114,11 @@ export class ChatService {
   /**
    * Create a Group Chat
    */
-  static async createGroupChat(userId: string, name: string, description?: string, participantIds: string[] = []) {
+  static async createGroupChat(userId: string, name: string, description: string, participantIds: string[] = []) {
+    if (!description || description.trim().length === 0) {
+      throw new Error('Description is required');
+    }
+
     const allParticipantIds = Array.from(new Set([userId, ...participantIds]));
 
     const chat = await prisma.chat.create({

@@ -90,8 +90,8 @@ class CreateGroupViewModel(
 
     fun createGroup() {
         val currentState = _state.value
-        if (currentState.groupName.isBlank() || currentState.selectedUserIds.size < 2) {
-            _state.value = _state.value.copy(error = "Group name required and at least 2 members needed")
+        if (currentState.groupName.isBlank() || currentState.groupDescription.isBlank() || currentState.selectedUserIds.size < 2) {
+            _state.value = _state.value.copy(error = "Group name, description, and at least 2 members required")
             return
         }
 
@@ -99,7 +99,7 @@ class CreateGroupViewModel(
             _state.value = _state.value.copy(isCreating = true, error = null)
             when (val result = chatRepository.createGroupChat(
                 name = currentState.groupName,
-                description = currentState.groupDescription.takeIf { it.isNotBlank() },
+                description = currentState.groupDescription,
                 participantIds = currentState.selectedUserIds.toList()
             )) {
                 is NetworkResult.Success -> {

@@ -15,8 +15,8 @@ export class ChamaService {
     data: {
       name: string;
       type: ChamaType;
-      description?: string;
-      reason?: string;
+      description: string;
+      reason: string;
       maxMembers?: number;
       autoLockOnFull?: boolean;
       contributionAmountKr: number;
@@ -29,6 +29,14 @@ export class ChamaService {
       allowMidTermVoteOut?: boolean;
     }
   ) {
+    // Validate required fields
+    if (!data.description || data.description.trim() === '') {
+      throw new Error('Description is required');
+    }
+    if (!data.reason || data.reason.trim() === '') {
+      throw new Error('Purpose is required');
+    }
+
     // Wave 2 Task 9.2: Validate creator is KYC-approved
     const isKYCApproved = await kycService.hasCompletedKYC(creatorId);
     if (!isKYCApproved) {

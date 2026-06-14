@@ -8,8 +8,8 @@ export const createDirectChatSchema = z.object({
 
 export const createGroupChatSchema = z.object({
   body: z.object({
-    name: z.string().min(1).max(100),
-    description: z.string().optional(),
+    name: z.string().min(1, 'Group name is required').max(100),
+    description: z.string().min(1, 'Description is required'),
     participantIds: z.array(z.string().uuid()).min(1).max(1000),
   }),
 });

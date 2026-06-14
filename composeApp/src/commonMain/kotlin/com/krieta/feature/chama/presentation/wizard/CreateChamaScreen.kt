@@ -227,7 +227,6 @@ private fun StepBasicInfo(state: CreateChamaState, viewModel: CreateChamaViewMod
         Text("Chama Type", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
         val types = listOf(
             Triple("ROTATING", "Merry-Go-Round", painterResource(Res.drawable.ic_sync)),
-            Triple("INVESTMENT", "Investment", painterResource(Res.drawable.ic_trending_up)),
             Triple("WELFARE", "Welfare", painterResource(Res.drawable.ic_favorite)),
             Triple("HYBRID", "Hybrid", painterResource(Res.drawable.ic_dashboard))
         )
@@ -245,7 +244,7 @@ private fun StepBasicInfo(state: CreateChamaState, viewModel: CreateChamaViewMod
         OutlinedTextField(
             value = state.description,
             onValueChange = { viewModel.updateDescription(it) },
-            label = { Text("Description (optional)") },
+            label = { Text("Description") },
             modifier = Modifier.fillMaxWidth(),
             minLines = 2,
             maxLines = 4,
@@ -255,7 +254,7 @@ private fun StepBasicInfo(state: CreateChamaState, viewModel: CreateChamaViewMod
         OutlinedTextField(
             value = state.reason,
             onValueChange = { viewModel.updateReason(it) },
-            label = { Text("Purpose (optional)") },
+            label = { Text("Purpose") },
             placeholder = { Text("e.g. School fees, Emergency fund") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,

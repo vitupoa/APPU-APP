@@ -85,7 +85,7 @@ data class CreateDirectChatRequest(
 @Serializable
 data class CreateGroupChatRequest(
     val name: String,
-    val description: String? = null,
+    val description: String,
     val participantIds: List<String>
 )
 

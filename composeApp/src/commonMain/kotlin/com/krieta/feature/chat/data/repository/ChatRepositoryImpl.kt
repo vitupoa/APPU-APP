@@ -39,7 +39,7 @@ class ChatRepositoryImpl(
 
     override suspend fun createGroupChat(
         name: String,
-        description: String?,
+        description: String,
         participantIds: List<String>
     ): NetworkResult<Chat> {
         return safeApiCall {

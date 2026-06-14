@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const createChamaSchema = z.object({
   name: z.string().min(2).max(100),
   type: z.enum(['MERRY_GO_ROUND', 'WELFARE']),
-  description: z.string().optional(),
-  reason: z.string().optional(),
+  description: z.string().min(1, 'Description is required'),
+  reason: z.string().min(1, 'Purpose is required'),
   maxMembers: z.number().int().min(2).optional(),
   autoLockOnFull: z.boolean().optional(),
   contributionAmountKr: z.number().positive(),

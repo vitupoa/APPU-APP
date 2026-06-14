@@ -185,14 +185,14 @@ class CreateChamaViewModel(
     fun canProceed(): Boolean {
         val s = _state.value
         return when (s.currentStep) {
-            0 -> s.name.length >= 2
+            0 -> s.name.length >= 2 && s.description.isNotBlank() && s.reason.isNotBlank()
             1 -> {
                 val amount = SafeConversion.toDoubleOrDefault(
                     s.contributionAmountKr,
                     "contributionAmount",
                     0.0
                 )
-                amount > 0
+                amount > 0 && s.contributionFrequency.isNotBlank()
             }
             2 -> true // Optional settings
             3 -> true // Confirmation

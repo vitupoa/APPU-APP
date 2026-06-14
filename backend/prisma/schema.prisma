@@ -374,13 +374,13 @@ model chama {
   avatar_url                String?
   contributionFrequency     ContributionFrequency
   creator_id                String
-  description               String?
+  description               String
   gracePeriodDays           Int                   @default(3)
   isLocked                  Boolean               @default(false)
   lockPeriodDays            Int?
   maxMembers                Int?
   membershipFeeKr           Decimal?              @db.Decimal(18, 4)
-  reason                    String?
+  reason                    String
   type                      ChamaType
   status                    ChamaStatus           @default(SETUP)
   kyc_verified_members_only Boolean               @default(true)

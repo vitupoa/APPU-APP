@@ -74,6 +74,7 @@ class ChatListScreen : Screen {
         LaunchedEffect(Unit) {
             viewModel.refreshChats()
             storiesViewModel.refresh()
+            chamaViewModel.loadMyChamas()
         }
         
         val tokenManager = org.koin.compose.koinInject<com.krieta.com.core.security.TokenManager>()
