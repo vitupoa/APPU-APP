@@ -115,6 +115,7 @@ data class UserSearchScreen(val title: String = "New Chat") : Screen {
                                                 when (val result = chatRepository.createDirectChat(user.id)) {
                                                     is NetworkResult.Success -> {
                                                         isCreatingChat = false
+                                                        navigator.pop()
                                                         navigator.push(ChatRoomScreen(
                                                             result.data.id,
                                                             user.displayName

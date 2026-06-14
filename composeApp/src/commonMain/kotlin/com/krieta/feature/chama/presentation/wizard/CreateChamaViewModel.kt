@@ -187,12 +187,12 @@ class CreateChamaViewModel(
         return when (s.currentStep) {
             0 -> s.name.length >= 2 && s.description.isNotBlank() && s.reason.isNotBlank()
             1 -> {
-                val amount = SafeConversion.toDoubleOrDefault(
-                    s.contributionAmountKr,
-                    "contributionAmount",
-                    0.0
-                )
-                amount > 0 && s.contributionFrequency.isNotBlank()
+                // Check if either Fiat or Kr amount is valid
+                val krAmount = s.contributionAmountKr.toDoubleOrNull() ?: 0.0
+                val fiatAmount = s.contributionAmountFiat.toDoubleOrNull() ?: 0.0
+                val hasValidAmount = krAmount > 0 || fiatAmount > 0
+                val hasFrequency = s.contributionFrequency.isNotBlank()
+                hasValidAmount && hasFrequency
             }
             2 -> true // Optional settings
             3 -> true // Confirmation

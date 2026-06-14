@@ -40,11 +40,11 @@ export class ChatService {
         isSystemEvent: m.is_system_event,
         status: m.status,
         createdAt: m.created_at.toISOString(),
-        sender: m.User_messages_sender_idTouser ? {
-          id: m.User_messages_sender_idTouser.id,
-          username: m.User_messages_sender_idTouser.username,
-          displayName: m.User_messages_sender_idTouser.display_name,
-          avatarUrl: m.User_messages_sender_idTouser.avatar_url
+        sender: m.user_messages_sender_idTouser ? {
+          id: m.user_messages_sender_idTouser.id,
+          username: m.user_messages_sender_idTouser.username,
+          displayName: m.user_messages_sender_idTouser.display_name,
+          avatarUrl: m.user_messages_sender_idTouser.avatar_url
         } : null
       })) || [],
       createdAt: chat.created_at.toISOString(),
@@ -176,7 +176,7 @@ export class ChatService {
           orderBy: { created_at: 'desc' }, 
           take: 1,
           include: {
-            User_messages_sender_idTouser: {
+            user_messages_sender_idTouser: {
               select: {
                 id: true,
                 username: true,
@@ -294,8 +294,8 @@ export class ChatService {
         status: 'sent',
       },
       include: {
-        User_messages_sender_idToUser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
-        User_messages_forwarded_from_idToUser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
+        user_messages_sender_idTouser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
+        user_messages_forwarded_from_idTouser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
       },
     });
 
@@ -378,7 +378,7 @@ export class ChatService {
     const originalMessage = await prisma.messages.findUnique({
       where: { id: messageId },
       include: {
-        User_messages_sender_idToUser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
+        user_messages_sender_idTouser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
       },
     });
 
@@ -408,8 +408,8 @@ export class ChatService {
         status: 'sent',
       },
       include: {
-        User_messages_sender_idToUser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
-        User_messages_forwarded_from_idToUser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
+        user_messages_sender_idTouser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
+        user_messages_forwarded_from_idTouser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
       },
     });
 
@@ -455,8 +455,8 @@ export class ChatService {
     return prisma.messages.findMany({
       where: { chat_id },
       include: {
-        User_messages_sender_idToUser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
-        User_messages_forwarded_from_idToUser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
+        user_messages_sender_idTouser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
+        user_messages_forwarded_from_idTouser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
       },
       orderBy: { created_at: 'desc' },
       skip,
@@ -513,7 +513,7 @@ export class ChatService {
         status: 'sent',
       },
       include: {
-        User_messages_sender_idToUser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
+        user_messages_sender_idTouser: { select: { id: true, username: true, display_name: true, avatar_url: true } },
       },
     });
 

@@ -70,8 +70,9 @@ class ChatListScreen : Screen {
         val chamaState by chamaViewModel.state.collectAsState()
         val scope = rememberCoroutineScope()
         
-        // Refresh chats when screen becomes visible
-        LaunchedEffect(Unit) {
+        // Use LaunchedEffect with a key that changes when returning from other screens
+        // This will re-trigger when the navigator changes
+        LaunchedEffect(navigator.lastItem) {
             viewModel.refreshChats()
             storiesViewModel.refresh()
             chamaViewModel.loadMyChamas()
