@@ -89,7 +89,11 @@ class ChatRoomScreen(private val chatId: String, private val chatTitle: String) 
             topBar = {
                 TopAppBar(
                     title = { 
-                        Column {
+                        Column(modifier = Modifier.clickable {
+                            if (state.chatType == com.krieta.feature.chat.domain.model.ChatType.GROUP) {
+                                navigator.push(com.krieta.feature.chat.presentation.info.GroupInfoScreen(chatId))
+                            }
+                        }) {
                             Text(chatTitle, fontWeight = FontWeight.Bold)
                             if (state.typingUsers.isNotEmpty()) {
                                 Text(

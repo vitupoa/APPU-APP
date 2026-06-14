@@ -54,6 +54,7 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
         var showContributeDialog by remember { mutableStateOf(false) }
         var contributeAmount by remember { mutableStateOf("") }
         var showEditDialog by remember { mutableStateOf(false) }
+        var showDeleteDialog by remember { mutableStateOf(false) }
 
         // Snackbar host
         val snackbarHostState = remember { SnackbarHostState() }
@@ -62,6 +63,12 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
             if (msg != null) {
                 snackbarHostState.showSnackbar(msg)
                 viewModel.clearMessages()
+            }
+        }
+
+        LaunchedEffect(state.deleteSuccess) {
+            if (state.deleteSuccess) {
+                navigator.popUntilRoot()
             }
         }
 
@@ -86,6 +93,9 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
                         if (state.chama?.creatorId == state.currentUserId) {
                             IconButton(onClick = { showEditDialog = true }) {
                                 Icon(painterResource(Res.drawable.ic_edit), contentDescription = "Edit")
+                            }
+                            IconButton(onClick = { showDeleteDialog = true }) {
+                                Icon(painterResource(Res.drawable.ic_delete), contentDescription = "Delete", tint = ChamaRed)
                             }
                         }
                         if (state.chama?.status == "SETUP") {
@@ -240,6 +250,30 @@ class ChamaDashboardScreen(private val chamaId: String) : Screen {
                 onSave = { name, description, avatarUrl ->
                     viewModel.updateChamaDetails(name, description, avatarUrl)
                     showEditDialog = false
+                }
+            )
+        }
+
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("Delete Chama?", fontWeight = FontWeight.Bold) },
+                text = { Text("This action cannot be undone. All chama data including transactions, elections, and cycles will be permanently deleted.") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.deleteChama()
+                            showDeleteDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = ChamaRed)
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text("Cancel")
+                    }
                 }
             )
         }

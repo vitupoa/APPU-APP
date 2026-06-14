@@ -52,6 +52,13 @@ class ChamaRepositoryImpl(
         }
     }
 
+    override suspend fun deleteChama(id: String): NetworkResult<Boolean> {
+        return safeApiCall {
+            api.deleteChama(id)
+            true
+        }
+    }
+
     override suspend fun joinChama(id: String): NetworkResult<ChamaDto> {
         return safeApiCall { 
             val response = api.joinChama(id)

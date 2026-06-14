@@ -23,6 +23,7 @@ data class ChamaDashboardState(
     val currentUserId: String? = null,
     val isLoading: Boolean = true,
     val isContributing: Boolean = false,
+    val deleteSuccess: Boolean = false,
     val error: String? = null,
     val successMessage: String? = null,
     val selectedTab: Int = 0 // 0=Overview, 1=Members, 2=Transactions, 3=Elections
@@ -338,6 +339,27 @@ class ChamaDashboardViewModel(
                             isLoading = false,
                             chama = result.data,
                             successMessage = "Group details updated successfully"
+                        ) 
+                    }
+                }
+                is NetworkResult.Loading -> {}
+                is NetworkResult.Error -> {
+                    _state.update { it.copy(isLoading = false, error = result.message) }
+                }
+            }
+        }
+    }
+
+    fun deleteChama() {
+        screenModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            when (val result = repository.deleteChama(chamaId)) {
+                is NetworkResult.Success -> {
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            deleteSuccess = true,
+                            successMessage = "Chama deleted successfully"
                         ) 
                     }
                 }

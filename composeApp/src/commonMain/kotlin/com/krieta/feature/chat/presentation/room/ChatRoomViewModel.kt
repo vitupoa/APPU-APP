@@ -36,6 +36,7 @@ data class SelectedMedia(
 data class ChatRoomState(
     val messages: List<ChatMessage> = emptyList(),
     val currentUserId: String = "",
+    val chatType: com.krieta.feature.chat.domain.model.ChatType? = null,
     val replyingTo: ChatMessage? = null,
     val selectedMessage: ChatMessage? = null,
     val isLoading: Boolean = false,
@@ -63,9 +64,22 @@ class ChatRoomViewModel(
 
     init {
         loadCurrentUserId()
+        loadChatDetails()
         loadMessages()
         observeWebSocketEvents()
         observeTypingIndicators()
+    }
+
+    private fun loadChatDetails() {
+        screenModelScope.launch {
+            when (val result = repository.getChatById(chatId)) {
+                is NetworkResult.Success -> {
+                    _state.value = _state.value.copy(chatType = result.data.type)
+                }
+                is NetworkResult.Error -> {}
+                is NetworkResult.Loading -> {}
+            }
+        }
     }
 
     @OptIn(ExperimentalEncodingApi::class)

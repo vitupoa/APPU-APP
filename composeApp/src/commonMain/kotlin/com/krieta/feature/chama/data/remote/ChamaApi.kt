@@ -45,6 +45,10 @@ class ChamaApi(private val httpClient: HttpClient) {
         return httpClient.post("${ApiConstants.CHAMAS}/$id/activate").body()
     }
 
+    suspend fun deleteChama(id: String): DefaultSuccessResponseDto {
+        return httpClient.delete("${ApiConstants.CHAMAS}/$id").body()
+    }
+
     // --- Membership ---
     suspend fun joinChama(id: String): ChamaResponseDto {
         return httpClient.post("${ApiConstants.CHAMAS}/$id/join").body()

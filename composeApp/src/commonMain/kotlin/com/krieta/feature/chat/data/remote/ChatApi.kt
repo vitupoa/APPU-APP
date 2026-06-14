@@ -20,6 +20,10 @@ class ChatApi(private val httpClient: HttpClient) {
         }.body()
     }
 
+    suspend fun getChatById(chatId: String): ChatResponseDto {
+        return httpClient.get("${ApiConstants.CHAT}/$chatId").body()
+    }
+
     suspend fun createDirectChat(recipientId: String): ChatResponseDto {
         return httpClient.post("${ApiConstants.CHAT}/direct") {
             setBody(CreateDirectChatRequest(recipientId))
@@ -111,6 +115,10 @@ class ChatApi(private val httpClient: HttpClient) {
         return httpClient.post("${ApiConstants.CHAT}/$chatId/typing") {
             setBody(TypingIndicatorRequest(isTyping))
         }.body()
+    }
+
+    suspend fun deleteGroup(chatId: String): ActionResponse {
+        return httpClient.delete("${ApiConstants.CHAT}/$chatId").body()
     }
 }
 

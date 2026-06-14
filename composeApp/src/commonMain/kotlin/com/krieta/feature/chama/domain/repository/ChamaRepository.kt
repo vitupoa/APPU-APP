@@ -11,6 +11,7 @@ interface ChamaRepository {
     suspend fun getChamaById(id: String): NetworkResult<ChamaDto>
     suspend fun updateChama(id: String, request: UpdateChamaRequest): NetworkResult<ChamaDto>
     suspend fun activateChama(id: String): NetworkResult<ChamaDto>
+    suspend fun deleteChama(id: String): NetworkResult<Boolean>
 
     // Membership
     suspend fun joinChama(id: String): NetworkResult<ChamaDto>

@@ -31,6 +31,12 @@ class ChatRepositoryImpl(
         }
     }
 
+    override suspend fun getChatById(chatId: String): NetworkResult<Chat> {
+        return safeApiCall {
+            api.getChatById(chatId).chat.toDomain()
+        }
+    }
+
     override suspend fun createDirectChat(recipientId: String): NetworkResult<Chat> {
         return safeApiCall {
             api.createDirectChat(recipientId).chat.toDomain()
@@ -117,6 +123,18 @@ class ChatRepositoryImpl(
     ): NetworkResult<Chat> {
         return safeApiCall {
             api.updateGroupChat(chatId, name, description, avatarUrl).chat.toDomain()
+        }
+    }
+
+    override suspend fun updateGroup(chatId: String, name: String, description: String?): NetworkResult<Chat> {
+        return safeApiCall {
+            api.updateGroupChat(chatId, name, description, null).chat.toDomain()
+        }
+    }
+
+    override suspend fun deleteGroup(chatId: String): NetworkResult<Boolean> {
+        return safeApiCall {
+            api.deleteGroup(chatId).success
         }
     }
 
