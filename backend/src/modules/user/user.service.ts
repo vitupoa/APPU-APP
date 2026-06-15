@@ -127,6 +127,8 @@ export class UserService {
     bio?: string;
     avatar_url?: string;
     cover_photo_url?: string;
+    selectedNiches?: string[];
+    customNiches?: string[];
   }) {
     const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
@@ -141,6 +143,8 @@ export class UserService {
     if (data.bio !== undefined) updateData.bio = data.bio;
     if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url;
     if (data.cover_photo_url !== undefined) updateData.cover_photo_url = data.cover_photo_url;
+    if (data.selectedNiches !== undefined) updateData.selectedNiches = data.selectedNiches;
+    if (data.customNiches !== undefined) updateData.customNiches = data.customNiches;
     if (!user.is_wallet_unlocked) {
       if (data.first_name) updateData.first_name = data.first_name;
       if (data.last_name) updateData.last_name = data.last_name;

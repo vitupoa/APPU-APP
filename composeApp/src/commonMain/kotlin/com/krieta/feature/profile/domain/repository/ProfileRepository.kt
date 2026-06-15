@@ -12,7 +12,8 @@ interface ProfileRepository {
     suspend fun getProfile(userId: String): NetworkResult<UserProfile>
     suspend fun updateProfile(
         firstName: String?, lastName: String?, displayName: String?,
-        username: String?, bio: String?, avatarUrl: String?, coverPhotoUrl: String?
+        username: String?, bio: String?, avatarUrl: String?, coverPhotoUrl: String?,
+        selectedNiches: List<String>? = null, customNiches: List<String>? = null
     ): NetworkResult<UserProfile>
     suspend fun searchUsers(query: String): NetworkResult<List<SocialUser>>
     suspend fun updateBioLinks(links: List<BioLink>): NetworkResult<List<BioLink>>

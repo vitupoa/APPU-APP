@@ -22,7 +22,9 @@ const updateProfileSchema = z.object({
   username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/).optional(),
   bio: z.string().max(300).optional(),
   avatar_url: z.string().url().optional().or(z.literal('')).nullable(),
-  cover_photo_url: z.string().url().optional().or(z.literal('')).nullable()
+  cover_photo_url: z.string().url().optional().or(z.literal('')).nullable(),
+  selectedNiches: z.array(z.string()).max(5).optional(),
+  customNiches: z.array(z.string()).max(3).optional()
 });
 
 

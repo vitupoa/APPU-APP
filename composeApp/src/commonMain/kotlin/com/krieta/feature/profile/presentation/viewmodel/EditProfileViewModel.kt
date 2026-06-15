@@ -112,7 +112,9 @@ class EditProfileViewModel(
                 username = if (s.username != p.username) s.username else null,
                 bio = if (s.bio != (p.bio ?: "")) s.bio else null,
                 avatarUrl = s.avatarUrl.ifEmpty { null },
-                coverPhotoUrl = s.coverPhotoUrl.ifEmpty { null }
+                coverPhotoUrl = s.coverPhotoUrl.ifEmpty { null },
+                selectedNiches = if (s.selectedNiches != p.selectedNiches) s.selectedNiches else null,
+                customNiches = if (s.customNiches != p.customNiches) s.customNiches else null
             )
             when (result) {
                 is NetworkResult.Success -> {

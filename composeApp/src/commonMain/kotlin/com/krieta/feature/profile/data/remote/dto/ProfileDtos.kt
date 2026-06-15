@@ -65,7 +65,9 @@ data class UpdateProfileRequestDto(
     @kotlinx.serialization.SerialName("avatar_url")
     val avatarUrl: String? = null,
     @kotlinx.serialization.SerialName("cover_photo_url")
-    val coverPhotoUrl: String? = null
+    val coverPhotoUrl: String? = null,
+    val selectedNiches: List<String>? = null,
+    val customNiches: List<String>? = null
 )
 
 @Serializable

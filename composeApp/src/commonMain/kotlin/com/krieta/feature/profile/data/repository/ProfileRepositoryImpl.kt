@@ -64,10 +64,11 @@ class ProfileRepositoryImpl(
 
     override suspend fun updateProfile(
         firstName: String?, lastName: String?, displayName: String?,
-        username: String?, bio: String?, avatarUrl: String?, coverPhotoUrl: String?
+        username: String?, bio: String?, avatarUrl: String?, coverPhotoUrl: String?,
+        selectedNiches: List<String>?, customNiches: List<String>?
     ): NetworkResult<UserProfile> = safeApiCall {
         val updated = api.updateProfile(
-            UpdateProfileRequestDto(firstName, lastName, displayName, username, bio, avatarUrl, coverPhotoUrl)
+            UpdateProfileRequestDto(firstName, lastName, displayName, username, bio, avatarUrl, coverPhotoUrl, selectedNiches, customNiches)
         ).toDomain()
         _profileUpdates.tryEmit(updated)
         updated
