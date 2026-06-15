@@ -158,7 +158,7 @@ class DripsScreen : Screen {
                     onDismiss = { showTippingFor = null },
                     onConfirm = { krAmount ->
                         scope.launch {
-                            walletRepository.sendTip(post.creator.id, krAmount.toInt(), currencyProvider.currencyCode)
+                            walletRepository.sendTip(post.creator.id, krAmount, currencyProvider.currencyCode)
                             showTippingFor = null
                         }
                     },

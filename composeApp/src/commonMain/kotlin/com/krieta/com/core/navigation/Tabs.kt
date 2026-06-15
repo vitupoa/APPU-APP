@@ -794,9 +794,12 @@ object ProfileTab : Tab {
 
     @Composable
     override fun Content() {
-        // ✅ Show logged-in user's profile directly without nested Navigator
-        // This prevents duplicate SaveableStateProvider keys
-        ProfileScreen(userId = null).Content()
+        Navigator(
+            screen = ProfileScreen(userId = null),
+            key = "ProfileNavigator"
+        ) {
+            CurrentScreen()
+        }
     }
 }
 
