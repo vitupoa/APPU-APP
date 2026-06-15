@@ -79,7 +79,7 @@ export class WalletService {
     const krDecimal = new Prisma.Decimal(roundedKrAmount);
     
     // TIPPING TAX LOGIC
-    const PLATFORM_FEE_RATE = 0.15; // 15% Explicit Cut mapped
+    const PLATFORM_FEE_RATE = 0.20; // 20% Explicit Cut mapped
     const platformCut = roundedKrAmount * PLATFORM_FEE_RATE;
     const recipientReceiveAmount = new Prisma.Decimal(roundedKrAmount - platformCut);
     const platformCutDecimal = new Prisma.Decimal(platformCut);
@@ -101,7 +101,7 @@ export class WalletService {
           data: { kr_balance: { decrement: krDecimal } }
         });
 
-        // Credit Recipient (-15% Platform cut applied -> 85%)
+        // Credit Recipient (-20% Platform cut applied -> 80%)
         const recipientWallet = await tx.wallets.upsert({
           where: { user_id: recipientId },
           create: { 
@@ -162,14 +162,14 @@ export class WalletService {
               amount_kr: platformCutDecimal,
               status: 'completed',
               provider: 'platform_engine',
-              description: `Platform fee (15%) from tip transaction`,
+              description: `Platform fee (20%) from tip transaction`,
               context: {
                 action: 'platform_fee',
                 source_transaction: 'tip',
                 sender_id: senderId,
                 recipient_id: recipientId,
                 fee_amount: platformCut,
-                fee_percentage: 15,
+                fee_percentage: 20,
                 original_amount: roundedKrAmount,
                 timestamp: new Date().toISOString()
               }

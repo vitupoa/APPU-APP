@@ -41,8 +41,7 @@ fun TippingModal(
     val exchangeRate by currencyProvider.exchangeRate.collectAsState()
     val currencyCode = currencyProvider.currencyCode
 
-    val minTipKr = 1.0
-    val krInt = krAmount.toInt()
+    val minTipKr = 0.01 // Changed from 1.0 to 0.01 to allow fractional tips
 
     // Quick-tip amounts in user's native fiat currency
     val quickFiatAmounts = listOf(500, 1000, 5000, 50000)
@@ -123,7 +122,7 @@ fun TippingModal(
                 )
 
                 // Validation: minimum tip
-                if (krInt in 1 until minTipKr.toInt()) {
+                if (krAmount > 0.0 && krAmount < minTipKr) {
                     Text(
                         "Minimum tip is ${KrCurrencyFormatter.formatKr(minTipKr)}",
                         style = MaterialTheme.typography.bodySmall,
@@ -132,7 +131,7 @@ fun TippingModal(
                 }
 
                 // Validation: insufficient balance
-                if (krInt > currentBalance.toInt()) {
+                if (krAmount > currentBalance) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -153,15 +152,15 @@ fun TippingModal(
                 Button(
                     onClick = {
                         when {
-                            krInt < minTipKr.toInt() -> {}
-                            krInt > currentBalance.toInt() -> onInsufficientBalance()
+                            krAmount < minTipKr -> {}
+                            krAmount > currentBalance -> onInsufficientBalance()
                             else -> onConfirm(krAmount)
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
-                    enabled = krInt >= minTipKr.toInt() && krInt <= currentBalance.toInt()
+                    enabled = krAmount >= minTipKr && krAmount <= currentBalance
                 ) {
-                    Text("Send Kr. $krInt Tip", fontWeight = FontWeight.Bold)
+                    Text("Send ${KrCurrencyFormatter.formatKr(krAmount)} Tip", fontWeight = FontWeight.Bold)
                 }
             }
         }

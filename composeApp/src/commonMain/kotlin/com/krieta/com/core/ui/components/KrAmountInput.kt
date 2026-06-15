@@ -78,10 +78,10 @@ fun KrAmountInput(
         OutlinedTextField(
             value = inputText,
             onValueChange = { value ->
-                // SECURITY: Only allow whole numbers (digits only, no decimals)
-                if (value.isEmpty() || value.matches(Regex("^\\d+$"))) {
+                // Allow whole numbers and decimals with up to 2 decimal places
+                if (value.isEmpty() || value.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
                     // Cap at reasonable length to prevent overflow
-                    if (value.length <= 10) {
+                    if (value.length <= 12) {
                         inputText = value
                     }
                 }

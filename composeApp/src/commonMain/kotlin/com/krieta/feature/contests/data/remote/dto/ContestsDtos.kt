@@ -109,6 +109,7 @@ data class CreateContestRequestDto(
 
 @Serializable
 data class CreateContestResponseDto(
+    @kotlinx.serialization.SerialName("contest_id")
     val contestId: String? = null,
     val message: String? = null,
     val error: String? = null
