@@ -259,7 +259,7 @@ class ShortsScreen(private val feedType: ShortsFeedType = ShortsFeedType.DISCOVE
                     onDismiss = { showTippingFor = null },
                     onConfirm = { krAmount ->
                         scope.launch {
-                            walletRepository.sendTip(short.creator.id, krAmount.toInt(), currencyProvider.currencyCode)
+                            walletRepository.sendTip(short.creator.id, krAmount, currencyProvider.currencyCode)
                             showTippingFor = null
                         }
                     },

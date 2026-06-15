@@ -10,7 +10,7 @@ interface WalletRepository {
     val balance: Flow<WalletBalance?>
     
     suspend fun getBalance(currency: String? = null): NetworkResult<WalletBalance>
-    suspend fun sendTip(recipientId: String, krAmount: Int, currency: String): NetworkResult<Double>
+    suspend fun sendTip(recipientId: String, krAmount: Double, currency: String): NetworkResult<Double>
     suspend fun getTransactions(limit: Int = 20, offset: Int = 0): NetworkResult<List<Transaction>>
     suspend fun getExchangeRate(currency: String): NetworkResult<ExchangeRate>
     suspend fun withdraw(request: WithdrawRequest): NetworkResult<WithdrawResponse>

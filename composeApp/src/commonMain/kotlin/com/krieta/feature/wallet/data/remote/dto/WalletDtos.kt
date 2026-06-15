@@ -16,7 +16,7 @@ data class WalletBalanceDto(
 @Serializable
 data class TipRequestDto(
     val recipientId: String,
-    val krAmount: Int,
+    val krAmount: Double,
     val currency: String,
     // MITM protection: HMAC signature over (recipientId, krAmount, currency, timestamp, nonce)
     val signature: String,

@@ -88,7 +88,7 @@ class FinancialTransactionSecurity {
      * 
      * @param senderId Sender user ID
      * @param recipientId Recipient user ID
-     * @param krAmount Amount in Kr
+     * @param krAmount Amount in Kr (supports fractional amounts)
      * @param nonce Unique request ID from server
      * @param timestamp Request timestamp
      * @return Signature or null if session invalid
@@ -96,7 +96,7 @@ class FinancialTransactionSecurity {
     suspend fun signTip(
         senderId: String,
         recipientId: String,
-        krAmount: Int,
+        krAmount: Double,
         nonce: String,
         timestamp: Long
     ): String? = mutex.withLock {

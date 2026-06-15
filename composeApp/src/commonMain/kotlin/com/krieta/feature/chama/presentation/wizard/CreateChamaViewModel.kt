@@ -226,14 +226,12 @@ class CreateChamaViewModel(
                 reason = s.reason.takeIf { it.isNotBlank() },
                 maxMembers = s.maxMembers.toIntOrNull(),
                 autoLockOnFull = s.autoLockOnFull,
-                contributionAmountKr = s.contributionAmountKr.toDoubleOrNull() ?: s.contributionAmountFiat.toDoubleOrNull()?.let { it * (s.exchangeRate ?: 1.0) } ?: 0.0,
+                contributionAmountKr = s.contributionAmountKr.takeIf { it.isNotBlank() }?.toDoubleOrNull() 
+                    ?: s.contributionAmountFiat.takeIf { it.isNotBlank() }?.toDoubleOrNull()?.let { it * (s.exchangeRate ?: 1.0) } 
+                    ?: 0.0,
                 contributionFrequency = s.contributionFrequency,
-                membershipFeeKr = if (s.membershipFeeKr.isNotEmpty()) {
-                    SafeConversion.toDoubleOrDefault(s.membershipFeeKr, "membershipFee", 0.0)
-                } else null,
-                penaltyAmountKr = if (s.penaltyAmountKr.isNotEmpty()) {
-                    SafeConversion.toDoubleOrDefault(s.penaltyAmountKr, "penaltyAmount", 0.0)
-                } else null,
+                membershipFeeKr = s.membershipFeeKr.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
+                penaltyAmountKr = s.penaltyAmountKr.takeIf { it.isNotBlank() }?.toDoubleOrNull(),
                 gracePeriodDays = s.gracePeriodDays.toIntOrNull() ?: 3,
                 minApprovals = s.minApprovals.toIntOrNull() ?: 2,
                 allowMidTermVoteOut = s.allowMidTermVoteOut

@@ -55,27 +55,33 @@ export class WalletService {
   /**
    * Transfers a Tip from one user to another atomically parsing explicit Tokenomics (15% platform cut).
    * Uses database locks to prevent race conditions.
+   * Supports fractional Kr amounts down to 0.01 Kr minimum (KES 0.013 / $0.0001)
    */
   static async sendTip(senderId: string, recipientId: string, senderKrAmount: number, senderCurrency: string) {
     if (senderId === recipientId) {
       throw new Error("You cannot tip yourself");
     }
 
-    if (!Number.isInteger(senderKrAmount) || senderKrAmount < 1) {
-      throw new Error("Tip amount must be a whole Kr integer strictly above 0.");
+    // Support fractional Kr amounts - minimum 0.01 Kr (approximately KES 0.013)
+    // This allows Kenyan users to tip as low as KES 1 (which is ~77 Kr)
+    if (typeof senderKrAmount !== 'number' || senderKrAmount < 0.01 || !isFinite(senderKrAmount)) {
+      throw new Error("Tip amount must be at least 0.01 Kr.");
     }
 
+    // Round to 2 decimal places to avoid floating point precision issues
+    const roundedKrAmount = Math.round(senderKrAmount * 100) / 100;
+
     // 1 Kr = 0.01 USD. Calculate specific fiat tracking values!
-    const baseUsd = ExchangeService.getUSDFromKr(senderKrAmount);
+    const baseUsd = ExchangeService.getUSDFromKr(roundedKrAmount);
     const localRate = await ExchangeService.getTransactionRate(senderCurrency, 'sell');
     const fiatAmount = baseUsd * localRate;
 
-    const krDecimal = new Prisma.Decimal(senderKrAmount);
+    const krDecimal = new Prisma.Decimal(roundedKrAmount);
     
     // TIPPING TAX LOGIC
     const PLATFORM_FEE_RATE = 0.15; // 15% Explicit Cut mapped
-    const platformCut = senderKrAmount * PLATFORM_FEE_RATE;
-    const recipientReceiveAmount = new Prisma.Decimal(senderKrAmount - platformCut);
+    const platformCut = roundedKrAmount * PLATFORM_FEE_RATE;
+    const recipientReceiveAmount = new Prisma.Decimal(roundedKrAmount - platformCut);
     const platformCutDecimal = new Prisma.Decimal(platformCut);
 
     // Execute atomic transaction with deadlock retry
@@ -85,7 +91,7 @@ export class WalletService {
         const wallets = await lockWalletsForUpdate(tx, [senderId, recipientId]);
         const senderWallet = wallets.find((w: any) => w.user_id === senderId);
         
-        if (!senderWallet || senderWallet.kr_balance < senderKrAmount) {
+        if (!senderWallet || Number(senderWallet.kr_balance) < roundedKrAmount) {
           throw new Error("Insufficient Kr balance to tip");
         }
 
@@ -127,7 +133,7 @@ export class WalletService {
                 action: 'tip_sent',
                 sender_id: senderId,
                 recipient_id: recipientId,
-                amount_kr: senderKrAmount,
+                amount_kr: roundedKrAmount,
                 timestamp: new Date().toISOString()
               }
             },
@@ -164,7 +170,7 @@ export class WalletService {
                 recipient_id: recipientId,
                 fee_amount: platformCut,
                 fee_percentage: 15,
-                original_amount: senderKrAmount,
+                original_amount: roundedKrAmount,
                 timestamp: new Date().toISOString()
               }
             }
@@ -182,7 +188,7 @@ export class WalletService {
 
         return {
           success: true,
-          krTipped: senderKrAmount,
+          krTipped: roundedKrAmount,
           krReceived: recipientReceiveAmount.toNumber(),
           platformFee: platformCut
         };

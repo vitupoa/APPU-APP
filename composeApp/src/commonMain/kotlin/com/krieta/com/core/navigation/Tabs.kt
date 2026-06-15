@@ -794,16 +794,9 @@ object ProfileTab : Tab {
 
     @Composable
     override fun Content() {
-        // ✅ ProfileTab ONLY shows the logged-in user's profile (no userId parameter)
-        // Other users' profiles should be pushed onto the current screen's Navigator,
-        // not navigated to via the ProfileTab. This follows the standard pattern
-        // used by Instagram, Twitter, etc. where the Profile tab is always "you".
-        Navigator(
-            screen = ProfileScreen(userId = null), // null = logged-in user
-            key = "ProfileTabNavigator"
-        ) {
-            CurrentScreen()
-        }
+        // ✅ Show logged-in user's profile directly without nested Navigator
+        // This prevents duplicate SaveableStateProvider keys
+        ProfileScreen(userId = null).Content()
     }
 }
 

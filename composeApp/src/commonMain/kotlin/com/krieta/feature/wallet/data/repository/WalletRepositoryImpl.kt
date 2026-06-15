@@ -63,15 +63,15 @@ class WalletRepositoryImpl(
         }
     }
 
-    override suspend fun sendTip(recipientId: String, krAmount: Int, currency: String): NetworkResult<Double> {
+    override suspend fun sendTip(recipientId: String, krAmount: Double, currency: String): NetworkResult<Double> {
         return safeApiCall {
             // CRITICAL: Block if offline
             offlineModeGuard.requireOnlineForFinancialTransaction()
             
-            // Validate amount
+            // Validate amount - minimum 0.01 Kr to support fractional tips
             val validation = financialSecurity.validateAmount(
-                amount = krAmount.toDouble(),
-                minAmount = 1.0,
+                amount = krAmount,
+                minAmount = 0.01,
                 maxAmount = 10000.0
             )
             if (!validation.isValid) {
