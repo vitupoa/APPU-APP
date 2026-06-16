@@ -414,8 +414,11 @@ export class FeedService {
   }) {
     console.log('[FeedService] Creating post with data:', data);
     
+    const postId = crypto.randomUUID();
+    
     const post = await prisma.post.create({
       data: {
+        id: postId,
         user_id: data.user_id,
         image_urls: data.imageUrls,
         caption: data.caption ?? '',
