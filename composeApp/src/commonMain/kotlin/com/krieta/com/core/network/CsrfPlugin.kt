@@ -11,12 +11,12 @@ val CsrfPlugin = createClientPlugin("CsrfPlugin", ::CsrfPluginConfig) {
     
     onRequest { request, _ ->
         val requiresCsrf = request.method in listOf(HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch, HttpMethod.Delete)
-        val path = request.url.encodedPath
+        val path = request.url.buildString()
         val isCsrfEndpoint = path.contains("/csrf-token")
         val isAuthRoute = path.contains("/auth/")
         
         if (requiresCsrf && !isCsrfEndpoint && !isAuthRoute) {
-            val csrfToken = runBlocking { csrfManager.getCsrfToken(client) }
+            val csrfToken = runBlocking { csrfManager.getCsrfToken(this@createClientPlugin.client) }
             if (csrfToken != null) {
                 request.headers.append("X-CSRF-Token", csrfToken)
                 println("🔒 Added CSRF token to ${request.method.value} $path")
