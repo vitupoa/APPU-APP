@@ -39,13 +39,7 @@ class LoginScreen : Screen {
         // Listen for successes
         LaunchedEffect(authState) {
             if (authState is AuthState.Success) {
-                // Navigate to main feed/wallet seamlessly
-                try {
-                    navigator.replaceAll(com.krieta.com.core.navigation.MainScreen())
-                } catch (e: Exception) {
-                    println("Navigation error: ${e.message}")
-                    e.printStackTrace()
-                }
+                navigator.replaceAll(com.krieta.com.core.navigation.MainScreen())
             }
         }
 

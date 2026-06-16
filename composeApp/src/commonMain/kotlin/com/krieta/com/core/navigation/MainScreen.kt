@@ -65,7 +65,10 @@ class MainScreen : Screen {
         var showFAB by remember { mutableStateOf(true) }
         val scope = rememberCoroutineScope()
 
-        TabNavigator(HomeTab) {
+        TabNavigator(
+            tab = HomeTab,
+            key = "MainTabNavigator"
+        ) {
             val tabNavigator = LocalTabNavigator.current
             val currentTab = tabNavigator.current
             

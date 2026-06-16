@@ -92,7 +92,9 @@ data class CreateGroupChatRequest(
 @Serializable
 data class SendMessageRequest(
     val payload: String,
+    @kotlinx.serialization.SerialName("media_url")
     val mediaUrl: String? = null,
+    @kotlinx.serialization.SerialName("media_type")
     val mediaType: String? = null,
     val replyToId: String? = null,
     val forwardedFromId: String? = null

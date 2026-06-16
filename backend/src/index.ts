@@ -150,7 +150,7 @@ app.use('/api/v1/*', (req, res, next) => {
     return next();
   }
   // Skip RLS for webhooks (system operations)
-  if (req.path.startsWith('/webhooks/')) {
+  if (req.path.startsWith('/webhooks/') || req.path.startsWith('/media/cloudinary-webhook')) {
     return next();
   }
   // Apply new RLS context middleware

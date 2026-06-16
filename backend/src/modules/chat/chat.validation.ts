@@ -20,7 +20,16 @@ export const sendMessageSchema = z.object({
     media_url: z.string().url().optional(),
     media_type: z.enum(['image', 'video', 'document']).optional(),
     replyToId: z.string().uuid().optional(),
-  }),
+  }).refine(
+    (data) => {
+      if (data.media_url && !data.media_type) return false;
+      if (data.media_type && !data.media_url) return false;
+      return true;
+    },
+    {
+      message: 'Both media_url and media_type must be provided together',
+    }
+  ),
 });
 
 export const mediaUploadSignatureSchema = z.object({
