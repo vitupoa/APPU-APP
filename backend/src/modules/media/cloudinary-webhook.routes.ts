@@ -96,9 +96,12 @@ router.post('/cloudinary-webhook', async (req: Request, res: Response) => {
       
       // Track upload in database (optional)
       try {
+        const configId = crypto.randomUUID();
+        
         await prisma.platform_config.upsert({
           where: { key: 'cloudinary_uploads' },
           create: {
+            id: configId,
             key: 'cloudinary_uploads',
             value: {
               uploads: [{
