@@ -94,7 +94,9 @@ router.post('/cloudinary-webhook', async (req: Request, res: Response) => {
       // Log upload for audit
       console.log(`[Cloudinary Webhook] Upload validated: ${public_id}`);
       
-      // Track upload in database (optional)
+      // Track upload in database (optional) - Disabled for now to avoid Prisma schema issues
+      // TODO: Enable after adding updated_at to platform_config schema
+      /*
       try {
         const configId = crypto.randomUUID();
         
@@ -132,6 +134,7 @@ router.post('/cloudinary-webhook', async (req: Request, res: Response) => {
       } catch (error) {
         console.error('[Cloudinary Webhook] Error tracking upload:', error);
       }
+      */
     }
 
     // Handle delete event
