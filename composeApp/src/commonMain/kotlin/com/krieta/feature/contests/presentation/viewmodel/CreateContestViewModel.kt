@@ -1030,10 +1030,16 @@ class CreateContestViewModel(
     fun publishContest() {
         val currentState = _state.value
         
+        println("🎯 Starting publishContest")
+        println("   Current step: ${currentState.currentStep}")
+        println("   Validate all steps: ${validateAllSteps()}")
+        
         // Task 12.1: Request validation before submission (Requirement 13.1)
         if (!validateAllSteps()) {
+            val errorMsg = "Please complete all required fields in all steps before publishing"
+            println("   ❌ Validation failed: $errorMsg")
             _state.value = currentState.copy(
-                error = "Please complete all required fields in all steps before publishing"
+                error = errorMsg
             )
             return
         }
@@ -1042,17 +1048,27 @@ class CreateContestViewModel(
         val totalPrize = currentState.totalPrizePool
         val totalCostKr = convertToKr(totalPrize, applyMargin = false)
         
+        println("   Total prize (fiat): $totalPrize")
+        println("   Total cost (Kr): $totalCostKr")
+        println("   Wallet balance (Kr): ${currentState.walletBalance}")
+        
         if (currentState.walletBalance < totalCostKr) {
+            val errorMsg = "Insufficient Kr balance. You need ${formatKr(totalCostKr)} but only have ${formatKr(currentState.walletBalance)}. Please top up your wallet."
+            println("   ❌ $errorMsg")
             _state.value = currentState.copy(
                 insufficientBalance = true,
-                error = "Insufficient Kr balance. You need ${formatKr(totalCostKr)} but only have ${formatKr(currentState.walletBalance)}. Please top up your wallet."
+                error = errorMsg
             )
             return
         }
         
+        println("✅ All validations passed, starting contest creation")
+        
         screenModelScope.launch {
             // Task 12.2: Add loading state management during submission (Requirement 13.8, 13.9)
             _state.value = currentState.copy(isPublishing = true, error = null, insufficientBalance = false)
+            
+            println("🚀 Launching contest creation coroutine")
             
             try {
                 // Task 12.1: Construct comprehensive payload from all wizard steps (Requirement 13.1)

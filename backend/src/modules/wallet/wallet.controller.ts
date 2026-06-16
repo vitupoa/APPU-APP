@@ -22,9 +22,9 @@ export class WalletController {
    * Uses constant-time comparison to prevent timing attacks.
    */
   private static verifyTipSignature(
+    senderId: string,
     recipientId: string,
     krAmount: number,
-    currency: string,
     timestamp: number,
     nonce: string,
     signature: string
@@ -43,7 +43,7 @@ export class WalletController {
     }
 
     // Reconstruct the canonical string exactly as the client builds it
-    const canonical = `tip|recipientId=${recipientId}&krAmount=${krAmount}&currency=${currency}&timestamp=${timestamp}&nonce=${nonce}`;
+    const canonical = `TIP|senderId=${senderId}&recipientId=${recipientId}&krAmount=${krAmount}&nonce=${nonce}&timestamp=${timestamp}`;
     const expected = crypto
       .createHmac('sha256', secret)
       .update(canonical)
@@ -70,9 +70,9 @@ export class WalletController {
 
       // SECURITY: Verify HMAC signature to prevent MITM tampering
       const signatureValid = WalletController.verifyTipSignature(
+        req.userId!,
         data.recipient_id,
         data.krAmount,
-        data.currency,
         data.timestamp,
         data.nonce,
         data.signature

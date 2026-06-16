@@ -313,7 +313,12 @@ fun BottomActionBar(
                 }
             } else {
                 Button(
-                    onClick = onPublish,
+                    onClick = {
+                        println("🔘 Publish button clicked")
+                        println("   Is valid: $isValid")
+                        println("   Is submitting: $isSubmitting")
+                        onPublish()
+                    },
                     enabled = isValid && !isSubmitting,
                     modifier = Modifier
                         .weight(1f)

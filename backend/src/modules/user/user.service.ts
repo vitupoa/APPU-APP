@@ -141,15 +141,15 @@ export class UserService {
 
     const updateData: any = {};
     if (data.bio !== undefined) updateData.bio = data.bio;
-    if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url;
-    if (data.cover_photo_url !== undefined) updateData.cover_photo_url = data.cover_photo_url;
+    if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url || null;
+    if (data.cover_photo_url !== undefined) updateData.cover_photo_url = data.cover_photo_url || null;
     if (data.selectedNiches !== undefined) updateData.selectedNiches = data.selectedNiches;
     if (data.customNiches !== undefined) updateData.customNiches = data.customNiches;
     if (!user.is_wallet_unlocked) {
-      if (data.first_name) updateData.first_name = data.first_name;
-      if (data.last_name) updateData.last_name = data.last_name;
-      if (data.display_name) updateData.display_name = data.display_name;
-      if (data.username) updateData.username = data.username;
+      if (data.first_name !== undefined) updateData.first_name = data.first_name;
+      if (data.last_name !== undefined) updateData.last_name = data.last_name;
+      if (data.display_name !== undefined) updateData.display_name = data.display_name;
+      if (data.username !== undefined) updateData.username = data.username;
     }
 
     return prisma.user.update({ where: { id: userId }, data: updateData });

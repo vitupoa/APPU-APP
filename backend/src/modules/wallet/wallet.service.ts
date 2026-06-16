@@ -90,6 +90,7 @@ export class WalletService {
         // LOCK: Lock both wallets to prevent race conditions (ordered to prevent deadlocks)
         const wallets = await lockWalletsForUpdate(tx, [senderId, recipientId]);
         const senderWallet = wallets.find((w: any) => w.user_id === senderId);
+        const recipientWallet = wallets.find((w: any) => w.user_id === recipientId);
         
         if (!senderWallet || Number(senderWallet.kr_balance) < roundedKrAmount) {
           throw new Error("Insufficient Kr balance to tip");
@@ -98,23 +99,32 @@ export class WalletService {
         // Deduct Full Amount Sender (-100%)
         await tx.wallets.update({
           where: { user_id: senderId },
-          data: { kr_balance: { decrement: krDecimal } }
+          data: { 
+            kr_balance: { decrement: krDecimal },
+            updated_at: new Date()
+          }
         });
 
         // Credit Recipient (-20% Platform cut applied -> 80%)
-        const recipientWallet = await tx.wallets.upsert({
+        // Calculate new balance
+        const currentRecipientBalance = Number(recipientWallet.kr_balance);
+        const newRecipientBalance = currentRecipientBalance + Number(recipientReceiveAmount);
+        
+        await tx.wallets.update({
           where: { user_id: recipientId },
-          create: { 
-            id: crypto.randomUUID(),
-            user: {
-              connect: { id: recipientId }
-            },
-            kr_balance: recipientReceiveAmount,
+          data: { 
+            kr_balance: new Prisma.Decimal(newRecipientBalance),
             updated_at: new Date()
-          },
-          update: { kr_balance: { increment: recipientReceiveAmount } }
+          }
         });
 
+        console.log(`💰 Tip completed: ${senderId} → ${recipientId}`);
+        console.log(`   Sender paid: Kr. ${roundedKrAmount}`);
+        console.log(`   Recipient gets: Kr. ${recipientReceiveAmount.toNumber()}`);
+        console.log(`   Platform fee: Kr. ${platformCut}`);
+        console.log(`   Recipient old balance: Kr. ${currentRecipientBalance}`);
+        console.log(`   Recipient new balance: Kr. ${newRecipientBalance}`);
+        
         // Record Transactions accurately outlining Revenue Velocity with full context
         await tx.transactions.createMany({
           data: [
