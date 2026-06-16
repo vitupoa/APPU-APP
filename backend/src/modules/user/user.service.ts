@@ -122,7 +122,6 @@ export class UserService {
   static async updateProfile(userId: string, data: {
     first_name?: string;
     last_name?: string;
-    display_name?: string;
     username?: string;
     bio?: string;
     avatar_url?: string;
@@ -134,7 +133,7 @@ export class UserService {
 
     // Identity lock check — reject name/username changes when wallet is unlocked
     if (user.is_wallet_unlocked) {
-      if (data.first_name || data.last_name || data.display_name || data.username) {
+      if (data.first_name || data.last_name || data.username) {
         throw new Error('Name and username are permanently locked after wallet activation');
       }
     }
@@ -148,8 +147,14 @@ export class UserService {
     if (!user.is_wallet_unlocked) {
       if (data.first_name !== undefined) updateData.first_name = data.first_name;
       if (data.last_name !== undefined) updateData.last_name = data.last_name;
-      if (data.display_name !== undefined) updateData.display_name = data.display_name;
       if (data.username !== undefined) updateData.username = data.username;
+      
+      // Auto-update display_name when first_name or last_name changes
+      if (data.first_name || data.last_name) {
+        const firstName = (data.first_name || user.first_name).trim();
+        const lastName = (data.last_name || user.last_name).trim();
+        updateData.display_name = `${firstName} ${lastName}`;
+      }
     }
 
     return prisma.user.update({ where: { id: userId }, data: updateData });

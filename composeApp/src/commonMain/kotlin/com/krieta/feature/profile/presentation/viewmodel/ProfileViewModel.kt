@@ -70,6 +70,11 @@ class ProfileViewModel(
         screenModelScope.launch {
             repository.profileUpdates.collectLatest { updatedProfile ->
                 if (isOwnProfile || updatedProfile.id == userId) {
+                    // Update cache for own profile
+                    if (isOwnProfile) {
+                        cachedOwnProfile = updatedProfile
+                        println("💾 ProfileViewModel: Updated cached profile - ${updatedProfile.displayName}")
+                    }
                     _state.value = _state.value.copy(profile = updatedProfile)
                 }
             }

@@ -63,12 +63,12 @@ class ProfileRepositoryImpl(
     }
 
     override suspend fun updateProfile(
-        firstName: String?, lastName: String?, displayName: String?,
+        firstName: String?, lastName: String?,
         username: String?, bio: String?, avatarUrl: String?, coverPhotoUrl: String?,
         selectedNiches: List<String>?, customNiches: List<String>?
     ): NetworkResult<UserProfile> = safeApiCall {
         val updated = api.updateProfile(
-            UpdateProfileRequestDto(firstName, lastName, displayName, username, bio, avatarUrl, coverPhotoUrl, selectedNiches, customNiches)
+            UpdateProfileRequestDto(firstName, lastName, username, bio, avatarUrl, coverPhotoUrl, selectedNiches, customNiches)
         ).toDomain()
         localDataSource.cacheProfile(updated)
         _profileUpdates.tryEmit(updated)
@@ -79,7 +79,7 @@ class ProfileRepositoryImpl(
         api.searchUsers(query).map { it.toDomain() }
     }
 
-    private fun SocialUserDto.toDomain() = SocialUser(id, username, displayName, avatarUrl, isVerified, isLovers)
+    private fun SocialUserDto.toDomain() = SocialUser(id, username, firstName ?: "", lastName ?: "", avatarUrl, isVerified, isLovers)
 
     override suspend fun updateBioLinks(links: List<BioLink>): NetworkResult<List<BioLink>> =
         safeApiCall {
@@ -132,7 +132,6 @@ class ProfileRepositoryImpl(
             username = username ?: "user",
             firstName = firstName ?: "",
             lastName = lastName ?: "",
-            displayName = displayName ?: username ?: "User",
             avatarUrl = avatarUrl,
             coverPhotoUrl = coverPhotoUrl,
             bio = bio,

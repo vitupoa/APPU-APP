@@ -18,7 +18,6 @@ const router = Router();
 const updateProfileSchema = z.object({
   first_name: z.string().min(2).max(50).optional(),
   last_name: z.string().min(2).max(50).optional(),
-  display_name: z.string().min(2).max(100).optional(),
   username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/).optional(),
   bio: z.string().max(300).optional(),
   avatar_url: z.string().url().optional().or(z.literal('')).nullable(),

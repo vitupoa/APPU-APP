@@ -26,7 +26,6 @@ data class UserProfile(
     val username: String,
     val firstName: String,
     val lastName: String,
-    val displayName: String,
     val avatarUrl: String?,
     val coverPhotoUrl: String?,
     val bio: String?,
@@ -42,7 +41,9 @@ data class UserProfile(
     val selectedNiches: List<String> = emptyList(),
     val customNiches: List<String> = emptyList(),
     val createdAt: String
-)
+) {
+    val displayName: String get() = "$firstName $lastName".trim()
+}
 
 data class SocialUser(
     val id: String,

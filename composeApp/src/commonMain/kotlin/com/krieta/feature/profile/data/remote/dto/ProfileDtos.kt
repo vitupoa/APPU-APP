@@ -58,8 +58,6 @@ data class UpdateProfileRequestDto(
     val firstName: String? = null,
     @kotlinx.serialization.SerialName("last_name")
     val lastName: String? = null,
-    @kotlinx.serialization.SerialName("display_name")
-    val displayName: String? = null,
     val username: String? = null,
     val bio: String? = null,
     @kotlinx.serialization.SerialName("avatar_url")

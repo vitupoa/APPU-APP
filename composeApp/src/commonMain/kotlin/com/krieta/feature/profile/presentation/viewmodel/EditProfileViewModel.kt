@@ -15,7 +15,6 @@ data class EditProfileState(
     val profile: UserProfile? = null,
     val firstName: String = "",
     val lastName: String = "",
-    val displayName: String = "",
     val username: String = "",
     val bio: String = "",
     val avatarUrl: String = "",
@@ -42,7 +41,6 @@ class EditProfileViewModel(
 
     fun onFirstNameChange(v: String) { _state.value = _state.value.copy(firstName = v) }
     fun onLastNameChange(v: String) { _state.value = _state.value.copy(lastName = v) }
-    fun onDisplayNameChange(v: String) { _state.value = _state.value.copy(displayName = v) }
     fun onUsernameChange(v: String) { _state.value = _state.value.copy(username = v) }
     fun onBioChange(v: String) { _state.value = _state.value.copy(bio = v) }
     
@@ -108,7 +106,6 @@ class EditProfileViewModel(
             val result = repository.updateProfile(
                 firstName = if (s.firstName != p.firstName) s.firstName else null,
                 lastName = if (s.lastName != p.lastName) s.lastName else null,
-                displayName = if (s.displayName != p.displayName) s.displayName else null,
                 username = if (s.username != p.username) s.username else null,
                 bio = if (s.bio != (p.bio ?: "")) s.bio else null,
                 avatarUrl = if (s.avatarUrl != (p.avatarUrl ?: "")) s.avatarUrl.ifEmpty { "" } else null,
@@ -137,7 +134,6 @@ class EditProfileViewModel(
                         profile = p,
                         firstName = p.firstName,
                         lastName = p.lastName,
-                        displayName = p.displayName,
                         username = p.username,
                         bio = p.bio ?: "",
                         avatarUrl = p.avatarUrl ?: "",

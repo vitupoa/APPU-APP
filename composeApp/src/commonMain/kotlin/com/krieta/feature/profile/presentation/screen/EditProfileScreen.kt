@@ -153,12 +153,6 @@ class EditProfileScreen : Screen {
                             isLocked = isLocked
                         )
                         LockedTextField(
-                            value = state.displayName,
-                            onValueChange = { viewModel.onDisplayNameChange(it) },
-                            label = "Display Name",
-                            isLocked = isLocked
-                        )
-                        LockedTextField(
                             value = state.username,
                             onValueChange = { viewModel.onUsernameChange(it) },
                             label = "Username",
