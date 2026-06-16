@@ -25,19 +25,34 @@ export class ShortsService {
    */
   static async getFeed(type: string, cursor?: string, limit = 20, userId?: string) {
     let whereClause: any = {};
+    let orderByClause: any = { created_at: 'desc' };
 
     if (userId) {
       if (type === 'lovers') {
-        // Get mutual lovers - only query where I am the admirer with is_lovers: true
-        // (both directional records have is_lovers: true when mutual)
-        const loversList = await prisma.admires.findMany({
+        // FIXED: Get mutual lovers by checking BOTH directions have is_lovers: true
+        // Query both where user admires someone AND that person admires user back
+        const myAdmires = await prisma.admires.findMany({
           where: { admirer_id: userId, is_lovers: true },
           select: { admired_id: true }
         });
-        const loversIds = loversList.map((a: { admired_id: string }) => a.admired_id);
+        
+        // Double-check mutual relationship exists in reverse direction
+        const mutualAdmires = await prisma.admires.findMany({
+          where: {
+            admirer_id: { in: myAdmires.map(a => a.admired_id) },
+            admired_id: userId,
+            is_lovers: true
+          },
+          select: { admirer_id: true }
+        });
+        
+        const loversIds = mutualAdmires.map((a: { admirer_id: string }) => a.admirer_id);
 
         if (loversIds.length > 0) {
           whereClause.user_id = { in: loversIds };
+          // Lovers tab: prioritize most recent (0-24hrs)
+          const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+          whereClause.created_at = { gte: oneDayAgo };
         } else {
           // No lovers, return empty by querying impossible condition
           whereClause.id = 'impossible-id-no-lovers';
@@ -63,6 +78,10 @@ export class ShortsService {
           // Only yourself, still show your shorts
           whereClause.user_id = userId;
         }
+        
+        // Admiring tab: show recent + high-engagement (7 days)
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        whereClause.created_at = { gte: sevenDaysAgo };
       } else if (type === 'discover') {
         // Get all people YOU are admiring
         // Discover should exclude: your own shorts + people you admire
@@ -75,6 +94,18 @@ export class ShortsService {
 
         // Exclude own shorts and anyone YOU are admiring
         whereClause.user_id = { notIn: [userId, ...admiringIds] };
+        
+        // FIXED: Discover tab - prioritize trending/recent content (last 14 days)
+        // Mix of time-based and engagement-based sorting
+        const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+        whereClause.created_at = { gte: fourteenDaysAgo };
+        
+        // Order by engagement + recency for viral content
+        orderByClause = [
+          { likes_count: 'desc' },
+          { views: 'desc' },
+          { created_at: 'desc' }
+        ];
       }
     }
     // If no userId, show all shorts (guest mode)
@@ -83,7 +114,7 @@ export class ShortsService {
       where: whereClause,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      orderBy: { created_at: 'desc' },
+      orderBy: orderByClause,
       include: { user: {
           select: {
             id: true,

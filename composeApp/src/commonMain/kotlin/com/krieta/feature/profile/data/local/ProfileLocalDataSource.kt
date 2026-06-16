@@ -71,7 +71,6 @@ class ProfileLocalDataSource(private val database: KrietaDatabase) {
         username = entity.username,
         firstName = entity.firstName,
         lastName = entity.lastName,
-        displayName = entity.displayName,
         avatarUrl = entity.avatarUrl,
         coverPhotoUrl = entity.coverPhotoUrl,
         bio = entity.bio,

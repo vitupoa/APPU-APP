@@ -25,7 +25,6 @@ class SecureProfileLocalDataSource(
             // Validate inputs
             val validatedId = InputValidator.validateId(profile.id, "Profile ID")
             val validatedUsername = InputValidator.validateText(profile.username, "Username")
-            val validatedDisplayName = InputValidator.validateText(profile.displayName, "Display Name")
             
             // Validate URLs if present
             profile.avatarUrl?.let { InputValidator.validateUrl(it) }
@@ -44,7 +43,7 @@ class SecureProfileLocalDataSource(
                 username = validatedUsername,
                 firstName = InputValidator.validateText(profile.firstName, "First Name"),
                 lastName = InputValidator.validateText(profile.lastName, "Last Name"),
-                displayName = validatedDisplayName,
+                displayName = "${profile.firstName} ${profile.lastName}".trim(),
                 avatarUrl = profile.avatarUrl,
                 coverPhotoUrl = profile.coverPhotoUrl,
                 bio = encryptedBio,
@@ -124,7 +123,6 @@ class SecureProfileLocalDataSource(
                 username = profileEntity.username,
                 firstName = profileEntity.firstName,
                 lastName = profileEntity.lastName,
-                displayName = profileEntity.displayName,
                 avatarUrl = profileEntity.avatarUrl,
                 coverPhotoUrl = profileEntity.coverPhotoUrl,
                 bio = decryptedBio,
@@ -194,7 +192,6 @@ class SecureProfileLocalDataSource(
                 username = profileEntity.username,
                 firstName = profileEntity.firstName,
                 lastName = profileEntity.lastName,
-                displayName = profileEntity.displayName,
                 avatarUrl = profileEntity.avatarUrl,
                 coverPhotoUrl = profileEntity.coverPhotoUrl,
                 bio = decryptedBio,

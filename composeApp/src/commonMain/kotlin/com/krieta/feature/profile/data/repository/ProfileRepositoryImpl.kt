@@ -152,7 +152,7 @@ class ProfileRepositoryImpl(
     private fun BioLinkDto.toBioLink() = BioLink(id, label, url, icon, sortOrder)
 
     private fun SocialListResponseDto.toSocialList() = SocialListResult(
-        items = items.map { SocialUser(it.id, it.username, it.displayName, it.avatarUrl, it.isVerified, it.isLovers) },
+        items = items.map { SocialUser(it.id, it.username, it.firstName ?: "", it.lastName ?: "", it.avatarUrl, it.isVerified, it.isLovers) },
         nextCursor = nextCursor
     )
 

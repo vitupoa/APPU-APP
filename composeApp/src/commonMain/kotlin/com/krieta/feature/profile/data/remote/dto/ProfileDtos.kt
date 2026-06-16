@@ -86,8 +86,10 @@ data class AdmireResponseDto(
 data class SocialUserDto(
     val id: String,
     val username: String,
-    @kotlinx.serialization.SerialName("display_name")
-    val displayName: String,
+    @kotlinx.serialization.SerialName("first_name")
+    val firstName: String? = null,
+    @kotlinx.serialization.SerialName("last_name")
+    val lastName: String? = null,
     @kotlinx.serialization.SerialName("avatar_url")
     val avatarUrl: String? = null,
     @kotlinx.serialization.SerialName("is_verified")
