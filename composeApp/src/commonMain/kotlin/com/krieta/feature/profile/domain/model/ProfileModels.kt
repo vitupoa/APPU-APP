@@ -48,11 +48,14 @@ data class UserProfile(
 data class SocialUser(
     val id: String,
     val username: String,
-    val displayName: String,
+    val firstName: String,
+    val lastName: String,
     val avatarUrl: String?,
     val isVerified: Boolean,
     val isLovers: Boolean
-)
+) {
+    val displayName: String get() = "$firstName $lastName".trim()
+}
 
 data class Milestone(
     val id: String,
