@@ -43,6 +43,8 @@ object KtorClientFactory {
         coerceInputValues = true
         explicitNulls = false
     }
+    
+    private val csrfTokenManager = CsrfTokenManager()
 
     fun create(tokenManager: TokenManager, deviceSecurity: DeviceSecurity? = null, sessionManager: SessionManager): HttpClient {
         val certificatePinner = createCertificatePinner()
@@ -51,6 +53,11 @@ object KtorClientFactory {
         
         return HttpClient {
             certificatePinner.configurePinning(this)
+            
+            install(CsrfPlugin) {
+                csrfManager = csrfTokenManager
+            }
+            
             install(ContentNegotiation) {
                 json(json)
             }

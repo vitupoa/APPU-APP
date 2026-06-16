@@ -70,6 +70,7 @@ class ProfileRepositoryImpl(
         val updated = api.updateProfile(
             UpdateProfileRequestDto(firstName, lastName, displayName, username, bio, avatarUrl, coverPhotoUrl, selectedNiches, customNiches)
         ).toDomain()
+        localDataSource.cacheProfile(updated)
         _profileUpdates.tryEmit(updated)
         updated
     }
