@@ -144,6 +144,7 @@ export class JwtSecretManager {
       expires_at: s.expiresAt.toISOString()
     }));
 
+    const now = new Date();
     await prisma.platform_config.upsert({
       where: { key: 'jwt_secrets' },
       create: {
@@ -152,13 +153,15 @@ export class JwtSecretManager {
         value: {
           currentVersion: this.currentVersion,
           secrets: secretsArray
-        }
+        },
+        updated_at: now
       },
       update: {
         value: {
           currentVersion: this.currentVersion,
           secrets: secretsArray
-        }
+        },
+        updated_at: now
       }
     });
   }
