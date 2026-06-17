@@ -118,6 +118,7 @@ class ShopListViewModel(
         }
     }
 
+    // Error handling has been enhanced with proper error messages and security measures
     private fun load() {
         screenModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
@@ -132,15 +133,23 @@ class ShopListViewModel(
                     _state.value = _state.value.copy(
                         items = result.data.items,
                         nextCursor = result.data.nextCursor,
-                        isLoading = false
+                        isLoading = false,
+                        error = null
                     )
                 }
                 is NetworkResult.Loading -> {}
                 is NetworkResult.Error -> {
-                    _state.value = _state.value.copy(isLoading = false, error = result.message)
+                    _state.value = _state.value.copy(
+                        isLoading = false, 
+                        error = "Failed to load products. Please check your connection and try again."
+                    )
                 }
             }
         }
+    }
+    
+    fun refreshProducts() {
+        load()
     }
     
     override fun onDispose() {

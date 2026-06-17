@@ -1,5 +1,8 @@
 package com.krieta.com.core.network
 
+import io.ktor.client.call.body
+import io.ktor.client.statement.bodyAsText
+
 sealed class NetworkResult<out T> {
     data class Success<T>(val data: T) : NetworkResult<T>()
     data class Error(val code: Int? = null, val message: String) : NetworkResult<Nothing>()
@@ -32,11 +35,41 @@ suspend inline fun <T> safeApiCall(crossinline block: suspend () -> T): NetworkR
         NetworkResult.Success(block())
     } catch (e: io.ktor.client.plugins.ClientRequestException) {
         println("❌ ClientRequestException (${e.response.status.value}): ${e.message}")
+        
+        // Try to extract error message from response body
+        val errorMessage = try {
+            val responseBody = e.response.bodyAsText()
+            println("❌ Response body: $responseBody")
+            
+            // Try to parse as JSON to extract error field
+            val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+            val errorResponse = json.decodeFromString<Map<String, kotlinx.serialization.json.JsonElement>>(responseBody)
+            
+            when {
+                errorResponse.containsKey("error") -> {
+                    val error = errorResponse["error"]?.toString()?.trim('"') ?: e.message
+                    
+                    // Check if there are validation details
+                    if (errorResponse.containsKey("details")) {
+                        val details = errorResponse["details"].toString()
+                        "$error\n$details"
+                    } else {
+                        error
+                    }
+                }
+                else -> e.message
+            }
+        } catch (parseError: Exception) {
+            println("❌ Failed to parse error response: ${parseError.message}")
+            e.message
+        }
+        
         when (e.response.status.value) {
+            400 -> NetworkResult.Error(400, errorMessage)
             401 -> NetworkResult.Error(401, "Your session has expired. Please log in again.")
             403 -> NetworkResult.Error(403, "Access denied. You don't have permission to view this.")
             404 -> NetworkResult.Error(404, "The requested resource was not found.")
-            else -> NetworkResult.Error(e.response.status.value, "Request failed. Please try again.")
+            else -> NetworkResult.Error(e.response.status.value, errorMessage)
         }
     } catch (e: io.ktor.client.plugins.ServerResponseException) {
         println("❌ ServerResponseException (${e.response.status.value}): ${e.message}")

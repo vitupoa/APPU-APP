@@ -38,6 +38,7 @@ class CreateListingScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinScreenModel<CreateListingViewModel>()
         val state by viewModel.state.collectAsState()
+        val currencyProvider = org.koin.compose.koinInject<com.krieta.com.core.location.UserCurrencyProvider>()
 
         LaunchedEffect(state.saveSuccess) {
             if (state.saveSuccess) navigator.pop()
@@ -125,70 +126,103 @@ class CreateListingScreen : Screen {
                 OutlinedTextField(
                     value = state.description,
                     onValueChange = { viewModel.onDescriptionChange(it) },
-                    label = { Text("Description (optional)") },
+                    label = { Text("Description") },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 4,
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                OutlinedTextField(
-                    value = state.priceKr,
-                    onValueChange = { viewModel.onPriceChange(it) },
-                    label = { Text("Retail Price (Kr) - Optional if wholesale set") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    shape = RoundedCornerShape(12.dp)
-                )
-
-                // Pricing Options Section
-                Text("Pricing Options (Optional)", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
+                // Pricing Section
+                Text("Pricing", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
                 
-                // Wholesale Pricing
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                // Retail Price (only show if wholesale is not set)
+                if (state.wholesalePrice.isBlank()) {
                     OutlinedTextField(
-                        value = state.wholesalePrice,
-                        onValueChange = { viewModel.onWholesalePriceChange(it) },
-                        label = { Text("Wholesale Price (Kr)") },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    OutlinedTextField(
-                        value = state.wholesaleMinQty,
-                        onValueChange = { viewModel.onWholesaleMinQtyChange(it) },
-                        label = { Text("Min Qty") },
-                        modifier = Modifier.weight(0.6f),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                }
-
-                // Bargaining Option
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = state.bargainEnabled,
-                        onCheckedChange = { viewModel.onBargainEnabledChange(it) }
-                    )
-                    Text("Enable Bargaining", modifier = Modifier.weight(1f))
-                }
-                
-                if (state.bargainEnabled) {
-                    OutlinedTextField(
-                        value = state.bargainMinPrice,
-                        onValueChange = { viewModel.onBargainMinPriceChange(it) },
-                        label = { Text("Minimum Bargain Price (Kr) - Hidden from buyers") },
+                        value = state.priceKr,
+                        onValueChange = { viewModel.onPriceChange(it) },
+                        label = { Text("Retail Price (${currencyProvider.localCurrencySymbol})") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         shape = RoundedCornerShape(12.dp),
-                        supportingText = { Text("Buyers won't see this. They'll be told if their offer is too low.", style = MaterialTheme.typography.bodySmall) }
+                        supportingText = if (state.priceKr.isNotBlank()) {
+                            { Text("≈ ${currencyProvider.formatWithKr(state.priceKr.toDoubleOrNull()?.let { currencyProvider.convertLocalToKr(it) } ?: 0.0)}") }
+                        } else null
                     )
+                    
+                    // Bargaining Option (only for retail)
+                    if (state.priceKr.isNotBlank()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = state.bargainEnabled,
+                                onCheckedChange = { viewModel.onBargainEnabledChange(it) }
+                            )
+                            Text("Enable Bargaining", modifier = Modifier.weight(1f))
+                        }
+                        
+                        if (state.bargainEnabled) {
+                            OutlinedTextField(
+                                value = state.bargainMinPrice,
+                                onValueChange = { viewModel.onBargainMinPriceChange(it) },
+                                label = { Text("Minimum Bargain Price (${currencyProvider.localCurrencySymbol}) - Hidden from buyers") },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                shape = RoundedCornerShape(12.dp),
+                                supportingText = { Text("Buyers won't see this. They'll be told if their offer is too low.", style = MaterialTheme.typography.bodySmall) }
+                            )
+                        }
+                    }
+                }
+                
+                // Wholesale Pricing (only show if retail is not set)
+                if (state.priceKr.isBlank()) {
+                    Text("Wholesale Pricing", fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyLarge)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = state.wholesalePrice,
+                            onValueChange = { viewModel.onWholesalePriceChange(it) },
+                            label = { Text("Wholesale Price (${currencyProvider.localCurrencySymbol})") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            shape = RoundedCornerShape(12.dp),
+                            supportingText = if (state.wholesalePrice.isNotBlank()) {
+                                { Text("≈ ${currencyProvider.formatWithKr(state.wholesalePrice.toDoubleOrNull()?.let { currencyProvider.convertLocalToKr(it) } ?: 0.0)}") }
+                            } else null
+                        )
+                        OutlinedTextField(
+                            value = state.wholesaleMinQty,
+                            onValueChange = { viewModel.onWholesaleMinQtyChange(it) },
+                            label = { Text("Min Qty") },
+                            modifier = Modifier.weight(0.6f),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    }
+                }
+                
+                // Show option to switch pricing type
+                if (state.priceKr.isBlank() && state.wholesalePrice.isBlank()) {
+                    Text("Choose pricing type:", style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(
+                            onClick = { /* User can just start typing in retail price */ },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Retail Price")
+                        }
+                        OutlinedButton(
+                            onClick = { /* User can just start typing in wholesale price */ },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Wholesale Only")
+                        }
+                    }
                 }
 
                 // Category Dropdown
@@ -283,7 +317,7 @@ class CreateListingScreen : Screen {
                 OutlinedTextField(
                     value = state.location,
                     onValueChange = { viewModel.onLocationChange(it) },
-                    label = { Text("Location (optional)") },
+                    label = { Text("Location") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     placeholder = { Text("e.g., Nairobi, Kenya") },
@@ -310,12 +344,18 @@ class CreateListingScreen : Screen {
                 OutlinedTextField(
                     value = state.whatsappNumber,
                     onValueChange = { viewModel.onWhatsappChange(it) },
-                    label = { Text("WhatsApp Number (with country code)") },
+                    label = { Text("WhatsApp Number (with country code) *") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     placeholder = { Text("+254...") },
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    isError = state.error?.contains("whatsapp", ignoreCase = true) == true,
+                    supportingText = if (state.error?.contains("whatsapp", ignoreCase = true) == true) {
+                        { Text("WhatsApp number is required", color = MaterialTheme.colorScheme.error) }
+                    } else {
+                        { Text("Required for buyer contact", style = MaterialTheme.typography.bodySmall) }
+                    }
                 )
 
                 state.error?.let {

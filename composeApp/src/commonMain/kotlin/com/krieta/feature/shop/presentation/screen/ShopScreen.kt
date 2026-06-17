@@ -85,6 +85,33 @@ class ShopScreen : Screen {
                     state.isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
+                    state.error != null -> {
+                        val errorMessage = state.error
+                        Column(
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Error loading products",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = errorMessage ?: "Unknown error",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                            Button(
+                                onClick = { viewModel.refreshProducts() },
+                                modifier = Modifier.padding(top = 16.dp)
+                            ) {
+                                Text("Retry")
+                            }
+                        }
+                    }
                     state.items.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("No products found", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }

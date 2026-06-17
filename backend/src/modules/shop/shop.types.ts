@@ -191,7 +191,7 @@ export const categoryDetailSchemas: Record<string, z.ZodType> = {
 
 export const createProductSchema = z.object({
   title: z.string().min(2).max(200),
-  description: z.string().max(5000).optional(),
+  description: z.string().min(1).max(5000),
   imageUrls: z.array(z.string().url()).min(1).max(10),
   priceKr: z.number().positive(),
   currency: z.string().max(3).optional(),
@@ -205,10 +205,12 @@ export const createProductSchema = z.object({
   condition: ProductConditionEnum.optional(),
   brand: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  whatsappNumber: z.string().min(7).max(20).optional(),
+  whatsappNumber: z.string().min(7).max(20).regex(/^\+[1-9][0-9]{6,19}$/, {
+    message: "WhatsApp number must start with country code (e.g., +254712345678)"
+  }),
   purchaseUrl: z.string().url().optional(),
   contactMethod: ContactMethodEnum.optional(),
-  location: z.string().optional(),
+  location: z.string().min(1),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   stock: z.number().int().min(0).optional(),
@@ -218,6 +220,10 @@ export const createProductSchema = z.object({
 
 export const updateProductSchema = createProductSchema.partial().extend({
   status: z.enum(['active', 'sold', 'paused']).optional(),
+  // Keep whatsappNumber required even in updates
+  whatsappNumber: z.string().min(7).max(20).regex(/^\+[1-9][0-9]{6,19}$/, {
+    message: "WhatsApp number must start with country code (e.g., +254712345678)"
+  }),
 });
 
 export const productFilterSchema = z.object({

@@ -72,6 +72,35 @@ class UserCurrencyProvider(
     }
 
     /**
+     * Convert local fiat currency to Kr amount.
+     * Returns 0.0 if exchange rate is not yet loaded.
+     */
+    fun convertLocalToKr(localAmount: Double): Double {
+        val rate = _exchangeRate.value?.baseRate ?: return 0.0
+        return localAmount * rate
+    }
+
+    /**
+     * Get the local currency symbol (e.g., "KES", "UGX")
+     */
+    val localCurrencySymbol: String
+        get() = currencyCode
+
+    /**
+     * Format amount in local currency
+     */
+    fun formatLocalCurrency(amount: Double): String {
+        return "$currencyCode ${String.format("%.2f", amount)}"
+    }
+
+    /**
+     * Format Kr amount with Kr symbol: "Kr 500"
+     */
+    fun formatWithKr(krAmount: Double): String {
+        return com.krieta.com.core.util.KrCurrencyFormatter.formatKr(krAmount)
+    }
+
+    /**
      * Format Kr with fiat equivalent: "Kr.500 (~KES 850)"
      */
     fun formatWithFiat(krAmount: Double): String {

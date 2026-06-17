@@ -51,7 +51,11 @@ class ProfileScreen(val userId: String? = null) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val parentNavigator = navigator.parent
+        // Find root navigator by traversing up the hierarchy
+        var rootNavigator = navigator
+        while (rootNavigator.parent != null) {
+            rootNavigator = rootNavigator.parent!!
+        }
         val profileViewModel = koinScreenModel<ProfileViewModel> { parametersOf(userId) }
         val bioLinksViewModel = koinScreenModel<BioLinksViewModel>()
         val chatRepository = koinInject<com.krieta.feature.chat.domain.repository.ChatRepository>()
@@ -63,6 +67,8 @@ class ProfileScreen(val userId: String? = null) : Screen {
         var menuExpanded by remember { mutableStateOf(false) }
         var showBioLinkSheet by remember { mutableStateOf(false) }
         var errorMessage by remember { mutableStateOf<String?>(null) }
+        var showFullScreenImage by remember { mutableStateOf(false) }
+        var fullScreenImageUrl by remember { mutableStateOf<String?>(null) }
         
         val isOwnProfile = profileViewModel.isOwnProfile
         
@@ -149,6 +155,10 @@ class ProfileScreen(val userId: String? = null) : Screen {
                                 .fillMaxWidth()
                                 .height(280.dp)
                                 .clip(RoundedCornerShape(0.dp))
+                                .clickable(enabled = profile.coverPhotoUrl != null) {
+                                    fullScreenImageUrl = profile.coverPhotoUrl
+                                    showFullScreenImage = true
+                                }
                         ) {
                             if (profile.coverPhotoUrl != null) {
                                 AsyncImage(
@@ -221,7 +231,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                                             onClick = {
                                                 menuExpanded = false
                                                 profileViewModel.logout {
-                                                    parentNavigator?.replaceAll(LoginScreen())
+                                                    rootNavigator.replaceAll(LoginScreen())
                                                 }
                                             }
                                         )
@@ -230,7 +240,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                                             onClick = {
                                                 menuExpanded = false
                                                 profileViewModel.wipeCache {
-                                                    parentNavigator?.replaceAll(LoginScreen())
+                                                    rootNavigator.replaceAll(LoginScreen())
                                                 }
                                             }
                                         )
@@ -243,7 +253,11 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .offset(y = 40.dp)
+                                .offset(y = 30.dp)
+                                .clickable(enabled = profile.avatarUrl != null) {
+                                    fullScreenImageUrl = profile.avatarUrl
+                                    showFullScreenImage = true
+                                }
                         ) {
                             if (profile.avatarUrl != null) {
                                 Box(
@@ -538,6 +552,48 @@ class ProfileScreen(val userId: String? = null) : Screen {
                 onDismiss = { showBioLinkSheet = false },
                 onAddLink = { label, url -> bioLinksViewModel.addLink(label, url) },
                 onDeleteLink = { id -> bioLinksViewModel.deleteLink(id) }
+            )
+        }
+        
+        if (showFullScreenImage && fullScreenImageUrl != null) {
+            FullScreenImageViewer(
+                imageUrl = fullScreenImageUrl!!,
+                onDismiss = { 
+                    showFullScreenImage = false
+                    fullScreenImageUrl = null
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun FullScreenImageViewer(imageUrl: String, onDismiss: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .clickable { onDismiss() },
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = "Full screen image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
+        
+        IconButton(
+            onClick = onDismiss,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+                .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+        ) {
+            Icon(
+                painterResource(Res.drawable.ic_close),
+                contentDescription = "Close",
+                tint = Color.White
             )
         }
     }

@@ -244,30 +244,97 @@ data class CreateListingState(
 
 class CreateListingViewModel(
     private val repository: ShopRepository,
-    private val cloudinaryUploader: com.krieta.com.core.network.CloudinaryUploader
+    private val cloudinaryUploader: com.krieta.com.core.network.CloudinaryUploader,
+    private val currencyProvider: com.krieta.com.core.location.UserCurrencyProvider
 ) : ScreenModel {
 
     private val _state = MutableStateFlow(CreateListingState())
     val state: StateFlow<CreateListingState> = _state.asStateFlow()
 
     // Common fields
-    fun onTitleChange(v: String) { _state.value = _state.value.copy(title = v) }
-    fun onDescriptionChange(v: String) { _state.value = _state.value.copy(description = v) }
-    fun onPriceChange(v: String) { _state.value = _state.value.copy(priceKr = v) }
-    fun onWholesalePriceChange(v: String) { _state.value = _state.value.copy(wholesalePrice = v) }
-    fun onWholesaleMinQtyChange(v: String) { _state.value = _state.value.copy(wholesaleMinQty = v) }
-    fun onBargainEnabledChange(v: Boolean) { _state.value = _state.value.copy(bargainEnabled = v) }
-    fun onBargainMinPriceChange(v: String) { _state.value = _state.value.copy(bargainMinPrice = v) }
+    fun onTitleChange(v: String) { 
+        _state.value = _state.value.copy(title = v, error = null) 
+    }
+    fun onDescriptionChange(v: String) { 
+        _state.value = _state.value.copy(description = v, error = null) 
+    }
+    // Pricing fields with conversion
+    fun onPriceChange(v: String) {
+        val cleanValue = v.replace(",", "")
+        _state.value = _state.value.copy(
+            priceKr = cleanValue, 
+            error = null,
+            // Clear wholesale when retail is set
+            wholesalePrice = "",
+            wholesaleMinQty = "",
+            bargainEnabled = false,
+            bargainMinPrice = ""
+        )
+    }
+    
+    fun onWholesalePriceChange(v: String) {
+        val cleanValue = v.replace(",", "")
+        _state.value = _state.value.copy(
+            wholesalePrice = cleanValue, 
+            error = null,
+            // Clear retail when wholesale is set
+            priceKr = "",
+            bargainEnabled = false,
+            bargainMinPrice = ""
+        )
+    }
+    fun onWholesaleMinQtyChange(v: String) { 
+        _state.value = _state.value.copy(wholesaleMinQty = v, error = null) 
+    }
+    // Currency conversion helpers
+    private fun convertLocalToKr(localAmount: Double): Double {
+        return currencyProvider.convertLocalToKr(localAmount)
+    }
+    
+    private fun formatLocalPrice(krAmount: Double): String {
+        val localAmount = currencyProvider.krToFiat(krAmount)
+        return currencyProvider.formatLocalCurrency(localAmount)
+    }
+
+    // Bargaining can only be set for retail price
+    fun onBargainEnabledChange(v: Boolean) {
+        if (_state.value.priceKr.isNotBlank()) {
+            _state.value = _state.value.copy(bargainEnabled = v, error = null)
+        }
+    }
+    fun onBargainMinPriceChange(v: String) { 
+        _state.value = _state.value.copy(bargainMinPrice = v, error = null) 
+    }
     fun onCategoryChange(category: ProductCategory?) {
-        _state.value = _state.value.copy(selectedCategory = category, selectedSubcategory = "")
+        _state.value = _state.value.copy(selectedCategory = category, selectedSubcategory = "", error = null)
     }
-    fun onSubcategoryChange(v: String) { _state.value = _state.value.copy(selectedSubcategory = v) }
+    fun onSubcategoryChange(v: String) { 
+        _state.value = _state.value.copy(selectedSubcategory = v, error = null) 
+    }
     fun onCustomCategoryChange(v: String) {
-        _state.value = _state.value.copy(customCategory = sanitizeInput(v))
+        _state.value = _state.value.copy(customCategory = sanitizeInput(v), error = null)
     }
-    fun onWhatsappChange(v: String) { _state.value = _state.value.copy(whatsappNumber = v) }
-    fun onConditionChange(v: String) { _state.value = _state.value.copy(conditionField = v) }
-    fun onLocationChange(v: String) { _state.value = _state.value.copy(location = v) }
+    fun onWhatsappChange(v: String) { 
+        val cleanValue = v.replace("\\s".toRegex(), "") // Remove spaces
+        _state.value = _state.value.copy(whatsappNumber = cleanValue, error = null)
+        
+        // Validate WhatsApp number format
+        if (cleanValue.isNotBlank() && !isValidWhatsAppNumber(cleanValue)) {
+            _state.value = _state.value.copy(error = "Please enter a valid WhatsApp number with country code (e.g., +254712345678)")
+        }
+    }
+    
+    private fun isValidWhatsAppNumber(number: String): Boolean {
+        // Must start with + and have 7-20 digits total
+        val regex = Regex("^\\+[1-9][0-9]{6,19}$")
+        return regex.matches(number)
+    }
+    fun onConditionChange(v: String) { 
+        _state.value = _state.value.copy(conditionField = v, error = null) 
+    }
+    fun onLocationChange(v: String) { 
+        _state.value = _state.value.copy(location = v, error = null) 
+    }
 
     // Vehicle
     fun updateVehicle(fn: VehicleDetails.() -> VehicleDetails) {
@@ -404,14 +471,25 @@ class CreateListingViewModel(
         }
     }
 
+    // Enhanced save method with proper error state management and security
     fun save() {
         val s = _state.value
-        if (s.title.isBlank() || s.imageUrls.isEmpty() || s.whatsappNumber.isBlank()) {
-            _state.value = s.copy(error = "Title, at least 1 image, and WhatsApp number are required")
+        
+        // Clear previous error state
+        _state.value = s.copy(error = null)
+        
+        if (s.title.isBlank() || s.description.isBlank() || s.location.isBlank() || s.imageUrls.isEmpty() || s.whatsappNumber.isBlank()) {
+            _state.value = _state.value.copy(error = "Title, description, location, at least 1 image, and WhatsApp number are required")
+            return
+        }
+        
+        // Validate WhatsApp number format
+        if (!isValidWhatsAppNumber(s.whatsappNumber)) {
+            _state.value = _state.value.copy(error = "Please enter a valid WhatsApp number with country code (e.g., +254712345678)")
             return
         }
         if (s.selectedCategory == null) {
-            _state.value = s.copy(error = "Please select a category")
+            _state.value = _state.value.copy(error = "Please select a category")
             return
         }
 
@@ -420,15 +498,28 @@ class CreateListingViewModel(
         val hasWholesalePrice = s.wholesalePrice.isNotBlank() && s.wholesaleMinQty.isNotBlank()
         
         if (!hasRetailPrice && !hasWholesalePrice) {
-            _state.value = s.copy(error = "Please enter either retail price or wholesale price with minimum quantity")
+            _state.value = _state.value.copy(error = "Please enter either retail price or wholesale price with minimum quantity")
             return
         }
 
-        val price = if (hasRetailPrice) {
-            SafeConversion.toDoubleOrDefaultWithValidation(s.priceKr, "productPrice", 0.0, defaultValue = 0.0)
+        // Convert prices to Kr for backend
+        val priceInKr = if (hasRetailPrice) {
+            val localPrice = SafeConversion.toDoubleOrDefaultWithValidation(s.priceKr, "productPrice", 0.0, defaultValue = 0.0) ?: 0.0
+            convertLocalToKr(localPrice)
         } else {
-            0.0 // Will use wholesale price as main price
+            val wholesaleLocalPrice = SafeConversion.toDoubleOrDefaultWithValidation(s.wholesalePrice, "wholesalePrice", 0.0, defaultValue = 0.0) ?: 0.0
+            convertLocalToKr(wholesaleLocalPrice)
         }
+        
+        val wholesalePriceInKr = if (s.wholesalePrice.isNotBlank()) {
+            val wholesaleLocalPrice = SafeConversion.toDoubleOrDefaultWithValidation(s.wholesalePrice, "wholesalePrice", 0.0, defaultValue = null)
+            if (wholesaleLocalPrice != null) convertLocalToKr(wholesaleLocalPrice) else null
+        } else null
+        
+        val bargainMinPriceInKr = if (s.bargainMinPrice.isNotBlank()) {
+            val bargainLocalPrice = SafeConversion.toDoubleOrDefaultWithValidation(s.bargainMinPrice, "bargainMinPrice", 0.0, defaultValue = null)
+            if (bargainLocalPrice != null) convertLocalToKr(bargainLocalPrice) else null
+        } else null
 
         screenModelScope.launch {
             _state.value = s.copy(isSaving = true, error = null)
@@ -439,30 +530,67 @@ class CreateListingViewModel(
 
             val result = (repository as com.krieta.feature.shop.data.repository.ShopRepositoryImpl).createProductWithDetails(
                 title = s.title,
-                description = s.description.ifBlank { null },
+                description = s.description,
                 imageUrls = s.imageUrls,
-                priceKr = if (hasRetailPrice) (price ?: 0.0) else SafeConversion.toDoubleOrDefaultWithValidation(s.wholesalePrice, "wholesalePrice", 0.0, defaultValue = 0.0) ?: 0.0,
-                wholesalePrice = if (s.wholesalePrice.isNotBlank()) SafeConversion.toDoubleOrDefaultWithValidation(s.wholesalePrice, "wholesalePrice", 0.0, defaultValue = null) else null,
+                priceKr = priceInKr,
+                wholesalePrice = wholesalePriceInKr,
                 wholesaleMinQty = if (s.wholesaleMinQty.isNotBlank()) s.wholesaleMinQty.toIntOrNull() else null,
                 bargainEnabled = s.bargainEnabled,
-                bargainMinPrice = if (s.bargainMinPrice.isNotBlank()) SafeConversion.toDoubleOrDefaultWithValidation(s.bargainMinPrice, "bargainMinPrice", 0.0, defaultValue = null) else null,
+                bargainMinPrice = bargainMinPriceInKr,
                 category = s.selectedCategory.backendValue,
                 whatsappNumber = s.whatsappNumber,
                 brand = brand,
                 condition = condition,
                 categoryDetails = categoryDetails,
                 subcategory = s.selectedSubcategory.ifBlank { null },
-                location = s.location.ifBlank { null }
+                location = s.location
             )
 
             when (result) {
                 is NetworkResult.Success -> {
-                    _state.value = _state.value.copy(isSaving = false, saveSuccess = true)
+                    _state.value = _state.value.copy(isSaving = false, saveSuccess = true, error = null)
                 }
                 is NetworkResult.Error -> {
-                    _state.value = _state.value.copy(isSaving = false, error = result.message)
+                    val errorMessage = when {
+                        result.message.contains("Validation failed", ignoreCase = true) -> {
+                            "Please check your input fields and try again."
+                        }
+                        result.message.contains("Insufficient balance", ignoreCase = true) -> {
+                            result.message
+                        }
+                        result.message.contains("required", ignoreCase = true) -> {
+                            "Please fill in all required fields."
+                        }
+                        result.message.contains("whatsapp", ignoreCase = true) -> {
+                            "Please enter a valid WhatsApp number with country code."
+                        }
+                        result.message.contains("image", ignoreCase = true) -> {
+                            "Please add at least one product image."
+                        }
+                        result.message.contains("price", ignoreCase = true) -> {
+                            "Please enter a valid price amount."
+                        }
+                        result.message.contains("location", ignoreCase = true) -> {
+                            "Please enter your location."
+                        }
+                        result.message.contains("description", ignoreCase = true) -> {
+                            "Please add a product description."
+                        }
+                        result.message.contains("Duplicate", ignoreCase = true) -> {
+                            "A similar product already exists. Please modify your listing."
+                        }
+                        result.message.contains("Payment Required", ignoreCase = true) -> {
+                            "Insufficient wallet balance for listing fee. Please top up your wallet."
+                        }
+                        else -> {
+                            "Failed to create product. Please check your connection and try again."
+                        }
+                    }
+                    _state.value = _state.value.copy(isSaving = false, error = errorMessage)
                 }
-                is NetworkResult.Loading -> {}
+                is NetworkResult.Loading -> {
+                    // Keep loading state
+                }
             }
         }
     }

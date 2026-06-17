@@ -154,7 +154,7 @@ export class ShopService {
 
   static async getProduct(productId: string, viewerId?: string) {
     const includeQuery: Prisma.productsInclude = {
-      User: { select: SELLER_SELECT },
+      user: { select: SELLER_SELECT },
       vehicle_details: true,
       spare_part_details: true,
       real_estate_details: true,
@@ -281,7 +281,7 @@ export class ShopService {
     }
 
     const includeQuery: Prisma.productsInclude = {
-      User: { select: SELLER_SELECT },
+      user: { select: SELLER_SELECT },
       vehicle_details: true,
       spare_part_details: true,
       real_estate_details: true,

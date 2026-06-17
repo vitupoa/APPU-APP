@@ -39,7 +39,25 @@ router.get('/products', async (req: AuthRequest, res: Response) => {
     const result = await ShopService.listProducts(filters);
     res.json(result);
   } catch (e: any) {
-    res.status(e.name === 'ZodError' ? 400 : 500).json({ error: e.message });
+    console.error('Product listing error:', {
+      error: e.message,
+      filters: req.query,
+      timestamp: new Date().toISOString()
+    });
+    
+    if (e.name === 'ZodError') {
+      res.status(400).json({ 
+        error: 'Invalid Filters',
+        message: 'Please check your search parameters.',
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(500).json({ 
+        error: 'Server Error',
+        message: 'Failed to load products. Please try again.',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 });
 
@@ -48,7 +66,14 @@ router.get('/products/trending', async (_req: AuthRequest, res: Response) => {
   try {
     const products = await ShopService.getTrendingProducts();
     res.json(products);
-  } catch (e: any) { res.status(500).json({ error: e.message }); }
+  } catch (e: any) { 
+    console.error('Trending products error:', e.message);
+    res.status(500).json({ 
+      error: 'Server Error',
+      message: 'Failed to load trending products.',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // GET /products/mine
@@ -76,6 +101,7 @@ router.get('/products/:id', optionalAuth, async (req: AuthRequest, res: Response
   } catch (e: any) { res.status(404).json({ error: 'Product not found' }); }
 });
 
+// Enhanced error handling with structured logging and secure error messages
 // POST /products
 router.post('/products', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
@@ -83,7 +109,63 @@ router.post('/products', authMiddleware, async (req: AuthRequest, res: Response)
     const product = await ShopService.createProduct(req.userId!, data);
     res.status(201).json(product);
   } catch (e: any) {
-    res.status(e.name === 'ZodError' ? 400 : 400).json({ error: e.message, details: e.errors });
+    console.error('Product creation error:', {
+      error: e.message,
+      userId: req.userId,
+      requestBody: req.body ? 'Present' : 'Missing',
+      timestamp: new Date().toISOString()
+    });
+    
+    if (e.name === 'ZodError') {
+      const validationErrors = e.errors.map((err: any) => {
+        const field = err.path.join('.');
+        return {
+          field,
+          message: err.message,
+          code: err.code
+        };
+      });
+      
+      res.status(400).json({ 
+        error: 'Validation failed', 
+        message: 'Please check the highlighted fields and try again.',
+        validationErrors,
+        timestamp: new Date().toISOString()
+      });
+    } else if (e.message?.includes('Insufficient balance')) {
+      res.status(402).json({ 
+        error: 'Payment Required',
+        message: e.message,
+        timestamp: new Date().toISOString()
+      });
+    } else if (e.message?.includes('required')) {
+      res.status(400).json({ 
+        error: 'Missing Required Fields',
+        message: e.message,
+        timestamp: new Date().toISOString()
+      });
+    } else if (e.code === 'P2002') { // Prisma unique constraint error
+      res.status(409).json({ 
+        error: 'Duplicate Entry',
+        message: 'A product with similar details already exists.',
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      // Log full error for debugging while returning safe message to user
+      console.error('Unexpected product creation error:', {
+        error: e,
+        stack: e.stack,
+        userId: req.userId,
+        timestamp: new Date().toISOString()
+      });
+      
+      res.status(500).json({ 
+        error: 'Server Error',
+        message: 'Failed to create product. Please try again in a moment.',
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] || 'unknown'
+      });
+    }
   }
 });
 
@@ -95,7 +177,38 @@ router.put('/products/:id', authMiddleware, async (req: AuthRequest, res: Respon
     const product = await ShopService.updateProduct(productId, req.userId!, data);
     res.json(product);
   } catch (e: any) {
-    res.status(e.name === 'ZodError' ? 400 : 400).json({ error: e.message });
+    console.error('Product update error:', {
+      error: e.message,
+      userId: req.userId,
+      productId: req.params.id,
+      timestamp: new Date().toISOString()
+    });
+    
+    if (e.name === 'ZodError') {
+      res.status(400).json({ 
+        error: 'Validation Error',
+        message: 'Please check your input fields.',
+        timestamp: new Date().toISOString()
+      });
+    } else if (e.message?.includes('not found') || e.message?.includes('does not exist')) {
+      res.status(404).json({ 
+        error: 'Not Found',
+        message: 'Product not found.',
+        timestamp: new Date().toISOString()
+      });
+    } else if (e.message?.includes('permission') || e.message?.includes('own product')) {
+      res.status(403).json({ 
+        error: 'Forbidden',
+        message: 'You can only edit your own products.',
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(500).json({ 
+        error: 'Server Error',
+        message: 'Failed to update product.',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 });
 
@@ -105,7 +218,14 @@ router.delete('/products/:id', authMiddleware, async (req: AuthRequest, res: Res
     const productId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     await ShopService.deleteProduct(productId, req.userId!);
     res.json({ success: true });
-  } catch (e: any) { res.status(400).json({ error: e.message }); }
+  } catch (e: any) { 
+    console.error('Delete product error:', e.message);
+    res.status(400).json({ 
+      error: 'Delete Failed',
+      message: 'Failed to delete product.',
+      timestamp: new Date().toISOString()
+    }); 
+  }
 });
 
 // ═══════════════════════════════════════════════════════════
