@@ -35,7 +35,7 @@ async function main() {
     }
 
     // Check if already a super admin
-    const existing = await prisma.adminProfile.findUnique({ where: { userId: user.id } });
+    const existing = await prisma.admin_profile.findUnique({ where: { user_id: user.id } });
     if (existing) {
       console.log(`⚠️  User already has role: ${existing.role}`);
       const confirm = await ask('Override to SUPER_ADMIN? [y/N]: ');
@@ -43,27 +43,27 @@ async function main() {
         console.log('Cancelled.');
         process.exit(0);
       }
-      await prisma.adminProfile.update({
+      await prisma.admin_profile.update({
         where: { id: existing.id },
-        data: { role: 'SUPER_ADMIN', isActive: true }
+        data: { role: 'SUPER_ADMIN', is_active: true }
       });
     } else {
-      await prisma.adminProfile.create({
+      await prisma.admin_profile.create({
         data: {
-          userId: user.id,
+          user_id: user.id,
           role: 'SUPER_ADMIN',
-          grantedBy: 'CLI_BOOTSTRAP',
+          granted_by: 'CLI_BOOTSTRAP',
         }
       });
     }
 
-    // Set isAdmin flag on user
+    // Set is_admin flag on user
     await prisma.user.update({
       where: { id: user.id },
-      data: { isAdmin: true }
+      data: { is_admin: true }
     });
 
-    console.log(`\n✅ ${user.displayName} (${user.email}) is now SUPER_ADMIN`);
+    console.log(`\n✅ ${user.display_name} (${user.email}) is now SUPER_ADMIN`);
     console.log(`   User ID: ${user.id}`);
 
   } else if (mode === '2') {
@@ -92,34 +92,34 @@ async function main() {
       process.exit(1);
     }
 
-    const passwordHash = await bcrypt.hash(password, 12);
-    const displayName = `${firstName} ${lastName}`;
+    const password_hash = await bcrypt.hash(password, 12);
+    const display_name = `${firstName} ${lastName}`;
 
     const user = await prisma.user.create({
       data: {
         email,
-        firstName,
-        lastName,
-        displayName,
+        first_name: firstName,
+        last_name: lastName,
+        display_name,
         username,
-        passwordHash,
+        password_hash,
         country: country.toUpperCase(),
         currency: currency.toUpperCase(),
-        accountType: 'CREATOR',
-        isAdmin: true,
+        account_type: 'CREATOR',
+        is_admin: true,
       }
     });
 
-    await prisma.adminProfile.create({
+    await prisma.admin_profile.create({
       data: {
-        userId: user.id,
+        user_id: user.id,
         role: 'SUPER_ADMIN',
-        grantedBy: 'CLI_BOOTSTRAP',
+        granted_by: 'CLI_BOOTSTRAP',
       }
     });
 
     console.log(`\n✅ Super Admin created successfully!`);
-    console.log(`   Name: ${displayName}`);
+    console.log(`   Name: ${display_name}`);
     console.log(`   Email: ${email}`);
     console.log(`   Username: ${username}`);
     console.log(`   User ID: ${user.id}`);
