@@ -51,21 +51,21 @@ export class UserService {
     const baseProfile = {
       id: user.id,
       username: user.username,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      displayName: user.display_name,
-      avatarUrl: user.avatar_url,
-      coverPhotoUrl: user.cover_photo_url,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      display_name: user.display_name,
+      avatar_url: user.avatar_url,
+      cover_photo_url: user.cover_photo_url,
       bio: user.bio,
       country: user.country,
-      accountType: user.account_type,
-      isVerified: user.is_verified,
+      account_type: user.account_type,
+      is_verified: user.is_verified,
       bioLinks: user.bio_links.map(link => ({
         id: link.id,
         label: link.label,
         url: link.url,
         icon: link.icon || '',
-        sortOrder: link.sort_order
+        sort_order: link.sort_order
       })),
       selectedNiches: user.selectedNiches || [],
       customNiches: user.customNiches || [],
@@ -77,7 +77,7 @@ export class UserService {
       },
       relationshipStatus,
       hasUnwatchedStories,
-      createdAt: user.created_at.toISOString()
+      created_at: user.created_at.toISOString()
     };
 
     // Only include sensitive data for own profile
@@ -85,7 +85,7 @@ export class UserService {
       return {
         ...baseProfile,
         currency: user.currency,
-        isWalletUnlocked: user.is_wallet_unlocked
+        is_wallet_unlocked: user.is_wallet_unlocked
       };
     }
 
