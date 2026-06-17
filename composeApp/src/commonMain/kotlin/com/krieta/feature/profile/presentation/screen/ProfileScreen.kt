@@ -8,6 +8,7 @@ import coil3.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.Navigator
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,6 +51,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val parentNavigator = navigator.parent
         val profileViewModel = koinScreenModel<ProfileViewModel> { parametersOf(userId) }
         val bioLinksViewModel = koinScreenModel<BioLinksViewModel>()
         val chatRepository = koinInject<com.krieta.feature.chat.domain.repository.ChatRepository>()
@@ -138,14 +140,14 @@ class ProfileScreen(val userId: String? = null) : Screen {
                     
                     // Header Area with Cover Image
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(300.dp),
+                        modifier = Modifier.fillMaxWidth().height(340.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         // Cover Banner - Display user banner or fallback
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(240.dp)
+                                .height(280.dp)
                                 .clip(RoundedCornerShape(0.dp))
                         ) {
                             if (profile.coverPhotoUrl != null) {
@@ -219,7 +221,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                                             onClick = {
                                                 menuExpanded = false
                                                 profileViewModel.logout {
-                                                    navigator.replaceAll(LoginScreen())
+                                                    parentNavigator?.replaceAll(LoginScreen())
                                                 }
                                             }
                                         )
@@ -228,7 +230,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                                             onClick = {
                                                 menuExpanded = false
                                                 profileViewModel.wipeCache {
-                                                    navigator.replaceAll(LoginScreen())
+                                                    parentNavigator?.replaceAll(LoginScreen())
                                                 }
                                             }
                                         )
@@ -241,15 +243,15 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .offset(y = 50.dp)
+                                .offset(y = 40.dp)
                         ) {
                             if (profile.avatarUrl != null) {
                                 Box(
                                     modifier = Modifier
-                                        .size(100.dp)
+                                        .size(120.dp)
                                         .clip(CircleShape)
                                         .background(KrietaColors.Background)
-                                        .padding(4.dp)
+                                        .padding(5.dp)
                                 ) {
                                     AsyncImage(
                                         model = profile.avatarUrl,
@@ -264,10 +266,10 @@ class ProfileScreen(val userId: String? = null) : Screen {
                             } else {
                                 Box(
                                     modifier = Modifier
-                                        .size(100.dp)
+                                        .size(120.dp)
                                         .clip(CircleShape)
                                         .background(KrietaColors.Background)
-                                        .padding(4.dp)
+                                        .padding(5.dp)
                                 ) {
                                     Box(
                                         modifier = Modifier
