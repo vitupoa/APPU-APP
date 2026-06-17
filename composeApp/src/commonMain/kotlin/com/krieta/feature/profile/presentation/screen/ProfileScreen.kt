@@ -138,14 +138,14 @@ class ProfileScreen(val userId: String? = null) : Screen {
                     
                     // Header Area with Cover Image
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(340.dp),
+                        modifier = Modifier.fillMaxWidth().height(300.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         // Cover Banner - Display user banner or fallback
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(280.dp)
+                                .height(240.dp)
                                 .clip(RoundedCornerShape(0.dp))
                         ) {
                             if (profile.coverPhotoUrl != null) {
@@ -241,7 +241,7 @@ class ProfileScreen(val userId: String? = null) : Screen {
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .offset(y = 60.dp)
+                                .offset(y = 50.dp)
                         ) {
                             if (profile.avatarUrl != null) {
                                 Box(
