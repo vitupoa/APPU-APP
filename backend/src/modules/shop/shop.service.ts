@@ -72,6 +72,7 @@ export class ShopService {
           longitude: productData.longitude ? new Prisma.Decimal(productData.longitude) : undefined,
           stock: productData.stock ?? 1,
           status: 'active',
+          updated_at: new Date(),
         },
         include: { user: { select: SELLER_SELECT } }
       });

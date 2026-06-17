@@ -17,9 +17,7 @@ const router = Router();
 const createContestSchema = z.object({
   title: z.string().min(5).max(100),
   description: z.string().min(10).max(2000),
-  // Accept both camelCase (from frontend) and snake_case (for backend)
-  media_type: z.enum(['PHOTO', 'VIDEO', 'PHOTO_AND_VIDEO']).optional(),
-  mediaType: z.enum(['PHOTO', 'VIDEO', 'PHOTO_AND_VIDEO']).optional(),
+  media_type: z.enum(['PHOTO', 'VIDEO', 'PHOTO_AND_VIDEO']),
   category: z.enum(['DANCE', 'CHALLENGE', 'PROMOTION', 'CREATIVE', 'ART', 'MUSIC']),
   prizeTotalKr: z.number().positive('Prize must be positive'),
   requiredActions: z.array(z.object({
@@ -102,17 +100,11 @@ router.post('/',
     console.log('✅ Zod validation passed');
     console.log('🚀 Calling ContestService.createContest...');
     
-    // Handle both camelCase and snake_case media_type
-    const mediaType = data.mediaType || data.media_type;
-    if (!mediaType) {
-      throw new Error('mediaType is required');
-    }
-    
     const contest = await ContestService.createContest({
       creator_id: req.userId!,
       title: data.title,
       description: data.description,
-      mediaType: mediaType,
+      mediaType: data.media_type,
       category: data.category,
       prizeTotalKr: data.prizeTotalKr,
       requiredActions: data.requiredActions as { type: string; targetUrl?: string; label: string; }[],

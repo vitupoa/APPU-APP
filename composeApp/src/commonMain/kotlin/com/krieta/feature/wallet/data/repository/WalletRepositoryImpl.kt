@@ -68,10 +68,10 @@ class WalletRepositoryImpl(
             // CRITICAL: Block if offline
             offlineModeGuard.requireOnlineForFinancialTransaction()
             
-            // Validate amount - minimum 0.01 Kr to support fractional tips
+            // Validate amount - minimum 5 Kr
             val validation = financialSecurity.validateAmount(
                 amount = krAmount,
-                minAmount = 0.01,
+                minAmount = 5.0,
                 maxAmount = 10000.0
             )
             if (!validation.isValid) {

@@ -64,8 +64,8 @@ export class WalletService {
 
     // Support fractional Kr amounts - minimum 0.01 Kr (approximately KES 0.013)
     // This allows Kenyan users to tip as low as KES 1 (which is ~77 Kr)
-    if (typeof senderKrAmount !== 'number' || senderKrAmount < 0.01 || !isFinite(senderKrAmount)) {
-      throw new Error("Tip amount must be at least 0.01 Kr.");
+    if (typeof senderKrAmount !== 'number' || senderKrAmount < 5 || !isFinite(senderKrAmount)) {
+      throw new Error("Tip amount must be at least 5 Kr.");
     }
 
     // Round to 2 decimal places to avoid floating point precision issues

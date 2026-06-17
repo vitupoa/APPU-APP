@@ -69,14 +69,17 @@ class UserCurrencyProvider(
      * New tokenomics: 1 Kr = 1 KES, 1 USD = 135 KES
      * Therefore: 1 Kr = 1/135 USD = 0.00740740741 USD
      * 
-     * Formula: Fiat = Kr * rate (since 1 Kr = 1 KES base unit)
-     * Example: 1 Kr * 135 = 135 KES
+     * Formula: Fiat = (Kr / 135) × UsdToLocalRate
+     * Example KES: (5 Kr / 135) × 135 = 5 KES ✓
+     * Example TZS: (5 Kr / 135) × 2300 = 85.2 TZS ✓
+     * Example UGX: (5 Kr / 135) × 3700 = 137 UGX ✓
      */
     fun krToFiat(krAmount: Double): Double {
         val rate = _exchangeRate.value ?: return 0.0
-        // rate is USD to local fiat (e.g., 135 for KES)
-        // Since 1 Kr = 1 KES: Kr_amount * rate gives fiat
-        return krAmount * rate.baseRate
+        // Convert Kr to USD, then to local fiat
+        val usdAmount = krAmount / 135.0
+        val fiatAmount = usdAmount * rate.baseRate
+        return fiatAmount
     }
 
     /**
@@ -86,15 +89,19 @@ class UserCurrencyProvider(
      * New tokenomics: 1 Kr = 1 KES, 1 USD = 135 KES
      * Therefore: 1 Kr = 1/135 USD = 0.00740740741 USD
      * 
-     * Formula: Kr = Fiat / rate (since 1 Kr = 1 Fiat unit in base currency KES)
-     * Example: 135 KES / 135 = 1 Kr
+     * Formula: Kr = (Fiat / UsdToLocalRate) × 135
+     * This normalizes everything to KES equivalent
+     * Example KES: (5 KES / 135) × 135 = 5 Kr ✓
+     * Example TZS: (85 TZS / 2300) × 135 = 5 Kr ✓
+     * Example UGX: (137 UGX / 3700) × 135 = 5 Kr ✓
      */
     fun convertLocalToKr(localAmount: Double): Double {
         val rate = _exchangeRate.value?.baseRate ?: return 0.0
-        // rate is USD to local fiat (e.g., 135 for KES)
-        // Since 1 Kr = 1 KES and 1 USD = 135 KES
-        // To convert any fiat to Kr: fiat_amount / rate
-        return localAmount / rate
+        // Convert local amount to USD, then to Kr
+        // Since 1 USD = 135 Kr and rate is USD to local fiat
+        val usdAmount = localAmount / rate
+        val krAmount = usdAmount * 135.0
+        return krAmount
     }
 
     /**
