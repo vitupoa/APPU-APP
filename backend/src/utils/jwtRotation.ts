@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { env } from '../config/env.js';
 import { prisma } from '../config/database.js';
 
@@ -146,6 +147,7 @@ export class JwtSecretManager {
     await prisma.platform_config.upsert({
       where: { key: 'jwt_secrets' },
       create: {
+        id: crypto.randomUUID(),
         key: 'jwt_secrets',
         value: {
           currentVersion: this.currentVersion,
