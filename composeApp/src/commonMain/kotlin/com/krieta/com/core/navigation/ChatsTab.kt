@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.krieta.feature.chat.presentation.list.ChatListScreen
@@ -15,16 +16,8 @@ object ChatsTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Chats"
             val icon = painterResource(Res.drawable.ic_chat)
-
-            return remember {
-                TabOptions(
-                    index = 4u,
-                    title = title,
-                    icon = icon
-                )
-            }
+            return remember { TabOptions(index = 3u, title = "Chats", icon = icon) }
         }
 
     @Composable
@@ -32,6 +25,8 @@ object ChatsTab : Tab {
         Navigator(
             screen = ChatListScreen(),
             key = "ChatsTabNavigator"
-        )
+        ) {
+            CurrentScreen()
+        }
     }
 }

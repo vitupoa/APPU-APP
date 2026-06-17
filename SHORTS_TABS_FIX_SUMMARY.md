@@ -89,16 +89,17 @@ whereClause.created_at = { gte: sevenDaysAgo };
 
 ---
 
-### Issue 4: Discover Tab Shows Too Much Old Content ✅
-**Problem**: No recency weight in algorithm - old viral content dominated feed.
+### Issue 4: Discover Tab Shows Too Much Old Content / New Users See Empty Discover Tab ✅
+**Problem**: 14-day time filter prevented new users from seeing any content and excluded older shorts from discovery.
 
-**Fix Applied** (`shorts.service.ts` lines 82-91):
+**Fix Applied** (`shorts.service.ts` lines 89-101):
 ```typescript
-// FIXED: Discover tab - prioritize trending/recent content (last 14 days)
-const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
-whereClause.created_at = { gte: fourteenDaysAgo };
+// Exclude own shorts and anyone YOU are admiring
+const excludeIds = [userId, ...admiringIds];
+whereClause.user_id = { notIn: excludeIds };
 
-// Order by engagement + recency for viral content
+// Order by engagement + recency for viral content discovery
+// No time restriction to ensure new users see content
 orderByClause = [
   { likes_count: 'desc' },
   { views: 'desc' },
@@ -106,7 +107,7 @@ orderByClause = [
 ];
 ```
 
-**Impact**: Discover tab now prioritizes trending content from last 14 days, sorted by engagement metrics.
+**Impact**: Discover tab now shows ALL shorts from users you don't admire, sorted by engagement. New users can immediately see content.
 
 ---
 
@@ -115,19 +116,19 @@ orderByClause = [
 | Tab | Time Window | Content Source | Sort Order |
 |-----|-------------|----------------|------------|
 | **Contests** | All time | Contest submissions | Recency |
-| **Discover** | 14 days | Strangers (exclude your admirees) | Engagement + Recency |
+| **Discover** | All time | Strangers (exclude your admirees) | Engagement (likes, views) + Recency |
 | **Lovers** | 24 hours | Mutual admirers only | Recency |
 | **Admiring** | 7 days | Your own + people you admire (non-mutual) | Recency |
 
 ## Virality Impact
 
 ### Before Fix:
-- Discover: Mixed old/new content, no engagement priority
+- Discover: 14-day time filter blocked new users from seeing content
 - Lovers: All-time content, stale feed
 - Admiring: All-time content
 
 ### After Fix:
-- **Discover Tab**: Primary virality driver - surfaces trending content with high engagement from last 14 days
+- **Discover Tab**: Shows ALL shorts from strangers, sorted by engagement (likes, views). New users immediately see popular content
 - **Lovers Tab**: Fresh 24hr content keeps mutual admirers engaged
 - **Admiring Tab**: 7-day window balances discovery with recency
 - **Result**: Content naturally flows from Admiring → Lovers → Discover as it gains traction

@@ -259,14 +259,14 @@ export class FeedService {
   }
 
   /**
-   * Get trending posts (high engagement in last 24 hours)
+   * Get trending posts (high engagement in last 7 days)
    */
   private static async getTrendingPosts(country: string, count: number, cursor?: string) {
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     return prisma.post.findMany({
       where: {
-        created_at: { gte: oneDayAgo },
+        created_at: { gte: sevenDaysAgo },
         user: { country }
       },
       take: count,
@@ -373,11 +373,11 @@ export class FeedService {
    * Get feed for guest users (not logged in)
    */
   private static async getGuestFeed(cursor: string | undefined, limit: number) {
-    // Show popular posts with randomization
+    // Show popular posts from last 30 days with randomization
     const posts = await prisma.$queryRaw<any[]>`
       SELECT p.*
       FROM post p
-      WHERE p.created_at >= NOW() - INTERVAL '7 days'
+      WHERE p.created_at >= NOW() - INTERVAL '30 days'
       AND p.likes_count > 5
       ORDER BY RANDOM()
       LIMIT ${limit + 1}

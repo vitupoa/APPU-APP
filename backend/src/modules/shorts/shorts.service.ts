@@ -50,9 +50,7 @@ export class ShortsService {
 
         if (loversIds.length > 0) {
           whereClause.user_id = { in: loversIds };
-          // Lovers tab: prioritize most recent (0-24hrs)
-          const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-          whereClause.created_at = { gte: oneDayAgo };
+          // Lovers tab: All time, chronologically (most recent first)
         } else {
           // No lovers, return empty by querying impossible condition
           whereClause.id = 'impossible-id-no-lovers';
@@ -79,9 +77,7 @@ export class ShortsService {
           whereClause.user_id = userId;
         }
         
-        // Admiring tab: show recent + high-engagement (7 days)
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        whereClause.created_at = { gte: sevenDaysAgo };
+        // Admiring tab: All time, chronologically (most recent first)
       } else if (type === 'discover') {
         // Get all people YOU are admiring
         // Discover should exclude: your own shorts + people you admire
@@ -93,14 +89,11 @@ export class ShortsService {
         const admiringIds = admiringList.map((a: { admired_id: string }) => a.admired_id);
 
         // Exclude own shorts and anyone YOU are admiring
-        whereClause.user_id = { notIn: [userId, ...admiringIds] };
+        const excludeIds = [userId, ...admiringIds];
+        whereClause.user_id = { notIn: excludeIds };
         
-        // FIXED: Discover tab - prioritize trending/recent content (last 14 days)
-        // Mix of time-based and engagement-based sorting
-        const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
-        whereClause.created_at = { gte: fourteenDaysAgo };
-        
-        // Order by engagement + recency for viral content
+        // Order by engagement + recency for viral content discovery
+        // No time restriction to ensure new users see content
         orderByClause = [
           { likes_count: 'desc' },
           { views: 'desc' },

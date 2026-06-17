@@ -796,7 +796,7 @@ object ProfileTab : Tab {
     override fun Content() {
         Navigator(
             screen = ProfileScreen(userId = null),
-            key = "ProfileNavigator"
+            key = "ProfileTabNavigator"
         ) {
             CurrentScreen()
         }
