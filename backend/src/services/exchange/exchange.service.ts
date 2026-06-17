@@ -109,16 +109,19 @@ export class ExchangeService {
 
   /**
    * Fiat -> KR Conversion engine properly isolating the Tokenomic Pegs
-   * Kr 1 = $0.01 USD (Base Peg is Absolute)
-   * KR_TO_USD_RATE = 0.01
-   * KR_PRECISION = 1000000 (1 million base units = 1 Kr)
+   * NEW TOKENOMICS:
+   * 1 Kr = 1 KES (Base Peg)
+   * 1 USD = 135 KES
+   * Therefore: 1 Kr = 1/135 USD = 0.00740740741 USD
+   * 
+   * KR_TO_USD_RATE = 1/135 = 0.00740740741
    */
   static getKrFromUSD(usdAmount: number): number {
-      return usdAmount / 0.01; // 1 USD = 100 Kr
+      return usdAmount * 135; // 1 USD = 135 Kr
   }
 
   static getUSDFromKr(krAmount: number): number {
-      return krAmount * 0.01; // 1 Kr = 0.01 USD
+      return krAmount / 135; // 1 Kr = 1/135 USD
   }
 
   /**
@@ -126,14 +129,19 @@ export class ExchangeService {
    * Additionally embeds the invisible KES 20 exchange fee on buys.
    * Withdrawals operate entirely free (Margin 0).
    * 
+   * NEW TOKENOMICS: 1 Kr = 1 KES, 1 Kr = 1/135 USD
+   * 
    * @param localCurrency User's local ISO currency (e.g. KES)
    * @param type transaction format (buy or sell)
    * @returns Exchange Rate relative to Fiat
    */
   static async getTransactionRate(localCurrency: string, type: 'buy' | 'sell'): Promise<number> {
     const usdToFiatRate = await this.getRate(localCurrency);
-    // 1 Kr = 0.01 USD
-    const krToFiatRate = usdToFiatRate * 0.01;
+    // 1 Kr = 1 KES, and we need Kr to any fiat
+    // First convert Kr to USD: 1 Kr = 1/135 USD
+    // Then convert USD to target fiat: USD * usdToFiatRate
+    // Combined: (1/135) * usdToFiatRate
+    const krToFiatRate = usdToFiatRate / 135;
     
     if (type === 'buy') {
       const TOPUP_MARGIN = 0.045; // 4.5% Spread explicitly isolated preventing arbitrage 

@@ -65,19 +65,36 @@ class UserCurrencyProvider(
     /**
      * Convert Kr amount to user's local fiat currency.
      * Returns 0.0 if exchange rate is not yet loaded.
+     * 
+     * New tokenomics: 1 Kr = 1 KES, 1 USD = 135 KES
+     * Therefore: 1 Kr = 1/135 USD = 0.00740740741 USD
+     * 
+     * Formula: Fiat = Kr * rate (since 1 Kr = 1 KES base unit)
+     * Example: 1 Kr * 135 = 135 KES
      */
     fun krToFiat(krAmount: Double): Double {
         val rate = _exchangeRate.value ?: return 0.0
-        return com.krieta.com.core.util.KrCurrencyFormatter.krToFiat(krAmount, rate.baseRate, applySellMargin = false)
+        // rate is USD to local fiat (e.g., 135 for KES)
+        // Since 1 Kr = 1 KES: Kr_amount * rate gives fiat
+        return krAmount * rate.baseRate
     }
 
     /**
      * Convert local fiat currency to Kr amount.
      * Returns 0.0 if exchange rate is not yet loaded.
+     * 
+     * New tokenomics: 1 Kr = 1 KES, 1 USD = 135 KES
+     * Therefore: 1 Kr = 1/135 USD = 0.00740740741 USD
+     * 
+     * Formula: Kr = Fiat / rate (since 1 Kr = 1 Fiat unit in base currency KES)
+     * Example: 135 KES / 135 = 1 Kr
      */
     fun convertLocalToKr(localAmount: Double): Double {
         val rate = _exchangeRate.value?.baseRate ?: return 0.0
-        return localAmount * rate
+        // rate is USD to local fiat (e.g., 135 for KES)
+        // Since 1 Kr = 1 KES and 1 USD = 135 KES
+        // To convert any fiat to Kr: fiat_amount / rate
+        return localAmount / rate
     }
 
     /**

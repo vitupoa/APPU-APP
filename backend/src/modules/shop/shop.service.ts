@@ -47,6 +47,7 @@ export class ShopService {
     const product = await prisma.$transaction(async (tx: any) => {
       const p = await tx.products.create({
         data: {
+          id: crypto.randomUUID(),
           seller_id: sellerId,
           title: productData.title,
           description: productData.description,

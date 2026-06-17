@@ -84,6 +84,9 @@ class ProfileViewModel(
     fun logout(onSuccess: () -> Unit) {
         screenModelScope.launch {
             authRepository.logout()
+            // Clear cached profile data
+            cachedOwnProfile = null
+            _state.value = ProfileState()
             onSuccess()
         }
     }
@@ -91,6 +94,9 @@ class ProfileViewModel(
     fun wipeCache(onSuccess: () -> Unit) {
         screenModelScope.launch {
             authRepository.logout()
+            // Clear cached profile data
+            cachedOwnProfile = null
+            _state.value = ProfileState()
             onSuccess()
         }
     }
