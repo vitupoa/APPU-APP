@@ -24,7 +24,7 @@ export const withdrawInitiateSchema = z.object({
 
 export const tipSchema = z.object({
   recipient_id: z.string().uuid('Invalid recipient ID'),
-  krAmount: z.number().int('Amount must be a whole number').positive('Tip must be a positive integer'),
+  krAmount: z.number().positive('Tip must be positive').min(5, 'Minimum tip is 5 Kr'),
   currency: z.string().length(3),
   // MITM protection fields
   signature: z.string().min(1, 'Transaction signature required'),

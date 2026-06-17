@@ -74,7 +74,8 @@ const envSchema = z.object({
   ),
 
   // Kr Coin Configuration
-  KR_TO_USD_RATE: z.string().default('0.01').transform(Number),
+  // NEW TOKENOMICS: 1 Kr = 1 KES, 1 USD = 135 KES, therefore 1 Kr = 1/135 USD
+  KR_TO_USD_RATE: z.string().default('0.00740740741').transform(Number), // 1/135
   KR_PRECISION: z.string().default('1000000').transform(Number),
 });
 

@@ -24,7 +24,8 @@ class AuthRepositoryImpl(
     private val tokenManager: TokenManager,
     private val deviceSecurity: DeviceSecurity,
     private val httpClient: HttpClient,
-    private val financialSecurity: com.krieta.com.core.security.FinancialTransactionSecurity
+    private val financialSecurity: com.krieta.com.core.security.FinancialTransactionSecurity,
+    private val profileLocalDataSource: com.krieta.feature.profile.data.local.ProfileLocalDataSource
 ) : AuthRepository {
 
     private val _currentUser = MutableStateFlow<User?>(null)
@@ -216,5 +217,12 @@ class AuthRepositoryImpl(
     private suspend fun clearSession() {
         tokenManager.clearTokens()
         _currentUser.value = null
+        // Clear all cached profile data
+        try {
+            profileLocalDataSource.clearCache()
+            println("✅ Cleared profile cache on logout")
+        } catch (e: Exception) {
+            println("⚠️ Failed to clear profile cache: ${e.message}")
+        }
     }
 }

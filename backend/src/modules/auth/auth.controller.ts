@@ -85,6 +85,10 @@ export class AuthController {
         refresh_token: data.refresh_token,
         deviceId: data.device_id
       });
+      // Add cache control headers to ensure client clears all cached data
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       res.status(200).json({ success: true, message: 'Logged out successfully' });
     } catch (error: any) {
       if (error.name === 'ZodError') {

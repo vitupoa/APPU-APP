@@ -43,17 +43,22 @@ object KrCurrencyFormatter {
 
     /**
      * Converts fiat to Kr using exchange rate with platform margin.
-     * Buy margin (topup): User gets LESS Kr (rate reduced by 4.5%)
-     * Sell margin (withdraw): User gets LESS fiat (rate reduced by 4.5%)
+     * NEW TOKENOMICS: 1 Kr = 1 KES, 1 USD = 135 KES, therefore 1 Kr = 1/135 USD
+     * 
+     * rate = USD to local fiat (e.g., 135 for KES)
+     * To convert fiat to Kr: fiat / rate (since 1 Kr = 1 KES and rate is KES per USD)
+     * 
+     * Buy margin (topup): User gets LESS Kr (rate increased by 4.5%)
+     * Sell margin (withdraw): User gets LESS fiat (rate increased by 4.5%)
      */
     fun fiatToKr(fiatAmount: Double, rate: Double, applyBuyMargin: Boolean = true): Double {
-        val baseKr = if (rate > 0) fiatAmount / (100.0 * rate) else 0.0
-        return if (applyBuyMargin) baseKr * (1 - PLATFORM_MARGIN) else baseKr
+        val effectiveRate = if (applyBuyMargin) rate * (1 + PLATFORM_MARGIN) else rate
+        return if (effectiveRate > 0) fiatAmount / effectiveRate else 0.0
     }
 
     fun krToFiat(krAmount: Double, rate: Double, applySellMargin: Boolean = true): Double {
-        val baseFiat = krAmount * 100.0 * rate
-        return if (applySellMargin) baseFiat * (1 - PLATFORM_MARGIN) else baseFiat
+        val effectiveRate = if (applySellMargin) rate * (1 - PLATFORM_MARGIN) else rate
+        return krAmount * effectiveRate
     }
 
     /**

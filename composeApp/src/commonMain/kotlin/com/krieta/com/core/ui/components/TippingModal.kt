@@ -41,10 +41,10 @@ fun TippingModal(
     val exchangeRate by currencyProvider.exchangeRate.collectAsState()
     val currencyCode = currencyProvider.currencyCode
 
-    val minTipKr = 0.01 // Changed from 1.0 to 0.01 to allow fractional tips
+    val minTipKr = 5.0 // Minimum 5 Kr = 5 KES (reasonable minimum for all currencies)
 
-    // Quick-tip amounts in user's native fiat currency
-    val quickFiatAmounts = listOf(500, 1000, 5000, 50000)
+    // Quick-tip amounts in user's native fiat currency (starting from 5 in local currency)
+    val quickFiatAmounts = listOf(5, 50, 500, 5000)
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
