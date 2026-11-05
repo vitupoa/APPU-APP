@@ -1,0 +1,16 @@
+# Ignore Android/KMP app - deploy backend only
+composeApp/
+gradle/
+*.gradle
+*.gradle.kts
+gradlew
+gradlew.bat
+local.properties
+
+# Ignore other mobile stuff
+iosApp/
+androidApp/
+shared/
+
+# Node modules (will be installed during build)
+node_modules/
