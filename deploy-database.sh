@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # Wave 5 Deployment Script - Database Migrations
 # This script runs all compliance-related database migrations
@@ -11,7 +11,7 @@ echo "=========================================="
 # Configuration
 DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-5432}"
-DB_NAME="${DB_NAME:-krieta}"
+DB_NAME="${DB_NAME:-runinga}"
 DB_USER="${DB_USER:-postgres}"
 
 echo "📊 Database: $DB_NAME@$DB_HOST:$DB_PORT"
