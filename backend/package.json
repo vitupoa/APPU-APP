@@ -8,7 +8,7 @@
     "dev": "tsx watch src/index.ts",
     "postinstall": "",
     "build": "echo 'Prisma generation happens at runtime'",
-    "start": "prisma generate && prisma migrate deploy && tsx src/index.ts",
+    "start": "prisma generate && (prisma migrate resolve --rolled-back 20260617080623_consolidated_init || true) && prisma migrate deploy && tsx src/index.ts",
     "start:prod": "prisma generate && npm run migrate:rls && tsx src/index.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
