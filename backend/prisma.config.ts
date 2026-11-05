@@ -1,13 +1,3 @@
-import "dotenv/config";
-import { defineConfig, env } from "prisma/config";
-
-export default defineConfig({
-  schema: "prisma/schema.prisma",
-  migrations: {
-    path: "prisma/migrations",
-    seed: "tsx prisma/seed.ts",
-  },
-  datasource: {
-    url: env("DATABASE_URL"),
-  },
-});
+// This file is optional and can cause issues in Railway deployments
+// The DATABASE_URL is defined directly in schema.prisma using env("DATABASE_URL")
+export default {};
