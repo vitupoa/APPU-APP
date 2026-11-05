@@ -1,8 +1,8 @@
-# Fix all remaining 48 TypeScript errors
+﻿# Fix all remaining 48 TypeScript errors
 
 Write-Host "Fixing all remaining 48 LOW PRIORITY errors..." -ForegroundColor Cyan
 
-# Fix 1: contests.service.ts - Change prizeTotalKr back to prizeAmountKr
+# Fix 1: contests.service.ts - Change prizeTotalRc back to prizeAmountKr
 Write-Host "1. Fixing contests.service.ts..." -ForegroundColor Yellow
 $file = "src/modules/contests/contests.service.ts"
 $content = Get-Content $file -Raw

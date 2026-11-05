@@ -1,4 +1,4 @@
-# Payment Integration Fixes - Production Ready
+﻿# Payment Integration Fixes - Production Ready
 
 ## Summary
 Fixed all payment integrations (M-Pesa, PayPal, Paystack) to be fully functional for live production use.
@@ -39,18 +39,18 @@ Fixed all payment integrations (M-Pesa, PayPal, Paystack) to be fully functional
 
 ### 1. Browser URL Opening (Implemented)
 **Files Created:**
-- `composeApp/src/commonMain/kotlin/com/krieta/com/core/util/BrowserUtil.kt` - Common interface
-- `composeApp/src/androidMain/kotlin/com/krieta/com/core/util/BrowserUtil.android.kt` - Android implementation
-- `composeApp/src/iosMain/kotlin/com/krieta/com/core/util/BrowserUtil.ios.kt` - iOS implementation
+- `composeApp/src/commonMain/kotlin/com/runinga/com/core/util/BrowserUtil.kt` - Common interface
+- `composeApp/src/androidMain/kotlin/com/runinga/com/core/util/BrowserUtil.android.kt` - Android implementation
+- `composeApp/src/iosMain/kotlin/com/runinga/com/core/util/BrowserUtil.ios.kt` - iOS implementation
 
-**File:** `composeApp/src/androidMain/kotlin/com/krieta/com/MainActivity.kt`
+**File:** `composeApp/src/androidMain/kotlin/com/runinga/com/MainActivity.kt`
 - Initialized BrowserUtil with application context
 
-**File:** `composeApp/src/commonMain/kotlin/com/krieta/feature/wallet/presentation/screen/TopupScreen.kt`
+**File:** `composeApp/src/commonMain/kotlin/com/runinga/feature/wallet/presentation/screen/TopupScreen.kt`
 - Implemented "Continue to Payment" button to open PayPal/Paystack payment URLs in browser
 
 ### 2. Payment Flow (Fixed)
-**File:** `composeApp/src/commonMain/kotlin/com/krieta/feature/wallet/presentation/viewmodel/TopupViewModel.kt`
+**File:** `composeApp/src/commonMain/kotlin/com/runinga/feature/wallet/presentation/viewmodel/TopupViewModel.kt`
 - Removed auto-confirmation simulation
 - Payment confirmations now handled via webhook callbacks (production-ready)
 

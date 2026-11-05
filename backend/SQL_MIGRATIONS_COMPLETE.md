@@ -1,4 +1,4 @@
-# SQL Migrations Status - Complete Summary ✅
+﻿# SQL Migrations Status - Complete Summary ✅
 
 ## 📊 Migration Status Overview
 
@@ -62,8 +62,8 @@ All these tables/enums are already defined in your `schema.prisma` and exist in 
 **Velocity Limits Enforced**:
 - 10 tips per minute per user
 - 50 transactions per hour per user
-- 100,000 Kr per 24h (non-KYC users)
-- 500,000 Kr per 24h (KYC-approved users)
+- 100,000 Rc per 24h (non-KYC users)
+- 500,000 Rc per 24h (KYC-approved users)
 - 24-hour cooling-off period for new accounts
 
 ---

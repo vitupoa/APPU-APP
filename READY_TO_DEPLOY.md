@@ -1,4 +1,4 @@
-# 🚀 READY TO DEPLOY - Quick Start Guide
+﻿# 🚀 READY TO DEPLOY - Quick Start Guide
 
 ## What You Have Now
 
@@ -22,7 +22,7 @@
 ### Step 1: Fix Prisma Version (2 minutes)
 
 ```powershell
-cd C:\Users\ADMIN\Krieta\backend
+cd C:\Users\ADMIN\Runinga\backend
 
 # Clean install
 Remove-Item -Recurse -Force node_modules
@@ -153,7 +153,7 @@ You mentioned ranking creators by **reach, engagement, and admire counts** (not 
 The influencer tier system uses:
 - **Total Reach**: Sum of followers across ALL social platforms
 - **Engagement Rate**: Average engagement across all platforms
-- **Admire Count**: From Krieta platform
+- **Admire Count**: From Runinga platform
 
 **Tier Calculation**:
 ```
@@ -280,7 +280,7 @@ cd ../composeApp
 Run this PowerShell script to deploy everything:
 
 ```powershell
-cd C:\Users\ADMIN\Krieta\backend
+cd C:\Users\ADMIN\Runinga\backend
 .\deploy-railway.ps1
 ```
 

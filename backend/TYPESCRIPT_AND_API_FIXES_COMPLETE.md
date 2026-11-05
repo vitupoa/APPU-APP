@@ -1,4 +1,4 @@
-# TypeScript Fixes & Exchange Rate API Fix - Complete Summary
+﻿# TypeScript Fixes & Exchange Rate API Fix - Complete Summary
 
 ## Date: 2025-05-02
 ## Status: ✅ CRITICAL FIXES COMPLETED
@@ -84,7 +84,7 @@ The backend is working correctly. The mobile app error suggests:
 ```typescript
 // BEFORE
 static async notifyContestWinner(userId: string, contestId: string, rank: number, prizeTotalKr: number) {
-  // ... uses prizeKr in body
+  // ... uses prizeRc in body
 
 // AFTER
 static async notifyContestWinner(userId: string, contestId: string, rank: number, prizeKr: number) {

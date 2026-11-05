@@ -1,4 +1,4 @@
-import { prisma } from '../config/database.js';
+﻿import { prisma } from '../config/database.js';
 import { Request } from 'express';
 import crypto from 'crypto';
 
@@ -148,7 +148,7 @@ export class AuditLogService {
       fiatAmount: number;
       currency: string;
       krAmount: number;
-      conversionType: 'FIAT_TO_KR' | 'KR_TO_FIAT';
+      conversionType: 'FIAT_TO_KR' | 'RC_TO_FIAT';
     }
   ): Promise<void> {
     await this.log({

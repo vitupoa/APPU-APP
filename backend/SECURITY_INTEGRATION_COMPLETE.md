@@ -1,7 +1,7 @@
-# Security Middleware Integration - Complete ✅
+﻿# Security Middleware Integration - Complete ✅
 
 ## Overview
-All security middleware has been successfully integrated into the Krieta backend routes. This document provides a summary of what was integrated and where.
+All security middleware has been successfully integrated into the Runinga backend routes. This document provides a summary of what was integrated and where.
 
 ---
 

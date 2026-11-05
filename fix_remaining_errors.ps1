@@ -1,4 +1,4 @@
-# PowerShell script to fix remaining compilation errors
+﻿# PowerShell script to fix remaining compilation errors
 
 Write-Host "Fixing remaining compilation errors..." -ForegroundColor Green
 
@@ -21,7 +21,7 @@ foreach ($file in $screenFiles) {
 Write-Host "`nFixing specific file issues..." -ForegroundColor Green
 
 # Fix DefaultersListScreen - completely broken, needs full rewrite of state handling
-$defaultersScreen = "composeApp\src\commonMain\kotlin\com\krieta\feature\chama\presentation\defaulters\DefaultersListScreen.kt"
+$defaultersScreen = "composeApp\src\commonMain\kotlin\com\runinga\feature\chama\presentation\defaulters\DefaultersListScreen.kt"
 if (Test-Path $defaultersScreen) {
     $content = Get-Content $defaultersScreen -Raw
     
@@ -43,7 +43,7 @@ if (Test-Path $defaultersScreen) {
 }
 
 # Fix ContributeViewModel - wrong property access
-$contributeVM = "composeApp\src\commonMain\kotlin\com\krieta\feature\chama\presentation\contribute\ContributeViewModel.kt"
+$contributeVM = "composeApp\src\commonMain\kotlin\com\runinga\feature\chama\presentation\contribute\ContributeViewModel.kt"
 if (Test-Path $contributeVM) {
     $content = Get-Content $contributeVM -Raw
     $content = $content -replace 'is NetworkResult\.Success -> _state\.value = _state\.value\.copy\(balance = result\.data\)', 'is NetworkResult.Success -> _state.value = _state.value.copy(balance = result.data.balance)'
@@ -52,16 +52,16 @@ if (Test-Path $contributeVM) {
 }
 
 # Fix SettingsViewModel - missing parameter
-$settingsVM = "composeApp\src\commonMain\kotlin\com\krieta\feature\chama\presentation\settings\SettingsViewModel.kt"
+$settingsVM = "composeApp\src\commonMain\kotlin\com\runinga\feature\chama\presentation\settings\SettingsViewModel.kt"
 if (Test-Path $settingsVM) {
     $content = Get-Content $settingsVM -Raw
-    $content = $content -replace "contributionAmountKr = ", "contributionAmount = "
+    $content = $content -replace "contributionAmountRc = ", "contributionAmount = "
     Set-Content -Path $settingsVM -Value $content -NoNewline
     Write-Host "Fixed SettingsViewModel" -ForegroundColor Yellow
 }
 
 # Fix AuthViewModel and RegisterViewModel - type mismatch
-$authVM = "composeApp\src\commonMain\kotlin\com\krieta\feature\auth\presentation\viewmodel\AuthViewModel.kt"
+$authVM = "composeApp\src\commonMain\kotlin\com\runinga\feature\auth\presentation\viewmodel\AuthViewModel.kt"
 if (Test-Path $authVM) {
     $content = Get-Content $authVM -Raw
     $content = $content -replace "_state\.value = result\.data", "_state.value = result.data as AuthState"
@@ -69,7 +69,7 @@ if (Test-Path $authVM) {
     Write-Host "Fixed AuthViewModel" -ForegroundColor Yellow
 }
 
-$registerVM = "composeApp\src\commonMain\kotlin\com\krieta\feature\auth\presentation\viewmodel\RegisterViewModel.kt"
+$registerVM = "composeApp\src\commonMain\kotlin\com\runinga\feature\auth\presentation\viewmodel\RegisterViewModel.kt"
 if (Test-Path $registerVM) {
     $content = Get-Content $registerVM -Raw
     $content = $content -replace "_registerState\.value = result\.data", "_registerState.value = result.data as RegisterState"
@@ -78,7 +78,7 @@ if (Test-Path $registerVM) {
 }
 
 # Fix UploadWorker - type mismatch
-$uploadWorker = "composeApp\src\androidMain\kotlin\com\krieta\com\core\upload\UploadWorker.kt"
+$uploadWorker = "composeApp\src\androidMain\kotlin\com\runinga\com\core\upload\UploadWorker.kt"
 if (Test-Path $uploadWorker) {
     $content = Get-Content $uploadWorker -Raw
     $emptyString = '""'
@@ -88,7 +88,7 @@ if (Test-Path $uploadWorker) {
 }
 
 # Fix Tabs.kt - color properties
-$tabs = "composeApp\src\commonMain\kotlin\com\krieta\com\core\navigation\Tabs.kt"
+$tabs = "composeApp\src\commonMain\kotlin\com\runinga\com\core\navigation\Tabs.kt"
 if (Test-Path $tabs) {
     $content = Get-Content $tabs -Raw
     $content = $content -replace "secondaryContainer", "secondary"
@@ -98,7 +98,7 @@ if (Test-Path $tabs) {
 }
 
 # Fix ContestDetailViewModel
-$contestDetailVM = "composeApp\src\commonMain\kotlin\com\krieta\feature\contests\presentation\viewmodel\ContestDetailViewModel.kt"
+$contestDetailVM = "composeApp\src\commonMain\kotlin\com\runinga\feature\contests\presentation\viewmodel\ContestDetailViewModel.kt"
 if (Test-Path $contestDetailVM) {
     $content = Get-Content $contestDetailVM -Raw
     $content = $content -replace "_state\.value = _state\.value\.copy\(contest = result\.data\)", "_state.value = _state.value.copy(contest = result.data as Contest)"
@@ -108,7 +108,7 @@ if (Test-Path $contestDetailVM) {
 }
 
 # Fix LiveSocketManager
-$liveSocket = "composeApp\src\commonMain\kotlin\com\krieta\feature\live\data\socket\LiveSocketManager.kt"
+$liveSocket = "composeApp\src\commonMain\kotlin\com\runinga\feature\live\data\socket\LiveSocketManager.kt"
 if (Test-Path $liveSocket) {
     $content = Get-Content $liveSocket -Raw
     $content = $content -replace "\.collect \{", ".collect { frame: Frame ->"
@@ -117,7 +117,7 @@ if (Test-Path $liveSocket) {
 }
 
 # Fix OAuthViewModel - map function issue
-$oauthVM = "composeApp\src\commonMain\kotlin\com\krieta\feature\marketplace\presentation\oauth\OAuthViewModel.kt"
+$oauthVM = "composeApp\src\commonMain\kotlin\com\runinga\feature\marketplace\presentation\oauth\OAuthViewModel.kt"
 if (Test-Path $oauthVM) {
     $content = Get-Content $oauthVM -Raw
     

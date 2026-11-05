@@ -1,4 +1,4 @@
-// API Routes with Complete Security Implementation
+﻿// API Routes with Complete Security Implementation
 // This file includes authentication and wallet endpoints with all security features
 
 import express, { Request, Response } from 'express';
@@ -77,9 +77,7 @@ router.post('/api/auth/login', async (req: Request, res: Response) => {
       secretExpiresAt     // ← Client checks expiry
     });
     
-    console.log(`✅ User ${user.id} logged in with session secret`);
-    
-  } catch (error: any) {
+    } catch (error: any) {
     console.error('❌ Login error:', error);
     res.status(500).json({ error: 'Login failed' });
   }
@@ -122,9 +120,7 @@ router.post('/api/auth/register', async (req: Request, res: Response) => {
       secretExpiresAt
     });
     
-    console.log(`✅ User ${user.id} registered with session secret`);
-    
-  } catch (error: any) {
+    } catch (error: any) {
     console.error('❌ Registration error:', error);
     res.status(500).json({ error: 'Registration failed' });
   }
@@ -143,8 +139,6 @@ router.post('/api/auth/logout', authenticateJWT, async (req: Request, res: Respo
       where: { user_id: userId, is_active: true },
       data: { is_active: false }
     });
-    
-    console.log(`✅ User ${userId} logged out - session secrets deactivated`);
     
     res.json({ success: true });
     
@@ -171,8 +165,6 @@ router.post('/api/wallet/tip', authenticateJWT, async (req: Request, res: Respon
     const ipAddress = req.ip;
     const userAgent = req.headers['user-agent'];
     const deviceId = req.headers['x-device-id'] as string;
-    
-    console.log(`💰 Tip request: ${senderId} → ${recipientId}, ${krAmount} Kr`);
     
     // Process transaction with all security checks
     const result = await processTipTransaction({
@@ -242,8 +234,6 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     const userAgent = req.headers['user-agent'];
     const deviceId = req.headers['x-device-id'] as string;
     
-    console.log(`💸 Withdrawal request: ${userId}, ${krAmount} Kr to ${provider}`);
-    
     // 1. Verify signature
     const isValid = await verifyWithdrawalSignature({
       user_id: userId,
@@ -274,7 +264,7 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     
     // 5. Validate amount
     if (krAmount < 10 || krAmount > 100000) {
-      throw new Error('Invalid amount - must be between 10 and 100,000 Kr');
+      throw new Error('Invalid amount - must be between 10 and 100,000 Rc');
     }
     
     // 6. Check balance
@@ -337,8 +327,6 @@ router.post('/api/wallet/withdraw', authenticateJWT, async (req: Request, res: R
     
     // 9. Process withdrawal with provider (implement your logic)
     // await processWithdrawalWithProvider(provider, { ... });
-    
-    console.log(`✅ Withdrawal ${transactionId} initiated`);
     
     res.json({
       success: true,
@@ -405,8 +393,6 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
       timestamp
     } = req.body;
     
-    console.log(`💳 Top-up request: ${userId}, ${fiatAmount} ${currency}`);
-    
     // 1. Verify signature
     const isValid = await verifyTopUpSignature({
       user_id: userId,
@@ -440,7 +426,7 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
       throw new Error('Invalid amount - must be between 5 and 50,000');
     }
     
-    // 6. Calculate Kr amount (implement your exchange rate logic)
+    // 6. Calculate Rc amount (implement your exchange rate logic)
     const exchangeRate = await getExchangeRate(currency);
     const krAmount = Math.floor(fiatAmount / exchangeRate.buyRate);
     
@@ -473,8 +459,6 @@ router.post('/api/wallet/topup/initiate', authenticateJWT, async (req: Request, 
       deviceId: req.headers['x-device-id'] as string,
       status: 'PENDING'
     });
-    
-    console.log(`✅ Top-up ${transactionId} initiated`);
     
     res.json({
       transactionId,

@@ -1,4 +1,4 @@
-# Chat User Search Bug Fix
+﻿# Chat User Search Bug Fix
 
 ## Issue
 When searching for users to initiate a new direct chat, clicking on a user in the search results did nothing - the app didn't navigate to the chat room.
@@ -18,7 +18,7 @@ The code had several issues:
 
 1. **Added proper import:**
 ```kotlin
-import com.krieta.feature.chat.presentation.room.ChatRoomScreen
+import com.runinga.feature.chat.presentation.room.ChatRoomScreen
 ```
 Previously used fully qualified name which could cause issues.
 

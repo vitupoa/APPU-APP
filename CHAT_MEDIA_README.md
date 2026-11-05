@@ -1,4 +1,4 @@
-# 📸 Chat Media Upload Feature - README
+﻿# 📸 Chat Media Upload Feature - README
 
 ## 🎉 Feature Complete!
 
@@ -307,4 +307,4 @@ For questions or issues:
 
 **Version**: 1.0  
 **Last Updated**: 2024  
-**Maintainer**: Krieta Development Team
+**Maintainer**: Runinga Development Team

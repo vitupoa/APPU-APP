@@ -1,4 +1,4 @@
-# Contest Judging System - Complete Implementation
+﻿# Contest Judging System - Complete Implementation
 
 ## 🎯 Overview
 
@@ -41,7 +41,7 @@ A comprehensive contest judging system with automatic winner calculation, judge 
 
 ### 7. **Real-Time Currency Conversion**
 - Prizes displayed in user's local currency
-- Fiat-first display (Kr secondary)
+- Fiat-first display (Rc secondary)
 - Real-time exchange rates with caching
 
 ---
@@ -122,9 +122,9 @@ POST /api/v1/contests
   "prizeTotalKr": 1000,
   "maxWinners": 3,
   "prizeDistribution": [
-    { "rank": 1, "percentage": 50 },  // 1st: Kr 500
-    { "rank": 2, "percentage": 30 },  // 2nd: Kr 300
-    { "rank": 3, "percentage": 20 }   // 3rd: Kr 200
+    { "rank": 1, "percentage": 50 },  // 1st: Rc 500
+    { "rank": 2, "percentage": 30 },  // 2nd: Rc 300
+    { "rank": 3, "percentage": 20 }   // 3rd: Rc 200
   ],
   "judgingCriteria": "COMBINATION",
   "publicVoteWeight": 40  // 60% judges, 40% votes
@@ -230,9 +230,9 @@ Total Charged = Prize + (Prize × 15%) +
 ```
 
 **Example:**
-- Prize: Kr 1,000 → Fee: Kr 150
-- Airdrops: Kr 1,000 → Fee: Kr 150
-- **Total: Kr 2,300**
+- Prize: Rc 1,000 → Fee: Rc 150
+- Airdrops: Rc 1,000 → Fee: Rc 150
+- **Total: Rc 2,300**
 
 ---
 
@@ -251,7 +251,7 @@ const contest = await fetch(
     {contest.prizeBreakdown.currency} {contest.prizeBreakdown.totalPrizeFiat.toLocaleString()}
   </h2>
   <p className="text-sm text-gray-500">
-    Kr {contest.prizeTotalKr}
+    Rc {contest.prizeTotalKr}
   </p>
 </div>
 ```
@@ -265,7 +265,7 @@ const contest = await fetch(
       {prize.currency} {prize.amountFiat.toLocaleString()}
     </span>
     <span className="text-sm text-gray-500">
-      (Kr {prize.amountKr})
+      (Rc {prize.amountKr})
     </span>
     <span className="text-sm">
       {prize.percentage}%

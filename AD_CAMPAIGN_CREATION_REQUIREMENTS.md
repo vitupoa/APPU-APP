@@ -1,7 +1,7 @@
-# 🎯 Brand Ad Campaign Creation Screen - Requirements
+﻿# 🎯 Brand Ad Campaign Creation Screen - Requirements
 
 ## Overview
-A comprehensive screen where businesses/brands can create display ad campaigns that run across the Krieta platform (Live, Contests, Discover, Admiring, Drips tabs).
+A comprehensive screen where businesses/brands can create display ad campaigns that run across the Runinga platform (Live, Contests, Discover, Admiring, Drips tabs).
 
 ---
 
@@ -524,4 +524,4 @@ Track these metrics for the ad creation flow:
 
 ---
 
-This comprehensive screen will enable businesses to create professional ad campaigns on Krieta, driving platform revenue while providing value to advertisers.
+This comprehensive screen will enable businesses to create professional ad campaigns on Runinga, driving platform revenue while providing value to advertisers.

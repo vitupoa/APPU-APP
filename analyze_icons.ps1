@@ -1,11 +1,11 @@
-# Material Icons Usage Analyzer
+﻿# Material Icons Usage Analyzer
 # This script identifies all Material Icons Extended usages in the codebase
 
 Write-Host "=== Material Icons Extended Usage Analyzer ===" -ForegroundColor Cyan
 Write-Host ""
 
-$projectRoot = "c:\Users\ADMIN\Krieta\composeApp\src\commonMain\kotlin"
-$outputFile = "c:\Users\ADMIN\Krieta\icon_migration_report.txt"
+$projectRoot = "c:\Users\ADMIN\Runinga\composeApp\src\commonMain\kotlin"
+$outputFile = "c:\Users\ADMIN\Runinga\icon_migration_report.txt"
 
 # Initialize counters
 $totalFiles = 0

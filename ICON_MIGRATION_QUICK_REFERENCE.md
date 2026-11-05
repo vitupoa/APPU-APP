@@ -1,4 +1,4 @@
-# Quick Icon Migration Reference
+﻿# Quick Icon Migration Reference
 
 ## Common Patterns
 
@@ -11,8 +11,8 @@ Icon(Icons.Filled.Home, "Home")
 
 // NEW
 import org.jetbrains.compose.resources.painterResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.ic_home
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.ic_home
 Icon(painterResource(Res.drawable.ic_home), "Home")
 ```
 
@@ -124,8 +124,8 @@ import androidx.compose.material.icons.automirrored.filled.*
 ### New Import Block
 ```kotlin
 import org.jetbrains.compose.resources.painterResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.* // Or import specific icons
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.* // Or import specific icons
 ```
 
 ## Download Instructions

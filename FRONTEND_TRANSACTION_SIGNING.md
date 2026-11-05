@@ -1,7 +1,7 @@
-# Frontend Transaction Signing - Implementation Guide
+﻿# Frontend Transaction Signing - Implementation Guide
 
 ## Overview
-This document describes the frontend implementation of cryptographic transaction signing for withdrawal requests in the Krieta Kotlin Multiplatform app.
+This document describes the frontend implementation of cryptographic transaction signing for withdrawal requests in the Runinga Kotlin Multiplatform app.
 
 ## Architecture
 

@@ -1,4 +1,4 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 import { env } from '../../config/env.js';
 import { pubClient as redis } from '../../shared/gateway/redis.js';
 
@@ -110,26 +110,26 @@ export class ExchangeService {
   /**
    * Fiat -> KR Conversion engine properly isolating the Tokenomic Pegs
    * NEW TOKENOMICS:
-   * 1 Kr = 1 KES (Base Peg)
+   * 1 Rc = 1 KES (Base Peg)
    * 1 USD = 135 KES
-   * Therefore: 1 Kr = 1/135 USD = 0.00740740741 USD
+   * Therefore: 1 Rc = 1/135 USD = 0.00740740741 USD
    * 
-   * KR_TO_USD_RATE = 1/135 = 0.00740740741
+   * RC_TO_USD_RATE = 1/135 = 0.00740740741
    */
   static getKrFromUSD(usdAmount: number): number {
-      return usdAmount * 135; // 1 USD = 135 Kr
+      return usdAmount * 135; // 1 USD = 135 Rc
   }
 
   static getUSDFromKr(krAmount: number): number {
-      return krAmount / 135; // 1 Kr = 1/135 USD
+      return krAmount / 135; // 1 Rc = 1/135 USD
   }
 
   /**
-   * Returns rate with Krieta's 4.5% platform margin applied ONLY on BUYS (Topups).
+   * Returns rate with Runinga's 4.5% platform margin applied ONLY on BUYS (Topups).
    * Additionally embeds the invisible KES 20 exchange fee on buys.
    * Withdrawals operate entirely free (Margin 0).
    * 
-   * NEW TOKENOMICS: 1 Kr = 1 KES, 1 Kr = 1/135 USD
+   * NEW TOKENOMICS: 1 Rc = 1 KES, 1 Rc = 1/135 USD
    * 
    * @param localCurrency User's local ISO currency (e.g. KES)
    * @param type transaction format (buy or sell)
@@ -137,8 +137,8 @@ export class ExchangeService {
    */
   static async getTransactionRate(localCurrency: string, type: 'buy' | 'sell'): Promise<number> {
     const usdToFiatRate = await this.getRate(localCurrency);
-    // 1 Kr = 1 KES, and we need Kr to any fiat
-    // First convert Kr to USD: 1 Kr = 1/135 USD
+    // 1 Rc = 1 KES, and we need Rc to any fiat
+    // First convert Rc to USD: 1 Rc = 1/135 USD
     // Then convert USD to target fiat: USD * usdToFiatRate
     // Combined: (1/135) * usdToFiatRate
     const krToFiatRate = usdToFiatRate / 135;
@@ -147,7 +147,7 @@ export class ExchangeService {
       const TOPUP_MARGIN = 0.045; // 4.5% Spread explicitly isolated preventing arbitrage 
       const marginApplied = krToFiatRate * (1 + TOPUP_MARGIN);
       // Embed KES 20 fee: Convert KES 20 into the target currency equivalent,
-      // then add it to the per-Kr rate so the user pays slightly more per Kr.
+      // then add it to the per-Rc rate so the user pays slightly more per Rc.
       const kesRate = await this.getRate('KES');
       const feeInTargetCurrency = (TOPUP_FX_FEE_KES / kesRate) * usdToFiatRate;
       return marginApplied + feeInTargetCurrency;
@@ -172,23 +172,23 @@ export class ExchangeService {
   }
 
   /**
-   * Returns the KES withdrawal fee converted to Kr for silent deduction.
+   * Returns the KES withdrawal fee converted to Rc for silent deduction.
    */
   static async getWithdrawalFeeKr(): Promise<number> {
     const kesRate = await this.getRate('KES');
-    // KES 1 in USD, then USD to Kr
+    // KES 1 in USD, then USD to Rc
     const feeUsd = WITHDRAWAL_FEE_KES / kesRate;
     return this.getKrFromUSD(feeUsd);
   }
 
   /**
-   * Returns the KES 20 topup fee converted to Kr for platform wallet crediting.
+   * Returns the KES 20 topup fee converted to Rc for platform wallet crediting.
    */
   static async getTopupFeeKr(fiatAmount: number, localCurrency: string): Promise<number> {
     const kesRate = await this.getRate('KES');
     const localRate = await this.getRate(localCurrency);
-    // Convert fiatAmount to USD, figure out how many Kr were bought
-    // The fee portion is the KES 20 equivalent in Kr
+    // Convert fiatAmount to USD, figure out how many Rc were bought
+    // The fee portion is the KES 20 equivalent in Rc
     const feeUsd = TOPUP_FX_FEE_KES / kesRate;
     return this.getKrFromUSD(feeUsd);
   }

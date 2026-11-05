@@ -1,4 +1,4 @@
-# Admin Ad Management Backend Integration
+﻿# Admin Ad Management Backend Integration
 
 ## Overview
 Complete backend integration for admin ad management system with persistent configuration, real-time updates, and database-backed state management.
@@ -521,10 +521,10 @@ CREATE INDEX idx_ad_analytics_date ON ad_analytics(date DESC);
 ### Migration
 ```bash
 # Run migration to create tables
-psql -U postgres -d krieta < backend/prisma/migrations/add_ad_config.sql
+psql -U postgres -d runinga < backend/prisma/migrations/add_ad_config.sql
 
 # Verify tables created
-psql -U postgres -d krieta -c "\dt ad_*"
+psql -U postgres -d runinga -c "\dt ad_*"
 ```
 
 ### Environment Variables

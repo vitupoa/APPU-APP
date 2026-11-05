@@ -1,10 +1,11 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { WalletService } from '../modules/wallet/wallet.service.js';
 import { PaypalService } from '../services/payments/paypal.service.js';
 import { PaystackService } from '../services/payments/paystack.service.js';
 import { MpesaService } from '../services/payments/mpesa.service.js';
 import { prisma } from '../config/database.js';
 import { Prisma } from '@prisma/client';
+import { logger } from '../shared/services/logger.service.js';
 
 export class WebhookController {
   /**
@@ -16,7 +17,7 @@ export class WebhookController {
       const isValid = await PaypalService.verifyWebhook(req.headers, req.body);
       
       if (!isValid) {
-        console.error('Invalid PayPal webhook signature');
+        logger.error('Invalid PayPal webhook signature');
         res.status(401).json({ error: 'Invalid signature' });
         return;
       }
@@ -24,7 +25,7 @@ export class WebhookController {
       const event = req.body;
       const eventType = event.event_type;
 
-      console.log(`PayPal webhook received: ${eventType}`);
+      logger.info(`PayPal webhook received: ${eventType}`);
 
       // SECURITY: Only process payment capture completed events
       if (eventType === 'PAYMENT.CAPTURE.COMPLETED') {
@@ -48,7 +49,7 @@ export class WebhookController {
         });
 
         if (!transaction) {
-          console.error('Transaction not found for PayPal order:', orderId);
+          logger.error('Transaction not found for PayPal order:', orderId);
           res.status(200).json({ received: true });
           return;
         }
@@ -57,7 +58,7 @@ export class WebhookController {
         const transactionAmount = typeof transaction.amount_fiat === 'number' ? transaction.amount_fiat : 0;
         const amountMatch = Math.abs(amount - transactionAmount) < 0.01;
         if (!amountMatch) {
-          console.error(`PayPal amount mismatch: Expected ${transaction.amount_fiat}, got ${amount}`);
+          logger.error(`PayPal amount mismatch: Expected ${transaction.amount_fiat}, got ${amount}`);
           await prisma.transactions.update({
             where: { id: transaction.id },
             data: { 
@@ -76,7 +77,7 @@ export class WebhookController {
 
         // SECURITY: Verify currency matches
         if (currency !== transaction.currency) {
-          console.error(`PayPal currency mismatch: Expected ${transaction.currency}, got ${currency}`);
+          logger.error(`PayPal currency mismatch: Expected ${transaction.currency}, got ${currency}`);
           await prisma.transactions.update({
             where: { id: transaction.id },
             data: { 
@@ -98,7 +99,7 @@ export class WebhookController {
           amount,
           currency
         );
-        console.log(`✅ PayPal payment confirmed for transaction ${transaction.id}`);
+        logger.info(`✅ PayPal payment confirmed for transaction ${transaction.id}`);
       }
 
       // SECURITY: Handle payment capture denied/failed
@@ -128,8 +129,7 @@ export class WebhookController {
               }
             }
           });
-          console.log(`❌ PayPal payment cancelled for transaction ${transaction.id}`);
-        }
+          }
       }
 
       res.status(200).json({ received: true });
@@ -164,8 +164,6 @@ export class WebhookController {
 
       const event = req.body;
       const eventType = event.event;
-
-      console.log(`Paystack webhook received: ${eventType}`);
 
       // SECURITY: Handle charge success
       if (eventType === 'charge.success') {
@@ -250,8 +248,7 @@ export class WebhookController {
           amount,
           currency
         );
-        console.log(`✅ Paystack payment confirmed for transaction ${transaction.id} via ${channel}`);
-      }
+        }
 
       // SECURITY: Handle charge failure
       if (eventType === 'charge.failed') {
@@ -277,8 +274,7 @@ export class WebhookController {
               }
             }
           });
-          console.log(`❌ Paystack payment cancelled for transaction ${transaction.id}`);
-        }
+          }
       }
 
       res.status(200).json({ received: true });
@@ -332,13 +328,13 @@ export class WebhookController {
         }
 
         // Redirect to app with success
-        res.redirect(`krieta://topup/success?reference=${transaction?.reference}`);
+        res.redirect(`runinga://topup/success?reference=${transaction?.reference}`);
       } else {
-        res.redirect(`krieta://topup/failed`);
+        res.redirect(`runinga://topup/failed`);
       }
     } catch (error: any) {
       console.error('PayPal success handler error:', error);
-      res.redirect(`krieta://topup/failed`);
+      res.redirect(`runinga://topup/failed`);
     }
   }
 
@@ -346,7 +342,7 @@ export class WebhookController {
    * PayPal cancel redirect handler
    */
   static async handlePayPalCancel(req: Request, res: Response): Promise<void> {
-    res.redirect(`krieta://topup/cancelled`);
+    res.redirect(`runinga://topup/cancelled`);
   }
 
   /**
@@ -387,13 +383,13 @@ export class WebhookController {
         }
 
         // Redirect to app with success
-        res.redirect(`krieta://topup/success?reference=${reference}`);
+        res.redirect(`runinga://topup/success?reference=${reference}`);
       } else {
-        res.redirect(`krieta://topup/failed`);
+        res.redirect(`runinga://topup/failed`);
       }
     } catch (error: any) {
       console.error('Paystack callback handler error:', error);
-      res.redirect(`krieta://topup/failed`);
+      res.redirect(`runinga://topup/failed`);
     }
   }
 
@@ -402,8 +398,6 @@ export class WebhookController {
    */
   static async handleMpesaCallback(req: Request, res: Response): Promise<void> {
     try {
-      console.log('M-Pesa callback received:', JSON.stringify(req.body));
-      
       // SECURITY: Validate callback structure
       if (!req.body?.Body?.stkCallback) {
         console.error('Invalid M-Pesa callback structure');
@@ -477,8 +471,7 @@ export class WebhookController {
           callbackData.amount,
           transaction.currency ?? undefined
         );
-        console.log(`✅ M-Pesa payment confirmed for transaction ${transaction.id}`);
-      } else {
+        } else {
         // SECURITY: Mark transaction as cancelled, never credit wallet
         await prisma.transactions.update({
           where: { id: transaction.id },
@@ -490,8 +483,7 @@ export class WebhookController {
             }
           }
         });
-        console.log(`❌ M-Pesa payment cancelled for transaction ${transaction.id}`);
-      }
+        }
 
       // Acknowledge M-Pesa callback
       res.status(200).json({ ResultCode: 0, ResultDesc: 'Accepted' });

@@ -50,12 +50,6 @@ router.post('/cloudinary-webhook', async (req: Request, res: Response) => {
     const signature = req.headers['x-cld-signature'] as string;
     const timestamp = req.headers['x-cld-timestamp'] as string;
 
-    console.log('[Cloudinary Webhook] Received webhook:', {
-      hasSignature: !!signature,
-      hasTimestamp: !!timestamp,
-      body: req.body
-    });
-
     // Verify webhook signature (if configured)
     if (signature && timestamp) {
       if (!verifyCloudinarySignature(req.body, timestamp, signature)) {
@@ -92,8 +86,6 @@ router.post('/cloudinary-webhook', async (req: Request, res: Response) => {
       }
 
       // Log upload for audit
-      console.log(`[Cloudinary Webhook] Upload validated: ${public_id}`);
-      
       // Track upload in database (optional) - Disabled for now to avoid Prisma schema issues
       // TODO: Enable after adding updated_at to platform_config schema
       /*
@@ -139,8 +131,7 @@ router.post('/cloudinary-webhook', async (req: Request, res: Response) => {
 
     // Handle delete event
     if (notification_type === 'delete') {
-      console.log(`[Cloudinary Webhook] Delete notification: ${public_id}`);
-    }
+      }
 
     res.status(200).json({ success: true });
   } catch (error: any) {

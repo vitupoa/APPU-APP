@@ -1,4 +1,4 @@
-# Final Time Windows Configuration & Status Explanation
+﻿# Final Time Windows Configuration & Status Explanation
 
 ## Status Terms Explained
 
@@ -235,7 +235,7 @@ whereClause.user_id = { in: includeIds };
 3. ✅ `backend/src/modules/contests/contests.service.ts`
    - No changes (was already working correctly)
 
-4. ✅ `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/screen/HomeScreen.kt`
+4. ✅ `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/screen/HomeScreen.kt`
    - Reordered tabs: Contests, Discover, Lovers, Admiring
    - Set Discover as default tab
 

@@ -1,4 +1,4 @@
-# Icon Migration Progress Report
+﻿# Icon Migration Progress Report
 
 ## Date: 2026-04-26
 
@@ -132,7 +132,7 @@
 
 ### Option 1: Run Automated Script (Recommended)
 ```powershell
-powershell -ExecutionPolicy Bypass -File "c:\Users\ADMIN\Krieta\migrate_icons_auto.ps1"
+powershell -ExecutionPolicy Bypass -File "c:\Users\ADMIN\Runinga\migrate_icons_auto.ps1"
 ```
 
 This will:
@@ -180,7 +180,7 @@ After complete migration:
 **Run the automated script now** to complete 80-90% of the migration automatically:
 
 ```powershell
-cd c:\Users\ADMIN\Krieta
+cd c:\Users\ADMIN\Runinga
 powershell -ExecutionPolicy Bypass -File "migrate_icons_auto.ps1"
 ```
 

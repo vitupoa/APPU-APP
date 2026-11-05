@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { WalletService } from '../wallet/wallet.service.js';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
@@ -17,12 +17,12 @@ import { paymentRateLimiter, withdrawalRateLimiter } from '../../middleware/ipRa
 /**
  * Silently credits @JohnOyugi's creator wallet with the exchange fee portion
  * collected from a top-up. This runs inside the same db transaction.
- * The 4.5% margin is captured implicitly (user gets fewer Kr) — that stays as platform value.
+ * The 4.5% margin is captured implicitly (user gets fewer Rc) — that stays as platform value.
  */
 async function creditOperationalFee(tx: any, fiatAmount: number, currency: string) {
   try {
-    const feeKr = await ExchangeService.getTopupFeeKr(fiatAmount, currency);
-    if (feeKr > 0) {
+    const feeRc = await ExchangeService.getTopupFeeKr(fiatAmount, currency);
+    if (feeRc > 0) {
       const opsUser = await tx.user.findFirst({ where: { username: 'JohnOyugi' } });
       if (opsUser) {
         await tx.wallets.upsert({
@@ -66,7 +66,7 @@ router.post('/topup',
           phoneNumber: data.phoneNumber,
           amount: data.fiatAmount,
           accountReference: reference,
-          transactionDesc: 'Krieta Wallet Top-Up'
+          transactionDesc: 'Runinga Wallet Top-Up'
         });
         break;
       }
@@ -74,7 +74,7 @@ router.post('/topup',
         result = await PaypalService.createOrder({
           amount: data.fiatAmount,
           currency: data.currency,
-          description: 'Krieta Wallet Top-Up',
+          description: 'Runinga Wallet Top-Up',
           referenceId: reference
         });
         break;
@@ -324,7 +324,7 @@ router.post('/withdraw',
       return;
     }
 
-    // Convert Kr to fiat
+    // Convert Rc to fiat
     const rate = await ExchangeService.getTransactionRate(data.currency, 'sell');
     const fiatAmount = Number(data.krAmount) * rate;
 
@@ -340,7 +340,7 @@ router.post('/withdraw',
           phoneNumber: data.phoneNumber,
           amount: fiatAmount,
           reference,
-          remarks: 'Krieta Withdrawal'
+          remarks: 'Runinga Withdrawal'
         });
         break;
       }
@@ -354,7 +354,7 @@ router.post('/withdraw',
           amount: fiatAmount,
           currency: data.currency,
           reference,
-          note: 'Krieta Withdrawal'
+          note: 'Runinga Withdrawal'
         });
         break;
       }
@@ -369,7 +369,7 @@ router.post('/withdraw',
           amount: fiatAmount,
           currency: data.currency,
           reference,
-          reason: 'Krieta Withdrawal',
+          reason: 'Runinga Withdrawal',
           recipientName: data.accountName || 'user',
           country: data.country // Pass country code (NG, GH, ZA, KE)
         });

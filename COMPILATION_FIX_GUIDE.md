@@ -1,4 +1,4 @@
-# Krieta Android Build Fixes
+﻿# Runinga Android Build Fixes
 
 ## Critical Issues Summary
 
@@ -52,10 +52,10 @@ is_locked INTEGER AS Boolean NOT NULL DEFAULT 0
 
 ### 4. Create Missing LiveType Enum
 
-Create `composeApp/src/commonMain/kotlin/com/krieta/feature/live/domain/model/LiveType.kt`:
+Create `composeApp/src/commonMain/kotlin/com/runinga/feature/live/domain/model/LiveType.kt`:
 
 ```kotlin
-package com.krieta.feature.live.domain.model
+package com.runinga.feature.live.domain.model
 
 enum class LiveType {
     STANDARD,
@@ -123,11 +123,11 @@ Set-Content $buildFile $content
 Write-Host "✓ Dependencies added"
 
 # 2. Create LiveType enum
-$liveTypeDir = "composeApp\src\commonMain\kotlin\com\krieta\feature\live\domain\model"
+$liveTypeDir = "composeApp\src\commonMain\kotlin\com\runinga\feature\live\domain\model"
 New-Item -ItemType Directory -Force -Path $liveTypeDir | Out-Null
 
 $liveTypeContent = @"
-package com.krieta.feature.live.domain.model
+package com.runinga.feature.live.domain.model
 
 enum class LiveType {
     STANDARD,

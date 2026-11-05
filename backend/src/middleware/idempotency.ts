@@ -185,7 +185,6 @@ export async function cleanupExpiredIdempotencyKeys() {
       WHERE expires_at < NOW()
     `;
     
-    console.log(`Cleaned up ${result} expired idempotency keys`);
     return result;
   } catch (error) {
     console.error('Failed to cleanup idempotency keys:', error);

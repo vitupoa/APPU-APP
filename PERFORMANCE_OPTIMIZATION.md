@@ -1,7 +1,7 @@
-# Performance Optimization Guide
+﻿# Performance Optimization Guide
 
 ## Overview
-Comprehensive performance optimization strategies for Krieta Kotlin Multiplatform app to improve responsiveness, reduce memory usage, and enhance user experience.
+Comprehensive performance optimization strategies for Runinga Kotlin Multiplatform app to improve responsiveness, reduce memory usage, and enhance user experience.
 
 ## Current Performance Baseline
 
@@ -462,8 +462,8 @@ object PerformanceMonitor {
 ### Manual Testing
 ```bash
 # Android
-adb shell dumpsys meminfo com.krieta.app
-adb shell dumpsys gfxinfo com.krieta.app
+adb shell dumpsys meminfo com.runinga.app
+adb shell dumpsys gfxinfo com.runinga.app
 
 # iOS
 # Use Xcode Instruments

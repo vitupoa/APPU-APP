@@ -1,10 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+﻿import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 async function main() {
     console.log('--- RembrandtRAR Super Admin Initializer ---');
-    const email = process.env.SUPER_ADMIN_EMAIL || 'admin@krieta.com';
-    const username = process.env.SUPER_ADMIN_USERNAME || 'krieta_admin';
+    const email = process.env.SUPER_ADMIN_EMAIL || 'admin@runinga.com';
+    const username = process.env.SUPER_ADMIN_USERNAME || 'runinga_admin';
     const password = process.env.SUPER_ADMIN_PASSWORD || 'RembrandtRAR2026!';
     try {
         const existing = await prisma.user.findFirst({

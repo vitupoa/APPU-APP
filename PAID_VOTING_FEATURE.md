@@ -1,14 +1,14 @@
-# Paid Voting Feature - Implementation Documentation
+﻿# Paid Voting Feature - Implementation Documentation
 
 ## Overview
-This document describes the implementation of the paid voting cost feature in the contest creation wizard. Content creators can now set a custom amount that users must pay to vote, with real-time currency conversion between fiat and Kr.
+This document describes the implementation of the paid voting cost feature in the contest creation wizard. Content creators can now set a custom amount that users must pay to vote, with real-time currency conversion between fiat and Rc.
 
 ## Feature Requirements
 - Content creator toggles paid voting ON
 - Content creator enters custom amount in their country's fiat currency
-- Amount is converted in real-time to Kr using universal wallet conversion
-- End users see Kr amount prominently with their location-based fiat currency conversion below/next to it
-- Kr is always in focus for end users
+- Amount is converted in real-time to Rc using universal wallet conversion
+- End users see Rc amount prominently with their location-based fiat currency conversion below/next to it
+- Rc is always in focus for end users
 
 ## Implementation Details
 
@@ -32,14 +32,14 @@ fun updateVotingCostFiat(v: Double)
 #### Conversion Functions
 
 **getVotingCostKrDisplay()**
-- Converts fiat to Kr for content creator view
-- Shows Kr equivalent of entered fiat amount
-- Returns: `"Kr.500"` format
+- Converts fiat to Rc for content creator view
+- Shows Rc equivalent of entered fiat amount
+- Returns: `"Rc.500"` format
 
 **getVotingCostUserDisplay()**
 - Formats voting cost for end user preview
-- Shows Kr prominently with fiat secondary
-- Returns: `"Kr.500 (~KES 850)"` format
+- Shows Rc prominently with fiat secondary
+- Returns: `"Rc.500 (~KES 850)"` format
 - Uses user's location-based currency code
 
 ### 3. Currency Conversion Logic
@@ -48,7 +48,7 @@ Uses existing wallet conversion system:
 ```kotlin
 fun convertToKr(fiatAmount: Double, applyMargin: Boolean = true): Double
 ```
-- Converts fiat to Kr using current exchange rate
+- Converts fiat to Rc using current exchange rate
 - `applyMargin = false` for voting costs (no platform margin)
 - Uses `currencyProvider.exchangeRate.value?.baseRate`
 
@@ -64,9 +64,9 @@ fun convertToKr(fiatAmount: Double, applyMargin: Boolean = true): Double
 - Supporting text: "Amount users pay to vote (in your currency)"
 
 **Real-time Conversion Display:**
-- Green card showing Kr equivalent
+- Green card showing Rc equivalent
 - Two sections:
-  1. **Kr Equivalent**: Shows converted Kr amount
+  1. **Rc Equivalent**: Shows converted Rc amount
   2. **Users will see**: Preview of end user display format
 
 **Visual Design:**
@@ -92,22 +92,22 @@ if (currentState.paidVoting && currentState.votingCostFiat <= 0.0) {
 4. Voting cost input field appears
 5. Enters amount in their fiat currency (e.g., 100 KES)
 6. Real-time conversion shows:
-   - Kr Equivalent: Kr.500
-   - Users will see: Kr.500 (~KES 100)
+   - Rc Equivalent: Rc.500
+   - Users will see: Rc.500 (~KES 100)
 7. Validation ensures amount > 0 before proceeding
 
 ## Currency Display Format
 
 ### For Content Creator (Input View)
 - Input: Fiat amount with currency code prefix
-- Display: Kr equivalent in green card
-- Example: Input "100" → Shows "Kr.500"
+- Display: Rc equivalent in green card
+- Example: Input "100" → Shows "Rc.500"
 
 ### For End Users (Preview)
-- Primary: Kr amount (bold, prominent)
+- Primary: Rc amount (bold, prominent)
 - Secondary: Fiat equivalent in parentheses
-- Format: `Kr.{amount} (~{currency} {fiat})`
-- Example: `Kr.500 (~KES 100)`
+- Format: `Rc.{amount} (~{currency} {fiat})`
+- Example: `Rc.500 (~KES 100)`
 
 ## Integration with Existing Features
 
@@ -131,16 +131,16 @@ if (currentState.paidVoting && currentState.votingCostFiat <= 0.0) {
 ### Content Creator Flow
 - [ ] Toggle paid voting ON/OFF
 - [ ] Enter voting cost in fiat currency
-- [ ] Verify real-time Kr conversion displays
+- [ ] Verify real-time Rc conversion displays
 - [ ] Verify user preview shows correct format
 - [ ] Test with different currency codes (KES, USD, EUR, etc.)
 - [ ] Verify validation error when cost is 0 or negative
 - [ ] Verify mutual exclusivity with entry fee
 
 ### End User Display
-- [ ] Verify Kr amount is prominent
+- [ ] Verify Rc amount is prominent
 - [ ] Verify fiat equivalent shows user's currency
-- [ ] Verify format: `Kr.{amount} (~{currency} {fiat})`
+- [ ] Verify format: `Rc.{amount} (~{currency} {fiat})`
 - [ ] Test with different user locations
 
 ### Edge Cases
@@ -168,7 +168,7 @@ if (currentState.paidVoting && currentState.votingCostFiat <= 0.0) {
 
 1. **Backend Integration**
    - Add `votingCostKr` field to contest creation API
-   - Store voting cost in Kr (converted from fiat)
+   - Store voting cost in Rc (converted from fiat)
    - Validate voting cost on backend
 
 2. **Voting Flow**
@@ -183,8 +183,8 @@ if (currentState.paidVoting && currentState.votingCostFiat <= 0.0) {
 
 ## Notes
 
-- Voting cost is stored in fiat but converted to Kr for display
-- Backend should receive Kr amount (converted from fiat)
+- Voting cost is stored in fiat but converted to Rc for display
+- Backend should receive Rc amount (converted from fiat)
 - Exchange rates are fetched from wallet currency provider
 - No platform margin applied to voting costs
-- Kr is always the primary display currency for end users
+- Rc is always the primary display currency for end users

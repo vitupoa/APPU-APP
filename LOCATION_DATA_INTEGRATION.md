@@ -1,4 +1,4 @@
-# Location Data Integration for Krieta Ads Manager
+﻿# Location Data Integration for Runinga Ads Manager
 
 ## Overview
 Instead of manual entry, we can automatically populate location data from free/paid APIs and services.
@@ -263,7 +263,7 @@ cron.schedule('0 2 * * 0', async () => {
 // In LocationPickerDialog
 LaunchedEffect(searchQuery) {
     if (searchQuery.length >= 3) {
-        val response = httpClient.get("https://api.krieta.com/api/v1/locations") {
+        val response = httpClient.get("https://api.runinga.com/api/v1/locations") {
             parameter("search", searchQuery)
             parameter("scope", selectedScope)
             parameter("countryCode", "KE")

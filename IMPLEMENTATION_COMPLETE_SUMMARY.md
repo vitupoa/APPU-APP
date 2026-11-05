@@ -1,4 +1,4 @@
-# Implementation Complete - Summary
+﻿# Implementation Complete - Summary
 
 ## ✅ What Has Been Implemented
 
@@ -14,9 +14,9 @@ The backend was already properly configured for signed uploads:
 
 **What You Need to Do**:
 1. Verify in Cloudinary Dashboard:
-   - Settings → Upload → Preset "Krieta"
+   - Settings → Upload → Preset "Runinga"
    - Signing mode: **Signed**
-   - Asset folder: **Krieta/uploads**
+   - Asset folder: **Runinga/uploads**
 2. Test upload from mobile app
 
 ---
@@ -326,7 +326,7 @@ webSocketService.reconnect() // Force reconnection
 
 ### Backend (100% Complete)
 - ✅ Authentication (JWT, OAuth)
-- ✅ Wallet system with Kr currency
+- ✅ Wallet system with Rc currency
 - ✅ Payment providers (M-Pesa, PayPal, Paystack)
 - ✅ Social features (admire, follow)
 - ✅ Content modules (Shorts, Feed, Contests, Shop)

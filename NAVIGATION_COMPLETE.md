@@ -1,12 +1,12 @@
-# ✅ Navigation & Module Registration - COMPLETE
+﻿# ✅ Navigation & Module Registration - COMPLETE
 
 ## 1. Module Registration ✅
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/com/core/di/AppModule.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/com/core/di/AppModule.kt`
 
 **Changes Made**:
 ```kotlin
-import com.krieta.feature.marketplace.di.marketplaceModule
+import com.runinga.feature.marketplace.di.marketplaceModule
 
 val appModules: List<Module>
     get() = listOf(
@@ -21,7 +21,7 @@ val appModules: List<Module>
 
 ## 2. Navigation Tab Added ✅
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/com/core/navigation/Tabs.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/com/core/navigation/Tabs.kt`
 
 **Changes Made**:
 ```kotlin
@@ -35,7 +35,7 @@ object MarketplaceTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(com.krieta.feature.marketplace.presentation.screen.MarketplaceHomeScreen()) {
+        Navigator(com.runinga.feature.marketplace.presentation.screen.MarketplaceHomeScreen()) {
             CurrentScreen()
         }
     }
@@ -48,7 +48,7 @@ object MarketplaceTab : Tab {
 
 ## 3. Bottom Navigation Updated ✅
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/com/core/navigation/MainScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/com/core/navigation/MainScreen.kt`
 
 **Changes Made**:
 ```kotlin
@@ -245,7 +245,7 @@ val uiState: StateFlow<InfluencerSearchState>
 - `ModalBottomSheet` for create menu
 
 **Theme Integration**:
-- Uses `KrietaColors` from existing theme
+- Uses `RuningaColors` from existing theme
 - Consistent with app design language
 - Glassmorphism effects where appropriate
 

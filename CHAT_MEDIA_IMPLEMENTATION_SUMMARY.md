@@ -1,4 +1,4 @@
-# Chat Media Upload - Implementation Summary
+﻿# Chat Media Upload - Implementation Summary
 
 ## ✅ Implementation Complete
 
@@ -80,7 +80,7 @@ Secure media sharing in chats (direct, group, and chama) with comprehensive secu
 
 ### Folder Structure
 ```
-Krieta/Chats/
+Runinga/Chats/
 ├── Direct/Images/
 ├── Direct/Videos/
 ├── Group/Images/

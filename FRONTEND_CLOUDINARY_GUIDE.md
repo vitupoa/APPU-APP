@@ -1,8 +1,8 @@
-# FRONTEND CLOUDINARY UPLOAD GUIDE
+﻿# FRONTEND CLOUDINARY UPLOAD GUIDE
 
 ## ✅ Status: Already Implemented Securely!
 
-The Krieta frontend is **already using signed uploads** correctly! No changes needed to the upload flow.
+The Runinga frontend is **already using signed uploads** correctly! No changes needed to the upload flow.
 
 ---
 
@@ -65,31 +65,31 @@ The following folders are allowed (validated by backend):
 
 ```kotlin
 // Profile uploads
-"Krieta/profile/Images"
-"Krieta/profile/Videos"
+"Runinga/profile/Images"
+"Runinga/profile/Videos"
 
 // Shorts uploads
-"Krieta/shorts/Videos"
-"Krieta/shorts/Images"
+"Runinga/shorts/Videos"
+"Runinga/shorts/Images"
 
 // Contest uploads
-"Krieta/contests/Images"
-"Krieta/contests/Videos"
+"Runinga/contests/Images"
+"Runinga/contests/Videos"
 
 // Feed/Drips uploads
-"Krieta/drips/Images"
+"Runinga/drips/Images"
 
 // Shop uploads
-"Krieta/shop/Images"
+"Runinga/shop/Images"
 
 // Chat uploads
-"Krieta/chat/Images"
-"Krieta/chat/Videos"
-"Krieta/chat/Audio"
+"Runinga/chat/Images"
+"Runinga/chat/Videos"
+"Runinga/chat/Audio"
 
 // Stories uploads (ephemeral)
-"Krieta/stories/Images"
-"Krieta/stories/Videos"
+"Runinga/stories/Images"
+"Runinga/stories/Videos"
 ```
 
 ---
@@ -102,7 +102,7 @@ The following folders are allowed (validated by backend):
 val cloudinaryUploader = CloudinaryUploader(authenticatedClient)
 
 val result = cloudinaryUploader.uploadMedia(
-    folder = "Krieta/profile/Images",
+    folder = "Runinga/profile/Images",
     filePath = "/path/to/image.jpg",
     isVideo = false
 )
@@ -125,7 +125,7 @@ when (result) {
 
 ```kotlin
 val result = cloudinaryUploader.uploadMedia(
-    folder = "Krieta/shorts/Videos",
+    folder = "Runinga/shorts/Videos",
     filePath = "/path/to/video.mp4",
     isVideo = true
 )
@@ -135,7 +135,7 @@ val result = cloudinaryUploader.uploadMedia(
 
 ```kotlin
 val result = cloudinaryUploader.uploadMedia(
-    folder = "Krieta/contests/Images",
+    folder = "Runinga/contests/Images",
     filePath = "/path/to/submission.jpg",
     isVideo = false
 )
@@ -145,7 +145,7 @@ val result = cloudinaryUploader.uploadMedia(
 
 ```kotlin
 val result = cloudinaryUploader.uploadMedia(
-    folder = "Krieta/stories/Images",
+    folder = "Runinga/stories/Images",
     filePath = "/path/to/story.jpg",
     isVideo = false
 )
@@ -159,7 +159,7 @@ val result = cloudinaryUploader.uploadMedia(
 ```kotlin
 // ❌ NEVER DO THIS
 val formData = mapOf(
-    "upload_preset" to "Krieta",  // INSECURE!
+    "upload_preset" to "Runinga",  // INSECURE!
     "file" to fileBytes
 )
 ```
@@ -234,7 +234,7 @@ val uploader = CloudinaryUploader(authenticatedClient)
 
 // 2. Test image upload
 val imageResult = uploader.uploadMedia(
-    folder = "Krieta/profile/Images",
+    folder = "Runinga/profile/Images",
     filePath = testImagePath,
     isVideo = false
 )
@@ -245,7 +245,7 @@ println("Image URL: ${(imageResult as NetworkResult.Success).data}")
 
 // 4. Test video upload
 val videoResult = uploader.uploadMedia(
-    folder = "Krieta/shorts/Videos",
+    folder = "Runinga/shorts/Videos",
     filePath = testVideoPath,
     isVideo = true
 )
@@ -280,7 +280,7 @@ The uploader automatically handles chunked uploads for files > 5MB:
 ```kotlin
 // Automatic chunked upload for large files
 val result = uploader.uploadMedia(
-    folder = "Krieta/shorts/Videos",
+    folder = "Runinga/shorts/Videos",
     filePath = largeVideoPath,  // > 5MB
     isVideo = true
 )
@@ -329,16 +329,16 @@ val result = uploader.uploadMedia(
 
 ```kotlin
 // Profile images
-"Krieta/profile/Images"
+"Runinga/profile/Images"
 
 // User-generated shorts
-"Krieta/shorts/Videos"
+"Runinga/shorts/Videos"
 
 // Contest submissions
-"Krieta/contests/Images"
+"Runinga/contests/Images"
 
 // Ephemeral stories
-"Krieta/stories/Images"
+"Runinga/stories/Images"
 ```
 
 ### 2. Handle Errors Gracefully
@@ -412,7 +412,7 @@ Since the frontend is already secure, this is just a verification checklist:
 
 **Status**: ✅ Frontend is already secure!
 
-The Krieta frontend correctly implements:
+The Runinga frontend correctly implements:
 - ✅ Signed uploads only
 - ✅ Backend signature generation
 - ✅ Folder validation

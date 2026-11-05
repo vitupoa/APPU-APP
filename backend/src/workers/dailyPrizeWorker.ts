@@ -1,15 +1,11 @@
-import cron from 'node-cron';
+﻿import cron from 'node-cron';
 import { prisma } from '../config/database.js'; // Assumes exported prisma instance 
 import { pubClient, RedisChannels } from '../shared/gateway/redis.js';
 import crypto from 'crypto';
 
 export function startDailyPrizeWorker() {
-    console.log('[Worker] Daily Prize Cron Job Scheduled: Runs daily at 00:00 Server Time (Midnight)');
-    
     // Runs every day at midnight "0 0 * * *"
     cron.schedule('0 0 * * *', async () => {
-        console.log('[Worker] Executing Daily Random Sweepstakes for Active Contests...');
-
         try {
             // Find all active contests allowing daily prizes fundamentally
             const activeContests = await prisma.contest.findMany({
@@ -36,7 +32,6 @@ export function startDailyPrizeWorker() {
                 });
 
                 if (eligibleSubmissions.length === 0) {
-                    console.log(`[Worker] No eligible daily submissions for Contest ${contest.id}. Skipping.`);
                     continue;
                 }
 
@@ -44,7 +39,7 @@ export function startDailyPrizeWorker() {
                 const randomIndex = Math.floor(Math.random() * eligibleSubmissions.length);
                 const winner = eligibleSubmissions[randomIndex];
 
-                // Deposit the Kr securely using Prisma Transactions
+                // Deposit the Rc securely using Prisma Transactions
                 await prisma.$transaction(async (tx: any) => {
                     // Update user's actual KR balance cleanly
                     await tx.wallets.update({
@@ -71,13 +66,12 @@ export function startDailyPrizeWorker() {
                 // Emit live Firebase/WebSocket Socket notification universally triggering FOMO!
                 const notificationPayload = JSON.stringify({
                     user_id: winner.user_id,
-                    message: `You won the ${contest.daily_prize_kr} Kr Daily Random Drop for Contest: ${contest.title}!`,
+                    message: `You won the ${contest.daily_prize_kr} Rc Daily Random Drop for Contest: ${contest.title}!`,
                     amount: contest.daily_prize_kr
                 });
 
                 pubClient.publish(`${RedisChannels.NOTIFICATIONS}:${winner.user_id}`, notificationPayload);
-                console.log(`[Worker] Rewarded User ${winner.user_id} ${contest.daily_prize_kr} Kr successfully.`);
-            }
+                }
             
         } catch (error) {
             console.error('[Worker] Daily Prize Sweepstakes Failure:', error);

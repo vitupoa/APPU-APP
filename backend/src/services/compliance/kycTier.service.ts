@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { KYCStatus } from '@prisma/client';
 
 export enum KYCTier {
@@ -18,23 +18,23 @@ export interface KYCLimits {
 const KYC_TIER_LIMITS: Record<KYCTier, KYCLimits> = {
   [KYCTier.TIER_0]: {
     tier: KYCTier.TIER_0,
-    dailyWithdrawalLimit: 10000, // 10,000 Kr (~$100)
-    monthlyWithdrawalLimit: 50000, // 50,000 Kr (~$500)
-    singleTransactionLimit: 5000, // 5,000 Kr (~$50)
+    dailyWithdrawalLimit: 10000, // 10,000 Rc (~$100)
+    monthlyWithdrawalLimit: 50000, // 50,000 Rc (~$500)
+    singleTransactionLimit: 5000, // 5,000 Rc (~$50)
     requiresKYC: false
   },
   [KYCTier.TIER_1]: {
     tier: KYCTier.TIER_1,
-    dailyWithdrawalLimit: 50000, // 50,000 Kr (~$500)
-    monthlyWithdrawalLimit: 500000, // 500,000 Kr (~$5,000)
-    singleTransactionLimit: 25000, // 25,000 Kr (~$250)
+    dailyWithdrawalLimit: 50000, // 50,000 Rc (~$500)
+    monthlyWithdrawalLimit: 500000, // 500,000 Rc (~$5,000)
+    singleTransactionLimit: 25000, // 25,000 Rc (~$250)
     requiresKYC: true
   },
   [KYCTier.TIER_2]: {
     tier: KYCTier.TIER_2,
-    dailyWithdrawalLimit: 500000, // 500,000 Kr (~$5,000)
-    monthlyWithdrawalLimit: 5000000, // 5,000,000 Kr (~$50,000)
-    singleTransactionLimit: 100000, // 100,000 Kr (~$1,000)
+    dailyWithdrawalLimit: 500000, // 500,000 Rc (~$5,000)
+    monthlyWithdrawalLimit: 5000000, // 5,000,000 Rc (~$50,000)
+    singleTransactionLimit: 100000, // 100,000 Rc (~$1,000)
     requiresKYC: true
   }
 };
@@ -73,10 +73,10 @@ export class KYCTierService {
     const tier = limits.tier;
 
     // Check single transaction limit
-    if (amountKr > limits.singleTransactionLimit) {
+    if (amountRc > limits.singleTransactionLimit) {
       return {
         allowed: false,
-        reason: `Single transaction limit exceeded. Max: ${limits.singleTransactionLimit} Kr`,
+        reason: `Single transaction limit exceeded. Max: ${limits.singleTransactionLimit} Rc`,
         currentTier: tier,
         limits
       };
@@ -101,7 +101,7 @@ export class KYCTierService {
     if (dailyTotal > limits.dailyWithdrawalLimit) {
       return {
         allowed: false,
-        reason: `Daily withdrawal limit exceeded. Max: ${limits.dailyWithdrawalLimit} Kr`,
+        reason: `Daily withdrawal limit exceeded. Max: ${limits.dailyWithdrawalLimit} Rc`,
         currentTier: tier,
         limits
       };
@@ -127,7 +127,7 @@ export class KYCTierService {
     if (monthlyTotal > limits.monthlyWithdrawalLimit) {
       return {
         allowed: false,
-        reason: `Monthly withdrawal limit exceeded. Max: ${limits.monthlyWithdrawalLimit} Kr`,
+        reason: `Monthly withdrawal limit exceeded. Max: ${limits.monthlyWithdrawalLimit} Rc`,
         currentTier: tier,
         limits
       };

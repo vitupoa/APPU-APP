@@ -1,7 +1,7 @@
-{
-  "name": "krieta-backend",
+﻿{
+  "name": "runinga-backend",
   "version": "1.0.0",
-  "description": "Krieta Creator Marketing Engine — Backend API",
+  "description": "Runinga Creator Marketing Engine — Backend API",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

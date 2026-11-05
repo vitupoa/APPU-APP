@@ -1,9 +1,9 @@
-# CLOUDINARY UPLOAD SECURITY FIX ✅
+﻿# CLOUDINARY UPLOAD SECURITY FIX ✅
 
 ## 🔴 CRITICAL: Cloudinary Upload Preset Exposed
 
 ### Issue
-Frontend could upload directly to Cloudinary without backend validation using the "Krieta" upload preset, allowing:
+Frontend could upload directly to Cloudinary without backend validation using the "Runinga" upload preset, allowing:
 - Unauthorized uploads
 - Arbitrary folder access
 - Storage abuse
@@ -31,33 +31,33 @@ Frontend could upload directly to Cloudinary without backend validation using th
 **Allowed Folders**:
 ```typescript
 const ALLOWED_FOLDERS = [
-  'Krieta/profile/Images',
-  'Krieta/profile/Videos',
-  'Krieta/shorts/Videos',
-  'Krieta/shorts/Images',
-  'Krieta/contests/Images',
-  'Krieta/contests/Videos',
-  'Krieta/drips/Images',
-  'Krieta/shop/Images',
-  'Krieta/chat/Images',
-  'Krieta/chat/Videos',
-  'Krieta/chat/Audio',
-  'Krieta/stories/Images',
-  'Krieta/stories/Videos',
+  'Runinga/profile/Images',
+  'Runinga/profile/Videos',
+  'Runinga/shorts/Videos',
+  'Runinga/shorts/Images',
+  'Runinga/contests/Images',
+  'Runinga/contests/Videos',
+  'Runinga/drips/Images',
+  'Runinga/shop/Images',
+  'Runinga/chat/Images',
+  'Runinga/chat/Videos',
+  'Runinga/chat/Audio',
+  'Runinga/stories/Images',
+  'Runinga/stories/Videos',
 ];
 ```
 
 **Usage**:
 ```typescript
 // Client requests signature
-GET /api/v1/media/upload-signature?folder=Krieta/profile/Images&resourceType=image
+GET /api/v1/media/upload-signature?folder=Runinga/profile/Images&resourceType=image
 Headers: { Authorization: "Bearer <token>" }
 
 Response:
 {
   "signature": "abc123...",
   "timestamp": 1234567890,
-  "folder": "Krieta/profile/Images",
+  "folder": "Runinga/profile/Images",
   "resourceType": "image",
   "apiKey": "your_api_key",
   "cloudName": "your_cloud_name"
@@ -112,7 +112,7 @@ Response:
 // Direct upload with preset (INSECURE)
 const formData = new FormData();
 formData.append('file', file);
-formData.append('upload_preset', 'Krieta'); // ❌ Exposed preset
+formData.append('upload_preset', 'Runinga'); // ❌ Exposed preset
 formData.append('folder', 'any/folder/i/want'); // ❌ No validation
 
 await fetch('https://api.cloudinary.com/v1_1/your-cloud/upload', {
@@ -125,7 +125,7 @@ await fetch('https://api.cloudinary.com/v1_1/your-cloud/upload', {
 ```typescript
 // Step 1: Get signed upload parameters from backend
 const signatureResponse = await fetch(
-  '/api/v1/media/upload-signature?folder=Krieta/profile/Images&resourceType=image',
+  '/api/v1/media/upload-signature?folder=Runinga/profile/Images&resourceType=image',
   {
     headers: {
       'Authorization': `Bearer ${accessToken}`
@@ -163,11 +163,11 @@ console.log('Upload successful:', result.secure_url);
 
 **Steps to secure Cloudinary**:
 
-1. **Disable "Krieta" Upload Preset**:
+1. **Disable "Runinga" Upload Preset**:
    ```
    1. Go to Cloudinary Dashboard
    2. Settings > Upload > Upload presets
-   3. Find "Krieta" preset
+   3. Find "Runinga" preset
    4. Click "Edit"
    5. Set "Signing Mode" to "Signed"
    6. OR Delete the preset entirely
@@ -221,14 +221,14 @@ console.log('Upload successful:', result.secure_url);
 
 ```bash
 # 1. Get signature (requires authentication)
-curl http://localhost:3000/api/v1/media/upload-signature?folder=Krieta/profile/Images \
+curl http://localhost:3000/api/v1/media/upload-signature?folder=Runinga/profile/Images \
   -H "Authorization: Bearer <token>"
 
 # Expected response:
 {
   "signature": "abc123...",
   "timestamp": 1234567890,
-  "folder": "Krieta/profile/Images",
+  "folder": "Runinga/profile/Images",
   "apiKey": "your_api_key",
   "cloudName": "your_cloud_name"
 }
@@ -238,7 +238,7 @@ curl -X POST https://api.cloudinary.com/v1_1/your-cloud/image/upload \
   -F "file=@image.jpg" \
   -F "signature=abc123..." \
   -F "timestamp=1234567890" \
-  -F "folder=Krieta/profile/Images" \
+  -F "folder=Runinga/profile/Images" \
   -F "api_key=your_api_key"
 
 # Expected: Upload successful
@@ -263,7 +263,7 @@ curl http://localhost:3000/api/v1/media/upload-signature?folder=unauthorized/fol
 ```bash
 # Make 51 requests in 15 minutes
 for i in {1..51}; do
-  curl http://localhost:3000/api/v1/media/upload-signature?folder=Krieta/profile/Images \
+  curl http://localhost:3000/api/v1/media/upload-signature?folder=Runinga/profile/Images \
     -H "Authorization: Bearer <token>"
 done
 
@@ -278,7 +278,7 @@ curl -X POST http://localhost:3000/api/v1/media/cloudinary-webhook \
   -H "Content-Type: application/json" \
   -d '{
     "notification_type": "upload",
-    "public_id": "Krieta/profile/Images/test",
+    "public_id": "Runinga/profile/Images/test",
     "resource_type": "image"
   }'
 
@@ -304,8 +304,8 @@ Response:
     "video": 234
   },
   "byFolder": {
-    "Krieta/profile/Images": 500,
-    "Krieta/shorts/Videos": 234
+    "Runinga/profile/Images": 500,
+    "Runinga/shorts/Videos": 234
   },
   "recentUploads": [...]
 }
@@ -324,7 +324,7 @@ Check server logs for:
 
 ## 🚨 Security Checklist
 
-- [x] Upload preset "Krieta" disabled or set to signed mode
+- [x] Upload preset "Runinga" disabled or set to signed mode
 - [x] Signed upload endpoint implemented
 - [x] Rate limiting enabled (50/15min)
 - [x] Folder validation enforced
@@ -345,7 +345,7 @@ Check server logs for:
 ```typescript
 // ❌ Remove all direct uploads with preset
 const formData = new FormData();
-formData.append('upload_preset', 'Krieta');
+formData.append('upload_preset', 'Runinga');
 ```
 
 **New Code (Implement)**:
@@ -401,7 +401,7 @@ async function uploadToCloudinary(file: File, folder: string) {
 1. **Check Upload Preset**:
    - Go to Cloudinary Dashboard
    - Settings > Upload > Upload presets
-   - Verify "Krieta" is disabled or deleted
+   - Verify "Runinga" is disabled or deleted
 
 2. **Test Signed Upload**:
    - Get signature from backend

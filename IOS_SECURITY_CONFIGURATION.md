@@ -1,4 +1,4 @@
-# iOS Configuration for Security Features
+﻿# iOS Configuration for Security Features
 
 ## Info.plist
 
@@ -11,15 +11,15 @@ Add the following keys to your `Info.plist`:
 <dict>
     <!-- Face ID Usage Description (Required for iOS 11+) -->
     <key>NSFaceIDUsageDescription</key>
-    <string>Krieta uses Face ID to securely authenticate withdrawals and protect your wallet.</string>
+    <string>Runinga uses Face ID to securely authenticate withdrawals and protect your wallet.</string>
     
     <!-- App Name -->
     <key>CFBundleDisplayName</key>
-    <string>Krieta</string>
+    <string>Runinga</string>
     
     <!-- Bundle Identifier -->
     <key>CFBundleIdentifier</key>
-    <string>com.krieta.app</string>
+    <string>com.runinga.app</string>
     
     <!-- Other standard keys... -->
 </dict>
@@ -28,7 +28,7 @@ Add the following keys to your `Info.plist`:
 
 ## Entitlements
 
-Create or update `Krieta.entitlements`:
+Create or update `Runinga.entitlements`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -38,13 +38,13 @@ Create or update `Krieta.entitlements`:
     <!-- Keychain Access Groups -->
     <key>keychain-access-groups</key>
     <array>
-        <string>$(AppIdentifierPrefix)com.krieta.app</string>
+        <string>$(AppIdentifierPrefix)com.runinga.app</string>
     </array>
     
     <!-- App Groups (if needed for shared data) -->
     <key>com.apple.security.application-groups</key>
     <array>
-        <string>group.com.krieta.app</string>
+        <string>group.com.runinga.app</string>
     </array>
 </dict>
 </plist>
@@ -60,11 +60,11 @@ Enable the following capabilities in Xcode:
    - Target → Signing & Capabilities
    - Click "+ Capability"
    - Add "Keychain Sharing"
-   - Add keychain group: `com.krieta.app`
+   - Add keychain group: `com.runinga.app`
 
 2. **App Groups** (Optional)
    - Add "App Groups"
-   - Add group: `group.com.krieta.app`
+   - Add group: `group.com.runinga.app`
 
 ### Build Settings
 
@@ -144,10 +144,10 @@ Ensure proper code signing:
 
 ```bash
 # Check code signing
-codesign -dv --verbose=4 /path/to/Krieta.app
+codesign -dv --verbose=4 /path/to/Runinga.app
 
 # Verify entitlements
-codesign -d --entitlements :- /path/to/Krieta.app
+codesign -d --entitlements :- /path/to/Runinga.app
 ```
 
 ## Troubleshooting

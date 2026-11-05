@@ -1,4 +1,4 @@
-# Material Icons Extended Migration Guide
+﻿# Material Icons Extended Migration Guide
 
 ## Overview
 This guide helps migrate from deprecated `compose.materialIconsExtended` to Material Symbols using vector resources.
@@ -25,8 +25,8 @@ Icon(
 ### After (Material Symbols - Vector Resources)
 ```kotlin
 import org.jetbrains.compose.resources.vectorResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.ic_home
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.ic_home
 
 Icon(
     painter = painterResource(Res.drawable.ic_home),
@@ -58,8 +58,8 @@ import androidx.compose.material.icons.outlined.*
 With:
 ```kotlin
 import org.jetbrains.compose.resources.painterResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.* // Import specific icons
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.* // Import specific icons
 ```
 
 ### 4. Update Icon Usage

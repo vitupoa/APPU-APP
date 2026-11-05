@@ -1,4 +1,4 @@
-# Quick Fix Reference
+﻿# Quick Fix Reference
 
 ## Changes Made
 
@@ -138,7 +138,7 @@ cd ..
 
 # Or for quick testing
 ./gradlew :composeApp:installDebug
-adb logcat | grep -i "krieta\|error\|exception"
+adb logcat | grep -i "runinga\|error\|exception"
 ```
 
 ## Verification Steps

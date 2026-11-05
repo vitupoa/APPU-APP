@@ -1,4 +1,4 @@
-# COMPLETE IMPLEMENTATION GUIDE & UNIT TESTS EXPLANATION
+﻿# COMPLETE IMPLEMENTATION GUIDE & UNIT TESTS EXPLANATION
 
 ## ✅ WHAT HAS BEEN DONE
 
@@ -115,7 +115,7 @@ The implementation is **backward compatible**. The app will:
 #### 1. **Catch Bugs Early** 🐛
 ```kotlin
 // Without tests: User discovers bug in production
-// User tries to withdraw 50,000 Kr
+// User tries to withdraw 50,000 Rc
 // App crashes ❌
 
 // With tests: You discover bug before release
@@ -239,8 +239,8 @@ class WithdrawalRateLimiterTest {
 #### 4. MultiSignatureManager Tests
 ```kotlin
 class MultiSignatureManagerTest {
-    @Test fun `require 2 signatures for 100K Kr`()
-    @Test fun `require 3 signatures for 500K Kr`()
+    @Test fun `require 2 signatures for 100K Rc`()
+    @Test fun `require 3 signatures for 500K Rc`()
     @Test fun `collect signatures from multiple users`()
     @Test fun `approve transaction when enough signatures`()
     @Test fun `reject duplicate signatures`()
@@ -398,7 +398,7 @@ fun testHourlyLimit() {
 - [ ] Test withdrawal with biometric
 - [ ] Test withdrawal without biometric (use PIN)
 - [ ] Test rate limiting (make 4 withdrawals quickly)
-- [ ] Test multi-sig (withdraw >100,000 Kr)
+- [ ] Test multi-sig (withdraw >100,000 Rc)
 - [ ] Test on device without biometric enrolled
 - [ ] Test on rooted/jailbroken device (should warn)
 

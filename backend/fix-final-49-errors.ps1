@@ -1,8 +1,8 @@
-# Final comprehensive fix for all 49 remaining TypeScript errors
+﻿# Final comprehensive fix for all 49 remaining TypeScript errors
 
 Write-Host "Fixing all 49 remaining errors properly..." -ForegroundColor Cyan
 
-# Fix 1: contests.service.ts - Change prizeAmountKr to prizeTotalKr (correct field name)
+# Fix 1: contests.service.ts - Change prizeAmountRc to prizeTotalRc (correct field name)
 Write-Host "1. Fixing contests.service.ts field name..." -ForegroundColor Yellow
 $file = "src/modules/contests/contests.service.ts"
 $content = Get-Content $file -Raw

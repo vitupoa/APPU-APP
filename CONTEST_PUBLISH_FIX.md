@@ -1,4 +1,4 @@
-# Contest Publish Button Fix
+﻿# Contest Publish Button Fix
 
 ## Problem
 When clicking the "Publish Contest" button, it showed "Something went wrong. Please try again." error. The contest was not being created.
@@ -10,7 +10,7 @@ When clicking the "Publish Contest" button, it showed "Something went wrong. Ple
 Added `@kotlinx.serialization.SerialName` annotation to properly map the backend's snake_case response to frontend's camelCase property.
 
 ### Changed File
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/contests/data/remote/dto/ContestsDtos.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/contests/data/remote/dto/ContestsDtos.kt`
 
 ### Change Made
 ```kotlin
@@ -28,7 +28,7 @@ data class CreateContestResponseDto(
 ### What Happens When User Clicks "Publish Contest"
 
 1. **Frontend Validation** (before API call):
-   - Checks wallet balance has enough Kr
+   - Checks wallet balance has enough Rc
    - Total cost = Prize Pool + 15% platform fee
    - Shows error if insufficient balance
 
@@ -37,9 +37,9 @@ data class CreateContestResponseDto(
    Total Deduction = Prize Pool + Platform Fee (15%)
    
    Example:
-   - Prize Pool: Kr.1000
-   - Platform Fee: Kr.150 (15%)
-   - Total Deducted: Kr.1150
+   - Prize Pool: Rc.1000
+   - Platform Fee: Rc.150 (15%)
+   - Total Deducted: Rc.1150
    ```
 
 3. **Money is Deducted from Creator's Wallet**:
@@ -60,8 +60,8 @@ data class CreateContestResponseDto(
    INSERT INTO escrows (
      contest_id,
      user_id,           -- contest creator
-     prize_amount_kr,   -- Kr.1000
-     fee_amount_kr,     -- Kr.150
+     prize_amount_kr,   -- Rc.1000
+     fee_amount_kr,     -- Rc.150
      status             -- 'held'
    )
    ```
@@ -94,29 +94,29 @@ When `distributeContestPrizes()` is called:
 
 **Before Contest Creation:**
 ```
-Creator Wallet: Kr.2000
-Platform Escrow: Kr.0
-Winner A Wallet: Kr.0
-Winner B Wallet: Kr.0
+Creator Wallet: Rc.2000
+Platform Escrow: Rc.0
+Winner A Wallet: Rc.0
+Winner B Wallet: Rc.0
 ```
 
-**After Contest Creation (Prize Pool: Kr.1000):**
+**After Contest Creation (Prize Pool: Rc.1000):**
 ```
-Creator Wallet: Kr.850 (deducted Kr.1150)
-Platform Escrow: Kr.1150 (held)
-  - Prize Pool: Kr.1000
-  - Platform Fee: Kr.150
-Winner A Wallet: Kr.0
-Winner B Wallet: Kr.0
+Creator Wallet: Rc.850 (deducted Rc.1150)
+Platform Escrow: Rc.1150 (held)
+  - Prize Pool: Rc.1000
+  - Platform Fee: Rc.150
+Winner A Wallet: Rc.0
+Winner B Wallet: Rc.0
 ```
 
 **After Contest Completion (2 winners: 60%/40% split):**
 ```
-Creator Wallet: Kr.850 (no change)
-Platform Escrow: Kr.150 (fee retained)
-Winner A Wallet: Kr.600 (60% of Kr.1000)
-Winner B Wallet: Kr.400 (40% of Kr.1000)
-Platform Revenue: Kr.150 (15% fee)
+Creator Wallet: Rc.850 (no change)
+Platform Escrow: Rc.150 (fee retained)
+Winner A Wallet: Rc.600 (60% of Rc.1000)
+Winner B Wallet: Rc.400 (40% of Rc.1000)
+Platform Revenue: Rc.150 (15% fee)
 ```
 
 ## Additional Features in Contest Creation
@@ -124,8 +124,8 @@ Platform Revenue: Kr.150 (15% fee)
 ### Prize Pool Calculation
 The backend calculates total escrow amount including:
 - Base prize pool
-- Daily prizes (if enabled): `dailyPrizeKr × durationDays + 15% fee`
-- Milestone airdrops (if enabled): `airdropKr × airdropLimit + 15% fee`
+- Daily prizes (if enabled): `dailyPrizeRc × durationDays + 15% fee`
+- Milestone airdrops (if enabled): `airdropRc × airdropLimit + 15% fee`
 
 ### Entry Fees
 If contest has entry fees:
@@ -152,7 +152,7 @@ Currently, there's no cancellation mechanism in the code. To implement:
 - [x] Contest creation successfully deducts wallet balance
 - [x] Escrow record is created with correct amounts
 - [x] Transaction record is created with type 'contest_escrow'
-- [x] Frontend shows correct Kr to fiat conversion
+- [x] Frontend shows correct Rc to fiat conversion
 - [x] Error handling for insufficient balance
 - [x] Response mapping between backend and frontend
 - [ ] Contest completion and prize distribution (not modified in this fix)

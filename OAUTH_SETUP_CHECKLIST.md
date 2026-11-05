@@ -1,4 +1,4 @@
-# OAuth Integration Setup Checklist
+﻿# OAuth Integration Setup Checklist
 
 ## ✅ Backend Implementation (COMPLETE)
 
@@ -230,12 +230,12 @@ ORDER BY ip.total_earnings_kr DESC;
 ### OAuth browser not opening (Android)
 - Check AndroidManifest has intent filter
 - Verify Chrome Custom Tabs dependency installed
-- Check deep link scheme: `krieta://oauth`
+- Check deep link scheme: `runinga://oauth`
 
 ### OAuth browser not opening (iOS)
 - Check Info.plist has URL scheme
 - Verify ASWebAuthenticationSession permissions
-- Check callback scheme: `krieta`
+- Check callback scheme: `runinga`
 
 ## 📈 Success Metrics
 

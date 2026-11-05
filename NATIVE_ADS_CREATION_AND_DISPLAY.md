@@ -1,15 +1,15 @@
-# Native Ads Creation & Display Flow in Krieta
+﻿# Native Ads Creation & Display Flow in Runinga
 
 ## Overview
 
-Krieta has a **Sponsored Content System** that allows creators and businesses to promote their existing content (Shorts, Drips/Posts) as native ads across the platform. This is different from traditional banner ads - the content looks like regular posts but is marked as "Sponsored".
+Runinga has a **Sponsored Content System** that allows creators and businesses to promote their existing content (Shorts, Drips/Posts) as native ads across the platform. This is different from traditional banner ads - the content looks like regular posts but is marked as "Sponsored".
 
 ---
 
 ## 🎯 How Native Ads Work
 
 ### Concept
-Native ads in Krieta are **existing user content** (Shorts or Posts) that businesses/creators pay to promote. They appear seamlessly in feeds with a "Sponsored" badge.
+Native ads in Runinga are **existing user content** (Shorts or Posts) that businesses/creators pay to promote. They appear seamlessly in feeds with a "Sponsored" badge.
 
 **Example:**
 - A creator posts a Short about a new restaurant
@@ -29,7 +29,7 @@ Native ads in Krieta are **existing user content** (Shorts or Posts) that busine
 
 ### 2. **Businesses** (Sponsored Campaigns)
 - Any verified business account
-- Minimum budget: KES 500 (100 Kr)
+- Minimum budget: KES 500 (100 Rc)
 - Must pass content moderation
 
 ---
@@ -60,11 +60,11 @@ Native ads in Krieta are **existing user content** (Shorts or Posts) that busine
 
 ### Flow 2: Business Self-Serve Campaigns (IMPLEMENTED)
 
-#### Step 1: Navigate to Krieta Ads Manager
+#### Step 1: Navigate to Runinga Ads Manager
 ```
 User clicks "Learn More" on dummy ad in Drips
    ↓
-Opens KrietaAdsManagerScreen
+Opens RuningaAdsManagerScreen
    ↓
 Selects "Sponsored Content" tab
    ↓
@@ -217,7 +217,7 @@ private fun NativeAdCard() {
         }
         
         Button("Learn More") {
-            navigator.push(KrietaAdsManagerScreen())
+            navigator.push(RuningaAdsManagerScreen())
         }
     }
 }
@@ -344,7 +344,7 @@ Similar to Shorts, but for contest submissions:
    ↓
 3. Clicks "Learn More"
    ↓
-4. Opens Krieta Ads Manager
+4. Opens Runinga Ads Manager
    ↓
 5. Explores 3 tabs:
    - Display Ads (banner/native ads)
@@ -570,7 +570,7 @@ fun SponsoredLabel(modifier: Modifier = Modifier) {
 - ✅ Budget escrow system
 
 ### Frontend
-- ✅ Krieta Ads Manager screen
+- ✅ Runinga Ads Manager screen
 - ✅ Create Campaign screen
 - ✅ Sponsored badge component
 - ✅ Sponsored label component

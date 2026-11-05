@@ -1,4 +1,4 @@
-# Remaining Compilation Fixes
+﻿# Remaining Compilation Fixes
 
 ## Status
 ✅ Fixed:
@@ -12,7 +12,7 @@
 ## Remaining Fixes Needed
 
 ### 1. PayoutViewModel.kt
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/chama/presentation/payout/PayoutViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/chama/presentation/payout/PayoutViewModel.kt`
 
 **Changes needed**:
 ```kotlin
@@ -21,14 +21,14 @@ reason = reason
 
 // To:
 recipientUserId = recipientUserId,
-amountKr = amountKr
+amountRc = amountKr
 
 // Add Loading branch to when expressions at lines 57, 84
 is NetworkResult.Loading -> {}
 ```
 
 ### 2. DefaultersViewModel.kt
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/chama/presentation/defaulters/DefaultersViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/chama/presentation/defaulters/DefaultersViewModel.kt`
 
 **Changes needed**:
 ```kotlin
@@ -43,7 +43,7 @@ defaulters = result.data
 ```
 
 ### 3. SettingsViewModel.kt
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/chama/presentation/settings/SettingsViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/chama/presentation/settings/SettingsViewModel.kt`
 
 **Changes needed**:
 ```kotlin
@@ -57,14 +57,14 @@ chama = result.data.chama
 chama = result.data
 
 // Line 70: Change parameter name from
-contributionAmountKr = contributionAmountKr
+contributionAmountRc = contributionAmountKr
 
 // To:
-contributionAmountKr = newAmount
+contributionAmountRc = newAmount
 ```
 
 ### 4. WithdrawViewModel.kt
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/wallet/presentation/withdraw/WithdrawViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/wallet/presentation/withdraw/WithdrawViewModel.kt`
 
 **Changes needed**:
 ```kotlin
@@ -73,7 +73,7 @@ is NetworkResult.Loading -> {}
 ```
 
 ### 5. OAuthViewModel.kt
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/presentation/oauth/OAuthViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/presentation/oauth/OAuthViewModel.kt`
 
 **Changes needed**:
 ```kotlin
@@ -145,7 +145,7 @@ import androidx.compose.foundation.BorderStroke
 
 ### 8. DefaultersListScreen.kt specific fixes
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/chama/presentation/defaulters/DefaultersListScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/chama/presentation/defaulters/DefaultersListScreen.kt`
 
 **Changes**:
 ```kotlin
@@ -201,7 +201,7 @@ defaulter.amountOwedKr.toDoubleOrNull() ?: 0.0
 
 ### 9. AndroidOAuthBrowser.kt
 
-**File**: `composeApp/src/androidMain/kotlin/com/krieta/com/core/oauth/AndroidOAuthBrowser.kt`
+**File**: `composeApp/src/androidMain/kotlin/com/runinga/com/core/oauth/AndroidOAuthBrowser.kt`
 
 **Add import**:
 ```kotlin
@@ -210,7 +210,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 
 ### 10. UploadWorker.kt
 
-**File**: `composeApp/src/androidMain/kotlin/com/krieta/com/core/upload/UploadWorker.kt`
+**File**: `composeApp/src/androidMain/kotlin/com/runinga/com/core/upload/UploadWorker.kt`
 
 **Line 60**: Cast to String:
 ```kotlin
@@ -219,7 +219,7 @@ val url = inputData.getString("url") ?: return Result.failure()
 
 ### 11. Tabs.kt
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/com/core/navigation/Tabs.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/com/core/navigation/Tabs.kt`
 
 **Lines 664, 670**: Change from
 ```kotlin
@@ -235,7 +235,7 @@ onSecondaryContainer
 
 ### 12. ImmersivePlayerNew.kt
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/components/ImmersivePlayerNew.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/components/ImmersivePlayerNew.kt`
 
 **Add imports**:
 ```kotlin
@@ -245,7 +245,7 @@ import androidx.compose.material.icons.filled.*
 
 ### 13. LiveSocketManager.kt
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/data/socket/LiveSocketManager.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/data/socket/LiveSocketManager.kt`
 
 **Line 113**: Wrap in coroutine:
 ```kotlin
@@ -258,7 +258,7 @@ scope.launch {
 
 ### 14. ViewerLiveScreen.kt
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/presentation/screen/ViewerLiveScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/presentation/screen/ViewerLiveScreen.kt`
 
 **Line 229**: Add missing parameters:
 ```kotlin
@@ -267,20 +267,20 @@ sendGift(giftType = selectedGift, message = "")
 
 ### 15. HostLiveScreen.kt
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/presentation/screen/HostLiveScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/presentation/screen/HostLiveScreen.kt`
 
 **Lines 160, 163, 166, 169**: Change Painter to ImageVector or use painterResource
 
 ### 16. ShortsScreen.kt
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/ShortsScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/ShortsScreen.kt`
 
 **Line 300**: Remove VideoProgressBar or add implementation
 **Line 396**: Change Border to BorderStroke
 
 ### 17. ConnectSocialAccountsScreen.kt
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/presentation/oauth/ConnectSocialAccountsScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/presentation/oauth/ConnectSocialAccountsScreen.kt`
 
 **Lines 33-37**: Fix state handling:
 ```kotlin

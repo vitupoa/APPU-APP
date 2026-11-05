@@ -1,4 +1,4 @@
-# Ad System Implementation Summary
+﻿# Ad System Implementation Summary
 
 ## ✅ COMPLETED TASKS
 
@@ -18,7 +18,7 @@ Added 4 new models:
 - Decimal precision for financial data
 
 ### 2. Ad Components (Kotlin Multiplatform)
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/ads/presentation/AdComponents.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/ads/presentation/AdComponents.kt`
 
 Created comprehensive ad components for ALL tabs:
 
@@ -45,10 +45,10 @@ Created comprehensive ad components for ALL tabs:
 
 ### 3. Role-Based Access Control
 **Files Modified**:
-- `composeApp/src/commonMain/kotlin/com/krieta/com/core/security/TokenManager.kt`
-- `composeApp/src/commonMain/kotlin/com/krieta/com/core/security/UserSession.kt`
-- `composeApp/src/androidMain/kotlin/com/krieta/com/core/security/AndroidTokenManager.kt`
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/admin/presentation/screen/AdminAdManagementScreen.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/com/core/security/TokenManager.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/com/core/security/UserSession.kt`
+- `composeApp/src/androidMain/kotlin/com/runinga/com/core/security/AndroidTokenManager.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/admin/presentation/screen/AdminAdManagementScreen.kt`
 
 **Changes**:
 - ✅ Added `adminRole: String?` to `UserSession` data class
@@ -70,7 +70,7 @@ if (userRole != "SUPER_ADMIN") {
 ```
 
 ### 4. Super Admin Dashboard
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/admin/presentation/screen/AdminAdManagementScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/admin/presentation/screen/AdminAdManagementScreen.kt`
 
 **Features** (Already Implemented):
 - ✅ Platform revenue split control (15% default)
@@ -170,16 +170,16 @@ railway logs
 
 # 5. Create super admin
 railway connect postgres
-UPDATE users SET is_admin = true WHERE email = 'admin@krieta.com';
+UPDATE users SET is_admin = true WHERE email = 'admin@runinga.com';
 INSERT INTO admin_profiles (user_id, role, is_active)
-SELECT id, 'SUPER_ADMIN', true FROM users WHERE email = 'admin@krieta.com';
+SELECT id, 'SUPER_ADMIN', true FROM users WHERE email = 'admin@runinga.com';
 ```
 
 ### For Frontend Integration
 
 ```kotlin
 // Example: Live Streams Tab
-import com.krieta.feature.ads.presentation.*
+import com.runinga.feature.ads.presentation.*
 
 LazyColumn {
     items(liveStreams) { stream ->
@@ -267,13 +267,13 @@ LazyColumn {
 ## 📞 SUPPORT
 
 ### Technical Issues
-- Email: dev@krieta.com
+- Email: dev@runinga.com
 - Documentation: See COMPREHENSIVE_AD_SYSTEM.md
 - Deployment: See RAILWAY_DEPLOYMENT_GUIDE.md
 
 ### Business Inquiries
-- Email: ads@krieta.com
-- Revenue questions: finance@krieta.com
+- Email: ads@runinga.com
+- Revenue questions: finance@runinga.com
 
 ## 🎯 SUCCESS CRITERIA
 

@@ -1,4 +1,4 @@
-# Implementation Summary - All Tasks Complete ✅
+﻿# Implementation Summary - All Tasks Complete ✅
 
 ## 📋 Tasks Completed
 
@@ -34,7 +34,7 @@ val currencyProvider = koinInject<UserCurrencyProvider>()
 val exchangeRate by currencyProvider.exchangeRate.collectAsState()
 
 var budgetFiat by remember { mutableStateOf("") }
-val budgetKr = remember(budgetFiat, exchangeRate) {
+val budgetRc = remember(budgetFiat, exchangeRate) {
     budgetFiat.toDoubleOrNull()?.let { currencyProvider.fiatToKr(it) } ?: 0.0
 }
 
@@ -97,7 +97,7 @@ OutlinedTextField(
 **To Apply:**
 ```bash
 cd backend
-psql -U postgres -d krieta < prisma/migrations/add_sponsored_content.sql
+psql -U postgres -d runinga < prisma/migrations/add_sponsored_content.sql
 ```
 
 ---
@@ -189,7 +189,7 @@ app.use('/api/v1/sponsored', sponsoredRoutes);
 
 ### User Flow
 1. ✅ User opens Drips → Sees dummy ad → Clicks "Learn More"
-2. ✅ Opens Krieta Ads Manager
+2. ✅ Opens Runinga Ads Manager
 3. ✅ Selects "Sponsored Content" tab
 4. ✅ Clicks "Create Sponsored Campaign"
 5. ✅ Enters budget in fiat (e.g., 5000 KES)
@@ -239,7 +239,7 @@ app.use('/api/v1/sponsored', sponsoredRoutes);
 ### Step 1: Apply Migration (5 min)
 ```bash
 cd backend
-psql -U postgres -d krieta < prisma/migrations/add_sponsored_content.sql
+psql -U postgres -d runinga < prisma/migrations/add_sponsored_content.sql
 ```
 
 ### Step 2: Restart Backend (2 min)

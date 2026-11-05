@@ -1,4 +1,4 @@
-# Implementation Checklist
+﻿# Implementation Checklist
 
 Track your progress implementing secure financial transactions.
 
@@ -127,7 +127,7 @@ Track your progress implementing secure financial transactions.
 
 ### Monitoring & Alerts
 - [ ] Detect rapid transactions (>20 in 5 minutes)
-- [ ] Detect large amounts (>50,000 Kr in 1 hour)
+- [ ] Detect large amounts (>50,000 Rc in 1 hour)
 - [ ] Detect failed signature verifications
 - [ ] Detect replay attempts
 - [ ] Detect expired timestamp attempts
@@ -205,8 +205,8 @@ Track your progress implementing secure financial transactions.
 - [ ] Amount validation shows errors
 
 ### Edge Cases
-- [ ] Test with very small amounts (0.01 Kr)
-- [ ] Test with very large amounts (1,000,000 Kr)
+- [ ] Test with very small amounts (0.01 Rc)
+- [ ] Test with very large amounts (1,000,000 Rc)
 - [ ] Test with negative amounts
 - [ ] Test with NaN amounts
 - [ ] Test with Infinity amounts

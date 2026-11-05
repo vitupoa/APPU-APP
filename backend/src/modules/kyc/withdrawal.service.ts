@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { WithdrawalStatus } from '@prisma/client';
 import { kycService } from '../kyc/kyc.service.js';
 import { transactionSigner, TransactionPayload } from '../../utils/transactionSigner.js';
@@ -7,9 +7,9 @@ import { WithdrawalSecurityMetadata } from './withdrawal.types.js';
 import { WithdrawalSecurityValidator } from '../../utils/withdrawalSecurity.js';
 import crypto from 'crypto';
 
-const DAILY_WITHDRAWAL_LIMIT = 500000; // Kr. 500,000 per day
-const HOURLY_WITHDRAWAL_LIMIT = 30000; // Kr. 30,000 per hour
-const SINGLE_TRANSACTION_LIMIT = 30000; // Kr. 30,000 per transaction
+const DAILY_WITHDRAWAL_LIMIT = 500000; // Rc. 500,000 per day
+const HOURLY_WITHDRAWAL_LIMIT = 30000; // Rc. 30,000 per hour
+const SINGLE_TRANSACTION_LIMIT = 30000; // Rc. 30,000 per transaction
 const RAPID_WITHDRAWAL_THRESHOLD = 3; // 3 withdrawals in 24 hours
 const NEW_ACCOUNT_DAYS = 7; // Account less than 7 days old
 const LARGE_FIRST_WITHDRAWAL_THRESHOLD = 50000;
@@ -200,14 +200,14 @@ export class WithdrawalService {
     }
 
     // SECURITY: Enforce minimum withdrawal amount from KYC limits
-    const minWithdrawalAmount = 100; // 100 Kr minimum
+    const minWithdrawalAmount = 100; // 100 Rc minimum
     if (finalAmount < minWithdrawalAmount) {
-      throw new Error(`Minimum withdrawal amount is ${minWithdrawalAmount} Kr`);
+      throw new Error(`Minimum withdrawal amount is ${minWithdrawalAmount} Rc`);
     }
 
     // SECURITY: Enforce maximum single transaction limit
     if (finalAmount > SINGLE_TRANSACTION_LIMIT) {
-      throw new Error(`Maximum withdrawal per transaction is Kr. ${SINGLE_TRANSACTION_LIMIT.toLocaleString()}`);
+      throw new Error(`Maximum withdrawal per transaction is Rc. ${SINGLE_TRANSACTION_LIMIT.toLocaleString()}`);
     }
 
     // SECURITY: Check hourly withdrawal limit
@@ -226,9 +226,9 @@ export class WithdrawalService {
 
     if (newHourlyTotal > HOURLY_WITHDRAWAL_LIMIT) {
       throw new Error(
-        `Hourly withdrawal limit exceeded. Limit: Kr. ${HOURLY_WITHDRAWAL_LIMIT.toLocaleString()}, ` +
-        `Already withdrawn this hour: Kr. ${withdrawnThisHour.toLocaleString()}, ` +
-        `Available: Kr. ${(HOURLY_WITHDRAWAL_LIMIT - withdrawnThisHour).toLocaleString()}`
+        `Hourly withdrawal limit exceeded. Limit: Rc. ${HOURLY_WITHDRAWAL_LIMIT.toLocaleString()}, ` +
+        `Already withdrawn this hour: Rc. ${withdrawnThisHour.toLocaleString()}, ` +
+        `Available: Rc. ${(HOURLY_WITHDRAWAL_LIMIT - withdrawnThisHour).toLocaleString()}`
       );
     }
 
@@ -252,15 +252,15 @@ export class WithdrawalService {
     const currentWithdrawn = Number(withdrawalLimit.withdrawn_today_kr);
     const dailyLimit = Number(withdrawalLimit.daily_limit_kr);
     
-    // SECURITY: Enforce maximum daily limit (cannot exceed 500,000 Kr)
+    // SECURITY: Enforce maximum daily limit (cannot exceed 500,000 Rc)
     const effectiveDailyLimit = Math.min(dailyLimit, DAILY_WITHDRAWAL_LIMIT);
     const newWithdrawnToday = currentWithdrawn + finalAmount;
     
     if (newWithdrawnToday > effectiveDailyLimit) {
       throw new Error(
-        `Daily withdrawal limit exceeded. Limit: Kr. ${effectiveDailyLimit.toLocaleString()}, ` +
-        `Already withdrawn today: Kr. ${currentWithdrawn.toLocaleString()}, ` +
-        `Available: Kr. ${(effectiveDailyLimit - currentWithdrawn).toLocaleString()}`
+        `Daily withdrawal limit exceeded. Limit: Rc. ${effectiveDailyLimit.toLocaleString()}, ` +
+        `Already withdrawn today: Rc. ${currentWithdrawn.toLocaleString()}, ` +
+        `Available: Rc. ${(effectiveDailyLimit - currentWithdrawn).toLocaleString()}`
       );
     }
 
@@ -298,7 +298,7 @@ export class WithdrawalService {
 
       // SECURITY: Re-validate balance after lock (prevent TOCTOU attacks)
       if (currentLockedBalance < finalAmount) {
-        throw new Error(`Insufficient balance. Available: ${currentLockedBalance} Kr, Requested: ${finalAmount} Kr`);
+        throw new Error(`Insufficient balance. Available: ${currentLockedBalance} Rc, Requested: ${finalAmount} Rc`);
       }
 
       // Deduct from wallet

@@ -1,4 +1,4 @@
-import { Router, Response, NextFunction } from 'express';
+﻿import { Router, Response, NextFunction } from 'express';
 import { ContentLockService } from './contentLock.service.js';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { setRLSContext } from '../../middleware/rls.js';
@@ -21,9 +21,9 @@ router.post('/unlock', unlockRateLimiter, failedUnlockRateLimiter, async (req: A
     if (!['SHORT', 'POST', 'LIVE'].includes(contentType)) { res.status(400).json({ error: 'Invalid contentType' }); return; }
 
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { currency: true } });
-    const amountKr = 0; // fraud check uses 0 as placeholder before actual unlock
+    const amountRc = 0; // fraud check uses 0 as placeholder before actual unlock
 
-    const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(userId, 'unlock', { content_id, contentType, amount_kr: amountKr });
+    const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(userId, 'unlock', { content_id, contentType, amount_kr: amountRc });
     if (fraudCheck.shouldBlock) {
       await AuditLogService.logFraudDetection(req, { userId: userId, operationType: 'unlock', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
       res.status(403).json({ error: 'Operation blocked', message: 'Suspicious activity detected.', reasons: fraudCheck.reasons });
@@ -42,7 +42,7 @@ router.post('/unlock', unlockRateLimiter, failedUnlockRateLimiter, async (req: A
 router.get('/price', conversionRateLimiter, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { unlockAmountKr, currency } = req.query;
-    if (!unlockAmountKr) { res.status(400).json({ error: 'unlockAmountKr is required' }); return; }
+    if (!unlockAmountKr) { res.status(400).json({ error: 'unlockAmountRc is required' }); return; }
     const user = await prisma.user.findUnique({ where: { id: req.userId! }, select: { currency: true } });
     const userCurrency = (currency as string) || user?.currency || 'USD';
     const price = await ContentLockService.getUnlockPrice(Number(unlockAmountKr), userCurrency);
@@ -85,7 +85,7 @@ router.get('/check-access', accessCheckRateLimiter, async (req: AuthRequest, res
     const creatorId = row.user_id!;
     const isLocked = !!row.is_locked;
     const requiredTier = row.required_tier;
-    const unlockAmountKr = row.unlock_amount_kr ? Number(row.unlock_amount_kr) : undefined;
+    const unlockAmountRc = row.unlock_amount_kr ? Number(row.unlock_amount_kr) : undefined;
 
     const access = await ContentLockService.checkAccess(userId, content_id, contentType as any, creatorId, isLocked, requiredTier, unlockAmountKr);
     await AuditLogService.logAccessCheck(req, { userId: userId, contentId, contentType, hasAccess: access.hasAccess, accessReason: (access as any).reason });

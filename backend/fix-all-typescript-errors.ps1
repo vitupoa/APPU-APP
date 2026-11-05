@@ -1,11 +1,11 @@
-# Fix All TypeScript Errors - Comprehensive Script
+﻿# Fix All TypeScript Errors - Comprehensive Script
 Write-Host "Starting comprehensive TypeScript error fixes..." -ForegroundColor Green
 
 # HIGH PRIORITY FIXES (7 errors)
 Write-Host "`n=== HIGH PRIORITY FIXES ===" -ForegroundColor Yellow
 
 # Already fixed:
-# - notification.service.ts prizeKr variable (DONE)
+# - notification.service.ts prizeRc variable (DONE)
 # - shorts.service.ts static method call (DONE)
 
 Write-Host "High priority fixes completed!" -ForegroundColor Green
@@ -68,7 +68,7 @@ if (Test-Path $rembrandtPath) {
 Write-Host "`nMedium priority fixes completed!" -ForegroundColor Green
 
 Write-Host "`n=== SUMMARY ===" -ForegroundColor Cyan
-Write-Host "[OK] Fixed notification.service.ts prizeKr variable"
+Write-Host "[OK] Fixed notification.service.ts prizeRc variable"
 Write-Host "[OK] Fixed shorts.service.ts static method call"
 Write-Host "[OK] Added return statements after res.json() calls"
 Write-Host "`nRun 'npm run build' to verify fixes" -ForegroundColor Yellow

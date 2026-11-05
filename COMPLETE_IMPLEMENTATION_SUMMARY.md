@@ -1,4 +1,4 @@
-# Wallet Compliance Restructuring - Complete Implementation Summary
+﻿# Wallet Compliance Restructuring - Complete Implementation Summary
 
 ## Executive Summary
 
@@ -66,8 +66,8 @@ All database schema updates completed with comprehensive compliance models:
 **File:** `backend/src/services/compliance/velocityChecker.service.ts`
 - Max 10 tips/minute enforcement
 - Max 50 transactions/hour enforcement
-- Max 100,000 Kr/24h for non-KYC users
-- Max 500,000 Kr/24h for KYC-approved users
+- Max 100,000 Rc/24h for non-KYC users
+- Max 500,000 Rc/24h for KYC-approved users
 - 24-hour cooling-off for new accounts
 
 ### 5.1 CurrencyConversionService ✅
@@ -96,9 +96,9 @@ All database schema updates completed with comprehensive compliance models:
 
 ### 10.1 Tiered KYC System ✅
 **File:** `backend/src/services/compliance/kycTier.service.ts`
-- **Tier 0 (No KYC)**: 10,000 Kr/day, 50,000 Kr/month, 5,000 Kr/transaction
-- **Tier 1 (Pending)**: 50,000 Kr/day, 500,000 Kr/month, 25,000 Kr/transaction
-- **Tier 2 (Approved)**: 500,000 Kr/day, 5,000,000 Kr/month, 100,000 Kr/transaction
+- **Tier 0 (No KYC)**: 10,000 Rc/day, 50,000 Rc/month, 5,000 Rc/transaction
+- **Tier 1 (Pending)**: 50,000 Rc/day, 500,000 Rc/month, 25,000 Rc/transaction
+- **Tier 2 (Approved)**: 500,000 Rc/day, 5,000,000 Rc/month, 100,000 Rc/transaction
 
 ### 11.1 & 11.2 Compliance Backend Endpoints ✅
 **Files:** 
@@ -191,7 +191,7 @@ All database schema updates completed with comprehensive compliance models:
 
 ### 5.3 API Fiat Conversion ⏳
 **Status:** Pending
-**Remaining:** Add fiat_equivalent to all Kr amount responses
+**Remaining:** Add fiat_equivalent to all Rc amount responses
 
 ### 6.3 Task Completion Flow ✅
 **Status:** Already implemented in lockedChatTask.service.ts
@@ -234,7 +234,7 @@ All database schema updates completed with comprehensive compliance models:
 ## Wave 4: Frontend Updates ⏳ PENDING (0/5)
 
 ### 13.1 Update Wallet UI
-- Remove "Send Kr" button
+- Remove "Send Rc" button
 - Add fiat conversion display
 - Update transaction history with context
 - Add KYC tier indicator
@@ -354,7 +354,7 @@ All database schema updates completed with comprehensive compliance models:
 ## Compliance Features Summary
 
 ### Transaction Validation:
-✅ Context required for all Kr transfers
+✅ Context required for all Rc transfers
 ✅ WALLET_TRANSFER blocked
 ✅ CHAT_TIP blocked
 ✅ Reference ID validation

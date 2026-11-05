@@ -1,0 +1,32 @@
+﻿package com.runinga.com.core.navigation
+
+import org.jetbrains.compose.resources.painterResource
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.CurrentScreen
+import cafe.adriel.voyager.navigator.tab.Tab
+import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.runinga.feature.chat.presentation.list.ChatListScreen
+
+object ChatsTab : Tab {
+    override val options: TabOptions
+        @Composable
+        get() {
+            val icon = painterResource(Res.drawable.ic_chat)
+            return remember { TabOptions(index = 3u, title = "Chats", icon = icon) }
+        }
+
+    @Composable
+    override fun Content() {
+        Navigator(
+            screen = ChatListScreen(),
+            key = "ChatsTabNavigator"
+        ) {
+            CurrentScreen()
+        }
+    }
+}

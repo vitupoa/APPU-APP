@@ -1,4 +1,4 @@
-# Edit Profile Not Persisting Fix
+﻿# Edit Profile Not Persisting Fix
 
 ## Issue
 When editing profile, changes were not being saved to the backend. Specifically, `selectedNiches` and `customNiches` were not being sent or persisted.
@@ -13,17 +13,17 @@ When editing profile, changes were not being saved to the backend. Specifically,
 ## Files Changed
 
 ### Frontend
-1. **UpdateProfileRequestDto** (`composeApp/src/commonMain/kotlin/com/krieta/feature/profile/data/remote/dto/ProfileDtos.kt`)
+1. **UpdateProfileRequestDto** (`composeApp/src/commonMain/kotlin/com/runinga/feature/profile/data/remote/dto/ProfileDtos.kt`)
    - Added `selectedNiches: List<String>?`
    - Added `customNiches: List<String>?`
 
-2. **ProfileRepository** (`composeApp/src/commonMain/kotlin/com/krieta/feature/profile/domain/repository/ProfileRepository.kt`)
+2. **ProfileRepository** (`composeApp/src/commonMain/kotlin/com/runinga/feature/profile/domain/repository/ProfileRepository.kt`)
    - Added parameters to `updateProfile()`: `selectedNiches: List<String>? = null, customNiches: List<String>? = null`
 
-3. **ProfileRepositoryImpl** (`composeApp/src/commonMain/kotlin/com/krieta/feature/profile/data/repository/ProfileRepositoryImpl.kt`)
+3. **ProfileRepositoryImpl** (`composeApp/src/commonMain/kotlin/com/runinga/feature/profile/data/repository/ProfileRepositoryImpl.kt`)
    - Updated `updateProfile()` to pass niches to DTO
 
-4. **EditProfileViewModel** (`composeApp/src/commonMain/kotlin/com/krieta/feature/profile/presentation/viewmodel/EditProfileViewModel.kt`)
+4. **EditProfileViewModel** (`composeApp/src/commonMain/kotlin/com/runinga/feature/profile/presentation/viewmodel/EditProfileViewModel.kt`)
    - Updated `save()` to send niches: `selectedNiches = if (s.selectedNiches != p.selectedNiches) s.selectedNiches else null`
 
 ### Backend

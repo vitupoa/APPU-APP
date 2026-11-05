@@ -1,4 +1,4 @@
-# OAuth Browser Integration - Complete Guide
+﻿# OAuth Browser Integration - Complete Guide
 
 ## Overview
 
@@ -26,12 +26,12 @@ sealed class OAuthResult {
 #### Android (Custom Tabs)
 - Opens OAuth URL in Chrome Custom Tab
 - Handles callback via deep link intent filter
-- Callback scheme: `krieta://oauth`
+- Callback scheme: `runinga://oauth`
 
 #### iOS (ASWebAuthenticationSession)
 - Opens OAuth URL in secure authentication session
 - Automatic callback handling
-- Callback scheme: `krieta`
+- Callback scheme: `runinga`
 
 ## API Endpoints Connected
 
@@ -103,7 +103,7 @@ class OAuthViewModel(
             val authUrl = result.data.authUrl
             
             // 2. Open platform-specific browser
-            when (val browserResult = oauthBrowser.openAuthUrl(authUrl, "krieta")) {
+            when (val browserResult = oauthBrowser.openAuthUrl(authUrl, "runinga")) {
                 is OAuthResult.Success -> {
                     // 3. Send code to backend
                     handleCallback(platform, browserResult.code, browserResult.state)
@@ -129,7 +129,7 @@ class OAuthViewModel(
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="krieta" android:host="oauth" />
+        <data android:scheme="runinga" android:host="oauth" />
     </intent-filter>
 </activity>
 ```
@@ -146,7 +146,7 @@ dependencies {
 override fun onNewIntent(intent: Intent?) {
     super.onNewIntent(intent)
     intent?.data?.let { uri ->
-        if (uri.scheme == "krieta" && uri.host == "oauth") {
+        if (uri.scheme == "runinga" && uri.host == "oauth") {
             val oauthBrowser = get<OAuthBrowser>() as AndroidOAuthBrowser
             oauthBrowser.handleCallback(uri)
         }
@@ -163,7 +163,7 @@ override fun onNewIntent(intent: Intent?) {
     <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-            <string>krieta</string>
+            <string>runinga</string>
         </array>
     </dict>
 </array>
@@ -182,7 +182,7 @@ viewModel.connectAccount("tiktok")
 **Expected Flow:**
 1. Browser opens TikTok authorization page
 2. User logs in and approves
-3. Browser redirects to `krieta://oauth?code=XXX&state=YYY`
+3. Browser redirects to `runinga://oauth?code=XXX&state=YYY`
 4. App handles callback and exchanges code for token
 5. Account appears in connected accounts list
 
@@ -266,7 +266,7 @@ Paystack multi-country support is **fully implemented** and requires backend con
 ✅ Backend: 4 countries (NG, GH, ZA, KE) with account type mapping
 ✅ Backend: Country-specific bank lists with currency info
 ✅ Backend: Real-time account verification (NG/GH/ZA only)
-✅ Backend: Currency conversion (Kr → NGN/GHS/ZAR/KES)
+✅ Backend: Currency conversion (Rc → NGN/GHS/ZAR/KES)
 ✅ Frontend: Country dropdown with currency display
 ✅ Frontend: Dynamic bank loading per country
 ✅ Frontend: Kenya warning for no verification

@@ -1,4 +1,4 @@
-# Railway Deployment Guide - Ad System
+﻿# Railway Deployment Guide - Ad System
 
 ## Prerequisites
 - Railway CLI installed
@@ -95,13 +95,13 @@ No new environment variables required. The ad system uses existing:
 -- Connect to Railway database
 UPDATE users 
 SET is_admin = true 
-WHERE email = 'admin@krieta.com';
+WHERE email = 'admin@runinga.com';
 
 -- Add admin profile
 INSERT INTO admin_profiles (user_id, role, is_active)
 SELECT id, 'SUPER_ADMIN', true
 FROM users
-WHERE email = 'admin@krieta.com'
+WHERE email = 'admin@runinga.com'
 ON CONFLICT (user_id) DO UPDATE SET role = 'SUPER_ADMIN';
 ```
 
@@ -267,4 +267,4 @@ Set up Railway alerts for:
 For deployment issues:
 - Railway Docs: https://docs.railway.app
 - Prisma Docs: https://www.prisma.io/docs
-- Krieta Support: dev@krieta.com
+- Runinga Support: dev@runinga.com

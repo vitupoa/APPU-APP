@@ -1,4 +1,4 @@
-# 📸 Chat Media Upload - Master README
+﻿# 📸 Chat Media Upload - Master README
 
 ## ✅ COMPLETE IMPLEMENTATION
 
@@ -11,7 +11,7 @@ Secure media sharing in chats with mobile UI, upload progress, preview, compress
 ### For Mobile Developers
 1. Read [`CHAT_MEDIA_MOBILE_IMPLEMENTATION.md`](./CHAT_MEDIA_MOBILE_IMPLEMENTATION.md)
 2. Review [`CHAT_MEDIA_MOBILE_ARCHITECTURE.md`](./CHAT_MEDIA_MOBILE_ARCHITECTURE.md)
-3. Check code in `composeApp/src/commonMain/kotlin/com/krieta/feature/chat/`
+3. Check code in `composeApp/src/commonMain/kotlin/com/runinga/feature/chat/`
 
 ### For Backend Developers
 1. Read [`CHAT_MEDIA_QUICK_REFERENCE.md`](./CHAT_MEDIA_QUICK_REFERENCE.md)
@@ -102,7 +102,7 @@ backend/src/
 ### Mobile (9 files)
 ```
 composeApp/src/
-├── commonMain/kotlin/com/krieta/feature/chat/
+├── commonMain/kotlin/com/runinga/feature/chat/
 │   ├── data/media/
 │   │   ├── ChatMediaUploadService.kt           # NEW
 │   │   ├── ImageCompressor.kt                  # NEW
@@ -113,7 +113,7 @@ composeApp/src/
 │       └── room/
 │           ├── ChatRoomScreenUpdated.kt        # NEW
 │           └── ChatRoomViewModelUpdated.kt     # NEW
-└── androidMain/kotlin/com/krieta/feature/chat/
+└── androidMain/kotlin/com/runinga/feature/chat/
     └── data/media/
         └── ImageCompressor.android.kt          # NEW
 ```
@@ -260,6 +260,6 @@ single { MediaUploadMonitor() }
 
 **Version**: 1.0
 **Last Updated**: 2024
-**Maintainer**: Krieta Development Team
+**Maintainer**: Runinga Development Team
 
 **Important**: Media uploads directly from mobile app to Cloudinary (not through backend). Backend provides signed upload parameters and validates URLs for security.

@@ -1,4 +1,4 @@
-# Contest Judging System - Deployment Checklist
+﻿# Contest Judging System - Deployment Checklist
 
 ## Pre-Deployment
 
@@ -106,7 +106,7 @@ npm run deploy
 npm run dev
 
 # Production
-pm2 restart krieta-api
+pm2 restart runinga-api
 # or
 npm start
 ```
@@ -169,7 +169,7 @@ curl -X POST http://localhost:3000/api/v1/contests \
 
 **Expected:**
 - [ ] Contest created
-- [ ] Total charged = 100 + 15 + 100 + 15 = 230 Kr
+- [ ] Total charged = 100 + 15 + 100 + 15 = 230 Rc
 - [ ] Wallet deducted correctly
 
 #### Test 2: Get Contest with Currency
@@ -321,7 +321,7 @@ curl -X POST "http://localhost:3000/api/v1/contests/submissions/$SUBMISSION_ID/s
 #### 3. Exchange Rate Failure
 - [ ] Mock exchange service failure
 - [ ] Request contest with currency
-- [ ] Should return Kr amounts only (graceful fallback)
+- [ ] Should return Rc amounts only (graceful fallback)
 
 ---
 
@@ -398,7 +398,7 @@ git revert HEAD
 git push origin main
 
 # Restart server
-pm2 restart krieta-api
+pm2 restart runinga-api
 ```
 
 #### 2. Database Rollback

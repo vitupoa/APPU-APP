@@ -1,4 +1,4 @@
-# Transaction Signing - Developer Checklist
+﻿# Transaction Signing - Developer Checklist
 
 ## ✅ Completed (By AI)
 
@@ -17,7 +17,7 @@
 
 ### 1. Update Secret Key
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/com/core/security/TransactionSigner.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/com/core/security/TransactionSigner.kt`
 
 **Current**:
 ```kotlin
@@ -82,7 +82,7 @@ TRANSACTION_SIGNING_SECRET=your-production-secret-from-backend
 
 ### 1. Unit Tests
 
-**Create**: `composeApp/src/commonTest/kotlin/com/krieta/com/core/security/TransactionSignerTest.kt`
+**Create**: `composeApp/src/commonTest/kotlin/com/runinga/com/core/security/TransactionSignerTest.kt`
 
 ```kotlin
 class TransactionSignerTest {
@@ -124,7 +124,7 @@ class TransactionSignerTest {
 **Test withdrawal flow**:
 1. Open app
 2. Navigate to Wallet → Withdraw
-3. Enter amount (e.g., Kr 50,000)
+3. Enter amount (e.g., Rc 50,000)
 4. Select M-Pesa
 5. Enter phone number
 6. Click "Withdraw"
@@ -160,17 +160,17 @@ open iosApp/iosApp.xcodeproj
 ## 📱 Manual Testing Scenarios
 
 ### Scenario 1: Successful Withdrawal
-- [ ] Amount: Kr 50,000
+- [ ] Amount: Rc 50,000
 - [ ] Provider: M-Pesa
 - [ ] Phone: +254712345678
 - [ ] Expected: Success message, balance updated
 
 ### Scenario 2: Invalid Amount
-- [ ] Amount: Kr 0
+- [ ] Amount: Rc 0
 - [ ] Expected: "Invalid amount" error
 
 ### Scenario 3: Insufficient Balance
-- [ ] Amount: Kr 999,999,999
+- [ ] Amount: Rc 999,999,999
 - [ ] Expected: "Insufficient balance" error
 
 ### Scenario 4: Network Error

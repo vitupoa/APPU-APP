@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { ShopNotificationService } from './notifications.service.js';
 import crypto from 'crypto';
@@ -182,7 +182,7 @@ export class DealAlertService {
         user_id: userId,
         product_id: data.productId,
         category: data.category as any,
-        max_price_kr: data.maxPriceKr ? new Prisma.Decimal(data.maxPriceKr) : undefined,
+        max_price_kr: data.maxPriceRc ? new Prisma.Decimal(data.maxPriceKr) : undefined,
         keywords: data.keywords || [],
         is_active: true,
       }

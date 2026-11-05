@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma, SubscriptionTierType } from '@prisma/client';
 import { emitLikeUpdate } from '../../shared/gateway/events.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
@@ -150,10 +150,10 @@ export class ShortsService {
         // CRITICAL: Use snake_case field names from Prisma
         const isLocked = s.is_locked;
         const requiredTier = s.required_tier;
-        const unlockAmountKr = s.unlock_amount_kr;
+        const unlockAmountRc = s.unlock_amount_kr;
         
         if (!isLocked) return { id: s.id, hasAccess: true };
-        if (!userId) return { id: s.id, hasAccess: false, requiresSubscription: !!requiredTier, requiresUnlock: !!unlockAmountKr };
+        if (!userId) return { id: s.id, hasAccess: false, requiresSubscription: !!requiredTier, requiresUnlock: !!unlockAmountRc };
         
         const access = await ContentLockService.checkAccess(
           userId,
@@ -162,7 +162,7 @@ export class ShortsService {
           s.user_id,
           isLocked,
           requiredTier,
-          unlockAmountKr ? Number(unlockAmountKr) : undefined
+          unlockAmountRc ? Number(unlockAmountKr) : undefined
         );
         return { id: s.id, ...access };
       })
@@ -263,7 +263,7 @@ export class ShortsService {
         linked_product_id: data.linkedProductId,
         is_locked: data.isLocked || false,
         required_tier: data.requiredTier,
-        unlock_amount_kr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
+        unlock_amount_kr: data.unlockAmountRc ? new Prisma.Decimal(data.unlockAmountKr) : undefined
       } as any,
       include: { user: {
           select: {

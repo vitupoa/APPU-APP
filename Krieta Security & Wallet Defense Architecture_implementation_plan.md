@@ -1,4 +1,4 @@
-# Krieta Security & Wallet Defense Architecture
+﻿# Runinga Security & Wallet Defense Architecture
 
 You have raised critical security insights defining the difference between a minimum viable product and a production-grade FinTech application.
 
@@ -9,17 +9,17 @@ Currently, users are instantly generated upon hitting `/register`.
 2.  **Forgot Password:** Same mechanism. `POST /auth/forgot-password` generates an OTP. The user submits the OTP with their new password to securely reset it without relying on archaic email links.
 
 ## 2. Withdrawal Security Validation
-Currently, any user holding the JWT access token can trigger a withdrawal. If someone snatches an unlocked phone, they can drain the Kr balance.
+Currently, any user holding the JWT access token can trigger a withdrawal. If someone snatches an unlocked phone, they can drain the Rc balance.
 **The Fix:**
 Every withdrawal request *MUST* include the user's explicit Wallet PIN. The backend will verify `Bcrypt.compare(providedPin, user.walletPinHash)`. If it fails, the withdrawal rejects entirely. For modern devices, we map this to Android's Native Biometrics (Fingerprint/FaceID) triggering the token natively.
 
 ## 3. The 6-Digit PIN vs 4-Digit PIN
 **Recommendation: 6-Digit PIN.**
 *   A 4-digit PIN has 10,000 combinations. A 6-digit PIN has 1,000,000 combinations. It is 100x more secure against shoulder-surfing and brute force. CashApp and Apple both mandate 6-digits today.
-*   **The 15-Minute Timeout Limit:** I will build an Android Lifecycle observer intercepting local sessions. If `System.currentTimeMillis() - lastActiveTime > 15 Minutes` evaluates true, the Voyager Navigator inherently intercepts and forces the `/wallet-unlock` screen demanding the 6-digit PIN before showing Kr balances.
+*   **The 15-Minute Timeout Limit:** I will build an Android Lifecycle observer intercepting local sessions. If `System.currentTimeMillis() - lastActiveTime > 15 Minutes` evaluates true, the Voyager Navigator inherently intercepts and forces the `/wallet-unlock` screen demanding the 6-digit PIN before showing Rc balances.
 
-## 4. Toggle Balances (Hide/Show Kr & Fiat)
-I will implement an `isBalanceHidden: Boolean` flow in Jetpack Compose's `WalletViewModel` stored in local DataStore. When toggled, the UI elegantly renders `Kr ****` and `~ $**.**`, securing users physically displaying their App in public spaces.
+## 4. Toggle Balances (Hide/Show Rc & Fiat)
+I will implement an `isBalanceHidden: Boolean` flow in Jetpack Compose's `WalletViewModel` stored in local DataStore. When toggled, the UI elegantly renders `Rc ****` and `~ $**.**`, securing users physically displaying their App in public spaces.
 
 > [!IMPORTANT]
 > **Database Overhaul Required:** I will need to push changes to the Prisma Schema adding `walletPinHash`, `pinUpdatedAt`, and `isEmailVerified` attributes seamlessly. 

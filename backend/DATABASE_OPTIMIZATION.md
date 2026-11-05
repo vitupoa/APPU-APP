@@ -1,4 +1,4 @@
-# DATABASE OPTIMIZATION GUIDE
+﻿# DATABASE OPTIMIZATION GUIDE
 
 ## Overview
 This guide provides comprehensive database optimization strategies including proper indexing, query optimization, and performance monitoring.
@@ -381,7 +381,7 @@ REINDEX TABLE users;
 ### Slow Query Log
 ```sql
 -- Enable slow query logging
-ALTER DATABASE krieta SET log_min_duration_statement = 1000;
+ALTER DATABASE runinga SET log_min_duration_statement = 1000;
 
 -- View slow queries
 SELECT 

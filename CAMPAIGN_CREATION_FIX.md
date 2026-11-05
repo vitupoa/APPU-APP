@@ -1,9 +1,9 @@
-# Campaign Creation Fix
+﻿# Campaign Creation Fix
 
 ## Problem
 When creating a campaign, the app was showing an error:
 ```
-Illegal input: Fields [id, brandId, brandName, title, description, budget, categories, requirements, deliverables, startDate, endDate, status, applicationsCount, selectedInfluencers] are required for type with serial name 'com.krieta.feature.marketplace.domain.model.BrandCampaign', but they were missing at path: $
+Illegal input: Fields [id, brandId, brandName, title, description, budget, categories, requirements, deliverables, startDate, endDate, status, applicationsCount, selectedInfluencers] are required for type with serial name 'com.runinga.feature.marketplace.domain.model.BrandCampaign', but they were missing at path: $
 ```
 
 ## Root Cause
@@ -104,10 +104,10 @@ where.AND = [
 When "ALL" is selected, all tiers are sent in the array, so campaigns will be visible to all influencer tiers.
 
 ## Files Modified
-1. `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/data/remote/MarketplaceApiService.kt`
-2. `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/data/repository/MarketplaceRepositoryImpl.kt`
-3. `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/presentation/screen/CampaignScreens.kt`
-4. `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/domain/model/MarketplaceModels.kt`
+1. `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/data/remote/MarketplaceApiService.kt`
+2. `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/data/repository/MarketplaceRepositoryImpl.kt`
+3. `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/presentation/screen/CampaignScreens.kt`
+4. `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/domain/model/MarketplaceModels.kt`
 
 ## Testing
 To test the fix:

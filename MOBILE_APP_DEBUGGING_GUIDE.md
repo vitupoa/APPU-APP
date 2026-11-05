@@ -1,4 +1,4 @@
-# 🔍 Mobile App Debugging - Exchange Rate API Issue
+﻿# 🔍 Mobile App Debugging - Exchange Rate API Issue
 
 ## Status: ✅ DEBUGGING ENABLED
 
@@ -283,7 +283,7 @@ railway up
 You'll know it's working when:
 1. ✅ Logcat shows "Exchange Rate Parsed Successfully"
 2. ✅ Top-up screen shows exchange rate
-3. ✅ Kr preview calculates correctly
+3. ✅ Rc preview calculates correctly
 4. ✅ No error messages in UI
 
 ---

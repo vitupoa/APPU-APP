@@ -1,4 +1,4 @@
-# 🔐 Complete Credentials Setup Guide
+﻿# 🔐 Complete Credentials Setup Guide
 
 ## 📋 Current Status
 
@@ -26,7 +26,7 @@ Your `.env` file already has most credentials configured. Here's what you need t
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
 2. Click **"Add project"** or select existing project
-3. Enter project name (e.g., "Krieta")
+3. Enter project name (e.g., "Runinga")
 4. Disable Google Analytics (optional)
 5. Click **"Create project"**
 
@@ -41,10 +41,10 @@ Your `.env` file already has most credentials configured. Here's what you need t
 ```json
 {
   "type": "service_account",
-  "project_id": "krieta-xxxxx",
+  "project_id": "runinga-xxxxx",
   "private_key_id": "...",
   "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-xxxxx@krieta-xxxxx.iam.gserviceaccount.com",
+  "client_email": "firebase-adminsdk-xxxxx@runinga-xxxxx.iam.gserviceaccount.com",
   "client_id": "...",
   "auth_uri": "...",
   "token_uri": "...",
@@ -58,8 +58,8 @@ Your `.env` file already has most credentials configured. Here's what you need t
 In Railway dashboard, add these 3 variables:
 
 ```env
-FIREBASE_PROJECT_ID=krieta-xxxxx
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@krieta-xxxxx.iam.gserviceaccount.com
+FIREBASE_PROJECT_ID=runinga-xxxxx
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@runinga-xxxxx.iam.gserviceaccount.com
 FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...\n-----END PRIVATE KEY-----\n
 ```
 
@@ -90,7 +90,7 @@ FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAA
 1. In Firebase Console → **Project settings** → **General** tab
 2. Scroll to **"Your apps"** section
 3. Click **Android icon** to add Android app
-4. Enter package name: `com.krieta.com`
+4. Enter package name: `com.runinga.com`
 5. Download `google-services.json`
 6. Place file in: `composeApp/src/androidMain/`
 
@@ -123,7 +123,7 @@ buildscript {
 
 1. In Firebase Console → **Project settings** → **General** tab
 2. Click **iOS icon** to add iOS app
-3. Enter bundle ID: `com.krieta.com`
+3. Enter bundle ID: `com.runinga.com`
 4. Download `GoogleService-Info.plist`
 5. Place file in: `iosApp/iosApp/`
 6. Add to Xcode project (drag & drop into Xcode)
@@ -148,7 +148,7 @@ pod 'Firebase/Messaging'
 1. In SES Console, go to **"Verified identities"**
 2. Click **"Create identity"**
 3. Select **"Email address"**
-4. Enter: `no-reply@krieta.com` (or your domain)
+4. Enter: `no-reply@runinga.com` (or your domain)
 5. Click **"Create identity"**
 6. Check email and click verification link
 
@@ -156,7 +156,7 @@ pod 'Firebase/Messaging'
 
 1. Go to **IAM** service in AWS Console
 2. Click **"Users"** → **"Add users"**
-3. Username: `krieta-ses-user`
+3. Username: `runinga-ses-user`
 4. Select **"Access key - Programmatic access"**
 5. Click **"Next: Permissions"**
 6. Click **"Attach existing policies directly"**
@@ -172,7 +172,7 @@ pod 'Firebase/Messaging'
 AWS_SES_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 AWS_SES_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 AWS_SES_REGION=us-east-1
-EMAIL_FROM_ADDRESS=no-reply@krieta.com
+EMAIL_FROM_ADDRESS=no-reply@runinga.com
 ```
 
 ### Step 5: Request Production Access (Optional)
@@ -203,7 +203,7 @@ FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_HERE\n-----EN
 AWS_SES_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 AWS_SES_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 AWS_SES_REGION=us-east-1
-EMAIL_FROM_ADDRESS=no-reply@krieta.com
+EMAIL_FROM_ADDRESS=no-reply@runinga.com
 ```
 
 ### 3. Already Configured (Keep as-is)
@@ -229,7 +229,7 @@ JWT_REFRESH_EXPIRES_IN=7d
 CLOUDINARY_CLOUD_NAME=dlfikd68s
 CLOUDINARY_API_KEY=651974261387216
 CLOUDINARY_API_SECRET=fNvOpSCgTqBnq5VIRVssVrTs6Ts
-CLOUDINARY_UPLOAD_PRESET=Krieta
+CLOUDINARY_UPLOAD_PRESET=Runinga
 
 # Request Signing
 REQUEST_SIGNING_KEY=7cb03cbeee0854dcbfd2bf492b37b38d91a2d2b99d7da602770ce8e8679c7543fc302546a05bb2cbf1e187730b23d7651957fd66bd514bb54077810cbbcc89a3
@@ -260,9 +260,9 @@ MPESA_CALLBACK_URL=https://appu-app-production.up.railway.app/webhooks/mpesa
 RATE_LIMIT_MAX=100
 RATE_LIMIT_WINDOW_MS=60000
 
-# Kr Coin
-KR_TO_USD_RATE=0.01
-KR_PRECISION=1000000
+# Rc Coin
+RC_TO_USD_RATE=0.01
+RC_PRECISION=1000000
 
 # Fees
 FEES_ENABLED=false
@@ -270,7 +270,7 @@ FEE_TIP_BASIS_POINTS=1500
 FEE_SHOP_BASIS_POINTS=200
 FEE_TOPUP_BASIS_POINTS=200
 FEE_WITHDRAWAL_BASIS_POINTS=300
-FEE_MIN_KR_MIKR=1000000
+FEE_MIN_RC_MIKR=1000000
 
 # Limits
 LIMIT_BASIC_TOPUP_DAILY=50
@@ -359,7 +359,7 @@ const message = {
   token: 'device-token-here',
   notification: {
     title: 'Test Notification',
-    body: 'This is a test from Krieta!',
+    body: 'This is a test from Runinga!',
   },
 };
 

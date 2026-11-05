@@ -1,13 +1,13 @@
-# Quick Fix: Patch existing SQLDelight generated files
+﻿# Quick Fix: Patch existing SQLDelight generated files
 # Run this if you just want to fix the Boolean import without full rebuild
 
 Write-Host "Fixing SQLDelight Boolean imports..." -ForegroundColor Cyan
 
-$generatedDbPath = "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db"
+$generatedDbPath = "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db"
 
 if (-not (Test-Path $generatedDbPath)) {
     Write-Host "✗ Generated code not found at: $generatedDbPath" -ForegroundColor Red
-    Write-Host "  Run: .\gradlew.bat :composeApp:generateCommonMainKrietaDatabaseInterface" -ForegroundColor Yellow
+    Write-Host "  Run: .\gradlew.bat :composeApp:generateCommonMainRuningaDatabaseInterface" -ForegroundColor Yellow
     exit 1
 }
 

@@ -1,4 +1,4 @@
-import { Client, OrdersController, PaymentsController, Environment } from '@paypal/paypal-server-sdk';
+﻿import { Client, OrdersController, PaymentsController, Environment } from '@paypal/paypal-server-sdk';
 import { env } from '../../config/env.js';
 
 export class PaypalService {
@@ -51,7 +51,7 @@ export class PaypalService {
         applicationContext: {
           returnUrl: `${env.MPESA_CALLBACK_URL}/api/v1/payments/paypal/success`,
           cancelUrl: `${env.MPESA_CALLBACK_URL}/api/v1/payments/paypal/cancel`,
-          brandName: 'Krieta',
+          brandName: 'Runinga',
           userAction: 'PAY_NOW' as any
         }
       },
@@ -136,7 +136,7 @@ export class PaypalService {
       {
         sender_batch_header: {
           sender_batch_id: params.reference,
-          email_subject: 'Krieta Withdrawal',
+          email_subject: 'Runinga Withdrawal',
           email_message: params.note
         },
         items: [{

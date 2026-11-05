@@ -1,10 +1,10 @@
-# FRONTEND SAFE CONVERSION UPDATE GUIDE
+﻿# FRONTEND SAFE CONVERSION UPDATE GUIDE
 
 ## Quick Reference for Updating Remaining Files
 
 ### Import Statement to Add
 ```kotlin
-import com.krieta.com.core.util.SafeConversion
+import com.runinga.com.core.util.SafeConversion
 ```
 
 ### Conversion Patterns
@@ -137,15 +137,15 @@ val target = SafeConversion.toDoubleOrDefault(
 
 **Location 2 & 3:**
 ```kotlin
-membershipFeeKr = s.membershipFeeKr.toDoubleOrNull(),
-penaltyAmountKr = s.penaltyAmountKr.toDoubleOrNull(),
+membershipFeeRc = s.membershipFeeKr.toDoubleOrNull(),
+penaltyAmountRc = s.penaltyAmountKr.toDoubleOrNull(),
 ```
 **Replace with:**
 ```kotlin
-membershipFeeKr = if (s.membershipFeeKr.isNotEmpty()) {
+membershipFeeRc = if (s.membershipFeeKr.isNotEmpty()) {
     SafeConversion.toDoubleOrDefault(s.membershipFeeKr, "membershipFee", 0.0)
 } else null,
-penaltyAmountKr = if (s.penaltyAmountKr.isNotEmpty()) {
+penaltyAmountRc = if (s.penaltyAmountKr.isNotEmpty()) {
     SafeConversion.toDoubleOrDefault(s.penaltyAmountKr, "penaltyAmount", 0.0)
 } else null,
 ```

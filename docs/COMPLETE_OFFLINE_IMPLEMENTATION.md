@@ -1,4 +1,4 @@
-# Complete Offline Support Implementation
+﻿# Complete Offline Support Implementation
 
 ## ✅ What Was Implemented
 
@@ -89,13 +89,13 @@ Downloads and stores images/videos locally so they're available offline.
 ```kotlin
 // When drip loads online
 val cachedPath = mediaCache.cacheMedia(
-    url = "https://cdn.krieta.com/drip_123.jpg",
+    url = "https://cdn.runinga.com/drip_123.jpg",
     mediaType = MediaType.IMAGE
 )
 
 // Later, when offline
 val localPath = mediaCache.getCachedMediaPath(
-    url = "https://cdn.krieta.com/drip_123.jpg"
+    url = "https://cdn.runinga.com/drip_123.jpg"
 )
 // Returns: "/data/cache/media_cache/abc123.jpg"
 ```
@@ -108,7 +108,7 @@ val localPath = mediaCache.getCachedMediaPath(
 - ✅ Cross-platform (Android & iOS)
 
 ### Storage Locations:
-- **Android**: `/data/data/com.krieta.com/cache/media_cache/`
+- **Android**: `/data/data/com.runinga.com/cache/media_cache/`
 - **iOS**: `~/Library/Caches/media_cache/`
 
 ## 🔄 Offline-First Flow

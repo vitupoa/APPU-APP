@@ -1,4 +1,4 @@
-# KYC & WITHDRAWAL VERIFICATION SYSTEM
+﻿# KYC & WITHDRAWAL VERIFICATION SYSTEM
 
 ## Overview
 Complete KYC (Know Your Customer) and withdrawal verification system with manual review capabilities for super admins and finance managers. Includes suspicious pattern detection, tiered withdrawal limits, and automated risk scoring.
@@ -7,7 +7,7 @@ Complete KYC (Know Your Customer) and withdrawal verification system with manual
 
 ### 1. **Single-Tier KYC System**
 - **All users must complete KYC before withdrawing**
-- Daily withdrawal limit: Kr 500,000
+- Daily withdrawal limit: Rc 500,000
 - Processing time: 24-48 hours
 - No KYC fees
 
@@ -31,7 +31,7 @@ System automatically flags suspicious patterns:
 - **Rapid Withdrawals**: 3+ withdrawals in 24 hours
 - **New Account**: Account less than 7 days old
 - **Unusual Amount**: > 10x user's average withdrawal
-- **Large First Withdrawal**: First withdrawal > Kr 50,000
+- **Large First Withdrawal**: First withdrawal > Rc 50,000
 - **0-29**: Low risk (green)
 - **30-49**: Medium risk (yellow)
 - **50-69**: High risk (orange)
@@ -77,7 +77,7 @@ model KYCDocument {
 model WithdrawalRequest {
   id              String           @id @default(uuid())
   userId          String
-  amountKr        Decimal
+  amountRc        Decimal
   status          WithdrawalStatus // PENDING, KYC_REQUIRED, UNDER_REVIEW, FLAGGED, APPROVED, REJECTED, COMPLETED
   requiresKyc     Boolean          @default(true)
   kycDocumentIds  String[]
@@ -95,8 +95,8 @@ model WithdrawalRequest {
 model WithdrawalLimit {
   id              String   @id @default(uuid())
   userId          String   @unique
-  dailyLimitKr    Decimal  // Kr 500,000 for all users
-  withdrawnTodayKr Decimal @default(0)
+  dailyLimitRc    Decimal  // Rc 500,000 for all users
+  withdrawnTodayRc Decimal @default(0)
   lastResetDate   DateTime @default(now())
 }
 ```
@@ -271,7 +271,7 @@ Content-Type: application/json
 5. User reviews photos and submits
 6. Admin reviews and approves KYC
 7. User requests withdrawal again
-8. System checks daily limit (Kr 500,000)
+8. System checks daily limit (Rc 500,000)
 9. Deducts from wallet
 10. Status: PENDING
 11. Processes within 24-48 hours

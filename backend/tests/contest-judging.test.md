@@ -1,4 +1,4 @@
-# Contest Judging System - Manual Test Guide
+﻿# Contest Judging System - Manual Test Guide
 
 ## Prerequisites
 - Backend server running
@@ -29,11 +29,11 @@ POST /api/v1/contests
 ```
 
 ### Expected Result:
-- Prize: Kr 1,000
-- Prize fee (15%): Kr 150
-- Airdrop pool: Kr 1,000 (10 × 100)
-- Airdrop fee (15%): Kr 150
-- **Total charged: Kr 2,300**
+- Prize: Rc 1,000
+- Prize fee (15%): Rc 150
+- Airdrop pool: Rc 1,000 (10 × 100)
+- Airdrop fee (15%): Rc 150
+- **Total charged: Rc 2,300**
 
 ### Verification:
 - Check creator wallet deduction
@@ -184,9 +184,9 @@ POST /api/v1/contests/:contestId/distribute-auto
 ```
 
 ### Expected Result:
-- Rank 1: Kr 500 (50%)
-- Rank 2: Kr 300 (30%)
-- Rank 3: Kr 200 (20%)
+- Rank 1: Rc 500 (50%)
+- Rank 2: Rc 300 (30%)
+- Rank 3: Rc 200 (20%)
 
 ### Verification:
 - Check winner wallets
@@ -367,7 +367,7 @@ GET /api/v1/contests?currency=kes&limit=10
 
 ### Test 16: Exchange Rate Failure
 - Mock exchange service failure
-- Verify graceful fallback (Kr amounts only)
+- Verify graceful fallback (Rc amounts only)
 
 ---
 

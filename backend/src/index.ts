@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import { env } from './config/env.js';
@@ -33,7 +33,6 @@ import commentsRoutes from './modules/comments/comments.routes.js';
 import teamsRoutes from './modules/teams/teams.routes.js';
 import chatRoutes from './modules/chat/chat.routes.js';
 import { storiesRoutes } from './modules/stories/stories.routes.js';
-import { chamaRoutes } from './modules/chama/chama.routes.js';
 import notificationsRoutes from './modules/notifications/notifications.routes.js';
 import marketplaceRoutes from './modules/marketplace/marketplace.routes.js';
 import oauthRoutes from './modules/marketplace/oauth.routes.js';
@@ -51,7 +50,6 @@ import contentLockRoutes from './modules/contentLock/contentLock.routes.js';
 import subscriptionRoutes from './modules/user/subscription.routes.js';
 import webhookRoutes from './routes/webhook.routes.js';
 import complianceRoutes from './modules/compliance/compliance.routes.js';
-import { startChamaDefaultWorker } from './workers/chamaDefaultWorker.js';
 import { ofacScreeningService } from './services/compliance/ofacScreening.service.js';
 import { ComplianceCronService } from './services/compliance/compliance.cron.js';
 import { trackDeviceFingerprint } from './middleware/compliance.middleware.js';
@@ -136,7 +134,7 @@ app.use(trackDeviceFingerprint); // Track device fingerprints for compliance
 
 // Health check
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'krieta-api', version: '1.0.0' });
+  res.json({ status: 'ok', service: 'runinga-api', version: '1.0.0' });
 });
 
 // CSRF token endpoint
@@ -177,7 +175,6 @@ app.use('/api/v1/comments', commentsRoutes);
 app.use('/api/v1/teams', teamsRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/stories', storiesRoutes);
-app.use('/api/v1/chamas', chamaRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
 app.use('/api/v1/marketplace', marketplaceRoutes);
 app.use('/api/v1/oauth', oauthRoutes);
@@ -227,7 +224,7 @@ const PORT = env.PORT || 3000;
     logger.info('JWT Secret Manager initialized');
 
     httpServer.listen(PORT, async () => {
-      logger.info(`Krieta API running on port ${PORT}`);
+      logger.info(`Runinga API running on port ${PORT}`);
       logger.info(`Environment: ${env.NODE_ENV}`);
       logger.info(`CORS Origin: ${env.CORS_ORIGIN}`);
       
@@ -240,10 +237,7 @@ const PORT = env.PORT || 3000;
         logger.info('OFAC screening service initialized');
         
         // Initialize compliance cron jobs
-        ComplianceCronService.initialize();
-        
-        startChamaDefaultWorker();
-        startStoryCleanupWorker();
+        ComplianceCronService.initialize();        startStoryCleanupWorker();
         startContestDeadlineWorker();
         startDailyPrizeWorker();
         startFlashSaleWorker();

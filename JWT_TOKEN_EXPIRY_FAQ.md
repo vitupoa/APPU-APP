@@ -1,4 +1,4 @@
-# JWT Token Expiry - Your Questions Answered
+﻿# JWT Token Expiry - Your Questions Answered
 
 ## Q1: How many days should I put for JWT token expiry in Railway variables?
 
@@ -32,7 +32,7 @@ JWT_REFRESH_EXPIRY=365d
 | **Social Media** | 30d | 365d | ✅ **RECOMMENDED** |
 | **Maximum Convenience** | 90d | 730d | Never logout (2 years) |
 
-### What I Recommend for Krieta:
+### What I Recommend for Runinga:
 
 ```bash
 JWT_ACCESS_EXPIRY=30d
@@ -40,7 +40,7 @@ JWT_REFRESH_EXPIRY=365d
 ```
 
 **Reasoning:**
-- Krieta is a social media app (like TikTok/Instagram)
+- Runinga is a social media app (like TikTok/Instagram)
 - Users expect to stay logged in indefinitely
 - 30 days is long enough that token refresh happens seamlessly
 - 365 days ensures users never get logged out unexpectedly
@@ -123,7 +123,7 @@ Now:
    - Logout on one device doesn't affect others
    - Can revoke specific device tokens
 
-### What Krieta Does Now (After Fix):
+### What Runinga Does Now (After Fix):
 
 ✅ **Same as WhatsApp/TikTok:**
 - 30-day access tokens

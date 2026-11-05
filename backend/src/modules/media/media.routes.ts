@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+﻿import { Router, Response } from 'express';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { generateUploadSignature, validateUploadFolder, CloudinaryFolder, CLOUDINARY_FOLDERS } from '../../config/cloudinary.js';
 import { rateLimiter } from '../../middleware/rateLimiter.js';
@@ -17,23 +17,23 @@ const uploadSignatureLimiter = rateLimit({
 
 const signatureSchema = z.object({
   folder: z.enum([
-    'Krieta/Profile/Images',
-    'Krieta/Profile/Videos',
-    'Krieta/Shorts/Videos',
-    'Krieta/Shorts/Images',
-    'Krieta/Contests/Images',
-    'Krieta/Contests/Videos',
-    'Krieta/Drips/Images',
-    'Krieta/Shop/Images',
-    'Krieta/Chats/Direct/Images',
-    'Krieta/Chats/Direct/Videos',
-    'Krieta/Chats/Group/Images',
-    'Krieta/Chats/Group/Videos',
-    'Krieta/Chats/Chama/Images',
-    'Krieta/Chats/Chama/Videos',
-    'Krieta/Chats/GroupAvatar/Images',
-    'Krieta/Stories/Images',
-    'Krieta/Stories/Videos',
+    'Runinga/Profile/Images',
+    'Runinga/Profile/Videos',
+    'Runinga/Shorts/Videos',
+    'Runinga/Shorts/Images',
+    'Runinga/Contests/Images',
+    'Runinga/Contests/Videos',
+    'Runinga/Drips/Images',
+    'Runinga/Shop/Images',
+    'Runinga/Chats/Direct/Images',
+    'Runinga/Chats/Direct/Videos',
+    'Runinga/Chats/Group/Images',
+    'Runinga/Chats/Group/Videos',
+    'Runinga/Chats/Chama/Images',
+    'Runinga/Chats/Chama/Videos',
+    'Runinga/Chats/GroupAvatar/Images',
+    'Runinga/Stories/Images',
+    'Runinga/Stories/Videos',
   ]),
   resourceType: z.enum(['image', 'video', 'raw']).optional()
 });
@@ -67,8 +67,6 @@ router.get('/upload-signature',
     );
     
     // Log signature generation for audit
-    console.log(`[Upload Signature] User ${req.userId} requested signature for ${folder}`);
-    
     res.status(200).json(signatureData);
   } catch (error: any) {
     if (error.name === 'ZodError') {

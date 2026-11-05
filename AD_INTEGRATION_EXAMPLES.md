@@ -1,9 +1,9 @@
-# Ad Integration Examples - Copy & Paste Ready
+﻿# Ad Integration Examples - Copy & Paste Ready
 
 ## Import Statement (Add to all screens)
 
 ```kotlin
-import com.krieta.feature.ads.presentation.*
+import com.runinga.feature.ads.presentation.*
 ```
 
 ---
@@ -446,4 +446,4 @@ For each tab integration:
 
 - **Documentation**: See COMPREHENSIVE_AD_SYSTEM.md
 - **Deployment**: See RAILWAY_DEPLOYMENT_GUIDE.md
-- **Support**: dev@krieta.com
+- **Support**: dev@runinga.com

@@ -1,4 +1,4 @@
-# Contest Judging System Documentation
+﻿# Contest Judging System Documentation
 
 ## Overview
 
@@ -162,18 +162,18 @@ for each winner:
 #### Contest List with Currency
 - **Endpoint**: `GET /api/v1/contests?currency=kes`
 - Returns all contests with fiat conversion
-- **Display Priority**: Fiat amount in large text, Kr amount below in smaller text
+- **Display Priority**: Fiat amount in large text, Rc amount below in smaller text
 
 #### Contest Detail with Currency
 - **Endpoint**: `GET /api/v1/contests/:id?currency=kes`
 - Includes full prize breakdown with currency conversion
-- Shows both Kr and fiat amounts for each rank
+- Shows both Rc and fiat amounts for each rank
 
 #### Exchange Rate Logic
 - Uses `ExchangeService` for real-time rates
-- **Conversion**: Kr → USD → Local Currency
-- **Base Rate**: 1 Kr = $100 USD
-- **Formula**: `prizeKr × 100 × usdToLocalRate`
+- **Conversion**: Rc → USD → Local Currency
+- **Base Rate**: 1 Rc = $100 USD
+- **Formula**: `prizeRc × 100 × usdToLocalRate`
 
 ## API Endpoints Summary
 
@@ -253,7 +253,7 @@ CREATE TABLE judge_scores (
      "deadline": "2026-06-01T00:00:00Z"
    }
    ```
-   - Creator pays: Kr 1,150 (1000 + 15% fee)
+   - Creator pays: Rc 1,150 (1000 + 15% fee)
 
 2. **Invite Judges**
    ```javascript
@@ -304,9 +304,9 @@ CREATE TABLE judge_scores (
    ```javascript
    POST /api/v1/contests/:id/distribute-auto
    ```
-   - Rank 1: Kr 500 (50%)
-   - Rank 2: Kr 300 (30%)
-   - Rank 3: Kr 200 (20%)
+   - Rank 1: Rc 500 (50%)
+   - Rank 2: Rc 300 (30%)
+   - Rank 3: Rc 200 (20%)
 
 9. **Winners Receive Prizes**
    - Wallets credited automatically
@@ -326,7 +326,7 @@ const contest = await response.json();
 
 // Display format:
 // Large text: KES 14,000,000
-// Small text below: Kr 1,000
+// Small text below: Rc 1,000
 ```
 
 ### Prize Breakdown Display
@@ -336,9 +336,9 @@ const breakdown = await fetch(
 );
 
 // Show for each rank:
-// 1st Place: KES 7,000,000 (Kr 500) - 50%
-// 2nd Place: KES 4,200,000 (Kr 300) - 30%
-// 3rd Place: KES 2,800,000 (Kr 200) - 20%
+// 1st Place: KES 7,000,000 (Rc 500) - 50%
+// 2nd Place: KES 4,200,000 (Rc 300) - 30%
+// 3rd Place: KES 2,800,000 (Rc 200) - 20%
 ```
 
 ## Testing

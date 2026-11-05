@@ -1,7 +1,7 @@
-# Material Icons Migration Script
+﻿# Material Icons Migration Script
 # This script automatically replaces Material Icons imports with painterResource
 
-$rootPath = "c:\Users\ADMIN\Krieta\composeApp\src\commonMain\kotlin"
+$rootPath = "c:\Users\ADMIN\Runinga\composeApp\src\commonMain\kotlin"
 
 # Icon mapping: Material Icons -> Drawable Resource
 $iconMap = @{
@@ -119,8 +119,8 @@ foreach ($file in $files) {
             $newImports = @"
 
 import org.jetbrains.compose.resources.painterResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.*
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.*
 "@
             $content = $content.Insert($insertPoint, $newImports)
         }

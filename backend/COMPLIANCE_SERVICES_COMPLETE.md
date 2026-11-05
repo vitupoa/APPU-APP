@@ -1,4 +1,4 @@
-# Compliance Services & Admin Routes - Implementation Complete
+﻿# Compliance Services & Admin Routes - Implementation Complete
 
 ## 📋 Overview
 
@@ -517,7 +517,7 @@ router.use(requireRarAccess as any);
 router.use('/compliance', complianceRoutes);
 ```
 
-**Access URL:** `https://api.krieta.com/api/v1/rembrandt-rar/compliance/*`
+**Access URL:** `https://api.runinga.com/api/v1/rembrandt-rar/compliance/*`
 
 ---
 
@@ -580,7 +580,7 @@ model audit_logs {
 
 ### Test Compliance Review Creation
 ```bash
-curl -X POST https://api.krieta.com/api/v1/rembrandt-rar/compliance/reviews \
+curl -X POST https://api.runinga.com/api/v1/rembrandt-rar/compliance/reviews \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -593,7 +593,7 @@ curl -X POST https://api.krieta.com/api/v1/rembrandt-rar/compliance/reviews \
 
 ### Test SAR Creation
 ```bash
-curl -X POST https://api.krieta.com/api/v1/rembrandt-rar/compliance/sars \
+curl -X POST https://api.runinga.com/api/v1/rembrandt-rar/compliance/sars \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -607,7 +607,7 @@ curl -X POST https://api.krieta.com/api/v1/rembrandt-rar/compliance/sars \
 
 ### Test Audit Log Query
 ```bash
-curl -X GET "https://api.krieta.com/api/v1/rembrandt-rar/compliance/audit-logs?action=COMPLIANCE_REVIEW_CREATED&limit=10" \
+curl -X GET "https://api.runinga.com/api/v1/rembrandt-rar/compliance/audit-logs?action=COMPLIANCE_REVIEW_CREATED&limit=10" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
 ```
 

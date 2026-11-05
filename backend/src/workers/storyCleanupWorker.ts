@@ -8,7 +8,6 @@ import { deleteExpiredMedia } from '../config/cloudinary.js';
  */
 export function startStoryCleanupWorker() {
   cron.schedule('0 * * * *', async () => {
-    console.log('[CRON] Running Story Cleanup...');
     try {
       const now = new Date();
       
@@ -22,11 +21,9 @@ export function startStoryCleanupWorker() {
       // Delete from Cloudinary
       const cloudinaryResult = await deleteExpiredMedia();
 
-      console.log(`[CRON] Story Cleanup completed: ${dbResult.count} stories deleted from DB, ${cloudinaryResult.deleted} media files deleted from Cloudinary.`);
-    } catch (error: any) {
+      } catch (error: any) {
       console.error('[CRON] Story Cleanup failed:', error.message);
     }
   });
 
-  console.log('[CRON] Story Cleanup Worker started (runs hourly)');
-}
+  }

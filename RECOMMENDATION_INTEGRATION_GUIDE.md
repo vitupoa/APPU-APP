@@ -1,4 +1,4 @@
-# RECOMMENDATION SYSTEM - INTEGRATION GUIDE
+﻿# RECOMMENDATION SYSTEM - INTEGRATION GUIDE
 
 ## Quick Start
 
@@ -86,7 +86,7 @@ override suspend fun trackInteraction(
 #### Step 2: Create Discover Feed Screen
 
 ```kotlin
-package com.krieta.feature.feed.presentation.screen
+package com.runinga.feature.feed.presentation.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
@@ -95,8 +95,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
-import com.krieta.feature.feed.presentation.components.ImmersivePlayerNew
-import com.krieta.feature.feed.presentation.viewmodel.DiscoverFeedViewModel
+import com.runinga.feature.feed.presentation.components.ImmersivePlayerNew
+import com.runinga.feature.feed.presentation.viewmodel.DiscoverFeedViewModel
 
 class DiscoverFeedScreen : Screen {
     @Composable

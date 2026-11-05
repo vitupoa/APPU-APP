@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../src/generated/prisma/client.js';
+﻿import { PrismaClient } from '../../src/generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcrypt';
 import 'dotenv/config';
@@ -22,9 +22,9 @@ async function seedSuperAdmin() {
     create: {
       email,
       username: 'Username',
-      firstName: 'Krieta',
+      firstName: 'Runinga',
       lastName: 'LTD',
-      displayName: 'Krieta LTD',
+      displayName: 'Runinga LTD',
       passwordHash,
       country: 'KE',
       currency: 'KES',

@@ -97,12 +97,6 @@ router.get('/:commentId/replies', optionalAuth, async (req: AuthRequest, res: Re
 // POST /api/v1/comments - Create a comment
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    console.log('Create comment request:', {
-      query: req.query,
-      body: req.body,
-      userId: req.userId
-    });
-    
     const { contentType, contentId } = getCommentsSchema.pick({ contentType: true, contentId: true }).parse(req.query);
     const { text, parent_id, replyToUserId } = createCommentSchema.parse(req.body);
 

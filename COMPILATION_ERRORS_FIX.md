@@ -1,4 +1,4 @@
-# Compilation Errors - Quick Fix Guide
+﻿# Compilation Errors - Quick Fix Guide
 
 ## ⚠️ Important Note
 These compilation errors existed **BEFORE** the sponsored content integration. The sponsored content code is correct and compiles fine. These are pre-existing issues in other parts of your codebase.
@@ -20,7 +20,7 @@ commonMain.dependencies {
 **Option B - Remove logging (quick fix):**
 ```kotlin
 // Replace SafeConversion.kt content with:
-package com.krieta.com.core.util
+package com.runinga.com.core.util
 
 object SafeConversion {
     fun toDoubleOrDefault(value: String, fieldName: String, defaultValue: Double = 0.0): Double {

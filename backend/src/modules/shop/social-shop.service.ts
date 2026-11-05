@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { ShopNotificationService } from './notifications.service.js';
 import crypto from 'crypto';
 
@@ -199,7 +199,7 @@ export class CartService {
     });
 
     // Calculate totals
-    let totalKr = 0;
+    let totalRc = 0;
     const formatted = items.map((item: any) => {
       const price = item.bargain_price
         ? Number(item.bargain_price)
@@ -207,7 +207,7 @@ export class CartService {
           ? Number(item.products.wholesale_price)
           : Number(item.products.price_kr);
       const lineTotal = price * item.quantity;
-      totalKr += lineTotal;
+      totalRc += lineTotal;
 
       return {
         id: item.id,

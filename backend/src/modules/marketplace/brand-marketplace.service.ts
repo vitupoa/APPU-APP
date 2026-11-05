@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
 
@@ -256,7 +256,7 @@ export class BrandMarketplaceService {
 
     const totalBudget = new Prisma.Decimal(data.budget_kr);
     if (!wallet || wallet.kr_balance.lessThan(totalBudget)) {
-      throw new Error(`Insufficient balance. Need Kr.${totalBudget.toFixed(2)}`);
+      throw new Error(`Insufficient balance. Need Rc.${totalBudget.toFixed(2)}`);
     }
 
     return prisma.$transaction(async (tx) => {
@@ -608,7 +608,7 @@ export class BrandMarketplaceService {
 
     const sponsorshipAmount = new Prisma.Decimal(data.sponsorship_kr);
     if (!wallet || wallet.kr_balance.lessThan(sponsorshipAmount)) {
-      throw new Error(`Insufficient balance. Need Kr.${sponsorshipAmount.toFixed(2)}`);
+      throw new Error(`Insufficient balance. Need Rc.${sponsorshipAmount.toFixed(2)}`);
     }
 
     return prisma.$transaction(async (tx) => {

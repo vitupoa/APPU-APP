@@ -1,4 +1,4 @@
-# Comments System Integration Guide
+﻿# Comments System Integration Guide
 
 ## Quick Integration
 
@@ -141,8 +141,8 @@ Column(
 Add these imports to your screen files:
 
 ```kotlin
-import com.krieta.feature.comments.presentation.screen.CommentsScreen
-import com.krieta.feature.comments.domain.model.ContentType
+import com.runinga.feature.comments.presentation.screen.CommentsScreen
+import com.runinga.feature.comments.domain.model.ContentType
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
 ```

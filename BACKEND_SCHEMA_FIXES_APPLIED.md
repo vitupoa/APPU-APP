@@ -1,4 +1,4 @@
-# Backend Schema Fixes - COMPLETED ✅
+﻿# Backend Schema Fixes - COMPLETED ✅
 
 ## Date: 2026-06-11
 ## Status: FIXED - All Critical Errors Resolved
@@ -123,14 +123,14 @@ Fixed all occurrences in `chama.service.ts`:
 
 ### Option 1: Automated (Recommended)
 ```powershell
-cd c:\Users\ADMIN\Krieta\backend
+cd c:\Users\ADMIN\Runinga\backend
 .\apply-schema-fixes.ps1
 ```
 
 ### Option 2: Manual Steps
 ```powershell
 # 1. Apply migration
-cd c:\Users\ADMIN\Krieta\backend
+cd c:\Users\ADMIN\Runinga\backend
 psql $env:DATABASE_URL < .\prisma\migrations\create_user_bookmarks_table.sql
 
 # 2. Generate Prisma Client

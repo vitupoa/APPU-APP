@@ -1,8 +1,6 @@
 import { prisma } from '../config/database.js';
 
 export function startTrendingTopicsWorker() {
-  console.log('Starting Trending Topics Worker (runs every 15 minutes)');
-
   // Run immediately on startup
   analyzeTrendingTopics();
 
@@ -12,8 +10,6 @@ export function startTrendingTopicsWorker() {
 
 async function analyzeTrendingTopics() {
   try {
-    console.log('[TrendingTopicsWorker] Analyzing trending topics...');
-
     // Get hashtags with high engagement in last 24 hours
     const trendingHashtags = await prisma.$queryRaw<{ tag: string; engagement_count: number }[]>`
       SELECT h.tag, COUNT(DISTINCT uis.user_id) as engagement_count
@@ -27,8 +23,6 @@ async function analyzeTrendingTopics() {
       ORDER BY engagement_count DESC
       LIMIT 50
     `;
-
-    console.log(`[TrendingTopicsWorker] Found ${trendingHashtags.length} trending topics`);
 
     // Update or create trending topics
     for (const { tag, engagement_count } of trendingHashtags) {
@@ -67,8 +61,6 @@ async function analyzeTrendingTopics() {
       }
     });
 
-    console.log(`[TrendingTopicsWorker] Expired ${expired.count} old topics`);
-
     // Deactivate topics with low recent engagement
     const deactivated = await prisma.$executeRaw`
       UPDATE trending_topics
@@ -85,9 +77,7 @@ async function analyzeTrendingTopics() {
         )
     `;
 
-    console.log(`[TrendingTopicsWorker] Deactivated ${deactivated} topics with low engagement`);
-    console.log('[TrendingTopicsWorker] Analysis complete');
-  } catch (error) {
+    } catch (error) {
     console.error('[TrendingTopicsWorker] Error:', error);
   }
 }

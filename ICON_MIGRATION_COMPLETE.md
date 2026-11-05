@@ -1,4 +1,4 @@
-# Icon Migration - COMPLETE ✅
+﻿# Icon Migration - COMPLETE ✅
 
 ## Migration Status: 100% COMPLETE
 
@@ -124,8 +124,8 @@ Icon(Icons.Filled.Home, "Home")
 **After:**
 ```kotlin
 import org.jetbrains.compose.resources.painterResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.*
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.*
 
 Icon(painterResource(Res.drawable.ic_home), "Home")
 ```

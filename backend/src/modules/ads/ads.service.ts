@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
 
@@ -33,7 +33,7 @@ export class AdsService {
       })
     ]);
 
-    return { credited: rewardKr };
+    return { credited: rewardRc };
   }
 
   /**

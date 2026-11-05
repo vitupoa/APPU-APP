@@ -1,7 +1,7 @@
-# HIGH PRIORITY SECURITY FIXES ✅
+﻿# HIGH PRIORITY SECURITY FIXES ✅
 
 ## Overview
-This document outlines all HIGH priority security vulnerabilities that were identified and fixed in the Krieta platform.
+This document outlines all HIGH priority security vulnerabilities that were identified and fixed in the Runinga platform.
 
 ---
 

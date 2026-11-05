@@ -1,9 +1,9 @@
-# Double Navigation Bar & Profile Tab Crash Fix
+﻿# Double Navigation Bar & Profile Tab Crash Fix
 
 ## Issues Fixed
 
 ### 1. Profile Tab Crash
-**Error:** `Key com.krieta.com.core.navigation.ProfileTab:currentTab was used multiple times`
+**Error:** `Key com.runinga.com.core.navigation.ProfileTab:currentTab was used multiple times`
 
 **Root Cause:** 
 - ProfileTab was creating a nested Navigator with key "ProfileTabNavigator"
@@ -15,7 +15,7 @@
 - ProfileTab now directly calls `ProfileScreen(userId = null).Content()`
 - This prevents duplicate state keys and allows proper navigation
 
-**File Changed:** `composeApp/src/commonMain/kotlin/com/krieta/com/core/navigation/Tabs.kt`
+**File Changed:** `composeApp/src/commonMain/kotlin/com/runinga/com/core/navigation/Tabs.kt`
 
 ### 2. Double Bottom Navigation Bars
 **Root Cause:**
@@ -35,9 +35,9 @@
 **Solution:**
 - Added `takeIf { it.isNotBlank() }` before all string-to-number conversions
 - This ensures empty strings are filtered out before parsing attempts
-- Updated membershipFeeKr and penaltyAmountKr to use simpler null-safe parsing
+- Updated membershipFeeRc and penaltyAmountRc to use simpler null-safe parsing
 
-**File Changed:** `composeApp/src/commonMain/kotlin/com/krieta/feature/chama/presentation/wizard/CreateChamaViewModel.kt`
+**File Changed:** `composeApp/src/commonMain/kotlin/com/runinga/feature/chama/presentation/wizard/CreateChamaViewModel.kt`
 
 ## Code Changes
 
@@ -58,12 +58,12 @@ ProfileScreen(userId = null).Content()
 ### CreateChamaViewModel.kt
 ```kotlin
 // BEFORE
-contributionAmountKr = s.contributionAmountKr.toDoubleOrNull() 
+contributionAmountRc = s.contributionAmountKr.toDoubleOrNull() 
     ?: s.contributionAmountFiat.toDoubleOrNull()?.let { ... } 
     ?: 0.0
 
 // AFTER
-contributionAmountKr = s.contributionAmountKr.takeIf { it.isNotBlank() }?.toDoubleOrNull() 
+contributionAmountRc = s.contributionAmountKr.takeIf { it.isNotBlank() }?.toDoubleOrNull() 
     ?: s.contributionAmountFiat.takeIf { it.isNotBlank() }?.toDoubleOrNull()?.let { ... } 
     ?: 0.0
 ```

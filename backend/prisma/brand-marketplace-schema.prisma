@@ -1,4 +1,4 @@
-// ═══════════════════════════════════════════════════════════
+﻿// ═══════════════════════════════════════════════════════════
 // BRAND MARKETPLACE - UNIFIED INFLUENCER & CONTEST SYSTEM
 // ═══════════════════════════════════════════════════════════
 // This schema implements:
@@ -110,7 +110,7 @@ model InfluencerProfile {
   
   // Stats
   totalCampaigns    Int            @default(0) @map("total_campaigns")
-  totalEarningsKr   Decimal        @default(0) @map("total_earnings_kr") @db.Decimal(18, 4)
+  totalEarningsRc   Decimal        @default(0) @map("total_earnings_kr") @db.Decimal(18, 4)
   avgRating         Decimal        @default(0) @map("avg_rating") @db.Decimal(3, 2)
   
   createdAt         DateTime       @default(now()) @map("created_at")
@@ -165,7 +165,7 @@ model BrandCampaign {
   targetGeos        String[]       @map("target_geos")
   
   // Budget & Compensation
-  budgetKr          Decimal        @map("budget_kr") @db.Decimal(18, 4)
+  budgetRc          Decimal        @map("budget_kr") @db.Decimal(18, 4)
   compensationPerInfluencer Decimal @map("compensation_per_influencer") @db.Decimal(18, 4)
   maxInfluencers    Int            @map("max_influencers")
   
@@ -191,7 +191,7 @@ model BrandCampaign {
   totalReach        Int            @default(0) @map("total_reach")
   totalEngagement   Int            @default(0) @map("total_engagement")
   totalConversions  Int            @default(0) @map("total_conversions")
-  totalRevenueKr    Decimal        @default(0) @map("total_revenue_kr") @db.Decimal(18, 4)
+  totalRevenueRc    Decimal        @default(0) @map("total_revenue_kr") @db.Decimal(18, 4)
   roi               Decimal        @default(0) @db.Decimal(10, 2) // Return on Investment %
   
   createdAt         DateTime       @default(now()) @map("created_at")
@@ -300,7 +300,7 @@ model ContestSponsorship {
   type              SponsorshipType
   
   // Sponsorship Details
-  sponsorshipKr     Decimal         @map("sponsorship_kr") @db.Decimal(18, 4)
+  sponsorshipRc     Decimal         @map("sponsorship_kr") @db.Decimal(18, 4)
   benefits          String[]        // Logo placement, mentions, etc.
   
   // Branding
@@ -436,7 +436,7 @@ model ConversionCampaignRecipient {
   
   // Conversion Details
   orderId       String?  @map("order_id")
-  revenueKr     Decimal? @map("revenue_kr") @db.Decimal(18, 4)
+  revenueRc     Decimal? @map("revenue_kr") @db.Decimal(18, 4)
 
   campaign      ConversionCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   user          User               @relation("ConversionRecipients", fields: [userId], references: [id], onDelete: Cascade)
@@ -545,7 +545,7 @@ model CampaignAnalytics {
   revenue       Decimal  @default(0) @db.Decimal(18, 4)
   
   // Costs
-  spentKr       Decimal  @default(0) @map("spent_kr") @db.Decimal(18, 4)
+  spentRc       Decimal  @default(0) @map("spent_kr") @db.Decimal(18, 4)
   
   // Calculated Metrics
   ctr           Decimal  @default(0) @db.Decimal(5, 4) // Click-through rate

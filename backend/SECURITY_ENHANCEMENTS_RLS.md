@@ -1,4 +1,4 @@
-# Security Enhancements & RLS for Subscription and Content Lock Systems
+﻿# Security Enhancements & RLS for Subscription and Content Lock Systems
 
 ## 📊 Current Implementation Status
 
@@ -22,7 +22,7 @@
 - **Features**:
   - Universal locking for Shorts, Posts, and Live streams
   - One-time unlock payments
-  - Real-time currency conversion (Fiat ↔ Kr)
+  - Real-time currency conversion (Fiat ↔ Rc)
   - 15% platform fee on unlocks
   - Access control (creator, subscriber, unlocked)
   - Atomic transactions with database locks
@@ -610,7 +610,7 @@ class PriceSecurityService {
           where: { id: contentId },
           select: { unlockAmountKr: true }
         });
-        actualPrice = short?.unlockAmountKr ? Number(short.unlockAmountKr) : 0;
+        actualPrice = short?.unlockAmountRc ? Number(short.unlockAmountKr) : 0;
         break;
       // ... similar for POST and LIVE
     }

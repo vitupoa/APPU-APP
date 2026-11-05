@@ -1,4 +1,4 @@
-# Remaining Compilation Errors - Fix Summary
+﻿# Remaining Compilation Errors - Fix Summary
 
 ## Status: SQLDelight Boolean imports FIXED ✅
 
@@ -18,7 +18,7 @@ The Boolean import errors have been fixed. Run the build again to see remaining 
 
 ### 3. Database Reference Issues
 **File:** OfflineActionQueue.kt
-**Error:** Unresolved reference 'db', 'KrietaDatabase', 'offlineActionQueries'
+**Error:** Unresolved reference 'db', 'RuningaDatabase', 'offlineActionQueries'
 **Fix:** These classes/tables may not exist in schema
 
 ### 4. Security/HMAC Issues (6 errors)

@@ -1,4 +1,4 @@
-# Security Implementation Complete ✅
+﻿# Security Implementation Complete ✅
 
 ## Overview
 All critical security measures have been implemented to protect against common vulnerabilities and ensure data integrity.
@@ -104,7 +104,7 @@ CREATE POLICY user_select_own ON "User"
 **Production setup:**
 ```env
 # In Railway, set this to your actual domains
-CORS_ORIGIN=https://krieta.com,https://www.krieta.com,https://app.krieta.com
+CORS_ORIGIN=https://runinga.com,https://www.runinga.com,https://app.runinga.com
 ```
 
 ---
@@ -330,7 +330,7 @@ Set these in Railway dashboard (Settings → Variables):
 # Runtime
 NODE_ENV=production
 PORT=3000
-CORS_ORIGIN=https://krieta.com,https://www.krieta.com
+CORS_ORIGIN=https://runinga.com,https://www.runinga.com
 
 # Security (generate with: openssl rand -base64 32)
 REQUEST_SIGNING_KEY=<generate-secure-random-string>
@@ -362,7 +362,7 @@ PAYPAL_CLIENT_ID=<your-client-id>
 PAYPAL_CLIENT_SECRET=<your-client-secret>
 PAYPAL_MODE=live
 PAYPAL_WEBHOOK_ID=<your-webhook-id>
-BACKEND_URL=https://api.krieta.com
+BACKEND_URL=https://api.runinga.com
 
 # Paystack
 PAYSTACK_SECRET_KEY=<your-secret-key>
@@ -374,7 +374,7 @@ MPESA_CONSUMER_SECRET=<your-consumer-secret>
 MPESA_SHORTCODE=<your-shortcode>
 MPESA_PASSKEY=<your-passkey>
 MPESA_ENV=production
-MPESA_CALLBACK_URL=https://api.krieta.com/api/v1/webhooks/mpesa
+MPESA_CALLBACK_URL=https://api.runinga.com/api/v1/webhooks/mpesa
 MPESA_INITIATOR_NAME=<your-initiator-name>
 MPESA_INITIATOR_PASSWORD=<your-initiator-password>
 ```
@@ -489,4 +489,4 @@ AWS Secrets Manager is a paid AWS service that costs:
 - You need cross-cloud secret management
 - You have compliance requirements for secret management
 
-**For Krieta:** Railway Variables are the right choice! ✅
+**For Runinga:** Railway Variables are the right choice! ✅

@@ -1,4 +1,4 @@
-# Comment System Bug Fix - Complete
+﻿# Comment System Bug Fix - Complete
 
 ## Problem
 Users were getting "Something went wrong. Please try again" error when trying to comment on drips/posts.
@@ -47,8 +47,8 @@ Users were getting "Something went wrong. Please try again" error when trying to
 **Impact**: JSON deserialization was failing
 
 **Files Fixed**:
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/comments/data/remote/CommentDtos.kt`
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/comments/data/repository/CommentsRepositoryImpl.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/comments/data/remote/CommentDtos.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/comments/data/repository/CommentsRepositoryImpl.kt`
 
 **Changes**:
 ```kotlin
@@ -169,10 +169,10 @@ After deployment, monitor:
 - `backend/prisma/schema.prisma` - Database schema (no changes)
 
 ### Frontend
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/comments/data/remote/CommentDtos.kt` - API DTOs
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/comments/data/remote/CommentsApi.kt` - API client
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/comments/data/repository/CommentsRepositoryImpl.kt` - Repository
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/comments/presentation/viewmodel/CommentsViewModel.kt` - ViewModel
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/comments/data/remote/CommentDtos.kt` - API DTOs
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/comments/data/remote/CommentsApi.kt` - API client
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/comments/data/repository/CommentsRepositoryImpl.kt` - Repository
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/comments/presentation/viewmodel/CommentsViewModel.kt` - ViewModel
 
 ## Summary
 

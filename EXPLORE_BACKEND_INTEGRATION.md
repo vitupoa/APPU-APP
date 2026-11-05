@@ -1,4 +1,4 @@
-# Explore Feature - Backend Integration Complete ✅
+﻿# Explore Feature - Backend Integration Complete ✅
 
 ## Backend Implementation
 
@@ -102,7 +102,7 @@ LIMIT 20
 SELECT id, title, coverMediaUrl, prizeKr, participantsCount, category
 FROM Contest
 WHERE status = 'ACTIVE'
-ORDER BY participantsCount DESC, prizeKr DESC
+ORDER BY participantsCount DESC, prizeRc DESC
 LIMIT 10
 ```
 
@@ -154,7 +154,7 @@ open iosApp/iosApp.xcodeproj
 ### Base URL:
 Update in `ExploreRepositoryImpl.kt` if needed:
 ```kotlin
-private val baseUrl = "https://api.krieta.com/api/v1/explore"
+private val baseUrl = "https://api.runinga.com/api/v1/explore"
 ```
 
 For local development:

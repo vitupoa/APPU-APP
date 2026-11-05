@@ -1,4 +1,4 @@
-# Brand Marketplace - Implementation Complete ✅
+﻿# Brand Marketplace - Implementation Complete ✅
 
 ## Backend Implementation
 
@@ -28,7 +28,7 @@ GET    /api/v1/marketplace/gamification/stats
 
 ### 3. Module Structure Created
 ```
-composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/
+composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/
 ├── data/
 │   ├── remote/
 │   │   └── MarketplaceApiService.kt          ✅ API client
@@ -139,7 +139,7 @@ npx prisma migrate dev --name add_brand_marketplace
 ### 2. Register DI Module
 Add to `AppModule.kt`:
 ```kotlin
-import com.krieta.feature.marketplace.di.marketplaceModule
+import com.runinga.feature.marketplace.di.marketplaceModule
 
 val appModule = module {
     // ... existing modules

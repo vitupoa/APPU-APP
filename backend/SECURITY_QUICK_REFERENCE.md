@@ -1,4 +1,4 @@
-# Security Quick Reference Card 🛡️
+﻿# Security Quick Reference Card 🛡️
 
 ## 🚀 Quick Start
 
@@ -141,12 +141,12 @@ router.post('/sensitive-action',
 
 ### CORS Error
 ```
-Error: "Access to fetch at 'https://api.krieta.com' from origin 
+Error: "Access to fetch at 'https://api.runinga.com' from origin 
 'https://myapp.com' has been blocked by CORS policy"
 
 Solution:
 1. Add origin to CORS_ORIGIN in Railway:
-   CORS_ORIGIN=https://krieta.com,https://myapp.com
+   CORS_ORIGIN=https://runinga.com,https://myapp.com
 2. Restart service
 ```
 
@@ -262,18 +262,18 @@ curl -H "Origin: https://evil.com" http://localhost:3000/api/v1/health
 ### Test in Production
 ```bash
 # Test HTTPS
-curl -I https://api.krieta.com/health
+curl -I https://api.runinga.com/health
 # Should see: Strict-Transport-Security header
 
 # Test CORS
-curl -H "Origin: https://krieta.com" https://api.krieta.com/api/v1/health
+curl -H "Origin: https://runinga.com" https://api.runinga.com/api/v1/health
 # Should succeed
 
-curl -H "Origin: https://evil.com" https://api.krieta.com/api/v1/health
+curl -H "Origin: https://evil.com" https://api.runinga.com/api/v1/health
 # Should fail
 
 # Test security headers
-curl -I https://api.krieta.com/api/v1/health
+curl -I https://api.runinga.com/api/v1/health
 # Should see: X-Frame-Options, X-Content-Type-Options, etc.
 ```
 

@@ -1,4 +1,4 @@
-# DeviceSecurity Reference - Fixed ✅
+﻿# DeviceSecurity Reference - Fixed ✅
 
 **Date:** 2025-01-XX  
 **Status:** RESOLVED
@@ -38,7 +38,7 @@ Only the import was missing.
 Added missing import to `AppModule.kt`:
 
 ```kotlin
-import com.krieta.com.core.security.DeviceSecurity
+import com.runinga.com.core.security.DeviceSecurity
 ```
 
 ---

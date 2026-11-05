@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { io } from '../../shared/gateway/socket.js';
 import { WalletService } from '../wallet/wallet.service.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -259,7 +259,7 @@ export class ChatService {
 
         if (!accessCheck.canMessage) {
           throw new Error(
-            `Chat is locked. Unlock fee: ${accessCheck.unlockFeeKr} Kr. Please unlock chat with a task to message this creator.`
+            `Chat is locked. Unlock fee: ${accessCheck.unlockFeeKr} Rc. Please unlock chat with a task to message this creator.`
           );
         }
       }
@@ -508,7 +508,7 @@ export class ChatService {
         id: uuidv4(),
         chat_id,
         sender_id: senderId,
-        payload: `💸 ${sender?.display_name} tipped ${recipient?.display_name} ${amount_kr} Kr!`,
+        payload: `💸 ${sender?.display_name} tipped ${recipient?.display_name} ${amount_kr} Rc!`,
         is_system_event: true,
         status: 'sent',
       },

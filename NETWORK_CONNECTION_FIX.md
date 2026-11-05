@@ -1,4 +1,4 @@
-# Network Connection Fix - "No Internet Connection" Error
+﻿# Network Connection Fix - "No Internet Connection" Error
 
 ## Problem
 The app was showing "No internet connection. Please check your internet" error even when connected to the internet during sign-up/sign-in.
@@ -21,7 +21,7 @@ The app was showing "No internet connection. Please check your internet" error e
 ## Fixes Applied
 
 ### 1. Disabled Certificate Pinning (Temporary)
-**File:** `composeApp/src/commonMain/kotlin/com/krieta/com/core/security/pinning/CertificatePinningConfig.kt`
+**File:** `composeApp/src/commonMain/kotlin/com/runinga/com/core/security/pinning/CertificatePinningConfig.kt`
 
 ```kotlin
 val PINNING_ENABLED = false  // Temporarily disabled - Railway provides its own SSL
@@ -30,7 +30,7 @@ val PINNING_ENABLED = false  // Temporarily disabled - Railway provides its own 
 **Why:** Railway manages SSL certificates automatically. Certificate pinning should only be enabled after obtaining the correct certificate pins from Railway.
 
 ### 2. Improved Error Messages
-**File:** `composeApp/src/commonMain/kotlin/com/krieta/com/core/network/NetworkResult.kt`
+**File:** `composeApp/src/commonMain/kotlin/com/runinga/com/core/network/NetworkResult.kt`
 
 ```kotlin
 } catch (e: kotlinx.io.IOException) {
@@ -51,7 +51,7 @@ val PINNING_ENABLED = false  // Temporarily disabled - Railway provides its own 
 **Why:** Provides specific error messages based on the actual error, making debugging easier.
 
 ### 3. Enhanced BASE_URL Configuration
-**File:** `composeApp/src/commonMain/kotlin/com/krieta/com/core/network/ApiConstants.kt`
+**File:** `composeApp/src/commonMain/kotlin/com/runinga/com/core/network/ApiConstants.kt`
 
 ```kotlin
 val BASE_URL = run {
@@ -80,7 +80,7 @@ val BASE_URL = run {
 **Why:** Better logging and protocol handling for debugging.
 
 ### 4. Added HttpClient Logging
-**File:** `composeApp/src/commonMain/kotlin/com/krieta/com/core/network/KtorClient.kt`
+**File:** `composeApp/src/commonMain/kotlin/com/runinga/com/core/network/KtorClient.kt`
 
 ```kotlin
 println("🔧 Creating HttpClient with BASE_URL: ${ApiConstants.BASE_URL}")

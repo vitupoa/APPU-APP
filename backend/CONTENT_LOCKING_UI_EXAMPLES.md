@@ -1,4 +1,4 @@
-# Frontend UI Examples - Content Locking System
+﻿# Frontend UI Examples - Content Locking System
 
 ## 1. Create Content Screen (Shorts/Drips/Live)
 
@@ -57,7 +57,7 @@ export const CreateContentScreen: React.FC<CreateContentProps> = ({
   const handleSubmit = () => {
     onSubmit({
       isLocked,
-      unlockAmountKr: isLocked && lockAmountKr > 0 ? lockAmountKr : undefined,
+      unlockAmountKr: isLocked && lockAmountRc > 0 ? lockAmountRc : undefined,
       requiredTier: selectedTier
     });
   };
@@ -98,11 +98,11 @@ export const CreateContentScreen: React.FC<CreateContentProps> = ({
                 />
               </View>
 
-              {/* Show Kr conversion */}
-              {lockAmountKr > 0 && (
+              {/* Show Rc conversion */}
+              {lockAmountRc > 0 && (
                 <View style={styles.conversionDisplay}>
                   <Text style={styles.krAmount}>
-                    {lockAmountKr} Kr
+                    {lockAmountKr} Rc
                   </Text>
                   <Text style={styles.fiatAmount}>
                     (≈ {lockAmountFiat} {userCurrency})
@@ -266,7 +266,7 @@ export const LockedContentOverlay: React.FC<LockedContentProps> = ({
               >
                 <View style={styles.priceContainer}>
                   <Text style={styles.krPrice}>
-                    {unlockPrice.krAmount} Kr
+                    {unlockPrice.krAmount} Rc
                   </Text>
                   <Text style={styles.fiatPrice}>
                     (≈ {unlockPrice.fiatAmount} {unlockPrice.currency})
@@ -463,7 +463,7 @@ export const LiveUnlockModal: React.FC<LiveUnlockModalProps> = ({
 
           {price && (
             <View style={styles.priceBox}>
-              <Text style={styles.krAmount}>{price.krAmount} Kr</Text>
+              <Text style={styles.krAmount}>{price.krAmount} Rc</Text>
               <Text style={styles.fiatAmount}>
                 ≈ {price.fiatAmount} {price.currency}
               </Text>
@@ -623,8 +623,8 @@ export const ShortsFeed = () => {
 
 ## Key UI/UX Principles
 
-1. **Kr in Focus**: Always display Kr amount prominently
-2. **Fiat as Secondary**: Show fiat conversion below or beside Kr
+1. **Rc in Focus**: Always display Rc amount prominently
+2. **Fiat as Secondary**: Show fiat conversion below or beside Rc
 3. **Real-time Conversion**: Update conversions as user types or changes currency
 4. **Clear Options**: Clearly separate subscription vs one-time unlock options
 5. **Loading States**: Show loading indicators during conversion and unlock

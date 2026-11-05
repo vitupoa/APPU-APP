@@ -1,4 +1,4 @@
-# 🚀 DEPLOYMENT ACTION PLAN - READY TO EXECUTE
+﻿# 🚀 DEPLOYMENT ACTION PLAN - READY TO EXECUTE
 
 ## Status: ✅ BACKEND FIXES COMPLETE | 🔍 MOBILE APP NEEDS INVESTIGATION
 
@@ -22,7 +22,7 @@
 
 ### Step 1: Run TypeScript Fixes (2 minutes)
 ```powershell
-cd c:\Users\ADMIN\Krieta\backend
+cd c:\Users\ADMIN\Runinga\backend
 .\fix-all-typescript-errors.ps1
 ```
 
@@ -65,7 +65,7 @@ Expected response:
 ### The Problem
 Your mobile app shows this error:
 ```
-Exchange rate fetch failed: Illegal input: Fields [currency, baseRate, buyRate, sellRate, margin] are required for type with serial name 'com.krieta.feature.wallet.data.remote.dto.ExchangeRateResponseDto', but they were missing
+Exchange rate fetch failed: Illegal input: Fields [currency, baseRate, buyRate, sellRate, margin] are required for type with serial name 'com.runinga.feature.wallet.data.remote.dto.ExchangeRateResponseDto', but they were missing
 ```
 
 ### Why This Happens
@@ -98,7 +98,7 @@ The exchange rate service might be failing (e.g., external API down).
 ## 🔧 MOBILE APP FIXES
 
 ### Check 1: Verify API URL
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/core/network/ApiConfig.kt` (or similar)
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/core/network/ApiConfig.kt` (or similar)
 
 ```kotlin
 // Ensure this points to your Railway deployment
@@ -106,7 +106,7 @@ const val BASE_URL = "https://appu-app-production.up.railway.app"
 ```
 
 ### Check 2: Add Logging
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/wallet/data/remote/WalletApi.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/wallet/data/remote/WalletApi.kt`
 
 ```kotlin
 suspend fun getExchangeRate(currency: String): ExchangeRateResponseDto {
@@ -127,7 +127,7 @@ suspend fun getExchangeRate(currency: String): ExchangeRateResponseDto {
 ```
 
 ### Check 3: Verify DTO Matches
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/wallet/data/remote/dto/ExchangeRateResponseDto.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/wallet/data/remote/dto/ExchangeRateResponseDto.kt`
 
 ```kotlin
 @Serializable

@@ -1,4 +1,4 @@
-# Kenya Advertising Revenue Analysis - Krieta Drips Platform
+﻿# Kenya Advertising Revenue Analysis - Runinga Drips Platform
 
 ## Current Kenya Market Rates (2024)
 
@@ -45,7 +45,7 @@
 - **Prefer**: Premium placements, brand awareness, mass reach
 - **Pain Points**: Ad fraud, viewability issues, brand safety
 
-## Krieta's Competitive Advantage Strategy
+## Runinga's Competitive Advantage Strategy
 
 ### 1. LOWER ENTRY BARRIERS
 **Problem**: Facebook minimum KES 100/day = KES 3,000/month is too high for small businesses
@@ -93,7 +93,7 @@
 - **Swahili Interface**: Full Kiswahili support
 - **WhatsApp Support**: Customer support via WhatsApp, not email
 
-## Krieta Pricing Model (Competitive & Profitable)
+## Runinga Pricing Model (Competitive & Profitable)
 
 ### Native Feed Ads (Between Drips)
 - **CPM**: KES 40-150 (20% cheaper than Facebook)
@@ -203,7 +203,7 @@
 - **TOTAL MONTHLY**: **KES 9,675,000** (~$75,000)
 - **TOTAL ANNUAL**: **KES 116,100,000** (~$900,000)
 
-## Why Businesses Will Choose Krieta Over Facebook/Instagram
+## Why Businesses Will Choose Runinga Over Facebook/Instagram
 
 ### 1. COST EFFICIENCY
 - **20-40% cheaper** than Facebook/Instagram
@@ -262,7 +262,7 @@
 - Dynamic creative optimization
 - Programmatic advertising
 - White-label solutions for brands
-- Krieta Ad Network (extend to other apps)
+- Runinga Ad Network (extend to other apps)
 
 ## Key Success Metrics
 
@@ -314,4 +314,4 @@
 
 ---
 
-**BOTTOM LINE**: With 200k DAU and smart monetization, Krieta can generate **KES 10M+ monthly** (~$77k) while staying 20-40% cheaper than Facebook/Instagram and providing better value to both businesses and creators.
+**BOTTOM LINE**: With 200k DAU and smart monetization, Runinga can generate **KES 10M+ monthly** (~$77k) while staying 20-40% cheaper than Facebook/Instagram and providing better value to both businesses and creators.

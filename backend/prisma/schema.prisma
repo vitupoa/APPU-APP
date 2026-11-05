@@ -1,4 +1,4 @@
-generator client {
+﻿generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["partialIndexes"]
   fieldMapping    = "camelCase"
@@ -149,8 +149,6 @@ model ad_platform_settings {
   stories_max_cpm         Decimal        @db.Decimal(10, 2)
   group_chat_min_cpm      Decimal        @db.Decimal(10, 2)
   group_chat_max_cpm      Decimal        @db.Decimal(10, 2)
-  chama_chat_min_cpm      Decimal        @db.Decimal(10, 2)
-  chama_chat_max_cpm      Decimal        @db.Decimal(10, 2)
   targeting_multiplier    Decimal        @default(1.0) @db.Decimal(3, 2)
   priority                Int            @default(0)
   is_active               Boolean        @default(true)
@@ -357,253 +355,6 @@ model cart_items {
   user          user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, product_id])
-}
-
-model chama {
-  id                        String                @id
-  name                      String
-  chat_id                   String
-  contribution_amount_kr    Decimal               @db.Decimal(18, 4)
-  current_cycle_number      Int                   @default(1)
-  min_approvals             Int                   @default(2)
-  created_at                DateTime              @default(now())
-  updated_at                DateTime
-  penalty_amount_kr         Decimal?              @db.Decimal(18, 4)
-  allowMidTermVoteOut       Boolean               @default(true)
-  autoLockOnFull            Boolean               @default(false)
-  avatar_url                String?
-  contributionFrequency     ContributionFrequency
-  creator_id                String
-  description               String
-  gracePeriodDays           Int                   @default(3)
-  isLocked                  Boolean               @default(false)
-  lockPeriodDays            Int?
-  maxMembers                Int?
-  membershipFeeKr           Decimal?              @db.Decimal(18, 4)
-  reason                    String
-  type                      ChamaType
-  status                    ChamaStatus           @default(SETUP)
-  kyc_verified_members_only Boolean               @default(true)
-  user                      user                  @relation(fields: [creator_id], references: [id])
-  chama_contribution        chama_contribution[]
-  chama_cycle               chama_cycle[]
-  chama_defaulter           chama_defaulter[]
-  chama_election            chama_election[]
-  chama_member              chama_member[]
-  chama_payout              chama_payout[]
-  chama_transaction         chama_transaction[]
-  chama_wallet              chama_wallet?
-
-  @@index([creator_id])
-  @@index([status])
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model chama_contribution {
-  id           String       @id
-  chama_id     String
-  member_id    String
-  user_id      String
-  cycle_number Int
-  amount_kr    Decimal      @db.Decimal(18, 4)
-  created_at   DateTime     @default(now())
-  chama        chama        @relation(fields: [chama_id], references: [id], onDelete: Cascade)
-  chama_member chama_member @relation(fields: [member_id], references: [id], onDelete: Cascade)
-  user         user         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([chama_id, cycle_number])
-  @@index([chama_id])
-  @@index([member_id])
-}
-
-model chama_cycle {
-  id                  String             @id
-  chama_id            String
-  cycle_number        Int
-  status              Chama_Cycle_Status @default(OPEN)
-  collected_amount_kr Decimal            @default(0) @db.Decimal(18, 4)
-  target_amount_kr    Decimal            @db.Decimal(18, 4)
-  start_date          DateTime
-  end_date            DateTime?
-  created_at          DateTime           @default(now())
-  updated_at          DateTime
-  chama               chama              @relation(fields: [chama_id], references: [id], onDelete: Cascade)
-  chama_payout        chama_payout[]
-
-  @@unique([chama_id, cycle_number])
-  @@index([chama_id])
-  @@index([chama_id, status])
-}
-
-model chama_defaulter {
-  id             String    @id
-  user_id        String
-  chama_id       String
-  chama_name     String
-  amount_owed_kr Decimal   @db.Decimal(18, 4)
-  fine_amount_kr Decimal   @default(0) @db.Decimal(18, 4)
-  is_resolved    Boolean   @default(false)
-  created_at     DateTime  @default(now())
-  resolved_at    DateTime?
-  chama          chama     @relation(fields: [chama_id], references: [id], onDelete: Cascade)
-  user           user      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([chama_id])
-  @@index([user_id])
-  @@index([user_id, is_resolved])
-}
-
-model chama_election {
-  id               String               @id
-  chama_id         String
-  position         Chama_Member_Role
-  phase            Chama_Election_Phase @default(NOMINATION)
-  is_mid_term      Boolean              @default(false)
-  completed_at     DateTime?
-  created_at       DateTime             @default(now())
-  updated_at       DateTime
-  chama            chama                @relation(fields: [chama_id], references: [id], onDelete: Cascade)
-  chama_nomination chama_nomination[]
-  chama_vote       chama_vote[]
-
-  @@index([chama_id])
-  @@index([chama_id, phase])
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model chama_member {
-  id                 String               @id
-  chama_id           String
-  user_id            String
-  role               Chama_Member_Role
-  status             Chama_Member_Status  @default(ACTIVE)
-  total_contributed  Decimal              @default(0) @db.Decimal(18, 4)
-  total_received     Decimal              @default(0) @db.Decimal(18, 4)
-  created_at         DateTime             @default(now())
-  updated_at         DateTime
-  is_defaulter       Boolean              @default(false)
-  leftAt             DateTime?
-  rotationNumber     Int?
-  device_fingerprint String?
-  chama_contribution chama_contribution[]
-  chama              chama                @relation(fields: [chama_id], references: [id], onDelete: Cascade)
-  user               user                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  chama_payout       chama_payout[]
-
-  @@unique([chama_id, user_id])
-  @@index([chama_id])
-  @@index([user_id])
-}
-
-model chama_nomination {
-  id                                       String             @id
-  election_id                              String
-  nominee_id                               String
-  nominator_id                             String
-  seconds_count                            Int                @default(0)
-  created_at                               DateTime           @default(now())
-  chama_election                           chama_election     @relation(fields: [election_id], references: [id], onDelete: Cascade)
-  user_chama_nomination_nominator_idTouser user               @relation("chama_nomination_nominator_idTouser", fields: [nominator_id], references: [id], onDelete: Cascade)
-  user_chama_nomination_nominee_idTouser   user               @relation("chama_nomination_nominee_idTouser", fields: [nominee_id], references: [id], onDelete: Cascade)
-  chama_secondment                         chama_secondment[]
-  chama_vote                               chama_vote[]
-
-  @@unique([election_id, nominee_id])
-  @@index([election_id])
-  @@index([nominee_id])
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model chama_payout {
-  id                    String                  @id
-  chama_id              String
-  recipient_id          String
-  member_id             String
-  cycle_id              String?
-  amount_kr             Decimal                 @db.Decimal(18, 4)
-  status                Chama_Payout_Status     @default(PENDING_APPROVAL)
-  disbursed_at          DateTime?
-  created_at            DateTime                @default(now())
-  chama                 chama                   @relation(fields: [chama_id], references: [id], onDelete: Cascade)
-  chama_cycle           chama_cycle?            @relation(fields: [cycle_id], references: [id])
-  chama_member          chama_member            @relation(fields: [member_id], references: [id], onDelete: Cascade)
-  user                  user                    @relation(fields: [recipient_id], references: [id], onDelete: Cascade)
-  chama_payout_approval chama_payout_approval[]
-
-  @@index([chama_id])
-  @@index([chama_id, status])
-  @@index([recipient_id])
-}
-
-model chama_payout_approval {
-  id           String                @id
-  payout_id    String
-  approver_id  String
-  decision     Chama_Payout_Decision
-  reason       String?
-  created_at   DateTime              @default(now())
-  user         user                  @relation(fields: [approver_id], references: [id], onDelete: Cascade)
-  chama_payout chama_payout          @relation(fields: [payout_id], references: [id], onDelete: Cascade)
-
-  @@index([approver_id])
-  @@index([payout_id])
-}
-
-model chama_secondment {
-  id               String           @id
-  nomination_id    String
-  seconder_id      String
-  created_at       DateTime         @default(now())
-  chama_nomination chama_nomination @relation(fields: [nomination_id], references: [id], onDelete: Cascade)
-  user             user             @relation(fields: [seconder_id], references: [id], onDelete: Cascade)
-
-  @@unique([nomination_id, seconder_id])
-  @@index([nomination_id])
-  @@index([seconder_id])
-}
-
-model chama_transaction {
-  id          String                 @id
-  chama_id    String
-  user_id     String
-  type        Chama_Transaction_Type
-  amount_kr   Decimal                @db.Decimal(18, 4)
-  description String
-  receipt_url String?
-  created_at  DateTime               @default(now())
-  chama       chama                  @relation(fields: [chama_id], references: [id], onDelete: Cascade)
-  user        user                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([chama_id, created_at])
-  @@index([chama_id])
-}
-
-model chama_vote {
-  id               String           @id
-  election_id      String
-  nomination_id    String
-  voter_id         String
-  created_at       DateTime         @default(now())
-  chama_election   chama_election   @relation(fields: [election_id], references: [id], onDelete: Cascade)
-  chama_nomination chama_nomination @relation(fields: [nomination_id], references: [id], onDelete: Cascade)
-  user             user             @relation(fields: [voter_id], references: [id], onDelete: Cascade)
-
-  @@unique([election_id, voter_id])
-  @@index([election_id])
-  @@index([nomination_id])
-  @@index([voter_id])
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model chama_wallet {
-  id         String   @id
-  chama_id   String   @unique
-  kr_balance Decimal  @default(0) @db.Decimal(18, 4)
-  created_at DateTime @default(now())
-  updated_at DateTime
-  chama      chama    @relation(fields: [chama_id], references: [id], onDelete: Cascade)
-
-  @@index([chama_id])
 }
 
 model chat {
@@ -1244,8 +995,6 @@ model display_ad_analytics {
   stories_clicks         Int                  @default(0)
   group_chat_impressions Int                  @default(0)
   group_chat_clicks      Int                  @default(0)
-  chama_chat_impressions Int                  @default(0)
-  chama_chat_clicks      Int                  @default(0)
   total_impressions      Int                  @default(0)
   total_clicks           Int                  @default(0)
   total_conversions      Int                  @default(0)
@@ -1538,26 +1287,10 @@ model garage_profiles {
   longitude       Decimal?          @db.Decimal(10, 7)
   service_area    String?
   offers_on_site  Boolean           @default(false)
-  avg_rating      Decimal           @default(0) @db.Decimal(3, 2)
-  review_count    Int               @default(0)
   is_verified     Boolean           @default(false)
   created_at      DateTime          @default(now())
   garage_bookings garage_bookings[]
   user            user              @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  garage_reviews  garage_reviews[]
-}
-
-model garage_reviews {
-  id              String          @id
-  garage_id       String
-  user_id         String
-  rating          Int
-  text            String?
-  created_at      DateTime        @default(now())
-  garage_profiles garage_profiles @relation(fields: [garage_id], references: [id], onDelete: Cascade)
-  user            user            @relation(fields: [user_id], references: [id])
-
-  @@unique([garage_id, user_id])
 }
 
 model gifts {
@@ -1725,7 +1458,6 @@ model influencer_profiles {
   verified_at           DateTime?
   total_campaigns       Int                     @default(0)
   total_earnings_kr     Decimal                 @default(0) @db.Decimal(18, 4)
-  avg_rating            Decimal                 @default(0) @db.Decimal(3, 2)
   created_at            DateTime                @default(now())
   updated_at            DateTime
   campaign_applications campaign_applications[]
@@ -2036,16 +1768,16 @@ model orders {
 }
 
 model platform_announcements {
-  id         String    @id
-  title      String
-  message    String
+  id          String    @id
+  title       String
+  message     String
   targetScope String?   @default("all")
-  type       String
-  is_active  Boolean   @default(true)
-  created_at DateTime  @default(now())
-  updated_at DateTime
-  created_by String?
-  expires_at DateTime?
+  type        String
+  is_active   Boolean   @default(true)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime
+  created_by  String?
+  expires_at  DateTime?
 }
 
 model platform_config {
@@ -2162,25 +1894,6 @@ model product_discounts {
   @@index([product_id, is_active])
 }
 
-model product_reviews {
-  id           String   @id
-  product_id   String
-  user_id      String
-  rating       Int
-  title        String?
-  text         String?
-  video_url    String?
-  image_urls   String[]
-  is_verified  Boolean  @default(false)
-  is_moderated Boolean  @default(false)
-  created_at   DateTime @default(now())
-  products     products @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  user         user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@unique([product_id, user_id])
-  @@index([product_id, rating])
-}
-
 model product_shares {
   id           String   @id
   product_id   String
@@ -2220,7 +1933,6 @@ model products {
   whatsapp_number         String?
   status                  String                   @default("active")
   created_at              DateTime                 @default(now())
-  avg_rating              Decimal                  @default(0) @db.Decimal(3, 2)
   bargain_enabled         Boolean                  @default(false)
   bargain_min_price       Decimal?                 @db.Decimal(18, 4)
   brand                   String?
@@ -2237,7 +1949,6 @@ model products {
   longitude               Decimal?                 @db.Decimal(10, 7)
   promoted_until          DateTime?
   purchase_url            String?
-  review_count            Int                      @default(0)
   sales_count             Int                      @default(0)
   stock                   Int                      @default(1)
   subcategory             String?
@@ -2263,7 +1974,6 @@ model products {
   premium_listings        premium_listings[]
   product_analytics       product_analytics[]
   product_discounts       product_discounts[]
-  product_reviews         product_reviews[]
   product_shares          product_shares[]
   product_tags            product_tags[]
   user                    user                     @relation(fields: [seller_id], references: [id], onDelete: Cascade)
@@ -2274,7 +1984,6 @@ model products {
   spare_part_details      spare_part_details?
   vehicle_details         vehicle_details?
   vehicle_favorites       vehicle_favorites[]
-  wishlist_items          wishlist_items[]
 
   @@index([category, status])
   @@index([seller_id, status])
@@ -2995,17 +2704,6 @@ model user {
   bio_links                                                        bio_links[]
   brand_campaigns                                                  brand_campaigns[]
   cart_items                                                       cart_items[]
-  chama                                                            chama[]
-  chama_contribution                                               chama_contribution[]
-  chama_defaulter                                                  chama_defaulter[]
-  chama_member                                                     chama_member[]
-  chama_nomination_chama_nomination_nominator_idTouser             chama_nomination[]               @relation("chama_nomination_nominator_idTouser")
-  chama_nomination_chama_nomination_nominee_idTouser               chama_nomination[]               @relation("chama_nomination_nominee_idTouser")
-  chama_payout                                                     chama_payout[]
-  chama_payout_approval                                            chama_payout_approval[]
-  chama_secondment                                                 chama_secondment[]
-  chama_transaction                                                chama_transaction[]
-  chama_vote                                                       chama_vote[]
   chat_participant                                                 chat_participant[]
   comment_likes                                                    comment_likes[]
   comment_reports                                                  comment_reports[]
@@ -3032,7 +2730,6 @@ model user {
   gamification_points                                              gamification_points?
   garage_bookings                                                  garage_bookings[]
   garage_profiles                                                  garage_profiles?
-  garage_reviews                                                   garage_reviews[]
   gifts_gifts_recipient_idTouser                                   gifts[]                          @relation("gifts_recipient_idTouser")
   gifts_gifts_sender_idTouser                                      gifts[]                          @relation("gifts_sender_idTouser")
   group_buy_participants                                           group_buy_participants[]
@@ -3049,7 +2746,6 @@ model user {
   post                                                             post[]
   post_comments                                                    post_comments[]
   post_likes                                                       post_likes[]
-  product_reviews                                                  product_reviews[]
   product_shares                                                   product_shares[]
   products                                                         products[]
   refresh_tokens                                                   refresh_tokens[]
@@ -3079,7 +2775,6 @@ model user {
   user_suspensions                                                 user_suspensions[]
   vehicle_favorites                                                vehicle_favorites[]
   wallets                                                          wallets?
-  wishlists                                                        wishlists[]
   withdrawal_requests                                              withdrawal_requests[]
 
   @@index([fcmToken])
@@ -3271,36 +2966,6 @@ model wallets {
   user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model wishlist_items {
-  id           String    @id
-  wishlist_id  String
-  product_id   String
-  quantity     Int       @default(1)
-  priority     Int       @default(0)
-  notes        String?
-  is_purchased Boolean   @default(false)
-  added_at     DateTime  @default(now())
-  products     products  @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  wishlists    wishlists @relation(fields: [wishlist_id], references: [id], onDelete: Cascade)
-
-  @@unique([wishlist_id, product_id])
-}
-
-model wishlists {
-  id             String           @id
-  user_id        String
-  name           String
-  is_public      Boolean          @default(false)
-  is_registry    Boolean          @default(false)
-  event_type     String?
-  event_date     DateTime?
-  created_at     DateTime         @default(now())
-  wishlist_items wishlist_items[]
-  user           user             @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id])
-}
-
 model withdrawal_limits {
   id                 String   @id
   user_id            String   @unique
@@ -3434,74 +3099,6 @@ enum CampaignType {
   CONTENT_CREATION
 }
 
-enum ChamaStatus {
-  SETUP
-  ACTIVE
-  PAUSED
-  COMPLETED
-  DISSOLVED
-}
-
-enum ChamaType {
-  MERRY_GO_ROUND
-  WELFARE
-}
-
-enum Chama_Cycle_Status {
-  OPEN
-  COLLECTING
-  CLOSED
-  DISBURSING
-}
-
-enum Chama_Election_Phase {
-  NOMINATION
-  SECONDING
-  VOTING
-  RERUN
-  COMPLETED
-  SECONDMENT
-}
-
-enum Chama_Member_Role {
-  ADMIN
-  CHAIRPERSON
-  TREASURER
-  SECRETARY
-  MEMBER
-}
-
-enum Chama_Member_Status {
-  ACTIVE
-  INACTIVE
-  LEFT
-  REMOVED
-}
-
-enum Chama_Payout_Decision {
-  APPROVED
-  REJECTED
-  APPROVE
-  REJECT
-}
-
-enum Chama_Payout_Status {
-  PENDING_APPROVAL
-  APPROVED
-  REJECTED
-  DISBURSED
-  FAILED
-}
-
-enum Chama_Transaction_Type {
-  CONTRIBUTION
-  PAYOUT
-  EXTERNAL
-  PENALTY
-  MEMBERSHIP_FEE
-  REFUND
-}
-
 enum ChatNiche {
   DOCTORS
   REAL_ESTATE_INVESTMENT
@@ -3526,7 +3123,6 @@ enum ChatTaskStatus {
 enum ChatType {
   DIRECT
   GROUP
-  CHAMA
 }
 
 enum ContactMethod {
@@ -3549,15 +3145,6 @@ enum ContestStatus {
   PENDING_PAYOUT
   COMPLETED
   CANCELLED
-}
-
-enum ContributionFrequency {
-  DAILY
-  WEEKLY
-  BIWEEKLY
-  MONTHLY
-  QUARTERLY
-  ONE_OFF
 }
 
 enum ConversionCampaignType {
@@ -3691,7 +3278,6 @@ enum PlacementType {
   DRIPS_FEED
   STORIES
   GROUP_CHATS
-  CHAMA_CHATS
 }
 
 enum PremiumType {
@@ -3730,7 +3316,7 @@ enum ProductCondition {
 }
 
 enum RequirementType {
-  FOLLOW_KRIETA
+  FOLLOW_RUNINGA
   YOUTUBE_SUB
   SPOTIFY_FOLLOW
   INSTAGRAM_FOLLOW
@@ -3831,8 +3417,7 @@ enum TransactionType {
   CONTEST_ENTRY
   CONTEST_VOTE
   CONTEST_PRIZE
-  CHAMA_CONTRIBUTION
-  CHAMA_PAYOUT
+
   PLATFORM_REWARD
   WITHDRAWAL
   TOP_UP

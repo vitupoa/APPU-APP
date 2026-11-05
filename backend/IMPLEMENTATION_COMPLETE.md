@@ -1,4 +1,4 @@
-# ✅ SECURITY FIXES IMPLEMENTATION COMPLETE
+﻿# ✅ SECURITY FIXES IMPLEMENTATION COMPLETE
 
 ## 🎯 Summary
 
@@ -180,20 +180,20 @@ await prisma.$executeRawUnsafe(
 1. **Test RLS:**
 ```bash
 # Should fail - accessing another user's data
-curl -X GET https://api.krieta.com/api/v1/users/{other-user-id}/wallet
+curl -X GET https://api.runinga.com/api/v1/users/{other-user-id}/wallet
 ```
 
 2. **Test IP Whitelisting:**
 ```bash
 # Should fail - webhook from non-whitelisted IP
-curl -X POST https://api.krieta.com/api/v1/webhooks/paypal \
+curl -X POST https://api.runinga.com/api/v1/webhooks/paypal \
   -d '{"fake": "webhook"}'
 ```
 
 3. **Test Ownership:**
 ```bash
 # Should fail - updating another user's profile
-curl -X PUT https://api.krieta.com/api/v1/users/{other-user-id} \
+curl -X PUT https://api.runinga.com/api/v1/users/{other-user-id} \
   -H "Authorization: Bearer {token}" \
   -d '{"bio": "hacked"}'
 ```
@@ -201,14 +201,14 @@ curl -X PUT https://api.krieta.com/api/v1/users/{other-user-id} \
 4. **Test Sensitive Data:**
 ```bash
 # Should NOT contain isWalletUnlocked, kycStatus
-curl -X GET https://api.krieta.com/api/v1/users/{other-user-id}
+curl -X GET https://api.runinga.com/api/v1/users/{other-user-id}
 ```
 
 5. **Test Rate Limiting:**
 ```bash
 # Should get 429 after 60 requests
 for i in {1..100}; do
-  curl -X GET https://api.krieta.com/api/v1/users/me
+  curl -X GET https://api.runinga.com/api/v1/users/me
 done
 ```
 
@@ -259,7 +259,7 @@ git push origin main
 
 ### 5. Restart Services
 ```bash
-pm2 restart krieta-api
+pm2 restart runinga-api
 ```
 
 ---

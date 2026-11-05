@@ -1,4 +1,4 @@
-Write-Host "=== KRIETA BUILD FIX SCRIPT ===" -ForegroundColor Cyan
+﻿Write-Host "=== RUNINGA BUILD FIX SCRIPT ===" -ForegroundColor Cyan
 Write-Host ""
 
 # Fix 1: SQLDelight Boolean imports

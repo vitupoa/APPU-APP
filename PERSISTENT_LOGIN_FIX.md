@@ -1,4 +1,4 @@
-# Persistent Login Fix - Complete Guide
+﻿# Persistent Login Fix - Complete Guide
 
 ## Problem Summary
 Users were getting automatically logged out after 15 minutes because:
@@ -162,7 +162,7 @@ refreshTokens {
 | **TikTok** | 30+ days | 365+ days | Never logs out |
 | **Instagram** | 60 days | 365 days | Rarely logs out |
 | **Snapchat** | 30 days | 365 days | Never logs out |
-| **Krieta (Now)** | 30 days | 365 days | ✅ Same as above |
+| **Runinga (Now)** | 30 days | 365 days | ✅ Same as above |
 
 ### FAQ
 

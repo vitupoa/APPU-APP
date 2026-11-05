@@ -1,4 +1,4 @@
-# Backend API Requirements
+﻿# Backend API Requirements
 
 ## New Endpoints Needed
 
@@ -96,7 +96,7 @@
 ```
 
 **Validation:**
-- Minimum tip: 50 Kr
+- Minimum tip: 50 Rc
 - User must have sufficient balance
 - Cannot tip own submissions
 - Cannot tip contest submissions (only non-contest content)
@@ -163,7 +163,7 @@ CREATE INDEX idx_contest_votes_user ON contest_votes(user_id);
 5. Only upvotes are displayed publicly
 
 ### Tipping Rules
-1. Minimum tip: 50 Kr
+1. Minimum tip: 50 Rc
 2. Tipping only available for non-contest content
 3. Cannot tip own content
 4. Tips are instant and non-refundable

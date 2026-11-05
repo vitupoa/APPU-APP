@@ -1,4 +1,4 @@
-# COMPLETE OAUTH INTEGRATION GUIDE
+﻿# COMPLETE OAUTH INTEGRATION GUIDE
 
 ## Overview
 
@@ -175,11 +175,11 @@ DELETE /api/v1/marketplace/oauth/:platform/disconnect
 ### Files Created
 ```
 composeApp/src/
-├── commonMain/kotlin/com/krieta/com/core/oauth/
+├── commonMain/kotlin/com/runinga/com/core/oauth/
 │   └── OAuthBrowser.kt                    ✅
-├── androidMain/kotlin/com/krieta/com/core/oauth/
+├── androidMain/kotlin/com/runinga/com/core/oauth/
 │   └── AndroidOAuthBrowser.kt             ✅
-└── iosMain/kotlin/com/krieta/com/core/oauth/
+└── iosMain/kotlin/com/runinga/com/core/oauth/
     └── IOSOAuthBrowser.kt                 ✅
 ```
 
@@ -198,7 +198,7 @@ class OAuthViewModel(
             val authUrl = result.data.authUrl
             
             // 2. Open platform-specific browser
-            when (val browserResult = oauthBrowser.openAuthUrl(authUrl, "krieta")) {
+            when (val browserResult = oauthBrowser.openAuthUrl(authUrl, "runinga")) {
                 is OAuthResult.Success -> {
                     // 3. Send code to backend
                     handleCallback(platform, browserResult.code, browserResult.state)
@@ -356,7 +356,7 @@ curl -X DELETE "http://localhost:3000/api/v1/marketplace/oauth/tiktok/disconnect
 ### Frontend
 - **Platform-specific secure browsers** (Custom Tabs, ASWebAuthenticationSession)
 - **Deep link validation** (Android)
-- **Callback scheme**: `krieta://oauth`
+- **Callback scheme**: `runinga://oauth`
 
 ## Error Handling
 

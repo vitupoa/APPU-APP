@@ -1,4 +1,4 @@
-import { prisma } from '../config/database.js';
+﻿import { prisma } from '../config/database.js';
 import crypto from 'crypto';
 
 type Decimal = {
@@ -42,7 +42,7 @@ export class FraudDetectionService {
     `;
     if (prevUnlocks.length > 0) {
       const avg = prevUnlocks.reduce((s: number, u: { amount_kr: string }) => s + Number(u.amount_kr), 0) / prevUnlocks.length;
-      if (amountKr > avg * 5) { reasons.push('Unusual unlock amount (5x average)'); riskScore += 15; }
+      if (amountRc > avg * 5) { reasons.push('Unusual unlock amount (5x average)'); riskScore += 15; }
     }
 
     // Check 4: New account
@@ -97,7 +97,7 @@ export class FraudDetectionService {
     const prevSubs = await prisma.subscriptions.findMany({ where: { subscriber_id: subscriberId }, select: { kr_amount: true }, take: 10, orderBy: { started_at: 'desc' } });
     if (prevSubs.length > 0) {
       const avg = prevSubs.reduce((s: number, sub: { kr_amount: Decimal }) => s + Number(sub.kr_amount), 0) / prevSubs.length;
-      if (amountKr > avg * 5) { reasons.push('Unusual subscription amount (5x average)'); riskScore += 20; }
+      if (amountRc > avg * 5) { reasons.push('Unusual subscription amount (5x average)'); riskScore += 20; }
     }
 
     return { isSuspicious: riskScore >= 40, reasons, riskScore, shouldBlock: riskScore >= 70 };
@@ -127,7 +127,7 @@ export class FraudDetectionService {
       select: { amount_kr: true, status: true },
     });
     const totalWithdrawal = withdrawals.reduce((s: number, w: { amount_kr: Decimal; status: string }) => s + Number(w.amount_kr), 0);
-    if (totalWithdrawal > 100000) { reasons.push('Large withdrawal amount (>100,000 Kr in 24 hours)'); riskScore += 35; }
+    if (totalWithdrawal > 100000) { reasons.push('Large withdrawal amount (>100,000 Rc in 24 hours)'); riskScore += 35; }
     if (withdrawals.filter((w: { status: string }) => w.status === 'FAILED').length >= 5) { reasons.push('Multiple failed withdrawal attempts'); riskScore += 30; }
 
     const txList = await prisma.transactions.findMany({ where: { user_id: userId, created_at: { gte: new Date(Date.now() - 86400000) } }, select: { type: true, amount_kr: true } });

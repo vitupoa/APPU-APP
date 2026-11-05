@@ -1,4 +1,4 @@
-# Automatic Token Refresh Implementation
+﻿# Automatic Token Refresh Implementation
 
 ## Overview
 The app now implements **automatic token refresh** to prevent authentication errors when the access token expires (15-minute lifetime).
@@ -32,7 +32,7 @@ Success! User never sees error
 
 ### 3. **Implementation Details**
 
-**Location**: `composeApp/src/commonMain/kotlin/com/krieta/com/core/network/KtorClient.kt`
+**Location**: `composeApp/src/commonMain/kotlin/com/runinga/com/core/network/KtorClient.kt`
 
 **Key Components**:
 

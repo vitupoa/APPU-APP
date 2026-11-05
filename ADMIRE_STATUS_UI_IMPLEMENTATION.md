@@ -1,4 +1,4 @@
-# Admire Status UI Update Implementation
+﻿# Admire Status UI Update Implementation
 
 ## Overview
 Implemented UI state tracking to reflect when a user admires a creator from the shorts feed, hiding the plus button after admiration.
@@ -183,7 +183,7 @@ When users admire a creator:
 
 ## Files Modified
 
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/ShortsScreen.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/ShortsScreen.kt`
   - Added `admiredCreatorIds` state tracking
   - Updated `onAdmire` handler with proper result handling
   - Added `isAdmired` parameter to `ShortItem`

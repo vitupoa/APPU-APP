@@ -1,4 +1,4 @@
-# Chat Media Upload - Mobile Implementation Guide
+﻿# Chat Media Upload - Mobile Implementation Guide
 
 ## ✅ Implementation Complete
 
@@ -8,7 +8,7 @@ Mobile UI for media picker with upload progress, media preview, image compressio
 
 ### Common (Multiplatform)
 ```
-composeApp/src/commonMain/kotlin/com/krieta/feature/chat/
+composeApp/src/commonMain/kotlin/com/runinga/feature/chat/
 ├── data/media/
 │   ├── ChatMediaUploadService.kt       # Upload service with progress
 │   ├── ImageCompressor.kt              # Expect/actual compressor
@@ -22,7 +22,7 @@ composeApp/src/commonMain/kotlin/com/krieta/feature/chat/
 
 ### Android-Specific
 ```
-composeApp/src/androidMain/kotlin/com/krieta/feature/chat/
+composeApp/src/androidMain/kotlin/com/runinga/feature/chat/
 └── data/media/
     └── ImageCompressor.android.kt      # Android implementation
 ```

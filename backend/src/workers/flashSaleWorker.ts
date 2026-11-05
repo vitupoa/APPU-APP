@@ -47,5 +47,4 @@ export function startFlashSaleWorker() {
     }
   });
 
-  console.log('Flash sale & premium listing worker started');
-}
+  }

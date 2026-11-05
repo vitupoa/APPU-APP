@@ -1,4 +1,4 @@
-# Contest Judging System - Implementation Complete ✅
+﻿# Contest Judging System - Implementation Complete ✅
 
 ## Summary
 
@@ -101,10 +101,10 @@ All 4 judging criteria fully implemented:
 
 ### 7. **Currency Conversion for Prize Display**
 - **Feature**: Prizes displayed in user's local currency
-- **Display Priority**: Fiat amount (large), Kr amount (small below)
+- **Display Priority**: Fiat amount (large), Rc amount (small below)
 - **Real-time Rates**: Uses ExchangeService with 5-minute cache
-- **Conversion**: Kr → USD → Local Currency
-- **Base Rate**: 1 Kr = $100 USD
+- **Conversion**: Rc → USD → Local Currency
+- **Base Rate**: 1 Rc = $100 USD
 - **Endpoints**:
   - `GET /api/v1/contests?currency=kes`
   - `GET /api/v1/contests/:id?currency=kes`
@@ -192,7 +192,7 @@ GET /api/v1/contests/:id/calculate-winners
 GET /api/v1/contests/:id/prize-breakdown?currency=kes
 ```
 - Get prize breakdown with currency conversion
-- Shows Kr and fiat amounts for each rank
+- Shows Rc and fiat amounts for each rank
 
 ### Prize Distribution
 ```
@@ -210,7 +210,7 @@ POST /api/v1/contests/:id/distribute-auto
 GET /api/v1/contests?currency=kes
 ```
 - Added optional `currency` parameter
-- Returns prizes in both Kr and fiat
+- Returns prizes in both Rc and fiat
 
 ### Contest Detail
 ```

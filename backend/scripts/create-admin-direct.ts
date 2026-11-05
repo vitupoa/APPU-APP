@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Direct Super Admin Creation Script
  * Creates admin user with predefined credentials and wallet balance
  */
@@ -14,7 +14,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log('\n🎨 Creating Super Admin...\n');
 
-  const email = 'admin@krieta.com';
+  const email = 'admin@runinga.com';
   const username = 'supaadmin';
   const firstName = 'Supa';
   const lastName = 'Admin';
@@ -22,9 +22,9 @@ async function main() {
   const password = 'RembrandtRAR2026!';
   const country = 'KE';
   const currency = 'KES';
-  const KR_TO_USD_RATE = 0.01;
-  const KR_PRECISION = 1000000;
-  const walletBalanceKr = 1000000 * KR_PRECISION; // 1M Kr in base units
+  const RC_TO_USD_RATE = 0.01;
+  const RC_PRECISION = 1000000;
+  const walletBalanceRc = 1000000 * RC_PRECISION; // 1M Rc in base units
 
   // Check conflicts and delete if exists
   const emailExists = await prisma.user.findUnique({ where: { email } });
@@ -89,9 +89,9 @@ async function main() {
   console.log(`   Email: ${email}`);
   console.log(`   Username: ${username}`);
   console.log(`   User ID: ${user.id}`);
-  const krAmount = walletBalanceKr / KR_PRECISION;
-  const usdEquivalent = krAmount * KR_TO_USD_RATE;
-  console.log(`   Wallet Balance: ${krAmount.toLocaleString()} Kr (USD ${usdEquivalent.toLocaleString()})`);
+  const krAmount = walletBalanceRc / RC_PRECISION;
+  const usdEquivalent = krAmount * RC_TO_USD_RATE;
+  console.log(`   Wallet Balance: ${krAmount.toLocaleString()} Rc (USD ${usdEquivalent.toLocaleString()})`);
 
   await prisma.$disconnect();
 }

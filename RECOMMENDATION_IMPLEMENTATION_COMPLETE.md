@@ -1,7 +1,7 @@
-# RECOMMENDATION SYSTEM - IMPLEMENTATION COMPLETE ✅
+﻿# RECOMMENDATION SYSTEM - IMPLEMENTATION COMPLETE ✅
 
 ## Overview
-Krieta's recommendation system is now fully implemented with a **matching algorithm** (not ranking) that ensures equal growth opportunity for all creators, regardless of follower count.
+Runinga's recommendation system is now fully implemented with a **matching algorithm** (not ranking) that ensures equal growth opportunity for all creators, regardless of follower count.
 
 ## ✅ Completed Features
 
@@ -88,7 +88,7 @@ Krieta's recommendation system is now fully implemented with a **matching algori
 ### 3. Frontend Components
 
 #### Immersive Player
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/components/ImmersivePlayerNew.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/components/ImmersivePlayerNew.kt`
 
 **Features**:
 - ✅ Full-screen edge-to-edge video playback
@@ -113,7 +113,7 @@ Krieta's recommendation system is now fully implemented with a **matching algori
 - ✅ Interaction tracking (view duration, engagement)
 
 #### Discover Feed ViewModel
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/viewmodel/DiscoverFeedViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/viewmodel/DiscoverFeedViewModel.kt`
 
 **Features**:
 - ✅ Fetch Discover feed from API

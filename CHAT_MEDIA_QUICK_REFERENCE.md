@@ -1,4 +1,4 @@
-# Chat Media Upload - Quick Reference
+﻿# Chat Media Upload - Quick Reference
 
 ## 🚀 Quick Start
 
@@ -51,7 +51,7 @@ backend/src/modules/chat/chat.service.ts       # Added URL validation
 ## 📁 Cloudinary Folders
 
 ```
-Krieta/
+Runinga/
 ├── Chats/
 │   ├── Direct/
 │   │   ├── Images/

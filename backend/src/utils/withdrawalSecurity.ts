@@ -1,7 +1,7 @@
-import crypto from 'crypto';
+﻿import crypto from 'crypto';
 
 export class WithdrawalSecurityValidator {
-  private static readonly SECURITY_SALT = 'KRIETA_WITHDRAWAL_SECURITY_2024';
+  private static readonly SECURITY_SALT = 'RUNINGA_WITHDRAWAL_SECURITY_2024';
   
   /**
    * Generate a secure hash for the withdrawal amount
@@ -71,12 +71,12 @@ export class WithdrawalSecurityValidator {
     
     // Check minimum amount
     if (requestedAmount < minAmount) {
-      return { isValid: false, message: `Minimum withdrawal amount is ${minAmount} Kr` };
+      return { isValid: false, message: `Minimum withdrawal amount is ${minAmount} Rc` };
     }
     
     // Check maximum amount
     if (requestedAmount > maxAmount) {
-      return { isValid: false, message: `Maximum withdrawal amount is ${maxAmount} Kr` };
+      return { isValid: false, message: `Maximum withdrawal amount is ${maxAmount} Rc` };
     }
     
     // Check if amount is a valid number
@@ -88,7 +88,7 @@ export class WithdrawalSecurityValidator {
     if (requestedAmount > availableBalance) {
       return { 
         isValid: false, 
-        message: `Insufficient balance. Available: ${availableBalance} Kr, Requested: ${requestedAmount} Kr` 
+        message: `Insufficient balance. Available: ${availableBalance} Rc, Requested: ${requestedAmount} Rc` 
       };
     }
     

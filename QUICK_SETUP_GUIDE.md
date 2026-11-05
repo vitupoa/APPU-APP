@@ -1,4 +1,4 @@
-# Quick Setup Guide - Database & Seeds
+﻿# Quick Setup Guide - Database & Seeds
 
 ## Current Status
 ✅ Schema already includes `CreatorBoostSettings` and `CreatorNiche` models
@@ -35,7 +35,7 @@ npm run seed:niches   # Seeds 21 predefined niches
 
 ### 4. Verify Super Admin Credentials
 ```
-Email: admin@krieta.com
+Email: admin@runinga.com
 Password: Admin@123
 ```
 ⚠️ **IMPORTANT**: Change password immediately after first login!
@@ -78,8 +78,8 @@ Make sure Prisma client is generated: `npx prisma generate`
 
 ### Default Data
 - **Super Admin User**
-  - Email: admin@krieta.com
-  - Username: krietaadmin
+  - Email: admin@runinga.com
+  - Username: runingaadmin
   - Role: SUPER_ADMIN
   
 - **21 Predefined Niches**

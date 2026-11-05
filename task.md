@@ -10,11 +10,22 @@
 ## Core — commonMain
 - [ ] core/network/NetworkResult.kt
 - [ ] core/network/ApiConstants.kt
-- [ ] core/network/KtorClient.kt
-- [ ] core/theme/Colors.kt
-- [ ] core/theme/Type.kt
-- [ ] core/theme/KrietaTheme.kt
-- [ ] core/di/AppModule.kt
+- [/] core/network/KtorClient.kt
+- [/] core/theme/Colors.kt
+- [/] core/theme/Type.kt
+- [/] core/theme/KrietaTheme.kt
+- [/] core/di/AppModule.kt
+- [/] Redesign the Cover Photo & Header Area (scrim gradient overlay, transparent top bar, dynamic stretch & parallax)
+- [/] Implement the modern profile details container (elevated card with subtle border)
+- [/] Implement card layout content:
+  - [/] Start-aligned avatar with professional double-ring border
+  - [/] Right-stacked name, verified badge, username, and account type pill
+  - [/] Left-aligned bio and styled niches flow row
+- [/] Implement the 4-column Stats panel (Admirers, Admiring, Lovers, Contests Won) with click navigation to SocialListScreen
+- [/] Polish Action Buttons (Edit Profile, Wallet, Admire, Message) with modern capsule styling
+- [/] Redesign Tabs navigation (capsule-shaped active state) and tab content empty-states (with custom themed empty layouts and CTA buttons)
+- [ ] Verify build and compile with `./gradlew :composeApp:installDebug`
+- [ ] Create walkthrough.md and finalize version catalog for KMP, Ktor, Koin, Voyager, SQLDelight, Coil, Media3, Security.
 - [ ] core/location/LocationProvider.kt (expect)
 - [ ] core/location/CurrencyMapper.kt
 - [ ] core/security/TokenManager.kt (interface)

@@ -1,4 +1,4 @@
-# Offline Support Implementation for Drips, Chats, Shop & Shorts
+﻿# Offline Support Implementation for Drips, Chats, Shop & Shorts
 
 ## Overview
 Implemented true offline-first architecture using SQLDelight for persistent local storage across all major features. Users can now browse cached content even when the internet is down.
@@ -170,7 +170,7 @@ val featureModule = module {
 ## Repository Updates Needed
 
 ### 1. Feed Repository (Drips)
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/data/repository/FeedRepositoryImpl.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/data/repository/FeedRepositoryImpl.kt`
 
 Add offline support to:
 - `getDrips()` - Load feed
@@ -179,7 +179,7 @@ Add offline support to:
 - `bookmarkDrip()` - Update bookmark status in cache
 
 ### 2. Shop Repository (Products)
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shop/data/repository/ShopRepositoryImpl.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shop/data/repository/ShopRepositoryImpl.kt`
 
 Add offline support to:
 - `getProducts()` - Product listing
@@ -188,7 +188,7 @@ Add offline support to:
 - `likeProduct()` - Update like status in cache
 
 ### 3. Chat Repository
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/chat/data/repository/ChatRepositoryImpl.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/chat/data/repository/ChatRepositoryImpl.kt`
 
 Add offline support to:
 - `getConversations()` - Conversation list
@@ -196,7 +196,7 @@ Add offline support to:
 - `sendMessage()` - Queue for later (future)
 
 ### 4. Shorts Repository
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/data/repository/ShortsRepositoryImpl.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/data/repository/ShortsRepositoryImpl.kt`
 
 Add offline support to:
 - `getShorts()` - Shorts feed

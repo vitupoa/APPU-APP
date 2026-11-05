@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { emitVoteUpdate, emitContestUpdate } from '../../shared/gateway/events.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
@@ -53,9 +53,9 @@ export class ContestService {
   }) {
     // Wave 2 Task 8.2: Validate contest structure for gambling compliance
     const validation = await contestValidationService.validateContestCreation({
-      entry_fee_kr: data.entryFeeKr || 0,
+      entry_fee_kr: data.entryFeeRc || 0,
       voting_enabled: data.votingEnabled !== false,
-      voting_cost_per_vote_kr: data.votingCostPerVoteKr || 0,
+      voting_cost_per_vote_kr: data.votingCostPerVoteRc || 0,
       judging_method: data.judgingMethod as any,
       judge_weight_percentage: data.judgeWeightPercentage,
       vote_weight_percentage: data.voteWeightPercentage,
@@ -69,41 +69,41 @@ export class ContestService {
       throw new Error(`Contest validation failed: ${validation.errors.join(', ')}`);
     }
 
-    const platformFeeKr = data.prizeTotalKr * PLATFORM_FEE_RATE;
+    const platformFeeRc = data.prizeTotalRc * PLATFORM_FEE_RATE;
     
     // Calculate total duration in days dynamically locking the daily prize pool Escrow natively
     const durationMs = data.deadline.getTime() - new Date().getTime();
     const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
     
-    const totalDailyPrizePool = data.allowDailyPrizes && data.dailyPrizeKr ? (data.dailyPrizeKr * durationDays) : 0;
+    const totalDailyPrizePool = data.allowDailyPrizes && data.dailyPrizeRc ? (data.dailyPrizeRc * durationDays) : 0;
     const dailyPrizePlatformFee = totalDailyPrizePool * PLATFORM_FEE_RATE;
     
-    const airdropTotalPool = (data.airdropKr && data.airdropLimit) ? (data.airdropKr * data.airdropLimit) : 0;
+    const airdropTotalPool = (data.airdropRc && data.airdropLimit) ? (data.airdropRc * data.airdropLimit) : 0;
     const airdropPlatformFee = airdropTotalPool * PLATFORM_FEE_RATE;
     
     // Massive Escrow Calculation blocking fraudulent contest creations natively 
     // Creator pays: prize + 15% fee + daily prizes + 15% fee + airdrops + 15% fee
-    const totalChargedKr = new Prisma.Decimal(
-      data.prizeTotalKr + platformFeeKr + 
+    const totalChargedRc = new Prisma.Decimal(
+      data.prizeTotalRc + platformFeeRc + 
       totalDailyPrizePool + dailyPrizePlatformFee + 
       airdropTotalPool + airdropPlatformFee
     );
-    const prizeKr = new Prisma.Decimal(data.prizeTotalKr);
-    const feeKr = new Prisma.Decimal(platformFeeKr + dailyPrizePlatformFee + airdropPlatformFee);
+    const prizeRc = new Prisma.Decimal(data.prizeTotalKr);
+    const feeRc = new Prisma.Decimal(platformFeeRc + dailyPrizePlatformFee + airdropPlatformFee);
 
     return prisma.$transaction(async (tx) => {
       // Verify creator balance
       const wallet = await tx.wallets.findUnique({ where: { user_id: data.creator_id } });
       if (!wallet || wallet.kr_balance.lessThan(totalChargedKr)) {
         throw new Error(
-          `Insufficient balance. Need Kr.${totalChargedKr.toFixed(2)} (prize + 15% platform fee)`
+          `Insufficient balance. Need Rc.${totalChargedKr.toFixed(2)} (prize + 15% platform fee)`
         );
       }
 
       // Deduct from creator wallet
       await tx.wallets.update({
         where: { user_id: data.creator_id },
-        data: { kr_balance: { decrement: totalChargedKr } }
+        data: { kr_balance: { decrement: totalChargedRc } }
       });
 
       // Create contest
@@ -125,13 +125,13 @@ export class ContestService {
           status: 'ACTIVE',
           
           // Inject Gamification
-          entry_fee_kr: data.entryFeeKr ? new Prisma.Decimal(data.entryFeeKr) : null,
+          entry_fee_kr: data.entryFeeRc ? new Prisma.Decimal(data.entryFeeKr) : null,
           public_vote_weight: data.publicVoteWeight,
           allow_daily_prizes: data.allowDailyPrizes ?? false,
-          daily_prize_kr: data.dailyPrizeKr ? new Prisma.Decimal(data.dailyPrizeKr) : null,
+          daily_prize_kr: data.dailyPrizeRc ? new Prisma.Decimal(data.dailyPrizeKr) : null,
           target_ages: data.targetAges,
           target_geos: data.targetGeos,
-          airdrop_kr: data.airdropKr ? new Prisma.Decimal(data.airdropKr) : null,
+          airdrop_kr: data.airdropRc ? new Prisma.Decimal(data.airdropKr) : null,
           airdrop_limit: data.airdropLimit,
           
           ContestAction: {
@@ -491,8 +491,8 @@ export class ContestService {
 
     return {
       items: items.map((c: any) => {
-        const prizeTotalKr = Number(c.prize_total_kr);
-        const prizeTotalFiat = userCurrency ? prizeTotalKr * krToLocalRate : null;
+        const prizeTotalRc = Number(c.prize_total_kr);
+        const prizeTotalFiat = userCurrency ? prizeTotalRc * krToLocalRate : null;
 
         return {
           id: c.id,
@@ -546,7 +546,7 @@ export class ContestService {
       try {
         prizeBreakdown = await this.getPrizeBreakdown(contestId, userCurrency);
       } catch (error) {
-        // Fallback to just Kr amounts if conversion fails
+        // Fallback to just Rc amounts if conversion fails
         prizeBreakdown = null;
       }
     }
@@ -1217,19 +1217,19 @@ export class ContestService {
       }
     });
 
-    const totalPrizeKr = Number(contest.prize_total_kr);
+    const totalPrizeRc = Number(contest.prize_total_kr);
     
     // Import exchange service dynamically
     const { ExchangeService } = await import('../../services/exchange/exchange.service.js');
     
     // Get exchange rate for user's currency
-    const krToUsd = ExchangeService.getUSDFromKr(1); // 1 Kr = $100 USD
+    const krToUsd = ExchangeService.getUSDFromKr(1); // 1 Rc = $100 USD
     const usdToLocalRate = await ExchangeService.getRate(userCurrency);
     const krToLocalRate = krToUsd * usdToLocalRate;
 
     const breakdown = contest.contest_prize_distributions.map(dist => {
-      const prizeKr = (totalPrizeKr * Number(dist.percentage)) / 100;
-      const prizeFiat = prizeKr * krToLocalRate;
+      const prizeRc = (totalPrizeRc * Number(dist.percentage)) / 100;
+      const prizeFiat = prizeRc * krToLocalRate;
 
       return {
         rank: dist.rank,
@@ -1242,7 +1242,7 @@ export class ContestService {
 
     return {
       totalPrizeKr,
-      totalPrizeFiat: totalPrizeKr * krToLocalRate,
+      totalPrizeFiat: totalPrizeRc * krToLocalRate,
       currency: userCurrency.toUpperCase(),
       breakdown
     };

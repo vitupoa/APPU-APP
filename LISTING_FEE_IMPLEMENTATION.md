@@ -1,7 +1,7 @@
-# Shop Listing Fee System - Implementation Complete
+﻿# Shop Listing Fee System - Implementation Complete
 
 ## Overview
-Implemented a comprehensive listing fee system for the Krieta shop marketplace with admin-configurable fees, free quota tracking, and mobile app integration.
+Implemented a comprehensive listing fee system for the Runinga shop marketplace with admin-configurable fees, free quota tracking, and mobile app integration.
 
 ## Implementation Breakdown
 
@@ -86,14 +86,14 @@ Implemented a comprehensive listing fee system for the Krieta shop marketplace w
 ### 4. Mobile App Integration
 
 #### API Client
-**Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shop/data/remote/ListingFeeApi.kt`
+**Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shop/data/remote/ListingFeeApi.kt`
 
 **Functions**:
 - `calculateListingFee(category)`: Get fee for product category
 - `getUserQuota()`: Get user's remaining free listings
 
 #### UI Component
-**Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shop/presentation/component/ListingFeeDialog.kt`
+**Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shop/presentation/component/ListingFeeDialog.kt`
 
 **Features**:
 - Shows listing fee before posting
@@ -243,7 +243,7 @@ Implemented a comprehensive listing fee system for the Krieta shop marketplace w
 
 ## Revenue Model Summary
 
-**Krieta Revenue Streams**:
+**Runinga Revenue Streams**:
 1. Contest fees: 15%
 2. Campaign fees: 10%
 3. Sponsorship fees: 5%

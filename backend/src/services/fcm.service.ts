@@ -56,8 +56,7 @@ export class FCMService {
       };
 
       await admin.messaging().send(message);
-      console.log(`[FCM] Notification sent to ${deviceToken}`);
-    } catch (error) {
+      } catch (error) {
       console.error(`[FCM] Failed to send notification:`, error);
       throw error;
     }
@@ -90,8 +89,7 @@ export class FCMService {
       };
 
       const response = await admin.messaging().sendEachForMulticast(message);
-      console.log(`[FCM] Sent ${response.successCount} notifications, ${response.failureCount} failed`);
-    } catch (error) {
+      } catch (error) {
       console.error(`[FCM] Failed to send notifications:`, error);
       throw error;
     }

@@ -90,16 +90,7 @@ router.post('/',
   richXssProtection(['title', 'description', 'sponsorName']),
   async (req: AuthRequest, res: Response) => {
   try {
-    console.log('🎯 Contest creation endpoint hit');
-    console.log('   User ID:', req.userId);
-    console.log('   Request body keys:', Object.keys(req.body));
-    console.log('   Full request body:', JSON.stringify(req.body, null, 2));
-    
-    console.log('📋 Validating request with Zod schema...');
     const data = createContestSchema.parse(req.body);
-    console.log('✅ Zod validation passed');
-    console.log('🚀 Calling ContestService.createContest...');
-    
     const contest = await ContestService.createContest({
       creator_id: req.userId!,
       title: data.title,
@@ -128,9 +119,7 @@ router.post('/',
       teamSize: data.teamSize,
       maxTeams: data.maxTeams
     });
-    console.log('✅ Contest created successfully:', contest.contest_id);
     // Return only contestId and message as expected by frontend
-    console.log('📤 Sending response to client');
     res.status(201).json({ 
       contest_id: contest.contest_id,
       message: 'Contest created successfully' 

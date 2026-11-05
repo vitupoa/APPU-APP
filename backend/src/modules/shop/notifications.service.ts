@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { FCMService } from '../../services/fcm.service.js';
 
 async function getToken(userId: string): Promise<string | null> {
@@ -35,7 +35,7 @@ export class ShopNotificationService {
     await send(
       buyerId,
       '🛍️ Order placed!',
-      `Your order of Kr ${totalKr.toFixed(2)} has been placed successfully.`,
+      `Your order of Rc ${totalKr.toFixed(2)} has been placed successfully.`,
       { type: 'order_placed', order_id }
     );
   }
@@ -87,7 +87,7 @@ export class ShopNotificationService {
       await send(
         userId as string,
         '🔖 Wishlist item on sale!',
-        `"${productTitle}" is now on sale for Kr ${salePrice.toFixed(2)}`,
+        `"${productTitle}" is now on sale for Rc ${salePrice.toFixed(2)}`,
         { type: 'wishlist_on_sale', product_id: productId, productTitle }
       );
     }
@@ -97,7 +97,7 @@ export class ShopNotificationService {
     await send(
       userId,
       '🔔 Deal Alert!',
-      `"${productTitle}" is now available at Kr ${priceKr.toFixed(2)}`,
+      `"${productTitle}" is now available at Rc ${priceKr.toFixed(2)}`,
       { type: 'deal_alert', productTitle }
     );
   }

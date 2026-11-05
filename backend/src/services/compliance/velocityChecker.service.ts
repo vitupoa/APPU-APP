@@ -1,4 +1,4 @@
-import { redis } from '../../config/redis.js';
+﻿import { redis } from '../../config/redis.js';
 import { prisma } from '../../config/database.js';
 
 /**
@@ -7,7 +7,7 @@ import { prisma } from '../../config/database.js';
  * Implements real-time transaction velocity checks using Redis to prevent:
  * - Rapid tipping (max 10 tips per minute)
  * - High transaction frequency (max 50 transactions per hour)
- * - Excessive daily volume (100K Kr for non-KYC, 500K Kr for KYC users)
+ * - Excessive daily volume (100K Rc for non-KYC, 500K Rc for KYC users)
  * - Premature withdrawals (24-hour cooling-off period for new accounts)
  * 
  * Requirements: 2.4.2 (Velocity Checks)
@@ -38,8 +38,8 @@ export class VelocityCheckerService {
   private readonly LIMITS = {
     TIPS_PER_MINUTE: 10,
     TRANSACTIONS_PER_HOUR: 50,
-    AMOUNT_24H_NON_KYC: 100000, // Kr
-    AMOUNT_24H_KYC: 500000, // Kr
+    AMOUNT_24H_NON_KYC: 100000, // Rc
+    AMOUNT_24H_KYC: 500000, // Rc
     COOLING_OFF_HOURS: 24,
   };
 
@@ -67,7 +67,7 @@ export class VelocityCheckerService {
    * 
    * @param userId - User ID
    * @param transactionType - Type of transaction (CONTENT_TIP, WITHDRAWAL, etc.)
-   * @param amountKr - Transaction amount in Kr
+   * @param amountRc - Transaction amount in Rc
    * @returns VelocityCheckResult indicating if transaction is allowed
    */
   async checkVelocity(
@@ -130,7 +130,7 @@ export class VelocityCheckerService {
    * 
    * @param userId - User ID
    * @param transactionType - Type of transaction
-   * @param amountKr - Transaction amount in Kr
+   * @param amountRc - Transaction amount in Rc
    */
   async recordTransaction(
     userId: string,
@@ -394,8 +394,8 @@ export class VelocityCheckerService {
       return {
         allowed: false,
         reason: isKYCApproved
-          ? `Maximum ${limit.toLocaleString()} Kr per 24 hours exceeded. ${hoursRemaining} hours until reset.`
-          : `Maximum ${limit.toLocaleString()} Kr per 24 hours for non-KYC users exceeded. Complete KYC verification to increase limit to ${this.LIMITS.AMOUNT_24H_KYC.toLocaleString()} Kr. ${hoursRemaining} hours until reset.`,
+          ? `Maximum ${limit.toLocaleString()} Rc per 24 hours exceeded. ${hoursRemaining} hours until reset.`
+          : `Maximum ${limit.toLocaleString()} Rc per 24 hours for non-KYC users exceeded. Complete KYC verification to increase limit to ${this.LIMITS.AMOUNT_24H_KYC.toLocaleString()} Rc. ${hoursRemaining} hours until reset.`,
         currentAmount,
         limit,
         resetAt: new Date(Date.now() + ttl * 1000),

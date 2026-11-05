@@ -1,4 +1,4 @@
-# Security Implementation Guide - Complete Setup
+﻿# Security Implementation Guide - Complete Setup
 
 ## 📋 Overview
 
@@ -16,7 +16,7 @@ This guide provides step-by-step instructions to implement all critical security
 
 ```bash
 # Connect to your PostgreSQL database
-psql -U your_username -d krieta_db
+psql -U your_username -d runinga_db
 
 # Run the RLS migration
 \i backend/prisma/migrations/add_rls_policies.sql

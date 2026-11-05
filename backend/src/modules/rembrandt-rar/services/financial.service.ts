@@ -1,4 +1,4 @@
-import { prisma } from '../../../config/database.js';
+﻿import { prisma } from '../../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { AuditService } from './audit.service.js';
 import { ADMIN_ACTIONS } from '../rembrandt-rar.types.js';
@@ -139,9 +139,9 @@ export class FinancialService {
     }
 
     // Name matching check
-    const krietaName = `${withdrawal.user.first_name} ${withdrawal.user.last_name}`.toLowerCase().trim();
+    const runingaName = `${withdrawal.user.first_name} ${withdrawal.user.last_name}`.toLowerCase().trim();
     const accountName = (withdrawal.account_name || '').toLowerCase().trim();
-    const nameMatch = this.fuzzyNameMatch(krietaName, accountName);
+    const nameMatch = this.fuzzyNameMatch(runingaName, accountName);
 
     if (data.action === 'approve') {
       if (!nameMatch.isMatch) {
@@ -150,7 +150,7 @@ export class FinancialService {
           return {
             success: false,
             warning: 'NAME_MISMATCH',
-            message: `Account name "${withdrawal.account_name}" does not match Krieta name "${withdrawal.user.first_name} ${withdrawal.user.last_name}"`,
+            message: `Account name "${withdrawal.account_name}" does not match Runinga name "${withdrawal.user.first_name} ${withdrawal.user.last_name}"`,
             similarity: nameMatch.similarity,
             requiresOverride: true,
           };
@@ -169,8 +169,8 @@ export class FinancialService {
           }
         });
 
-        // Calculate invisible withdrawal fee (KES 1 → Kr)
-        const withdrawalFeeKr = await ExchangeService.getWithdrawalFeeKr();
+        // Calculate invisible withdrawal fee (KES 1 → Rc)
+        const withdrawalFeeRc = await ExchangeService.getWithdrawalFeeKr();
         const totalDeduction = withdrawal.amount_kr.add(new Prisma.Decimal(withdrawalFeeKr));
 
         // Deduct from user wallet (withdrawal amount + invisible fee)
@@ -193,7 +193,7 @@ export class FinancialService {
         });
 
         // Credit withdrawal fee to @JohnOyugi's operational wallet
-        if (withdrawalFeeKr > 0) {
+        if (withdrawalFeeRc > 0) {
           const opsUser = await tx.user.findFirst({ where: { username: 'JohnOyugi' } });
           if (opsUser) {
             await tx.wallets.upsert({
@@ -342,7 +342,7 @@ export class FinancialService {
   /**
    * Super Admin enters a fiat amount + currency code (e.g. $1 USD, Tsh 1 TZS).
    * All users whose wallet currency matches get that fiat amount silently
-   * deducted from their Kr balance. The total is credited to the platform revenue wallet.
+   * deducted from their Rc balance. The total is credited to the platform revenue wallet.
    */
   static async bulkCurrencyDeduction(
     adminId: string,
@@ -351,7 +351,7 @@ export class FinancialService {
   ) {
     const { fiatAmount, currency, reason } = data;
 
-    // Convert fiat amount → USD → Kr
+    // Convert fiat amount → USD → Rc
     const usdToFiatRate = await ExchangeService.getRate(currency);
     const fiatInUsd = fiatAmount / usdToFiatRate;
     const krAmount = ExchangeService.getKrFromUSD(fiatInUsd);

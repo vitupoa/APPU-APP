@@ -1,4 +1,4 @@
-# Contest Submission Feature
+﻿# Contest Submission Feature
 
 ## Overview
 Complete contest submission system with requirement validation, media upload, and proof screenshots.
@@ -56,9 +56,9 @@ Complete contest submission system with requirement validation, media upload, an
   "actions": [
     {
       "id": "uuid",
-      "actionType": "FOLLOW_KRIETA",
+      "actionType": "FOLLOW_RUNINGA",
       "targetUrl": "https://...",
-      "label": "Follow @krieta on Instagram",
+      "label": "Follow @runinga on Instagram",
       "isVerifiable": true,
       "requiresUpload": true,
       "sortOrder": 0
@@ -93,7 +93,7 @@ Complete contest submission system with requirement validation, media upload, an
 
 | Type | Icon | Description | Requires Proof |
 |------|------|-------------|----------------|
-| FOLLOW_KRIETA | Person | Follow Krieta account | Optional |
+| FOLLOW_RUNINGA | Person | Follow Runinga account | Optional |
 | YOUTUBE_SUB | PlayArrow | Subscribe on YouTube | Yes |
 | SPOTIFY_FOLLOW | MusicNote | Follow on Spotify | Yes |
 | INSTAGRAM_FOLLOW | Camera | Follow on Instagram | Yes |

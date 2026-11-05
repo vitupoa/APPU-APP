@@ -1,4 +1,4 @@
-# Backend Schema Fixes - DEPLOYMENT READY ✅
+﻿# Backend Schema Fixes - DEPLOYMENT READY ✅
 
 ## Execution Summary - 2026-06-11
 
@@ -54,14 +54,14 @@ All critical backend database schema issues have been **SUCCESSFULLY FIXED** and
 
 ### 1. Commit Changes
 ```bash
-cd c:\Users\ADMIN\Krieta
+cd c:\Users\ADMIN\Runinga
 
 # Stage all changes
 git add backend/src/modules/chama/chama.service.ts
 git add backend/src/modules/stories/stories.service.ts
 git add backend/prisma/schema.prisma
 git add backend/prisma/migrations/create_user_bookmarks_table.sql
-git add composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/ShortsScreen.kt
+git add composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/ShortsScreen.kt
 
 # Commit with descriptive message
 git commit -m "fix: resolve critical database schema issues
@@ -109,7 +109,7 @@ curl https://your-railway-url.up.railway.app/api/v1/shorts/feed
 
 ## 📱 Android App Changes
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/ShortsScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/ShortsScreen.kt`
 
 **Change**: Added null check before rendering video player (line 284)
 ```kotlin
@@ -178,7 +178,7 @@ curl https://your-railway-url.up.railway.app/api/v1/shorts/feed
 4. `prisma/migrations/create_user_bookmarks_table.sql` - Created
 
 **Frontend:**
-1. `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/ShortsScreen.kt` - 1 fix
+1. `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/ShortsScreen.kt` - 1 fix
 
 **Documentation:**
 1. `BACKEND_SCHEMA_FIXES_APPLIED.md` - Complete documentation

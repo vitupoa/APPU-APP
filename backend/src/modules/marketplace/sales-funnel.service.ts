@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
 
@@ -36,7 +36,7 @@ export class SalesFunnelService {
     // Check if purchase meets minimum
     const minPurchase = Number(contest.entry_fee_kr);
     if (data.purchaseAmount < minPurchase) {
-      throw new Error(`Purchase must be at least Kr.${minPurchase}`);
+      throw new Error(`Purchase must be at least Rc.${minPurchase}`);
     }
 
     return prisma.$transaction(async (tx) => {
@@ -289,7 +289,7 @@ export class SalesFunnelService {
       case 'CONVERTED':
         updateData.converted_at = new Date();
         updateData.order_id = data.orderId;
-        updateData.revenue_kr = data.revenueKr ? new Prisma.Decimal(data.revenueKr) : null;
+        updateData.revenue_kr = data.revenueRc ? new Prisma.Decimal(data.revenueKr) : null;
         campaignUpdate.total_converted = { increment: 1 };
         if (data.revenueKr) {
           campaignUpdate.revenue_generated = {

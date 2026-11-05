@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 
 const SUBSCRIPTION_PLATFORM_FEE = 0.15; // 15%
@@ -70,7 +70,7 @@ export class SubscriptionService {
       // Check subscriber balance
       const subscriberWallet = await tx.wallets.findUnique({ where: { user_id: subscriberId } });
       if (!subscriberWallet || subscriberWallet.kr_balance.lessThan(tier.kr_amount)) {
-        throw new Error(`Insufficient balance. Need Kr.${tier.kr_amount.toFixed(2)}`);
+        throw new Error(`Insufficient balance. Need Rc.${tier.kr_amount.toFixed(2)}`);
       }
 
       // Check for existing active subscription

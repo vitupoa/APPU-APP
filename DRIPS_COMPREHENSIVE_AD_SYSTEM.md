@@ -1,4 +1,4 @@
-# Drips Comprehensive Ad System & Navigation Updates
+﻿# Drips Comprehensive Ad System & Navigation Updates
 
 ## Overview
 Implemented complete advertising ecosystem in Drips with 4 ad types, smart FAB, updated bottom navigation, and realistic Kenya revenue projections.
@@ -283,7 +283,7 @@ TopAppBar(
 - **TikTok Kenya CPM**: KES 200-600
 - **Google Display CPM**: KES 100-400
 
-### Krieta Competitive Pricing
+### Runinga Competitive Pricing
 - **Native Ads**: KES 40-150 CPM (20-40% cheaper)
 - **Banner Ads**: KES 30-100 CPM (cheapest option)
 - **Story Ads**: KES 80-200 CPM (competitive with Instagram)
@@ -334,30 +334,30 @@ Annual Revenue: KES 86,400,000 (~$670,000)
 
 ## 6. Competitive Advantages
 
-### Why Businesses Choose Krieta Over Facebook/Instagram
+### Why Businesses Choose Runinga Over Facebook/Instagram
 
 #### 1. Lower Cost (20-40% cheaper)
 - **Facebook**: KES 100 minimum daily = KES 3,000/month
-- **Krieta**: KES 500 minimum total, pay-as-you-go
+- **Runinga**: KES 500 minimum total, pay-as-you-go
 
 #### 2. Hyper-Local Targeting
 - **Facebook**: County-level (too broad)
-- **Krieta**: Estate-level (Westlands, Kilimani, Eastleigh)
+- **Runinga**: Estate-level (Westlands, Kilimani, Eastleigh)
 - **Unique**: Matatu route targeting, shopping center proximity
 
 #### 3. Mobile Money Integration
 - **Facebook**: Requires credit card
-- **Krieta**: M-Pesa, Airtel Money, cash agents
+- **Runinga**: M-Pesa, Airtel Money, cash agents
 - **Lipa Mdogo Mdogo**: KES 50/day installments
 
 #### 4. Simplified Dashboard
 - **Facebook Ads Manager**: Complex, 50+ settings
-- **Krieta**: One-click campaigns, pre-made templates
+- **Runinga**: One-click campaigns, pre-made templates
 - **Swahili Interface**: Full Kiswahili support
 
 #### 5. Creator Revenue Share
 - **Instagram**: 55% to creator, high payout threshold
-- **Krieta**: 85% to creator, KES 500 minimum payout (industry-leading)
+- **Runinga**: 85% to creator, KES 500 minimum payout (industry-leading)
 - **Weekly Payouts**: Not monthly
 
 #### 6. Performance-Based Pricing
@@ -566,4 +566,4 @@ Available: KES 8,500 (Withdraw Now)
 5. Admin moderation workflow
 6. **Super admin dashboard** for ad config, pricing, platform cut control
 
-**BOTTOM LINE**: With 200k DAU and smart monetization, Krieta can generate **KES 9.7M+ monthly** (~$75k) while staying 20-40% cheaper than Facebook/Instagram and providing better value to both businesses and creators with an industry-leading 85/15 revenue split.
+**BOTTOM LINE**: With 200k DAU and smart monetization, Runinga can generate **KES 9.7M+ monthly** (~$75k) while staying 20-40% cheaper than Facebook/Instagram and providing better value to both businesses and creators with an industry-leading 85/15 revenue split.

@@ -1,6 +1,6 @@
-# Icon Resources Directory
+﻿# Icon Resources Directory
 
-This directory contains vector drawable icons for the Krieta app.
+This directory contains vector drawable icons for the Runinga app.
 
 ## File Naming Convention
 - Use lowercase with underscores: `ic_home.xml`, `ic_settings.xml`
@@ -33,8 +33,8 @@ All icons should be in Android Vector Drawable XML format:
 
 ```kotlin
 import org.jetbrains.compose.resources.painterResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.ic_home
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.ic_home
 
 Icon(
     painter = painterResource(Res.drawable.ic_home),

@@ -1,4 +1,4 @@
-# Explore Tab - Enhanced with Trending Sections ✅
+﻿# Explore Tab - Enhanced with Trending Sections ✅
 
 ## What Was Added
 
@@ -17,7 +17,7 @@ The Explore tab now includes TikTok-inspired trending sections **while keeping a
 ## Files Created
 
 ```
-composeApp/src/commonMain/kotlin/com/krieta/feature/explore/
+composeApp/src/commonMain/kotlin/com/runinga/feature/explore/
 ├── domain/
 │   ├── model/TrendingModels.kt
 │   └── repository/ExploreRepository.kt

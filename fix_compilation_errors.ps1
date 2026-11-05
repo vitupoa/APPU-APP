@@ -1,4 +1,4 @@
-# Comprehensive fix for all compilation errors
+﻿# Comprehensive fix for all compilation errors
 
 Write-Host "Fixing ALL compilation errors..." -ForegroundColor Green
 
@@ -16,7 +16,7 @@ foreach ($file in $screenFiles) {
 
 # 2. Add Material Icons to component files
 $componentFiles = @(
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\feed\presentation\components\ImmersivePlayerNew.kt"
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\feed\presentation\components\ImmersivePlayerNew.kt"
 )
 foreach ($file in $componentFiles) {
     if (Test-Path $file) {
@@ -37,10 +37,10 @@ $safeConversionFiles = Get-ChildItem -Path "composeApp\src\commonMain\kotlin" -R
 foreach ($file in $safeConversionFiles) {
     $content = Get-Content $file.FullName -Raw
     # Remove all SafeConversion imports
-    $content = $content -replace "import com\.krieta\.com\.core\.util\.SafeConversion\.[^\n]+\n", ""
+    $content = $content -replace "import com\.runinga\.com\.core\.util\.SafeConversion\.[^\n]+\n", ""
     # Add single correct import if not present
-    if ($content -notmatch "import com\.krieta\.com\.core\.util\.SafeConversion$") {
-        $content = $content -replace "(package .+?\n)", "`$1import com.krieta.com.core.util.SafeConversion`n"
+    if ($content -notmatch "import com\.runinga\.com\.core\.util\.SafeConversion$") {
+        $content = $content -replace "(package .+?\n)", "`$1import com.runinga.com.core.util.SafeConversion`n"
     }
     Set-Content -Path $file.FullName -Value $content -NoNewline
     Write-Host "  Fixed: $($file.Name)"
@@ -49,11 +49,11 @@ foreach ($file in $safeConversionFiles) {
 # 4. Fix BorderStroke conflicts
 Write-Host "`n3. Fixing BorderStroke conflicts..." -ForegroundColor Yellow
 $borderFiles = @(
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\chama\presentation\wizard\CreateChamaScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\contests\presentation\screen\CreateContestScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\profile\presentation\screen\ProfileScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\wallet\presentation\screen\TopupScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\wallet\presentation\screen\WithdrawScreen.kt"
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\chama\presentation\wizard\CreateChamaScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\contests\presentation\screen\CreateContestScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\profile\presentation\screen\ProfileScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\wallet\presentation\screen\TopupScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\wallet\presentation\screen\WithdrawScreen.kt"
 )
 foreach ($file in $borderFiles) {
     if (Test-Path $file) {

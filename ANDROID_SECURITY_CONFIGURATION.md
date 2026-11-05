@@ -1,4 +1,4 @@
-# Android Configuration for Security Features
+﻿# Android Configuration for Security Features
 
 ## AndroidManifest.xml
 
@@ -22,11 +22,11 @@ Add the following permissions to your `AndroidManifest.xml`:
         android:required="false" />
     
     <application
-        android:name=".KrietaApplication"
+        android:name=".RuningaApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Krieta">
+        android:theme="@style/Theme.Runinga">
         
         <!-- Activities -->
         <activity
@@ -49,11 +49,11 @@ Add required dependencies:
 
 ```kotlin
 android {
-    namespace = "com.krieta"
+    namespace = "com.runinga"
     compileSdk = 34
     
     defaultConfig {
-        applicationId = "com.krieta"
+        applicationId = "com.runinga"
         minSdk = 23  // Android 6.0 for Keystore
         targetSdk = 34
         versionCode = 1
@@ -84,7 +84,7 @@ Add to `proguard-rules.pro`:
 
 ```proguard
 # Keep security classes
--keep class com.krieta.com.core.security.** { *; }
+-keep class com.runinga.com.core.security.** { *; }
 
 # Keep Android Keystore classes
 -keep class android.security.keystore.** { *; }

@@ -1,4 +1,4 @@
-# Backend Implementation Complete
+﻿# Backend Implementation Complete
 
 ## ✅ Implemented Features
 
@@ -122,7 +122,7 @@
 
 **Connection:**
 ```
-wss://api.krieta.com/socket.io/?EIO=4&transport=websocket
+wss://api.runinga.com/socket.io/?EIO=4&transport=websocket
 ```
 
 **Authentication:**

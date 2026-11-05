@@ -1,4 +1,4 @@
-# Server Setup Guide - Complete Implementation
+﻿# Server Setup Guide - Complete Implementation
 
 This guide walks you through setting up the secure financial transaction system on your server.
 
@@ -185,7 +185,7 @@ Create/update `.env`:
 
 ```env
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/krieta"
+DATABASE_URL="postgresql://user:password@localhost:5432/runinga"
 
 # JWT
 JWT_SECRET="your-super-secret-jwt-key-change-this"

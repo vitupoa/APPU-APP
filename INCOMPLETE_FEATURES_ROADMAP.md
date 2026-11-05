@@ -1,4 +1,4 @@
-# INCOMPLETE FEATURES - IMPLEMENTATION ROADMAP
+﻿# INCOMPLETE FEATURES - IMPLEMENTATION ROADMAP
 
 ## Priority Matrix
 
@@ -27,7 +27,7 @@
 ### Implementation Plan
 
 #### iOS AVPlayer Implementation
-**File**: `composeApp/src/iosMain/kotlin/com/krieta/com/core/ui/components/VideoPlayer.ios.kt`
+**File**: `composeApp/src/iosMain/kotlin/com/runinga/com/core/ui/components/VideoPlayer.ios.kt`
 
 ```kotlin
 @Composable
@@ -64,7 +64,7 @@ actual class SecureTokenManager {
 
 ### Implementation Plan
 
-**File**: `composeApp/src/iosMain/kotlin/com/krieta/com/core/security/SecureTokenManager.ios.kt`
+**File**: `composeApp/src/iosMain/kotlin/com/runinga/com/core/security/SecureTokenManager.ios.kt`
 
 ```kotlin
 import platform.Security.*
@@ -129,7 +129,7 @@ commonMain.dependencies {
 ```
 
 #### Step 2: Create Socket Manager
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/data/LiveSocketManager.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/data/LiveSocketManager.kt`
 
 ```kotlin
 class LiveSocketManager(private val baseUrl: String) {
@@ -173,7 +173,7 @@ class LiveSocketManager(private val baseUrl: String) {
 ```
 
 #### Step 3: Update ViewModel
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/presentation/viewmodel/LiveStreamViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/presentation/viewmodel/LiveStreamViewModel.kt`
 
 ```kotlin
 class LiveStreamViewModel(
@@ -247,7 +247,7 @@ export class MpesaService {
         PhoneNumber: phoneNumber,
         CallBackURL: `${env.MPESA_CALLBACK_URL}/topup`,
         AccountReference: userId,
-        TransactionDesc: 'Krieta Wallet Top-up'
+        TransactionDesc: 'Runinga Wallet Top-up'
       },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -390,7 +390,7 @@ export class NotificationService {
 ### Implementation Plan
 
 #### Defaulters Screen
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/chama/presentation/screen/DefaultersScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/chama/presentation/screen/DefaultersScreen.kt`
 
 ```kotlin
 @Composable
@@ -414,7 +414,7 @@ fun DefaultersScreen(chamaId: String) {
 ```
 
 #### Payouts Screen
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/chama/presentation/screen/PayoutsScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/chama/presentation/screen/PayoutsScreen.kt`
 
 ```kotlin
 @Composable

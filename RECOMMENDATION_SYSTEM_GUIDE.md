@@ -1,7 +1,7 @@
-# KRIETA RECOMMENDATION SYSTEM - IMPLEMENTATION GUIDE
+﻿# RUNINGA RECOMMENDATION SYSTEM - IMPLEMENTATION GUIDE
 
 ## Overview
-This document outlines the complete implementation of Krieta's  recommendation algorithm with matching system (not ranking), ensuring equal growth opportunity for all creators.
+This document outlines the complete implementation of Runinga's  recommendation algorithm with matching system (not ranking), ensuring equal growth opportunity for all creators.
 
 ## Core Principles
 1. **Matching System** - Not ranking-based, content matched to interested users
@@ -279,7 +279,7 @@ CREATE INDEX idx_trending_active ON trending_topics(is_active);
 ## Frontend Implementation
 
 ### 1. Full-Screen Immersive Player Component
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/components/ImmersivePlayerNew.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/components/ImmersivePlayerNew.kt`
 
 **Features**:
 - Edge-to-edge video playback
@@ -301,7 +301,7 @@ CREATE INDEX idx_trending_active ON trending_topics(is_active);
 - Long press: Show options menu
 
 ### 2. Feed State Management
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/viewmodel/FeedViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/viewmodel/FeedViewModel.kt`
 
 **Responsibilities**:
 - Fetch feed from API
@@ -311,7 +311,7 @@ CREATE INDEX idx_trending_active ON trending_topics(is_active);
 - Send interaction signals to backend
 
 ### 3. Interaction Tracker
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/analytics/InteractionTracker.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/analytics/InteractionTracker.kt`
 
 **Tracks**:
 - View duration

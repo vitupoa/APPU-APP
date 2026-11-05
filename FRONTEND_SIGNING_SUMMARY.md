@@ -1,27 +1,27 @@
-# Frontend Transaction Signing - Implementation Summary
+﻿# Frontend Transaction Signing - Implementation Summary
 
 ## ✅ Completed Implementation
 
 ### Files Created
 
-1. **c:\Users\ADMIN\Krieta\composeApp\src\commonMain\kotlin\com\krieta\com\core\security\TransactionSigner.kt**
+1. **c:\Users\ADMIN\Runinga\composeApp\src\commonMain\kotlin\com\runinga\com\core\security\TransactionSigner.kt**
    - Platform-agnostic signature generation
    - Nonce generation (16 random bytes, Base64 encoded)
    - Timestamp generation (Unix milliseconds)
    - Canonical string creation for HMAC-SHA256
    - Main signing function: `signWithdrawal()`
 
-2. **c:\Users\ADMIN\Krieta\composeApp\src\androidMain\kotlin\com\krieta\com\core\security\HmacSha256.android.kt**
+2. **c:\Users\ADMIN\Runinga\composeApp\src\androidMain\kotlin\com\runinga\com\core\security\HmacSha256.android.kt**
    - Android-specific HMAC-SHA256 implementation
    - Uses javax.crypto.Mac
    - SecretKeySpec for key management
 
-3. **c:\Users\ADMIN\Krieta\composeApp\src\iosMain\kotlin\com\krieta\com\core\security\HmacSha256.ios.kt**
+3. **c:\Users\ADMIN\Runinga\composeApp\src\iosMain\kotlin\com\runinga\com\core\security\HmacSha256.ios.kt**
    - iOS-specific HMAC-SHA256 implementation
    - Uses CommonCrypto CCHmac
    - Native interop with C libraries
 
-4. **c:\Users\ADMIN\Krieta\FRONTEND_TRANSACTION_SIGNING.md**
+4. **c:\Users\ADMIN\Runinga\FRONTEND_TRANSACTION_SIGNING.md**
    - Comprehensive documentation (200+ lines)
    - Architecture overview
    - Security features
@@ -29,7 +29,7 @@
    - Troubleshooting
    - Deployment checklist
 
-5. **c:\Users\ADMIN\Krieta\TRANSACTION_SIGNING_QUICK_REF.md**
+5. **c:\Users\ADMIN\Runinga\TRANSACTION_SIGNING_QUICK_REF.md**
    - Quick reference guide
    - Usage examples
    - Error codes

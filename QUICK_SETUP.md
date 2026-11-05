@@ -1,4 +1,4 @@
-# 🚀 QUICK SETUP GUIDE - Railway Variables
+﻿# 🚀 QUICK SETUP GUIDE - Railway Variables
 
 ## Copy-Paste This Into Railway
 
@@ -22,7 +22,7 @@ Copy the output.
 Go to Railway → Your Project → Variables → Add these:
 
 ```
-CORS_ORIGIN=https://krieta.com,https://www.krieta.com,https://admin.krieta.com
+CORS_ORIGIN=https://runinga.com,https://www.runinga.com,https://admin.runinga.com
 
 FIELD_ENCRYPTION_KEY=<paste-generated-key-from-step-1>
 
@@ -41,7 +41,7 @@ Railway will auto-deploy when you push to main branch.
 ### 5. Test
 ```bash
 # Test analytics
-curl https://krieta-backend.up.railway.app/api/v1/rar/analytics/overview \
+curl https://runinga-backend.up.railway.app/api/v1/rar/analytics/overview \
   -H "Authorization: Bearer <admin-token>"
 ```
 

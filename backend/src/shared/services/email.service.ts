@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+﻿import nodemailer from 'nodemailer';
 
 export class EmailService {
   private static transporter = nodemailer.createTransport({
@@ -18,9 +18,9 @@ export class EmailService {
     }
 
     await this.transporter.sendMail({
-      from: `"Krieta Support" <${process.env.SMTP_USER}>`,
+      from: `"Runinga Support" <${process.env.SMTP_USER}>`,
       to,
-      subject: 'Your Krieta Password Has Been Reset',
+      subject: 'Your Runinga Password Has Been Reset',
       html: `
         <div style="font-family: sans-serif; padding: 20px;">
           <h2>Password Reset</h2>

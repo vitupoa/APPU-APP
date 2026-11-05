@@ -1,4 +1,4 @@
-# 🎯 FINAL DIAGNOSIS & FIX - Exchange Rate Issue
+﻿# 🎯 FINAL DIAGNOSIS & FIX - Exchange Rate Issue
 
 ## ✅ ISSUE IDENTIFIED: Authentication Token Expired
 
@@ -188,7 +188,7 @@ The issue is **100% authentication-related**. Re-login will fix it immediately! 
 adb logcat | grep -E "Exchange|Wallet|401"
 
 # Clear app data (forces re-login)
-adb shell pm clear com.krieta.com
+adb shell pm clear com.runinga.com
 ```
 
 ---

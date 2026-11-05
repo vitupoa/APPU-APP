@@ -1,4 +1,4 @@
-# Compliance System - Quick Reference Guide
+﻿# Compliance System - Quick Reference Guide
 
 ## 🎯 Overview
 
@@ -34,8 +34,8 @@ This is a quick reference for developers working with the compliance system.
    - > 100 tx/24h: 10 points
 
 5. **Transaction Volume** (0-15 points)
-   - > 100,000 Kr/24h: 15 points
-   - > 50,000 Kr/24h: 10 points
+   - > 100,000 Rc/24h: 15 points
+   - > 50,000 Rc/24h: 10 points
 
 6. **Self-Tipping** (0-25 points)
    - Shared device + tips to shared users: 25 points
@@ -81,7 +81,7 @@ if (profile.withdrawal_blocked) {
 - `CHAMA_PAYOUT` - Group savings payout
 - `PLATFORM_REWARD` - Platform-funded reward
 - `WITHDRAWAL` - Cash out to fiat
-- `TOP_UP` - Buy Kr with fiat
+- `TOP_UP` - Buy Rc with fiat
 - `SHOP_LISTING_FEE` - Shop listing fee
 
 ### Blocked Transaction Types
@@ -93,8 +93,8 @@ if (profile.withdrawal_blocked) {
 ### Velocity Limits
 - **Tips**: Max 10 per minute
 - **All Transactions**: Max 50 per hour
-- **Volume (non-KYC)**: Max 100,000 Kr per 24 hours
-- **Volume (KYC)**: Max 500,000 Kr per 24 hours
+- **Volume (non-KYC)**: Max 100,000 Rc per 24 hours
+- **Volume (KYC)**: Max 500,000 Rc per 24 hours
 
 ### Usage
 
@@ -149,7 +149,7 @@ import { lockedChatTaskService } from './services/compliance/lockedChatTask.serv
 // Check if user can message creator
 const access = await lockedChatTaskService.canUserMessageCreator(userId, creatorId);
 if (!access.canMessage) {
-  console.log(`Chat locked. Fee: ${access.unlockFeeKr} Kr`);
+  console.log(`Chat locked. Fee: ${access.unlockFeeKr} Rc`);
 }
 
 // Unlock chat for a task

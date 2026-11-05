@@ -1,4 +1,4 @@
-# Floating Chat Menu Implementation Summary
+﻿# Floating Chat Menu Implementation Summary
 
 ## ✅ Implemented Features
 
@@ -171,7 +171,7 @@ var showChatMenu by remember { mutableStateOf(false) }
 
 ## 🎯 WhatsApp-Style Features
 
-| Feature | WhatsApp | Krieta | Status |
+| Feature | WhatsApp | Runinga | Status |
 |---------|----------|--------|--------|
 | Floating menu button | ✅ | ✅ | Complete |
 | New chat option | ✅ | ✅ | Complete |
@@ -181,7 +181,7 @@ var showChatMenu by remember { mutableStateOf(false) }
 | Menu animations | ✅ | ✅ | Complete |
 
 **Additional Feature**:
-- ✅ New Chama option (unique to Krieta)
+- ✅ New Chama option (unique to Runinga)
 
 ---
 

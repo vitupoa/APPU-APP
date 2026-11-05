@@ -1,4 +1,4 @@
-# Contest Publish Button Not Working - Debugging Guide
+﻿# Contest Publish Button Not Working - Debugging Guide
 
 ## Problem
 When clicking the "Publish Contest" button on Step 5 of the contest creation wizard, nothing happens.
@@ -67,8 +67,8 @@ println("🎯 Starting publishContest")
 println("   Current step: ${currentState.currentStep}")
 println("   Validate all steps: ${validateAllSteps()}")
 println("   Total prize (fiat): $totalPrize")
-println("   Total cost (Kr): $totalCostKr")
-println("   Wallet balance (Kr): ${currentState.walletBalance}")
+println("   Total cost (Rc): $totalCostKr")
+println("   Wallet balance (Rc): ${currentState.walletBalance}")
 ```
 
 **What to check**: 
@@ -104,15 +104,15 @@ println("   Wallet balance (Kr): ${currentState.walletBalance}")
 
 ### Test 3: Check Wallet Balance
 1. Check your wallet balance before creating contest
-2. Ensure balance >= prize pool in Kr
+2. Ensure balance >= prize pool in Rc
 3. Look for log showing balance comparison
 
 **Example**:
 ```
 Total prize (fiat): 1000.0 KES
-Total cost (Kr): 769.23
-Wallet balance (Kr): 100.0
-❌ Insufficient Kr balance...
+Total cost (Rc): 769.23
+Wallet balance (Rc): 100.0
+❌ Insufficient Rc balance...
 ```
 
 ### Test 4: Check Network Request
@@ -161,11 +161,11 @@ If wallet balance is too low:
 
 **Calculate Required Balance**:
 ```
-Prize Pool (fiat) ÷ Exchange Rate = Kr Needed
-Example: 1000 KES ÷ 130 = 769.23 Kr
+Prize Pool (fiat) ÷ Exchange Rate = Rc Needed
+Example: 1000 KES ÷ 130 = 769.23 Rc
 
 Plus 15% platform fee:
-769.23 × 1.15 = 884.61 Kr total needed
+769.23 × 1.15 = 884.61 Rc total needed
 ```
 
 ### Solution 3: Step Validation Issues
@@ -202,8 +202,8 @@ If the button clicks but nothing happens:
    Current step: 5
    Validate all steps: true
    Total prize (fiat): 1000.0
-   Total cost (Kr): 769.23
-   Wallet balance (Kr): 1000.0
+   Total cost (Rc): 769.23
+   Wallet balance (Rc): 1000.0
 ✅ All validations passed, starting contest creation
 🚀 Launching contest creation coroutine
 ```
@@ -225,9 +225,9 @@ If the button clicks but nothing happens:
    Current step: 5
    Validate all steps: true
    Total prize (fiat): 1000.0
-   Total cost (Kr): 769.23
-   Wallet balance (Kr): 100.0
-❌ Insufficient Kr balance. You need Kr. 769.23 but only have Kr. 100.0
+   Total cost (Rc): 769.23
+   Wallet balance (Rc): 100.0
+❌ Insufficient Rc balance. You need Rc. 769.23 but only have Rc. 100.0
 ```
 
 ### Failed Flow - Backend Error

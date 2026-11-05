@@ -1,7 +1,7 @@
-#!/bin/bash
+﻿#!/bin/bash
 set -e
 
-echo "🚀 Starting Krieta Backend..."
+echo "🚀 Starting Runinga Backend..."
 
 # Run RLS migration (non-blocking)
 echo "📦 Running RLS migration..."

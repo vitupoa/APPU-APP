@@ -15,8 +15,7 @@ redis.on('error', (err) => {
 });
 
 redis.on('connect', () => {
-  console.log('Redis connected');
-});
+  });
 
 // Cache helpers
 export const CACHE_TTL = {

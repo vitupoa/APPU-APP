@@ -1,4 +1,4 @@
-# Wallet Compliance Restructuring - Final Implementation Report
+﻿# Wallet Compliance Restructuring - Final Implementation Report
 
 ## Executive Summary
 
@@ -55,7 +55,7 @@ All middleware and enforcement mechanisms deployed.
 ### 1. Transaction Compliance ✅
 
 **Context Validation:**
-- All Kr transfers require valid context (type, ref_id, description)
+- All Rc transfers require valid context (type, ref_id, description)
 - WALLET_TRANSFER and CHAT_TIP types blocked
 - Reference ID validation ensures linked content/service exists
 
@@ -97,8 +97,8 @@ LOW (0-29): Standard monitoring
 **Velocity Checks:**
 - Max 10 tips per minute
 - Max 50 transactions per hour
-- Max 100,000 Kr/24h for non-KYC users
-- Max 500,000 Kr/24h for KYC-approved users
+- Max 100,000 Rc/24h for non-KYC users
+- Max 500,000 Rc/24h for KYC-approved users
 - 24-hour cooling-off for new accounts
 
 **Chama Fraud Detection:**
@@ -111,21 +111,21 @@ LOW (0-29): Standard monitoring
 ### 4. Tiered KYC System ✅
 
 **Tier 0 (No KYC):**
-- Daily: 10,000 Kr
-- Monthly: 50,000 Kr
-- Single Transaction: 5,000 Kr
+- Daily: 10,000 Rc
+- Monthly: 50,000 Rc
+- Single Transaction: 5,000 Rc
 - Can tip, subscribe, unlock content
 
 **Tier 1 (Pending KYC):**
-- Daily: 50,000 Kr
-- Monthly: 500,000 Kr
-- Single Transaction: 25,000 Kr
+- Daily: 50,000 Rc
+- Monthly: 500,000 Rc
+- Single Transaction: 25,000 Rc
 - Email + phone verification
 
 **Tier 2 (Approved KYC):**
-- Daily: 500,000 Kr
-- Monthly: 5,000,000 Kr
-- Single Transaction: 100,000 Kr
+- Daily: 500,000 Rc
+- Monthly: 5,000,000 Rc
+- Single Transaction: 100,000 Rc
 - ID + selfie verification, can withdraw
 
 ### 5. Compliance Dashboard ✅
@@ -190,7 +190,7 @@ UNLOCKED → Creator hasn't enabled lock
 ### 9. API Enhancements ✅
 
 **Fiat Conversion:**
-- All Kr amounts include fiat equivalent
+- All Rc amounts include fiat equivalent
 - Exchange rate metadata in responses
 - User's preferred currency
 - Real-time rate updates
@@ -303,7 +303,7 @@ SELECT COUNT(*) FROM "Contest" WHERE is_legal_structure IS NULL;
 ### ⏳ Frontend Deployment
 
 **Wave 4 Tasks:**
-1. [ ] Update wallet UI (remove "Send Kr" button)
+1. [ ] Update wallet UI (remove "Send Rc" button)
 2. [ ] Update chat UI (add "Unlock Chat" button)
 3. [ ] Update contest creation UI (add validation)
 4. [ ] Update Shop UI (remove "Buy Now" buttons)

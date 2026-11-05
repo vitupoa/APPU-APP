@@ -1,4 +1,4 @@
-# Profile Database Caching Implementation (Option 1)
+﻿# Profile Database Caching Implementation (Option 1)
 
 ## Overview
 Implemented true offline-first architecture using SQLDelight for persistent local storage of profile data. This ensures the app works seamlessly even when the internet is down or when the app is restarted.
@@ -6,7 +6,7 @@ Implemented true offline-first architecture using SQLDelight for persistent loca
 ## What Was Implemented
 
 ### 1. SQLDelight Schema (`Profile.sq`)
-**Location**: `composeApp/src/commonMain/sqldelight/com/krieta/db/Profile.sq`
+**Location**: `composeApp/src/commonMain/sqldelight/com/runinga/db/Profile.sq`
 
 **Tables:**
 - `UserProfile` - Stores complete profile data including stats, niches, and metadata
@@ -18,7 +18,7 @@ Implemented true offline-first architecture using SQLDelight for persistent loca
 - Efficient queries for both own profile and other users' profiles
 
 ### 2. ProfileLocalDataSource
-**Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/profile/data/local/ProfileLocalDataSource.kt`
+**Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/profile/data/local/ProfileLocalDataSource.kt`
 
 **Methods:**
 - `cacheProfile(profile)` - Save/update profile in database
@@ -32,7 +32,7 @@ Implemented true offline-first architecture using SQLDelight for persistent loca
 - Coroutine-based async operations on IO dispatcher
 
 ### 3. Updated ProfileRepositoryImpl
-**Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/profile/data/repository/ProfileRepositoryImpl.kt`
+**Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/profile/data/repository/ProfileRepositoryImpl.kt`
 
 **Offline-First Strategy:**
 ```kotlin
@@ -54,7 +54,7 @@ Implemented true offline-first architecture using SQLDelight for persistent loca
 - Graceful degradation when network fails
 
 ### 4. Updated Dependency Injection
-**Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/profile/di/ProfileModule.kt`
+**Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/profile/di/ProfileModule.kt`
 
 Added `ProfileLocalDataSource` to Koin module for dependency injection.
 
@@ -146,8 +146,8 @@ plugins {
 
 sqldelight {
     databases {
-        create("KrietaDatabase") {
-            packageName.set("com.krieta.com.db")
+        create("RuningaDatabase") {
+            packageName.set("com.runinga.com.db")
         }
     }
 }

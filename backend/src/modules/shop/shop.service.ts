@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { categoryDetailSchemas } from './shop.types.js';
 import { io } from '../../index.js';
@@ -107,7 +107,7 @@ export class ShopService {
     if (updates.title !== undefined) updateData.title = updates.title;
     if (updates.description !== undefined) updateData.description = updates.description;
     if (updates.imageUrls !== undefined) updateData.image_urls = updates.imageUrls;
-    if (updates.priceKr !== undefined) updateData.price_kr = new Prisma.Decimal(updates.priceKr);
+    if (updates.priceRc !== undefined) updateData.price_kr = new Prisma.Decimal(updates.priceKr);
     if (updates.currency !== undefined) updateData.currency = updates.currency;
     if (updates.localPrice !== undefined) updateData.local_price = new Prisma.Decimal(updates.localPrice);
     if (updates.wholesalePrice !== undefined) updateData.wholesale_price = new Prisma.Decimal(updates.wholesalePrice);

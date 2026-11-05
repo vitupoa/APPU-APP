@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Logger } from '../../utils/logger.js';
 import crypto from 'crypto';
 
@@ -92,7 +92,7 @@ export class LockedChatTaskService {
     }
 
     if (data.amount_kr < Number(chatSettings.task_fee_kr)) {
-      throw new Error(`Minimum fee is ${chatSettings.task_fee_kr} Kr`);
+      throw new Error(`Minimum fee is ${chatSettings.task_fee_kr} Rc`);
     }
 
     // Calculate deadline
@@ -205,7 +205,7 @@ export class LockedChatTaskService {
         data: {
           creator_id: creatorId,
           is_locked: false,
-          task_fee_kr: 100, // Default 100 Kr
+          task_fee_kr: 100, // Default 100 Rc
           typical_delivery_time: '24 hours'
         }
       } as any);

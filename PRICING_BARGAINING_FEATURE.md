@@ -1,4 +1,4 @@
-# Product Pricing Options & Bargaining Feature
+﻿# Product Pricing Options & Bargaining Feature
 
 ## Overview
 Enhanced the product listing form and detail page to support multiple pricing options (retail, wholesale, bargaining) with a smart bargaining system that validates buyer offers against seller's minimum price.
@@ -100,7 +100,7 @@ buyerOffer = 250.0 // Above minimum - approved
 ┌─────────────────────────────┐
 │ Make an Offer               │
 │                             │
-│ [Your Offer (Kr)_______]    │
+│ [Your Offer (Rc)_______]    │
 │                             │
 │ [Submit Offer Button]       │
 └─────────────────────────────┘
@@ -111,7 +111,7 @@ buyerOffer = 250.0 // Above minimum - approved
 ┌─────────────────────────────┐
 │ ✓ Offer Accepted!           │
 │                             │
-│ Your offer of Kr. 250 is    │
+│ Your offer of Rc. 250 is    │
 │ acceptable. Contact seller  │
 │ to complete the purchase.   │
 └─────────────────────────────┘

@@ -1,4 +1,4 @@
-# 🔒 KRIETA SECURITY AUDIT REPORT
+﻿# 🔒 RUNINGA SECURITY AUDIT REPORT
 **Date:** 2026
 **Auditor:** Reinherts
 **Severity Levels:** CRITICAL | HIGH | MEDIUM | LOW
@@ -127,7 +127,7 @@ return {
 return {
   kycStatus: user?.kycStatus || 'NOT_STARTED', // ❌ EXPOSED
   documents: kycDocuments, // ❌ SENSITIVE
-  dailyLimit: withdrawalLimit?.dailyLimitKr || DAILY_WITHDRAWAL_LIMIT, // ❌ EXPOSED
+  dailyLimit: withdrawalLimit?.dailyLimitRc || DAILY_WITHDRAWAL_LIMIT, // ❌ EXPOSED
 }
 ```
 **Risk:** Attackers can identify high-value targets
@@ -211,7 +211,7 @@ static async sendTip(senderId: string, recipientId: string, senderKrAmount: numb
   // ❌ Race condition possible
   const senderWallet = await tx.wallet.findUnique({ where: { userId: senderId } });
   if (!senderWallet || senderWallet.krBalance.lessThan(krDecimal)) {
-    throw new Error("Insufficient Kr balance to tip");
+    throw new Error("Insufficient Rc balance to tip");
   }
   // ❌ Time gap between check and deduction
   await tx.wallet.update({
@@ -384,7 +384,7 @@ CORS_ORIGIN: z.string().default('*'), // ❌ DANGEROUS
 
 ### Fix Required
 ```typescript
-CORS_ORIGIN: z.string().default('https://krieta.com'),
+CORS_ORIGIN: z.string().default('https://runinga.com'),
 ```
 
 ---

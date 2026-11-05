@@ -1,4 +1,4 @@
-// Complete Server Implementation for Secure Financial Transactions
+﻿// Complete Server Implementation for Secure Financial Transactions
 // This file includes all security features: session secrets, signature verification,
 // nonce tracking, rate limiting, and transaction processing
 
@@ -37,8 +37,6 @@ export async function generateSessionSecret(userId: string, device_id: string) {
     } 
   } as any);
   
-  console.log(`✅ Generated session secret for user ${userId}`);
-  
   // Return base64-encoded secret for client
   return {
     sessionSecret: secret.toString('base64'),
@@ -60,7 +58,6 @@ async function getUserSessionSecret(userId: string): Promise<Buffer | null> {
   });
   
   if (!sessionSecret) {
-    console.log(`❌ No active session secret for user ${userId}`);
     return null;
   }
   
@@ -77,8 +74,7 @@ export async function cleanupExpiredSecrets() {
     }
   });
   
-  console.log(`🧹 Cleaned up ${result.count} expired session secrets`);
-}
+  }
 
 // ============================================================================
 // 2. SIGNATURE VERIFICATION
@@ -210,8 +206,7 @@ async function storeNonce(
     } 
   } as any);
   
-  console.log(`✅ Stored nonce ${nonce} for ${transactionType}`);
-}
+  }
 
 /**
  * Validate timestamp (max 5 minutes old)
@@ -223,8 +218,7 @@ function isTimestampValid(timestamp: number): boolean {
   const isValid = (now - timestamp) <= maxAge && timestamp <= now;
   
   if (!isValid) {
-    console.log(`❌ Invalid timestamp: ${timestamp}, now: ${now}, diff: ${now - timestamp}ms`);
-  }
+    }
   
   return isValid;
 }
@@ -239,8 +233,7 @@ export async function cleanupExpiredNonces() {
     }
   });
   
-  console.log(`🧹 Cleaned up ${result.count} expired nonces`);
-}
+  }
 
 // ============================================================================
 // 4. TRANSACTION LOGGING
@@ -288,8 +281,7 @@ async function logFinancialTransaction(data: {
     } 
   } as any);
   
-  console.log(`📝 Logged transaction ${data.transactionId} - ${data.status}`);
-}
+  }
 
 // ============================================================================
 // 5. RATE LIMITING
@@ -319,8 +311,7 @@ async function checkRateLimit(
     throw new Error(`Rate limit exceeded. Maximum ${maxAttempts} ${action}s per ${windowSeconds} seconds`);
   }
   
-  console.log(`✅ Rate limit check passed: ${recentAttempts}/${maxAttempts} for ${action}`);
-}
+  }
 
 // ============================================================================
 // 6. SUSPICIOUS ACTIVITY DETECTION
@@ -350,10 +341,9 @@ async function detectSuspiciousActivity(userId: string) {
       }
     });
     
-    console.log(`🚨 ALERT: Rapid transactions detected for user ${userId}`);
-  }
+    }
   
-  // Check for large amounts (>50,000 Kr in 1 hour)
+  // Check for large amounts (>50,000 Rc in 1 hour)
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   const result = await prisma.financial_transaction_logs.aggregate({
     where: {
@@ -370,14 +360,13 @@ async function detectSuspiciousActivity(userId: string) {
       data: {
         user_id: userId,
         activityType: 'LARGE_AMOUNT',
-        description: `${totalAmount} Kr in 1 hour`,
+        description: `${totalAmount} Rc in 1 hour`,
         severity: 'MEDIUM',
         metadata: { amount: totalAmount.toString() }
       }
     });
     
-    console.log(`🚨 ALERT: Large amount detected for user ${userId}`);
-  }
+    }
 }
 
 // ============================================================================
@@ -402,10 +391,7 @@ export async function processTipTransaction(data: {
   const transactionId = crypto.randomUUID();
   
   try {
-    console.log(`🔄 Processing tip transaction ${transactionId}`);
-    
     // 1. Verify signature
-    console.log('1️⃣ Verifying signature...');
     const isValidSignature = await verifyTipSignature({
       sender_id: data.sender_id,
       recipientId: data.recipientId,
@@ -418,36 +404,21 @@ export async function processTipTransaction(data: {
     if (!isValidSignature) {
       throw new Error('Invalid signature');
     }
-    console.log('✅ Signature valid');
-    
     // 2. Check nonce uniqueness
-    console.log('2️⃣ Checking nonce uniqueness...');
     if (await isNonceUsed(data.nonce)) {
       throw new Error('Duplicate request - nonce already used');
     }
-    console.log('✅ Nonce unique');
-    
     // 3. Validate timestamp
-    console.log('3️⃣ Validating timestamp...');
     if (!isTimestampValid(data.timestamp)) {
       throw new Error('Request expired - timestamp too old');
     }
-    console.log('✅ Timestamp valid');
-    
     // 4. Check rate limit (10 tips per minute)
-    console.log('4️⃣ Checking rate limit...');
     await checkRateLimit(data.sender_id, 'tip', 10, 60);
-    console.log('✅ Rate limit OK');
-    
     // 5. Validate amount
-    console.log('5️⃣ Validating amount...');
     if (data.krAmount < 1 || data.krAmount > 10000) {
-      throw new Error('Invalid amount - must be between 1 and 10,000 Kr');
+      throw new Error('Invalid amount - must be between 1 and 10,000 Rc');
     }
-    console.log('✅ Amount valid');
-    
     // 6. Check sender balance
-    console.log('6️⃣ Checking sender balance...');
     const senderWallet = await prisma.wallets.findUnique({
       where: { user_id: data.sender_id }
     });
@@ -455,10 +426,7 @@ export async function processTipTransaction(data: {
     if (!senderWallet || Number(senderWallet.kr_balance) < data.krAmount) {
       throw new Error('Insufficient balance');
     }
-    console.log('✅ Balance sufficient');
-    
     // 7. Process transaction atomically
-    console.log('7️⃣ Processing transaction...');
     await prisma.$transaction(async (tx) => {
       // Deduct from sender
       await tx.wallets.update({
@@ -495,8 +463,6 @@ export async function processTipTransaction(data: {
         }
       });
     });
-    console.log('✅ Transaction completed');
-    
     // 8. Log transaction
     await logFinancialTransaction({
       transactionId,
@@ -516,8 +482,6 @@ export async function processTipTransaction(data: {
     
     // 9. Check for suspicious activity
     await detectSuspiciousActivity(data.sender_id);
-    
-    console.log(`✅ Tip transaction ${transactionId} completed successfully`);
     
     return {
       success: true,
@@ -559,13 +523,10 @@ export async function processTipTransaction(data: {
  * Call this every hour using a cron job or scheduler
  */
 export async function runCleanupJobs() {
-  console.log('🧹 Running cleanup jobs...');
-  
   await cleanupExpiredSecrets();
   await cleanupExpiredNonces();
   
-  console.log('✅ Cleanup jobs completed');
-}
+  }
 
 // ============================================================================
 // 9. EXPORT ALL FUNCTIONS

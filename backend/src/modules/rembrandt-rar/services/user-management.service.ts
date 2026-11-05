@@ -1,4 +1,4 @@
-import { prisma } from '../../../config/database.js';
+﻿import { prisma } from '../../../config/database.js';
 import { AuditService } from './audit.service.js';
 import { ADMIN_ACTIONS } from '../rembrandt-rar.types.js';
 import { EmailService } from '../../../shared/services/email.service.js';
@@ -251,7 +251,7 @@ export class UserManagementService {
 
   static async resetUserPassword(adminId: string, targetUserId: string, ip?: string, ua?: string) {
     // Generate a temporary password
-    const tempPassword = `Krieta_${Math.random().toString(36).substring(2, 10)}!`;
+    const tempPassword = `Runinga_${Math.random().toString(36).substring(2, 10)}!`;
     const hash = await (await import('bcrypt')).hash(tempPassword, 12);
 
     const user = await prisma.user.update({ where: { id: targetUserId }, data: { password_hash: hash } });

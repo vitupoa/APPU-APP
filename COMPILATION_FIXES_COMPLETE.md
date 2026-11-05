@@ -1,4 +1,4 @@
-# Compilation Errors Fixed - Summary
+﻿# Compilation Errors Fixed - Summary
 
 ## Overview
 Fixed multiple compilation errors in the Kotlin Multiplatform project related to:
@@ -18,7 +18,7 @@ Fixed multiple compilation errors in the Kotlin Multiplatform project related to
 ### 2. ChatListViewModel.kt
 **Issue**: `System.currentTimeMillis()` not available in common code
 **Fix**: 
-- Added import: `com.krieta.com.core.util.currentTimeMillis`
+- Added import: `com.runinga.com.core.util.currentTimeMillis`
 - Replaced `System.currentTimeMillis()` with `currentTimeMillis()`
 
 ### 3. ChatRoomViewModel.kt
@@ -34,13 +34,13 @@ Fixed multiple compilation errors in the Kotlin Multiplatform project related to
 
 ### 5. CommentsViewModel.kt
 **Issue**: `System.currentTimeMillis()` references (already using Clock.System but import was missing)
-**Fix**: Added import: `com.krieta.com.core.util.currentTimeMillis`
+**Fix**: Added import: `com.runinga.com.core.util.currentTimeMillis`
 
 ### 6. CreateContestViewModel.kt
-**Issue**: `String.format()` and `com.krieta.com.core.util.formatString()` usage
+**Issue**: `String.format()` and `com.runinga.com.core.util.formatString()` usage
 **Fix**:
-- Added import: `com.krieta.com.core.util.formatString`
-- Replaced `com.krieta.com.core.util.formatString()` with `formatString()`
+- Added import: `com.runinga.com.core.util.formatString`
+- Replaced `com.runinga.com.core.util.formatString()` with `formatString()`
 
 ### 7. CampaignScreens.kt
 **Issue**: `DateTimePeriod` usage
@@ -49,14 +49,14 @@ Fixed multiple compilation errors in the Kotlin Multiplatform project related to
 ### 8. WithdrawViewModel.kt (both versions)
 **Issue**: `System.currentTimeMillis()` and `toByteArray()` issues
 **Fix**:
-- Added import: `com.krieta.com.core.util.currentTimeMillis`
+- Added import: `com.runinga.com.core.util.currentTimeMillis`
 - Replaced `System.currentTimeMillis()` with `currentTimeMillis()`
 - Replaced `"...".toByteArray()` with `"...".encodeToByteArray()`
 
 ### 9. CreateCampaignViewModel.kt (sponsored)
 **Issue**: `System.currentTimeMillis()` and `fiatToKr` method
 **Fix**:
-- Added import: `com.krieta.com.core.util.currentTimeMillis`
+- Added import: `com.runinga.com.core.util.currentTimeMillis`
 - Replaced `System.currentTimeMillis()` with `currentTimeMillis()`
 - Fixed `fiatToKr()` to use `KrCurrencyFormatter.fiatToKr()` with exchange rate
 
@@ -64,13 +64,13 @@ Fixed multiple compilation errors in the Kotlin Multiplatform project related to
 **Issue**: `currencyProvider.fiatToKr()` method doesn't exist, `String.format()` usage
 **Fix**:
 - Replaced `currencyProvider.fiatToKr(it)` with `KrCurrencyFormatter.fiatToKr(it, exchangeRate?.baseRate ?: 0.0)`
-- Added import: `com.krieta.com.core.util.formatString`
+- Added import: `com.runinga.com.core.util.formatString`
 - Replaced `String.format()` with `formatString()`
 
 ### 11. MultiSignatureManager.kt
 **Issue**: `System.currentTimeMillis()` and `inWholeMinutes` compatibility
 **Fix**:
-- Added import: `com.krieta.com.core.util.currentTimeMillis`
+- Added import: `com.runinga.com.core.util.currentTimeMillis`
 - Replaced duration calculations using `inWholeMinutes` with manual millisecond calculations
 - Used `toEpochMilliseconds()` for timestamp comparisons
 
@@ -84,27 +84,27 @@ Fixed multiple compilation errors in the Kotlin Multiplatform project related to
 ### 13. WithdrawalSecurity.kt
 **Issue**: `System.currentTimeMillis()`
 **Fix**:
-- Added import: `com.krieta.com.core.util.currentTimeMillis`
+- Added import: `com.runinga.com.core.util.currentTimeMillis`
 - Replaced `System.currentTimeMillis()` with `currentTimeMillis()`
 
 ### 14. MediaUploadMonitor.kt
 **Issue**: Missing import (already using Clock.System correctly)
-**Fix**: Added import: `com.krieta.com.core.util.currentTimeMillis`
+**Fix**: Added import: `com.runinga.com.core.util.currentTimeMillis`
 
 ## Platform-Specific Utilities Used
 
 ### currentTimeMillis()
-- **Location**: `com.krieta.com.core.util.Platform.kt`
+- **Location**: `com.runinga.com.core.util.Platform.kt`
 - **Purpose**: Platform-agnostic way to get current time in milliseconds
 - **Usage**: Replaces `System.currentTimeMillis()` in common code
 
 ### formatString()
-- **Location**: `com.krieta.com.core.util.StringFormat.kt`
+- **Location**: `com.runinga.com.core.util.StringFormat.kt`
 - **Purpose**: Platform-agnostic string formatting
 - **Usage**: Replaces `String.format()` in common code
 
-### KrCurrencyFormatter
-- **Location**: `com.krieta.com.core.util.KrCurrencyFormatter.kt`
+### RcCurrencyFormatter
+- **Location**: `com.runinga.com.core.util.KrCurrencyFormatter.kt`
 - **Methods**: `fiatToKr()`, `krToFiat()`, `formatKr()`, `formatFiat()`
 - **Purpose**: Currency conversion and formatting utilities
 

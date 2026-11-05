@@ -1,4 +1,4 @@
-# Logout Cache Clearing Implementation
+﻿# Logout Cache Clearing Implementation
 
 ## Problem
 When a user logs out and another user logs in on the same device, the old user's profile data was still being displayed. This was caused by multiple caching layers not being properly cleared on logout.
@@ -25,7 +25,7 @@ When a user logs out and another user logs in on the same device, the old user's
 
 ### 2. Frontend/Mobile App Changes
 
-#### File: `composeApp/src/commonMain/kotlin/com/krieta/feature/profile/presentation/viewmodel/ProfileViewModel.kt`
+#### File: `composeApp/src/commonMain/kotlin/com/runinga/feature/profile/presentation/viewmodel/ProfileViewModel.kt`
 - **Updated `logout()` function** to clear the in-memory cached profile:
   ```kotlin
   fun logout(onSuccess: () -> Unit) {
@@ -40,7 +40,7 @@ When a user logs out and another user logs in on the same device, the old user's
   ```
 - **Updated `wipeCache()` function** with the same logic
 
-#### File: `composeApp/src/commonMain/kotlin/com/krieta/feature/auth/data/repository/AuthRepositoryImpl.kt`
+#### File: `composeApp/src/commonMain/kotlin/com/runinga/feature/auth/data/repository/AuthRepositoryImpl.kt`
 - **Added `ProfileLocalDataSource` dependency** to constructor:
   ```kotlin
   class AuthRepositoryImpl(
@@ -68,7 +68,7 @@ When a user logs out and another user logs in on the same device, the old user's
   }
   ```
 
-#### File: `composeApp/src/commonMain/kotlin/com/krieta/feature/auth/di/AuthModule.kt`
+#### File: `composeApp/src/commonMain/kotlin/com/runinga/feature/auth/di/AuthModule.kt`
 - **Updated DI configuration** to inject `ProfileLocalDataSource`:
   ```kotlin
   single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get(), get()) }
@@ -107,9 +107,9 @@ When a user logs out and another user logs in on the same device, the old user's
 1. `backend/src/modules/auth/auth.controller.ts`
 
 ### Frontend (3 files)
-1. `composeApp/src/commonMain/kotlin/com/krieta/feature/profile/presentation/viewmodel/ProfileViewModel.kt`
-2. `composeApp/src/commonMain/kotlin/com/krieta/feature/auth/data/repository/AuthRepositoryImpl.kt`
-3. `composeApp/src/commonMain/kotlin/com/krieta/feature/auth/di/AuthModule.kt`
+1. `composeApp/src/commonMain/kotlin/com/runinga/feature/profile/presentation/viewmodel/ProfileViewModel.kt`
+2. `composeApp/src/commonMain/kotlin/com/runinga/feature/auth/data/repository/AuthRepositoryImpl.kt`
+3. `composeApp/src/commonMain/kotlin/com/runinga/feature/auth/di/AuthModule.kt`
 
 ## How It Works
 

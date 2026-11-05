@@ -1,4 +1,4 @@
-# Live Streaming - Quick Reference
+﻿# Live Streaming - Quick Reference
 
 ## 🎯 Quick Start
 
@@ -178,7 +178,7 @@ actual class CameraManager {
 
 ### Payment Flow
 ```
-100 Kr gift → 85 Kr creator + 15 Kr platform
+100 Rc gift → 85 Rc creator + 15 Rc platform
 ```
 
 ---

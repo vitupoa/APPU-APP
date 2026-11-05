@@ -1,7 +1,7 @@
-# Content Locking Feature Implementation
+﻿# Content Locking Feature Implementation
 
 ## Overview
-Implemented the ability for creators to lock posts (Drips) and shorts during creation. Locked content requires viewers to either pay a Kr amount or subscribe to the creator's profile to unlock.
+Implemented the ability for creators to lock posts (Drips) and shorts during creation. Locked content requires viewers to either pay a Rc amount or subscribe to the creator's profile to unlock.
 
 ## ✅ ANSWERS TO KEY QUESTIONS
 
@@ -44,7 +44,7 @@ Implemented the ability for creators to lock posts (Drips) and shorts during cre
 
 - **Two Ways to Unlock**:
   1. **Subscribe to Creator**: Get access to ALL locked content at that tier level
-  2. **Pay Per Content**: Pay Kr amount to unlock just this one post/short
+  2. **Pay Per Content**: Pay Rc amount to unlock just this one post/short
 
 ### 3. Content Randomization for Different Users
 **YES!** Content is served randomly and differently to each user:
@@ -90,14 +90,14 @@ Implemented the ability for creators to lock posts (Drips) and shorts during cre
 ### 1. Creator Experience (Content Creation)
 - **Lock Toggle**: Added a switch in both CreatePostScreen and CreateShortScreen to enable/disable content locking
 - **Price Input**: When locked, creators enter unlock price in their local currency (e.g., KES, USD)
-- **Real-time Conversion**: Shows Kr equivalent using the universal currency conversion system from wallet
+- **Real-time Conversion**: Shows Rc equivalent using the universal currency conversion system from wallet
 - **Validation**: Ensures valid price is entered before allowing post/short creation
 
 ### 2. Currency Conversion
 - Uses existing `UserCurrencyProvider` for currency conversion
 - Creator enters price in their local currency
-- Automatically converts to Kr using exchange rate: `Kr = localAmount / exchangeRate`
-- Displays Kr preview below the input field
+- Automatically converts to Rc using exchange rate: `Rc = localAmount / exchangeRate`
+- Displays Rc preview below the input field
 
 ### 3. Backend Integration
 - **Database**: Both `Post` and `shorts` models already have `unlock_amount_kr` field
@@ -117,61 +117,61 @@ Implemented the ability for creators to lock posts (Drips) and shorts during cre
 ### Frontend (Kotlin Multiplatform)
 
 #### Create Screens
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/screen/CreatePostScreen.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/screen/CreatePostScreen.kt`
   - Added lock toggle UI
   - Added price input field with currency label
-  - Added Kr conversion display
+  - Added Rc conversion display
   - Integrated UserCurrencyProvider
 
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/CreateShortScreen.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/CreateShortScreen.kt`
   - Same UI additions as CreatePostScreen
 
 #### View Models
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/viewmodel/CreatePostViewModel.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/viewmodel/CreatePostViewModel.kt`
   - Added `isLocked`, `unlockPriceLocal`, `unlockPriceKr` to state
   - Added `toggleLock()` method
   - Added `updateUnlockPrice()` method with currency conversion logic
   - Updated `post()` to validate and pass lock parameters
 
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/viewmodel/CreateShortViewModel.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/viewmodel/CreateShortViewModel.kt`
   - Same additions as CreatePostViewModel
 
 #### Upload System
-- `composeApp/src/commonMain/kotlin/com/krieta/com/core/upload/BackgroundUploader.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/com/core/upload/BackgroundUploader.kt`
   - Added `isLocked` and `unlockAmountKr` parameters to `enqueueUpload()`
 
-- `composeApp/src/androidMain/kotlin/com/krieta/com/core/upload/BackgroundUploader.android.kt`
+- `composeApp/src/androidMain/kotlin/com/runinga/com/core/upload/BackgroundUploader.android.kt`
   - Updated to pass lock parameters to WorkManager
 
-- `composeApp/src/iosMain/kotlin/com/krieta/com/core/upload/BackgroundUploader.ios.kt`
+- `composeApp/src/iosMain/kotlin/com/runinga/com/core/upload/BackgroundUploader.ios.kt`
   - Updated to pass lock parameters to IosUploadProcessor
 
-- `composeApp/src/androidMain/kotlin/com/krieta/com/core/upload/UploadWorker.kt`
+- `composeApp/src/androidMain/kotlin/com/runinga/com/core/upload/UploadWorker.kt`
   - Extracts `IS_LOCKED` and `UNLOCK_AMOUNT_KR` from WorkManager data
   - Passes to repository methods
 
-- `composeApp/src/iosMain/kotlin/com/krieta/com/core/upload/IosUploadProcessor.kt`
+- `composeApp/src/iosMain/kotlin/com/runinga/com/core/upload/IosUploadProcessor.kt`
   - Accepts lock parameters
   - Passes to repository methods
 
 #### Repositories
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/domain/repository/FeedRepository.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/domain/repository/FeedRepository.kt`
   - Updated `createPost()` signature to accept `isLocked` and `unlockAmountKr`
 
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/data/repository/FeedRepositoryImpl.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/data/repository/FeedRepositoryImpl.kt`
   - Updated implementation to pass lock parameters to API
 
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/data/remote/FeedApi.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/data/remote/FeedApi.kt`
   - Updated `CreatePostRequest` DTO to include lock fields
   - Updated `createPost()` method signature
 
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/domain/repository/ShortsRepository.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/domain/repository/ShortsRepository.kt`
   - Updated `createShort()` signature to accept `isLocked` and `unlockAmountKr`
 
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/data/repository/ShortsRepositoryImpl.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/data/repository/ShortsRepositoryImpl.kt`
   - Updated implementation to pass lock parameters to API
 
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/data/remote/dto/ShortsDtos.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/data/remote/dto/ShortsDtos.kt`
   - Updated `CreateShortRequestDto` to include `unlockAmountKr` field
 
 ### Backend (Node.js/TypeScript)
@@ -190,8 +190,8 @@ Implemented the ability for creators to lock posts (Drips) and shorts during cre
 2. Toggles "Lock this content" switch
 3. Enters unlock price in their local currency (e.g., "100" KES)
 4. System fetches exchange rate from UserCurrencyProvider
-5. Converts to Kr: `Kr = 100 / 0.0085 = 11,764.71 Kr`
-6. Displays conversion: "≈ Kr.11,764.71"
+5. Converts to Rc: `Rc = 100 / 0.0085 = 11,764.71 Rc`
+6. Displays conversion: "≈ Rc.11,764.71"
 7. Creator clicks "Post"
 8. Upload system queues upload with lock parameters
 9. Backend creates post/short with `is_locked=true` and `unlock_amount_kr=11764.71`
@@ -212,17 +212,17 @@ The conversion uses the wallet's universal currency system:
 fun updateUnlockPrice(priceLocal: String, exchangeRate: Double?) {
     val priceDouble = priceLocal.toDoubleOrNull()
     if (priceDouble != null && priceDouble > 0 && exchangeRate != null && exchangeRate > 0) {
-        // Convert local currency to Kr
+        // Convert local currency to Rc
         val krAmount = priceDouble / exchangeRate
-        _state.value = _state.value.copy(unlockPriceKr = krAmount)
+        _state.value = _state.value.copy(unlockPriceRc = krAmount)
     }
 }
 ```
 
 **Example**:
 - Creator in Kenya enters: 100 KES
-- Exchange rate: 1 Kr = 0.0085 KES
-- Calculation: 100 / 0.0085 = 11,764.71 Kr
+- Exchange rate: 1 Rc = 0.0085 KES
+- Calculation: 100 / 0.0085 = 11,764.71 Rc
 - Stored in database: `unlock_amount_kr = 11764.71`
 
 ## Testing Checklist
@@ -231,7 +231,7 @@ fun updateUnlockPrice(priceLocal: String, exchangeRate: Double?) {
 - [ ] Lock toggle works on CreatePostScreen
 - [ ] Lock toggle works on CreateShortScreen
 - [ ] Price input accepts decimal numbers
-- [ ] Kr conversion displays correctly
+- [ ] Rc conversion displays correctly
 - [ ] Validation prevents posting without price when locked
 - [ ] Currency code displays correctly (KES, USD, etc.)
 - [ ] Exchange rate fetches on screen load

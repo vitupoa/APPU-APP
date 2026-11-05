@@ -1,7 +1,7 @@
-# Immersive 9:16 Live Streaming
+﻿# Immersive 9:16 Live Streaming
 
 ## Overview
-All live streams in Krieta are displayed in **full immersive 9:16 portrait aspect ratio** (vertical format). The system automatically adapts to any camera shooting aspect ratio while maintaining the 9:16 output.
+All live streams in Runinga are displayed in **full immersive 9:16 portrait aspect ratio** (vertical format). The system automatically adapts to any camera shooting aspect ratio while maintaining the 9:16 output.
 
 ## Key Features ✅
 
@@ -140,7 +140,7 @@ All resolutions maintain 9:16 aspect ratio.
 ### 9. Implementation Details
 
 #### VideoProcessor Class
-**Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/data/video/VideoProcessor.kt`
+**Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/data/video/VideoProcessor.kt`
 
 **Methods**:
 - `initialize()` - Setup blur filters

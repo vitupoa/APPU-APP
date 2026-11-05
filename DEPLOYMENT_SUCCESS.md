@@ -1,4 +1,4 @@
-# ✅ DEPLOYMENT SUCCESS - Admire & Message Integration
+﻿# ✅ DEPLOYMENT SUCCESS - Admire & Message Integration
 
 ## 🎉 Build Status: SUCCESSFUL
 
@@ -124,7 +124,7 @@ Expected: Creator is admired
 ### Test 4: Locked Chat
 ```
 1. Message creator with locked chat
-Expected: Shows error "Chat is locked. Unlock fee: X Kr"
+Expected: Shows error "Chat is locked. Unlock fee: X Rc"
 ```
 
 ### Test 5: Become Lovers
@@ -154,7 +154,7 @@ Expected: Both show "Unlove" button, relationship = LOVERS
 ## 🎯 Next Steps
 
 1. **Test on Device**
-   - Open the Krieta app on your Nokia G20
+   - Open the Runinga app on your Nokia G20
    - Navigate to any user profile
    - Test Admire button
    - Test Message button
@@ -237,7 +237,7 @@ curl http://YOUR_IP:3000/api/v1/users/me -H "Authorization: Bearer YOUR_TOKEN"
 
 If you need help testing or encounter any issues:
 
-1. Check device logs: `adb logcat | grep Krieta`
+1. Check device logs: `adb logcat | grep Runinga`
 2. Test backend: `curl http://YOUR_IP:3000/api/v1/users/me`
 3. Review documentation: `INTEGRATION_COMPLETE.md`
 

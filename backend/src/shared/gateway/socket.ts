@@ -18,20 +18,16 @@ export function initializeGateway(httpServer: HttpServer) {
   io.adapter(createAdapter(pubClient, subClient));
 
   io.on('connection', (socket) => {
-    console.log(`[Gateway] Client connection initiated: ${socket.id}`);
-
     // Join secure room authenticated mapping
     socket.on('authenticate', (data) => {
       // Expecting { user_id: string } natively
       if (data && data.user_id) {
         socket.join(`user:${data.user_id}`);
-        console.log(`[Gateway] Socket ${socket.id} securely joined user channel: user:${data.user_id}`);
-      }
+        }
     });
 
     socket.on('disconnect', () => {
-      console.log(`[Gateway] Client disconnected: ${socket.id}`);
-    });
+      });
   });
 
   return io;

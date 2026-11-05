@@ -1,4 +1,4 @@
-# ✅ FINAL CHECKLIST - Ready to Debug
+﻿# ✅ FINAL CHECKLIST - Ready to Debug
 
 ## Backend Status: ✅ COMPLETE
 - [x] TypeScript errors fixed
@@ -18,7 +18,7 @@
 
 ### 1. Build Mobile App (2 minutes)
 ```bash
-cd c:\Users\ADMIN\Krieta
+cd c:\Users\ADMIN\Runinga
 ./gradlew :composeApp:installDebug
 ```
 
@@ -77,7 +77,7 @@ Look for one of these:
 You'll know it's working when:
 1. Logcat shows: `✅ Exchange Rate Parsed Successfully`
 2. Top-up screen displays exchange rate
-3. Kr preview calculates correctly
+3. Rc preview calculates correctly
 4. No error messages
 
 ---

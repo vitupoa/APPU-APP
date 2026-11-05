@@ -1,4 +1,4 @@
-# Quick Start Guide
+﻿# Quick Start Guide
 
 ## Testing the New Features
 
@@ -85,14 +85,14 @@
 3. Tap gift icon on right side
 4. Tipping modal opens
 5. Enter amount or use quick buttons
-6. Observe Kr ↔ Fiat conversion
+6. Observe Rc ↔ Fiat conversion
 7. Tap "Send Tip"
 
 **Expected Behavior:**
 - Modal shows recipient info
 - Currency conversion is real-time
-- Quick buttons: 50, 100, 500, 1000 Kr
-- Balance validation (min 50 Kr)
+- Quick buttons: 50, 100, 500, 1000 Rc
+- Balance validation (min 50 Rc)
 - Redirects to wallet if insufficient balance
 - Tip button NOT shown on contest content
 
@@ -131,7 +131,7 @@
 ### Issue: Tipping not working
 **Solution:**
 - Verify wallet balance
-- Check minimum tip amount (50 Kr)
+- Check minimum tip amount (50 Rc)
 - Ensure user is not tipping own content
 - Verify exchange rate is loaded
 

@@ -1,4 +1,4 @@
-# Enhanced Explore Tab - Implementation Complete ✅
+﻿# Enhanced Explore Tab - Implementation Complete ✅
 
 ## Overview
 The Explore tab has been enhanced with TikTok-inspired trending content sections, providing users with a comprehensive discovery experience.
@@ -69,7 +69,7 @@ The Explore tab has been enhanced with TikTok-inspired trending content sections
 ## Architecture
 
 ### Domain Layer
-**Location:** `com.krieta.feature.explore.domain`
+**Location:** `com.runinga.feature.explore.domain`
 
 **Models:**
 - `TrendingHashtag` - Hashtag with view/post counts
@@ -91,7 +91,7 @@ interface ExploreRepository {
 ```
 
 ### Data Layer
-**Location:** `com.krieta.feature.explore.data.repository`
+**Location:** `com.runinga.feature.explore.data.repository`
 
 **Implementation:**
 - `ExploreRepositoryImpl` - Mock implementation with sample data
@@ -99,7 +99,7 @@ interface ExploreRepository {
 - Ready to be replaced with real API calls
 
 ### Presentation Layer
-**Location:** `com.krieta.feature.explore.presentation.viewmodel`
+**Location:** `com.runinga.feature.explore.presentation.viewmodel`
 
 **ViewModel:**
 ```kotlin
@@ -126,7 +126,7 @@ data class ExploreState(
 ```
 
 ### UI Components
-**Location:** `com.krieta.com.core.navigation.Tabs.kt`
+**Location:** `com.runinga.com.core.navigation.Tabs.kt`
 
 **Composables:**
 - `TrendingContent` - Main container with LazyColumn
@@ -223,7 +223,7 @@ Explore Tab
 ## Dependency Injection
 
 **Module:** `exploreModule`
-**Location:** `com.krieta.feature.explore.di.ExploreModule.kt`
+**Location:** `com.runinga.feature.explore.di.ExploreModule.kt`
 
 ```kotlin
 val exploreModule = module {
@@ -354,7 +354,7 @@ Currently using mock data with:
 
 ### New Files
 ```
-composeApp/src/commonMain/kotlin/com/krieta/feature/explore/
+composeApp/src/commonMain/kotlin/com/runinga/feature/explore/
 ├── domain/
 │   ├── model/
 │   │   └── TrendingModels.kt
@@ -372,7 +372,7 @@ composeApp/src/commonMain/kotlin/com/krieta/feature/explore/
 
 ### Modified Files
 ```
-composeApp/src/commonMain/kotlin/com/krieta/com/core/
+composeApp/src/commonMain/kotlin/com/runinga/com/core/
 ├── navigation/
 │   └── Tabs.kt (Enhanced ExploreScreen + UI components)
 └── di/

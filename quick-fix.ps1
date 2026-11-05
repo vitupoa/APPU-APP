@@ -1,21 +1,21 @@
-Write-Host "Fixing all compilation errors..." -ForegroundColor Cyan
+﻿Write-Host "Fixing all compilation errors..." -ForegroundColor Cyan
 
 # 1. Fix SQLDelight Boolean imports
 Write-Host "`n1. Fixing SQLDelight Boolean imports..." -ForegroundColor Yellow
 $sqlFiles = @(
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\ChatQueries.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\Conversation.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\Drip.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\DripComment.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\DripQueries.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\Message.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\Product.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\ProductQueries.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\ProfileQueries.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\Short.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\ShortComment.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\ShortQueries.kt",
-    "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db\UserProfile.kt"
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\ChatQueries.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\Conversation.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\Drip.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\DripComment.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\DripQueries.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\Message.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\Product.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\ProductQueries.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\ProfileQueries.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\Short.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\ShortComment.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\ShortQueries.kt",
+    "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db\UserProfile.kt"
 )
 
 foreach ($file in $sqlFiles) {

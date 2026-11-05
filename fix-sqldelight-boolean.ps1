@@ -1,7 +1,7 @@
-# Fix SQLDelight Boolean import issue
+﻿# Fix SQLDelight Boolean import issue
 # This script fixes the "import Boolean" to "import kotlin.Boolean" in generated files
 
-$generatedPath = "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db"
+$generatedPath = "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db"
 
 Write-Host "Fixing SQLDelight Boolean imports..." -ForegroundColor Cyan
 

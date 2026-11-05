@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+﻿import { Request, Response, NextFunction } from 'express';
 import { transactionContextService } from '../services/compliance/transactionContext.service.js';
 import { kycTierService } from '../services/compliance/kycTier.service.js';
 
@@ -67,7 +67,7 @@ export async function validateTransactionContext(req: Request, res: Response, ne
 export async function enforceKYCLimits(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = req.user?.id;
-    const amountKr = req.body.amount_kr || req.body.amount;
+    const amountRc = req.body.amount_kr || req.body.amount;
 
     if (!userId || !amountKr) {
       next();

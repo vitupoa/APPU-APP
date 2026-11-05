@@ -1,4 +1,4 @@
-# BRAND MARKETPLACE SYSTEM - EXECUTIVE SUMMARY
+﻿# BRAND MARKETPLACE SYSTEM - EXECUTIVE SUMMARY
 ## Transforming Contests into a Unified Sales & Marketing Engine
 
 ---
@@ -97,8 +97,8 @@ LEGAL Implementation:
 
 Example:
 - User can join contest FREE
-- Optional: Buy product for Kr.50+ → Auto-entered
-- User gets Kr.50+ worth of product (main value)
+- Optional: Buy product for Rc.50+ → Auto-entered
+- User gets Rc.50+ worth of product (main value)
 - Contest entry is bonus
 - Still competes based on submission quality
 ```
@@ -142,11 +142,11 @@ RETENTION (100) → Repeat customer
 ADVOCACY (20) → Became promoter
 
 ROI Dashboard:
-- Investment: Kr.11,500 (prize + fees)
-- Revenue: Kr.85,000 (purchases + conversions + sponsorships)
-- Net Profit: Kr.73,500
+- Investment: Rc.11,500 (prize + fees)
+- Revenue: Rc.85,000 (purchases + conversions + sponsorships)
+- Net Profit: Rc.73,500
 - ROI: 639%
-- Revenue per participant: Kr.17
+- Revenue per participant: Rc.17
 ```
 
 ### 8. ✅ Create Sponsor Marketplace
@@ -349,23 +349,23 @@ Influencer Flow:
 
 ### 1. Contest Platform Fees (15%)
 ```
-Contest prize: Kr.10,000
-Platform fee: Kr.1,500
-Total charged: Kr.11,500
+Contest prize: Rc.10,000
+Platform fee: Rc.1,500
+Total charged: Rc.11,500
 ```
 
 ### 2. Campaign Fees (10%)
 ```
-Campaign budget: Kr.20,000
-Platform fee: Kr.2,000
-Total charged: Kr.22,000
+Campaign budget: Rc.20,000
+Platform fee: Rc.2,000
+Total charged: Rc.22,000
 ```
 
 ### 3. Sponsorship Fees (5%)
 ```
-Sponsorship amount: Kr.5,000
-Platform fee: Kr.250
-Total charged: Kr.5,250
+Sponsorship amount: Rc.5,000
+Platform fee: Rc.250
+Total charged: Rc.5,250
 ```
 
 ### 4. Premium Features
@@ -375,7 +375,7 @@ Total charged: Kr.5,250
 - White-label solutions
 
 ### 5. Transaction Fees
-- Payment processing (2.9% + Kr.0.30)
+- Payment processing (2.9% + Rc.0.30)
 - Currency conversion
 - Withdrawal fees
 
@@ -387,19 +387,19 @@ Total charged: Kr.5,250
 - Onboard 100 brands
 - Recruit 1,000 influencers
 - Run 500 contests
-- Process Kr.1M in transactions
+- Process Rc.1M in transactions
 
 ### Phase 2: Scale (Month 4-6)
 - Expand to 500 brands
 - Grow to 5,000 influencers
 - Run 2,000 contests
-- Process Kr.10M in transactions
+- Process Rc.10M in transactions
 
 ### Phase 3: Dominate (Month 7-12)
 - Reach 2,000 brands
 - Achieve 20,000 influencers
 - Run 10,000 contests
-- Process Kr.100M in transactions
+- Process Rc.100M in transactions
 
 ---
 

@@ -1,4 +1,4 @@
-# Chat Media Upload - Complete Implementation Index
+﻿# Chat Media Upload - Complete Implementation Index
 
 ## 📁 Files Created/Modified
 
@@ -124,7 +124,7 @@
 
 ### Cloudinary Folders
 ```
-Krieta/Chats/
+Runinga/Chats/
 ├── Direct/Images/
 ├── Direct/Videos/
 ├── Group/Images/
@@ -177,7 +177,7 @@ curl -X POST http://localhost:3000/api/v1/chat/CHAT_ID/media/signature \
 ### 3. Implement Mobile
 ```bash
 # Copy Kotlin example
-cp CHAT_MEDIA_KOTLIN_EXAMPLE.kt composeApp/src/commonMain/kotlin/com/krieta/chat/media/
+cp CHAT_MEDIA_KOTLIN_EXAMPLE.kt composeApp/src/commonMain/kotlin/com/runinga/chat/media/
 
 # Implement UI components
 # See CHAT_MEDIA_KOTLIN_EXAMPLE.kt for examples

@@ -1,4 +1,4 @@
-# 🚀 SECURITY FIXES DEPLOYMENT CHECKLIST
+﻿# 🚀 SECURITY FIXES DEPLOYMENT CHECKLIST
 
 ## ✅ IMPLEMENTED FIXES
 
@@ -101,7 +101,7 @@ Expected output: All tables should show `rowsecurity = true`
 ### 4. Update Environment Variables
 ```env
 # Ensure CORS is properly configured
-CORS_ORIGIN=https://krieta.com,https://www.krieta.com,https://app.krieta.com
+CORS_ORIGIN=https://runinga.com,https://www.runinga.com,https://app.runinga.com
 
 # Ensure Redis is configured
 REDIS_URL=redis://localhost:6379
@@ -144,12 +144,12 @@ cd /app/backend
 
 ### 4. Restart Application
 ```bash
-pm2 restart krieta-api
+pm2 restart runinga-api
 ```
 
 ### 5. Monitor Logs
 ```bash
-pm2 logs krieta-api --lines 100
+pm2 logs runinga-api --lines 100
 ```
 
 ---
@@ -159,14 +159,14 @@ pm2 logs krieta-api --lines 100
 ### 1. Test RLS
 ```bash
 # Try to access another user's data (should fail)
-curl -X GET https://api.krieta.com/api/v1/users/{other-user-id} \
+curl -X GET https://api.runinga.com/api/v1/users/{other-user-id} \
   -H "Authorization: Bearer {your-token}"
 ```
 
 ### 2. Test IP Whitelisting
 ```bash
 # Try webhook from non-whitelisted IP (should fail with 403)
-curl -X POST https://api.krieta.com/api/v1/webhooks/paypal \
+curl -X POST https://api.runinga.com/api/v1/webhooks/paypal \
   -H "Content-Type: application/json" \
   -d '{"test": "data"}'
 ```
@@ -175,7 +175,7 @@ curl -X POST https://api.krieta.com/api/v1/webhooks/paypal \
 ```bash
 # Make multiple rapid requests (should get 429 after limit)
 for i in {1..100}; do
-  curl -X GET https://api.krieta.com/api/v1/users/me \
+  curl -X GET https://api.runinga.com/api/v1/users/me \
     -H "Authorization: Bearer {token}"
 done
 ```
@@ -183,7 +183,7 @@ done
 ### 4. Test Ownership Validation
 ```bash
 # Try to update another user's profile (should fail with 403)
-curl -X PUT https://api.krieta.com/api/v1/users/{other-user-id} \
+curl -X PUT https://api.runinga.com/api/v1/users/{other-user-id} \
   -H "Authorization: Bearer {your-token}" \
   -H "Content-Type: application/json" \
   -d '{"bio": "hacked"}'
@@ -192,7 +192,7 @@ curl -X PUT https://api.krieta.com/api/v1/users/{other-user-id} \
 ### 5. Test Sensitive Data Removal
 ```bash
 # View another user's profile (should not show sensitive data)
-curl -X GET https://api.krieta.com/api/v1/users/{other-user-id}
+curl -X GET https://api.runinga.com/api/v1/users/{other-user-id}
 # Should NOT contain: isWalletUnlocked, kycStatus, currency
 ```
 
@@ -231,7 +231,7 @@ ALTER TABLE withdrawal_requests DISABLE ROW LEVEL SECURITY;
 ```bash
 git revert HEAD
 git push origin main
-pm2 restart krieta-api
+pm2 restart runinga-api
 ```
 
 ### 3. Restore Database

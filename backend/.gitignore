@@ -13,3 +13,6 @@ test-query.ts
 test-upload.cjs
 tsc-errors.txt
 dummy.jpg
+
+# Firebase credentials
+*.json

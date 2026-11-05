@@ -1,4 +1,4 @@
-# Contest Judging Features - Verification Summary ✅
+﻿# Contest Judging Features - Verification Summary ✅
 
 ## All Requested Features Implemented and Ready
 
@@ -8,15 +8,15 @@
 
 **Code:**
 ```typescript
-const platformFeeKr = data.prizeTotalKr * PLATFORM_FEE_RATE;
-const totalDailyPrizePool = data.allowDailyPrizes && data.dailyPrizeKr ? (data.dailyPrizeKr * durationDays) : 0;
+const platformFeeRc = data.prizeTotalRc * PLATFORM_FEE_RATE;
+const totalDailyPrizePool = data.allowDailyPrizes && data.dailyPrizeRc ? (data.dailyPrizeRc * durationDays) : 0;
 const dailyPrizePlatformFee = totalDailyPrizePool * PLATFORM_FEE_RATE;
 
-const airdropTotalPool = (data.airdropKr && data.airdropLimit) ? (data.airdropKr * data.airdropLimit) : 0;
+const airdropTotalPool = (data.airdropRc && data.airdropLimit) ? (data.airdropRc * data.airdropLimit) : 0;
 const airdropPlatformFee = airdropTotalPool * PLATFORM_FEE_RATE;
 
-const totalChargedKr = new Prisma.Decimal(
-  data.prizeTotalKr + platformFeeKr + 
+const totalChargedRc = new Prisma.Decimal(
+  data.prizeTotalRc + platformFeeRc + 
   totalDailyPrizePool + dailyPrizePlatformFee + 
   airdropTotalPool + airdropPlatformFee
 );
@@ -34,7 +34,7 @@ POST /api/v1/contests
 # Calculation:
 # Prize: 1000 + (1000 × 0.15) = 1150
 # Airdrops: 1000 + (1000 × 0.15) = 1150
-# Total Charged: 2300 Kr ✅
+# Total Charged: 2300 Rc ✅
 ```
 
 ---
@@ -181,9 +181,9 @@ static async distributeContestPrizes(contestId: string, winnerIds?: string[]) {
 {
   "prizeTotalKr": 1000,
   "prizeDistribution": [
-    { "rank": 1, "percentage": 50 },  // Gets Kr 500
-    { "rank": 2, "percentage": 30 },  // Gets Kr 300
-    { "rank": 3, "percentage": 20 }   // Gets Kr 200
+    { "rank": 1, "percentage": 50 },  // Gets Rc 500
+    { "rank": 2, "percentage": 30 },  // Gets Rc 300
+    { "rank": 3, "percentage": 20 }   // Gets Rc 200
   ]
 }
 
@@ -209,7 +209,7 @@ POST /api/v1/contests/:id/distribute
 const { ExchangeService } = await import('../../services/exchange/exchange.service.js');
 
 // Get exchange rate for user's currency
-const krToUsd = ExchangeService.getUSDFromKr(1); // 1 Kr = $100 USD
+const krToUsd = ExchangeService.getUSDFromKr(1); // 1 Rc = $100 USD
 const usdToLocalRate = await ExchangeService.getRate(userCurrency);
 const krToLocalRate = krToUsd * usdToLocalRate;
 ```
@@ -249,14 +249,14 @@ GET /api/v1/contests?currency=kes
 - All currencies supported by ExchangeService
 - USD, KES, EUR, GBP, NGN, ZAR, etc.
 - Real-time rates with 5-minute cache
-- Graceful fallback to Kr if conversion fails
+- Graceful fallback to Rc if conversion fails
 
 **Display Format:**
 ```
 Frontend should display:
 ┌─────────────────────────┐
 │  KES 14,000,000        │  ← Large, prominent
-│  Kr 1,000              │  ← Small, below
+│  Rc 1,000              │  ← Small, below
 └─────────────────────────┘
 ```
 
@@ -327,7 +327,7 @@ curl -X POST http://localhost:3000/api/v1/contests \
     "airdropLimit": 100
   }'
 
-# Expected: Total charged = 2300 Kr
+# Expected: Total charged = 2300 Rc
 # ✅ Verified in code (lines 42-58)
 ```
 
@@ -401,7 +401,7 @@ curl "http://localhost:3000/api/v1/contests/:id?currency=kes"
 
 4. **Frontend Integration**
    - Use API endpoints documented in `backend/docs/CONTEST_API_QUICK_REFERENCE.md`
-   - Display fiat amounts prominently, Kr amounts below
+   - Display fiat amounts prominently, Rc amounts below
 
 ---
 

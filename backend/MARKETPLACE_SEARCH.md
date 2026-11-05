@@ -1,4 +1,4 @@
-# Influencer Marketplace Search - Updated
+﻿# Influencer Marketplace Search - Updated
 
 ## Overview
 Businesses can now search and filter creators/influencers in the marketplace based on multiple metrics including admire count, follower count, and subscriber count.
@@ -17,8 +17,8 @@ Requires authentication token (Business account)
 - `minFollowers` (number) - Minimum followers across Instagram/TikTok/YouTube
 - `minEngagementRate` (number) - Minimum engagement rate percentage
 - `minRating` (number) - Minimum average rating (1-5)
-- `minAdmirers` (number) - **NEW** Minimum number of admirers on Krieta platform
-- `minSubscribers` (number) - **NEW** Minimum number of subscribers on Krieta platform
+- `minAdmirers` (number) - **NEW** Minimum number of admirers on Runinga platform
+- `minSubscribers` (number) - **NEW** Minimum number of subscribers on Runinga platform
 
 ### Sorting
 - `sortBy` (string) - Sort results by:
@@ -122,9 +122,9 @@ GET /api/v1/marketplace/influencers?categories=Fashion&minEngagementRate=3.0&min
 ## Key Metrics Explained
 
 ### Admirers Count
-- Number of users who "admire" (follow) the creator on Krieta platform
+- Number of users who "admire" (follow) the creator on Runinga platform
 - Indicates platform-specific popularity and engagement
-- Useful for brands targeting Krieta's active user base
+- Useful for brands targeting Runinga's active user base
 
 ### Subscribers Count
 - Number of paid subscribers to the creator's subscription tiers
@@ -139,7 +139,7 @@ GET /api/v1/marketplace/influencers?categories=Fashion&minEngagementRate=3.0&min
 ## Business Use Cases
 
 1. **Micro-Influencer Discovery**: Find rising creators with high engagement but lower follower counts
-2. **Platform-Native Campaigns**: Target creators with strong Krieta presence (high admirers/subscribers)
+2. **Platform-Native Campaigns**: Target creators with strong Runinga presence (high admirers/subscribers)
 3. **Monetization Potential**: Identify creators with proven ability to convert fans to paying subscribers
 4. **Niche Targeting**: Combine category filters with engagement metrics for precise targeting
 5. **Budget Optimization**: Sort by rate to find cost-effective influencers within budget
@@ -147,6 +147,6 @@ GET /api/v1/marketplace/influencers?categories=Fashion&minEngagementRate=3.0&min
 ## Notes
 
 - All counts are real-time from the database
-- Filtering by admirers/subscribers helps identify creators with engaged Krieta audiences
+- Filtering by admirers/subscribers helps identify creators with engaged Runinga audiences
 - Sorting options allow businesses to prioritize different metrics based on campaign goals
 - Pagination ensures efficient loading of large result sets

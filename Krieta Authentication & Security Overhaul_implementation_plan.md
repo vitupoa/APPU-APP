@@ -1,4 +1,4 @@
-# Krieta Authentication & Security Overhaul
+﻿# Runinga Authentication & Security Overhaul
 
 This plan outlines the specific security restructuring defining the removal of expensive phone-based auth alongside executing the robust 6-Digit Wallet PIN limits.
 
@@ -14,7 +14,7 @@ This plan outlines the specific security restructuring defining the removal of e
 The OTP is generated securely on the **Backend Node Express Server** natively using `Crypto` Math. The frontend never touches its logic. Storing it in Redis is mathematically bulletproof because the object physically deletes itself (TTL) after exactly 10 minutes. Even if a hacker breaches the database, the code literally does not exist there.
 
 **4. Will OTP slow down signups?**
-Yes, it adds roughly ~25 seconds of friction. However, in an ecosystem explicitly moving real Fiat and Kr Tokens, this friction is *mandatory*. It prevents "Bot Farms" from generating 50,000 fake accounts completely draining your system.
+Yes, it adds roughly ~25 seconds of friction. However, in an ecosystem explicitly moving real Fiat and Rc Tokens, this friction is *mandatory*. It prevents "Bot Farms" from generating 50,000 fake accounts completely draining your system.
 
 ## Proposed Modifications
 
@@ -27,7 +27,7 @@ Yes, it adds roughly ~25 seconds of friction. However, in an ecosystem explicitl
 3.  **Frontend Wallet Defenses (`WalletScreen.kt` & `PinSetupScreen.kt`):**
     *   As you requested, users sign up without friction! 
     *   Only when they tap the **`WALLET`** Tab for the first time implicitly, Voyager routing will hijack the screen demanding a **6-Digit PIN Setup.**
-4.  **Balance Obscuration (`Kr ***`):**
+4.  **Balance Obscuration (`Rc ***`):**
     *   Inject a floating "Eye Icon" inside `WalletScreen` mapping locally to `Boolean` DataStore limits toggling numeric displays natively!
 
 > [!IMPORTANT]

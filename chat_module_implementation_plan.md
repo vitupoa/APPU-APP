@@ -1,7 +1,7 @@
-# Krieta Chat & Chama Module Implementation Plan
+﻿# Runinga Chat & Chama Module Implementation Plan
 
 ## 🎯 Overview
-This document outlines the architecture and phased delivery of the core messaging system, stories, group-based financial systems (Chamas), personal budgeting, and advanced End-to-End Encryption (E2EE) for Krieta.
+This document outlines the architecture and phased delivery of the core messaging system, stories, group-based financial systems (Chamas), personal budgeting, and advanced End-to-End Encryption (E2EE) for Runinga.
 
 ---
 
@@ -29,7 +29,7 @@ This document outlines the architecture and phased delivery of the core messagin
 *   **Database Schema:** `Chama`, `ChamaWallet`, `ChamaMember`, `ChamaTransaction`, `ChamaVote`
 *   **Backend:** 
     *   Smart contract-like logic for Rotating, Investment, Welfare, and Hybrid chamas.
-    *   Wallet integrations: Convert M-Pesa/Bank to Kr on deposit, Kr to fiat on withdrawal.
+    *   Wallet integrations: Convert M-Pesa/Bank to Rc on deposit, Rc to fiat on withdrawal.
     *   Role-based access control (Chair, Treasurer, Secretary) for approvals.
 *   **Frontend:** In-chat Chama widgets, Chama Dashboard (Vault, Schedule, Analytics, Voting).
 
@@ -118,7 +118,7 @@ model Message {
 ---
 
 ## 📱 Mobile Architecture (Phase 1)
-1. **Module Structure:** Create `composeApp/src/commonMain/kotlin/com/krieta/feature/chat`
+1. **Module Structure:** Create `composeApp/src/commonMain/kotlin/com/runinga/feature/chat`
 2. **Navigation:** Update `BottomNavigationBar.kt` to handle 6 elements natively (or a + FAB overlay).
 3. **Local DB:** Use Room Database for `LocalMessage` caching to allow offline queueing.
 4. **UI States:** `ChatListViewModel` and `ChatRoomViewModel`.

@@ -1,4 +1,4 @@
-# ERROR HANDLING, LOGGING, ANALYTICS & DATABASE OPTIMIZATION - IMPLEMENTATION SUMMARY
+﻿# ERROR HANDLING, LOGGING, ANALYTICS & DATABASE OPTIMIZATION - IMPLEMENTATION SUMMARY
 
 ## Overview
 Comprehensive implementation of error handling for all `toDoubleOrNull()` conversions, structured logging system, analytics tracking, and database query optimization with proper indexing.
@@ -7,7 +7,7 @@ Comprehensive implementation of error handling for all `toDoubleOrNull()` conver
 
 ## 1. SAFE CONVERSION UTILITY ✅
 
-### File: `composeApp/src/commonMain/kotlin/com/krieta/com/core/util/SafeConversion.kt`
+### File: `composeApp/src/commonMain/kotlin/com/runinga/com/core/util/SafeConversion.kt`
 
 **Features:**
 - ✅ Safe String to Double conversion with error handling
@@ -421,7 +421,7 @@ REINDEX TABLE users;
 ### Frontend (Kotlin Multiplatform)
 
 - [x] Create SafeConversion utility
-- [x] Update KrAmountInput.kt
+- [x] Update RcAmountInput.kt
 - [x] Update TopupViewModel.kt
 - [x] Update WithdrawViewModel.kt
 - [x] Update CreateContestViewModel.kt
@@ -488,7 +488,7 @@ npm run dev
 VACUUM ANALYZE;
 
 -- Enable slow query logging
-ALTER DATABASE krieta SET log_min_duration_statement = 1000;
+ALTER DATABASE runinga SET log_min_duration_statement = 1000;
 ```
 
 ### Step 4: Monitoring Setup

@@ -1,4 +1,4 @@
-# Ads Implementation Summary
+﻿# Ads Implementation Summary
 
 ## ✅ What Has Been Implemented
 
@@ -132,7 +132,7 @@
 | **Ad Format** | Banners, Interstitials | Native shorts in feed |
 | **User Experience** | Disruptive | Seamless |
 | **Revenue (10K DAU)** | ~$50-100/month | ~$500-1000/month |
-| **Minimum Budget** | N/A (AdMob pays you) | 100 Kr (~$1) |
+| **Minimum Budget** | N/A (AdMob pays you) | 100 Rc (~$1) |
 | **Control** | None (Google decides) | Full control |
 | **Targeting** | Basic | Advanced (age, gender, location, interests) |
 | **Analytics** | Limited | Real-time, detailed |
@@ -236,16 +236,16 @@ backend/src/generated/
 **Assumptions:**
 - 10,000 daily active users
 - Each user sees 1 sponsored short per day
-- Average CPV: 0.05 Kr per view
+- Average CPV: 0.05 Rc per view
 - 80% view rate (3+ seconds)
 - Platform fee: 20%
 
 **Calculation:**
 - Daily impressions: 10,000
 - Daily views: 8,000 (80% view rate)
-- Daily brand spend: 8,000 × 0.05 Kr = 400 Kr
-- Daily platform revenue: 400 Kr × 20% = 80 Kr
-- **Monthly platform revenue: 80 Kr × 30 = 2,400 Kr (~$24)**
+- Daily brand spend: 8,000 × 0.05 Rc = 400 Rc
+- Daily platform revenue: 400 Rc × 20% = 80 Rc
+- **Monthly platform revenue: 80 Rc × 30 = 2,400 Rc (~$24)**
 
 **At 100,000 DAU:** ~$240/month
 **At 1,000,000 DAU:** ~$2,400/month

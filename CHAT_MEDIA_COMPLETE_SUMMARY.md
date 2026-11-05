@@ -1,4 +1,4 @@
-# Chat Media Upload - Complete Implementation Summary
+﻿# Chat Media Upload - Complete Implementation Summary
 
 ## ✅ IMPLEMENTATION COMPLETE
 
@@ -164,7 +164,7 @@ backend/
 │       └── chat.service.ts (modified)
 
 composeApp/src/
-├── commonMain/kotlin/com/krieta/feature/chat/
+├── commonMain/kotlin/com/runinga/feature/chat/
 │   ├── data/media/
 │   │   ├── ChatMediaUploadService.kt
 │   │   ├── ImageCompressor.kt
@@ -175,7 +175,7 @@ composeApp/src/
 │       └── room/
 │           ├── ChatRoomScreenUpdated.kt
 │           └── ChatRoomViewModelUpdated.kt
-└── androidMain/kotlin/com/krieta/feature/chat/
+└── androidMain/kotlin/com/runinga/feature/chat/
     └── data/media/
         └── ImageCompressor.android.kt
 ```

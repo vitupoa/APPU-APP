@@ -1,4 +1,4 @@
-# 🚀 Railway Deployment - Quick Fix Guide
+﻿# 🚀 Railway Deployment - Quick Fix Guide
 
 ## ✅ Changes Applied
 
@@ -64,7 +64,7 @@ curl https://your-app.railway.app/health
 
 Expected response:
 ```json
-{"status":"ok","service":"krieta-api","version":"1.0.0"}
+{"status":"ok","service":"runinga-api","version":"1.0.0"}
 ```
 
 ### Run Database Migrations

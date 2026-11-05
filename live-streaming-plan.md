@@ -1,6 +1,6 @@
-# 🎥 Krieta Live Streaming — Full Implementation Plan
+﻿# 🎥 Runinga Live Streaming — Full Implementation Plan
 
-> **Scope**: Live Streaming + Live Commerce + Gamification + Video Calls + Krieta Enhancements  
+> **Scope**: Live Streaming + Live Commerce + Gamification + Video Calls + Runinga Enhancements  
 > **Domains**: Database → Backend → WebSocket → Mobile (KMP Compose)  
 > **Estimated Files**: ~80+
 
@@ -84,8 +84,8 @@ model LiveStream {
   viewerCount     Int              @default(0) @map("viewer_count")
   peakViewers     Int              @default(0) @map("peak_viewers")
   likesCount      Int              @default(0) @map("likes_count")
-  totalTipsKr     Decimal          @default(0) @map("total_tips_kr") @db.Decimal(18, 4)
-  totalSalesKr    Decimal          @default(0) @map("total_sales_kr") @db.Decimal(18, 4)
+  totalTipsRc     Decimal          @default(0) @map("total_tips_kr") @db.Decimal(18, 4)
+  totalSalesRc    Decimal          @default(0) @map("total_sales_kr") @db.Decimal(18, 4)
   
   // Gift Goals
   giftGoalTitle   String?          @map("gift_goal_title")
@@ -145,7 +145,7 @@ model LiveViewer {
   userId       String   @map("user_id")
   joinedAt     DateTime @default(now()) @map("joined_at")
   leftAt       DateTime? @map("left_at")
-  totalTipsKr  Decimal  @default(0) @map("total_tips_kr") @db.Decimal(18, 4)
+  totalTipsRc  Decimal  @default(0) @map("total_tips_kr") @db.Decimal(18, 4)
   likesGiven   Int      @default(0) @map("likes_given")
 
   stream LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
@@ -175,7 +175,7 @@ model LiveTip {
   streamId     String   @map("stream_id")
   senderId     String   @map("sender_id")
   recipientId  String   @map("recipient_id")
-  amountKr     Decimal  @map("amount_kr") @db.Decimal(18, 4)
+  amountRc     Decimal  @map("amount_kr") @db.Decimal(18, 4)
   giftType     String?  @map("gift_type")
   message      String?
   createdAt    DateTime @default(now()) @map("created_at")
@@ -305,7 +305,7 @@ model CallParticipant {
 | `POST` | `/api/v1/live/:streamId/end` | End live stream |
 | `GET` | `/api/v1/live/active` | Get all active live streams (discovery) |
 | `GET` | `/api/v1/live/:streamId` | Get stream details |
-| `POST` | `/api/v1/live/:streamId/tip` | Send Kr tip (15% platform cut via WalletService) |
+| `POST` | `/api/v1/live/:streamId/tip` | Send Rc tip (15% platform cut via WalletService) |
 | `POST` | `/api/v1/live/:streamId/like` | Send likes |
 | `GET` | `/api/v1/live/:streamId/leaderboard` | Top gifters |
 | `POST` | `/api/v1/live/:streamId/pin-product` | Pin product to stream |
@@ -465,7 +465,7 @@ feature/calls/
 │  💬 Chat Messages (scroll)   │
 │  ├── @user1: Great show!     │
 │  ├── @user2 joined           │
-│  └── 💸 @user3 sent 50 Kr!  │
+│  └── 💸 @user3 sent 50 Rc!  │
 │                              │
 │ [Comment] [🛒] [🎁] [⚙️]   │
 └─────────────────────────────┘
@@ -509,25 +509,25 @@ feature/calls/
 
 ### 4.1 Virtual Gift Catalog
 
-| Gift | Kr Cost | Animation Level |
+| Gift | Rc Cost | Animation Level |
 |------|---------|-----------------|
-| 🌹 Rose | 1 Kr | Small float-up |
-| ⭐ Star | 5 Kr | Medium sparkle |
-| 🚀 Rocket | 50 Kr | Screen fly-across |
-| 🎆 Fireworks | 100 Kr | Full screen takeover |
-| 👑 Crown | 500 Kr | Crown drop on host |
-| 🏰 Castle | 1000 Kr | Epic full-screen |
+| 🌹 Rose | 1 Rc | Small float-up |
+| ⭐ Star | 5 Rc | Medium sparkle |
+| 🚀 Rocket | 50 Rc | Screen fly-across |
+| 🎆 Fireworks | 100 Rc | Full screen takeover |
+| 👑 Crown | 500 Rc | Crown drop on host |
+| 🏰 Castle | 1000 Rc | Epic full-screen |
 
 ### 4.2 Features
 - **Tap-to-Like**: Rapid tapping → animated hearts float up right edge
-- **Gift Goals**: Progress bar toward a Kr target
+- **Gift Goals**: Progress bar toward a Rc target
 - **Viewer Leaderboard**: Top 3-5 gifters pinned at top
 - **Entrance Animations**: Top gifters get special join alerts
 - **PK Battle Timer**: 5-minute countdown + tug-of-war bar
 
 ---
 
-## 📋 Phase 5: Krieta-Specific Enhancements
+## 📋 Phase 5: Runinga-Specific Enhancements
 
 ### 5.1 Chama Live
 - Chama leaders start `CHAMA` type streams
@@ -540,10 +540,10 @@ feature/calls/
 - Viewer tips count as contest "votes"
 - Winner advances on the Contest leaderboard
 
-### 5.3 Direct Kr Commerce
+### 5.3 Direct Rc Commerce
 - Tips use universal `WalletService.sendTip()` (15% platform cut)
 - Shoppable basket uses existing Cart/Order/Escrow system
-- Viewers commit Kr into Escrow → item secured during stream
+- Viewers commit Rc into Escrow → item secured during stream
 
 ### 5.4 Proof of Task
 - Service providers stream `PROOF_OF_TASK` linked to an Order

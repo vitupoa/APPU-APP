@@ -1,7 +1,7 @@
-# Backend API Implementation Guide
+﻿# Backend API Implementation Guide
 
 ## Overview
-This document provides the complete backend implementation for the Krieta app features including contest submissions, shorts feeds, drips feed, video player support, and real-time WebSocket updates.
+This document provides the complete backend implementation for the Runinga app features including contest submissions, shorts feeds, drips feed, video player support, and real-time WebSocket updates.
 
 ## 1. Contest Submissions API
 
@@ -177,8 +177,8 @@ Get Cloudinary signature for video upload.
   "assetFolder": "shorts",
   "resourceType": "video",
   "apiKey": "123456789",
-  "cloudName": "krieta",
-  "uploadPreset": "krieta_videos"
+  "cloudName": "runinga",
+  "uploadPreset": "runinga_videos"
 }
 ```
 
@@ -193,7 +193,7 @@ Get Cloudinary signature for video upload.
 
 ### Connection
 ```
-wss://api.krieta.com/socket.io/?EIO=4&transport=websocket
+wss://api.runinga.com/socket.io/?EIO=4&transport=websocket
 ```
 
 ### Authentication

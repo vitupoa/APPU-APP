@@ -1,4 +1,4 @@
-# Contest Creation Wizard - Comprehensive Crash Fixes
+﻿# Contest Creation Wizard - Comprehensive Crash Fixes
 
 ## Overview
 Fixed all potential crashes across all 5 wizard steps (Step 1 → Step 5) by adding comprehensive error handling, null safety checks, and try-catch blocks throughout the validation flow.
@@ -233,7 +233,7 @@ fun nextStep() {
 - ✅ At least one task required
 - ✅ Task configuration must be valid for selected task type
 - ✅ All task types supported:
-  - Follow Krieta
+  - Follow Runinga
   - Subscribe YouTube
   - Follow Spotify
   - Follow Instagram

@@ -1,4 +1,4 @@
-# Quick Fix Summary - Network Connection Issue
+﻿# Quick Fix Summary - Network Connection Issue
 
 ## What Was Fixed
 
@@ -13,7 +13,7 @@
 
 1. **Clean build:**
    ```bash
-   cd c:\Users\ADMIN\Krieta
+   cd c:\Users\ADMIN\Runinga
    .\gradlew.bat clean
    .\gradlew.bat :composeApp:assembleDebug
    ```

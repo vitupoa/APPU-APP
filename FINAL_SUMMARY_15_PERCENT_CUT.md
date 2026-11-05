@@ -1,4 +1,4 @@
-# FINAL SUMMARY: Ad System with 15% Platform Cut & Admin Controls
+﻿# FINAL SUMMARY: Ad System with 15% Platform Cut & Admin Controls
 
 ## What Changed
 
@@ -12,23 +12,23 @@
 | Instagram | 55% | 45% |
 | YouTube | 55% | 45% |
 | TikTok | 50% | 50% |
-| **Krieta** | **85%** | **15%** |
+| **Runinga** | **85%** | **15%** |
 
-**Result**: Creators earn 30-35% MORE on Krieta than competitors!
+**Result**: Creators earn 30-35% MORE on Runinga than competitors!
 
 ---
 
 ## Files Created/Updated
 
 ### 1. Domain Models
-**File**: `com/krieta/feature/admin/domain/model/AdModels.kt`
+**File**: `com/runinga/feature/admin/domain/model/AdModels.kt`
 - AdConfig (platformCutPercentage: 15.0)
 - AdCampaign (all ad types)
 - SponsoredPostRequest (with 85/15 split)
 - AdAnalytics
 
 ### 2. Admin Screen
-**File**: `com/krieta/feature/admin/presentation/screen/AdminAdManagementScreen.kt`
+**File**: `com/runinga/feature/admin/presentation/screen/AdminAdManagementScreen.kt`
 - 4 tabs: Config, Campaigns, Sponsored Posts, Analytics
 - Platform cut control (adjust 1-50%)
 - Pricing management (CPM ranges)
@@ -38,7 +38,7 @@
 - Real-time analytics
 
 ### 3. ViewModel
-**File**: `com/krieta/feature/admin/presentation/viewmodel/AdManagementViewModel.kt`
+**File**: `com/runinga/feature/admin/presentation/viewmodel/AdManagementViewModel.kt`
 - updatePlatformCut()
 - updateNativeAdPricing()
 - updateBannerAdPricing()
@@ -51,7 +51,7 @@
 - toggleAds()
 
 ### 4. Repository
-**File**: `com/krieta/feature/admin/domain/repository/AdManagementRepository.kt`
+**File**: `com/runinga/feature/admin/domain/repository/AdManagementRepository.kt`
 - Interface for all admin operations
 - Config management
 - Campaign management
@@ -59,7 +59,7 @@
 - Analytics
 
 ### 5. Post Model Updated
-**File**: `com/krieta/feature/feed/domain/model/FeedModels.kt`
+**File**: `com/runinga/feature/feed/domain/model/FeedModels.kt`
 - Added: isSponsored: Boolean?
 - Added: sponsorName: String?
 - Added: sponsorLogoUrl: String?
@@ -305,15 +305,15 @@ ALTER TABLE posts ADD COLUMN sponsor_logo_url VARCHAR;
 ```
 🎉 INDUSTRY-LEADING REVENUE SHARE!
 
-Earn 85% on Krieta vs 55% on Instagram/YouTube
+Earn 85% on Runinga vs 55% on Instagram/YouTube
 
 Example: KES 10,000 sponsored post
-• Krieta: You get KES 8,500 (85%)
+• Runinga: You get KES 8,500 (85%)
 • Instagram: You get KES 5,500 (55%)
 
 That's KES 3,000 MORE per post! 💰
 
-Join Krieta today and earn what you deserve.
+Join Runinga today and earn what you deserve.
 ```
 
 ### For Advertisers
@@ -378,6 +378,6 @@ Get started in 5 minutes. No minimum spend.
 
 ---
 
-**BOTTOM LINE**: With 15% platform cut (85% to creators), Krieta becomes the most creator-friendly platform in the world. This attracts top talent, drives viral growth, and creates a sustainable competitive advantage. Short-term revenue loss is offset by long-term network effects, resulting in higher overall revenue and market dominance.
+**BOTTOM LINE**: With 15% platform cut (85% to creators), Runinga becomes the most creator-friendly platform in the world. This attracts top talent, drives viral growth, and creates a sustainable competitive advantage. Short-term revenue loss is offset by long-term network effects, resulting in higher overall revenue and market dominance.
 
 **Projected Revenue (Year 3)**: KES 11.1M/month (~$86k) or KES 133M/year (~$1.03M)

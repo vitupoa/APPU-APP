@@ -1,4 +1,4 @@
-# Entry Fee Section Relocation - Implementation Summary
+﻿# Entry Fee Section Relocation - Implementation Summary
 
 ## Overview
 Moved the entry fee configuration section from Step 2 (Audience and Fees) to Step 4 (Prizes and Validation) for better user experience and logical grouping with the paid voting feature.
@@ -32,18 +32,18 @@ Moved the entry fee configuration section from Step 2 (Audience and Fees) to Ste
 ### 3. Paid Voting Warning Message
 **Before:**
 ```
-"Users pay Kr to vote for submissions"
+"Users pay Rc to vote for submissions"
 ```
 
 **After (Dynamic):**
-- When entry fee = 0: `"Users pay Kr to vote for submissions"`
+- When entry fee = 0: `"Users pay Rc to vote for submissions"`
 - When entry fee > 0: `"Participants can't pay to vote when they are paying to participate"`
 
 ## New Step 4 Layout Order
 
 1. **Entry Fee Section** (NEW POSITION)
    - Entry fee input field
-   - Real-time Kr conversion display
+   - Real-time Rc conversion display
 
 2. **Prize Distribution Section**
    - Winner slots selector
@@ -104,11 +104,11 @@ if (currentState.entryFee > 0.0 && currentState.paidVoting) {
 - Currency code prefix (e.g., KES, USD)
 - Placeholder: "0.00"
 - Supporting text: "Leave at 0 for free contests"
-- Real-time Kr conversion display when amount > 0
+- Real-time Rc conversion display when amount > 0
 
 ### Paid Voting Toggle
 - **Enabled state**: Entry fee = 0
-  - Description: "Users pay Kr to vote for submissions"
+  - Description: "Users pay Rc to vote for submissions"
   - Can be toggled ON/OFF
   
 - **Disabled state**: Entry fee > 0
@@ -118,7 +118,7 @@ if (currentState.entryFee > 0.0 && currentState.paidVoting) {
 
 ### Voting Cost Input
 - Only appears when paid voting is ON
-- Shows real-time Kr conversion
+- Shows real-time Rc conversion
 - Shows end user preview format
 
 ## Testing Checklist
@@ -126,7 +126,7 @@ if (currentState.entryFee > 0.0 && currentState.paidVoting) {
 ### Entry Fee in Step 4
 - [ ] Entry fee section appears at top of Step 4
 - [ ] Entry fee input accepts decimal values
-- [ ] Real-time Kr conversion displays correctly
+- [ ] Real-time Rc conversion displays correctly
 - [ ] Validation works (negative values rejected)
 - [ ] Currency code displays user's location currency
 

@@ -1,4 +1,4 @@
-# Locked Content Security Fix
+﻿# Locked Content Security Fix
 
 ## Issue
 Locked shorts/posts were showing content even when users didn't have access:
@@ -93,7 +93,7 @@ when {
     }
     short.requiresUnlock -> {
         lockMessage.text = "Unlock this content"
-        unlockButton.text = "Unlock for ${short.unlockAmountKr} Kr"
+        unlockButton.text = "Unlock for ${short.unlockAmountKr} Rc"
         unlockButton.setOnClickListener {
             // Call unlock API
         }

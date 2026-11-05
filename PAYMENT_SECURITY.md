@@ -1,4 +1,4 @@
-# Payment Security Implementation - Industry Standard
+﻿# Payment Security Implementation - Industry Standard
 
 ## 🔒 Security Measures Implemented
 
@@ -51,8 +51,8 @@
 #### Immutable Transaction Records
 - ✅ Transaction created with exact amounts before payment
 - ✅ Amounts stored in database (source of truth)
-- ✅ Kr amount calculated server-side using live exchange rates
-- ✅ Never trust client-provided Kr amounts
+- ✅ Rc amount calculated server-side using live exchange rates
+- ✅ Never trust client-provided Rc amounts
 
 #### Double-Credit Prevention
 - ✅ Status check: Only 'pending' transactions can be confirmed
@@ -144,7 +144,7 @@
 - ✅ 10-second timeout
 
 #### Decimal Precision
-- ✅ Prisma.Decimal for Kr amounts (no floating point errors)
+- ✅ Prisma.Decimal for Rc amounts (no floating point errors)
 - ✅ Exact arithmetic for financial calculations
 - ✅ No rounding errors
 
@@ -168,7 +168,7 @@
 - ❌ User cannot send inflated amounts
 - ❌ User cannot send negative amounts
 - ❌ User cannot bypass server-side calculation
-- ✅ Server calculates Kr amount using live rates
+- ✅ Server calculates Rc amount using live rates
 
 ### 2. Double-Credit Attack
 - ❌ User cannot confirm transaction twice

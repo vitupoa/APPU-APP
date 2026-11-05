@@ -1,4 +1,4 @@
-# All Compilation Fixes Applied ✅
+﻿# All Compilation Fixes Applied ✅
 
 ## Summary of All Fixes
 
@@ -44,17 +44,17 @@
 ## Files Modified (Total: 11)
 
 ### Created:
-1. `composeApp/src/commonMain/kotlin/com/krieta/com/core/security/HmacSha256.kt`
-2. `composeApp/src/commonMain/kotlin/com/krieta/com/core/security/SecureConfig.kt`
-3. `composeApp/src/commonMain/kotlin/com/krieta/feature/live/domain/model/LiveType.kt`
+1. `composeApp/src/commonMain/kotlin/com/runinga/com/core/security/HmacSha256.kt`
+2. `composeApp/src/commonMain/kotlin/com/runinga/com/core/security/SecureConfig.kt`
+3. `composeApp/src/commonMain/kotlin/com/runinga/feature/live/domain/model/LiveType.kt`
 
 ### Modified:
 4. `composeApp/build.gradle.kts`
-5. `composeApp/src/androidMain/kotlin/com/krieta/com/core/security/AndroidSecureKeyStorage.kt`
-6. `composeApp/src/commonMain/kotlin/com/krieta/com/core/security/WithdrawalSecurity.kt`
-7. `composeApp/src/commonMain/kotlin/com/krieta/feature/shop/data/local/ProductLocalDataSource.kt`
-8. `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/data/local/ShortLocalDataSource.kt`
-9. `composeApp/src/commonMain/kotlin/com/krieta/feature/shop/presentation/screen/ProductDetailScreen.kt`
+5. `composeApp/src/androidMain/kotlin/com/runinga/com/core/security/AndroidSecureKeyStorage.kt`
+6. `composeApp/src/commonMain/kotlin/com/runinga/com/core/security/WithdrawalSecurity.kt`
+7. `composeApp/src/commonMain/kotlin/com/runinga/feature/shop/data/local/ProductLocalDataSource.kt`
+8. `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/data/local/ShortLocalDataSource.kt`
+9. `composeApp/src/commonMain/kotlin/com/runinga/feature/shop/presentation/screen/ProductDetailScreen.kt`
 
 ### Generated (Fixed):
 10. 13 SQLDelight generated files in `composeApp/build/generated/sqldelight/`

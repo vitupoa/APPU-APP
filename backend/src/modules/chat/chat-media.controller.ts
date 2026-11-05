@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express';
+﻿import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../../middleware/auth.js';
 import { generateUploadSignature, CLOUDINARY_FOLDERS } from '../../config/cloudinary.js';
 import { validateMediaUrl, validateExternalLink } from '../../utils/media-validator.js';
@@ -102,7 +102,7 @@ export class ChatMediaController {
       ];
 
       const isFromAllowedFolder = allowedFolders.some(folder => 
-        media_url.includes(folder.replace('Krieta/', ''))
+        media_url.includes(folder.replace('Runinga/', ''))
       );
 
       if (!isFromAllowedFolder) {

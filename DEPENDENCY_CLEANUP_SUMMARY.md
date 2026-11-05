@@ -1,4 +1,4 @@
-# Dependency Cleanup & Migration Summary
+﻿# Dependency Cleanup & Migration Summary
 
 ## Date: 2026-04-26
 
@@ -119,8 +119,8 @@ Icon(Icons.Filled.Home, "Home")
 
 // After
 import org.jetbrains.compose.resources.painterResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.ic_home
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.ic_home
 Icon(painterResource(Res.drawable.ic_home), "Home")
 ```
 

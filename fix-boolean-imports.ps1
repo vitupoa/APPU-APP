@@ -1,8 +1,8 @@
-# Quick Fix: Patch existing SQLDelight generated files
+﻿# Quick Fix: Patch existing SQLDelight generated files
 
 Write-Host "Fixing SQLDelight Boolean imports..." -ForegroundColor Cyan
 
-$generatedDbPath = "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db"
+$generatedDbPath = "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db"
 
 if (-not (Test-Path $generatedDbPath)) {
     Write-Host "Generated code not found" -ForegroundColor Red

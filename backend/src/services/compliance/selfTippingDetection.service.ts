@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 
 /**
  * Self-Tipping Detection Service
@@ -8,7 +8,7 @@ import { prisma } from '../../config/database.js';
  * Detection Patterns:
  * 1. Device Fingerprint Sharing: Multiple accounts using same device
  * 2. Interaction Exclusivity: Accounts only tipping each other (no other interactions)
- * 3. Rapid Cycles: Buy Kr → Tip → Withdraw within 1 hour
+ * 3. Rapid Cycles: Buy Rc → Tip → Withdraw within 1 hour
  * 4. Circular Patterns: A tips B, B tips C, C tips A
  * 
  * Score: 0-100 (>70 = flagged)
@@ -304,7 +304,7 @@ export class SelfTippingDetectionService {
 
   /**
    * Pattern 3: Rapid Buy-Tip-Withdraw Cycles
-   * Detects rapid cycles: Buy Kr → Tip → Withdraw within 1 hour
+   * Detects rapid cycles: Buy Rc → Tip → Withdraw within 1 hour
    * 
    * Score breakdown:
    * - 0 points: No rapid cycles
@@ -570,10 +570,7 @@ export class SelfTippingDetectionService {
       });
 
       // Log the detection for audit trail
-      console.log(`[SELF-TIPPING DETECTED] User ${userId} flagged with score ${score}`, {
-        patterns
-      });
-    }
+      }
   }
 }
 

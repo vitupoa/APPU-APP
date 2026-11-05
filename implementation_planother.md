@@ -1,4 +1,4 @@
-# KMP Secrets & Prisma alignment
+﻿# KMP Secrets & Prisma alignment
 
 I apologize for the oversight regarding the UI! You are absolutely right—the mobile app Architecture, Repositories, ViewModels, and many UI features (including the Login Screen) are already robustly built in `composeApp/src/commonMain`. 
 
@@ -17,12 +17,12 @@ My new goal is to securely bridge your local setups, eliminate any remaining stu
 #### [MODIFY] [composeApp/build.gradle.kts](file:///c:/Users/ADMIN/appu/composeApp/build.gradle.kts)
 - Apply the plugin and configure it to parse `RAILWAY_URL` strictly from `local.properties`.
 
-#### [MODIFY] [ApiConstants.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/com/core/network/ApiConstants.kt)
-- Remove the hardcoded `https://krieta-api.up.railway.app`. Replace it by referencing `BuildConfig.RAILWAY_URL`.
+#### [MODIFY] [ApiConstants.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/com/core/network/ApiConstants.kt)
+- Remove the hardcoded `https://runinga-api.up.railway.app`. Replace it by referencing `BuildConfig.RAILWAY_URL`.
 
 ### 2. Eliminating Stubs (Ktor Client)
 
-#### [MODIFY] [KtorClient.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/com/core/network/KtorClient.kt)
+#### [MODIFY] [KtorClient.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/com/core/network/KtorClient.kt)
 - Right now, your Token Manager's `refreshTokens` block has a comment saying `// This is a placeholder`. I will inject the `AuthRepository` dependency or correctly map the endpoint so the app actually attempts a token refresh via `/auth/refresh` upon a 401 Unauthorized API error, ensuring no stubs remain.
 
 ### 3. Strict Prisma ↔ Mobile DTO Parity
@@ -37,13 +37,13 @@ However, your mobile app's `UserDto` inside `AuthDtos.kt` only tracks:
   id, username, email, displayName, accountType, isWalletUnlocked
 ```
 
-#### [MODIFY] [AuthDtos.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/auth/data/remote/dto/AuthDtos.kt)
+#### [MODIFY] [AuthDtos.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/auth/data/remote/dto/AuthDtos.kt)
 - Expand `UserDto` to include `firstName`, `lastName`, `phone`, `avatarUrl`, `currency`, `country`, `bio`, and `isVerified`. So the mobile app is fully aware of the precise user state tracked by Prisma.
 
-#### [MODIFY] [User.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/auth/domain/model/User.kt)
+#### [MODIFY] [User.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/auth/domain/model/User.kt)
 - Expand the core Domain Model to support these newly un-stubbed Prisma fields.
 
-#### [MODIFY] [AuthRepositoryImpl.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/auth/data/repository/AuthRepositoryImpl.kt)
+#### [MODIFY] [AuthRepositoryImpl.kt](file:///c:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/auth/data/repository/AuthRepositoryImpl.kt)
 - Update the internal mapper function to map all new fields successfully from the expanded DTO payload.
 
 

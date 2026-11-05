@@ -1,4 +1,4 @@
-# Chat Media Upload Validation Fix
+﻿# Chat Media Upload Validation Fix
 
 ## Problem
 When sending media in chat, users encountered a validation error:
@@ -82,7 +82,7 @@ To test the fix:
 
 ## Related Files
 - `backend/src/modules/chat/chat.validation.ts` - Validation schema
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/chat/data/remote/dto/ChatDtos.kt` - Request DTO
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/chat/data/remote/dto/ChatDtos.kt` - Request DTO
 - `backend/CHAT_MEDIA_UPLOAD.md` - Full media upload documentation
 
 ## Additional Notes

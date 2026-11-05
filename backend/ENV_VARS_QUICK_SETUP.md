@@ -1,4 +1,4 @@
-# Railway Environment Variables - Quick Setup
+﻿# Railway Environment Variables - Quick Setup
 
 ## 🚀 Copy-Paste Ready Commands
 
@@ -19,7 +19,7 @@ CORS_ORIGIN=https://yourdomain.com,https://app.yourdomain.com
 ⚠️ **Important**: 
 - Use comma-separated list (NO SPACES)
 - Include all your frontend domains
-- Example: `https://krieta.com,https://app.krieta.com,https://admin.krieta.com`
+- Example: `https://runinga.com,https://app.runinga.com,https://admin.runinga.com`
 
 ---
 
@@ -49,12 +49,12 @@ Open the downloaded JSON and copy these values:
 ```bash
 FIREBASE_PROJECT_ID=<copy_from_json_project_id>
 ```
-Example: `krieta-app`
+Example: `runinga-app`
 
 ```bash
 FIREBASE_CLIENT_EMAIL=<copy_from_json_client_email>
 ```
-Example: `firebase-adminsdk-xxxxx@krieta-app.iam.gserviceaccount.com`
+Example: `firebase-adminsdk-xxxxx@runinga-app.iam.gserviceaccount.com`
 
 ```bash
 FIREBASE_PRIVATE_KEY=<copy_entire_private_key_including_BEGIN_END_lines>

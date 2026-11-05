@@ -1,9 +1,9 @@
-# iOS Native Implementation Status
+﻿# iOS Native Implementation Status
 
 ## ✅ COMPLETED IMPLEMENTATIONS
 
 ### 1. iOS Native Video Player (AVPlayer)
-**Location**: `composeApp/src/iosMain/kotlin/com/krieta/com/core/ui/components/VideoPlayer.ios.kt`
+**Location**: `composeApp/src/iosMain/kotlin/com/runinga/com/core/ui/components/VideoPlayer.ios.kt`
 
 **Features Implemented**:
 - ✅ AVPlayer integration with UIKitView
@@ -32,7 +32,7 @@
 ---
 
 ### 2. iOS Keychain Integration (Secure Enclave)
-**Location**: `composeApp/src/iosMain/kotlin/com/krieta/com/core/security/IosSecureKeyStorage.kt`
+**Location**: `composeApp/src/iosMain/kotlin/com/runinga/com/core/security/IosSecureKeyStorage.kt`
 
 **Features Implemented**:
 - ✅ Secure Enclave key generation (ECC 256-bit)

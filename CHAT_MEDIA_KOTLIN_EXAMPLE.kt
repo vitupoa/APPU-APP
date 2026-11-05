@@ -1,7 +1,7 @@
-// Chat Media Upload Implementation for Kotlin Multiplatform
-// Location: composeApp/src/commonMain/kotlin/com/krieta/chat/media/
+﻿// Chat Media Upload Implementation for Kotlin Multiplatform
+// Location: composeApp/src/commonMain/kotlin/com/runinga/chat/media/
 
-package com.krieta.chat.media
+package com.runinga.chat.media
 
 import io.ktor.client.*
 import io.ktor.client.request.*

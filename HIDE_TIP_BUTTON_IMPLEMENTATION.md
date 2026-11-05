@@ -1,4 +1,4 @@
-# Hide Tip Button Implementation - Complete ✅
+﻿# Hide Tip Button Implementation - Complete ✅
 
 ## Overview
 Implemented frontend logic to hide the tip button when users view their own content (shorts and drips/posts).
@@ -6,7 +6,7 @@ Implemented frontend logic to hide the tip button when users view their own cont
 ## Implementation Details
 
 ### 1. ShortsScreen.kt
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/ShortsScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/ShortsScreen.kt`
 
 **Changes**:
 - Added `isOwnContent` parameter to `ShortItem` composable
@@ -34,7 +34,7 @@ if (!short.isLocked && !isOwnContent) {
 ```
 
 ### 2. DripsScreen.kt
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/screen/DripsScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/screen/DripsScreen.kt`
 
 **Changes**:
 - Added `currentUserId` parameter to `PostCard` and `SponsoredPostCard` composables
@@ -110,8 +110,8 @@ No backend changes required.
 | Not logged in | ✅ Yes (but can't tip) |
 
 ## Files Modified
-1. `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/ShortsScreen.kt`
-2. `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/screen/DripsScreen.kt`
+1. `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/ShortsScreen.kt`
+2. `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/screen/DripsScreen.kt`
 
 ## Related Screens
 - **HomeScreen.kt**: Uses `ShortsScreen`, automatically inherits the fix

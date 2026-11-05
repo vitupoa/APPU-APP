@@ -218,15 +218,11 @@ export class CommentsService {
     replyToUserId: string | null
   ) {
     try {
-      console.log('Creating comment:', { userId, contentType, contentId, textLength: text.length, parent_id, replyToUserId });
-      
       if (text.length > 500) {
         throw new Error('Comment text must be 500 characters or less');
       }
 
       const settings = await this.getCommentSettings(contentType, contentId);
-      console.log('Comment settings:', settings);
-      
       if (!settings.commentsEnabled) {
         throw new Error('Comments are disabled for this content');
       }
@@ -288,8 +284,6 @@ export class CommentsService {
         contentType,
         newCount: await this.getCommentCount(contentType, contentId),
       });
-
-      console.log('Comment created successfully:', comment.id);
 
       return {
         success: true,

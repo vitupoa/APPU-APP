@@ -1,6 +1,6 @@
-#!/bin/bash
+﻿#!/bin/bash
 
-# KRIETA RLS Migration Script
+# RUNINGA RLS Migration Script
 # This script enables Row-Level Security on all sensitive tables
 
 echo "🔒 Starting RLS Migration..."

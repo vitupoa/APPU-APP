@@ -1,4 +1,4 @@
-# Krieta Authentication & Protocol Overhaul - Complete!
+﻿# Runinga Authentication & Protocol Overhaul - Complete!
 
 Every component of your Socratic Security approvals has been executed, compiled structurally, and officially deployed into the `main` GitHub repository natively!
 
@@ -17,4 +17,4 @@ I explicitly built the new Jetpack Compose Vault: `WalletPinScreen.kt`.
 Following your strict instructions, users do **not** setup a PIN on account creation natively. They are allowed to freely explore the platform seamlessly increasing sign up limits! The system exclusively executes `navigator.push(WalletPinScreen())` forcing them to establish a 6-digit PIN upon touching the **WALLET** tab natively!
 
 ### 4. Visibility Protection
-I appended stateful `isBalanceHidden` logic bound to a seamless `Eye-Icon` button inside your newly styled Wallet. Toggling it masks all metrics securely to `Kr ****` and `~ $**.**` natively allowing users to track interfaces in public safely!
+I appended stateful `isBalanceHidden` logic bound to a seamless `Eye-Icon` button inside your newly styled Wallet. Toggling it masks all metrics securely to `Rc ****` and `~ $**.**` natively allowing users to track interfaces in public safely!

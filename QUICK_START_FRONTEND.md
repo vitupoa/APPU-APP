@@ -1,4 +1,4 @@
-# 🚀 QUICK START - Frontend Implementation (20 Minutes)
+﻿# 🚀 QUICK START - Frontend Implementation (20 Minutes)
 
 ## ✅ Backend Status: 100% COMPLETE
 - All APIs live and tested
@@ -12,7 +12,7 @@
 ## 📱 Frontend: 3 Simple Steps
 
 ### STEP 1: Add Repository Methods (5 min)
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/data/repository/FeedRepositoryImpl.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/data/repository/FeedRepositoryImpl.kt`
 
 ```kotlin
 override suspend fun getDiscoverFeed(limit: Int, cursor: String?): NetworkResult<DiscoverFeedResult> {
@@ -66,7 +66,7 @@ override suspend fun trackInteraction(
 ---
 
 ### STEP 2: Initialize Distribution on Upload (2 min)
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/viewmodel/CreateShortViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/viewmodel/CreateShortViewModel.kt`
 
 **Add after successful upload:**
 

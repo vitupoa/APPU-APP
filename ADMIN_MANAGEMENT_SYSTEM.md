@@ -1,4 +1,4 @@
-# Admin Management System - Complete Guide
+﻿# Admin Management System - Complete Guide
 
 ## Overview
 Implemented a comprehensive admin management system with settings menu, logout functionality, and the ability for super admins to add new administrators with different roles.
@@ -188,7 +188,7 @@ const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 **Request Body**:
 ```json
 {
-  "email": "admin@krieta.com",
+  "email": "admin@runinga.com",
   "username": "admin_user",
   "firstName": "John",
   "lastName": "Doe",
@@ -203,7 +203,7 @@ const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   "success": true,
   "admin": {
     "id": "uuid",
-    "email": "admin@krieta.com",
+    "email": "admin@runinga.com",
     "username": "admin_user",
     "displayName": "John Doe",
     "role": "MODERATOR"
@@ -337,7 +337,7 @@ curl -X POST http://localhost:3000/api/v1/rar/team/add \
   -H "Authorization: Bearer SUPER_ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "moderator@krieta.com",
+    "email": "moderator@runinga.com",
     "username": "mod_user",
     "firstName": "Jane",
     "lastName": "Smith",

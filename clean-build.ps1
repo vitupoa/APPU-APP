@@ -1,4 +1,4 @@
-# Clean, fix, and build script
+﻿# Clean, fix, and build script
 Write-Host "Starting clean build with fixes..." -ForegroundColor Cyan
 
 # Step 1: Clean build
@@ -7,7 +7,7 @@ Write-Host "`n1. Cleaning build..." -ForegroundColor Yellow
 
 # Step 2: Generate SQLDelight files
 Write-Host "`n2. Generating SQLDelight code..." -ForegroundColor Yellow
-& gradlew.bat generateCommonMainKrietaDatabaseInterface
+& gradlew.bat generateCommonMainRuningaDatabaseInterface
 
 # Step 3: Fix Boolean imports in generated files
 Write-Host "`n3. Fixing SQLDelight Boolean imports..." -ForegroundColor Yellow

@@ -1,8 +1,8 @@
-# Comprehensive SQLDelight Fix Script
+﻿# Comprehensive SQLDelight Fix Script
 # This script fixes the Boolean import issue and rebuilds the project
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  Krieta SQLDelight Fix & Rebuild" -ForegroundColor Cyan
+Write-Host "  Runinga SQLDelight Fix & Rebuild" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -29,7 +29,7 @@ Write-Host ""
 
 # Step 3: Generate SQLDelight code
 Write-Host "[3/5] Generating SQLDelight code..." -ForegroundColor Yellow
-.\gradlew.bat :composeApp:generateCommonMainKrietaDatabaseInterface
+.\gradlew.bat :composeApp:generateCommonMainRuningaDatabaseInterface
 if ($LASTEXITCODE -ne 0) {
     Write-Host "  ✗ Generation failed!" -ForegroundColor Red
     exit 1
@@ -39,7 +39,7 @@ Write-Host ""
 
 # Step 4: Fix Boolean imports in generated files
 Write-Host "[4/5] Fixing Boolean imports..." -ForegroundColor Yellow
-$generatedDbPath = "composeApp\build\generated\sqldelight\code\KrietaDatabase\commonMain\com\krieta\db"
+$generatedDbPath = "composeApp\build\generated\sqldelight\code\RuningaDatabase\commonMain\com\runinga\db"
 $fixedCount = 0
 
 if (Test-Path $generatedDbPath) {

@@ -1,4 +1,4 @@
-# 🚀 READY TO DEPLOY - Final Checklist
+﻿# 🚀 READY TO DEPLOY - Final Checklist
 
 ## ✅ ALL CRITICAL FIXES COMPLETED
 
@@ -67,7 +67,7 @@ curl https://your-app.railway.app/health
 
 Expected response:
 ```json
-{"status":"ok","service":"krieta-api","version":"1.0.0"}
+{"status":"ok","service":"runinga-api","version":"1.0.0"}
 ```
 
 ### Step 5: Run Database Migrations

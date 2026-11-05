@@ -1,4 +1,4 @@
-# Payment Security Updates - Final Implementation
+﻿# Payment Security Updates - Final Implementation
 
 ## Changes Made
 
@@ -51,7 +51,7 @@ const fiatAfterMargin = fiatAfterFlatFee * (1 - platformMargin);
 // Convert to USD base
 const baseUsd = fiatAfterMargin / buyRate;
 
-// Convert to Kr (1 Kr = $0.01 USD)
+// Convert to Rc (1 Rc = $0.01 USD)
 const krAmount = Math.floor(baseUsd * 100);
 ```
 
@@ -59,11 +59,11 @@ const krAmount = Math.floor(baseUsd * 100);
 - User enters: KES 1000
 - After KES 30 fee: KES 970
 - After 4.5% margin: KES 926.35
-- Converted to Kr: ~926 Kr (depending on exchange rate)
+- Converted to Rc: ~926 Rc (depending on exchange rate)
 
 **Frontend Display:**
 - Shows "Fees: 4.5% + KES 30" in the preview card
-- Real-time Kr preview updates as user types
+- Real-time Rc preview updates as user types
 
 **Result:** All top-ups now have fees deducted before crediting wallet.
 
@@ -131,11 +131,11 @@ Run `npx prisma db push` to apply indexes to Railway database.
 ### Fee Structure
 - ✅ KES 30 flat fee deducted
 - ✅ 4.5% platform margin applied
-- ✅ Fees applied before Kr calculation
+- ✅ Fees applied before Rc calculation
 - ✅ Transparent fee display to users
 
 ### Transaction Integrity
-- ✅ Server-side Kr calculation
+- ✅ Server-side Rc calculation
 - ✅ Immutable transaction records
 - ✅ Double-credit prevention
 - ✅ 30-minute transaction expiry
@@ -224,7 +224,7 @@ Ensure all payment provider credentials are set:
 - [ ] Decimal input is blocked
 - [ ] Rate limiting works (1 per minute)
 - [ ] Fee calculation is correct (KES 30 + 4.5%)
-- [ ] Kr preview updates correctly
+- [ ] Rc preview updates correctly
 - [ ] M-Pesa cancelled transactions marked as 'cancelled'
 - [ ] PayPal cancelled transactions marked as 'cancelled'
 - [ ] Paystack cancelled transactions marked as 'cancelled'

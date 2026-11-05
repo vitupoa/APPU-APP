@@ -1,4 +1,4 @@
-# Chat Media Upload Implementation
+﻿# Chat Media Upload Implementation
 
 ## Overview
 Secure media sharing in direct and group chats with comprehensive security sanitization against malicious files and attacks.
@@ -40,10 +40,10 @@ Secure media sharing in direct and group chats with comprehensive security sanit
 - JavaScript protocol blocking
 
 ### 5. Folder Isolation
-- Direct chats: `Krieta/Chats/Direct/Images|Videos`
-- Group chats: `Krieta/Chats/Group/Images|Videos`
-- Chama chats: `Krieta/Chats/Chama/Images|Videos`
-- Group avatars: `Krieta/Chats/GroupAvatar/Images`
+- Direct chats: `Runinga/Chats/Direct/Images|Videos`
+- Group chats: `Runinga/Chats/Group/Images|Videos`
+- Chama chats: `Runinga/Chats/Chama/Images|Videos`
+- Group avatars: `Runinga/Chats/GroupAvatar/Images`
 
 ## API Endpoints
 
@@ -68,7 +68,7 @@ Content-Type: application/json
   "uploadParams": {
     "signature": "abc123...",
     "timestamp": 1234567890,
-    "folder": "Krieta/Chats/Direct/Images",
+    "folder": "Runinga/Chats/Direct/Images",
     "resourceType": "image",
     "apiKey": "your_api_key",
     "cloudName": "your_cloud_name"

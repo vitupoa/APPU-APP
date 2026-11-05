@@ -2,8 +2,6 @@ import { prisma } from '../config/database.js';
 import crypto from 'crypto';
 
 export function startMicroInterestWorker() {
-  console.log('Starting Micro Interest Worker (runs every hour)');
-
   // Run immediately on startup
   updateMicroInterests();
 
@@ -13,8 +11,6 @@ export function startMicroInterestWorker() {
 
 async function updateMicroInterests() {
   try {
-    console.log('[MicroInterestWorker] Updating user micro-interests...');
-
     // Decay old interests (reduce weight over time if not engaged)
     await prisma.$executeRaw`
       UPDATE user_micro_interests
@@ -29,8 +25,6 @@ async function updateMicroInterests() {
       }
     });
 
-    console.log(`[MicroInterestWorker] Decayed old interests and removed ${deleted.count} low-weight interests`);
-
     // Update interests based on recent interactions
     const recentInteractions = await prisma.$queryRaw<{ user_id: string; content_id: string; content_type: string; signal_type: string }[]>`
       SELECT user_id, content_id, content_type, signal_type
@@ -40,8 +34,6 @@ async function updateMicroInterests() {
       ORDER BY created_at DESC
       LIMIT 1000
     `;
-
-    console.log(`[MicroInterestWorker] Processing ${recentInteractions.length} recent interactions`);
 
     for (const interaction of recentInteractions) {
       try {
@@ -92,8 +84,7 @@ async function updateMicroInterests() {
       }
     }
 
-    console.log('[MicroInterestWorker] Update complete');
-  } catch (error) {
+    } catch (error) {
     console.error('[MicroInterestWorker] Error:', error);
   }
 }

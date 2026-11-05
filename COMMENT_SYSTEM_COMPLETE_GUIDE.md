@@ -1,4 +1,4 @@
-# Comment System - Complete Fix & Troubleshooting Guide
+﻿# Comment System - Complete Fix & Troubleshooting Guide
 
 ## Problem
 Users get "Something went wrong. Please try again" when trying to comment on drips/posts.
@@ -57,7 +57,7 @@ Added console.log statements to track:
 - Errors with stack traces
 
 ### 5. Frontend DTO Updates
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/comments/data/remote/CommentDtos.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/comments/data/remote/CommentDtos.kt`
 
 Added dual field support for snake_case and camelCase:
 ```kotlin
@@ -77,7 +77,7 @@ data class CreateCommentRequestDto(
 ```
 
 ### 6. Frontend Mapper Updates
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/comments/data/repository/CommentsRepositoryImpl.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/comments/data/repository/CommentsRepositoryImpl.kt`
 
 ```kotlin
 private fun CommentDto.toDomain() = Comment(

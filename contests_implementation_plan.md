@@ -1,4 +1,4 @@
-# Enterprise Contest Ecosystem Overhaul
+﻿# Enterprise Contest Ecosystem Overhaul
 
 You are building an entirely gamified marketing ecosystem. This architecture shifts Contests from simple galleries into a massive engine driving user growth, brand conversions, and FOMO urgency.
 
@@ -10,7 +10,7 @@ You are building an entirely gamified marketing ecosystem. This architecture shi
 *   **Monetization**: `entryFeeKr` (Funds inflate the overarching `prizeTotalKr`).
 *   **Combination Weighting**: Add `publicVoteWeight` (Int layout 0-100) allocating the physical slider choice mapping percentage weights properly.
 *   **Demographic Locks**: `targetAges`, `targetGeos`.
-*   **FOMO Pools**: Implement `airdropKr` and `airdropParticipantCount` (First X participants get guaranteed Kr!).
+*   **FOMO Pools**: Implement `airdropKr` and `airdropParticipantCount` (First X participants get guaranteed Rc!).
 *   **Pre-Funding Security**: Natively validate Creators have `$PrizePool + $DailyPools + $Airdrops` inside their `wallet.krBalance`. Prisma will freeze/escrow this natively before the contest status hits `ACTIVE`.
 
 ### 2. Post-Contest Fraud Escrow System (The "Trust but Verify" Solution)
@@ -19,7 +19,7 @@ To resolve the exact risk you raised regarding fraudulent screenshot uploads wit
 *   Instead, they enter a mandatory `JUDGING_REVIEW` status (e.g., locking for 72 Hours). 
 *   The Backend calculates the winners algorithmically based on Votes/Scores, but places their rewards into a `"pending_release"` state.
 *   **Moderation Flow**: Judges check their assigned Dashboard purely looking at the Top Winners' submitted proof. If the #1 winner uploaded fake/blank screenshots, the Judge hits **Disqualify**. The Algorithm instantly recalculates natively kicking #2 into the 1st place slot! 
-*   Once Judges physically hit **Release Funds**, the Kr permanently enters the clean user wallets. 
+*   Once Judges physically hit **Release Funds**, the Rc permanently enters the clean user wallets. 
 
 ### 3. Requirements Tracking (`ContestRequirement` & `ContestVerification`)
 Brands can construct requirements out of 8 templates natively mapping social hooks!
@@ -53,4 +53,4 @@ Brands can construct requirements out of 8 templates natively mapping social hoo
 > [!TIP]
 > **The Best Gamification Path**
 > **Remove voting fees entirely**. Voting must be 100% free and frictionless. This is how you drive "FOMO" and algorithmic virality. If people have to pay to swipe, nobody will swipe. 
-> **How you monetize:** The Brands/Creators pay the Platform. When a brand creates a $10,000 contest, Krieta takes 15% ($1,500) upfront. The brand gets 100,000 real TikTok followers for free because voting is frictionless. This protects you entirely from Casino laws because users are never risking their own money natively!
+> **How you monetize:** The Brands/Creators pay the Platform. When a brand creates a $10,000 contest, Runinga takes 15% ($1,500) upfront. The brand gets 100,000 real TikTok followers for free because voting is frictionless. This protects you entirely from Casino laws because users are never risking their own money natively!

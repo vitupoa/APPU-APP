@@ -1,4 +1,4 @@
-# Chat Media Upload - Visual Flow Diagram
+﻿# Chat Media Upload - Visual Flow Diagram
 
 ## 🔄 Complete Upload Flow
 
@@ -47,7 +47,7 @@
 │  {                                                                       │
 │    "signature": "abc123...",                                            │
 │    "timestamp": 1234567890,                                             │
-│    "folder": "Krieta/Chats/Direct/Images",                              │
+│    "folder": "Runinga/Chats/Direct/Images",                              │
 │    "apiKey": "your_api_key",                                            │
 │    "cloudName": "your_cloud"                                            │
 │  }                                                                       │
@@ -62,7 +62,7 @@
 │    - file: [binary data]                                                │
 │    - signature: "abc123..."                                             │
 │    - timestamp: 1234567890                                              │
-│    - folder: "Krieta/Chats/Direct/Images"                               │
+│    - folder: "Runinga/Chats/Direct/Images"                               │
 │    - api_key: "your_api_key"                                            │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
@@ -82,7 +82,7 @@
 │                    RECEIVE CLOUDINARY URL                                │
 │  {                                                                       │
 │    "secure_url": "https://res.cloudinary.com/.../image.jpg",            │
-│    "public_id": "Krieta/Chats/Direct/Images/abc123",                    │
+│    "public_id": "Runinga/Chats/Direct/Images/abc123",                    │
 │    "format": "jpg",                                                     │
 │    "resource_type": "image"                                             │
 │  }                                                                       │
@@ -200,7 +200,7 @@
 ```
 Cloudinary Storage
 │
-└── Krieta/
+└── Runinga/
     └── Chats/
         ├── Direct/
         │   ├── Images/

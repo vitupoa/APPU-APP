@@ -1,4 +1,4 @@
-# Universal Content Locking System - Implementation Guide
+﻿# Universal Content Locking System - Implementation Guide
 
 ## Overview
 This system allows creators to lock their Shorts, Drips (Posts), and Live streams, requiring users to either:
@@ -20,17 +20,17 @@ Add to `schema.prisma`:
 ```prisma
 model Short {
   // ... existing fields
-  unlockAmountKr Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
+  unlockAmountRc Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
 }
 
 model Post {
   // ... existing fields
-  unlockAmountKr Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
+  unlockAmountRc Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
 }
 
 model LiveStream {
   // ... existing fields
-  unlockAmountKr Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
+  unlockAmountRc Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
 }
 ```
 
@@ -41,9 +41,9 @@ Location: `src/modules/contentLock/contentLock.service.ts`
 
 Key methods:
 - `checkAccess()` - Check if user has access to locked content
-- `unlockContent()` - Unlock content by paying Kr
+- `unlockContent()` - Unlock content by paying Rc
 - `getUnlockPrice()` - Get price in user's currency with real-time conversion
-- `convertFiatToKr()` - Convert creator's fiat input to Kr
+- `convertFiatToKr()` - Convert creator's fiat input to Rc
 
 ### 2. API Endpoints
 Location: `src/modules/contentLock/contentLock.routes.ts`
@@ -83,19 +83,19 @@ app.use('/api/content-lock', contentLockRoutes);
 
 ## Currency Conversion Flow
 
-### Creator Sets Lock Amount (Fiat → Kr)
+### Creator Sets Lock Amount (Fiat → Rc)
 1. Creator enters amount in their local currency (e.g., 500 KES)
 2. Frontend calls `POST /api/content-lock/convert-fiat` with `{ fiatAmount: 500, currency: 'KES' }`
-3. Backend converts to Kr using real-time exchange rate
-4. Returns Kr amount to display to creator
+3. Backend converts to Rc using real-time exchange rate
+4. Returns Rc amount to display to creator
 5. Creator creates content with `unlockAmountKr` field
 
-### User Views Lock Price (Kr → Fiat)
-1. User sees locked content with `unlockAmountKr` (e.g., 50 Kr)
+### User Views Lock Price (Rc → Fiat)
+1. User sees locked content with `unlockAmountKr` (e.g., 50 Rc)
 2. Frontend calls `GET /api/content-lock/price?unlockAmountKr=50&currency=USD`
-3. Backend converts Kr to user's local currency using real-time exchange rate
-4. Returns: `{ krAmount: 50, fiatAmount: 50, currency: 'USD', displayText: '50 Kr (≈ 50 USD)' }`
-5. Display with Kr in focus and fiat as secondary
+3. Backend converts Rc to user's local currency using real-time exchange rate
+4. Returns: `{ krAmount: 50, fiatAmount: 50, currency: 'USD', displayText: '50 Rc (≈ 50 USD)' }`
+5. Display with Rc in focus and fiat as secondary
 
 ## Frontend Implementation
 
@@ -134,7 +134,7 @@ const createShort = async () => {
       videoUrl,
       caption,
       isLocked,
-      unlockAmountKr: isLocked ? lockAmountKr : undefined,
+      unlockAmountKr: isLocked ? lockAmountRc : undefined,
       requiredTier: selectedTier // Optional: for subscription-based access
     })
   });
@@ -204,7 +204,7 @@ const ShortItem = ({ short }: { short: ContentItem }) => {
         
         {short.requiresUnlock && unlockPrice && (
           <button onClick={handleUnlock}>
-            Unlock for {unlockPrice.krAmount} Kr
+            Unlock for {unlockPrice.krAmount} Rc
             <span className="fiat-price">
               (≈ {unlockPrice.fiatAmount} {unlockPrice.currency})
             </span>
@@ -277,17 +277,17 @@ const showUnlockModal = async (streamId: string) => {
 ## UI/UX Guidelines
 
 ### Display Format
-Always show Kr amount in focus with fiat as secondary:
-- ✅ **50 Kr** (≈ 500 KES)
-- ❌ 500 KES (50 Kr)
+Always show Rc amount in focus with fiat as secondary:
+- ✅ **50 Rc** (≈ 500 KES)
+- ❌ 500 KES (50 Rc)
 
 ### Creator Input
 1. Creator enters amount in their local currency
-2. Show real-time Kr conversion as they type
+2. Show real-time Rc conversion as they type
 3. Display both values when creating content
 
 ### User View
-1. Show Kr amount prominently
+1. Show Rc amount prominently
 2. Show user's local currency equivalent below/beside
 3. Update conversion in real-time when user changes currency preference
 
@@ -302,15 +302,15 @@ User can access locked content if:
 Otherwise:
 - Show locked state
 - Offer subscription option (if requiredTier is set)
-- Offer unlock option (if unlockAmountKr is set)
+- Offer unlock option (if unlockAmountRc is set)
 ```
 
 ## Payment Flow
 
 1. User clicks "Unlock" button
-2. System checks user's Kr balance
+2. System checks user's Rc balance
 3. If sufficient:
-   - Deduct Kr from user wallet
+   - Deduct Rc from user wallet
    - Credit creator (85% after 15% platform fee)
    - Record unlock in `content_unlocks` table
    - Record transactions for audit trail
@@ -325,17 +325,17 @@ Otherwise:
 - [ ] Test content creation with unlock amount
 - [ ] Test access check for locked content
 - [ ] Test unlock payment flow
-- [ ] Test currency conversion (fiat → Kr)
-- [ ] Test price display (Kr → fiat)
+- [ ] Test currency conversion (fiat → Rc)
+- [ ] Test price display (Rc → fiat)
 - [ ] Test subscription-based access
 - [ ] Test creator always has access to own content
 
 ### Frontend
 - [ ] Creator can set lock amount in their currency
-- [ ] Real-time Kr conversion works
+- [ ] Real-time Rc conversion works
 - [ ] Locked content shows lock icon/overlay
 - [ ] Unlock button displays correct price
-- [ ] Kr shown in focus, fiat as secondary
+- [ ] Rc shown in focus, fiat as secondary
 - [ ] Unlock payment flow works
 - [ ] Content refreshes after unlock
 - [ ] Subscription option shown when applicable

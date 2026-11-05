@@ -1,4 +1,4 @@
-# Universal Content Locking System - Implementation Summary
+﻿# Universal Content Locking System - Implementation Summary
 
 ## ✅ What Has Been Implemented
 
@@ -14,8 +14,8 @@
 - **Location**: `src/modules/contentLock/contentLock.service.ts`
 - **Features**:
   - Check if user has access to locked content
-  - Unlock content by paying Kr (with 15% platform fee)
-  - Real-time currency conversion (Fiat ↔ Kr)
+  - Unlock content by paying Rc (with 15% platform fee)
+  - Real-time currency conversion (Fiat ↔ Rc)
   - Prevent duplicate unlocks
   - Atomic transactions with database locks
 
@@ -24,7 +24,7 @@
 - **Endpoints**:
   - `POST /api/content-lock/unlock` - Unlock content
   - `GET /api/content-lock/price` - Get unlock price in user's currency
-  - `POST /api/content-lock/convert-fiat` - Convert fiat to Kr for creator
+  - `POST /api/content-lock/convert-fiat` - Convert fiat to Rc for creator
   - `GET /api/content-lock/check-access` - Check user access
 
 #### 4. Service Integrations
@@ -79,17 +79,17 @@
    ```prisma
    model Short {
      // ... existing fields
-     unlockAmountKr Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
+     unlockAmountRc Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
    }
 
    model Post {
      // ... existing fields
-     unlockAmountKr Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
+     unlockAmountRc Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
    }
 
    model LiveStream {
      // ... existing fields
-     unlockAmountKr Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
+     unlockAmountRc Decimal? @map("unlock_amount_kr") @db.Decimal(18, 4)
    }
    ```
 
@@ -118,13 +118,13 @@
    - Add lock toggle to Shorts creation screen
    - Add lock toggle to Drips/Posts creation screen
    - Add lock toggle to Live stream setup screen
-   - Implement real-time fiat → Kr conversion
-   - Display both Kr and fiat amounts
+   - Implement real-time fiat → Rc conversion
+   - Display both Rc and fiat amounts
 
 2. **Feed/Content Display**
    - Add locked content overlay component
    - Show lock icon for locked content
-   - Display unlock price with Kr in focus
+   - Display unlock price with Rc in focus
    - Show subscription option if applicable
    - Implement unlock button functionality
 
@@ -156,7 +156,7 @@
 
 2. **Real-time Conversion**
    - Enter amount in local currency
-   - See Kr equivalent instantly
+   - See Rc equivalent instantly
    - Conversion uses live exchange rates
 
 3. **Revenue Tracking**
@@ -171,7 +171,7 @@
    - Choose based on preference
 
 2. **Clear Pricing**
-   - Kr amount shown prominently
+   - Rc amount shown prominently
    - Local currency shown as reference
    - Real-time conversion
 
@@ -201,15 +201,15 @@
 ## 💰 Payment Flow
 
 ```
-User Unlocks Content (100 Kr)
-├─ User Wallet: -100 Kr
-├─ Creator Wallet: +85 Kr (85%)
-└─ Platform Revenue: +15 Kr (15%)
+User Unlocks Content (100 Rc)
+├─ User Wallet: -100 Rc
+├─ Creator Wallet: +85 Rc (85%)
+└─ Platform Revenue: +15 Rc (15%)
 
 Transactions Created:
-1. User: content_unlock_paid (-100 Kr)
-2. Creator: content_unlock_earned (+85 Kr)
-3. Platform: platform_fee (+15 Kr)
+1. User: content_unlock_paid (-100 Rc)
+2. Creator: content_unlock_earned (+85 Rc)
+3. Platform: platform_fee (+15 Rc)
 ```
 
 ## 🌍 Currency Conversion
@@ -219,22 +219,22 @@ Transactions Created:
 Creator (Kenya):
 Input: 500 KES
 ↓ Real-time conversion
-Output: 50 Kr
+Output: 50 Rc
 
-Stored in database: 50 Kr
+Stored in database: 50 Rc
 ```
 
 ### User Views Price
 ```
 User (USA):
-Database: 50 Kr
+Database: 50 Rc
 ↓ Real-time conversion
-Display: 50 Kr (≈ $50 USD)
+Display: 50 Rc (≈ $50 USD)
 
 User (Nigeria):
-Database: 50 Kr
+Database: 50 Rc
 ↓ Real-time conversion
-Display: 50 Kr (≈ ₦75,000 NGN)
+Display: 50 Rc (≈ ₦75,000 NGN)
 ```
 
 ## 📊 Database Structure
@@ -272,32 +272,32 @@ Can user access locked content?
 
 ## 📱 UI Display Format
 
-### Always Show Kr First
+### Always Show Rc First
 ✅ **Correct**:
-- 50 Kr (≈ 500 KES)
-- 100 Kr (≈ $100 USD)
-- 25 Kr (≈ ₦37,500 NGN)
+- 50 Rc (≈ 500 KES)
+- 100 Rc (≈ $100 USD)
+- 25 Rc (≈ ₦37,500 NGN)
 
 ❌ **Incorrect**:
-- 500 KES (50 Kr)
-- $100 USD (100 Kr)
+- 500 KES (50 Rc)
+- $100 USD (100 Rc)
 
 ### Creator Input
 ```
 Enter amount: [500] KES
 ↓
-Converts to: 50 Kr
+Converts to: 50 Rc
 ↓
-Display: "Lock for 50 Kr (≈ 500 KES)"
+Display: "Lock for 50 Rc (≈ 500 KES)"
 ```
 
 ### User View
 ```
-Database: 50 Kr
+Database: 50 Rc
 ↓
 User currency: USD
 ↓
-Display: "Unlock for 50 Kr (≈ $50 USD)"
+Display: "Unlock for 50 Rc (≈ $50 USD)"
 ```
 
 ## 🚀 Next Steps
@@ -338,8 +338,8 @@ For questions or issues:
 - ✅ Universal locking system for Shorts, Drips, and Live
 - ✅ Subscription-based access
 - ✅ One-time unlock payments
-- ✅ Real-time currency conversion (Fiat ↔ Kr)
-- ✅ Kr displayed in focus, fiat as secondary
+- ✅ Real-time currency conversion (Fiat ↔ Rc)
+- ✅ Rc displayed in focus, fiat as secondary
 - ✅ 15% platform fee on unlocks
 - ✅ Atomic transactions with database locks
 - ✅ Comprehensive access control

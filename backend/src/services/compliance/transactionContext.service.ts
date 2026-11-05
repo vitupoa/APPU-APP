@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Transaction Context Service
  * 
  * This service validates that all transactions have proper context (type, reference_id, description)
@@ -331,11 +331,11 @@ export class TransactionContextService {
           break;
 
         case TransactionType.WITHDRAWAL:
-          description = `Withdrawal to fiat (${additionalInfo?.amount || 0} Kr)`;
+          description = `Withdrawal to fiat (${additionalInfo?.amount || 0} Rc)`;
           break;
 
         case TransactionType.TOP_UP:
-          description = `Top up wallet (${additionalInfo?.amount || 0} Kr)`;
+          description = `Top up wallet (${additionalInfo?.amount || 0} Rc)`;
           break;
 
         default:

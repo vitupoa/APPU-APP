@@ -1,4 +1,4 @@
-# Performance & Security Implementation Complete
+﻿# Performance & Security Implementation Complete
 
 ## Executive Summary
 
@@ -122,7 +122,7 @@
 
 ### Performance Files Created
 ```
-composeApp/src/commonMain/kotlin/com/krieta/com/core/
+composeApp/src/commonMain/kotlin/com/runinga/com/core/
 ├── pagination/
 │   └── PagingDataSource.kt          [NEW]
 ├── network/
@@ -135,7 +135,7 @@ composeApp/src/commonMain/kotlin/com/krieta/com/core/
 
 ### Security Files Reviewed
 ```
-composeApp/src/commonMain/kotlin/com/krieta/com/core/security/
+composeApp/src/commonMain/kotlin/com/runinga/com/core/security/
 ├── TokenManager.kt                  [REVIEWED ✅]
 ├── InputValidator.kt                [REVIEWED ✅]
 ├── DatabaseEncryption.kt            [REVIEWED ✅]

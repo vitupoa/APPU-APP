@@ -1,4 +1,4 @@
-# Chat Media Upload - Mobile Architecture
+﻿# Chat Media Upload - Mobile Architecture
 
 ## 🏗️ Complete Architecture
 
@@ -103,13 +103,13 @@
 │  • Returns secure URLs                                          │
 │                                                                  │
 │  Folders:                                                       │
-│  ├── Krieta/Chats/Direct/Images/                               │
-│  ├── Krieta/Chats/Direct/Videos/                               │
-│  ├── Krieta/Chats/Group/Images/                                │
-│  ├── Krieta/Chats/Group/Videos/                                │
-│  ├── Krieta/Chats/Chama/Images/                                │
-│  ├── Krieta/Chats/Chama/Videos/                                │
-│  └── Krieta/Chats/GroupAvatar/Images/                          │
+│  ├── Runinga/Chats/Direct/Images/                               │
+│  ├── Runinga/Chats/Direct/Videos/                               │
+│  ├── Runinga/Chats/Group/Images/                                │
+│  ├── Runinga/Chats/Group/Videos/                                │
+│  ├── Runinga/Chats/Chama/Images/                                │
+│  ├── Runinga/Chats/Chama/Videos/                                │
+│  └── Runinga/Chats/GroupAvatar/Images/                          │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```

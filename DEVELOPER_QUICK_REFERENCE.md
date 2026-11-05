@@ -1,4 +1,4 @@
-# KRIETA - DEVELOPER QUICK REFERENCE
+﻿# RUNINGA - DEVELOPER QUICK REFERENCE
 
 ## 🚀 Quick Start
 
@@ -25,7 +25,7 @@ open iosApp/iosApp.xcodeproj
 ## 📁 Project Structure
 
 ```
-Krieta/
+Runinga/
 ├── backend/                    # Node.js + Express + Prisma
 │   ├── src/
 │   │   ├── modules/           # Feature modules
@@ -430,7 +430,7 @@ git push railway main
 
 - **Documentation**: See `/docs` folder
 - **Issues**: GitHub Issues
-- **Team**: Slack #krieta-dev
+- **Team**: Slack #runinga-dev
 
 ---
 

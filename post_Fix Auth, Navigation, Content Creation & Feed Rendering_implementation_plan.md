@@ -1,4 +1,4 @@
-# Fix Auth, Navigation, Content Creation & Feed Rendering
+﻿# Fix Auth, Navigation, Content Creation & Feed Rendering
 
 ## Problem Summary
 
@@ -18,12 +18,12 @@ Multiple critical issues need to be addressed:
 
 ### 1. Dynamic Currency via LocationProvider
 
-#### [MODIFY] [RegisterViewModel.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/auth/presentation/viewmodel/RegisterViewModel.kt)
+#### [MODIFY] [RegisterViewModel.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/auth/presentation/viewmodel/RegisterViewModel.kt)
 
 - Inject `LocationProvider` via constructor
 - Replace hardcoded `country = "US"` / `currency = "USD"` with `locationProvider.getCurrentCountry()` / `locationProvider.getCurrentCurrency()`
 
-#### [MODIFY] [AppModule.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/com/core/di/AppModule.kt)
+#### [MODIFY] [AppModule.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/com/core/di/AppModule.kt)
 
 - No change needed — `LocationProvider()` already registered as singleton
 
@@ -31,9 +31,9 @@ Multiple critical issues need to be addressed:
 
 ### 2. Fix Bottom Navigation Floating
 
-#### [MODIFY] [MainScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/com/core/navigation/MainScreen.kt)
+#### [MODIFY] [MainScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/com/core/navigation/MainScreen.kt)
 
-- The `KrietaBottomBar` is inside `NavigationBar` which uses `Row` with `weight(1f)`. The center "+" button uses `fillMaxHeight()` which inside a `NavigationBar` can cause layout issues.
+- The `RuningaBottomBar` is inside `NavigationBar` which uses `Row` with `weight(1f)`. The center "+" button uses `fillMaxHeight()` which inside a `NavigationBar` can cause layout issues.
 - Fix: Wrap the entire `Content()` in a `Box(Modifier.fillMaxSize())` and position bottom bar as overlay, OR fix the Scaffold content padding chain. The likely issue is the content `Box` not filling available space.
 - Change content box to use `Modifier.fillMaxSize().padding(innerPadding)` explicitly.
 
@@ -41,7 +41,7 @@ Multiple critical issues need to be addressed:
 
 ### 3. Create Post — Support Text + Image + Posting
 
-#### [MODIFY] [CreatePostScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/screen/CreatePostScreen.kt)
+#### [MODIFY] [CreatePostScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/screen/CreatePostScreen.kt)
 
 - Add Android image picker via `ActivityResultContracts.PickMultipleVisualMedia`
 - Display selected image thumbnails in horizontal row
@@ -55,11 +55,11 @@ Multiple critical issues need to be addressed:
 
 - Make `imageUrls` optional (allow text-only posts): change `.min(1)` to `.optional().default([])`
 
-#### [MODIFY] [FeedApi.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/feed/data/remote/FeedApi.kt)
+#### [MODIFY] [FeedApi.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/feed/data/remote/FeedApi.kt)
 
 - Add `createPost(caption, imageUrls)` method
 
-#### [MODIFY] [FeedRepository.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/feed/domain/repository/FeedRepository.kt) & [FeedRepositoryImpl.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/feed/data/repository/FeedRepositoryImpl.kt)
+#### [MODIFY] [FeedRepository.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/feed/domain/repository/FeedRepository.kt) & [FeedRepositoryImpl.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/feed/data/repository/FeedRepositoryImpl.kt)
 
 - Add `createPost()` method to interface and implementation
 
@@ -67,7 +67,7 @@ Multiple critical issues need to be addressed:
 
 ### 4. Create Short — Real Camera/Gallery Picker
 
-#### [MODIFY] [CreateShortScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/CreateShortScreen.kt)
+#### [MODIFY] [CreateShortScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/CreateShortScreen.kt)
 
 - Replace fake camera UI with two options: "Record Video" (launches native camera intent) and "Pick from Gallery" (launches video picker)
 - Use Android `ActivityResultContracts.CaptureVideo` and `PickVisualMedia(VideoOnly)`
@@ -78,7 +78,7 @@ Multiple critical issues need to be addressed:
 
 ### 5. Product Image Picker  
 
-#### [MODIFY] [CreateListingScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/shop/presentation/screen/CreateListingScreen.kt)
+#### [MODIFY] [CreateListingScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/shop/presentation/screen/CreateListingScreen.kt)
 
 - Replace URL-paste approach with image picker button using `PickMultipleVisualMedia`
 - Keep URL input as fallback option
@@ -88,7 +88,7 @@ Multiple critical issues need to be addressed:
 
 ### 6. Create Contest — Wire Posting Logic
 
-#### [MODIFY] [CreateContestScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/krieta/feature/contests/presentation/screen/CreateContestScreen.kt)
+#### [MODIFY] [CreateContestScreen.kt](file:///C:/Users/ADMIN/appu/composeApp/src/commonMain/kotlin/com/runinga/feature/contests/presentation/screen/CreateContestScreen.kt)
 
 - Add all required fields from the backend Zod schema (description, mediaType, category, prizeKr, requiredActions, maxWinners, prizeDistribution, judgingCriteria, deadline)
 - Wire "Launch" button to call contests API

@@ -1,4 +1,4 @@
-# Backend Security Updates & Anti-Reverse Engineering Implementation
+﻿# Backend Security Updates & Anti-Reverse Engineering Implementation
 
 ## ✅ COMPLETED IMPLEMENTATIONS
 
@@ -64,9 +64,9 @@ The `/kyc/withdrawal/request` endpoint now accepts:
 - Validates file system integrity
 
 #### Files Created
-- `composeApp/src/commonMain/kotlin/com/krieta/com/security/DeviceSecurityChecker.kt`
-- `composeApp/src/androidMain/kotlin/com/krieta/com/security/DeviceSecurityChecker.android.kt`
-- `composeApp/src/iosMain/kotlin/com/krieta/com/security/DeviceSecurityChecker.ios.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/com/security/DeviceSecurityChecker.kt`
+- `composeApp/src/androidMain/kotlin/com/runinga/com/security/DeviceSecurityChecker.android.kt`
+- `composeApp/src/iosMain/kotlin/com/runinga/com/security/DeviceSecurityChecker.ios.kt`
 
 #### Integration
 - Integrated into `WithdrawViewModel.kt`
@@ -113,7 +113,7 @@ Created `CertificatePinningConfig.kt` for SSL certificate pinning.
 #### Setup Required
 1. Get your server's certificate pin:
 ```bash
-openssl s_client -connect api.krieta.com:443 | \
+openssl s_client -connect api.runinga.com:443 | \
 openssl x509 -pubkey -noout | \
 openssl pkey -pubin -outform der | \
 openssl dgst -sha256 -binary | \
@@ -122,12 +122,12 @@ openssl enc -base64
 
 2. Add pins to `CertificatePinningConfig.kt`:
 ```kotlin
-.add("api.krieta.com", "sha256/YOUR_PRIMARY_PIN=")
-.add("api.krieta.com", "sha256/YOUR_BACKUP_PIN=")
+.add("api.runinga.com", "sha256/YOUR_PRIMARY_PIN=")
+.add("api.runinga.com", "sha256/YOUR_BACKUP_PIN=")
 ```
 
 #### File Created
-- `composeApp/src/androidMain/kotlin/com/krieta/com/security/CertificatePinningConfig.kt`
+- `composeApp/src/androidMain/kotlin/com/runinga/com/security/CertificatePinningConfig.kt`
 
 ---
 

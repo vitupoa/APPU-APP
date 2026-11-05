@@ -1,4 +1,4 @@
-# Krieta Backend - Prisma 7.8.0 Update & Railway Deployment Guide
+﻿# Runinga Backend - Prisma 7.8.0 Update & Railway Deployment Guide
 
 ## Issue: Prisma keeps reverting to 6.19.3
 

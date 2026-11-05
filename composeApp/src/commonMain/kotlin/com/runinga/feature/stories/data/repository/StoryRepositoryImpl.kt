@@ -1,0 +1,112 @@
+﻿package com.runinga.feature.stories.data.repository
+
+import com.runinga.com.core.network.NetworkResult
+import com.runinga.feature.stories.data.remote.StoryApi
+import com.runinga.feature.stories.data.remote.dto.CreateStoryRequestDto
+import com.runinga.feature.stories.domain.model.Story
+import com.runinga.feature.stories.domain.model.StoryCreator
+import com.runinga.feature.stories.domain.model.StoryGroup
+import com.runinga.feature.stories.domain.model.StoryPrivacy
+import com.runinga.feature.stories.domain.repository.StoryRepository
+import kotlinx.datetime.Instant
+
+import com.runinga.com.core.network.safeApiCall
+
+class StoryRepositoryImpl(
+    private val api: StoryApi
+) : StoryRepository {
+
+    override suspend fun getFeed(): NetworkResult<List<StoryGroup>> {
+        return safeApiCall {
+            val response = api.getFeed()
+            if (response.success) {
+                response.feed.map { groupDto ->
+                    StoryGroup(
+                        creator = StoryCreator(
+                            id = groupDto.creator.id,
+                            username = groupDto.creator.username,
+                            displayName = groupDto.creator.displayName,
+                            avatarUrl = groupDto.creator.avatarUrl
+                        ),
+                        stories = groupDto.stories.map { storyDto ->
+                            Story(
+                                id = storyDto.id,
+                                mediaUrl = storyDto.mediaUrl,
+                                mediaType = storyDto.mediaType,
+                                text = storyDto.text,
+                                createdAt = try { Instant.parse(storyDto.createdAt) } catch (e: Exception) { Instant.DISTANT_PAST },
+                                expiresAt = try { Instant.parse(storyDto.expiresAt) } catch (e: Exception) { Instant.DISTANT_FUTURE },
+                                isViewed = storyDto.isViewed
+                            )
+                        }
+                    )
+                }
+            } else {
+                throw Exception("Failed to fetch stories feed")
+            }
+        }
+    }
+
+    override suspend fun createStory(
+        mediaUrl: String,
+        mediaType: String,
+        text: String?,
+        privacy: StoryPrivacy,
+        expiresInHours: Int
+    ): NetworkResult<Unit> {
+        return safeApiCall {
+            api.createStory(
+                CreateStoryRequestDto(
+                    mediaUrl = mediaUrl,
+                    mediaType = mediaType,
+                    text = text,
+                    privacy = privacy.name,
+                    expiresInHours = expiresInHours
+                )
+            )
+        }
+    }
+
+    override suspend fun viewStory(storyId: String): NetworkResult<Unit> {
+        return safeApiCall {
+            api.viewStory(storyId)
+        }
+    }
+    
+    override suspend fun getMyStories(): NetworkResult<List<StoryGroup>> {
+        return safeApiCall {
+            val response = api.getMyStories()
+            if (response.success) {
+                response.feed.map { groupDto ->
+                    StoryGroup(
+                        creator = StoryCreator(
+                            id = groupDto.creator.id,
+                            username = groupDto.creator.username,
+                            displayName = groupDto.creator.displayName,
+                            avatarUrl = groupDto.creator.avatarUrl
+                        ),
+                        stories = groupDto.stories.map { storyDto ->
+                            Story(
+                                id = storyDto.id,
+                                mediaUrl = storyDto.mediaUrl,
+                                mediaType = storyDto.mediaType,
+                                text = storyDto.text,
+                                createdAt = try { Instant.parse(storyDto.createdAt) } catch (e: Exception) { Instant.DISTANT_PAST },
+                                expiresAt = try { Instant.parse(storyDto.expiresAt) } catch (e: Exception) { Instant.DISTANT_FUTURE },
+                                isViewed = storyDto.isViewed
+                            )
+                        }
+                    )
+                }
+            } else {
+                throw Exception("Failed to fetch my stories")
+            }
+        }
+    }
+    
+    override suspend fun deleteStory(storyId: String): NetworkResult<Unit> {
+        return safeApiCall {
+            api.deleteStory(storyId)
+        }
+    }
+}

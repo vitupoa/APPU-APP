@@ -1,4 +1,4 @@
-# Firebase Cloud Messaging (FCM) Setup Guide
+﻿# Firebase Cloud Messaging (FCM) Setup Guide
 
 ## 📥 Download Firebase Service Account JSON
 
@@ -7,7 +7,7 @@
 3. Click the gear icon ⚙️ → **Project Settings**
 4. Go to **Service Accounts** tab
 5. Click **Generate New Private Key**
-6. Download the JSON file (e.g., `krieta-firebase-adminsdk.json`)
+6. Download the JSON file (e.g., `runinga-firebase-adminsdk.json`)
 
 ---
 
@@ -18,10 +18,10 @@ Your downloaded JSON file looks like this:
 ```json
 {
   "type": "service_account",
-  "project_id": "krieta-app",
+  "project_id": "runinga-app",
   "private_key_id": "abc123...",
   "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBg...\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-xxxxx@krieta-app.iam.gserviceaccount.com",
+  "client_email": "firebase-adminsdk-xxxxx@runinga-app.iam.gserviceaccount.com",
   "client_id": "123456789",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
@@ -43,15 +43,15 @@ Your downloaded JSON file looks like this:
 
 | Variable Name | Value | Example |
 |---------------|-------|---------|
-| `FIREBASE_PROJECT_ID` | Copy `project_id` from JSON | `krieta-app` |
-| `FIREBASE_CLIENT_EMAIL` | Copy `client_email` from JSON | `firebase-adminsdk-xxxxx@krieta-app.iam.gserviceaccount.com` |
+| `FIREBASE_PROJECT_ID` | Copy `project_id` from JSON | `runinga-app` |
+| `FIREBASE_CLIENT_EMAIL` | Copy `client_email` from JSON | `firebase-adminsdk-xxxxx@runinga-app.iam.gserviceaccount.com` |
 | `FIREBASE_PRIVATE_KEY` | Copy entire `private_key` from JSON (including BEGIN/END lines) | `-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBg...\n-----END PRIVATE KEY-----\n` |
 
 ### Option 2: Railway CLI
 
 ```bash
-railway variables set FIREBASE_PROJECT_ID="krieta-app"
-railway variables set FIREBASE_CLIENT_EMAIL="firebase-adminsdk-xxxxx@krieta-app.iam.gserviceaccount.com"
+railway variables set FIREBASE_PROJECT_ID="runinga-app"
+railway variables set FIREBASE_CLIENT_EMAIL="firebase-adminsdk-xxxxx@runinga-app.iam.gserviceaccount.com"
 railway variables set FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBg...
 -----END PRIVATE KEY-----

@@ -1,4 +1,4 @@
-# Frontend Integration Guide
+﻿# Frontend Integration Guide
 
 ## Overview
 This guide covers connecting the Kotlin Multiplatform frontend to the new backend API endpoints for:
@@ -13,7 +13,7 @@ This guide covers connecting the Kotlin Multiplatform frontend to the new backen
 
 ### Base Configuration
 ```kotlin
-// composeApp/src/commonMain/kotlin/com/krieta/core/network/ApiClient.kt
+// composeApp/src/commonMain/kotlin/com/runinga/core/network/ApiClient.kt
 
 object ApiConfig {
     const val BASE_URL = "http://localhost:3000/api/v1" // Update for production
@@ -32,7 +32,7 @@ object ApiConfig {
 
 ### API Service
 ```kotlin
-// composeApp/src/commonMain/kotlin/com/krieta/feature/boost/data/BoostApiService.kt
+// composeApp/src/commonMain/kotlin/com/runinga/feature/boost/data/BoostApiService.kt
 
 interface BoostApiService {
     @GET("${ApiConfig.CREATOR_BOOST}/settings")
@@ -49,7 +49,7 @@ data class BoostSettingsResponse(
 
 ### Update ViewModel
 ```kotlin
-// composeApp/src/commonMain/kotlin/com/krieta/feature/boost/presentation/BoostContentViewModel.kt
+// composeApp/src/commonMain/kotlin/com/runinga/feature/boost/presentation/BoostContentViewModel.kt
 
 class BoostContentViewModel(
     private val boostApiService: BoostApiService
@@ -77,7 +77,7 @@ class BoostContentViewModel(
 
 ### API Service
 ```kotlin
-// composeApp/src/commonMain/kotlin/com/krieta/feature/niches/data/NicheApiService.kt
+// composeApp/src/commonMain/kotlin/com/runinga/feature/niches/data/NicheApiService.kt
 
 interface NicheApiService {
     @GET(ApiConfig.NICHES)
@@ -117,7 +117,7 @@ data class AddCustomNicheRequest(
 
 ### Update EditProfileViewModel
 ```kotlin
-// composeApp/src/commonMain/kotlin/com/krieta/feature/profile/presentation/EditProfileViewModel.kt
+// composeApp/src/commonMain/kotlin/com/runinga/feature/profile/presentation/EditProfileViewModel.kt
 
 class EditProfileViewModel(
     private val nicheApiService: NicheApiService
@@ -188,7 +188,7 @@ class EditProfileViewModel(
 
 ### API Service
 ```kotlin
-// composeApp/src/commonMain/kotlin/com/krieta/feature/ads/data/DisplayAdsApiService.kt
+// composeApp/src/commonMain/kotlin/com/runinga/feature/ads/data/DisplayAdsApiService.kt
 
 interface DisplayAdsApiService {
     @POST("${ApiConfig.DISPLAY_ADS}/campaigns")
@@ -261,7 +261,7 @@ data class CampaignResponse(
 
 ### Update CreateDisplayAdCampaignViewModel
 ```kotlin
-// composeApp/src/commonMain/kotlin/com/krieta/feature/ads/presentation/CreateDisplayAdCampaignViewModel.kt
+// composeApp/src/commonMain/kotlin/com/runinga/feature/ads/presentation/CreateDisplayAdCampaignViewModel.kt
 
 class CreateDisplayAdCampaignViewModel(
     private val displayAdsApiService: DisplayAdsApiService
@@ -324,7 +324,7 @@ class CreateDisplayAdCampaignViewModel(
 
 ### API Service
 ```kotlin
-// composeApp/src/commonMain/kotlin/com/krieta/feature/locations/data/LocationApiService.kt
+// composeApp/src/commonMain/kotlin/com/runinga/feature/locations/data/LocationApiService.kt
 
 interface LocationApiService {
     @GET("${ApiConfig.LOCATIONS}/hierarchy")
@@ -361,7 +361,7 @@ data class LocationResponse(
 
 ### Koin Module
 ```kotlin
-// composeApp/src/commonMain/kotlin/com/krieta/di/NetworkModule.kt
+// composeApp/src/commonMain/kotlin/com/runinga/di/NetworkModule.kt
 
 val networkModule = module {
     // API Services
@@ -429,7 +429,7 @@ npx tsx prisma/seeds/seed-niches.ts
 
 ### Backend (.env)
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/krieta"
+DATABASE_URL="postgresql://user:password@localhost:5432/runinga"
 JWT_SECRET="your-secret-key"
 PORT=3000
 ```
@@ -439,7 +439,7 @@ PORT=3000
 object ApiConfig {
     const val BASE_URL = "http://10.0.2.2:3000/api/v1" // Android emulator
     // const val BASE_URL = "http://localhost:3000/api/v1" // iOS simulator
-    // const val BASE_URL = "https://api.krieta.com/api/v1" // Production
+    // const val BASE_URL = "https://api.runinga.com/api/v1" // Production
 }
 ```
 

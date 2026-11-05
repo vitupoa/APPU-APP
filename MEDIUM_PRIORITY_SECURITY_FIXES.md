@@ -1,7 +1,7 @@
-# MEDIUM PRIORITY SECURITY FIXES ✅
+﻿# MEDIUM PRIORITY SECURITY FIXES ✅
 
 ## Overview
-This document outlines all MEDIUM priority security vulnerabilities that were identified and fixed in the Krieta platform.
+This document outlines all MEDIUM priority security vulnerabilities that were identified and fixed in the Runinga platform.
 
 ---
 

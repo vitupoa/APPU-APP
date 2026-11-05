@@ -1,8 +1,8 @@
-# Phase 6: RembrandtRAR Web Dashboard & Hosting Guide
+﻿# Phase 6: RembrandtRAR Web Dashboard & Hosting Guide
 
 The **RembrandtRAR Super Admin System** backend is fully operational with role-based access control, comprehensive auditing, and core governance modules. Phase 6 covers the frontend implementation and production hosting.
 
-Because the admin dashboard requires high security, separate physical infrastructure is recommended over integrating it into the primary Krieta mobile API or consumer frontend.
+Because the admin dashboard requires high security, separate physical infrastructure is recommended over integrating it into the primary Runinga mobile API or consumer frontend.
 
 ## 1. Technology Stack Recommendation
 
@@ -11,7 +11,7 @@ We recommend building the RembrandtRAR dashboard as a **Next.js (App Router)** w
 * **Styling:** Tailwind CSS + Shadcn UI (for clean, accessible, enterprise-grade admin components)
 * **State Management:** Zustand (for global admin session and RBAC claims)
 * **Data Fetching:** TanStack Query (React Query) + Axios
-* **Authentication:** NextAuth.js (or custom JWT implementation syncing with Krieta's backend)
+* **Authentication:** NextAuth.js (or custom JWT implementation syncing with Runinga's backend)
 
 ## 2. Setting Up the Project
 
@@ -32,7 +32,7 @@ Set up an Axios instance that automatically attaches the Super Admin JWT to requ
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_KRIETA_API_URL + '/api/v1/rar',
+  baseURL: process.env.NEXT_PUBLIC_RUNINGA_API_URL + '/api/v1/rar',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -122,7 +122,7 @@ To ensure high availability and security, the RembrandtRAR frontend should be de
 
 ### Step 1: Version Control & Repository Protection
 1. Create a private GitHub/GitLab repository for the dashboard.
-2. **CRITICAL:** Do not store the source code in the same repository as the public Krieta website to prevent accidental leakage of internal admin structures.
+2. **CRITICAL:** Do not store the source code in the same repository as the public Runinga website to prevent accidental leakage of internal admin structures.
 
 ### Step 2: Vercel Deployment Workflow
 1. Log in to [Vercel](https://vercel.com).
@@ -130,7 +130,7 @@ To ensure high availability and security, the RembrandtRAR frontend should be de
 3. Import your private `rembrandt-rar-dashboard` repository.
 4. **Environment Variables Configuration:**
    Before clicking deploy, configure the following Environment Variables in the Vercel dashboard:
-   * `NEXT_PUBLIC_KRIETA_API_URL`: Your production API URL (e.g., `https://api.krieta.com`).
+   * `NEXT_PUBLIC_RUNINGA_API_URL`: Your production API URL (e.g., `https://api.runinga.com`).
 
 ### Step 3: Security Hardening (Vercel Firewall)
 Because this is a Super Admin dashboard, you must lock down access to prevent brute-force attacks on the login page.
@@ -140,8 +140,8 @@ Because this is a Super Admin dashboard, you must lock down access to prevent br
    * Enable DDoS mitigation.
 
 ### Step 4: Custom Domain
-1. Map a cryptic or internal subdomain to the Vercel project, avoiding obvious names like `admin.krieta.com`.
-2. Examples: `governance.krieta.com`, `sys-portal.krieta.com`, or `rar.krieta.com`.
+1. Map a cryptic or internal subdomain to the Vercel project, avoiding obvious names like `admin.runinga.com`.
+2. Examples: `governance.runinga.com`, `sys-portal.runinga.com`, or `rar.runinga.com`.
 3. Vercel automatically provisions enterprise-grade SSL certificates via Let's Encrypt.
 
 ### Step 5: Connecting the First Super Admin
@@ -152,8 +152,8 @@ Once the frontend is live:
    node dist/modules/rembrandt-rar/scripts/create-superadmin.js
    ```
    *(Follow the prompt to create the initial Super Admin account.)*
-3. Open your live dashboard URL (`rar.krieta.com`) and log in with those credentials.
-4. From the frontend, you can now invite Sub-Admins, assign RBAC permissions, and manage Krieta.
+3. Open your live dashboard URL (`rar.runinga.com`) and log in with those credentials.
+4. From the frontend, you can now invite Sub-Admins, assign RBAC permissions, and manage Runinga.
 
 ---
 

@@ -2,8 +2,6 @@ import { prisma } from '../config/database.js';
 import { contentDistributionService } from '../modules/recommendation/services/contentDistribution.service.js';
 
 export function startContentDistributionWorker() {
-  console.log('Starting Content Distribution Worker (runs every 5 minutes)');
-
   // Run immediately on startup
   evaluateContent();
 
@@ -13,8 +11,6 @@ export function startContentDistributionWorker() {
 
 async function evaluateContent() {
   try {
-    console.log('[ContentDistributionWorker] Evaluating content performance...');
-
     // Get all content that needs evaluation (has enough views and hasn't been evaluated recently)
     const contentToEvaluate = await prisma.$queryRaw<{ content_id: string; content_type: string }[]>`
       SELECT cd.content_id, cd.content_type
@@ -35,8 +31,6 @@ async function evaluateContent() {
       LIMIT 100
     `;
 
-    console.log(`[ContentDistributionWorker] Found ${contentToEvaluate.length} content items to evaluate`);
-
     for (const content of contentToEvaluate) {
       try {
         const result = await contentDistributionService.evaluatePerformance(
@@ -45,15 +39,13 @@ async function evaluateContent() {
         );
 
         if (result.shouldAmplify) {
-          console.log(`[ContentDistributionWorker] Amplifying ${content.content_type} ${content.content_id} to ${result.nextTier}`);
-        }
+          }
       } catch (error) {
         console.error(`[ContentDistributionWorker] Error evaluating ${content.content_type} ${content.content_id}:`, error);
       }
     }
 
-    console.log('[ContentDistributionWorker] Evaluation complete');
-  } catch (error) {
+    } catch (error) {
     console.error('[ContentDistributionWorker] Error:', error);
   }
 }

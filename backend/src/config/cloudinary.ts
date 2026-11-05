@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+﻿import { v2 as cloudinary } from 'cloudinary';
 import { env } from './env.js';
 
 cloudinary.config({
@@ -11,32 +11,28 @@ cloudinary.config({
 // Folder structure for organizing uploads by module
 export const CLOUDINARY_FOLDERS = {
   // Profiles
-  PROFILE_IMAGES: 'Krieta/Profile/Images',
-  PROFILE_VIDEOS: 'Krieta/Profile/Videos',
+  PROFILE_IMAGES: 'Runinga/Profile/Images',
+  PROFILE_VIDEOS: 'Runinga/Profile/Videos',
   // Shorts (TikTok-like - permanent)
-  SHORTS_VIDEOS: 'Krieta/Shorts/Videos',
-  SHORTS_IMAGES: 'Krieta/Shorts/Images',
+  SHORTS_VIDEOS: 'Runinga/Shorts/Videos',
+  SHORTS_IMAGES: 'Runinga/Shorts/Images',
   // Contests
-  CONTESTS_IMAGES: 'Krieta/Contests/Images',
-  CONTESTS_VIDEOS: 'Krieta/Contests/Videos',
+  CONTESTS_IMAGES: 'Runinga/Contests/Images',
+  CONTESTS_VIDEOS: 'Runinga/Contests/Videos',
   // Feed
-  DRIPS_IMAGES: 'Krieta/Drips/Images',
+  DRIPS_IMAGES: 'Runinga/Drips/Images',
   // Shop
-  SHOP_IMAGES: 'Krieta/Shop/Images',
+  SHOP_IMAGES: 'Runinga/Shop/Images',
   // Chat - Direct
-  CHAT_DIRECT_IMAGES: 'Krieta/Chats/Direct/Images',
-  CHAT_DIRECT_VIDEOS: 'Krieta/Chats/Direct/Videos',
+  CHAT_DIRECT_IMAGES: 'Runinga/Chats/Direct/Images',
+  CHAT_DIRECT_VIDEOS: 'Runinga/Chats/Direct/Videos',
   // Chat - Normal Groups
-  CHAT_GROUP_IMAGES: 'Krieta/Chats/Group/Images',
-  CHAT_GROUP_VIDEOS: 'Krieta/Chats/Group/Videos',
-  // Chat - Chama Groups
-  CHAT_CHAMA_IMAGES: 'Krieta/Chats/Chama/Images',
-  CHAT_CHAMA_VIDEOS: 'Krieta/Chats/Chama/Videos',
-  // Chat - Group Avatars (both normal and chama)
-  CHAT_GROUP_AVATAR_IMAGES: 'Krieta/Chats/GroupAvatar/Images',
+  CHAT_GROUP_IMAGES: 'Runinga/Chats/Group/Images',
+  CHAT_GROUP_VIDEOS: 'Runinga/Chats/Group/Videos',  // Chat - Group Avatars (both normal and chama)
+  CHAT_GROUP_AVATAR_IMAGES: 'Runinga/Chats/GroupAvatar/Images',
   // Stories (WhatsApp-like status - 24h ephemeral)
-  STORIES_IMAGES: 'Krieta/Stories/Images',
-  STORIES_VIDEOS: 'Krieta/Stories/Videos',
+  STORIES_IMAGES: 'Runinga/Stories/Images',
+  STORIES_VIDEOS: 'Runinga/Stories/Videos',
 } as const;
 
 export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINARY_FOLDERS];
@@ -46,7 +42,7 @@ export type CloudinaryFolder = (typeof CLOUDINARY_FOLDERS)[keyof typeof CLOUDINA
  * Enforces folder routing — client cannot choose arbitrary folders.
  * 
  * SECURITY: Uses signed uploads only (no upload_preset)
- * - Upload preset "Krieta" should be disabled in Cloudinary dashboard
+ * - Upload preset "Runinga" should be disabled in Cloudinary dashboard
  * - All uploads must go through this signed endpoint
  * - Folder is validated and signed
  * - Webhook validates uploads and deletes unauthorized ones

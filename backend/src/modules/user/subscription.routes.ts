@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { SubscriptionService } from './subscription.service.js';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { setRLSContext } from '../../middleware/rls.js';
@@ -66,8 +66,8 @@ router.post('/subscribe', subscriptionRateLimiter, async (req: AuthRequest, res,
     if (!creator_id || !tierType) return res.status(400).json({ error: 'creator_id and tierType are required' });
     const tier = await prisma.subscription_tier.findUnique({ where: { creator_id_tier: { creator_id, tier: tierType } }, select: { kr_amount: true } });
     if (!tier) return res.status(404).json({ error: 'Subscription tier not found' });
-    const amountKr = Number(tier.kr_amount);
-    const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(subscriberId, 'subscription', { creator_id, tierType, amount_kr: amountKr });
+    const amountRc = Number(tier.kr_amount);
+    const fraudCheck = await FraudDetectionService.comprehensiveFraudCheck(subscriberId, 'subscription', { creator_id, tierType, amount_kr: amountRc });
     if (fraudCheck.shouldBlock) {
       await AuditLogService.logFraudDetection(req, { userId: subscriberId, operationType: 'subscription', riskScore: fraudCheck.riskScore, reasons: fraudCheck.reasons, blocked: true });
       return res.status(403).json({ error: 'Operation blocked', message: 'Suspicious activity detected.', reasons: fraudCheck.reasons });

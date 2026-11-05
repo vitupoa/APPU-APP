@@ -1,4 +1,4 @@
-# Production Deployment Security Checklist
+﻿# Production Deployment Security Checklist
 
 ## 🚨 CRITICAL: Before Going Live
 
@@ -9,7 +9,7 @@
 NODE_ENV=production
 
 # ✅ Set CORS_ORIGIN to your actual domains (NEVER use *)
-CORS_ORIGIN=https://krieta.com,https://www.krieta.com,https://app.krieta.com
+CORS_ORIGIN=https://runinga.com,https://www.runinga.com,https://app.runinga.com
 
 # ✅ Generate strong secrets (use: openssl rand -base64 32)
 REQUEST_SIGNING_KEY=<32+ character random string>
@@ -40,7 +40,7 @@ PAYPAL_CLIENT_ID=<live-client-id>
 PAYPAL_CLIENT_SECRET=<live-client-secret>
 
 # ✅ Configure webhook in PayPal dashboard
-# URL: https://api.krieta.com/api/v1/webhooks/paypal
+# URL: https://api.runinga.com/api/v1/webhooks/paypal
 # Events: PAYMENT.CAPTURE.COMPLETED, PAYMENT.CAPTURE.DENIED
 ```
 
@@ -51,7 +51,7 @@ PAYSTACK_SECRET_KEY=sk_live_<your-key>
 PAYSTACK_PUBLIC_KEY=pk_live_<your-key>
 
 # ✅ Configure webhook in Paystack dashboard
-# URL: https://api.krieta.com/api/v1/webhooks/paystack
+# URL: https://api.runinga.com/api/v1/webhooks/paystack
 ```
 
 #### M-Pesa
@@ -66,10 +66,10 @@ MPESA_SHORTCODE=<production-shortcode>
 MPESA_PASSKEY=<production-passkey>
 
 # ✅ Set callback URL
-MPESA_CALLBACK_URL=https://api.krieta.com/api/v1/webhooks/mpesa
+MPESA_CALLBACK_URL=https://api.runinga.com/api/v1/webhooks/mpesa
 
 # ✅ Whitelist Railway IP in Safaricom portal
-# Get Railway IP: curl https://api.krieta.com/health
+# Get Railway IP: curl https://api.runinga.com/health
 ```
 
 ### 4. Security Headers
@@ -110,18 +110,18 @@ RATE_LIMIT_WINDOW_MS=900000
 ```bash
 # Should FAIL from unauthorized origin
 curl -H "Origin: https://evil.com" \
-  https://api.krieta.com/api/v1/health
+  https://api.runinga.com/api/v1/health
 
 # Should SUCCEED from authorized origin
-curl -H "Origin: https://krieta.com" \
-  https://api.krieta.com/api/v1/health
+curl -H "Origin: https://runinga.com" \
+  https://api.runinga.com/api/v1/health
 ```
 
 ### Test 2: Rate Limiting
 ```bash
 # Send 101 requests rapidly
 for i in {1..101}; do
-  curl https://api.krieta.com/api/v1/health
+  curl https://api.runinga.com/api/v1/health
 done
 # Should get 429 after 100 requests
 ```
@@ -129,7 +129,7 @@ done
 ### Test 3: Input Sanitization
 ```bash
 # Try XSS attack
-curl -X POST https://api.krieta.com/api/v1/auth/register \
+curl -X POST https://api.runinga.com/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username": "<script>alert(1)</script>"}'
 # Should be rejected or sanitized
@@ -138,7 +138,7 @@ curl -X POST https://api.krieta.com/api/v1/auth/register \
 ### Test 4: Webhook Security
 ```bash
 # Try webhook without signature
-curl -X POST https://api.krieta.com/api/v1/webhooks/paypal \
+curl -X POST https://api.runinga.com/api/v1/webhooks/paypal \
   -H "Content-Type: application/json" \
   -d '{"event_type": "PAYMENT.CAPTURE.COMPLETED"}'
 # Should be rejected (401 Unauthorized)
@@ -205,7 +205,7 @@ RATE_LIMIT_WINDOW_MS=900000
 ### If CORS blocks legitimate requests:
 ```bash
 # Add domain to CORS_ORIGIN
-CORS_ORIGIN=https://krieta.com,https://new-domain.com
+CORS_ORIGIN=https://runinga.com,https://new-domain.com
 ```
 
 ---

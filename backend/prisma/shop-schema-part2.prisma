@@ -1,4 +1,4 @@
-
+﻿
 // ─── PRICING & DISCOUNTS ─────────────────────────────────
 
 model ProductDiscount {
@@ -103,8 +103,8 @@ model CartItem {
 model Order {
   id            String      @id @default(uuid())
   buyerId       String      @map("buyer_id")
-  totalKr       Decimal     @map("total_kr") @db.Decimal(18, 4)
-  platformFeeKr Decimal     @map("platform_fee_kr") @db.Decimal(18, 4)
+  totalRc       Decimal     @map("total_kr") @db.Decimal(18, 4)
+  platformFeeRc Decimal     @map("platform_fee_kr") @db.Decimal(18, 4)
   status        OrderStatus @default(PENDING)
   notes         String?
   createdAt     DateTime    @default(now()) @map("created_at")
@@ -123,8 +123,8 @@ model OrderItem {
   productId    String  @map("product_id")
   sellerId     String  @map("seller_id")
   quantity     Int
-  unitPriceKr  Decimal @map("unit_price_kr") @db.Decimal(18, 4)
-  totalPriceKr Decimal @map("total_price_kr") @db.Decimal(18, 4)
+  unitPriceRc  Decimal @map("unit_price_kr") @db.Decimal(18, 4)
+  totalPriceRc Decimal @map("total_price_kr") @db.Decimal(18, 4)
   escrowStatus String  @default("held") @map("escrow_status") // held, released, refunded
   deliveredAt  DateTime? @map("delivered_at")
 
@@ -176,7 +176,7 @@ model Gift {
   recipientId   String   @map("recipient_id")
   productId     String   @map("product_id")
   message       String?
-  amountKr      Decimal  @map("amount_kr") @db.Decimal(18, 4)
+  amountRc      Decimal  @map("amount_kr") @db.Decimal(18, 4)
   escrowStatus  String   @default("held") @map("escrow_status")
   status        String   @default("pending") // pending, purchased, delivered, cancelled
   createdAt     DateTime @default(now()) @map("created_at")

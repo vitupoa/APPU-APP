@@ -1,4 +1,4 @@
-# 🚀 FINAL 20 MINUTES - Complete Implementation Guide
+﻿# 🚀 FINAL 20 MINUTES - Complete Implementation Guide
 
 ## ✅ What's Already Done (95%)
 
@@ -22,7 +22,7 @@
 
 ### Task 1: Update ShortsViewModel (10 min)
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/viewmodel/ShortsViewModel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/viewmodel/ShortsViewModel.kt`
 
 **Step 1**: Add FeedRepository to constructor
 ```kotlin
@@ -168,7 +168,7 @@ fun trackShare(shortId: String) {
 
 ### Task 2: Update ShortsScreen (5 min)
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/screen/ShortsScreen.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/screen/ShortsScreen.kt`
 
 **Step 1**: Add view tracking
 ```kotlin
@@ -200,7 +200,7 @@ onComment = {
 
 ### Task 3: Update Koin Module (2 min)
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/di/AppModule.kt` (or wherever Koin is configured)
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/di/AppModule.kt` (or wherever Koin is configured)
 
 **Add FeedRepository to ShortsViewModel**:
 ```kotlin

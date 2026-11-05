@@ -1,6 +1,6 @@
-# Mobile WebSocket Gateway Integration
+﻿# Mobile WebSocket Gateway Integration
 
-This layout establishes the pipeline for ingesting concurrent WebSocket events seamlessly into Jetpack Compose UI streams natively within your Kotlin Multiplatform application (Krieta). We will bridge the Redis-backed Socket.io server logic onto the Ktor Android clients explicitly for push notifications and milestone live updates.
+This layout establishes the pipeline for ingesting concurrent WebSocket events seamlessly into Jetpack Compose UI streams natively within your Kotlin Multiplatform application (Runinga). We will bridge the Redis-backed Socket.io server logic onto the Ktor Android clients explicitly for push notifications and milestone live updates.
 
 ## 1. Ktor WebSockets Client Initialization
 We will augment your existing network module `KtorClient.kt`.

@@ -1,4 +1,4 @@
-# Live Shopping - Simple MVP
+﻿# Live Shopping - Simple MVP
 
 ## 🎯 MVP Approach
 
@@ -42,7 +42,7 @@
 **What Shows:**
 - Product image/icon
 - Product name
-- Product price in Kr
+- Product price in Rc
 - **"Contact" button only**
 
 **What Doesn't Show:**
@@ -73,7 +73,7 @@
 ```
 ┌─────────────────────────────────┐
 │ 📦  iPhone 15 Pro               │
-│     150,000 Kr                  │
+│     150,000 Rc                  │
 │                    [Contact]    │
 └─────────────────────────────────┘
 ```
@@ -83,7 +83,7 @@
 ```
 ┌─────────────────────────────────┐
 │ 📦  iPhone 15 Pro               │
-│     150,000 Kr                  │
+│     150,000 Rc                  │
 │                    [Contact]    │
 └─────────────────────────────────┘
 ```

@@ -1,11 +1,11 @@
-# TypeScript Error Fixes - Batch Processing
+﻿# TypeScript Error Fixes - Batch Processing
 
 ## Status: 106 errors remaining (down from 200+)
 
 ## Critical Fixes Completed ✅
 1. Fixed nonce.service.ts Prisma import
 2. Fixed queryParams helper array handling  
-3. Fixed contests.service.ts (dailyPrizeTotalKr typo, ContestVote fields, invalid include syntax)
+3. Fixed contests.service.ts (dailyPrizeTotalRc typo, ContestVote fields, invalid include syntax)
 4. Fixed withdrawal.service.ts Decimal comparison
 
 ## Remaining Errors by Category

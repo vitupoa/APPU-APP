@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Sponsored Content System - Native Ad Marketplace (TikTok Model)
  * Brands create sponsored shorts that appear seamlessly in user feeds
  */
@@ -21,7 +21,7 @@ export interface CreateSponsoredContentRequest {
   contentType: SponsoredContentType;
   contentId: string;  // ID of the short/post/story
   campaignName: string;
-  budget: number;     // Total budget in Kr
+  budget: number;     // Total budget in Rc
   pricingModel: PricingModel;
   bidAmount: number;  // Amount per action (CPM/CPV/CPE/CPC)
   startDate: Date;

@@ -1,4 +1,4 @@
-# ProfileScreen "Unknown User" Bug Fix
+﻿# ProfileScreen "Unknown User" Bug Fix
 
 ## Problem
 
@@ -63,7 +63,7 @@ if (isOwnProfile) {
 ```kotlin
 Column(horizontalAlignment = Alignment.CenterHorizontally) {
     Text("😕", fontSize = 48.sp)
-    Text(error, color = KrietaColors.Error)
+    Text(error, color = RuningaColors.Error)
     Button(onClick = { profileViewModel.refreshProfile() }) { 
         Text("Retry") 
     }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Transaction Types and Context Definitions
  * 
  * This file defines TypeScript types for transaction context validation
@@ -19,10 +19,7 @@ export enum TransactionType {
   SUBSCRIPTION = 'SUBSCRIPTION',
   CONTEST_ENTRY = 'CONTEST_ENTRY',
   CONTEST_VOTE = 'CONTEST_VOTE',
-  CONTEST_PRIZE = 'CONTEST_PRIZE',
-  CHAMA_CONTRIBUTION = 'CHAMA_CONTRIBUTION',
-  CHAMA_PAYOUT = 'CHAMA_PAYOUT',
-  PLATFORM_REWARD = 'PLATFORM_REWARD',
+  CONTEST_PRIZE = 'CONTEST_PRIZE',  PLATFORM_REWARD = 'PLATFORM_REWARD',
   WITHDRAWAL = 'WITHDRAWAL',
   TOP_UP = 'TOP_UP',
   SHOP_LISTING_FEE = 'SHOP_LISTING_FEE',
@@ -154,22 +151,7 @@ export const TRANSACTION_TYPE_METADATA: Record<TransactionType, TransactionTypeM
     description: 'Contest prize distribution',
     requires_reference: true,
     allowed_content_types: ['contest'],
-  },
-  [TransactionType.CHAMA_CONTRIBUTION]: {
-    type: TransactionType.CHAMA_CONTRIBUTION,
-    label: 'Chama Contribution',
-    description: 'Group savings contribution',
-    requires_reference: true,
-    allowed_content_types: ['chama'],
-  },
-  [TransactionType.CHAMA_PAYOUT]: {
-    type: TransactionType.CHAMA_PAYOUT,
-    label: 'Chama Payout',
-    description: 'Group savings payout',
-    requires_reference: true,
-    allowed_content_types: ['chama'],
-  },
-  [TransactionType.PLATFORM_REWARD]: {
+  },  [TransactionType.PLATFORM_REWARD]: {
     type: TransactionType.PLATFORM_REWARD,
     label: 'Platform Reward',
     description: 'Platform-funded reward',
@@ -184,7 +166,7 @@ export const TRANSACTION_TYPE_METADATA: Record<TransactionType, TransactionTypeM
   [TransactionType.TOP_UP]: {
     type: TransactionType.TOP_UP,
     label: 'Top Up',
-    description: 'Buy Kr with fiat',
+    description: 'Buy Rc with fiat',
     requires_reference: false,
   },
   [TransactionType.SHOP_LISTING_FEE]: {

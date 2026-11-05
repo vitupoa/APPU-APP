@@ -1,4 +1,4 @@
-# 🔍 DIAGNOSIS: Exchange Rate API Issue - AUTHENTICATION ERROR
+﻿# 🔍 DIAGNOSIS: Exchange Rate API Issue - AUTHENTICATION ERROR
 
 ## Status: ✅ ISSUE IDENTIFIED
 
@@ -12,7 +12,7 @@ From your logcat output, I can see the **exact issue**:
 KtorHttp: RESPONSE https://appu-app-production.up.railway.app/api/v1/wallet/exchange-rate?currency=KES 
 failed with exception: io.ktor.serialization.JsonConvertException: 
 Illegal input: Fields [currency, baseRate, buyRate, sellRate, margin] are required 
-for type with serial name 'com.krieta.feature.wallet.data.remote.dto.ExchangeRateResponseDto', 
+for type with serial name 'com.runinga.feature.wallet.data.remote.dto.ExchangeRateResponseDto', 
 but they were missing at path: $
 ```
 
@@ -63,7 +63,7 @@ refreshTokens {
         }
         
         if (response.status.value == 200) {
-            val tokens = response.body<com.krieta.feature.auth.data.remote.dto.AuthResponseDto>()
+            val tokens = response.body<com.runinga.feature.auth.data.remote.dto.AuthResponseDto>()
             if (tokens.accessToken != null && tokens.refreshToken != null) {
                 tokenManager.saveAccessToken(tokens.accessToken)
                 tokenManager.saveRefreshToken(tokens.refreshToken)

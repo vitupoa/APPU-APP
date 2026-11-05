@@ -1,4 +1,4 @@
-# Contest Creation Wizard - Bug Fixes
+﻿# Contest Creation Wizard - Bug Fixes
 
 ## Issue
 App was crashing when users clicked "Next" to go from Step 3 to Step 4 in the contest creation wizard.
@@ -108,11 +108,11 @@ All optional fields in the wizard properly handle empty states:
 - [ ] Entry fee and paid voting mutual exclusivity validation works
 
 ## Files Modified
-1. `composeApp/src/commonMain/kotlin/com/krieta/feature/contests/presentation/screen/wizard/Step4PrizesAndValidation.kt`
+1. `composeApp/src/commonMain/kotlin/com/runinga/feature/contests/presentation/screen/wizard/Step4PrizesAndValidation.kt`
    - Removed `.verticalScroll(scrollState)` from Column modifier
    - Removed `val scrollState = rememberScrollState()` declaration
 
-2. `composeApp/src/commonMain/kotlin/com/krieta/feature/contests/presentation/screen/wizard/Step5ReviewAndJudges.kt`
+2. `composeApp/src/commonMain/kotlin/com/runinga/feature/contests/presentation/screen/wizard/Step5ReviewAndJudges.kt`
    - Removed `.verticalScroll(scrollState)` from Column modifier
    - Removed `val scrollState = rememberScrollState()` declaration
 

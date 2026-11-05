@@ -1,4 +1,4 @@
-// ─── SHOP (MULTI-CATEGORY MARKETPLACE) ────────────────────
+﻿// ─── SHOP (MULTI-CATEGORY MARKETPLACE) ────────────────────
 
 enum ProductCategory {
   VEHICLES
@@ -125,7 +125,7 @@ model Product {
   title           String
   description     String?          @db.Text
   imageUrls       String[]         @map("image_urls")
-  priceKr         Decimal          @map("price_kr") @db.Decimal(18, 4)
+  priceRc         Decimal          @map("price_kr") @db.Decimal(18, 4)
   currency        String?          @db.VarChar(3)
   localPrice      Decimal?         @map("local_price") @db.Decimal(18, 4)
   wholesalePrice  Decimal?         @map("wholesale_price") @db.Decimal(18, 4)

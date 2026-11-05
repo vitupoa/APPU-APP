@@ -1,4 +1,4 @@
-# ⚡ QUICK FIX - Exchange Rate Issue
+﻿# ⚡ QUICK FIX - Exchange Rate Issue
 
 ## Problem
 Exchange rate API failing with serialization error
@@ -16,7 +16,7 @@ Exchange rate API failing with serialization error
 
 ### Option 2: Clear App Data
 ```bash
-adb shell pm clear com.krieta.com
+adb shell pm clear com.runinga.com
 ```
 Then login again.
 

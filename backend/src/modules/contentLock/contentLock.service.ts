@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
 import { lockWalletsForUpdate, withDeadlockRetry } from '../../utils/databaseLocks.js';
@@ -64,7 +64,7 @@ export class ContentLockService {
       hasAccess: false,
       requiresSubscription: !!requiredTier,
       requiresUnlock: !!unlockAmountKr,
-      unlockAmountKr: unlockAmountKr ? Number(unlockAmountKr) : undefined
+      unlockAmountKr: unlockAmountRc ? Number(unlockAmountKr) : undefined
     };
   }
 
@@ -100,9 +100,9 @@ export class ContentLockService {
       throw new Error('Content not found');
     }
 
-    unlockAmountKr = content.unlock_amount_kr ? Number(content.unlock_amount_kr) : 0;
+    unlockAmountRc = content.unlock_amount_kr ? Number(content.unlock_amount_kr) : 0;
 
-    if (!unlockAmountKr || unlockAmountKr <= 0) {
+    if (!unlockAmountRc || unlockAmountRc <= 0) {
       throw new Error('Content does not have an unlock amount set');
     }
 
@@ -123,8 +123,8 @@ export class ContentLockService {
     }
 
     const PLATFORM_FEE_RATE = 0.15;
-    const platformFeeKr = Math.floor(unlockAmountKr * PLATFORM_FEE_RATE);
-    const creatorReceiveKr = unlockAmountKr - platformFeeKr;
+    const platformFeeRc = Math.floor(unlockAmountRc * PLATFORM_FEE_RATE);
+    const creatorReceiveRc = unlockAmountRc - platformFeeKr;
 
     const baseUsd = ExchangeService.getUSDFromKr(unlockAmountKr);
     const localRate = await ExchangeService.getTransactionRate(userCurrency, 'sell');
@@ -136,7 +136,7 @@ export class ContentLockService {
         const userWallet = wallets.find((w: any) => w.user_id === userId);
 
         if (!userWallet || Number(userWallet.kr_balance) < unlockAmountKr) {
-          throw new Error('Insufficient Kr balance to unlock content');
+          throw new Error('Insufficient Rc balance to unlock content');
         }
 
         await tx.wallets.update({
@@ -231,12 +231,12 @@ export class ContentLockService {
       krAmount: unlockAmountKr,
       fiatAmount: Math.ceil(fiatAmount),
       currency: userCurrency,
-      displayText: `${unlockAmountKr} Kr (≈ ${Math.ceil(fiatAmount)} ${userCurrency})`
+      displayText: `${unlockAmountKr} Rc (≈ ${Math.ceil(fiatAmount)} ${userCurrency})`
     };
   }
 
   /**
-   * Convert creator's fiat input to Kr in real-time
+   * Convert creator's fiat input to Rc in real-time
    */
   static async convertFiatToKr(fiatAmount: number, creatorCurrency: string): Promise<number> {
     const localRate = await ExchangeService.getTransactionRate(creatorCurrency, 'sell');

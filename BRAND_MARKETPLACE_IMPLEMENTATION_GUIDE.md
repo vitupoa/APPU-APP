@@ -1,4 +1,4 @@
-# BRAND MARKETPLACE IMPLEMENTATION GUIDE
+﻿# BRAND MARKETPLACE IMPLEMENTATION GUIDE
 ## Unified Influencer Marketing & Contest Sales Engine
 
 ---
@@ -203,11 +203,11 @@ GET    /api/v1/marketplace/gamification/me          # Get my stats
    - Title: "Promote Our New Product"
    - Type: SPONSORED_POST
    - Target: MICRO influencers in Fashion category
-   - Budget: Kr.10,000
-   - Compensation: Kr.500 per influencer
+   - Budget: Rc.10,000
+   - Compensation: Rc.500 per influencer
    - Max Influencers: 20
    - Deliverables: 2 posts, 3 stories
-4. System deducts Kr.10,000 from brand wallet (escrow)
+4. System deducts Rc.10,000 from brand wallet (escrow)
 5. Campaign created in DRAFT status
 6. Brand clicks "Publish"
 7. Campaign visible to matching influencers
@@ -236,9 +236,9 @@ GET    /api/v1/marketplace/gamification/me          # Get my stats
 2. Filters by category, participants
 3. Selects contest with 5,000 participants
 4. Chooses sponsorship type: CONTEST_PRIZE
-5. Adds Kr.5,000 to prize pool
+5. Adds Rc.5,000 to prize pool
 6. Uploads logo, brand message
-7. System deducts Kr.5,000 from wallet
+7. System deducts Rc.5,000 from wallet
 8. Sponsorship active
 9. Brand logo appears on contest page
 10. Tracks impressions, clicks, conversions
@@ -247,11 +247,11 @@ GET    /api/v1/marketplace/gamification/me          # Get my stats
 ### Flow 4: Purchase-to-Enter Contest (NON-GAMBLING)
 
 ```
-1. User sees contest: "Win Kr.10,000 - Dance Challenge"
+1. User sees contest: "Win Rc.10,000 - Dance Challenge"
 2. Entry is FREE (joins contest)
-3. Sees optional action: "Buy any product for Kr.50+ to support"
+3. Sees optional action: "Buy any product for Rc.50+ to support"
 4. User browses shop
-5. Adds Kr.100 worth of products to cart
+5. Adds Rc.100 worth of products to cart
 6. Completes purchase
 7. System automatically:
    - Records purchase entry
@@ -259,7 +259,7 @@ GET    /api/v1/marketplace/gamification/me          # Get my stats
    - Awards gamification points
 8. User still competes based on SKILL (votes/judges)
 9. Purchase doesn't increase winning odds
-10. User got Kr.100 worth of products (primary value)
+10. User got Rc.100 worth of products (primary value)
 ```
 
 ### Flow 5: Post-Contest Conversion (Losers → Customers)
@@ -276,8 +276,8 @@ GET    /api/v1/marketplace/gamification/me          # Get my stats
 6. User makes purchase with discount
 7. System tracks conversion
 8. Brand sees ROI:
-   - Investment: Kr.10,000 (prize + fee)
-   - Revenue: Kr.45,000 (from conversions)
+   - Investment: Rc.10,000 (prize + fee)
+   - Revenue: Rc.45,000 (from conversions)
    - ROI: 350%
 ```
 
@@ -313,7 +313,7 @@ const contest = {
   // Optional purchase mechanics
   purchaseToEnter: {
     enabled: true,
-    minPurchase: 50,              // Buy product worth Kr.50+
+    minPurchase: 50,              // Buy product worth Rc.50+
     benefit: "Support the contest", // NOT "increase odds"
     primaryValue: "Product",      // User gets product (main value)
     bonusBenefit: "Contest entry" // Entry is bonus, not primary
@@ -617,9 +617,9 @@ npm run test
 - Sample Conversion: See `examples/sample-conversion.json`
 
 ### Contact
-- Technical Support: dev@krieta.com
-- Legal Questions: legal@krieta.com
-- Business Inquiries: business@krieta.com
+- Technical Support: dev@runinga.com
+- Legal Questions: legal@runinga.com
+- Business Inquiries: business@runinga.com
 
 ---
 

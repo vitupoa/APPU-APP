@@ -1,13 +1,13 @@
-# Logout Testing Guide
+﻿# Logout Testing Guide
 
 ## Quick Test Steps
 
 ### Test 1: Basic Logout & Login with Different Users
 
-1. **Login as User A (admin@krieta.com)**
+1. **Login as User A (admin@runinga.com)**
    - Navigate to Profile
    - Verify you see admin user details
-   - Note the username, email, and Kr balance
+   - Note the username, email, and Rc balance
 
 2. **Logout User A**
    - Tap the 3-dot menu on profile
@@ -97,7 +97,7 @@ Check if cache is properly cleared by looking at logs:
 ## What to Look For
 
 1. **Profile Screen**: Display name, username, avatar should match logged-in user
-2. **Wallet Screen**: Kr balance should match logged-in user
+2. **Wallet Screen**: Rc balance should match logged-in user
 3. **Edit Profile**: All fields pre-filled with correct user data
 4. **Bio Links**: Should show correct user's links
 5. **Stats**: Admirers/Admiring counts should be for current user
@@ -105,10 +105,10 @@ Check if cache is properly cleared by looking at logs:
 ## Test Users
 
 ### Admin User (from script)
-- Email: admin@krieta.com
+- Email: admin@runinga.com
 - Username: supaadmin
 - Password: RembrandtRAR2026!
-- Wallet: 1,000,000 Kr
+- Wallet: 1,000,000 Rc
 
 ### Other Test User (if available)
 - Use any other registered user

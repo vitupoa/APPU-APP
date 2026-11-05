@@ -1,18 +1,18 @@
-# Drips Ad Navigation Update
+﻿# Drips Ad Navigation Update
 
 ## Changes Made
 
-Updated all dummy ad cards in DripsScreen to navigate to the **Krieta Ads Manager** when users interact with them.
+Updated all dummy ad cards in DripsScreen to navigate to the **Runinga Ads Manager** when users interact with them.
 
 ### Modified Components
 
-1. **NativeAdCard** - "Learn More" button now navigates to KrietaAdsManagerScreen
-2. **BannerAdCard** - Entire card is now clickable and navigates to KrietaAdsManagerScreen
-3. **StoryStyleAdCard** - "Swipe Up" button now navigates to KrietaAdsManagerScreen
+1. **NativeAdCard** - "Learn More" button now navigates to RuningaAdsManagerScreen
+2. **BannerAdCard** - Entire card is now clickable and navigates to RuningaAdsManagerScreen
+3. **StoryStyleAdCard** - "Swipe Up" button now navigates to RuningaAdsManagerScreen
 
-## Krieta Ads Manager Screen Content
+## Runinga Ads Manager Screen Content
 
-The **KrietaAdsManagerScreen** has 3 main tabs:
+The **RuningaAdsManagerScreen** has 3 main tabs:
 
 ### 1. Display Ads Tab
 Create professional ad campaigns with various placements:
@@ -65,7 +65,7 @@ User sees dummy ad (Native/Banner/Story)
     ↓
 User clicks "Learn More" / "Swipe Up" / Card
     ↓
-Krieta Ads Manager Screen
+Runinga Ads Manager Screen
     ↓
 User selects tab (Display Ads / Sponsored Content / Boost Content)
     ↓
@@ -77,27 +77,27 @@ Campaign Creation Screen
 ## Technical Implementation
 
 ### File Modified
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/screen/DripsScreen.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/screen/DripsScreen.kt`
 
 ### Changes
 ```kotlin
 // NativeAdCard
 Button(
-    onClick = { navigator.push(com.krieta.feature.ads.presentation.screen.KrietaAdsManagerScreen()) },
+    onClick = { navigator.push(com.runinga.feature.ads.presentation.screen.RuningaAdsManagerScreen()) },
     // ...
 )
 
 // BannerAdCard
 Card(
     modifier = Modifier.clickable { 
-        navigator.push(com.krieta.feature.ads.presentation.screen.KrietaAdsManagerScreen()) 
+        navigator.push(com.runinga.feature.ads.presentation.screen.RuningaAdsManagerScreen()) 
     },
     // ...
 )
 
 // StoryStyleAdCard
 Button(
-    onClick = { navigator.push(com.krieta.feature.ads.presentation.screen.KrietaAdsManagerScreen()) },
+    onClick = { navigator.push(com.runinga.feature.ads.presentation.screen.RuningaAdsManagerScreen()) },
     // ...
 )
 ```
@@ -117,13 +117,13 @@ Test the navigation flow:
 1. Open Drips screen
 2. Scroll to find dummy ads (appear every 6, 15, or 20 posts)
 3. Click "Learn More" on Native Ad
-4. Verify navigation to Krieta Ads Manager
+4. Verify navigation to Runinga Ads Manager
 5. Explore all 3 tabs
 6. Test "Create Campaign" buttons
 7. Test back navigation
 
 ## Related Files
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/ads/presentation/screen/KrietaAdsManagerScreen.kt`
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/sponsored/presentation/screen/CreateCampaignScreen.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/ads/presentation/screen/RuningaAdsManagerScreen.kt`
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/sponsored/presentation/screen/CreateCampaignScreen.kt`
 - `DRIPS_COMPREHENSIVE_AD_SYSTEM.md`
 - `ADS_IMPLEMENTATION_SUMMARY.md`

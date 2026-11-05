@@ -1,4 +1,4 @@
-# CLOUDINARY WEBHOOK SETUP FOR RAILWAY
+﻿# CLOUDINARY WEBHOOK SETUP FOR RAILWAY
 
 ## 🚀 Your Railway Configuration
 
@@ -42,7 +42,7 @@ After setup, test the webhook:
 
 ```bash
 # 1. Get upload signature
-curl https://appu-app-production.up.railway.app/api/v1/media/upload-signature?folder=Krieta/profile/Images \
+curl https://appu-app-production.up.railway.app/api/v1/media/upload-signature?folder=Runinga/profile/Images \
   -H "Authorization: Bearer YOUR_TOKEN"
 
 # 2. Upload a test image to Cloudinary with the signature
@@ -50,7 +50,7 @@ curl https://appu-app-production.up.railway.app/api/v1/media/upload-signature?fo
 
 # 3. Check your Railway logs
 # You should see:
-# [Cloudinary Webhook] Upload validated: Krieta/profile/Images/...
+# [Cloudinary Webhook] Upload validated: Runinga/profile/Images/...
 ```
 
 ### Check Railway Logs
@@ -85,14 +85,14 @@ The webhook endpoint automatically verifies Cloudinary's signature using:
 
 ```bash
 # 1. Get signature
-curl https://appu-app-production.up.railway.app/api/v1/media/upload-signature?folder=Krieta/profile/Images \
+curl https://appu-app-production.up.railway.app/api/v1/media/upload-signature?folder=Runinga/profile/Images \
   -H "Authorization: Bearer YOUR_TOKEN"
 
 # Response:
 {
   "signature": "abc123...",
   "timestamp": 1234567890,
-  "folder": "Krieta/profile/Images",
+  "folder": "Runinga/profile/Images",
   "apiKey": "your_api_key",
   "cloudName": "your_cloud_name"
 }
@@ -102,11 +102,11 @@ curl -X POST https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload \
   -F "file=@test.jpg" \
   -F "signature=abc123..." \
   -F "timestamp=1234567890" \
-  -F "folder=Krieta/profile/Images" \
+  -F "folder=Runinga/profile/Images" \
   -F "api_key=your_api_key"
 
 # 3. Check Railway logs - should see:
-# [Cloudinary Webhook] Upload validated: Krieta/profile/Images/test
+# [Cloudinary Webhook] Upload validated: Runinga/profile/Images/test
 ```
 
 ### Test 2: Invalid Folder (Should be Deleted)
@@ -139,8 +139,8 @@ curl https://appu-app-production.up.railway.app/api/v1/media/cloudinary-stats \
     "video": 23
   },
   "byFolder": {
-    "Krieta/profile/Images": 50,
-    "Krieta/shorts/Videos": 23
+    "Runinga/profile/Images": 50,
+    "Runinga/shorts/Videos": 23
   }
 }
 ```
@@ -222,19 +222,19 @@ If no logs, webhook might not be configured correctly
 ### Allowed Folders
 
 ```
-Krieta/profile/Images
-Krieta/profile/Videos
-Krieta/shorts/Videos
-Krieta/shorts/Images
-Krieta/contests/Images
-Krieta/contests/Videos
-Krieta/drips/Images
-Krieta/shop/Images
-Krieta/chat/Images
-Krieta/chat/Videos
-Krieta/chat/Audio
-Krieta/stories/Images
-Krieta/stories/Videos
+Runinga/profile/Images
+Runinga/profile/Videos
+Runinga/shorts/Videos
+Runinga/shorts/Images
+Runinga/contests/Images
+Runinga/contests/Videos
+Runinga/drips/Images
+Runinga/shop/Images
+Runinga/chat/Images
+Runinga/chat/Videos
+Runinga/chat/Audio
+Runinga/stories/Images
+Runinga/stories/Videos
 ```
 
 ---
@@ -248,7 +248,7 @@ Krieta/stories/Videos
 - [ ] Railway logs show webhook notifications
 - [ ] Upload statistics accessible
 - [ ] Frontend updated to use signed uploads
-- [ ] "Krieta" upload preset disabled in Cloudinary
+- [ ] "Runinga" upload preset disabled in Cloudinary
 
 ---
 

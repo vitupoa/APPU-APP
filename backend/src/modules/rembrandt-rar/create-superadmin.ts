@@ -1,13 +1,11 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 
 
 async function main() {
-  console.log('--- RembrandtRAR Super Admin Initializer ---');
-  
-  const email = process.env.SUPER_ADMIN_EMAIL || 'admin@krieta.com';
-  const username = process.env.SUPER_ADMIN_USERNAME || 'krieta_admin';
+  const email = process.env.SUPER_ADMIN_EMAIL || 'admin@runinga.com';
+  const username = process.env.SUPER_ADMIN_USERNAME || 'runinga_admin';
   const password = process.env.SUPER_ADMIN_PASSWORD || 'RembrandtRAR2026!';
 
   try {
@@ -16,7 +14,6 @@ async function main() {
     });
 
     if (existing) {
-      console.log(`User ${email} or ${username} already exists. Upgrading to Super Admin...`);
       await prisma.admin_profile.upsert({
         where: { user_id: existing.id },
         update: { role: 'SUPER_ADMIN' },
@@ -25,7 +22,6 @@ async function main() {
           role: 'SUPER_ADMIN',
         }
       });
-      console.log('Successfully upgraded user to SUPER_ADMIN.');
       return;
     }
 
@@ -49,12 +45,7 @@ async function main() {
       }
     });
 
-    console.log(`Successfully created Super Admin!`);
-    console.log(`Email: ${email}`);
-    console.log(`Username: ${username}`);
-    console.log(`Password: ${password}`);
-    
-  } catch (err) {
+    } catch (err) {
     console.error('Error creating super admin:', err);
   } finally {
     await prisma.$disconnect();

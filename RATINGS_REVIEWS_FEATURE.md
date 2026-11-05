@@ -1,4 +1,4 @@
-# Product Ratings, Reviews & Pricing Updates
+﻿# Product Ratings, Reviews & Pricing Updates
 
 ## Overview
 Implemented a complete ratings and reviews system for products, allowing users to rate and review both products and sellers. Also updated pricing logic to make retail price optional when wholesale pricing is provided.
@@ -84,7 +84,7 @@ data class ProductReview(
 ```
 
 **Form Updates:**
-- Retail price label: "Retail Price (Kr) - Optional if wholesale set"
+- Retail price label: "Retail Price (Rc) - Optional if wholesale set"
 - Wholesale fields must be filled together
 - Clear error messages for validation failures
 

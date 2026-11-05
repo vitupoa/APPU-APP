@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { HashtagService } from '../../shared/hashtag.service.js';
 import { ContentLockService } from '../contentLock/contentLock.service.js';
 import { Prisma } from '@prisma/client';
@@ -46,10 +46,10 @@ export class FeedService {
         items.map(async (p: any) => {
           const isLocked = p.is_locked;
           const requiredTier = p.required_tier;
-          const unlockAmountKr = p.unlock_amount_kr;
+          const unlockAmountRc = p.unlock_amount_kr;
           
           if (!isLocked) return { id: p.id, hasAccess: true };
-          if (!userId) return { id: p.id, hasAccess: false, requiresSubscription: !!requiredTier, requiresUnlock: !!unlockAmountKr };
+          if (!userId) return { id: p.id, hasAccess: false, requiresSubscription: !!requiredTier, requiresUnlock: !!unlockAmountRc };
           
           const access = await ContentLockService.checkAccess(
             userId,
@@ -58,7 +58,7 @@ export class FeedService {
             p.user_id,
             isLocked,
             requiredTier,
-            unlockAmountKr ? Number(unlockAmountKr) : undefined
+            unlockAmountRc ? Number(unlockAmountKr) : undefined
           );
           return { id: p.id, ...access };
         })
@@ -110,15 +110,11 @@ export class FeedService {
    * Mix of: admirers' posts, similar interests, trending, and random
    */
   private static async getPersonalizedFeed(userId: string, cursor: string | undefined, limit: number) {
-    console.log('[FeedService] Getting personalized feed for user:', userId);
-    
     const user = await prisma.user.findUnique({ 
       where: { id: userId },
       select: { country: true }
     });
     const userCountry = user?.country || '';
-    console.log('[FeedService] User country:', userCountry);
-
     // Get user's admirers (people they follow)
     const admiringList = await prisma.admires.findMany({
       where: { admirer_id: userId },
@@ -149,15 +145,6 @@ export class FeedService {
       ...randomPosts,
       ...userPosts
     ];
-
-    console.log('[FeedService] Feed sources:', {
-      admirers: admirersPosts.length,
-      similar: similarPosts.length,
-      trending: trendingPosts.length,
-      random: randomPosts.length,
-      userOwn: userPosts.length,
-      total: allPosts.length
-    });
 
     // Remove duplicates by post ID
     const uniquePosts = Array.from(
@@ -412,8 +399,6 @@ export class FeedService {
     requiredTier?: string;
     unlockAmountKr?: number;
   }) {
-    console.log('[FeedService] Creating post with data:', data);
-    
     const postId = crypto.randomUUID();
     
     const post = await prisma.post.create({
@@ -424,13 +409,11 @@ export class FeedService {
         caption: data.caption ?? '',
         is_locked: data.isLocked,
         required_tier: data.requiredTier as any,
-        unlock_amount_kr: data.unlockAmountKr ? new Prisma.Decimal(data.unlockAmountKr) : undefined
+        unlock_amount_kr: data.unlockAmountRc ? new Prisma.Decimal(data.unlockAmountKr) : undefined
       } as any,
       include: { user: { select: { id: true, username: true, display_name: true, avatar_url: true } }
       }
     });
-
-    console.log('[FeedService] Post created successfully:', post.id);
 
     // Process hashtags and mentions from caption (fire-and-forget)
     if (post.caption) {

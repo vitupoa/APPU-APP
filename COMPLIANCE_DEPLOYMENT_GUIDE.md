@@ -1,4 +1,4 @@
-# Wallet Compliance Restructuring - Deployment Guide
+﻿# Wallet Compliance Restructuring - Deployment Guide
 
 ## 🚀 Quick Start
 
@@ -138,7 +138,7 @@ Expected response:
 ```json
 {
   "status": "ok",
-  "service": "krieta-api",
+  "service": "runinga-api",
   "version": "1.0.0"
 }
 ```
@@ -467,7 +467,7 @@ After rollback:
 
 ### 5. Plan Frontend Updates
 
-- [ ] Remove "Send Kr" button from wallet
+- [ ] Remove "Send Rc" button from wallet
 - [ ] Remove tip button from direct chats
 - [ ] Add locked chat UI
 - [ ] Add contest validation UI

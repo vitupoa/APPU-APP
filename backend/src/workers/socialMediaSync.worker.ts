@@ -27,19 +27,15 @@ export class SocialMediaSyncWorker {
 
   private static async run() {
     if (this.isRunning) {
-      console.log('[SocialMediaSyncWorker] Already running, skipping...');
       return;
     }
 
     this.isRunning = true;
-    console.log('[SocialMediaSyncWorker] Starting sync...');
-
     try {
       await this.refreshTokens();
       await this.syncFollowerCounts();
       await this.syncEngagementMetrics();
-      console.log('[SocialMediaSyncWorker] Sync complete');
-    } catch (error: any) {
+      } catch (error: any) {
       console.error('[SocialMediaSyncWorker] Error:', error.message);
     } finally {
       this.isRunning = false;
@@ -58,8 +54,6 @@ export class SocialMediaSyncWorker {
         refresh_token: { not: null }
       }
     });
-
-    console.log(`[SocialMediaSyncWorker] Refreshing ${expiringAccounts.length} tokens...`);
 
     for (const account of expiringAccounts) {
       try {
@@ -85,7 +79,6 @@ export class SocialMediaSyncWorker {
             newTokens = await TwitchService.refreshAccessToken(account.refresh_token!);
             break;
           default:
-            console.log(`[SocialMediaSyncWorker] Unsupported platform for token refresh: ${account.platform}`);
             continue;
         }
 
@@ -99,8 +92,7 @@ export class SocialMediaSyncWorker {
           }
         });
 
-        console.log(`[SocialMediaSyncWorker] Refreshed token for ${account.platform} account ${account.id}`);
-      } catch (error: any) {
+        } catch (error: any) {
         console.error(`[SocialMediaSyncWorker] Failed to refresh token for ${account.id}:`, error.message);
         await prisma.social_media_accounts.update({
           where: { id: account.id },
@@ -123,8 +115,6 @@ export class SocialMediaSyncWorker {
         token_expires_at: { gt: new Date() }
       }
     });
-
-    console.log(`[SocialMediaSyncWorker] Syncing follower counts for ${accounts.length} accounts...`);
 
     for (const account of accounts) {
       try {
@@ -224,8 +214,7 @@ export class SocialMediaSyncWorker {
           } as any
         });
 
-        console.log(`[SocialMediaSyncWorker] Synced ${account.platform} account ${account.id}: ${followersBefore} -> ${followersAfter}`);
-      } catch (error: any) {
+        } catch (error: any) {
         console.error(`[SocialMediaSyncWorker] Failed to sync ${account.id}:`, error.message);
         await prisma.social_media_sync_logs.create({
           data: {
@@ -253,8 +242,6 @@ export class SocialMediaSyncWorker {
         token_expires_at: { gt: new Date() }
       }
     });
-
-    console.log(`[SocialMediaSyncWorker] Syncing engagement metrics for ${accounts.length} accounts...`);
 
     for (const account of accounts) {
       try {
@@ -315,8 +302,7 @@ export class SocialMediaSyncWorker {
           }
         }
 
-        console.log(`[SocialMediaSyncWorker] Synced engagement for ${account.platform} account ${account.id}`);
-      } catch (error: any) {
+        } catch (error: any) {
         console.error(`[SocialMediaSyncWorker] Failed to sync engagement for ${account.id}:`, error.message);
       }
     }

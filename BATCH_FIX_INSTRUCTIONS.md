@@ -1,4 +1,4 @@
-# ALL COMPILATION FIXES - APPLY MANUALLY
+﻿# ALL COMPILATION FIXES - APPLY MANUALLY
 
 ## Summary of What Was Fixed
 ✅ Kermit dependency added to build.gradle.kts
@@ -59,7 +59,7 @@ Change:
 
 ## Files That Need Manual Fixes
 
-1. **PayoutViewModel.kt** - Line 54: Change `reason = reason` to `recipientUserId = recipientUserId, amountKr = amountKr`
+1. **PayoutViewModel.kt** - Line 54: Change `reason = reason` to `recipientUserId = recipientUserId, amountRc = amountKr`
 2. **DefaultersViewModel.kt** - Add Loading branches, fix property access
 3. **SettingsViewModel.kt** - Add Loading branches, fix property access
 4. **WithdrawViewModel.kt** - Add Loading branches
@@ -91,8 +91,8 @@ Run: `chmod +x fix_errors.sh && ./fix_errors.sh`
 **Scope**: All ViewModels
 
 ### Find/Replace 2:
-**Find**: `package com.krieta.feature`
-**Replace**: `package com.krieta.feature\n\nimport androidx.compose.material.icons.Icons\nimport androidx.compose.material.icons.filled.*`
+**Find**: `package com.runinga.feature`
+**Replace**: `package com.runinga.feature\n\nimport androidx.compose.material.icons.Icons\nimport androidx.compose.material.icons.filled.*`
 **Scope**: All Screen files
 
 ## Test After Fixes

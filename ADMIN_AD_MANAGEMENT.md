@@ -1,4 +1,4 @@
-# Super Admin Ad Management System
+﻿# Super Admin Ad Management System
 
 ## Overview
 Complete admin control panel for managing all aspects of the advertising platform including pricing, placement, platform revenue split, campaign approval, and analytics.
@@ -22,7 +22,7 @@ Complete admin control panel for managing all aspects of the advertising platfor
 - **Instagram**: Takes 45% (55% to creator)
 - **YouTube**: Takes 45% (55% to creator)
 - **TikTok**: Takes 50% (50% to creator)
-- **Krieta**: Takes 15% (85% to creator) - **INDUSTRY-LEADING**
+- **Runinga**: Takes 15% (85% to creator) - **INDUSTRY-LEADING**
 
 **Benefits**:
 - Attracts top creators from other platforms

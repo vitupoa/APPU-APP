@@ -1,4 +1,4 @@
-# BRAND MARKETPLACE - QUICK REFERENCE
+﻿# BRAND MARKETPLACE - QUICK REFERENCE
 
 ## 🚀 Quick Start
 
@@ -429,7 +429,7 @@ const contest = await prisma.contest.findUnique({
   where: { id: contestId }
 });
 
-if (!contest.entryFeeKr || contest.entryFeeKr.equals(0)) {
+if (!contest.entryFeeRc || contest.entryFeeKr.equals(0)) {
   throw new Error("Contest doesn't have purchase-to-enter");
 }
 

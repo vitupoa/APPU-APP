@@ -1,4 +1,4 @@
-# Walkthrough - Cloudinary Signed Uploads Fix
+﻿# Walkthrough - Cloudinary Signed Uploads Fix
 
 I have implemented the fix for the Cloudinary "Upload preset must be whitelisted for unsigned uploads" error by correctly implementing **Signed Upload Presets**.
 
@@ -24,6 +24,6 @@ I ran `npm run build` in the backend directory to ensure the changes are type-sa
 I initiated a Gradle build (`:composeApp:assembleDebug`) to verify the Kotlin code changes.
 
 ## Next Steps for User
-1. **Cloudinary Console**: Ensure your `Krieta` upload preset is set to **Signed** and has **"Allow override"** enabled for the Folder.
-2. **Environment Variables**: Ensure `CLOUDINARY_UPLOAD_PRESET=Krieta` is set in your backend `.env` file (it already was).
+1. **Cloudinary Console**: Ensure your `Runinga` upload preset is set to **Signed** and has **"Allow override"** enabled for the Folder.
+2. **Environment Variables**: Ensure `CLOUDINARY_UPLOAD_PRESET=Runinga` is set in your backend `.env` file (it already was).
 3. **Test Upload**: Try uploading a new post or short in the app to confirm the fix.

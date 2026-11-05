@@ -1,4 +1,4 @@
-# Admire/Love and Message Button Fixes
+﻿# Admire/Love and Message Button Fixes
 
 ## Issues Fixed
 
@@ -217,7 +217,7 @@ Common errors to handle:
 - `"Cannot admire yourself"` - User tried to admire their own profile
 - `"Not admiring this user"` - User tried to unadmire someone they don't admire
 - `"Not lovers with this user"` - User tried to unlove someone they're not lovers with
-- `"Chat is locked. Unlock fee: X Kr"` - Chat requires task completion
+- `"Chat is locked. Unlock fee: X Rc"` - Chat requires task completion
 - `"User not found"` - Creator profile doesn't exist
 
 ## Deployment

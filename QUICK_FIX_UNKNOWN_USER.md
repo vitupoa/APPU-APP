@@ -1,4 +1,4 @@
-# ⚡ QUICK FIX - "Unknown User" Issue
+﻿# ⚡ QUICK FIX - "Unknown User" Issue
 
 ## Problem
 Profile shows "Unknown User" when switching tabs
@@ -15,7 +15,7 @@ Authentication token expired (401 error)
 
 ### Option 2: Clear App Data
 ```bash
-adb shell pm clear com.krieta.com
+adb shell pm clear com.runinga.com
 ```
 Then login again.
 

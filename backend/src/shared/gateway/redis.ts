@@ -1,4 +1,4 @@
-import { Redis } from 'ioredis';
+﻿import { Redis } from 'ioredis';
 import { env } from '../../config/env.js';
 
 export const pubClient = new Redis(env.REDIS_URL);
@@ -13,7 +13,7 @@ subClient.on('error', (err) => {
 });
 
 export const RedisChannels = {
-  NOTIFICATIONS: 'krieta:notifications',
-  MILESTONES: 'krieta:milestones',
-  CONTEST_RACE: 'krieta:contests', // Used for race conditions/leaderboard gateways
+  NOTIFICATIONS: 'runinga:notifications',
+  MILESTONES: 'runinga:milestones',
+  CONTEST_RACE: 'runinga:contests', // Used for race conditions/leaderboard gateways
 } as const;

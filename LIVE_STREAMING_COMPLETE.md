@@ -1,8 +1,8 @@
-# Live Streaming - Complete Feature Summary
+﻿# Live Streaming - Complete Feature Summary
 
 ## 🎉 What's Been Implemented
 
-Your Krieta app now has a **fully functional live streaming system** with 4 types of live streams and complete camera controls!
+Your Runinga app now has a **fully functional live streaming system** with 4 types of live streams and complete camera controls!
 
 ---
 
@@ -162,7 +162,7 @@ iosMain/
 │                                     │
 │  ┌─────────────────────┐           │
 │  │ 📦 iPhone 15 Pro    │           │
-│  │ 150,000 Kr          │           │
+│  │ 150,000 Rc          │           │
 │  │ [Contact Seller]    │           │
 │  └─────────────────────┘           │
 │                                     │
@@ -190,7 +190,7 @@ iosMain/
 │ 🔴 LIVE  👤 125    🔄 ⏸️ ❌        │
 ├──────────────────┬──────────────────┤
 │      You         │    Opponent      │
-│   1,250 Kr       │    980 Kr        │
+│   1,250 Rc       │    980 Rc        │
 │                  │                  │
 │  🤳 Front Camera │                  │
 └──────────────────┴──────────────────┘

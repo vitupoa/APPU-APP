@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { Prisma } from '@prisma/client';
 import { ShopAnalyticsService } from './analytics.service.js';
 import { ShopNotificationService } from './notifications.service.js';
@@ -51,8 +51,8 @@ export class OrderService {
       };
     });
 
-    const totalKr = lineItems.reduce((s: number, i: any) => s + i.totalPriceKr, 0);
-    const platformFeeKr = totalKr * PLATFORM_FEE_RATE;
+    const totalRc = lineItems.reduce((s: number, i: any) => s + i.totalPriceKr, 0);
+    const platformFeeRc = totalRc * PLATFORM_FEE_RATE;
 
     const order = await prisma.$transaction(async (tx) => {
       const o = await tx.orders.create({

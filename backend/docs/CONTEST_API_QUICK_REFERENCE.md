@@ -1,4 +1,4 @@
-# Contest Judging API - Quick Reference
+﻿# Contest Judging API - Quick Reference
 
 ## Base URL
 ```
@@ -45,9 +45,9 @@ Content-Type: application/json
 ```
 
 **Fee Calculation:**
-- Prize: Kr 1,000 + 15% = Kr 1,150
-- Airdrops: Kr 1,000 + 15% = Kr 1,150
-- **Total Charged: Kr 2,300**
+- Prize: Rc 1,000 + 15% = Rc 1,150
+- Airdrops: Rc 1,000 + 15% = Rc 1,150
+- **Total Charged: Rc 2,300**
 
 ---
 
@@ -495,11 +495,11 @@ ACTIVE → JUDGING → COMPLETED
 ```javascript
 // Frontend display priority:
 // 1. Fiat amount (large, prominent)
-// 2. Kr amount (small, below)
+// 2. Rc amount (small, below)
 
 <div>
   <h2>KES 14,000,000</h2>
-  <p>Kr 1,000</p>
+  <p>Rc 1,000</p>
 </div>
 ```
 
@@ -516,7 +516,7 @@ if (contest.status === 'JUDGING') {
 ```javascript
 const rank = 1; // User's rank
 const distribution = contest.prizeDistributions.find(d => d.rank === rank);
-const prizeKr = (contest.prizeTotalKr * distribution.percentage) / 100;
+const prizeRc = (contest.prizeTotalRc * distribution.percentage) / 100;
 ```
 
 ---

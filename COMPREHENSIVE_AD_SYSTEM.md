@@ -1,7 +1,7 @@
-# Comprehensive Ad System Implementation
+﻿# Comprehensive Ad System Implementation
 
 ## Overview
-Implemented a complete advertising ecosystem across **ALL** major tabs in Krieta with role-based super admin controls.
+Implemented a complete advertising ecosystem across **ALL** major tabs in Runinga with role-based super admin controls.
 
 ## Database Schema (Prisma)
 
@@ -362,7 +362,7 @@ router.use(adminMiddleware); // Checks user.isAdmin = true
 
 **Import Ad Components**:
 ```kotlin
-import com.krieta.feature.ads.presentation.*
+import com.runinga.feature.ads.presentation.*
 ```
 
 **Insert Ads in Feed**:
@@ -474,5 +474,5 @@ val itemsWithAds = buildList {
    - Confirm adminRole in UserSession
 
 **Contact**:
-- Technical issues: dev@krieta.com
-- Business inquiries: ads@krieta.com
+- Technical issues: dev@runinga.com
+- Business inquiries: ads@runinga.com

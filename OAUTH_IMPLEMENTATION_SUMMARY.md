@@ -1,4 +1,4 @@
-# OAuth Integration - Implementation Summary
+﻿# OAuth Integration - Implementation Summary
 
 ## 🎯 What Was Implemented
 
@@ -36,17 +36,17 @@ Complete OAuth integration for **8 social media platforms** to verify influencer
 ### Frontend (3 new files, 5 modified)
 
 **New Platform-Specific OAuth:**
-- `composeApp/src/commonMain/kotlin/com/krieta/com/core/oauth/OAuthBrowser.kt` ✅
-- `composeApp/src/androidMain/kotlin/com/krieta/com/core/oauth/AndroidOAuthBrowser.kt` ✅
-- `composeApp/src/iosMain/kotlin/com/krieta/com/core/oauth/IOSOAuthBrowser.kt` ✅
+- `composeApp/src/commonMain/kotlin/com/runinga/com/core/oauth/OAuthBrowser.kt` ✅
+- `composeApp/src/androidMain/kotlin/com/runinga/com/core/oauth/AndroidOAuthBrowser.kt` ✅
+- `composeApp/src/iosMain/kotlin/com/runinga/com/core/oauth/IOSOAuthBrowser.kt` ✅
 
 **Modified:**
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/presentation/oauth/OAuthViewModel.kt` - Integrated OAuth browser
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/domain/repository/MarketplaceRepository.kt` - Added OAuth methods
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/data/repository/MarketplaceRepositoryImpl.kt` - Implemented OAuth methods
-- `composeApp/src/commonMain/kotlin/com/krieta/feature/marketplace/data/remote/MarketplaceApiService.kt` - Added OAuth API calls
-- `composeApp/src/androidMain/kotlin/com/krieta/com/core/di/PlatformModule.android.kt` - Added OAuthBrowser DI
-- `composeApp/src/iosMain/kotlin/com/krieta/com/core/di/PlatformModule.ios.kt` - Added OAuthBrowser DI
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/presentation/oauth/OAuthViewModel.kt` - Integrated OAuth browser
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/domain/repository/MarketplaceRepository.kt` - Added OAuth methods
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/data/repository/MarketplaceRepositoryImpl.kt` - Implemented OAuth methods
+- `composeApp/src/commonMain/kotlin/com/runinga/feature/marketplace/data/remote/MarketplaceApiService.kt` - Added OAuth API calls
+- `composeApp/src/androidMain/kotlin/com/runinga/com/core/di/PlatformModule.android.kt` - Added OAuthBrowser DI
+- `composeApp/src/iosMain/kotlin/com/runinga/com/core/di/PlatformModule.ios.kt` - Added OAuthBrowser DI
 - `composeApp/src/androidMain/AndroidManifest.xml` - Added OAuth deep link
 
 ### Documentation (3 files)
@@ -93,7 +93,7 @@ Runs every **6 hours** to:
 
 ### Android
 - **Chrome Custom Tabs** for in-app OAuth
-- Deep link handling: `krieta://oauth`
+- Deep link handling: `runinga://oauth`
 - Automatic callback processing
 
 ### iOS

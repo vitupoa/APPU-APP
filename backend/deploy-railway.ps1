@@ -1,8 +1,8 @@
-# Krieta Backend - Railway Deployment Script
+﻿# Runinga Backend - Railway Deployment Script
 # Run this script to properly update Prisma and deploy to Railway
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Krieta Backend - Railway Deployment" -ForegroundColor Cyan
+Write-Host "Runinga Backend - Railway Deployment" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 

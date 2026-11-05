@@ -1,4 +1,4 @@
-# 🚀 Quick FCM Setup - 5 Minutes
+﻿# 🚀 Quick FCM Setup - 5 Minutes
 
 ## Step 1: Get Firebase Credentials (3 minutes)
 
@@ -39,13 +39,13 @@ Your push notifications are now configured!
 
 ### Android
 1. Firebase Console → Add Android app
-2. Package name: `com.krieta.com`
+2. Package name: `com.runinga.com`
 3. Download `google-services.json`
 4. Place in `composeApp/src/androidMain/`
 
 ### iOS
 1. Firebase Console → Add iOS app
-2. Bundle ID: `com.krieta.com`
+2. Bundle ID: `com.runinga.com`
 3. Download `GoogleService-Info.plist`
 4. Place in `iosApp/iosApp/`
 

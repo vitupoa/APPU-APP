@@ -1,10 +1,10 @@
-# Automated Icon Migration Script
+﻿# Automated Icon Migration Script
 # This script replaces Material Icons Extended with Material Symbols across all Kotlin files
 
 Write-Host "=== Material Icons Migration Script ===" -ForegroundColor Cyan
 Write-Host ""
 
-$projectRoot = "c:\Users\ADMIN\Krieta\composeApp\src\commonMain\kotlin"
+$projectRoot = "c:\Users\ADMIN\Runinga\composeApp\src\commonMain\kotlin"
 $filesProcessed = 0
 $totalReplacements = 0
 
@@ -54,8 +54,8 @@ $oldImports = @(
 
 $newImports = @"
 import org.jetbrains.compose.resources.painterResource
-import krieta.composeapp.generated.resources.Res
-import krieta.composeapp.generated.resources.*
+import runinga.composeapp.generated.resources.Res
+import runinga.composeapp.generated.resources.*
 "@
 
 Write-Host "Scanning for files with Material Icons..." -ForegroundColor Yellow

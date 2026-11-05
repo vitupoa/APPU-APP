@@ -1,4 +1,4 @@
-# 🎯 AD SYSTEM - FINAL INTEGRATION STATUS
+﻿# 🎯 AD SYSTEM - FINAL INTEGRATION STATUS
 
 ## ✅ COMPLETE UNDERSTANDING
 
@@ -18,7 +18,7 @@
 
 ## 🎨 AD COMPONENTS CREATED
 
-### Location: `composeApp/src/commonMain/kotlin/com/krieta/feature/ads/presentation/AdComponents.kt`
+### Location: `composeApp/src/commonMain/kotlin/com/runinga/feature/ads/presentation/AdComponents.kt`
 
 **All Components:**
 - ✅ `LiveStreamBannerAd` - Banner for live stream feeds

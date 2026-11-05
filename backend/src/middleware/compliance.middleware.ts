@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+﻿import { Request, Response, NextFunction } from 'express';
 import { deviceFingerprintService } from '../services/compliance/deviceFingerprint.service.js';
 import { riskScoringService } from '../services/compliance/riskScoring.service.js';
 
@@ -109,7 +109,7 @@ export async function enforceTransactionLimits(req: Request, res: Response, next
     const riskProfile = await riskScoringService.getUserRiskProfile(userId);
 
     if (riskProfile?.transaction_limited) {
-      const limit = 10000; // Kr limit for high-risk users
+      const limit = 10000; // Rc limit for high-risk users
 
       if (amount > limit) {
         return res.status(403).json({

@@ -136,9 +136,7 @@ export function additionalSecurityHeaders(req: any, res: any, next: any) {
   if (req.path.includes('/api/v1/wallet') || 
       req.path.includes('/api/v1/payments') ||
       req.path.includes('/api/v1/kyc') ||
-      req.path.includes('/api/v1/auth') ||
-      req.path.includes('/api/v1/chamas')) {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+      req.path.includes('/api/v1/auth') || {    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
   }

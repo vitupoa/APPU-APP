@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 
 export class RiskScoringService {
   /**
@@ -355,7 +355,7 @@ export class RiskScoringService {
   private async calculateLargeTransactionsRisk(userId: string): Promise<{ score: number; count: number; largestAmount: number }> {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    // Count transactions over 10,000 Kr
+    // Count transactions over 10,000 Rc
     const largeTransactions = await prisma.transactions.findMany({
       where: {
         user_id: userId,

@@ -1,4 +1,4 @@
-# CLOUDINARY SECURITY - COMPLETE IMPLEMENTATION ✅
+﻿# CLOUDINARY SECURITY - COMPLETE IMPLEMENTATION ✅
 
 ## 🎯 Executive Summary
 
@@ -76,7 +76,7 @@
 ```
 1. Login at https://cloudinary.com/console
 2. Settings > Upload > Upload presets
-3. Find "Krieta" preset
+3. Find "Runinga" preset
 4. Either:
    - Delete it completely, OR
    - Set "Signing Mode" to "Signed"
@@ -99,7 +99,7 @@
 **Test the flow**:
 ```bash
 # 1. Get signature (requires auth)
-curl https://appu-app-production.up.railway.app/api/v1/media/upload-signature?folder=Krieta/profile/Images \
+curl https://appu-app-production.up.railway.app/api/v1/media/upload-signature?folder=Runinga/profile/Images \
   -H "Authorization: Bearer YOUR_TOKEN"
 
 # 2. Upload with signature (use response from step 1)
@@ -107,11 +107,11 @@ curl -X POST https://api.cloudinary.com/v1_1/YOUR_CLOUD/image/upload \
   -F "file=@test.jpg" \
   -F "signature=SIGNATURE_FROM_STEP_1" \
   -F "timestamp=TIMESTAMP_FROM_STEP_1" \
-  -F "folder=Krieta/profile/Images" \
+  -F "folder=Runinga/profile/Images" \
   -F "api_key=YOUR_API_KEY"
 
 # 3. Check Railway logs for webhook notification
-# Should see: [Cloudinary Webhook] Upload validated: Krieta/profile/Images/...
+# Should see: [Cloudinary Webhook] Upload validated: Runinga/profile/Images/...
 ```
 
 ---
@@ -139,7 +139,7 @@ curl -X POST https://api.cloudinary.com/v1_1/YOUR_CLOUD/image/upload \
 ```typescript
 // Frontend could upload directly
 const formData = new FormData();
-formData.append('upload_preset', 'Krieta');  // ❌ Exposed
+formData.append('upload_preset', 'Runinga');  // ❌ Exposed
 formData.append('folder', 'any/folder');     // ❌ No validation
 formData.append('file', file);
 
@@ -161,7 +161,7 @@ fetch('https://api.cloudinary.com/v1_1/cloud/upload', {
 ```typescript
 // Step 1: Get signature from backend (authenticated)
 const { signature, timestamp, folder, apiKey } = 
-  await fetch('/api/v1/media/upload-signature?folder=Krieta/profile/Images', {
+  await fetch('/api/v1/media/upload-signature?folder=Runinga/profile/Images', {
     headers: { Authorization: `Bearer ${token}` }
   }).then(r => r.json());
 
@@ -197,19 +197,19 @@ fetch(`https://api.cloudinary.com/v1_1/cloud/image/upload`, {
 Only these 13 folders are allowed:
 
 ```
-1.  Krieta/profile/Images
-2.  Krieta/profile/Videos
-3.  Krieta/shorts/Videos
-4.  Krieta/shorts/Images
-5.  Krieta/contests/Images
-6.  Krieta/contests/Videos
-7.  Krieta/drips/Images
-8.  Krieta/shop/Images
-9.  Krieta/chat/Images
-10. Krieta/chat/Videos
-11. Krieta/chat/Audio
-12. Krieta/stories/Images
-13. Krieta/stories/Videos
+1.  Runinga/profile/Images
+2.  Runinga/profile/Videos
+3.  Runinga/shorts/Videos
+4.  Runinga/shorts/Images
+5.  Runinga/contests/Images
+6.  Runinga/contests/Videos
+7.  Runinga/drips/Images
+8.  Runinga/shop/Images
+9.  Runinga/chat/Images
+10. Runinga/chat/Videos
+11. Runinga/chat/Audio
+12. Runinga/stories/Images
+13. Runinga/stories/Videos
 ```
 
 Any upload to other folders will be:
@@ -220,7 +220,7 @@ Any upload to other folders will be:
 
 ## 🧪 Testing Checklist
 
-- [ ] **Disable "Krieta" upload preset** in Cloudinary Dashboard
+- [ ] **Disable "Runinga" upload preset** in Cloudinary Dashboard
 - [ ] **Configure webhook** with Railway URL
 - [ ] **Test valid upload** (should succeed)
 - [ ] **Test invalid folder** (should fail with 400)
@@ -252,7 +252,7 @@ Response:
   "totalUploads": 123,
   "totalBytes": 12345678,
   "byResourceType": { "image": 100, "video": 23 },
-  "byFolder": { "Krieta/profile/Images": 50 }
+  "byFolder": { "Runinga/profile/Images": 50 }
 }
 ```
 
@@ -299,7 +299,7 @@ Response:
 - [x] Chunked upload support
 
 ### Cloudinary Dashboard
-- [ ] **"Krieta" upload preset disabled** ⚠️ ACTION REQUIRED
+- [ ] **"Runinga" upload preset disabled** ⚠️ ACTION REQUIRED
 - [ ] **Webhook configured** ⚠️ ACTION REQUIRED
 - [ ] Upload events selected
 - [ ] Delete events selected (optional)
@@ -322,7 +322,7 @@ Response:
 **Webhook**: ✅ Ready to configure  
 
 **Remaining Actions**:
-1. ⚠️ Disable "Krieta" upload preset in Cloudinary Dashboard
+1. ⚠️ Disable "Runinga" upload preset in Cloudinary Dashboard
 2. ⚠️ Configure webhook in Cloudinary Dashboard
 3. ✅ Test the complete flow
 

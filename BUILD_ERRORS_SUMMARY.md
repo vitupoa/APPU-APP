@@ -1,4 +1,4 @@
-# Build Errors Summary & Fixes Needed
+﻿# Build Errors Summary & Fixes Needed
 
 ## ✅ Icon Migration: COMPLETE
 - **59 files migrated** successfully
@@ -30,7 +30,7 @@ The build is failing due to **pre-existing issues** in your codebase, NOT from t
 
 **Fix**: These files are using `System.currentTimeMillis()` in commonMain, which is platform-specific. Replace with:
 ```kotlin
-import com.krieta.com.core.util.currentTimeMillis
+import com.runinga.com.core.util.currentTimeMillis
 // Use: currentTimeMillis() instead of System.currentTimeMillis()
 ```
 

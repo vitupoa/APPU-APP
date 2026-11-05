@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+﻿import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.File
 import java.io.FileInputStream
 import java.util.Properties
@@ -164,15 +164,15 @@ kotlin {
 
 sqldelight {
     databases {
-        create("KrietaDatabase") {
-            packageName.set("com.krieta.db")
+        create("RuningaDatabase") {
+            packageName.set("com.runinga.db")
             dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
         }
     }
 }
 
 buildConfig {
-    packageName("com.krieta.com")
+    packageName("com.runinga.com")
     
     val localProps = Properties()
     val localPropsFile = project.rootProject.file("local.properties")
@@ -187,11 +187,11 @@ buildConfig {
 }
 
 android {
-    namespace = "com.krieta.com"
+    namespace = "com.runinga.com"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.krieta.com"
+        applicationId = "com.runinga.com"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -203,8 +203,8 @@ android {
         }
     }
 
-    // Signing config — reads from krieta-release.properties (DO NOT commit to VCS)
-    val releasePropsFile = File(project.rootProject.rootDir, "krieta-release.properties")
+    // Signing config — reads from runinga-release.properties (DO NOT commit to VCS)
+    val releasePropsFile = File(project.rootProject.rootDir, "runinga-release.properties")
     if (releasePropsFile.exists()) {
         val releaseProps = Properties()
         releaseProps.load(FileInputStream(releasePropsFile))

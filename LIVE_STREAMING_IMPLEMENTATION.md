@@ -1,12 +1,12 @@
-# Live Streaming Implementation
+﻿# Live Streaming Implementation
 
 ## Overview
-Complete implementation of camera hardware binding, backend API connection, and WebRTC video streaming for the Krieta live streaming feature.
+Complete implementation of camera hardware binding, backend API connection, and WebRTC video streaming for the Runinga live streaming feature.
 
 ## 1. Camera Hardware Binding ✅
 
 ### Common Interface
-- **Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/data/camera/CameraManager.kt`
+- **Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/data/camera/CameraManager.kt`
 - **Functions**:
   - `initializeCamera(useFrontCamera: Boolean)` - Initialize camera with front/back selection
   - `startCamera()` - Start camera preview and capture
@@ -17,7 +17,7 @@ Complete implementation of camera hardware binding, backend API connection, and 
   - `release()` - Release camera resources
 
 ### Android Implementation (CameraX)
-- **Location**: `composeApp/src/androidMain/kotlin/com/krieta/feature/live/data/camera/CameraManager.kt`
+- **Location**: `composeApp/src/androidMain/kotlin/com/runinga/feature/live/data/camera/CameraManager.kt`
 - **Features**:
   - Uses CameraX library for camera management
   - Supports HD video quality (720p/1080p)
@@ -27,7 +27,7 @@ Complete implementation of camera hardware binding, backend API connection, and 
   - Camera control access (focus, zoom, exposure)
 
 ### iOS Implementation (AVFoundation)
-- **Location**: `composeApp/src/iosMain/kotlin/com/krieta/feature/live/data/camera/CameraManager.kt`
+- **Location**: `composeApp/src/iosMain/kotlin/com/runinga/feature/live/data/camera/CameraManager.kt`
 - **Features**:
   - Uses AVFoundation framework
   - AVCaptureSession with high preset quality
@@ -37,18 +37,18 @@ Complete implementation of camera hardware binding, backend API connection, and 
   - Capture session configuration
 
 ### UI Components
-- **Common**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/presentation/components/CameraPreview.kt`
-- **Android**: `composeApp/src/androidMain/kotlin/com/krieta/feature/live/presentation/components/CameraPreview.android.kt`
+- **Common**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/presentation/components/CameraPreview.kt`
+- **Android**: `composeApp/src/androidMain/kotlin/com/runinga/feature/live/presentation/components/CameraPreview.android.kt`
   - Uses AndroidView with PreviewView
   - Lifecycle-aware binding
-- **iOS**: `composeApp/src/iosMain/kotlin/com/krieta/feature/live/presentation/components/CameraPreview.ios.kt`
+- **iOS**: `composeApp/src/iosMain/kotlin/com/runinga/feature/live/presentation/components/CameraPreview.ios.kt`
   - Uses UIKitView with UIView
   - AVCaptureVideoPreviewLayer integration
 
 ## 2. Backend API Connection ✅
 
 ### API Service
-- **Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/data/api/LiveApiService.kt`
+- **Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/data/api/LiveApiService.kt`
 
 ### Endpoints
 1. **POST /api/v1/live/start** - Start live stream
@@ -76,7 +76,7 @@ Complete implementation of camera hardware binding, backend API connection, and 
    - Response: Success confirmation
 
 8. **POST /api/v1/live/:streamId/gift-goal** - Set gift goal
-   - Request: `{ title, targetKr }`
+   - Request: `{ title, targetRc }`
    - Response: Gift goal details
 
 ### Data Models
@@ -89,7 +89,7 @@ Complete implementation of camera hardware binding, backend API connection, and 
 ## 3. WebRTC Video Streaming ✅
 
 ### Common Interface
-- **Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/data/webrtc/WebRTCManager.kt`
+- **Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/data/webrtc/WebRTCManager.kt`
 - **Functions**:
   - `initialize(streamKey: String, streamUrl: String)` - Initialize WebRTC
   - `startStreaming()` - Start video/audio streaming
@@ -108,7 +108,7 @@ Complete implementation of camera hardware binding, backend API connection, and 
 - `FAILED` - Connection failed
 
 ### Android Implementation
-- **Location**: `composeApp/src/androidMain/kotlin/com/krieta/feature/live/data/webrtc/WebRTCManager.kt`
+- **Location**: `composeApp/src/androidMain/kotlin/com/runinga/feature/live/data/webrtc/WebRTCManager.kt`
 - **Features**:
   - Uses WebRTC library (org.webrtc)
   - PeerConnectionFactory with hardware encoding
@@ -119,7 +119,7 @@ Complete implementation of camera hardware binding, backend API connection, and 
   - ICE connection state monitoring
 
 ### iOS Implementation
-- **Location**: `composeApp/src/iosMain/kotlin/com/krieta/feature/live/data/webrtc/WebRTCManager.kt`
+- **Location**: `composeApp/src/iosMain/kotlin/com/runinga/feature/live/data/webrtc/WebRTCManager.kt`
 - **Features**:
   - Uses WebRTC framework
   - RTCPeerConnectionFactory
@@ -144,7 +144,7 @@ data class StreamConfig(
 ## 4. ViewModel Integration ✅
 
 ### HostLiveViewModel Updates
-- **Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/live/presentation/viewmodel/HostLiveViewModel.kt`
+- **Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/live/presentation/viewmodel/HostLiveViewModel.kt`
 - **Dependencies**:
   - `CameraManager` - Camera hardware control
   - `WebRTCManager` - Video streaming

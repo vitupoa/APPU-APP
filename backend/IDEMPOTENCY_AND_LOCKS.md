@@ -1,4 +1,4 @@
-# Idempotency Keys & Database Locks Implementation ✅
+﻿# Idempotency Keys & Database Locks Implementation ✅
 
 ## Overview
 Implemented comprehensive protection against duplicate financial transactions and race conditions using idempotency keys and database locks.
@@ -134,35 +134,35 @@ User clicks "Send Tip" twice rapidly
 ### Prevents Race Conditions
 **Before:**
 ```
-Request A: Read balance (100 Kr)
-Request B: Read balance (100 Kr)
-Request A: Deduct 50 Kr → Balance = 50 Kr
-Request B: Deduct 50 Kr → Balance = 50 Kr (should be 0!)
+Request A: Read balance (100 Rc)
+Request B: Read balance (100 Rc)
+Request A: Deduct 50 Rc → Balance = 50 Rc
+Request B: Deduct 50 Rc → Balance = 50 Rc (should be 0!)
 ```
 
 **After:**
 ```
-Request A: Lock wallet → Read balance (100 Kr)
+Request A: Lock wallet → Read balance (100 Rc)
 Request B: Wait for lock...
-Request A: Deduct 50 Kr → Balance = 50 Kr → Release lock
-Request B: Acquire lock → Read balance (50 Kr)
-Request B: Deduct 50 Kr → Balance = 0 Kr ✅
+Request A: Deduct 50 Rc → Balance = 50 Rc → Release lock
+Request B: Acquire lock → Read balance (50 Rc)
+Request B: Deduct 50 Rc → Balance = 0 Rc ✅
 ```
 
 ### Prevents Duplicate Webhooks
 **Before:**
 ```
 PayPal sends webhook
-→ Credit wallet with 100 Kr
+→ Credit wallet with 100 Rc
 PayPal retries webhook (network issue)
-→ Credit wallet with 100 Kr again
-→ User gets 200 Kr instead of 100 Kr
+→ Credit wallet with 100 Rc again
+→ User gets 200 Rc instead of 100 Rc
 ```
 
 **After:**
 ```
 PayPal sends webhook (idempotency key: webhook_id_123)
-→ Credit wallet with 100 Kr
+→ Credit wallet with 100 Rc
 → Store response in idempotency_keys table
 PayPal retries webhook (same idempotency key)
 → Return cached response
@@ -246,7 +246,7 @@ POST /api/v1/wallet/topup/initiate
 ```typescript
 import { safeWalletTransfer } from './utils/databaseLocks.js';
 
-// Transfer 100 Kr from sender to recipient
+// Transfer 100 Rc from sender to recipient
 await safeWalletTransfer(
   senderId,
   recipientId,

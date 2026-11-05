@@ -1,4 +1,4 @@
-# Security Implementation Summary
+﻿# Security Implementation Summary
 
 ## ✅ What Has Been Implemented
 
@@ -123,10 +123,10 @@
 #### 1. Database Setup
 ```bash
 # Run RLS migration
-psql -U your_username -d krieta_db -f backend/prisma/migrations/add_rls_policies.sql
+psql -U your_username -d runinga_db -f backend/prisma/migrations/add_rls_policies.sql
 
 # Verify RLS is enabled
-psql -U your_username -d krieta_db -c "SELECT schemaname, tablename, rowsecurity FROM pg_tables WHERE tablename IN ('subscriptions', 'content_unlocks', 'wallets');"
+psql -U your_username -d runinga_db -c "SELECT schemaname, tablename, rowsecurity FROM pg_tables WHERE tablename IN ('subscriptions', 'content_unlocks', 'wallets');"
 ```
 
 #### 2. Install Dependencies

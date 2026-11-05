@@ -1,8 +1,8 @@
-# Explore API Documentation
+﻿# Explore API Documentation
 
 ## Base URL
 ```
-Production: https://api.krieta.com/api/v1/explore
+Production: https://api.runinga.com/api/v1/explore
 Development: http://localhost:3000/api/v1/explore
 ```
 
@@ -41,7 +41,7 @@ Returns the most used hashtags across the platform.
 
 **Example:**
 ```bash
-curl -X GET "https://api.krieta.com/api/v1/explore/trending/hashtags?limit=10"
+curl -X GET "https://api.runinga.com/api/v1/explore/trending/hashtags?limit=10"
 ```
 
 ---
@@ -61,17 +61,17 @@ Returns trending short videos based on views and engagement.
 [
   {
     "id": "uuid",
-    "thumbnailUrl": "https://cdn.krieta.com/shorts/thumb.jpg",
+    "thumbnailUrl": "https://cdn.runinga.com/shorts/thumb.jpg",
     "viewCount": 125000,
     "creatorUsername": "creator1",
-    "creatorAvatar": "https://cdn.krieta.com/avatars/user.jpg"
+    "creatorAvatar": "https://cdn.runinga.com/avatars/user.jpg"
   }
 ]
 ```
 
 **Example:**
 ```bash
-curl -X GET "https://api.krieta.com/api/v1/explore/trending/shorts?category=COMEDY&limit=20"
+curl -X GET "https://api.runinga.com/api/v1/explore/trending/shorts?category=COMEDY&limit=20"
 ```
 
 ---
@@ -91,7 +91,7 @@ Returns active contests with the most participants and highest prizes.
   {
     "id": "uuid",
     "title": "Dance Challenge 2024",
-    "thumbnailUrl": "https://cdn.krieta.com/contests/cover.jpg",
+    "thumbnailUrl": "https://cdn.runinga.com/contests/cover.jpg",
     "prizeKr": 5000.0,
     "participantsCount": 234,
     "category": "DANCE"
@@ -101,7 +101,7 @@ Returns active contests with the most participants and highest prizes.
 
 **Example:**
 ```bash
-curl -X GET "https://api.krieta.com/api/v1/explore/trending/contests?limit=10"
+curl -X GET "https://api.runinga.com/api/v1/explore/trending/contests?limit=10"
 ```
 
 ---
@@ -122,7 +122,7 @@ Returns creators with the most followers (minimum 100 followers).
     "id": "uuid",
     "username": "sarah_fitness",
     "displayName": "Sarah Johnson",
-    "avatarUrl": "https://cdn.krieta.com/avatars/sarah.jpg",
+    "avatarUrl": "https://cdn.runinga.com/avatars/sarah.jpg",
     "followerCount": 125000,
     "isVerified": true,
     "bio": "Fitness coach & nutritionist"
@@ -132,7 +132,7 @@ Returns creators with the most followers (minimum 100 followers).
 
 **Example:**
 ```bash
-curl -X GET "https://api.krieta.com/api/v1/explore/trending/creators?limit=10"
+curl -X GET "https://api.runinga.com/api/v1/explore/trending/creators?limit=10"
 ```
 
 ---
@@ -153,8 +153,8 @@ Returns currently active live streams ordered by viewer count.
     "id": "uuid",
     "creatorId": "uuid",
     "creatorUsername": "sarah_fitness",
-    "creatorAvatar": "https://cdn.krieta.com/avatars/sarah.jpg",
-    "thumbnailUrl": "https://cdn.krieta.com/live/thumb.jpg",
+    "creatorAvatar": "https://cdn.runinga.com/avatars/sarah.jpg",
+    "thumbnailUrl": "https://cdn.runinga.com/live/thumb.jpg",
     "viewerCount": 1234,
     "title": "Morning Workout Session",
     "category": "Fitness"
@@ -164,7 +164,7 @@ Returns currently active live streams ordered by viewer count.
 
 **Example:**
 ```bash
-curl -X GET "https://api.krieta.com/api/v1/explore/live?limit=20"
+curl -X GET "https://api.runinga.com/api/v1/explore/live?limit=20"
 ```
 
 ---
@@ -216,7 +216,7 @@ Cache-Control: public, max-age=300
 ## CORS
 
 CORS is enabled for all origins in development.
-Production restricts to `https://krieta.com` and `https://app.krieta.com`.
+Production restricts to `https://runinga.com` and `https://app.runinga.com`.
 
 ---
 
@@ -230,4 +230,4 @@ Breaking changes will be released under a new version: `/api/v2/explore`
 
 ## Support
 
-For API support, contact: dev@krieta.com
+For API support, contact: dev@runinga.com

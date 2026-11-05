@@ -1,4 +1,4 @@
-# Terms of Service
+﻿# Terms of Service
 
 **Last Updated:** [Date]
 
@@ -8,47 +8,47 @@
 
 ## 1. Introduction
 
-Welcome to Krieta ("Platform", "we", "us", or "our"). These Terms of Service ("Terms") govern your access to and use of the Krieta platform, including our website, mobile applications, and related services (collectively, the "Services").
+Welcome to Runinga ("Platform", "we", "us", or "our"). These Terms of Service ("Terms") govern your access to and use of the Runinga platform, including our website, mobile applications, and related services (collectively, the "Services").
 
 By accessing or using our Services, you agree to be bound by these Terms. If you do not agree to these Terms, you may not access or use our Services.
 
 ---
 
-## 2. Platform Currency - Kr Coin
+## 2. Platform Currency - Rc Coin
 
-### 2.1 Definition of Kr
+### 2.1 Definition of Rc
 
-**Kr** (also referred to as "Kr Coin" or "Kr Token") is a **non-redeemable platform reward token** used exclusively within the Krieta platform. Kr is NOT money, legal tender, or a financial instrument. Kr is a digital unit of account that represents access to platform services and features.
+**Rc** (also referred to as "Rc Coin" or "Rc Token") is a **non-redeemable platform reward token** used exclusively within the Runinga platform. Rc is NOT money, legal tender, or a financial instrument. Rc is a digital unit of account that represents access to platform services and features.
 
-### 2.2 Key Characteristics of Kr
+### 2.2 Key Characteristics of Rc
 
-**Kr has the following characteristics:**
+**Rc has the following characteristics:**
 
-1. **Platform-Internal Only**: Kr exists solely within the Krieta platform and has no existence, value, or utility outside of our Services.
+1. **Platform-Internal Only**: Rc exists solely within the Runinga platform and has no existence, value, or utility outside of our Services.
 
-2. **No Cash Value**: Kr has no cash value, monetary value, or exchange value outside the Krieta platform. Kr cannot be redeemed for cash, currency, or any other form of monetary value except as explicitly provided in Section 2.5 (Creator Withdrawals).
+2. **No Cash Value**: Rc has no cash value, monetary value, or exchange value outside the Runinga platform. Rc cannot be redeemed for cash, currency, or any other form of monetary value except as explicitly provided in Section 2.5 (Creator Withdrawals).
 
-3. **Platform-Controlled Exchange Rates**: Krieta maintains sole and exclusive control over the exchange rate between fiat currency and Kr. Exchange rates may be adjusted at any time at our discretion to reflect operational costs, market conditions, or business requirements.
+3. **Platform-Controlled Exchange Rates**: Runinga maintains sole and exclusive control over the exchange rate between fiat currency and Rc. Exchange rates may be adjusted at any time at our discretion to reflect operational costs, market conditions, or business requirements.
 
-4. **Non-Transferable to External Wallets**: Kr cannot be transferred, exported, or moved to external wallets, cryptocurrency exchanges, blockchain networks, or any third-party platforms. Kr remains within the Krieta ecosystem at all times.
+4. **Non-Transferable to External Wallets**: Rc cannot be transferred, exported, or moved to external wallets, cryptocurrency exchanges, blockchain networks, or any third-party platforms. Rc remains within the Runinga ecosystem at all times.
 
-5. **Not a Security or Investment**: Kr is not a security, investment contract, equity interest, or financial instrument of any kind. Purchasing Kr does not grant any ownership rights, profit-sharing rights, or governance rights in Krieta or any related entity.
+5. **Not a Security or Investment**: Rc is not a security, investment contract, equity interest, or financial instrument of any kind. Purchasing Rc does not grant any ownership rights, profit-sharing rights, or governance rights in Runinga or any related entity.
 
-6. **No Independent Market Value**: Kr does not have an independent market value and cannot be traded on secondary markets, exchanges, or peer-to-peer platforms.
+6. **No Independent Market Value**: Rc does not have an independent market value and cannot be traded on secondary markets, exchanges, or peer-to-peer platforms.
 
-### 2.3 Acquiring Kr (Fiat to Kr Conversion)
+### 2.3 Acquiring Rc (Fiat to Rc Conversion)
 
-Users may purchase Kr using fiat currency (USD, KES, or other supported currencies) through our authorized payment processors. This is a **one-way conversion** from fiat currency to Kr.
+Users may purchase Rc using fiat currency (USD, KES, or other supported currencies) through our authorized payment processors. This is a **one-way conversion** from fiat currency to Rc.
 
 **Key Terms:**
-- When you purchase Kr, you are paying for access to platform services, not purchasing a currency or financial asset.
-- All Kr purchases are **final and non-refundable** except as required by applicable law or as explicitly stated in these Terms.
+- When you purchase Rc, you are paying for access to platform services, not purchasing a currency or financial asset.
+- All Rc purchases are **final and non-refundable** except as required by applicable law or as explicitly stated in these Terms.
 - Exchange rates are displayed at the time of purchase and may change without notice.
 - Minimum and maximum purchase amounts may apply.
 
-### 2.4 Using Kr on the Platform
+### 2.4 Using Rc on the Platform
 
-Kr can be used for the following platform services:
+Rc can be used for the following platform services:
 
 - **Content Tips**: Tipping creators on their posts, videos, shorts, and other content
 - **Subscriptions**: Monthly subscriptions to creator channels
@@ -60,13 +60,13 @@ Kr can be used for the following platform services:
 - **Shop Listing Fees**: Optional fees to list products in the Shop module
 - **Other Platform Services**: As may be introduced from time to time
 
-### 2.5 Creator Withdrawals (Kr to Fiat Conversion)
+### 2.5 Creator Withdrawals (Rc to Fiat Conversion)
 
-**Creators Only**: Users who create content and earn Kr through tips, subscriptions, content unlocks, locked chat services, or contest prizes may withdraw their earned Kr to fiat currency, subject to the following conditions:
+**Creators Only**: Users who create content and earn Rc through tips, subscriptions, content unlocks, locked chat services, or contest prizes may withdraw their earned Rc to fiat currency, subject to the following conditions:
 
 1. **KYC Verification Required**: Creators must complete full KYC (Know Your Customer) verification before withdrawing funds.
 
-2. **Minimum Withdrawal Amount**: A minimum withdrawal threshold may apply (e.g., 10,000 Kr or equivalent).
+2. **Minimum Withdrawal Amount**: A minimum withdrawal threshold may apply (e.g., 10,000 Rc or equivalent).
 
 3. **Withdrawal Fees**: Withdrawal fees may apply to cover payment processing costs.
 
@@ -76,11 +76,11 @@ Kr can be used for the following platform services:
 
 6. **Tax Responsibility**: Creators are solely responsible for reporting and paying any applicable taxes on their earnings.
 
-**Important**: Regular users (non-creators) cannot withdraw Kr to fiat currency. Kr purchased by regular users can only be spent on platform services.
+**Important**: Regular users (non-creators) cannot withdraw Rc to fiat currency. Rc purchased by regular users can only be spent on platform services.
 
 ### 2.6 Fiat Conversion Display
 
-To provide transparency, all Kr amounts displayed on the platform will show the approximate fiat equivalent in your selected local currency (e.g., "1000 Kr (≈ $12.50 USD)" or "1000 Kr (≈ KES 1,250)").
+To provide transparency, all Rc amounts displayed on the platform will show the approximate fiat equivalent in your selected local currency (e.g., "1000 Rc (≈ $12.50 USD)" or "1000 Rc (≈ KES 1,250)").
 
 **Key Points:**
 - Fiat equivalents are approximate and for informational purposes only.
@@ -89,37 +89,37 @@ To provide transparency, all Kr amounts displayed on the platform will show the 
 
 ### 2.7 No Peer-to-Peer Transfers
 
-**Direct wallet-to-wallet transfers of Kr between users are strictly prohibited.** All Kr transactions must occur through platform services with clear business context (e.g., tipping content, subscribing to a creator, unlocking a chat for a task).
+**Direct wallet-to-wallet transfers of Rc between users are strictly prohibited.** All Rc transactions must occur through platform services with clear business context (e.g., tipping content, subscribing to a creator, unlocking a chat for a task).
 
 **Prohibited Activities:**
-- Sending Kr directly from one user's wallet to another user's wallet
-- Using Kr for person-to-person payments outside of platform services
-- Attempting to use Kr as a medium of exchange for goods or services outside the platform
+- Sending Rc directly from one user's wallet to another user's wallet
+- Using Rc for person-to-person payments outside of platform services
+- Attempting to use Rc as a medium of exchange for goods or services outside the platform
 
-**Rationale**: This restriction ensures that Kr remains a platform service token and not a money transmission instrument.
+**Rationale**: This restriction ensures that Rc remains a platform service token and not a money transmission instrument.
 
-### 2.8 Platform's Rights Regarding Kr
+### 2.8 Platform's Rights Regarding Rc
 
-Krieta reserves the following rights with respect to Kr:
+Runinga reserves the following rights with respect to Rc:
 
-1. **Modify Exchange Rates**: We may adjust Kr exchange rates at any time without prior notice.
+1. **Modify Exchange Rates**: We may adjust Rc exchange rates at any time without prior notice.
 
-2. **Suspend or Terminate Accounts**: We may suspend or terminate user accounts and freeze Kr balances if we detect suspicious activity, Terms violations, or compliance concerns.
+2. **Suspend or Terminate Accounts**: We may suspend or terminate user accounts and freeze Rc balances if we detect suspicious activity, Terms violations, or compliance concerns.
 
-3. **Forfeit Kr Balances**: Kr balances in accounts that violate these Terms, engage in fraudulent activity, or remain inactive for extended periods may be forfeited.
+3. **Forfeit Rc Balances**: Rc balances in accounts that violate these Terms, engage in fraudulent activity, or remain inactive for extended periods may be forfeited.
 
-4. **Modify Kr System**: We may modify, update, or discontinue the Kr system at any time, subject to applicable law.
+4. **Modify Rc System**: We may modify, update, or discontinue the Rc system at any time, subject to applicable law.
 
 5. **Compliance Actions**: We may take any action necessary to comply with applicable laws, regulations, or legal orders, including freezing accounts, reversing transactions, or reporting activity to authorities.
 
 ### 2.9 No Guarantee of Value
 
-**Krieta makes no guarantee, representation, or warranty regarding the value, utility, or availability of Kr.** The value of Kr is determined solely by Krieta and may change at any time. Users acknowledge that:
+**Runinga makes no guarantee, representation, or warranty regarding the value, utility, or availability of Rc.** The value of Rc is determined solely by Runinga and may change at any time. Users acknowledge that:
 
-- Kr may lose value or utility at any time
-- Platform services available for Kr may change or be discontinued
+- Rc may lose value or utility at any time
+- Platform services available for Rc may change or be discontinued
 - Exchange rates may become less favorable
-- Kr balances may be subject to expiration or forfeiture under certain conditions
+- Rc balances may be subject to expiration or forfeiture under certain conditions
 
 ---
 
@@ -127,7 +127,7 @@ Krieta reserves the following rights with respect to Kr:
 
 ### 3.1 Mandatory Transaction Context
 
-All Kr transactions on the platform must have a clear business context. Every transaction will include:
+All Rc transactions on the platform must have a clear business context. Every transaction will include:
 
 - **Transaction Type**: The category of service (e.g., CONTENT_TIP, SUBSCRIPTION, LOCKED_CHAT_TASK)
 - **Reference ID**: A unique identifier linking the transaction to specific content, service, or activity
@@ -137,10 +137,10 @@ All Kr transactions on the platform must have a clear business context. Every tr
 
 The following transaction types are **strictly prohibited**:
 
-- **Direct Wallet Transfers**: Sending Kr from one user's wallet to another without platform service context
+- **Direct Wallet Transfers**: Sending Rc from one user's wallet to another without platform service context
 - **Direct Chat Tips**: Tipping users in private/direct messages (tips must be on public content)
-- **Escrow Transactions**: Using Kr for escrow or holding funds for physical goods transactions
-- **External Transfers**: Attempting to transfer Kr to external wallets, exchanges, or platforms
+- **Escrow Transactions**: Using Rc for escrow or holding funds for physical goods transactions
+- **External Transfers**: Attempting to transfer Rc to external wallets, exchanges, or platforms
 
 ### 3.3 Transaction Immutability
 
@@ -152,7 +152,7 @@ Once a transaction is completed, it is **final and immutable**. Transaction cont
 
 ### 4.1 General Refund Policy
 
-**All Kr purchases and transactions are final and non-refundable** except in the following circumstances:
+**All Rc purchases and transactions are final and non-refundable** except in the following circumstances:
 
 1. **Technical Error**: If a technical error results in duplicate charges or incorrect amounts
 2. **Service Failure**: If the platform fails to deliver a paid service (e.g., content unlock fails, subscription not activated)
@@ -168,7 +168,7 @@ If you believe a transaction was made in error or you did not receive the servic
 2. Our compliance team will review the dispute within 5-7 business days
 3. We may request additional information or documentation
 4. A decision will be communicated via email
-5. Approved refunds will be issued as Kr credit to your wallet (not fiat refund)
+5. Approved refunds will be issued as Rc credit to your wallet (not fiat refund)
 
 ### 4.3 Chargebacks
 
@@ -183,7 +183,7 @@ If you believe a transaction was made in error or you did not receive the servic
 Creators may enable "Locked Chat" on their profiles, which requires users to pay a one-time fee to unlock the chat for a specific task or service request.
 
 **How It Works:**
-1. User pays Kr and describes the task they want (e.g., "Record a birthday message", "Review my portfolio")
+1. User pays Rc and describes the task they want (e.g., "Record a birthday message", "Review my portfolio")
 2. Chat unlocks for that specific task
 3. Creator delivers the requested service
 4. Once the task is marked complete or the deadline expires, the chat locks again
@@ -200,7 +200,7 @@ Creators may enable "Locked Chat" on their profiles, which requires users to pay
 
 ### 5.3 No Guarantee of Service Quality
 
-While creators are expected to deliver requested tasks, **Krieta does not guarantee the quality, timeliness, or suitability of creator services.** Disputes regarding service quality should be resolved between the user and creator. Krieta may mediate disputes but is not responsible for creator performance.
+While creators are expected to deliver requested tasks, **Runinga does not guarantee the quality, timeliness, or suitability of creator services.** Disputes regarding service quality should be resolved between the user and creator. Runinga may mediate disputes but is not responsible for creator performance.
 
 ---
 
@@ -226,13 +226,13 @@ All contests on the platform must be **skill-based** and comply with applicable 
 
 ### 6.3 Prize Pool Management
 
-Contest prize pools are **non-refundable service fees** paid to Krieta for contest hosting and prize distribution services. Prize pools are not held in escrow; they are platform-held funds that will be distributed to winners as part of our contest service.
+Contest prize pools are **non-refundable service fees** paid to Runinga for contest hosting and prize distribution services. Prize pools are not held in escrow; they are platform-held funds that will be distributed to winners as part of our contest service.
 
 **Key Terms:**
 - Prize pools are non-refundable once the contest starts
-- Krieta distributes prizes to winners after contest completion
+- Runinga distributes prizes to winners after contest completion
 - Prize distribution is subject to compliance review and winner verification
-- Krieta reserves the right to withhold prizes if fraud or Terms violations are detected
+- Runinga reserves the right to withhold prizes if fraud or Terms violations are detected
 
 ---
 
@@ -260,7 +260,7 @@ All Chama members must complete **full KYC verification** before joining or crea
 
 ### 7.4 Platform's Rights Regarding Chamas
 
-Krieta reserves the right to:
+Runinga reserves the right to:
 - Suspend or terminate Chamas that violate these Terms
 - Freeze Chama funds pending investigation of suspicious activity
 - Require additional verification or documentation from Chama members
@@ -272,20 +272,20 @@ Krieta reserves the right to:
 
 ### 8.1 Shop Purpose
 
-The Shop module allows users to list physical goods for sale (e.g., cars, electronics, household items). **The Shop is a listing-only marketplace.** Krieta does not process payments or provide escrow services for Shop transactions.
+The Shop module allows users to list physical goods for sale (e.g., cars, electronics, household items). **The Shop is a listing-only marketplace.** Runinga does not process payments or provide escrow services for Shop transactions.
 
 ### 8.2 No Payment Processing or Escrow
 
-**Important**: All Shop transactions must be completed outside the platform. Buyers and sellers must arrange payment and delivery independently. Krieta is not involved in the transaction and does not hold funds in escrow.
+**Important**: All Shop transactions must be completed outside the platform. Buyers and sellers must arrange payment and delivery independently. Runinga is not involved in the transaction and does not hold funds in escrow.
 
 **Prohibited Activities:**
-- Using Kr to purchase physical goods in the Shop
-- Requesting Krieta to hold funds in escrow for Shop transactions
-- Expecting Krieta to mediate payment disputes for Shop transactions
+- Using Rc to purchase physical goods in the Shop
+- Requesting Runinga to hold funds in escrow for Shop transactions
+- Expecting Runinga to mediate payment disputes for Shop transactions
 
 ### 8.3 Shop Listing Fees
 
-Krieta may charge optional listing fees in Kr to promote or feature Shop listings. These fees are non-refundable and do not guarantee sales.
+Runinga may charge optional listing fees in Rc to promote or feature Shop listings. These fees are non-refundable and do not guarantee sales.
 
 ### 8.4 Buyer and Seller Responsibility
 
@@ -296,7 +296,7 @@ Buyers and sellers are solely responsible for:
 - Resolving disputes
 - Complying with applicable laws (e.g., sales tax, consumer protection)
 
-**Krieta is not liable for any issues arising from Shop transactions.**
+**Runinga is not liable for any issues arising from Shop transactions.**
 
 ---
 
@@ -304,7 +304,7 @@ Buyers and sellers are solely responsible for:
 
 ### 9.1 Automated Risk Assessment
 
-Krieta uses automated risk scoring to detect suspicious activity, fraud, and money laundering. Every user has a risk score (0-100) based on factors including:
+Runinga uses automated risk scoring to detect suspicious activity, fraud, and money laundering. Every user has a risk score (0-100) based on factors including:
 
 - KYC verification status
 - Account age and activity
@@ -322,14 +322,14 @@ Users with elevated risk scores may face automatic restrictions, including:
 
 ### 9.3 Suspicious Activity Detection
 
-Krieta monitors for suspicious activity patterns, including:
+Runinga monitors for suspicious activity patterns, including:
 
 - **Self-Tipping**: Using multiple accounts to tip yourself
 - **Circular Transactions**: Transactions that loop back to the originating account
 - **Rapid Cycling**: Quick buy-tip-withdraw patterns
 - **Velocity Violations**: Excessive transaction frequency or volume
 
-**Consequences**: Users engaging in suspicious activity may face account suspension, Kr forfeiture, and reporting to authorities.
+**Consequences**: Users engaging in suspicious activity may face account suspension, Rc forfeiture, and reporting to authorities.
 
 ### 9.4 Transaction Velocity Limits
 
@@ -337,8 +337,8 @@ To prevent money laundering, the following velocity limits apply:
 
 - Maximum 10 tips per minute per user
 - Maximum 50 transactions per hour per user
-- Maximum 100,000 Kr per 24 hours for non-KYC users
-- Maximum 500,000 Kr per 24 hours for KYC-approved users
+- Maximum 100,000 Rc per 24 hours for non-KYC users
+- Maximum 500,000 Rc per 24 hours for KYC-approved users
 - 24-hour cooling-off period for new accounts before first withdrawal
 
 ### 9.5 Compliance Cooperation
@@ -348,7 +348,7 @@ Users agree to cooperate with compliance investigations, including:
 - Responding to inquiries about transaction activity
 - Accepting temporary account restrictions during investigations
 
-**Failure to cooperate may result in account termination and Kr forfeiture.**
+**Failure to cooperate may result in account termination and Rc forfeiture.**
 
 ---
 
@@ -356,11 +356,11 @@ Users agree to cooperate with compliance investigations, including:
 
 ### 10.1 Tiered KYC System
 
-Krieta uses a tiered KYC system based on user activity:
+Runinga uses a tiered KYC system based on user activity:
 
-- **Tier 0 (No KYC)**: Can tip, subscribe, unlock content (max 10,000 Kr/month)
-- **Tier 1 (Basic KYC)**: Email + phone verification (max 50,000 Kr/month)
-- **Tier 2 (Full KYC)**: ID + selfie verification (max 500,000 Kr/month, can withdraw)
+- **Tier 0 (No KYC)**: Can tip, subscribe, unlock content (max 10,000 Rc/month)
+- **Tier 1 (Basic KYC)**: Email + phone verification (max 50,000 Rc/month)
+- **Tier 2 (Full KYC)**: ID + selfie verification (max 500,000 Rc/month, can withdraw)
 - **Tier 3 (Enhanced KYC)**: Proof of income, business documents (unlimited)
 
 ### 10.2 Mandatory KYC Triggers
@@ -400,7 +400,7 @@ Users may not:
 9. **Intellectual Property Violations**: Infringe on copyrights, trademarks, or other IP rights
 10. **Platform Manipulation**: Manipulate contests, voting, or other platform features
 
-**Consequences**: Violations may result in account suspension, Kr forfeiture, legal action, and reporting to authorities.
+**Consequences**: Violations may result in account suspension, Rc forfeiture, legal action, and reporting to authorities.
 
 ---
 
@@ -408,7 +408,7 @@ Users may not:
 
 ### 12.1 Platform Ownership
 
-Krieta owns all rights, title, and interest in the platform, including:
+Runinga owns all rights, title, and interest in the platform, including:
 - Software, code, and technology
 - Trademarks, logos, and branding
 - Platform design and user interface
@@ -416,14 +416,14 @@ Krieta owns all rights, title, and interest in the platform, including:
 
 ### 12.2 User Content
 
-Users retain ownership of content they create and post on the platform. By posting content, users grant Krieta a worldwide, non-exclusive, royalty-free license to:
+Users retain ownership of content they create and post on the platform. By posting content, users grant Runinga a worldwide, non-exclusive, royalty-free license to:
 - Display, distribute, and promote user content on the platform
 - Use content for marketing and promotional purposes
 - Create derivative works (e.g., thumbnails, previews)
 
 ### 12.3 DMCA Compliance
 
-Krieta complies with the Digital Millennium Copyright Act (DMCA). If you believe your copyright has been infringed, please submit a DMCA takedown notice to our designated agent.
+Runinga complies with the Digital Millennium Copyright Act (DMCA). If you believe your copyright has been infringed, please submit a DMCA takedown notice to our designated agent.
 
 ---
 
@@ -451,14 +451,14 @@ We retain user data for as long as necessary to provide services and comply with
 
 ### 14.1 No Warranties
 
-THE PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. KRIETA DISCLAIMS ALL WARRANTIES, INCLUDING:
+THE PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. RUNINGA DISCLAIMS ALL WARRANTIES, INCLUDING:
 - MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT
 - ACCURACY, RELIABILITY, OR AVAILABILITY OF THE PLATFORM
 - SECURITY OR FREEDOM FROM VIRUSES OR HARMFUL CODE
 
 ### 14.2 Limitation of Liability
 
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, KRIETA SHALL NOT BE LIABLE FOR:
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, RUNINGA SHALL NOT BE LIABLE FOR:
 - INDIRECT, INCIDENTAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES
 - LOSS OF PROFITS, DATA, OR BUSINESS OPPORTUNITIES
 - DAMAGES ARISING FROM USER CONTENT, THIRD-PARTY SERVICES, OR EXTERNAL LINKS
@@ -466,13 +466,13 @@ TO THE MAXIMUM EXTENT PERMITTED BY LAW, KRIETA SHALL NOT BE LIABLE FOR:
 
 ### 14.3 Third-Party Services
 
-The platform may integrate with third-party services (e.g., payment processors, KYC providers). Krieta is not responsible for third-party service failures, errors, or Terms violations.
+The platform may integrate with third-party services (e.g., payment processors, KYC providers). Runinga is not responsible for third-party service failures, errors, or Terms violations.
 
 ---
 
 ## 15. Indemnification
 
-Users agree to indemnify, defend, and hold harmless Krieta, its affiliates, officers, directors, employees, and agents from any claims, damages, losses, or expenses (including legal fees) arising from:
+Users agree to indemnify, defend, and hold harmless Runinga, its affiliates, officers, directors, employees, and agents from any claims, damages, losses, or expenses (including legal fees) arising from:
 - User's violation of these Terms
 - User's content or activity on the platform
 - User's violation of applicable laws or third-party rights
@@ -486,12 +486,12 @@ Users agree to indemnify, defend, and hold harmless Krieta, its affiliates, offi
 
 Users may terminate their account at any time by contacting support. Upon termination:
 - User access to the platform will be revoked
-- Unused Kr balances may be forfeited (subject to applicable law)
+- Unused Rc balances may be forfeited (subject to applicable law)
 - User content may be deleted or anonymized
 
-### 16.2 Termination by Krieta
+### 16.2 Termination by Runinga
 
-Krieta may suspend or terminate user accounts at any time for:
+Runinga may suspend or terminate user accounts at any time for:
 - Violation of these Terms
 - Suspicious or fraudulent activity
 - Compliance concerns or legal requirements
@@ -500,9 +500,9 @@ Krieta may suspend or terminate user accounts at any time for:
 ### 16.3 Effect of Termination
 
 Upon termination:
-- User loses access to the platform and all Kr balances
+- User loses access to the platform and all Rc balances
 - Pending transactions may be canceled or reversed
-- Krieta may retain data as required by law or for compliance purposes
+- Runinga may retain data as required by law or for compliance purposes
 
 ---
 
@@ -510,7 +510,7 @@ Upon termination:
 
 ### 17.1 Informal Resolution
 
-Before initiating formal dispute resolution, users agree to contact Krieta support to attempt informal resolution.
+Before initiating formal dispute resolution, users agree to contact Runinga support to attempt informal resolution.
 
 ### 17.2 Binding Arbitration
 
@@ -539,9 +539,9 @@ These Terms are governed by the laws of [Jurisdiction], without regard to confli
 
 ## 19. Changes to Terms
 
-Krieta reserves the right to modify these Terms at any time. Changes will be effective upon posting to the platform. Continued use of the platform after changes constitutes acceptance of the modified Terms.
+Runinga reserves the right to modify these Terms at any time. Changes will be effective upon posting to the platform. Continued use of the platform after changes constitutes acceptance of the modified Terms.
 
-**Material Changes**: For material changes (e.g., changes to Kr system, refund policy, arbitration), we will provide advance notice via email or platform notification.
+**Material Changes**: For material changes (e.g., changes to Rc system, refund policy, arbitration), we will provide advance notice via email or platform notification.
 
 ---
 
@@ -553,7 +553,7 @@ If any provision of these Terms is found to be invalid or unenforceable, the rem
 
 ## 21. Entire Agreement
 
-These Terms, together with our Privacy Policy and any other policies referenced herein, constitute the entire agreement between users and Krieta regarding use of the platform.
+These Terms, together with our Privacy Policy and any other policies referenced herein, constitute the entire agreement between users and Runinga regarding use of the platform.
 
 ---
 
@@ -561,7 +561,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
 
 For questions, concerns, or support regarding these Terms, please contact us at:
 
-**Email**: [support@krieta.com]  
+**Email**: [support@runinga.com]  
 **Address**: [Company Address]  
 **Support Portal**: [Support URL]
 
@@ -569,7 +569,7 @@ For questions, concerns, or support regarding these Terms, please contact us at:
 
 ## 23. Acknowledgment
 
-By using the Krieta platform, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
+By using the Runinga platform, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
 
 ---
 

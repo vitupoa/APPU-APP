@@ -1,4 +1,4 @@
-# Krieta — Full Implementation Plan (v2)
+﻿# Runinga — Full Implementation Plan (v2)
 
 > **Creator-centric marketing engine** — KMP + Compose Multiplatform (Android-first, iOS-second)
 > Railway Backend (Node.js + TypeScript) · Custom JWT · Server-side Payments · Cloudinary Media
@@ -8,7 +8,7 @@
 ## User Review Required
 
 > [!IMPORTANT]
-> **Contests are the core MVP feature.** The module order is dependency-driven — we must build Core → Auth → Wallet before Contests can function (contests need users, authentication, and Kr transactions). However, Contests will receive the most design attention and will be the first "feature" module fully wired end-to-end.
+> **Contests are the core MVP feature.** The module order is dependency-driven — we must build Core → Auth → Wallet before Contests can function (contests need users, authentication, and Rc transactions). However, Contests will receive the most design attention and will be the first "feature" module fully wired end-to-end.
 
 > [!WARNING]
 > **Chat and Creator Marketplace are planned but deferred to post-MVP.** They are included in the architecture to ensure extensibility, but not in the initial build. Chat architecture is now expanded to include: 1-on-1 tipping/tip requests, group fundraisers with fund managers and transparent group wallets.
@@ -20,26 +20,26 @@
 > - **Max file size**: ~150 MB (hard limit), target ~80–100 MB after client-side compression
 > - **Cloudinary** handles transcoding/adaptive bitrate on upload — we send the original and Cloudinary serves optimized versions
 > - **Client-side**: Compress before upload using platform-native (Android MediaCodec / iOS AVAssetExportSession) via expect/actual
-> - **Cloudinary folder structure**: `Krieta/{module}/{mediaType}` (e.g., `Krieta/contests/video`, `Krieta/profile/photo`) — never mix media types
+> - **Cloudinary folder structure**: `Runinga/{module}/{mediaType}` (e.g., `Runinga/contests/video`, `Runinga/profile/photo`) — never mix media types
 
 ---
 
 ## Critical Business Rules (Global)
 
-### Kr Currency Display (EVERYWHERE)
+### Rc Currency Display (EVERYWHERE)
 
 ```
-✅ Kr.500 (~KES 850)     — symbol DOT amount, fiat in parentheses
-✅ Kr.1                   — dot between symbol and amount
-✅ Kr.0.50                — decimals allowed
-❌ 500 Kr                 — NEVER amount then symbol
-❌ Kr 500                 — NEVER space between symbol and amount
-❌ Kr500                  — NEVER without dot
+✅ Rc.500 (~KES 850)     — symbol DOT amount, fiat in parentheses
+✅ Rc.1                   — dot between symbol and amount
+✅ Rc.0.50                — decimals allowed
+❌ 500 Rc                 — NEVER amount then symbol
+❌ Rc 500                 — NEVER space between symbol and amount
+❌ Rc500                  — NEVER without dot
 ```
 
-- **Every** Kr amount displayed in the app MUST show the user's location-based fiat currency conversion below/beside it
+- **Every** Rc amount displayed in the app MUST show the user's location-based fiat currency conversion below/beside it
 - Applies to: Wallet, Shop, Milestones, Contests, Tips, Profile earnings, Analytics, Transaction history, Subscription tiers
-- **Input fields**: User always enters amount in their local fiat currency. Real-time Kr conversion displayed as they type
+- **Input fields**: User always enters amount in their local fiat currency. Real-time Rc conversion displayed as they type
 - Fiat rate refreshed at: app launch, wallet access, wallet pull-to-refresh
 
 ### Account Types (Permanent)
@@ -54,7 +54,7 @@
 
 1. **Real names required**: User MUST enter their legal name as on government-issued document (passport, driving licence)
 2. **Explicit warning on signup**: "Your name and username cannot be changed after your wallet is unlocked. Use your real name as it appears on your government-issued ID. This is for accountability and security purposes."
-3. **Wallet unlock trigger**: First time ANY Kr enters the wallet (topup, tip received, shop sale, brand payment, ad revenue, contest prize)
+3. **Wallet unlock trigger**: First time ANY Rc enters the wallet (topup, tip received, shop sale, brand payment, ad revenue, contest prize)
 4. **After wallet unlock**: Username and display name fields become permanently read-only
 5. **Before wallet unlock**: User can edit username and display name freely
 6. **Backend enforces**: `is_wallet_unlocked` flag on user record, checked on every profile update request
@@ -82,7 +82,7 @@ Neither admires      |  Neither admires     |  "Admire"                     |  "
 | **Shorts** | ✅ Yes | Tip button overlay on unlocked shorts |
 | **Contests** | ❌ No | No tipping on contest entries |
 | **Locked content** | ❌ No tip button | Must subscribe to access, no tip on locked content |
-| **Wallet (search)** | ✅ Yes | Search user → Enter amount in local fiat → Live Kr conversion → Confirm prompt |
+| **Wallet (search)** | ✅ Yes | Search user → Enter amount in local fiat → Live Rc conversion → Confirm prompt |
 | **1-on-1 Chat** | ✅ Yes (Post-MVP) | Tip + request tip in DMs |
 | **Group Chat** | ❌ No tips | Fundraiser system instead (Post-MVP) |
 
@@ -90,7 +90,7 @@ Neither admires      |  Neither admires     |  "Admire"                     |  "
 ```
 You are about to tip
 @username (Full Name)
-Kr.50 (~KES 85)
+Rc.50 (~KES 85)
 
 [CANCEL]  [TIP]
 ```
@@ -102,13 +102,13 @@ Creators can lock posts/shorts behind subscription tiers. Users must subscribe t
 **Subscription Tiers** (creator-defined):
 | Tier | Default Order | Creator Customizable |
 |------|---------------|---------------------|
-| **Top Fun** | Tier 1 (lowest) | Custom Kr amount, custom benefits description |
-| **Real Fan** | Tier 2 | Custom Kr amount, custom benefits description |
-| **True Fan** | Tier 3 | Custom Kr amount, custom benefits description |
-| **Super Fan** | Tier 4 (highest) | Custom Kr amount, custom benefits description |
+| **Top Fun** | Tier 1 (lowest) | Custom Rc amount, custom benefits description |
+| **Real Fan** | Tier 2 | Custom Rc amount, custom benefits description |
+| **True Fan** | Tier 3 | Custom Rc amount, custom benefits description |
+| **Super Fan** | Tier 4 (highest) | Custom Rc amount, custom benefits description |
 
 - Creator can enable 1, 2, 3, or all 4 tiers
-- Each tier has a custom monthly Kr amount set by the creator
+- Each tier has a custom monthly Rc amount set by the creator
 - Each tier has a creator-written benefits description
 - Higher tiers automatically include access to all lower tier content
 - **Platform fee: 15% per subscription** (deducted from creator's received amount)
@@ -119,7 +119,7 @@ Creators can lock posts/shorts behind subscription tiers. Users must subscribe t
 
 - **15% platform fee** calculated and deducted at contest creation time
 - Creator enters prize pool → Platform adds 15% → Total charged from wallet = Prize + 15% fee
-- Example: Creator sets Kr.100 prize → Platform fee Kr.15 → Total escrowed: Kr.115 → Winners receive Kr.100 total
+- Example: Creator sets Rc.100 prize → Platform fee Rc.15 → Total escrowed: Rc.115 → Winners receive Rc.100 total
 - Fee is shown transparently in the contest creation flow
 
 ### Contest Types
@@ -149,7 +149,7 @@ Creators can lock posts/shorts behind subscription tiers. Users must subscribe t
 ### Cloudinary Folder Structure
 
 ```
-Krieta/
+Runinga/
 ├── profile/
 │   ├── photo/       ← Avatars, cover photos
 │   └── video/       ← Profile videos (if any)
@@ -220,7 +220,7 @@ graph TD
 
 ```
 composeApp/src/
-├── commonMain/kotlin/com/krieta/     ← 85% of code lives here
+├── commonMain/kotlin/com/runinga/     ← 85% of code lives here
 │   ├── core/
 │   ├── feature/auth/
 │   ├── feature/wallet/
@@ -231,8 +231,8 @@ composeApp/src/
 │   ├── feature/shop/
 │   ├── feature/analytics/
 │   └── feature/ads/
-├── androidMain/kotlin/com/krieta/    ← Android-specific (ExoPlayer, Location, Biometric)
-└── iosMain/kotlin/com/krieta/        ← iOS-specific (AVPlayer, CLLocation, LocalAuth)
+├── androidMain/kotlin/com/runinga/    ← Android-specific (ExoPlayer, Location, Biometric)
+└── iosMain/kotlin/com/runinga/        ← iOS-specific (AVPlayer, CLLocation, LocalAuth)
 ```
 
 Each feature module follows **Clean Architecture** internally:
@@ -320,13 +320,13 @@ backend/
 - Add signing config placeholder
 
 ##### [MODIFY] [settings.gradle.kts](file:///c:/Users/ADMIN/appu/settings.gradle.kts)
-- Rename root project to `Krieta`
+- Rename root project to `Runinga`
 
-##### [NEW] `commonMain/com/krieta/core/di/AppModule.kt`
+##### [NEW] `commonMain/com/runinga/core/di/AppModule.kt`
 - Root Koin module aggregating all feature modules
 - Platform-specific module injection via expect/actual
 
-##### [NEW] `commonMain/com/krieta/core/network/KtorClient.kt`
+##### [NEW] `commonMain/com/runinga/core/network/KtorClient.kt`
 - Ktor HttpClient factory with:
   - ContentNegotiation (JSON with snake_case ↔ camelCase via `JsonNamingStrategy.SnakeCase`)
   - Auth (Bearer token interceptor with auto-refresh on 401)
@@ -335,104 +335,104 @@ backend/
   - Timeout configuration (connect: 15s, request: 30s)
   - Certificate pinning (via expect/actual for platform engines)
 
-##### [NEW] `commonMain/com/krieta/core/network/ApiConstants.kt`
+##### [NEW] `commonMain/com/runinga/core/network/ApiConstants.kt`
 - Base URL (Railway backend), API version prefix
 - Endpoint paths as constants (organized by module)
 
-##### [NEW] `commonMain/com/krieta/core/network/NetworkResult.kt`
+##### [NEW] `commonMain/com/runinga/core/network/NetworkResult.kt`
 - Sealed class: `Success<T>`, `Error(code, message)`, `Loading`
 - Extension functions for safe API calls with error mapping
 
-##### [NEW] `commonMain/com/krieta/core/navigation/AppNavigator.kt`
+##### [NEW] `commonMain/com/runinga/core/navigation/AppNavigator.kt`
 - Voyager Tab-based navigation (Home, Discover, Contests, Shop, Profile)
 - Nested stack navigation within each tab
 - Deep link support
 
-##### [NEW] `commonMain/com/krieta/core/theme/KrietaTheme.kt`
+##### [NEW] `commonMain/com/runinga/core/theme/RuningaTheme.kt`
 - Material3 dark/light theme
 - Custom color palette (premium feel, NO purple per GEMINI.md rules)
 - Typography (Inter/Outfit via Google Fonts)
 - Shape system, elevation, spacing tokens
 
-##### [NEW] `commonMain/com/krieta/core/theme/Colors.kt`
+##### [NEW] `commonMain/com/runinga/core/theme/Colors.kt`
 - Curated color palette — dark-mode-first
 - Primary: Deep teal/emerald green
 - Accent: Warm gold/amber
 - Surface: Rich dark grays
 - Status colors (success, error, warning)
 
-##### [NEW] `commonMain/com/krieta/core/security/TokenManager.kt`
+##### [NEW] `commonMain/com/runinga/core/security/TokenManager.kt`
 - `expect class TokenManager` — stores access/refresh tokens
 - Android: EncryptedSharedPreferences + Android Keystore
 - iOS: Keychain Services
 
-##### [NEW] `commonMain/com/krieta/core/security/DeviceSecurity.kt`
+##### [NEW] `commonMain/com/runinga/core/security/DeviceSecurity.kt`
 - `expect class DeviceSecurity`
 - Android: Root detection (RootBeer), emulator detection, SafetyNet/Play Integrity
 - iOS: Jailbreak detection, debug detection
 
-##### [NEW] `commonMain/com/krieta/core/location/LocationProvider.kt`
+##### [NEW] `commonMain/com/runinga/core/location/LocationProvider.kt`
 - `expect class LocationProvider`
 - `getCurrentCountry(): String` — ISO country code ("KE", "NG", "US")
 - `getCurrentCurrency(): String` — currency code ("KES", "NGN", "USD")
 - Android: `Locale.getDefault()` + GPS fallback via FusedLocationProvider
 - iOS: `Locale.current` + CLLocationManager fallback
 
-##### [NEW] `commonMain/com/krieta/core/location/CurrencyMapper.kt`
+##### [NEW] `commonMain/com/runinga/core/location/CurrencyMapper.kt`
 - Country code → Currency code mapping (ISO 4217 complete table)
 - Cache in DataStore, refresh on app launch
 
-##### [NEW] `commonMain/com/krieta/core/datastore/PreferencesManager.kt`
+##### [NEW] `commonMain/com/runinga/core/datastore/PreferencesManager.kt`
 - `expect class PreferencesManager`
 - Wrapper around DataStore for: detected currency, theme preference, user session cache
 - Android: AndroidX DataStore
 - iOS: NSUserDefaults DataStore
 
-##### [NEW] `commonMain/com/krieta/core/database/KrietaDatabase.kt`
+##### [NEW] `commonMain/com/runinga/core/database/RuningaDatabase.kt`
 - SQLDelight database definition
 - Tables for offline cache: users, wallet_cache, feed_cache, contest_cache, shorts_cache
 
-##### [NEW] `commonMain/com/krieta/core/util/KrCurrencyFormatter.kt`
-- Format `Kr.{amount}` — always symbol DOT amount, no space
-- Format with fiat: `Kr.500 (~KES 850)` 
-- Input conversion: fiat amount → Kr.{converted} as user types
+##### [NEW] `commonMain/com/runinga/core/util/KrCurrencyFormatter.kt`
+- Format `Rc.{amount}` — always symbol DOT amount, no space
+- Format with fiat: `Rc.500 (~KES 850)` 
+- Input conversion: fiat amount → Rc.{converted} as user types
 - Handle decimal precision per currency
 - Handle rounding rules
 
-##### [NEW] `commonMain/com/krieta/core/util/DateTimeUtil.kt`
+##### [NEW] `commonMain/com/runinga/core/util/DateTimeUtil.kt`
 - kotlinx-datetime helpers for contest deadlines, timestamps
 
-##### [NEW] `commonMain/com/krieta/core/ui/components/`
-- `KrietaTopBar.kt` — App bar with consistent styling
-- `KrietaBottomBar.kt` — Bottom navigation (5 tabs)
+##### [NEW] `commonMain/com/runinga/core/ui/components/`
+- `RuningaTopBar.kt` — App bar with consistent styling
+- `RuningaBottomBar.kt` — Bottom navigation (5 tabs)
 - `LoadingIndicator.kt` — Branded loading spinner
 - `ErrorState.kt` — Error display with retry button
 - `EmptyState.kt` — Empty content placeholder
-- `KrAmountDisplay.kt` — Kr.{amount} + fiat conversion display (reused EVERYWHERE)
-- `KrAmountInput.kt` — Fiat input → live Kr.{amount} conversion as user types
-- `TipConfirmDialog.kt` — "You are about to tip @username (Full Name) Kr.{amount} (~{fiat}) [CANCEL] [TIP]"
+- `KrAmountDisplay.kt` — Rc.{amount} + fiat conversion display (reused EVERYWHERE)
+- `KrAmountInput.kt` — Fiat input → live Rc.{amount} conversion as user types
+- `TipConfirmDialog.kt` — "You are about to tip @username (Full Name) Rc.{amount} (~{fiat}) [CANCEL] [TIP]"
 - `ContentPaywall.kt` — Subscription tier paywall overlay for locked content
 - `IdentityLockBanner.kt` — Warning banner: "Name/username locked after wallet activation"
 
-##### [MODIFY] `commonMain/com/krieta/com/App.kt`
-- Replace template content with Koin initialization + Voyager navigator + KrietaTheme
+##### [MODIFY] `commonMain/com/runinga/com/App.kt`
+- Replace template content with Koin initialization + Voyager navigator + RuningaTheme
 
-##### [NEW] `androidMain/com/krieta/core/di/PlatformModule.android.kt`
+##### [NEW] `androidMain/com/runinga/core/di/PlatformModule.android.kt`
 - Android-specific Koin bindings (Context, ExoPlayer, Location)
 
-##### [NEW] `iosMain/com/krieta/core/di/PlatformModule.ios.kt`
+##### [NEW] `iosMain/com/runinga/core/di/PlatformModule.ios.kt`
 - iOS-specific Koin bindings
 
-##### [MODIFY] `androidMain/com/krieta/com/MainActivity.kt`
+##### [MODIFY] `androidMain/com/runinga/com/MainActivity.kt`
 - Initialize Koin in Application class
 - Handle edge-to-edge display, safe areas
 
-##### [NEW] `androidMain/com/krieta/com/KrietaApplication.kt`
+##### [NEW] `androidMain/com/runinga/com/RuningaApplication.kt`
 - Application class with Koin startup
 
 ##### [MODIFY] `androidMain/AndroidManifest.xml`
 - Add permissions: INTERNET, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, CAMERA, READ_EXTERNAL_STORAGE, READ_MEDIA_VIDEO, READ_MEDIA_IMAGES
-- Add `KrietaApplication` as application class
+- Add `RuningaApplication` as application class
 - Add `usesCleartextTraffic="false"`
 - Add network security config
 
@@ -466,17 +466,17 @@ backend/
 - Cloudinary config + folder path constants:
   ```typescript
   export const CLOUDINARY_FOLDERS = {
-    PROFILE_PHOTO: 'Krieta/profile/photo',
-    PROFILE_VIDEO: 'Krieta/profile/video',
-    SHORTS_VIDEO: 'Krieta/shorts/video',
-    SHORTS_PHOTO: 'Krieta/shorts/photo',
-    CONTESTS_PHOTO: 'Krieta/contests/photo',
-    CONTESTS_VIDEO: 'Krieta/contests/video',
-    FEED_PHOTO: 'Krieta/feed/photo',
-    SHOP_PHOTO: 'Krieta/shop/photo',
-    CHAT_PHOTO: 'Krieta/chat/photo',
-    CHAT_VIDEO: 'Krieta/chat/video',
-    CHAT_AUDIO: 'Krieta/chat/audio',
+    PROFILE_PHOTO: 'Runinga/profile/photo',
+    PROFILE_VIDEO: 'Runinga/profile/video',
+    SHORTS_VIDEO: 'Runinga/shorts/video',
+    SHORTS_PHOTO: 'Runinga/shorts/photo',
+    CONTESTS_PHOTO: 'Runinga/contests/photo',
+    CONTESTS_VIDEO: 'Runinga/contests/video',
+    FEED_PHOTO: 'Runinga/feed/photo',
+    SHOP_PHOTO: 'Runinga/shop/photo',
+    CHAT_PHOTO: 'Runinga/chat/photo',
+    CHAT_VIDEO: 'Runinga/chat/video',
+    CHAT_AUDIO: 'Runinga/chat/audio',
   } as const;
   ```
 
@@ -508,40 +508,40 @@ backend/
 
 #### 2A. [MOBILE] Auth Feature
 
-##### [NEW] `commonMain/com/krieta/feature/auth/data/remote/AuthApi.kt`
+##### [NEW] `commonMain/com/runinga/feature/auth/data/remote/AuthApi.kt`
 - Ktor endpoints: `/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/verify-otp`, `/auth/logout`
 
-##### [NEW] `commonMain/com/krieta/feature/auth/data/remote/dto/`
+##### [NEW] `commonMain/com/runinga/feature/auth/data/remote/dto/`
 - `LoginRequestDto.kt`, `RegisterRequestDto.kt`, `AuthResponseDto.kt`, `RefreshTokenDto.kt`
 - All DTOs use kotlinx.serialization with `@SerialName` for snake_case mapping
 
-##### [NEW] `commonMain/com/krieta/feature/auth/data/repository/AuthRepositoryImpl.kt`
+##### [NEW] `commonMain/com/runinga/feature/auth/data/repository/AuthRepositoryImpl.kt`
 - Implements AuthRepository interface
 - Handles token storage via TokenManager
 - Manages auth state flow
 
-##### [NEW] `commonMain/com/krieta/feature/auth/domain/model/User.kt`
+##### [NEW] `commonMain/com/runinga/feature/auth/domain/model/User.kt`
 - Domain model: id, username, displayName, firstName, lastName, email, phone, avatarUrl, bio, country, currency, accountType (PERSONAL/CREATOR/BUSINESS), isVerified, isWalletUnlocked, createdAt
 
-##### [NEW] `commonMain/com/krieta/feature/auth/domain/repository/AuthRepository.kt`
+##### [NEW] `commonMain/com/runinga/feature/auth/domain/repository/AuthRepository.kt`
 - Interface: login, register, refreshToken, logout, getCurrentUser, isAuthenticated
 
-##### [NEW] `commonMain/com/krieta/feature/auth/domain/usecase/`
+##### [NEW] `commonMain/com/runinga/feature/auth/domain/usecase/`
 - `LoginUseCase.kt`, `RegisterUseCase.kt`, `RefreshTokenUseCase.kt`, `ValidateInputUseCase.kt`
 
-##### [NEW] `commonMain/com/krieta/feature/auth/presentation/viewmodel/AuthViewModel.kt`
+##### [NEW] `commonMain/com/runinga/feature/auth/presentation/viewmodel/AuthViewModel.kt`
 - Login/Register state management
 - Form validation (real name validation)
 - Auth state observation
 - Account type selection state
 
-##### [NEW] `commonMain/com/krieta/feature/auth/presentation/screen/LoginScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/auth/presentation/screen/LoginScreen.kt`
 - Email/phone + password login
 - Biometric unlock option
 - "Sign up" navigation
 - Premium design with gradient background, glassmorphism cards
 
-##### [NEW] `commonMain/com/krieta/feature/auth/presentation/screen/RegisterScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/auth/presentation/screen/RegisterScreen.kt`
 - **Step-by-step registration**:
   1. **Account Type**: Personal / Creator / Business — with explicit warning: "Account type cannot be changed later"
   2. **Full Name**: First name + Last name — with notice: "Use your legal name as on your government-issued ID (passport, driving licence). Your name and username will be permanently locked once your wallet is activated."
@@ -550,16 +550,16 @@ backend/
   5. **Phone (optional)** + OTP verification
   6. **Terms acceptance** (including identity lock acknowledgment)
 
-##### [NEW] `commonMain/com/krieta/feature/auth/presentation/screen/BiometricSetupScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/auth/presentation/screen/BiometricSetupScreen.kt`
 - Biometric enrollment prompt after first login
 
-##### [NEW] `commonMain/com/krieta/feature/auth/di/AuthModule.kt`
+##### [NEW] `commonMain/com/runinga/feature/auth/di/AuthModule.kt`
 - Koin module for auth dependencies
 
-##### [NEW] `androidMain/com/krieta/feature/auth/BiometricAuthManager.android.kt`
+##### [NEW] `androidMain/com/runinga/feature/auth/BiometricAuthManager.android.kt`
 - AndroidX Biometric API implementation
 
-##### [NEW] `iosMain/com/krieta/feature/auth/BiometricAuthManager.ios.kt`
+##### [NEW] `iosMain/com/runinga/feature/auth/BiometricAuthManager.ios.kt`
 - iOS LocalAuthentication framework
 
 #### 2B. [BACKEND] Auth Module
@@ -582,7 +582,7 @@ backend/
 - Refresh token rotation (single-use refresh tokens)
 - Device binding
 - **Account type enforcement**: Set once at registration, no update endpoint
-- **Wallet lock check**: `is_wallet_unlocked` flag, set to `true` on first Kr credit
+- **Wallet lock check**: `is_wallet_unlocked` flag, set to `true` on first Rc credit
 
 ##### [NEW] `backend/src/modules/auth/auth.validation.ts`
 - Zod schemas for all auth endpoints
@@ -593,12 +593,12 @@ backend/
 
 ### Phase 3: Wallet Module
 
-> Kr platform currency with multi-provider payment integration (all server-side). Wallet activation permanently locks user identity.
+> Rc platform currency with multi-provider payment integration (all server-side). Wallet activation permanently locks user identity.
 
 #### 3A. [MOBILE] Wallet Feature
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/data/remote/WalletApi.kt`
-- GET `/wallet/balance` — Current Kr balance + `is_wallet_unlocked` status
+##### [NEW] `commonMain/com/runinga/feature/wallet/data/remote/WalletApi.kt`
+- GET `/wallet/balance` — Current Rc balance + `is_wallet_unlocked` status
 - POST `/wallet/topup/initiate` — Start topup flow (returns provider redirect/reference)
 - POST `/wallet/withdraw/initiate` — Start withdrawal
 - GET `/wallet/transactions` — Transaction history
@@ -606,26 +606,26 @@ backend/
 - GET `/wallet/exchange-rate?from={currency}&to=kr` — Current rate
 - GET `/wallet/search-users?q={query}` — Search users for tipping
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/data/remote/dto/`
+##### [NEW] `commonMain/com/runinga/feature/wallet/data/remote/dto/`
 - `WalletBalanceDto.kt`, `TopupRequestDto.kt`, `WithdrawRequestDto.kt`, `TransactionDto.kt`, `ExchangeRateDto.kt`, `TipRequestDto.kt`
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/data/local/WalletCacheDao.kt`
+##### [NEW] `commonMain/com/runinga/feature/wallet/data/local/WalletCacheDao.kt`
 - SQLDelight: cached balance, cached transactions (offline display)
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/data/repository/WalletRepositoryImpl.kt`
+##### [NEW] `commonMain/com/runinga/feature/wallet/data/repository/WalletRepositoryImpl.kt`
 - Fetches from API, caches locally
 - **Balance is ALWAYS server-authoritative** — local is display-only cache
 - Refresh on: app launch, wallet access, pull-to-refresh
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/domain/model/`
+##### [NEW] `commonMain/com/runinga/feature/wallet/domain/model/`
 - `WalletBalance.kt` — krBalance, fiatEquivalent, currency, lastUpdated, isWalletUnlocked
 - `Transaction.kt` — id, type (topup/withdraw/tip_sent/tip_received/contest_prize/contest_escrow/subscription_earned/subscription_paid/shop_sale/ad_revenue), amount, currency, status, recipientOrSender, timestamp
 - `ExchangeRate.kt` — fromCurrency, toCurrency, rate, marginRate (4.5% platform margin), fetchedAt
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/domain/repository/WalletRepository.kt`
+##### [NEW] `commonMain/com/runinga/feature/wallet/domain/repository/WalletRepository.kt`
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/domain/usecase/`
-- `GetBalanceUseCase.kt` — Fetch balance, format with fiat equivalent using Kr.{amount} format
+##### [NEW] `commonMain/com/runinga/feature/wallet/domain/usecase/`
+- `GetBalanceUseCase.kt` — Fetch balance, format with fiat equivalent using Rc.{amount} format
 - `InitiateTopupUseCase.kt` — Determine available providers by country, initiate
 - `InitiateWithdrawUseCase.kt` — Validate minimum withdrawal, initiate
 - `GetTransactionsUseCase.kt` — Paginated transaction history
@@ -633,23 +633,23 @@ backend/
 - `SendTipUseCase.kt` — Tip validation, confirmation prompt, and sending
 - `GetExchangeRateUseCase.kt` — Live rate with 4.5% margin applied
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/presentation/viewmodel/WalletViewModel.kt`
-- Balance state (with fiat conversion in Kr.{amount} (~{fiat}) format)
+##### [NEW] `commonMain/com/runinga/feature/wallet/presentation/viewmodel/WalletViewModel.kt`
+- Balance state (with fiat conversion in Rc.{amount} (~{fiat}) format)
 - Transaction list state
 - Topup/Withdraw flow state
 - Exchange rate polling
 - User search state for tipping
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/presentation/screen/WalletScreen.kt`
-- Balance card showing `Kr.{amount}` with fiat equivalent below
+##### [NEW] `commonMain/com/runinga/feature/wallet/presentation/screen/WalletScreen.kt`
+- Balance card showing `Rc.{amount}` with fiat equivalent below
 - Quick actions: Topup, Withdraw, Tip, History
-- Recent transactions list (each showing Kr.{amount} with fiat)
+- Recent transactions list (each showing Rc.{amount} with fiat)
 - Screenshot prevention on this screen (secure flag)
 - Wallet unlock status indicator
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/presentation/screen/TopupScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/wallet/presentation/screen/TopupScreen.kt`
 - Amount input in local fiat currency
-- Live conversion display as user types: "You'll receive Kr.{amount}"
+- Live conversion display as user types: "You'll receive Rc.{amount}"
 - Payment method selection (based on detected country):
   - 🌍 International: PayPal (card only)
   - 🇰🇪 Kenya: M-Pesa, PayPal
@@ -659,36 +659,36 @@ backend/
 - Confirmation screen with exchange rate, fee breakdown, PIN/biometric verification
 - **First topup warning**: "After this topup, your wallet will be activated and your name/username will be permanently locked."
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/presentation/screen/WithdrawScreen.kt`
-- Enter amount in local fiat currency → shows Kr.{equivalent} to deduct
+##### [NEW] `commonMain/com/runinga/feature/wallet/presentation/screen/WithdrawScreen.kt`
+- Enter amount in local fiat currency → shows Rc.{equivalent} to deduct
 - Withdrawal method (based on country):
   - 🇰🇪 Kenya: M-Pesa
   - 🌍 International: Payoneer
-- Minimum withdrawal: Kr.10 (~equivalent)
+- Minimum withdrawal: Rc.10 (~equivalent)
 - Processing time notice
 - PIN/biometric verification required
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/presentation/screen/TransactionHistoryScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/wallet/presentation/screen/TransactionHistoryScreen.kt`
 - Filterable by type (all, topups, withdrawals, tips, prizes, subscriptions, shop, ads)
-- Each transaction shows Kr.{amount} with fiat equivalent
+- Each transaction shows Rc.{amount} with fiat equivalent
 - Paginated with pull-to-refresh
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/presentation/screen/TipScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/wallet/presentation/screen/TipScreen.kt`
 - **Real-time user search** (search by username, display name)
 - Shows matching users with avatar, @username, full name
-- Enter amount in local fiat currency → real-time Kr.{amount} conversion as they type
-- **Confirmation dialog**: "You are about to tip @{username} ({Full Name}) Kr.{amount} (~{fiat equivalent}) [CANCEL] [TIP]"
+- Enter amount in local fiat currency → real-time Rc.{amount} conversion as they type
+- **Confirmation dialog**: "You are about to tip @{username} ({Full Name}) Rc.{amount} (~{fiat equivalent}) [CANCEL] [TIP]"
 - PIN/biometric verification after confirm
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/presentation/component/`
-- `BalanceCard.kt` — Animated balance display with glassmorphism, shows Kr.{amount} and fiat
+##### [NEW] `commonMain/com/runinga/feature/wallet/presentation/component/`
+- `BalanceCard.kt` — Animated balance display with glassmorphism, shows Rc.{amount} and fiat
 - `PaymentMethodCard.kt` — Payment provider selector
-- `TransactionItem.kt` — Single transaction row with Kr.{amount} + fiat
+- `TransactionItem.kt` — Single transaction row with Rc.{amount} + fiat
 - `ExchangeRateBar.kt` — Current rate banner
 - `UserSearchResult.kt` — Search result for tip recipient
 - `WalletUnlockWarning.kt` — Warning about identity lock on first wallet activation
 
-##### [NEW] `commonMain/com/krieta/feature/wallet/di/WalletModule.kt`
+##### [NEW] `commonMain/com/runinga/feature/wallet/di/WalletModule.kt`
 
 #### 3B. [BACKEND] Wallet Module
 
@@ -696,21 +696,21 @@ backend/
 ##### [NEW] `backend/src/modules/wallet/wallet.controller.ts`
 ##### [NEW] `backend/src/modules/wallet/wallet.service.ts`
 - **Balance management**: Atomic PostgreSQL transactions for all balance changes
-- **Wallet unlock logic**: On first credit (topup webhook, tip received, any Kr income) → Set `is_wallet_unlocked = true` on user record → Lock name/username edits permanently
+- **Wallet unlock logic**: On first credit (topup webhook, tip received, any Rc income) → Set `is_wallet_unlocked = true` on user record → Lock name/username edits permanently
 - **Topup flow**:
   1. App → POST `/wallet/topup/initiate` (amount, currency, provider)
   2. Server validates, creates pending transaction, returns provider-specific data
-  3. Provider webhook → Server verifies signature → Credits Kr balance → Triggers wallet unlock if first credit
+  3. Provider webhook → Server verifies signature → Credits Rc balance → Triggers wallet unlock if first credit
 - **Withdrawal flow**:
   1. App → POST `/wallet/withdraw/initiate` (fiatAmount, provider, destination)
-  2. Server converts fiat → Kr at current rate, validates balance, creates pending transaction, queues payout
+  2. Server converts fiat → Rc at current rate, validates balance, creates pending transaction, queues payout
   3. BullMQ worker processes payout via provider API
-  4. On success → Debit Kr balance
+  4. On success → Debit Rc balance
 - **Tip flow**:
   1. App → POST `/wallet/tip` (recipientId, fiatAmount, currency)
-  2. Server converts fiat → Kr, validates sender balance, performs atomic transfer
+  2. Server converts fiat → Rc, validates sender balance, performs atomic transfer
   3. Creates transaction records for both sender (tip_sent) and recipient (tip_received)
-  4. Triggers wallet unlock for recipient if first Kr credit
+  4. Triggers wallet unlock for recipient if first Rc credit
 
 ##### [NEW] `backend/src/services/payment/paypal.service.ts`
 - PayPal REST API v2 (Orders API)
@@ -748,7 +748,7 @@ backend/
 
 #### 4A. [MOBILE] Profile Feature
 
-##### [NEW] `commonMain/com/krieta/feature/profile/data/remote/ProfileApi.kt`
+##### [NEW] `commonMain/com/runinga/feature/profile/data/remote/ProfileApi.kt`
 - GET `/users/{id}` — User profile (includes relationship status: none/admiring/admired_by/lovers)
 - PUT `/users/me` — Update profile (server rejects if wallet unlocked and name/username changed)
 - POST `/users/{id}/admire` — Follow (Admire)
@@ -764,15 +764,15 @@ backend/
 - PUT `/users/me/subscription-tiers` — Update tier config (for creators)
 - GET `/users/{id}/subscription-tiers` — Get user's available tiers (for subscribers)
 
-##### [NEW] `commonMain/com/krieta/feature/profile/domain/model/`
-- `UserProfile.kt` — Full profile with stats (admirers, admiring, lovers, contests won, Kr earned), accountType, isWalletUnlocked
+##### [NEW] `commonMain/com/runinga/feature/profile/domain/model/`
+- `UserProfile.kt` — Full profile with stats (admirers, admiring, lovers, contests won, Rc earned), accountType, isWalletUnlocked
 - `RelationshipStatus.kt` — enum: NONE, ADMIRING, ADMIRED_BY, LOVERS
-- `Milestone.kt` — id, title, description, requirement, reward (Kr.{amount} + fiat), isCompleted, completedByUser, progress
+- `Milestone.kt` — id, title, description, requirement, reward (Rc.{amount} + fiat), isCompleted, completedByUser, progress
 - `BioLink.kt` — label, url, icon
 - `SubscriptionTier.kt` — tier (TOP_FUN/REAL_FAN/TRUE_FAN/SUPER_FAN), krAmount, fiatEquivalent, benefits description, isEnabled
 - `UserSubscription.kt` — subscribedTo, tier, startDate, nextBillingDate
 
-##### [NEW] `commonMain/com/krieta/feature/profile/presentation/screen/ProfileScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/profile/presentation/screen/ProfileScreen.kt`
 - Cover photo + avatar
 - Display name, username, bio, bio links
 - Account type badge (Creator/Business)
@@ -786,33 +786,33 @@ backend/
 - Tabs: Posts | Shorts | Collections | Contests | Shop
 - Locked content items show paywall with required tier
 
-##### [NEW] `commonMain/com/krieta/feature/profile/presentation/screen/EditProfileScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/profile/presentation/screen/EditProfileScreen.kt`
 - Name fields: Editable if `!isWalletUnlocked`, read-only with lock icon if locked
 - Username field: Same lock behavior
 - Banner: "Name and username permanently locked for accountability and security" (if locked)
 - Pre-lock warning: "Your name and username will be permanently locked after your wallet is activated"
 - Avatar, cover photo, bio, bio links — always editable
 
-##### [NEW] `commonMain/com/krieta/feature/profile/presentation/screen/MilestonesScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/profile/presentation/screen/MilestonesScreen.kt`
 - List of milestones with progress bars
 - Completed milestones with checkmark and who completed it first
 - Available milestones with progress indicators
-- Reward display: Kr.{amount} (~{fiat})
+- Reward display: Rc.{amount} (~{fiat})
 
-##### [NEW] `commonMain/com/krieta/feature/profile/presentation/screen/SubscriptionTierSetupScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/profile/presentation/screen/SubscriptionTierSetupScreen.kt`
 - For creators: Enable/disable tiers (1-4)
-- Set custom Kr amount per tier (input in fiat → live Kr conversion)
+- Set custom Rc amount per tier (input in fiat → live Rc conversion)
 - Write benefits description per tier
 - Preview how it looks to subscribers
 
-##### [NEW] `commonMain/com/krieta/feature/profile/presentation/screen/SubscribersListScreen.kt`
-##### [NEW] `commonMain/com/krieta/feature/profile/presentation/screen/AdmirersListScreen.kt`
-##### [NEW] `commonMain/com/krieta/feature/profile/presentation/screen/AdmiringListScreen.kt`
-##### [NEW] `commonMain/com/krieta/feature/profile/presentation/screen/LoversListScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/profile/presentation/screen/SubscribersListScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/profile/presentation/screen/AdmirersListScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/profile/presentation/screen/AdmiringListScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/profile/presentation/screen/LoversListScreen.kt`
 
-##### [NEW] `commonMain/com/krieta/feature/profile/presentation/component/`
+##### [NEW] `commonMain/com/runinga/feature/profile/presentation/component/`
 - `RelationshipButton.kt` — Dynamic Admire/Unadmire/Unlove button with animated state changes
-- `SubscriptionTierCard.kt` — Tier display with amount (Kr.{amount} + fiat), benefits, subscribe button
+- `SubscriptionTierCard.kt` — Tier display with amount (Rc.{amount} + fiat), benefits, subscribe button
 - `LockedContentOverlay.kt` — Paywall with tier info and subscribe CTA
 - `IdentityLockIndicator.kt` — Lock icon + explanation on locked fields
 
@@ -829,7 +829,7 @@ backend/
 - Bio link management
 - **Subscription tier management**:
   - Creator sets tiers via PUT endpoint
-  - Subscribe: Charge subscriber's wallet Kr amount → Credit creator (minus 15% platform fee) → Create subscription record
+  - Subscribe: Charge subscriber's wallet Rc amount → Credit creator (minus 15% platform fee) → Create subscription record
   - Recurring billing via BullMQ scheduled job
   - Tier access check middleware for content access
 
@@ -848,25 +848,25 @@ backend/
 
 #### 5A. [MOBILE] Shorts Feature
 
-##### [NEW] `commonMain/com/krieta/feature/shorts/data/remote/ShortsApi.kt`
+##### [NEW] `commonMain/com/runinga/feature/shorts/data/remote/ShortsApi.kt`
 - GET `/shorts/feed?tab={home|discover|admiring}&cursor={cursor}` — Paginated feed
 - POST `/shorts` — Create short (metadata after Cloudinary upload)
 - POST `/shorts/{id}/like`, DELETE `/shorts/{id}/like`
 - POST `/shorts/{id}/comment`
 - GET `/shorts/{id}/comments`
-- POST `/shorts/upload-signature` — Get Cloudinary upload signature (folder: `Krieta/shorts/video`)
+- POST `/shorts/upload-signature` — Get Cloudinary upload signature (folder: `Runinga/shorts/video`)
 - POST `/shorts/{id}/tip` — Tip creator on a short (not available on locked shorts)
 - GET `/shorts/collections/{userId}` — Get user's collections
 - POST `/shorts/collections` — Create collection
 - PUT `/shorts/{id}/collection` — Move short to a collection
 
-##### [NEW] `commonMain/com/krieta/feature/shorts/domain/model/`
+##### [NEW] `commonMain/com/runinga/feature/shorts/domain/model/`
 - `Short.kt` — id, creator, videoUrl, thumbnailUrl, caption, likes, comments, views, musicTrack, isLocked, requiredTier, contestId, collectionId, createdAt
 - `Comment.kt` — id, user, text, createdAt
 - `ShortCollection.kt` — id, userId, name, coverUrl, shortCount, createdAt, order
 - `MusicTrack.kt` — title, artist, uri (from device)
 
-##### [NEW] `commonMain/com/krieta/feature/shorts/presentation/screen/ShortsScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/shorts/presentation/screen/ShortsScreen.kt`
 - **Full-screen 9:16 vertical pager** (swipe up/down)
 - Three sub-tabs at top: Home (contest submissions) | Discover (For You) | Admiring (Following)
 - Overlay: creator name, caption, like/comment/share/tip buttons
@@ -879,7 +879,7 @@ backend/
   - Only one video plays at a time (no audio bleed)
   - Background music from device plays ONLY with its associated short
 
-##### [NEW] `commonMain/com/krieta/feature/shorts/presentation/screen/CreateShortScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/shorts/presentation/screen/CreateShortScreen.kt`
 - Video picker from gallery
 - Record via camera (expect/actual)
 - **Background music picker**: Browse device music library, attach to short
@@ -889,19 +889,19 @@ backend/
 - Collection selection: Standalone (Singles) or existing collection
 - Lock toggle: Set subscription tier required (for creators)
 - Upload progress with animated indicator
-- Upload to Cloudinary folder: `Krieta/shorts/video`
+- Upload to Cloudinary folder: `Runinga/shorts/video`
 
-##### [NEW] `commonMain/com/krieta/feature/shorts/presentation/screen/CollectionScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/shorts/presentation/screen/CollectionScreen.kt`
 - View shorts within a collection
 - Reorder shorts within collection
 - Edit collection name/cover
 
-##### [NEW] `commonMain/com/krieta/feature/shorts/presentation/screen/ManageCollectionsScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/shorts/presentation/screen/ManageCollectionsScreen.kt`
 - List all collections (including auto "Singles")
 - Create new collection
 - Move shorts between collections
 
-##### [NEW] `commonMain/com/krieta/feature/shorts/presentation/component/`
+##### [NEW] `commonMain/com/runinga/feature/shorts/presentation/component/`
 - `VideoPlayer.kt` — expect/actual (ExoPlayer Android / AVPlayer iOS)
   - **Must handle**: play, pause, stop, seek, volume
   - **Must release**: player when short scrolled off screen
@@ -913,14 +913,14 @@ backend/
 - `MusicTrackBadge.kt` — Currently playing music display on short
 - `LockedShortOverlay.kt` — Paywall for locked shorts
 
-##### [NEW] `androidMain/com/krieta/feature/shorts/VideoPlayerImpl.android.kt`
+##### [NEW] `androidMain/com/runinga/feature/shorts/VideoPlayerImpl.android.kt`
 - ExoPlayer 2.19+ / Media3 with cache
 - OkHttp DataSource for Ktor compatibility
 - **Lifecycle-aware**: Release on dispose, pause on background
 - **Audio focus management**: Request audio focus, release on stop
 - Background music mixing via separate MediaPlayer instance
 
-##### [NEW] `iosMain/com/krieta/feature/shorts/VideoPlayerImpl.ios.kt`
+##### [NEW] `iosMain/com/runinga/feature/shorts/VideoPlayerImpl.ios.kt`
 - AVPlayer with AVPlayerLayer
 - AVAudioSession management for background music
 
@@ -930,7 +930,7 @@ backend/
 ##### [NEW] `backend/src/modules/shorts/shorts.service.ts`
 - Feed algorithm (Discover: engagement-weighted, Admiring: chronological from followed users)
 - Cloudinary webhook: process video metadata (duration validation ≤ 3 min, resolution check)
-- Enforce Cloudinary folder: `Krieta/shorts/video` for videos, `Krieta/shorts/photo` for thumbnails
+- Enforce Cloudinary folder: `Runinga/shorts/video` for videos, `Runinga/shorts/photo` for thumbnails
 - Comment moderation hooks
 - View counting (debounced, Redis → PostgreSQL batch write)
 - **Locked content access**: Check subscriber tier before returning video URL
@@ -953,18 +953,18 @@ backend/
 
 #### 6A. [MOBILE] Feed Feature
 
-##### [NEW] `commonMain/com/krieta/feature/feed/data/remote/FeedApi.kt`
+##### [NEW] `commonMain/com/runinga/feature/feed/data/remote/FeedApi.kt`
 - GET `/feed?cursor={cursor}` — Paginated feed
 - POST `/feed` — Create post (photo + text)
 - POST `/feed/{id}/like`, DELETE `/feed/{id}/like`
 - POST `/feed/{id}/comment`
 - POST `/feed/{id}/tip` — Tip on a post (not available on locked posts)
 
-##### [NEW] `commonMain/com/krieta/feature/feed/domain/model/`
+##### [NEW] `commonMain/com/runinga/feature/feed/domain/model/`
 - `Post.kt` — id, creator, imageUrls (up to 10), caption, likes, comments, tipCount, isLocked, requiredTier, createdAt
 - `FeedComment.kt`
 
-##### [NEW] `commonMain/com/krieta/feature/feed/presentation/screen/FeedScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/feed/presentation/screen/FeedScreen.kt`
 - Scrollable feed of photo + text posts
 - Like animation (double-tap heart)
 - **Tip button** on each unlocked post
@@ -972,13 +972,13 @@ backend/
 - Comments bottom sheet
 - Lazy loading with pagination
 
-##### [NEW] `commonMain/com/krieta/feature/feed/presentation/screen/CreatePostScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/feed/presentation/screen/CreatePostScreen.kt`
 - Photo picker (multi-select up to 10)
 - Caption editor
 - Lock toggle: Set subscription tier required (for creators)
-- Upload to Cloudinary folder: `Krieta/feed/photo`
+- Upload to Cloudinary folder: `Runinga/feed/photo`
 
-##### [NEW] `commonMain/com/krieta/feature/feed/presentation/component/`
+##### [NEW] `commonMain/com/runinga/feature/feed/presentation/component/`
 - `PostCard.kt` — Avatar, name, photo carousel, caption, like/comment/tip row (tip hidden on locked)
 - `PhotoCarousel.kt` — Swipeable photo pager with dots
 - `LikeAnimation.kt` — Heart burst animation on double-tap
@@ -990,7 +990,7 @@ backend/
 ##### [NEW] `backend/src/modules/feed/feed.routes.ts`
 ##### [NEW] `backend/src/modules/feed/feed.service.ts`
 - CRUD for posts
-- Enforce Cloudinary folder: `Krieta/feed/photo`
+- Enforce Cloudinary folder: `Runinga/feed/photo`
 - Locked content access check (subscriber tier validation)
 - Tip routing to wallet service (no tip on locked content)
 
@@ -998,20 +998,20 @@ backend/
 
 ### Phase 7: Contests Module ⭐ (MVP CORE)
 
-> **The heart of Krieta.** Result-based marketing engine. Supports PHOTO and VIDEO contests. 15% platform fee. All entries linked to parent contest permanently.
+> **The heart of Runinga.** Result-based marketing engine. Supports PHOTO and VIDEO contests. 15% platform fee. All entries linked to parent contest permanently.
 
 #### Contest Flow
 
 ```mermaid
 sequenceDiagram
     participant Brand as Brand/Creator
-    participant App as Krieta App
+    participant App as Runinga App
     participant Server as Railway Backend
     participant Wallet as Wallet Service
 
     Brand->>App: Create Contest (photo or video type)
     App->>Server: POST /contests (details, prize, rules, actions, type)
-    Server->>Wallet: Verify Brand has Kr for prize + 15% platform fee
+    Server->>Wallet: Verify Brand has Rc for prize + 15% platform fee
     Wallet-->>Server: Balance confirmed
     Server->>Server: Escrow prize + fee from Brand's wallet
     Server-->>App: Contest Created (ID, status: active)
@@ -1037,7 +1037,7 @@ sequenceDiagram
 
 #### 7A. [MOBILE] Contests Feature
 
-##### [NEW] `commonMain/com/krieta/feature/contests/data/remote/ContestApi.kt`
+##### [NEW] `commonMain/com/runinga/feature/contests/data/remote/ContestApi.kt`
 - POST `/contests` — Create contest
 - GET `/contests?status={active|completed|upcoming}&cursor={cursor}` — List contests
 - GET `/contests/{id}` — Contest details (ALWAYS includes ALL submissions, active or ended)
@@ -1049,7 +1049,7 @@ sequenceDiagram
 - GET `/contests/my-contests` — Created contests
 - GET `/contests/my-entries` — Participated contests
 
-##### [NEW] `commonMain/com/krieta/feature/contests/domain/model/`
+##### [NEW] `commonMain/com/runinga/feature/contests/domain/model/`
 - `Contest.kt`:
   ```kotlin
   data class Contest(
@@ -1084,9 +1084,9 @@ sequenceDiagram
   ```
 - `ContestAction.kt` — type, targetUrl, label, isVerifiable
 - `ContestSubmission.kt` — id, participant, mediaUrl (photo or video), mediaType, proofScreenshots, actionCompletionStatus, votes, rank, submittedAt, **parentContestId** (always linked)
-- `ContestWinner.kt` — participant, rank, prizeAmount (Kr.{amount} + fiat)
+- `ContestWinner.kt` — participant, rank, prizeAmount (Rc.{amount} + fiat)
 
-##### [NEW] `commonMain/com/krieta/feature/contests/domain/usecase/`
+##### [NEW] `commonMain/com/runinga/feature/contests/domain/usecase/`
 - `CreateContestUseCase.kt` — Validate contest, calculate 15% platform fee, verify creator balance for escrow + fee
 - `JoinContestUseCase.kt` — Check eligibility, enrollment
 - `SubmitEntryUseCase.kt` — Upload photo/video proof, link to parent contest
@@ -1094,24 +1094,24 @@ sequenceDiagram
 - `GetAllSubmissionsUseCase.kt` — Get all submissions for a contest (active or ended)
 - `GetLeaderboardUseCase.kt`
 
-##### [NEW] `commonMain/com/krieta/feature/contests/presentation/viewmodel/`
+##### [NEW] `commonMain/com/runinga/feature/contests/presentation/viewmodel/`
 - `ContestFeedViewModel.kt` — Feed state, filtering, pagination
 - `ContestDetailViewModel.kt` — Single contest state, join/submit actions, ALL submissions
 - `CreateContestViewModel.kt` — Multi-step contest creation form state
 - `ContestSubmissionViewModel.kt`
 
-##### [NEW] `commonMain/com/krieta/feature/contests/presentation/screen/ContestFeedScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/contests/presentation/screen/ContestFeedScreen.kt`
 - Full-screen 9:16 feed of contest submission videos/photos
-- Contest info overlay (prize in Kr.{amount} + fiat, deadline, actions required)
+- Contest info overlay (prize in Rc.{amount} + fiat, deadline, actions required)
 - "Join Contest" CTA
 - **No tip button** on contest entries
 - Filter tabs: Active | Trending | Ending Soon | My Entries
 
-##### [NEW] `commonMain/com/krieta/feature/contests/presentation/screen/ContestDetailScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/contests/presentation/screen/ContestDetailScreen.kt`
 - Contest cover media (video/image)
 - Title, description, creator info
 - Contest type badge (PHOTO / VIDEO)
-- **Prize pool display**: `Kr.500 (~KES 850)` with winner distribution breakdown
+- **Prize pool display**: `Rc.500 (~KES 850)` with winner distribution breakdown
 - **Platform fee note**: "15% platform fee applies"
 - **Required Actions list** with completion checkmarks:
   - ☐ Subscribe to YouTube Channel → [Open Link]
@@ -1122,39 +1122,39 @@ sequenceDiagram
 - **ALL submissions gallery** — always visible whether contest is active or ended
 - Leaderboard preview
 
-##### [NEW] `commonMain/com/krieta/feature/contests/presentation/screen/CreateContestScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/contests/presentation/screen/CreateContestScreen.kt`
 - **Multi-step wizard**:
   1. **Basics**: Title, description, category, media type (photo/video/both), cover media
   2. **Actions**: Add required actions (YouTube subscribe, Spotify follow, etc.) with target URLs
-  3. **Prize**: Enter prize pool in fiat → shows Kr.{equivalent}. Number of winners (1-3), distribution split. **15% platform fee shown**: "Prize: Kr.100 + Platform fee: Kr.15 = Total: Kr.115"
+  3. **Prize**: Enter prize pool in fiat → shows Rc.{equivalent}. Number of winners (1-3), distribution split. **15% platform fee shown**: "Prize: Rc.100 + Platform fee: Rc.15 = Total: Rc.115"
   4. **Rules**: Deadline, judging criteria, additional rules
   5. **Review & Pay**: Full summary with fee breakdown, escrow confirmation from wallet, publish
 
-##### [NEW] `commonMain/com/krieta/feature/contests/presentation/screen/SubmitEntryScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/contests/presentation/screen/SubmitEntryScreen.kt`
 - Action completion checklist (mark each done, optional proof screenshots)
-- **Photo upload** (for photo contests) → Cloudinary `Krieta/contests/photo`
-- **Video upload** (for video contests) → Cloudinary `Krieta/contests/video`
+- **Photo upload** (for photo contests) → Cloudinary `Runinga/contests/photo`
+- **Video upload** (for video contests) → Cloudinary `Runinga/contests/video`
 - Submit button — entry permanently linked to parent contest
 
-##### [NEW] `commonMain/com/krieta/feature/contests/presentation/screen/ContestLeaderboardScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/contests/presentation/screen/ContestLeaderboardScreen.kt`
 - Ranked submissions
 - Vote button (if community voting)
-- Prize distribution preview (Kr.{amount} + fiat per rank)
+- Prize distribution preview (Rc.{amount} + fiat per rank)
 
-##### [NEW] `commonMain/com/krieta/feature/contests/presentation/screen/ContestWinnersScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/contests/presentation/screen/ContestWinnersScreen.kt`
 - Podium-style winner display with animated reveal
-- Prize amounts credited (Kr.{amount} + fiat)
+- Prize amounts credited (Rc.{amount} + fiat)
 
-##### [NEW] `commonMain/com/krieta/feature/contests/presentation/screen/ContestSubmissionsScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/contests/presentation/screen/ContestSubmissionsScreen.kt`
 - Full gallery of ALL submissions for a contest
 - Available for both active and completed contests
 - Grid view (photos) or scroll view (videos)
 - Each submission linked to its parent contest
 
-##### [NEW] `commonMain/com/krieta/feature/contests/presentation/component/`
-- `ContestCard.kt` — Compact contest card with contest type badge, prize in Kr.{amount} + fiat
+##### [NEW] `commonMain/com/runinga/feature/contests/presentation/component/`
+- `ContestCard.kt` — Compact contest card with contest type badge, prize in Rc.{amount} + fiat
 - `ContestOverlay.kt` — Full-screen overlay on submission entries (no tip button)
-- `PrizePoolBadge.kt` — Animated Kr prize display (Kr.{amount} + fiat)
+- `PrizePoolBadge.kt` — Animated Rc prize display (Rc.{amount} + fiat)
 - `ActionChecklistItem.kt` — Individual required action with status
 - `CountdownTimer.kt` — Live countdown to deadline
 - `WinnerPodium.kt` — Animated podium component
@@ -1162,7 +1162,7 @@ sequenceDiagram
 - `ContestTypeBadge.kt` — PHOTO / VIDEO badge
 - `PlatformFeeSummary.kt` — Fee breakdown component
 
-##### [NEW] `commonMain/com/krieta/feature/contests/di/ContestModule.kt`
+##### [NEW] `commonMain/com/runinga/feature/contests/di/ContestModule.kt`
 
 #### 7B. [BACKEND] Contests Module
 
@@ -1172,7 +1172,7 @@ sequenceDiagram
 - **Create contest**: Validate → Calculate 15% fee → Escrow (prize + fee) from creator's wallet (atomic) → Create contest record
 - **Join contest**: Eligibility check (not creator, not already joined, contest active)
 - **Submit entry**: Store submission with proof, **always link submission to parent contest via `contest_id` foreign key**, queue action verification
-  - Enforce Cloudinary folder: `Krieta/contests/photo` or `Krieta/contests/video` based on media type
+  - Enforce Cloudinary folder: `Runinga/contests/photo` or `Runinga/contests/video` based on media type
 - **Get submissions**: Always return ALL submissions for a contest regardless of status (active, judging, completed)
 - **Judging**: When deadline hits, BullMQ job triggers:
   - CREATOR_PICKS: Notify creator to select winners
@@ -1192,41 +1192,41 @@ sequenceDiagram
 
 #### 8A. [MOBILE] Shop Feature
 
-##### [NEW] `commonMain/com/krieta/feature/shop/data/remote/ShopApi.kt`
+##### [NEW] `commonMain/com/runinga/feature/shop/data/remote/ShopApi.kt`
 - GET `/shop/products?category={cat}&cursor={cursor}`
 - GET `/shop/products/{id}`
 - POST `/shop/products` — List a product (seller)
 - PUT `/shop/products/{id}`
 - DELETE `/shop/products/{id}`
 
-##### [NEW] `commonMain/com/krieta/feature/shop/domain/model/`
+##### [NEW] `commonMain/com/runinga/feature/shop/domain/model/`
 - `Product.kt` — id, seller, title, description, imageUrls, priceKr, priceFiat, category, whatsappNumber, createdAt
 
-##### [NEW] `commonMain/com/krieta/feature/shop/presentation/screen/ShopScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/shop/presentation/screen/ShopScreen.kt`
 - Grid/List of products with search and category filters
-- Product cards with image, price: `Kr.50 (~KES 85)`, seller
+- Product cards with image, price: `Rc.50 (~KES 85)`, seller
 
-##### [NEW] `commonMain/com/krieta/feature/shop/presentation/screen/ProductDetailScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/shop/presentation/screen/ProductDetailScreen.kt`
 - Product images carousel
-- Price: `Kr.50 (~KES 85)`
+- Price: `Rc.50 (~KES 85)`
 - Seller info
 - "Buy via WhatsApp" button → Opens WhatsApp with pre-filled message:
   ```
   Hello, I am interested in this product
   [Product Image URL]
-  [Product Name] - Kr.50 (~KES 85)
+  [Product Name] - Rc.50 (~KES 85)
   ```
 
-##### [NEW] `commonMain/com/krieta/feature/shop/presentation/screen/CreateListingScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/shop/presentation/screen/CreateListingScreen.kt`
 - Product creation form for sellers
-- Price input in fiat → live Kr.{amount} conversion
-- Upload to Cloudinary folder: `Krieta/shop/photo`
+- Price input in fiat → live Rc.{amount} conversion
+- Upload to Cloudinary folder: `Runinga/shop/photo`
 
 #### 8B. [BACKEND] Shop Module
 
 ##### [NEW] `backend/src/modules/shop/shop.routes.ts`
 ##### [NEW] `backend/src/modules/shop/shop.service.ts`
-- Enforce Cloudinary folder: `Krieta/shop/photo`
+- Enforce Cloudinary folder: `Runinga/shop/photo`
 
 ---
 
@@ -1234,19 +1234,19 @@ sequenceDiagram
 
 #### 9A. [MOBILE] Analytics Feature
 
-##### [NEW] `commonMain/com/krieta/feature/analytics/presentation/screen/AnalyticsScreen.kt`
+##### [NEW] `commonMain/com/runinga/feature/analytics/presentation/screen/AnalyticsScreen.kt`
 - Engagement metrics: views, likes, admirers growth
 - Contest performance: participation rate, completion rate
-- Earnings breakdown: tips (Kr.{amount}), contest prizes (Kr.{amount}), subscription revenue (Kr.{amount}), ad revenue
+- Earnings breakdown: tips (Rc.{amount}), contest prizes (Rc.{amount}), subscription revenue (Rc.{amount}), ad revenue
 - Charts and visualizations
-- All Kr amounts with fiat equivalents
+- All Rc amounts with fiat equivalents
 
 #### 9B. [MOBILE] Ads Feature
 
-##### [NEW] `commonMain/com/krieta/feature/ads/presentation/component/`
+##### [NEW] `commonMain/com/runinga/feature/ads/presentation/component/`
 - `NativeAdBanner.kt` — In-feed native ad
 - `InterstitialAd.kt` — Between content transitions
-- `RewardedAd.kt` — Watch ad for Kr reward
+- `RewardedAd.kt` — Watch ad for Rc reward
 
 #### 9C. [BACKEND] Analytics + Ads Modules
 
@@ -1279,7 +1279,7 @@ sequenceDiagram
 #### Chat Module (WhatsApp-like)
 - Socket.io real-time messaging
 - End-to-end encryption (Signal Protocol via libsignal)
-- Media sharing (photos → `Krieta/chat/photo`, videos → `Krieta/chat/video`, voice notes → `Krieta/chat/audio`)
+- Media sharing (photos → `Runinga/chat/photo`, videos → `Runinga/chat/video`, voice notes → `Runinga/chat/audio`)
 - **1-on-1 chats**: Tipping + Tip requests enabled
 - **Group chats**:
   - NO tipping
@@ -1362,7 +1362,7 @@ subscription_tiers (
   id UUID PK,
   creator_id FK NOT NULL,
   tier VARCHAR NOT NULL CHECK (tier IN ('TOP_FUN', 'REAL_FAN', 'TRUE_FAN', 'SUPER_FAN')),
-  kr_amount DECIMAL(18,4) NOT NULL, -- monthly price in Kr
+  kr_amount DECIMAL(18,4) NOT NULL, -- monthly price in Rc
   benefits TEXT NOT NULL,
   is_enabled BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP,
@@ -1523,7 +1523,7 @@ daily_stats (id, user_id FK, date DATE, views, likes, new_admirers, kr_earned DE
 - Admire/Lover flow: A admires B → B admires A → Both see "Unlove" → A unloves → A sees "Admire", B sees "Unadmire"
 - Locked content flow: Create locked short → Non-subscriber sees paywall → Subscribe → Access unlocked
 - Shorts playback: Scroll test (audio stops on scroll, correct audio plays per short)
-- Kr display: Verify Kr.{amount} format with fiat conversion everywhere in app
+- Rc display: Verify Rc.{amount} format with fiat conversion everywhere in app
 
 ### Security Verification
 - OWASP Mobile Top 10 checklist

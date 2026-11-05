@@ -1,4 +1,4 @@
-# Wallet Compliance API Documentation
+﻿# Wallet Compliance API Documentation
 
 ## Overview
 
@@ -20,7 +20,7 @@ Authorization: Bearer <jwt_token>
 
 All transaction endpoints automatically apply the following compliance checks:
 
-1. **Transaction Context Validation** - All Kr transfers require valid context
+1. **Transaction Context Validation** - All Rc transfers require valid context
 2. **Velocity Checks** - Rate limiting (10/min, 50/hour, 100K/day)
 3. **Self-Tipping Detection** - Pattern detection for suspicious tipping
 4. **Risk Scoring** - Automatic risk calculation and mitigation
@@ -481,8 +481,8 @@ All transactions must include valid context:
 ### Transaction Velocity:
 - **10 tips per minute** per user
 - **50 transactions per hour** per user
-- **100,000 Kr per 24h** for non-KYC users
-- **500,000 Kr per 24h** for KYC-approved users
+- **100,000 Rc per 24h** for non-KYC users
+- **500,000 Rc per 24h** for KYC-approved users
 
 ### API Rate Limits:
 - **100 requests per minute** per user
@@ -527,7 +527,7 @@ All transactions must include valid context:
 
 ### For Developers:
 
-1. **Always include transaction context** - All Kr transfers require valid context
+1. **Always include transaction context** - All Rc transfers require valid context
 2. **Handle velocity errors gracefully** - Implement retry logic with backoff
 3. **Display fiat equivalents** - Use provided exchange rates for UI
 4. **Respect KYC limits** - Check tier before large transactions
@@ -546,6 +546,6 @@ All transactions must include valid context:
 ## Support
 
 For API support or compliance questions:
-- Email: compliance@krieta.com
-- Documentation: https://docs.krieta.com/compliance
-- Status: https://status.krieta.com
+- Email: compliance@runinga.com
+- Documentation: https://docs.runinga.com/compliance
+- Status: https://status.runinga.com

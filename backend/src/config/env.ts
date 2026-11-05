@@ -1,4 +1,4 @@
-import 'dotenv/config';
+﻿import 'dotenv/config';
 import { z } from 'zod';
 
 const envSchema = z.object({
@@ -48,6 +48,9 @@ const envSchema = z.object({
   MPESA_SHORTCODE: z.string().optional(),
   MPESA_PASSKEY: z.string().optional(),
   MPESA_ENV: z.enum(['sandbox', 'production']).default('sandbox'),
+
+  // Webhook Security
+  SKIP_WEBHOOK_IP_CHECK: z.string().optional().default('false'),
   MPESA_CALLBACK_URL: z.string().optional(),
   MPESA_INITIATOR_NAME: z.string().optional(),
   MPESA_INITIATOR_PASSWORD: z.string().optional(),
@@ -73,10 +76,10 @@ const envSchema = z.object({
     'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies'
   ),
 
-  // Kr Coin Configuration
-  // NEW TOKENOMICS: 1 Kr = 1 KES, 1 USD = 135 KES, therefore 1 Kr = 1/135 USD
-  KR_TO_USD_RATE: z.string().default('0.00740740741').transform(Number), // 1/135
-  KR_PRECISION: z.string().default('1000000').transform(Number),
+  // Rc Coin Configuration
+  // NEW TOKENOMICS: 1 Rc = 1 KES, 1 USD = 135 KES, therefore 1 Rc = 1/135 USD
+  RC_TO_USD_RATE: z.string().default('0.00740740741').transform(Number), // 1/135
+  RC_PRECISION: z.string().default('1000000').transform(Number),
 });
 
 export type Env = z.infer<typeof envSchema>;

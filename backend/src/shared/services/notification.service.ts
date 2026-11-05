@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import admin from 'firebase-admin';
 
 // Initialize Firebase Admin (should be done once in app initialization)
@@ -72,8 +72,7 @@ export class NotificationService {
         });
       }
 
-      console.log(`[NotificationService] Judge invite sent to ${judge.display_name} for contest ${contest.title}`);
-    } catch (error) {
+      } catch (error) {
       console.error('[NotificationService] Failed to send judge invite:', error);
       // Don't throw - notification failure shouldn't break the invite flow
     }
@@ -200,7 +199,7 @@ export class NotificationService {
           priority: 'high',
           notification: {
             sound: 'default',
-            channelId: 'krieta_notifications'
+            channelId: 'runinga_notifications'
           }
         },
         apns: {
@@ -213,8 +212,7 @@ export class NotificationService {
         }
       });
 
-      console.log(`[NotificationService] Push notification sent successfully`);
-    } catch (error: any) {
+      } catch (error: any) {
       if (error.code === 'messaging/registration-token-not-registered') {
         console.warn('[NotificationService] FCM token invalid, removing from user');
         // TODO: Remove invalid FCM token from user
@@ -244,8 +242,8 @@ export class NotificationService {
           ${userId},
           'CONTEST_WINNER',
           'Congratulations! 🎉',
-          ${`You won ${rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} place in "${contest.title}" and earned Kr.${prizeKr}!`},
-          ${JSON.stringify({ contest_id, rank, prizeKr })}::jsonb,
+          ${`You won ${rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} place in "${contest.title}" and earned Rc.${prizeKr}!`},
+          ${JSON.stringify({ contest_id, rank, prizeRc })}::jsonb,
           false,
           NOW()
         )
@@ -255,7 +253,7 @@ export class NotificationService {
       if (user.fcmToken) {
         await this.sendPushNotification(user.fcmToken, {
           title: 'You Won! 🎉',
-          body: `Congratulations! You won Kr.${prizeKr} in "${contest.title}"`,
+          body: `Congratulations! You won Rc.${prizeKr} in "${contest.title}"`,
           data: { type: 'CONTEST_WINNER', contest_id, rank: rank.toString() }
         });
       }
@@ -324,7 +322,7 @@ export class NotificationService {
           ${recipientId},
           'TIP_RECEIVED',
           'Tip Received',
-          ${`${sender.display_name} sent you Kr.${amount_kr}${message ? `: "${message}"` : ''}`},
+          ${`${sender.display_name} sent you Rc.${amount_kr}${message ? `: "${message}"` : ''}`},
           ${JSON.stringify({ sender_id, amount_kr, message })}::jsonb,
           false,
           NOW()
@@ -335,7 +333,7 @@ export class NotificationService {
       if (recipient.fcmToken) {
         await this.sendPushNotification(recipient.fcmToken, {
           title: 'Tip Received 💰',
-          body: `${sender.display_name} sent you Kr.${amount_kr}`,
+          body: `${sender.display_name} sent you Rc.${amount_kr}`,
           data: { type: 'TIP_RECEIVED', sender_id, amount: amount_kr.toString() }
         });
       }

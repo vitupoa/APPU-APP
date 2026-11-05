@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+﻿import { prisma } from '../../config/database.js';
 import { ExchangeService } from '../../services/exchange/exchange.service.js';
 import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
@@ -39,7 +39,7 @@ export class WalletService {
 
     const currencyToUse = targetCurrency || wallet.user.currency;
     const fiatRate = await ExchangeService.getDisplayRate(currencyToUse);
-    const baseUsd = Number(wallet.kr_balance) * 0.01; // 1 Kr = 0.01 USD
+    const baseUsd = Number(wallet.kr_balance) * 0.01; // 1 Rc = 0.01 USD
     const fiatEquivalent = baseUsd * fiatRate;
 
     return {
@@ -55,23 +55,23 @@ export class WalletService {
   /**
    * Transfers a Tip from one user to another atomically parsing explicit Tokenomics (15% platform cut).
    * Uses database locks to prevent race conditions.
-   * Supports fractional Kr amounts down to 0.01 Kr minimum (KES 0.013 / $0.0001)
+   * Supports fractional Rc amounts down to 0.01 Rc minimum (KES 0.013 / $0.0001)
    */
   static async sendTip(senderId: string, recipientId: string, senderKrAmount: number, senderCurrency: string) {
     if (senderId === recipientId) {
       throw new Error("You cannot tip yourself");
     }
 
-    // Support fractional Kr amounts - minimum 0.01 Kr (approximately KES 0.013)
-    // This allows Kenyan users to tip as low as KES 1 (which is ~77 Kr)
+    // Support fractional Rc amounts - minimum 0.01 Rc (approximately KES 0.013)
+    // This allows Kenyan users to tip as low as KES 1 (which is ~77 Rc)
     if (typeof senderKrAmount !== 'number' || senderKrAmount < 5 || !isFinite(senderKrAmount)) {
-      throw new Error("Tip amount must be at least 5 Kr.");
+      throw new Error("Tip amount must be at least 5 Rc.");
     }
 
     // Round to 2 decimal places to avoid floating point precision issues
     const roundedKrAmount = Math.round(senderKrAmount * 100) / 100;
 
-    // 1 Kr = 0.01 USD. Calculate specific fiat tracking values!
+    // 1 Rc = 0.01 USD. Calculate specific fiat tracking values!
     const baseUsd = ExchangeService.getUSDFromKr(roundedKrAmount);
     const localRate = await ExchangeService.getTransactionRate(senderCurrency, 'sell');
     const fiatAmount = baseUsd * localRate;
@@ -93,7 +93,7 @@ export class WalletService {
         const recipientWallet = wallets.find((w: any) => w.user_id === recipientId);
         
         if (!senderWallet || Number(senderWallet.kr_balance) < roundedKrAmount) {
-          throw new Error("Insufficient Kr balance to tip");
+          throw new Error("Insufficient Rc balance to tip");
         }
 
         // Deduct Full Amount Sender (-100%)
@@ -118,13 +118,6 @@ export class WalletService {
           }
         });
 
-        console.log(`💰 Tip completed: ${senderId} → ${recipientId}`);
-        console.log(`   Sender paid: Kr. ${roundedKrAmount}`);
-        console.log(`   Recipient gets: Kr. ${recipientReceiveAmount.toNumber()}`);
-        console.log(`   Platform fee: Kr. ${platformCut}`);
-        console.log(`   Recipient old balance: Kr. ${currentRecipientBalance}`);
-        console.log(`   Recipient new balance: Kr. ${newRecipientBalance}`);
-        
         // Record Transactions accurately outlining Revenue Velocity with full context
         await tx.transactions.createMany({
           data: [
@@ -245,7 +238,7 @@ export class WalletService {
     const fiatRate = await ExchangeService.getDisplayRate(currency);
 
     return transactions.map(tx => {
-      const baseUsd = Number(tx.amount_kr) * 0.01; // 1 Kr = 0.01 USD
+      const baseUsd = Number(tx.amount_kr) * 0.01; // 1 Rc = 0.01 USD
       const fiatEquivalent = baseUsd * fiatRate;
 
       return {
@@ -259,11 +252,8 @@ export class WalletService {
 
   static async searchUsers(query: string) {
     if (!query || query.length < 2) {
-      console.log('⚠️ Search query too short or empty:', query);
       return [];
     }
-    
-    console.log('🔍 Searching for users with query:', query);
     
     // Search by username or display name
     const users = await prisma.user.findMany({
@@ -287,10 +277,8 @@ export class WalletService {
       }
     });
 
-    console.log(`✅ Found ${users.length} users matching "${query}"`);
     if (users.length > 0) {
-      console.log('Sample results:', users.slice(0, 3).map(u => ({ username: u.username, display_name: u.display_name })));
-    }
+      }
 
     return users.map((u: any) => ({
       id: u.id,
@@ -364,7 +352,7 @@ export class WalletService {
       throw new Error('Too many top-up attempts. Please wait a moment.');
     }
 
-    // Calculate Kr amount user will receive using server-side rate (NEVER trust client)
+    // Calculate Rc amount user will receive using server-side rate (NEVER trust client)
     // Apply 4.5% platform margin + KES 30 flat fee
     const buyRate = await ExchangeService.getTransactionRate(currency, 'buy');
     
@@ -378,11 +366,11 @@ export class WalletService {
     // Convert to USD base
     const baseUsd = fiatAfterMargin / buyRate;
     
-    // Convert to Kr (1 Kr = 0.01 USD, so 1 USD = 100 Kr)
+    // Convert to Rc (1 Rc = 0.01 USD, so 1 USD = 100 Rc)
     const krAmount = Math.floor(baseUsd * 100);
 
     if (krAmount < 1) {
-      throw new Error('Amount too small after fees. Minimum 1 Kr required.');
+      throw new Error('Amount too small after fees. Minimum 1 Rc required.');
     }
 
     // SECURITY: Generate cryptographically secure unique reference
@@ -400,7 +388,7 @@ export class WalletService {
         provider,
         status: 'pending',
         reference,
-        description: `Wallet top-up via ${provider.toUpperCase()} - ${krAmount} Kr`,
+        description: `Wallet top-up via ${provider.toUpperCase()} - ${krAmount} Rc`,
         context: {
           action: 'topup_initiated',
           provider,
@@ -435,7 +423,7 @@ export class WalletService {
             phoneNumber,
             amount: fiatAmount,
             accountReference: reference,
-            transactionDesc: `Krieta Wallet Top-up - ${krAmount} Kr`
+            transactionDesc: `Runinga Wallet Top-up - ${krAmount} Rc`
           });
           
           paymentInstructions = {
@@ -476,7 +464,7 @@ export class WalletService {
           const paypalOrder = await PaypalService.createOrder({ 
             amount: fiatAmount, 
             currency, 
-            description: `Krieta Wallet Top-up - ${krAmount} Kr`, 
+            description: `Runinga Wallet Top-up - ${krAmount} Rc`, 
             referenceId: reference 
           });
           paymentInstructions = {
@@ -674,7 +662,7 @@ export class WalletService {
           where: { id: transactionId },
           data: {
             status: 'completed',
-            description: `Wallet top-up completed via ${transaction.provider?.toUpperCase()} - ${transaction.amount_kr} Kr`,
+            description: `Wallet top-up completed via ${transaction.provider?.toUpperCase()} - ${transaction.amount_kr} Rc`,
             context: {
               ...(transaction.context as any),
               action: 'topup_completed',
@@ -717,8 +705,6 @@ export class WalletService {
             data: { is_wallet_unlocked: true }
           });
         }
-
-        console.log(`✅ Top-up confirmed: User ${userId}, Transaction ${transactionId}, Amount ${transaction.amount_kr} Kr`);
 
         return {
           success: true,

@@ -1,6 +1,6 @@
-# Native Ads Quick Reference
+﻿# Native Ads Quick Reference
 
-## 🎯 What Are Native Ads in Krieta?
+## 🎯 What Are Native Ads in Runinga?
 
 Native ads are **existing user content** (Shorts or Posts) that businesses pay to promote. They look like regular posts but have a "Sponsored" badge.
 
@@ -10,12 +10,12 @@ Native ads are **existing user content** (Shorts or Posts) that businesses pay t
 
 ### Step 1: Access Ads Manager
 ```
-Drips Feed → See dummy ad → Click "Learn More" → Krieta Ads Manager
+Drips Feed → See dummy ad → Click "Learn More" → Runinga Ads Manager
 ```
 
 ### Step 2: Choose Campaign Type
 ```
-Krieta Ads Manager → 3 Tabs:
+Runinga Ads Manager → 3 Tabs:
 ├── Display Ads (banner/native ads)
 ├── Sponsored Content (promote existing content) ← SELECT THIS
 └── Boost Content (increase reach)
@@ -117,7 +117,7 @@ SponsoredLabel()        - Text label below username
 SponsoredContentManager - Fetch & track sponsored content
 
 // Screens
-KrietaAdsManagerScreen  - Main ads hub
+RuningaAdsManagerScreen  - Main ads hub
 CreateCampaignScreen    - Campaign creation form
 ```
 
@@ -158,7 +158,7 @@ CreateCampaignScreen    - Campaign creation form
 ## 📊 Current Status Summary
 
 ### ✅ What Works
-- Krieta Ads Manager screen
+- Runinga Ads Manager screen
 - Create Campaign screen
 - Backend API (all endpoints)
 - Sponsored badge components

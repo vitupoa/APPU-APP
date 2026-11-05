@@ -1,49 +1,49 @@
-# Kr Currency - Complete Explanation
+﻿# Rc Currency - Complete Explanation
 
-## What is Kr?
+## What is Rc?
 
-**Kr** (pronounced "Krieta") is the in-app virtual currency used throughout the Krieta platform. It serves as the unified medium of exchange for all transactions within the ecosystem.
+**Rc** (pronounced "Runinga") is the in-app virtual currency used throughout the Runinga platform. It serves as the unified medium of exchange for all transactions within the ecosystem.
 
 ## Display Format
 
-- **Format**: `Kr. [amount]` (with space after the dot)
+- **Format**: `Rc. [amount]` (with space after the dot)
 - **Examples**: 
-  - `Kr. 500`
-  - `Kr. 0.50`
-  - `Kr. 1`
+  - `Rc. 500`
+  - `Rc. 0.50`
+  - `Rc. 1`
 
 ## Exchange Rate System
 
 ### Base Peg
-**Kr. 1 = $100.00 USD** (fixed base rate)
+**Rc. 1 = $100.00 USD** (fixed base rate)
 
 This is the fundamental peg that all other currency conversions are based on.
 
 ### How It Works
-- **Fiat to Kr**: Divide USD amount by 100
-  - Example: $500 USD ÷ 100 = Kr. 5
-- **Kr to Fiat**: Multiply Kr amount by 100
-  - Example: Kr. 5 × 100 = $500 USD
+- **Fiat to Rc**: Divide USD amount by 100
+  - Example: $500 USD ÷ 100 = Rc. 5
+- **Rc to Fiat**: Multiply Rc amount by 100
+  - Example: Rc. 5 × 100 = $500 USD
 
 ### Current Exchange Rates (Approximate)
 
 | Amount | USD | KES (Kenyan Shilling) | KWD (Kuwaiti Dinar) |
 |--------|-----|----------------------|---------------------|
-| **Kr. 1** | $100.00 | ~KES 13,000 | ~KWD 30.70 |
-| **Kr. 0.01** | $1.00 | ~KES 130 | ~KWD 0.307 |
-| **Kr. 10** | $1,000.00 | ~KES 130,000 | ~KWD 307 |
-| **Kr. 100** | $10,000.00 | ~KES 1,300,000 | ~KWD 3,070 |
+| **Rc. 1** | $100.00 | ~KES 13,000 | ~KWD 30.70 |
+| **Rc. 0.01** | $1.00 | ~KES 130 | ~KWD 0.307 |
+| **Rc. 10** | $1,000.00 | ~KES 130,000 | ~KWD 307 |
+| **Rc. 100** | $10,000.00 | ~KES 1,300,000 | ~KWD 3,070 |
 
 *Note: KES and KWD rates are based on current market exchange rates and may fluctuate.*
 
 ## Platform Fees & Margins
 
-### Top-up (Buy Kr)
+### Top-up (Buy Rc)
 - **4.5% platform margin** applied to exchange rate
 - **KES 20 invisible fee** embedded in the rate
-- User receives LESS Kr per dollar spent
+- User receives LESS Rc per dollar spent
 
-### Withdrawal (Sell Kr)
+### Withdrawal (Sell Rc)
 - **0% margin** on exchange rate
 - **KES 1 flat fee** deducted from wallet
 - User receives full market rate (minus flat fee)
@@ -61,7 +61,7 @@ Applied to:
 
 ## Use Cases
 
-Kr can be used for:
+Rc can be used for:
 - **Tipping creators** (15% platform fee)
 - **Contest entry fees and prizes** (15% platform fee)
 - **Subscription payments** (15% platform fee)
@@ -72,40 +72,40 @@ Kr can be used for:
 
 ## Example Calculations
 
-### Top-up Example (KES → Kr)
+### Top-up Example (KES → Rc)
 1. User wants to top up KES 1,300
-2. Base rate: 1 USD = 130 KES, so Kr. 1 = KES 13,000
-3. Without fees: KES 1,300 ÷ 13,000 = Kr. 0.1
-4. With 4.5% margin: Kr. 0.1 × 0.955 = Kr. 0.0955
+2. Base rate: 1 USD = 130 KES, so Rc. 1 = KES 13,000
+3. Without fees: KES 1,300 ÷ 13,000 = Rc. 0.1
+4. With 4.5% margin: Rc. 0.1 × 0.955 = Rc. 0.0955
 5. With KES 20 fee: Further reduced slightly
-6. **User receives: ~Kr. 0.095**
+6. **User receives: ~Rc. 0.095**
 
-### Withdrawal Example (Kr → KES)
-1. User wants to withdraw Kr. 1
-2. Base rate: Kr. 1 = KES 13,000
+### Withdrawal Example (Rc → KES)
+1. User wants to withdraw Rc. 1
+2. Base rate: Rc. 1 = KES 13,000
 3. No margin applied (0%)
 4. KES 1 flat fee deducted
 5. **User receives: ~KES 12,999**
 
 ### Tip Example
-1. User tips Kr. 10
-2. Platform takes 15% fee: Kr. 1.5
-3. **Recipient receives: Kr. 8.5**
+1. User tips Rc. 10
+2. Platform takes 15% fee: Rc. 1.5
+3. **Recipient receives: Rc. 8.5**
 
 ## Technical Implementation
 
 ### Backend
 - Exchange rates fetched from external API (fawazahmed0)
 - Cached for 5 minutes
-- Base peg: `1 Kr = 100 USD`
+- Base peg: `1 Rc = 100 USD`
 - Conversion functions:
   - `getKrFromUSD(usdAmount)`: usdAmount / 100
   - `getUSDFromKr(krAmount)`: krAmount * 100
 
 ### Frontend (Kotlin)
-- `KrCurrencyFormatter.formatKr(amount)`: Formats Kr amounts
-- `KrCurrencyFormatter.formatKrWithFiat()`: Shows Kr with fiat equivalent
-- `KrAmountDisplay`: Composable component for displaying Kr amounts
+- `KrCurrencyFormatter.formatKr(amount)`: Formats Rc amounts
+- `KrCurrencyFormatter.formatKrWithFiat()`: Shows Rc with fiat equivalent
+- `KrAmountDisplay`: Composable component for displaying Rc amounts
 
 ## Supported Currencies
 

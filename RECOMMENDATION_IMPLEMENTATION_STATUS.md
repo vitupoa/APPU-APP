@@ -1,4 +1,4 @@
- # RECOMMENDATION SYSTEM - IMPLEMENTATION STATUS
+﻿ # RECOMMENDATION SYSTEM - IMPLEMENTATION STATUS
 
 ## ✅ COMPLETED TASKS
 
@@ -23,7 +23,7 @@
 ### 2. Frontend Implementation Needed
 
 #### ✅ Step 1: Add Methods to FeedRepository
-Location: `composeApp/src/commonMain/kotlin/com/krieta/data/repository/FeedRepositoryImpl.kt`
+Location: `composeApp/src/commonMain/kotlin/com/runinga/data/repository/FeedRepositoryImpl.kt`
 
 ```kotlin
 override suspend fun getDiscoverFeed(limit: Int, cursor: String?): NetworkResult<DiscoverFeedResult> {
@@ -75,7 +75,7 @@ override suspend fun trackInteraction(
 ```
 
 #### ✅ Step 2: Initialize Content Distribution on Upload
-Location: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/viewmodel/CreateShortViewModel.kt`
+Location: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/viewmodel/CreateShortViewModel.kt`
 
 Add after successful upload:
 

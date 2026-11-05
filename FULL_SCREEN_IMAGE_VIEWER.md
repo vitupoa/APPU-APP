@@ -1,4 +1,4 @@
-# Full-Screen Image Viewer Implementation ✅
+﻿# Full-Screen Image Viewer Implementation ✅
 
 ## Overview
 Implemented a full-screen image viewer for Drips (posts) that allows users to tap on images and view them in full screen with zoom, pan, and swipe capabilities.
@@ -29,7 +29,7 @@ Implemented a full-screen image viewer for Drips (posts) that allows users to ta
 ## Implementation Details
 
 ### File Modified
-`composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/screen/DripsScreen.kt`
+`composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/screen/DripsScreen.kt`
 
 ### Key Components
 

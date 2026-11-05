@@ -1,9 +1,9 @@
-# Fix all remaining compilation errors
+﻿# Fix all remaining compilation errors
 
 Write-Host "Fixing all remaining errors..." -ForegroundColor Green
 
 # 1. Fix ConnectSocialAccountsScreen - update to use new state structure
-$connectScreen = "composeApp\src\commonMain\kotlin\com\krieta\feature\marketplace\presentation\oauth\ConnectSocialAccountsScreen.kt"
+$connectScreen = "composeApp\src\commonMain\kotlin\com\runinga\feature\marketplace\presentation\oauth\ConnectSocialAccountsScreen.kt"
 if (Test-Path $connectScreen) {
     $content = Get-Content $connectScreen -Raw
     
@@ -17,13 +17,13 @@ if (Test-Path $connectScreen) {
 
 # 2. Fix all conflicting SafeConversion imports
 $conflictingFiles = @(
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\marketplace\presentation\screen\CampaignScreens.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\marketplace\presentation\screen\SponsorAndGamificationScreens.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\profile\presentation\viewmodel\SubscriptionTierSetupViewModel.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\shop\presentation\viewmodel\CreateListingViewModel.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\sponsored\presentation\screen\CreateCampaignScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\wallet\presentation\withdraw\WithdrawScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\wallet\presentation\withdraw\WithdrawViewModel.kt"
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\marketplace\presentation\screen\CampaignScreens.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\marketplace\presentation\screen\SponsorAndGamificationScreens.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\profile\presentation\viewmodel\SubscriptionTierSetupViewModel.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\shop\presentation\viewmodel\CreateListingViewModel.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\sponsored\presentation\screen\CreateCampaignScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\wallet\presentation\withdraw\WithdrawScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\wallet\presentation\withdraw\WithdrawViewModel.kt"
 )
 
 foreach ($file in $conflictingFiles) {
@@ -31,12 +31,12 @@ foreach ($file in $conflictingFiles) {
         $content = Get-Content $file -Raw
         
         # Remove all SafeConversion imports and replace with single correct one
-        $content = $content -replace "import com\.krieta\.com\.core\.util\.SafeConversion\.[^\n]+\n", ""
-        $content = $content -replace "import com\.krieta\.com\.core\.util\.SafeConversion\n", ""
+        $content = $content -replace "import com\.runinga\.com\.core\.util\.SafeConversion\.[^\n]+\n", ""
+        $content = $content -replace "import com\.runinga\.com\.core\.util\.SafeConversion\n", ""
         
         # Add single correct import after package
-        if ($content -notmatch "import com\.krieta\.com\.core\.util\.SafeConversion$") {
-            $content = $content -replace "(package .+?\n)", "`$1import com.krieta.com.core.util.SafeConversion`n"
+        if ($content -notmatch "import com\.runinga\.com\.core\.util\.SafeConversion$") {
+            $content = $content -replace "(package .+?\n)", "`$1import com.runinga.com.core.util.SafeConversion`n"
         }
         
         Set-Content -Path $file -Value $content -NoNewline
@@ -46,11 +46,11 @@ foreach ($file in $conflictingFiles) {
 
 # 3. Fix all conflicting BorderStroke imports
 $borderStrokeFiles = @(
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\chama\presentation\wizard\CreateChamaScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\contests\presentation\screen\CreateContestScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\profile\presentation\screen\ProfileScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\wallet\presentation\screen\TopupScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\wallet\presentation\screen\WithdrawScreen.kt"
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\chama\presentation\wizard\CreateChamaScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\contests\presentation\screen\CreateContestScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\profile\presentation\screen\ProfileScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\wallet\presentation\screen\TopupScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\wallet\presentation\screen\WithdrawScreen.kt"
 )
 
 foreach ($file in $borderStrokeFiles) {
@@ -134,7 +134,7 @@ foreach ($file in $iconFiles) {
 }
 
 # 6. Fix ShortsViewModel - completely broken state handling
-$shortsVM = "composeApp\src\commonMain\kotlin\com\krieta\feature\shorts\presentation\viewmodel\ShortsViewModel.kt"
+$shortsVM = "composeApp\src\commonMain\kotlin\com\runinga\feature\shorts\presentation\viewmodel\ShortsViewModel.kt"
 if (Test-Path $shortsVM) {
     $content = Get-Content $shortsVM -Raw
     
@@ -154,7 +154,7 @@ is NetworkResult.Success -> {
 }
 
 # 7. Fix ViewerLiveScreen - missing parameters
-$viewerLive = "composeApp\src\commonMain\kotlin\com\krieta\feature\live\presentation\screen\ViewerLiveScreen.kt"
+$viewerLive = "composeApp\src\commonMain\kotlin\com\runinga\feature\live\presentation\screen\ViewerLiveScreen.kt"
 if (Test-Path $viewerLive) {
     $content = Get-Content $viewerLive -Raw
     
@@ -167,7 +167,7 @@ if (Test-Path $viewerLive) {
 }
 
 # 8. Fix ShortsScreen - missing VideoProgressBar
-$shortsScreen = "composeApp\src\commonMain\kotlin\com\krieta\feature\shorts\presentation\screen\ShortsScreen.kt"
+$shortsScreen = "composeApp\src\commonMain\kotlin\com\runinga\feature\shorts\presentation\screen\ShortsScreen.kt"
 if (Test-Path $shortsScreen) {
     $content = Get-Content $shortsScreen -Raw
     
@@ -180,10 +180,10 @@ if (Test-Path $shortsScreen) {
 
 # 9. Fix all Painter to ImageVector mismatches
 $painterFiles = @(
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\chama\presentation\ChamaListScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\chama\presentation\wizard\CreateChamaScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\live\presentation\screen\HostLiveScreen.kt",
-    "composeApp\src\commonMain\kotlin\com\krieta\feature\marketplace\presentation\screen\SocialMediaComponents.kt"
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\chama\presentation\ChamaListScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\chama\presentation\wizard\CreateChamaScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\live\presentation\screen\HostLiveScreen.kt",
+    "composeApp\src\commonMain\kotlin\com\runinga\feature\marketplace\presentation\screen\SocialMediaComponents.kt"
 )
 
 foreach ($file in $painterFiles) {

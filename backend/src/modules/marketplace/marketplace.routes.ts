@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+﻿import { Router, Response } from 'express';
 import { authMiddleware, AuthRequest } from '../../middleware/auth.js';
 import { BrandMarketplaceService } from './brand-marketplace.service.js';
 import { SalesFunnelService } from './sales-funnel.service.js';
@@ -315,7 +315,7 @@ router.post('/contests/:id/track-purchase', authMiddleware, async (req: AuthRequ
       user_id: req.user_id!,
       activityType: 'PURCHASE_TO_ENTER',
       category: 'SALES',
-      pointsEarned: Math.floor(data.purchaseAmount / 10), // 1 point per Kr.10
+      pointsEarned: Math.floor(data.purchaseAmount / 10), // 1 point per Rc.10
       referenceType: 'contest',
       referenceId: String(req.params.id)
     });

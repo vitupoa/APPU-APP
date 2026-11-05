@@ -1,9 +1,9 @@
-# Additional Fixes Applied ✅
+﻿# Additional Fixes Applied ✅
 
 ## Issues Fixed
 
 ### 1. Database Package Imports ✅
-Fixed incorrect package `com.krieta.com.db` → `com.krieta.db` in:
+Fixed incorrect package `com.runinga.com.db` → `com.runinga.db` in:
 - ChatLocalDataSource.kt
 - DripLocalDataSource.kt
 - ProductLocalDataSource.kt

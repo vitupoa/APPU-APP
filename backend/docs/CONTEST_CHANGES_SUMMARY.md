@@ -1,4 +1,4 @@
-# Contest System Changes Summary
+﻿# Contest System Changes Summary
 
 ## Overview
 This document summarizes all changes made to implement the complete contest judging system, fix airdrop fees, and add currency conversion for prize display.
@@ -36,16 +36,16 @@ model judge_scores {
 #### Fixed Airdrop Fee Calculation
 ```typescript
 // OLD (Missing airdrop fees)
-const totalChargedKr = new Prisma.Decimal(
-  data.prizeTotalKr + platformFeeKr + totalDailyPrizePool + airdropTotalPool
+const totalChargedRc = new Prisma.Decimal(
+  data.prizeTotalRc + platformFeeRc + totalDailyPrizePool + airdropTotalPool
 );
 
 // NEW (Includes 15% fee on airdrops and daily prizes)
 const dailyPrizePlatformFee = totalDailyPrizePool * PLATFORM_FEE_RATE;
 const airdropPlatformFee = airdropTotalPool * PLATFORM_FEE_RATE;
 
-const totalChargedKr = new Prisma.Decimal(
-  data.prizeTotalKr + platformFeeKr + 
+const totalChargedRc = new Prisma.Decimal(
+  data.prizeTotalRc + platformFeeRc + 
   totalDailyPrizePool + dailyPrizePlatformFee + 
   airdropTotalPool + airdropPlatformFee
 );
@@ -82,12 +82,12 @@ const totalChargedKr = new Prisma.Decimal(
    - Unlocks winner wallet
 
 7. **`getPrizeBreakdown(contestId, userCurrency)`**
-   - Returns prize amounts in Kr and user's local currency
+   - Returns prize amounts in Rc and user's local currency
    - Uses real-time exchange rates
 
 8. **`listContests(params)`** (Modified)
    - Added `userCurrency` parameter
-   - Returns prizes in both Kr and fiat currency
+   - Returns prizes in both Rc and fiat currency
 
 9. **`getContestById(contestId, userId?, userCurrency?)`** (Modified)
    - Added `userCurrency` parameter
@@ -186,7 +186,7 @@ Body: { winnerIds?: string[] }
 7. **Currency Conversion** - IMPLEMENTED
    - Real-time exchange rates
    - Prize display in user's local currency
-   - Fiat-first display (Kr secondary)
+   - Fiat-first display (Rc secondary)
    - Prize breakdown API
 
 ## API Changes Summary

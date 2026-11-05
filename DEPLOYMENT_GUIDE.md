@@ -1,4 +1,4 @@
-# 🚀 KRIETA SECURITY & FEATURES - FINAL DEPLOYMENT GUIDE
+﻿# 🚀 RUNINGA SECURITY & FEATURES - FINAL DEPLOYMENT GUIDE
 
 ## ✅ COMPLETED IMPLEMENTATIONS
 
@@ -29,7 +29,7 @@
 # 1. Add to .env file
 FIELD_ENCRYPTION_KEY=<generate-new-key>
 REQUEST_SIGNING_KEY=<existing-or-generate-new>
-CORS_ORIGIN=https://krieta.com,https://www.krieta.com,https://admin.krieta.com
+CORS_ORIGIN=https://runinga.com,https://www.runinga.com,https://admin.runinga.com
 PAYSTACK_SECRET_KEY=<your-paystack-secret>
 MPESA_SECRET_KEY=<your-mpesa-secret>
 PAYPAL_SECRET_KEY=<your-paypal-secret>
@@ -453,7 +453,7 @@ git push origin main
 # 3. Railway will auto-deploy
 
 # 4. Verify deployment
-curl https://krieta-backend.up.railway.app/health
+curl https://runinga-backend.up.railway.app/health
 
 # 5. Run RLS migration on production
 psql -h centerbeam.proxy.rlwy.net -p 12988 -U postgres -d railway -f backend/prisma/migrations/implement_rls.sql

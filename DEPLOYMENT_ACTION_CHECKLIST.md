@@ -1,4 +1,4 @@
-# 🚀 FINAL ACTION CHECKLIST
+﻿# 🚀 FINAL ACTION CHECKLIST
 
 ## ✅ WHAT'S DONE
 
@@ -144,7 +144,7 @@ jadx composeApp/build/outputs/apk/release/composeApp-release.apk
 
 **Get Certificate Pin**:
 ```bash
-openssl s_client -connect api.krieta.com:443 | \
+openssl s_client -connect api.runinga.com:443 | \
 openssl x509 -pubkey -noout | \
 openssl pkey -pubin -outform der | \
 openssl dgst -sha256 -binary | \
@@ -152,10 +152,10 @@ openssl enc -base64
 ```
 
 **Update Config**:
-Edit `composeApp/src/androidMain/kotlin/com/krieta/com/security/CertificatePinningConfig.kt`:
+Edit `composeApp/src/androidMain/kotlin/com/runinga/com/security/CertificatePinningConfig.kt`:
 ```kotlin
-.add("api.krieta.com", "sha256/YOUR_PIN_HERE=")
-.add("api.krieta.com", "sha256/BACKUP_PIN_HERE=")
+.add("api.runinga.com", "sha256/YOUR_PIN_HERE=")
+.add("api.runinga.com", "sha256/BACKUP_PIN_HERE=")
 ```
 
 **Enable in HTTP Client**:

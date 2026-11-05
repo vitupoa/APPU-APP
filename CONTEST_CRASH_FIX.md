@@ -1,4 +1,4 @@
-# Contest Creation Form Crash Fix
+﻿# Contest Creation Form Crash Fix
 
 ## Problem
 The app was crashing when clicking the "Next" button in the create contest form (Step 1 → Step 2 transition).
@@ -177,12 +177,12 @@ To proceed from Step 1 to Step 2, the following fields must be valid:
 
 ## Files Modified
 
-1. `composeApp/src/commonMain/kotlin/com/krieta/feature/contests/presentation/viewmodel/CreateContestViewModel.kt`
+1. `composeApp/src/commonMain/kotlin/com/runinga/feature/contests/presentation/viewmodel/CreateContestViewModel.kt`
    - Enhanced `nextStep()` function
    - Added try-catch to `validateStep1()`
    - Improved `duration` calculation
 
-2. `composeApp/src/commonMain/kotlin/com/krieta/feature/contests/presentation/screen/CreateContestScreen.kt`
+2. `composeApp/src/commonMain/kotlin/com/runinga/feature/contests/presentation/screen/CreateContestScreen.kt`
    - Added error clearing on continue button click
 
 ## Next Steps

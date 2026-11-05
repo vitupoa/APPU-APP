@@ -1,10 +1,10 @@
-# Security Middleware Integration Map
+﻿# Security Middleware Integration Map
 
 ## 🗺️ Visual Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     KRIETA BACKEND API                          │
+│                     RUNINGA BACKEND API                          │
 │                   Security Layer Integration                     │
 └─────────────────────────────────────────────────────────────────┘
 

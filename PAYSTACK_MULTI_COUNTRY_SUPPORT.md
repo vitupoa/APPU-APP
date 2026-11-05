@@ -1,4 +1,4 @@
-# PAYSTACK MULTI-COUNTRY SUPPORT DOCUMENTATION
+﻿# PAYSTACK MULTI-COUNTRY SUPPORT DOCUMENTATION
 
 ## Overview
 Paystack bank transfer withdrawals are now supported in **4 African countries** where Paystack operates and accepts bank transfers.
@@ -233,7 +233,7 @@ Content-Type: application/json
 5. **Verify Account:** 
    - For NG, GH, ZA: Real-time verification shows account name
    - For KE: Warning message shown (no verification available)
-6. **Enter Amount:** User enters withdrawal amount in Kr
+6. **Enter Amount:** User enters withdrawal amount in Rc
 7. **Submit:** Withdrawal processed with automatic currency conversion
 
 ### UI Components
@@ -264,10 +264,10 @@ ExposedDropdownMenuBox {
 ```kotlin
 if (country == "KE") {
     Card(colors = CardDefaults.cardColors(
-        containerColor = KrietaColors.Warning.copy(alpha = 0.1f)
+        containerColor = RuningaColors.Warning.copy(alpha = 0.1f)
     )) {
         Row {
-            Icon(ic_info, tint = KrietaColors.Warning)
+            Icon(ic_info, tint = RuningaColors.Warning)
             Text("Account verification not available for Kenya. Please ensure account details are correct.")
         }
     }
@@ -367,10 +367,10 @@ curl -X POST http://localhost:3000/api/v1/payments/withdraw \
 
 ## Currency Conversion
 
-The system automatically converts Kr to local currency based on the selected country:
+The system automatically converts Rc to local currency based on the selected country:
 
 ```typescript
-// Example conversion rates (1 Kr = $0.01 USD)
+// Example conversion rates (1 Rc = $0.01 USD)
 const conversionRates = {
   'NGN': 1600,  // 1 USD = 1600 NGN
   'GHS': 15,    // 1 USD = 15 GHS
@@ -378,7 +378,7 @@ const conversionRates = {
   'KES': 130    // 1 USD = 130 KES
 };
 
-// User withdraws 10,000 Kr = $100 USD
+// User withdraws 10,000 Rc = $100 USD
 // Nigeria: 100 * 1600 = 160,000 NGN
 // Ghana: 100 * 15 = 1,500 GHS
 // South Africa: 100 * 18 = 1,800 ZAR

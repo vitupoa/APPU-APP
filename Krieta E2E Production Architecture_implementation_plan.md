@@ -1,4 +1,4 @@
-# Krieta E2E Production Architecture Plan
+﻿# Runinga E2E Production Architecture Plan
 
 This document details the comprehensive implementation phases merging the newly requested Backend scaling functionality (Security, Storage, Real-time messaging) and mapping the currently disconnected KMP Frontend Repository Modules organically to Live Express APIs operating concurrently down to your newly minted Railway PostgreSQL database.
 
@@ -10,8 +10,8 @@ This document details the comprehensive implementation phases merging the newly 
 
 ## Phase 2: Restructuring Cloudinary Multi-Module Hierarchy
 Rewrite configurations inside `src/config/cloudinary.ts` and their respective upload routes. 
-- Overhaul upload definitions to natively resolve to dynamic module schemas explicitly defined natively: `Krieta/{Module}/(Videos|Images|Audio)`.
-- **Thumbnail Auto-generation Strategy**: Adapt generation utilities allocating dedicated configurations isolating files into their localized directories specifically natively mapping images inside `Krieta/{Module}/Images/thumbnail` and videos into `Krieta/{Module}/Videos/thumbnail` seamlessly mapping associations without external clutter issues.
+- Overhaul upload definitions to natively resolve to dynamic module schemas explicitly defined natively: `Runinga/{Module}/(Videos|Images|Audio)`.
+- **Thumbnail Auto-generation Strategy**: Adapt generation utilities allocating dedicated configurations isolating files into their localized directories specifically natively mapping images inside `Runinga/{Module}/Images/thumbnail` and videos into `Runinga/{Module}/Videos/thumbnail` seamlessly mapping associations without external clutter issues.
 
 ## Phase 3: Redis WebSocket Event Pipeline
 Convert the generic Socket.io single-server configuration located in `index.ts` to a clustered production-ready implementation leveraging Railway's natively provisioned Redis engine.

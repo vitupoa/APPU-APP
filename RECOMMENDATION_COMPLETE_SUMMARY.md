@@ -1,4 +1,4 @@
-# ✅ RECOMMENDATION SYSTEM - COMPLETE IMPLEMENTATION SUMMARY
+﻿# ✅ RECOMMENDATION SYSTEM - COMPLETE IMPLEMENTATION SUMMARY
 
 ## 🎉 ALL BACKEND TASKS COMPLETED (100%)
 
@@ -142,7 +142,7 @@ startTrendingTopicsWorker();       // Every 15 minutes
 ## 📱 FRONTEND IMPLEMENTATION GUIDE
 
 ### Step 1: Add Repository Methods
-**Location**: `composeApp/src/commonMain/kotlin/com/krieta/data/repository/FeedRepositoryImpl.kt`
+**Location**: `composeApp/src/commonMain/kotlin/com/runinga/data/repository/FeedRepositoryImpl.kt`
 
 ```kotlin
 override suspend fun getDiscoverFeed(limit: Int, cursor: String?): NetworkResult<DiscoverFeedResult> {
@@ -194,7 +194,7 @@ override suspend fun trackInteraction(
 ```
 
 ### Step 2: Initialize Distribution on Upload
-**Location**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/presentation/viewmodel/CreateShortViewModel.kt`
+**Location**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/presentation/viewmodel/CreateShortViewModel.kt`
 
 Add after successful upload:
 

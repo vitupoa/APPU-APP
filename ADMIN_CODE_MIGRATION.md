@@ -1,4 +1,4 @@
-# Admin Code Migration Summary
+﻿# Admin Code Migration Summary
 
 ## Overview
 Identified and migrated admin-only functionality from the mobile app to the standalone admin dashboard (rembrandt-rar).
@@ -55,7 +55,7 @@ Admin management screens were incorrectly implemented in the user-facing mobile 
 
 #### Deleted Files:
 ```
-composeApp/src/commonMain/kotlin/com/krieta/feature/admin/
+composeApp/src/commonMain/kotlin/com/runinga/feature/admin/
 ├── data/
 │   └── repository/
 │       └── AdManagementRepositoryImpl.kt

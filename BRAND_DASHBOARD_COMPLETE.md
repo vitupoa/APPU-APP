@@ -1,4 +1,4 @@
-# Brand Dashboard - Implementation Complete ✅
+﻿# Brand Dashboard - Implementation Complete ✅
 
 ## Overview
 Complete brand dashboard for managing sponsored campaigns in the mobile app with ViewModels for state management.
@@ -117,12 +117,12 @@ when (state) {
 **Currency Conversion**:
 ```kotlin
 val exchangeRate by currencyProvider.exchangeRate.collectAsState()
-val budgetKr = budgetFiat.toDouble() * exchangeRate
+val budgetRc = budgetFiat.toDouble() * exchangeRate
 
 OutlinedTextField(
     value = budgetFiat,
     label = { Text("Budget ($currencyCode)") },
-    supportingText = { Text("≈ $budgetKr KR") }
+    supportingText = { Text("≈ $budgetRc KR") }
 )
 ```
 
@@ -312,11 +312,11 @@ val exchangeRate = 130.0 // 1 USD = 130 KR
 val budgetFiat = 100.0 // USD
 
 // Convert to KR
-val budgetKr = budgetFiat * exchangeRate // 13000 KR
+val budgetRc = budgetFiat * exchangeRate // 13000 KR
 
 // Display both values
 Text("Budget: $budgetFiat $currencyCode")
-Text("≈ $budgetKr KR", color = Primary)
+Text("≈ $budgetRc KR", color = Primary)
 ```
 
 ### Supported Currencies

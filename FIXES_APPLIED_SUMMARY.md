@@ -1,4 +1,4 @@
-# Fixes Applied Summary
+﻿# Fixes Applied Summary
 
 ## Issue 1: Niche Selection Required on Signup ✅ FIXED
 
@@ -68,7 +68,7 @@ App crashes when clicking the marketplace card in the explore tab.
 ### Analysis
 The ExploreScreen in Tabs.kt correctly navigates to:
 ```kotlin
-onClick = { navigator.push(com.krieta.feature.marketplace.presentation.screen.MarketplaceHomeScreen()) }
+onClick = { navigator.push(com.runinga.feature.marketplace.presentation.screen.MarketplaceHomeScreen()) }
 ```
 
 The MarketplaceHomeScreen class exists and is properly implemented.
@@ -112,10 +112,10 @@ The frontend was sending `recipientId` (camelCase) but the backend expected `rec
 ### Files Modified
 
 #### Frontend (Kotlin)
-1. `composeApp/src/commonMain/kotlin/com/krieta/feature/auth/presentation/viewmodel/RegisterViewModel.kt`
-2. `composeApp/src/commonMain/kotlin/com/krieta/feature/auth/presentation/screen/RegisterScreen.kt`
-3. `composeApp/src/commonMain/kotlin/com/krieta/feature/auth/data/remote/dto/AuthDtos.kt`
-4. `composeApp/src/commonMain/kotlin/com/krieta/feature/chat/data/remote/dto/ChatDtos.kt`
+1. `composeApp/src/commonMain/kotlin/com/runinga/feature/auth/presentation/viewmodel/RegisterViewModel.kt`
+2. `composeApp/src/commonMain/kotlin/com/runinga/feature/auth/presentation/screen/RegisterScreen.kt`
+3. `composeApp/src/commonMain/kotlin/com/runinga/feature/auth/data/remote/dto/AuthDtos.kt`
+4. `composeApp/src/commonMain/kotlin/com/runinga/feature/chat/data/remote/dto/ChatDtos.kt`
 
 #### Backend (TypeScript)
 1. `backend/src/modules/auth/auth.validation.ts`

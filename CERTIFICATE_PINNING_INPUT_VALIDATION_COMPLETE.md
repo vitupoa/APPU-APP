@@ -1,4 +1,4 @@
-# Certificate Pinning & Input Validation Implementation Complete
+﻿# Certificate Pinning & Input Validation Implementation Complete
 
 ## Executive Summary
 
@@ -41,7 +41,7 @@
 #### Configuration
 ```kotlin
 object CertificatePinningConfig {
-    const val API_HOSTNAME = "api.krieta.com"
+    const val API_HOSTNAME = "api.runinga.com"
     
     val CERTIFICATE_PINS = listOf(
         "sha256/PRIMARY_CERT_PIN_HERE",
@@ -56,7 +56,7 @@ object CertificatePinningConfig {
 #### How to Generate Pins
 ```bash
 # 1. Get certificate
-openssl s_client -connect api.krieta.com:443 < /dev/null | openssl x509 -outform DER > cert.der
+openssl s_client -connect api.runinga.com:443 < /dev/null | openssl x509 -outform DER > cert.der
 
 # 2. Extract public key and generate pin
 openssl x509 -in cert.der -inform DER -pubkey -noout | openssl pkey -pubin -outform DER | openssl dgst -sha256 -binary | openssl base64
@@ -164,13 +164,13 @@ fun updateName(value: String) {
 ## Files Modified
 
 ### New Files (4)
-1. `com/krieta/com/core/security/pinning/CertificatePinningConfig.kt`
-2. `com/krieta/com/core/security/pinning/CertificatePinner.kt`
+1. `com/runinga/com/core/security/pinning/CertificatePinningConfig.kt`
+2. `com/runinga/com/core/security/pinning/CertificatePinner.kt`
 3. `androidMain/.../security/pinning/CertificatePinner.android.kt`
 4. `iosMain/.../security/pinning/CertificatePinner.ios.kt`
 
 ### Modified Files (4)
-1. `com/krieta/com/core/network/KtorClient.kt`
+1. `com/runinga/com/core/network/KtorClient.kt`
 2. `feature/chat/presentation/room/ChatRoomViewModel.kt`
 3. `feature/contests/presentation/viewmodel/CreateContestViewModel.kt`
 4. `feature/chama/presentation/wizard/CreateChamaViewModel.kt`

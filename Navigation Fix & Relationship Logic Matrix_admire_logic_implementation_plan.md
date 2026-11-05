@@ -1,4 +1,4 @@
-# Navigation Fix & Relationship Logic Matrix
+﻿# Navigation Fix & Relationship Logic Matrix
 
 ## Background
 Currently, attempting to open a searched user's profile from the Explore Tab invokes a crash due to `TabNavigator` implicitly catching the `.push()` invocation rather than a stack-based Navigator. Additionally, the Profile UI needs to implement a robust state machine for follow relationships to differentiate one-way follows ("Admiring", "Love") and mutual relationships ("Lovers" -> "Unlove").
@@ -13,21 +13,21 @@ Currently, attempting to open a searched user's profile from the Explore Tab inv
 ---
 
 ### Navigation Engine
-#### [MODIFY] [Tabs.kt](file:///c:/Users/ADMIN/Krieta/composeApp/src/commonMain/kotlin/com/krieta/com/core/navigation/Tabs.kt)
+#### [MODIFY] [Tabs.kt](file:///c:/Users/ADMIN/Runinga/composeApp/src/commonMain/kotlin/com/runinga/com/core/navigation/Tabs.kt)
 - Update `navigator.parent ?: navigator` to dynamically seek the absolute Root Navigator via `navigator.parent?.parent ?: navigator`.
 - This ensures the pushed profile bypasses the `TabNavigator` restrictions, successfully avoiding `UnsupportedOperationException`. 
 
 ---
 
 ### Profile Relationship State Machine (Mathematical Logic)
-#### [MODIFY] [ProfileViewModel.kt](file:///c:/Users/ADMIN/Krieta/composeApp/src/commonMain/kotlin/com/krieta/feature/profile/presentation/viewmodel/ProfileViewModel.kt)
+#### [MODIFY] [ProfileViewModel.kt](file:///c:/Users/ADMIN/Runinga/composeApp/src/commonMain/kotlin/com/runinga/feature/profile/presentation/viewmodel/ProfileViewModel.kt)
 - Update `toggleAdmire()` to transition accurately through the defined states:
   - If `NONE` + toggle -> `ADMIRING`
   - If `ADMIRED_BY` + toggle -> `LOVERS` (Both admire each other)
   - If `ADMIRING` + toggle -> `NONE`
   - If `LOVERS` + toggle -> `ADMIRED_BY` (I drop the relationship, but they still admire me).
 
-#### [MODIFY] [ProfileScreen.kt](file:///c:/Users/ADMIN/Krieta/composeApp/src/commonMain/kotlin/com/krieta/feature/profile/presentation/screen/ProfileScreen.kt)
+#### [MODIFY] [ProfileScreen.kt](file:///c:/Users/ADMIN/Runinga/composeApp/src/commonMain/kotlin/com/runinga/feature/profile/presentation/screen/ProfileScreen.kt)
 - Implement dynamic Relationship Action Button Logic mapping:
   - `RelationshipStatus.ADMIRING` -> **"Unadmire"** (I admire them)
   - `RelationshipStatus.ADMIRED_BY` -> **"Love"** (They admire me, I haven't loved back)

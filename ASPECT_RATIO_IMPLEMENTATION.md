@@ -1,4 +1,4 @@
-# ASPECT RATIO IMPLEMENTATION GUIDE
+﻿# ASPECT RATIO IMPLEMENTATION GUIDE
 
 ## Overview
 Complete implementation of adaptive aspect ratio handling for videos and photos across Shorts, Discover, Admiring, and Contest tabs.
@@ -47,7 +47,7 @@ Update shorts API to include new fields in response:
 
 ### 1. Domain Model Updates
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/shorts/domain/model/ShortsModels.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/shorts/domain/model/ShortsModels.kt`
 
 ```kotlin
 data class Short(
@@ -65,7 +65,7 @@ data class Short(
 ### 2. New Components
 
 #### AdaptiveMediaPlayer
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/com/core/ui/components/AdaptiveMediaPlayer.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/com/core/ui/components/AdaptiveMediaPlayer.kt`
 
 Handles different aspect ratios:
 - **9:16 (Vertical)**: Fills entire screen, no letterboxing
@@ -74,7 +74,7 @@ Handles different aspect ratios:
 - **Photos**: Zoomable with pinch-to-zoom support
 
 #### PhotoCarousel
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/com/core/ui/components/PhotoCarousel.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/com/core/ui/components/PhotoCarousel.kt`
 
 Features:
 - Horizontal swipe navigation
@@ -85,7 +85,7 @@ Features:
 
 ### 3. Updated ImmersivePlayer
 
-**File**: `composeApp/src/commonMain/kotlin/com/krieta/feature/feed/presentation/components/ImmersivePlayerNew.kt`
+**File**: `composeApp/src/commonMain/kotlin/com/runinga/feature/feed/presentation/components/ImmersivePlayerNew.kt`
 
 Now accepts:
 ```kotlin

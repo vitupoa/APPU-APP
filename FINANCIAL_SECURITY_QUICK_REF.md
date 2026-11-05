@@ -1,4 +1,4 @@
-# Financial Security Quick Reference
+﻿# Financial Security Quick Reference
 
 ## 🚨 Golden Rules
 
@@ -208,7 +208,7 @@ single {
 
 ```kotlin
 // In Application class
-class KrietaApp : Application() {
+class RuningaApp : Application() {
     private val offlineModeGuard: OfflineModeGuard by inject()
     
     override fun onCreate() {

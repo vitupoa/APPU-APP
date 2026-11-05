@@ -1,4 +1,4 @@
----
+﻿---
 name: game-art
 description: Game art principles. Visual style selection, asset pipeline, animation workflow.
 allowed-tools: Read, Glob, Grep
@@ -53,7 +53,7 @@ What feeling should the game evoke?
 | Phase | Tool Options | Output |
 |-------|--------------|--------|
 | **Concept** | Paper, Procreate, Photoshop | Reference sheet |
-| **Creation** | Aseprite, Photoshop, Krita | Individual sprites |
+| **Creation** | Aseprite, Photoshop, Rcita | Individual sprites |
 | **Atlas** | TexturePacker, Aseprite | Spritesheet |
 | **Animation** | Spine, DragonBones, Frame-by-frame | Animation data |
 | **Integration** | Engine import | Game-ready assets |
